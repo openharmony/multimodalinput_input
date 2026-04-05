@@ -40,6 +40,16 @@ void TouchEventNormalize::InputDeviceObserver::OnDeviceRemoved(int32_t deviceId)
     TOUCH_EVENT_HDR->OnDeviceRemoved(deviceId);
 }
 
+void TouchEventNormalize::InputDeviceObserver::OnDeviceEnabled(int32_t deviceId)
+{
+    TOUCH_EVENT_HDR->HandleDeviceEnabled(deviceId);
+}
+
+void TouchEventNormalize::InputDeviceObserver::OnDeviceDisabled(int32_t deviceId)
+{
+    TOUCH_EVENT_HDR->HandleDeviceDisabled(deviceId);
+}
+
 TouchEventNormalize::TouchEventNormalize()
 {
     SetUpDeviceObserver();
@@ -296,6 +306,39 @@ void TouchEventNormalize::OnDeviceRemoved(int32_t deviceId)
             processor->OnDeviceRemoved();
         }
     }
+}
+
+void TouchEventNormalize::HandleDeviceEnabled(int32_t deviceId)
+{
+    auto processor = FindProcessor(deviceId);
+    if (processor != nullptr) {
+        processor->OnDeviceEnabled();
+    }
+}
+
+void TouchEventNormalize::HandleDeviceDisabled(int32_t deviceId)
+{
+    auto processor = FindProcessor(deviceId);
+    if (processor != nullptr) {
+        processor->OnDeviceDisabled();
+    }
+}
+
+std::shared_ptr<TransformProcessor> TouchEventNormalize::FindProcessor(int32_t deviceId)
+{
+    auto it = processors_.find(deviceId);
+    if (it != processors_.end()) {
+        return it->second;
+    }
+    it = touchpad_processors_.find(deviceId);
+    if (it != touchpad_processors_.end()) {
+        return it->second;
+    }
+    it = remote_control_processors_.find(deviceId);
+    if (it != remote_control_processors_.end()) {
+        return it->second;
+    }
+    return nullptr;
 }
 } // namespace MMI
 } // namespace OHOS

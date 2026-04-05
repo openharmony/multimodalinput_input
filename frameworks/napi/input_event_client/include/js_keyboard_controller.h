@@ -16,26 +16,23 @@
 #ifndef JS_KEYBOARD_CONTROLLER_H
 #define JS_KEYBOARD_CONTROLLER_H
 
-#include <map>
 #include <memory>
-#include <mutex>
-#include <vector>
 
-#include "key_event.h"
+#include "keyboard_controller_impl.h"
 
 namespace OHOS {
 namespace MMI {
 
 /**
- * @brief Keyboard controller for simulating keyboard operations
+ * @brief NAPI wrapper for KeyboardControllerImpl
  *
- * This class maintains client-side state for key presses.
- * Supports recording and playback scenarios where keys can be pressed repeatedly.
+ * This class is a thin adapter layer that converts JS parameters to C++ calls.
+ * All core logic is delegated to KeyboardControllerImpl.
  */
 class JsKeyboardController {
 public:
     JsKeyboardController();
-    ~JsKeyboardController();
+    ~JsKeyboardController() = default;
 
     /**
      * @brief Press a key
@@ -52,32 +49,8 @@ public:
     int32_t ReleaseKey(int32_t keyCode);
 
 private:
-    /**
-     * @brief Create a KeyEvent with specified action
-     * @param action Key action type (KEY_ACTION_DOWN / KEY_ACTION_UP)
-     * @param keyCode Key code
-     * @return Shared pointer to KeyEvent
-     */
-    std::shared_ptr<KeyEvent> CreateKeyEvent(int32_t action, int32_t keyCode);
-
-    /**
-     * @brief Inject key event to system
-     * @param event Key event to inject
-     * @return RET_OK on success, error code otherwise
-     */
-    int32_t InjectKeyEvent(std::shared_ptr<KeyEvent> event);
-
-    // Currently pressed keys in order (maximum 5)
-    std::vector<int32_t> pressedKeys_;
-
-    // Record the down time for each pressed key
-    std::map<int32_t, int64_t> keyDownTimes_;
-
-    // Mutex to protect state (for thread safety)
-    mutable std::mutex mutex_;
-
-    // Maximum number of simultaneously pressed keys
-    static constexpr size_t MAX_PRESSED_KEYS = 5;
+    // Core implementation instance
+    std::shared_ptr<KeyboardControllerImpl> impl_;
 };
 
 } // namespace MMI

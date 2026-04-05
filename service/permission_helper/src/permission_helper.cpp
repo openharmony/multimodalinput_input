@@ -40,6 +40,7 @@ namespace {
     const std::string KEYBOARD_CONTROLLER_PERMISSION_CODE = "ohos.permission.INPUT_KEYBOARD_CONTROLLER";
     const std::string KEY_EVENT_HOOK_PERMISSION_CODE = "ohos.permission.HOOK_KEY_EVENT";
     const std::string CONTROL_DEVICE_PERMISSION_CODE = "ohos.permission.CONTROL_DEVICE";
+    const std::string MANAGE_EDM_POLICY_PERMISSION_CODE = "ohos.permission.MANAGE_EDM_POLICY";
 } // namespace
 bool PermissionHelper::VerifySystemApp()
 {
@@ -242,6 +243,12 @@ bool PermissionHelper::CheckControlDevice()
 {
     CALL_DEBUG_ENTER;
     return CheckHapPermission(CONTROL_DEVICE_PERMISSION_CODE);
+}
+
+bool PermissionHelper::CheckManageEdmPolicy()
+{
+    CALL_DEBUG_ENTER;
+    return CheckHapPermission(MANAGE_EDM_POLICY_PERMISSION_CODE);
 }
 } // namespace MMI
 } // namespace OHOS

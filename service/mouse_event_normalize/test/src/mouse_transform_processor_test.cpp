@@ -139,7 +139,9 @@ HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_DeletePressedB
     MouseTransformProcessor processor(&env_, deviceId);
     int32_t originButton = 1;
     int32_t mappedButton = 2;
-    processor.buttonMapping_[originButton] = mappedButton;
+    processor.buttonMapping_[originButton] = MouseTransformProcessor::ButtonMappingData {
+        .buttonId_ = mappedButton
+    };
     ASSERT_NO_FATAL_FAILURE(processor.DeletePressedButton(originButton));
 }
 #ifdef OHOS_BUILD_ENABLE_TOUCHPAD

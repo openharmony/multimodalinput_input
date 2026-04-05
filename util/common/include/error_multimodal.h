@@ -156,6 +156,10 @@ enum {
     CAPABILITY_NOT_SUPPORTED,
     // 无相应产品配置或产品配置不合法
     MMI_ERR_NO_PRODUCT_CONFIG,
+    // 输入设备禁用
+    ERROR_INPUT_DEVICE_DISABLED,
+    // 全局输入禁用
+    ERROR_EDU_INPUT_DISABLED,
 };
 } // namespace MMI
 } // namespace OHOS

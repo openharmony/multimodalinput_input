@@ -220,6 +220,7 @@ public:
     int32_t OnGetAllSystemHotkey(std::vector<std::unique_ptr<KeyOption>> &keyOptions);
     ErrCode GetAllSystemHotkeys(std::vector<KeyOption>& keyOptions) override;
     ErrCode SetInputDeviceEnabled(int32_t deviceId, bool enable, int32_t index) override;
+    ErrCode DisableInputEventDispatch(bool disabled) override;
     ErrCode ShiftAppPointerEvent(const ShiftWindowParam &param, bool autoGenDown) override;
     ErrCode SetMultiWindowScreenId(uint64_t screenId, uint64_t displayNodeScreenId) override;
     int32_t SetMultiWindowScreenIdInner(uint64_t screenId, uint64_t displayNodeScreenId);

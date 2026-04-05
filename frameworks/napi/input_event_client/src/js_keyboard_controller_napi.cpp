@@ -59,9 +59,9 @@ napi_value CreateKeyboardController(napi_env env, napi_callback_info info)
     MMI_HILOGD("CreateKeyboardController called");
 
     // Call service to check permission
-    int32_t ret = InputManager::GetInstance()->CreateKeyboardController();
+    int32_t ret = InputManager::GetInstance()->CheckKeyboardControllerPermission();
     if (ret != RET_OK) {
-        MMI_HILOGE("CreateKeyboardController permission check failed, ret=%{public}d", ret);
+        MMI_HILOGE("CheckKeyboardControllerPermission failed, ret=%{public}d", ret);
         THROWERR_CUSTOM(env, ret, "Permission check failed");
         return nullptr;
     }

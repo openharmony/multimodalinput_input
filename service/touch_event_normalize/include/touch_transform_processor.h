@@ -32,6 +32,8 @@ public:
     std::shared_ptr<PointerEvent> OnEvent(struct libinput_event *event) override;
     std::shared_ptr<PointerEvent> GetPointerEvent() override { return pointerEvent_; }
     void OnDeviceRemoved() override;
+    void OnDeviceEnabled() override;
+    void OnDeviceDisabled() override;
 
 private:
     bool OnEventTouchDown(struct libinput_event *event);
@@ -52,12 +54,16 @@ private:
     void RemoveInvalidAreaDownedEvent(int32_t seatSlot);
     bool IsInvalidAreaDownedEvent(int32_t seatSlot);
 #endif // OHOS_BUILD_EXTERNAL_SCREEN
+    void RecordActiveOperations();
+    void CancelAllTouches();
+
 private:
     const int32_t deviceId_ { -1 };
     int32_t processedCount_ { 0 };
     std::shared_ptr<PointerEvent> pointerEvent_ { nullptr };
     std::vector<std::pair<int32_t, int32_t>> vecToolType_;
     std::unordered_map<int32_t, bool> pointerItemCancelMarks_;
+
     Aggregator aggregator_ {
             [](int32_t intervalMs, int32_t repeatCount, std::function<void()> callback) -> int32_t {
                 return TimerMgr->AddTimer(intervalMs, repeatCount, std::move(callback),

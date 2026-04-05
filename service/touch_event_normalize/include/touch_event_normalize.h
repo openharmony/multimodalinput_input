@@ -34,6 +34,8 @@ private:
         void OnDeviceAdded(int32_t deviceId) override {}
         void OnDeviceRemoved(int32_t deviceId) override;
         void UpdatePointerDevice(bool hasPointerDevice, bool isVisible, bool isHotPlug) override {}
+        void OnDeviceEnabled(int32_t deviceId) override;
+        void OnDeviceDisabled(int32_t deviceId) override;
     };
 
     DECLARE_DELAYED_SINGLETON(TouchEventNormalize);
@@ -85,6 +87,9 @@ private:
     void SetUpDeviceObserver();
     void TearDownDeviceObserver();
     void OnDeviceRemoved(int32_t deviceId);
+    void HandleDeviceEnabled(int32_t deviceId);
+    void HandleDeviceDisabled(int32_t deviceId);
+    std::shared_ptr<TransformProcessor> FindProcessor(int32_t deviceId);
 
 private:
     std::map<int32_t, std::shared_ptr<TransformProcessor>> processors_;

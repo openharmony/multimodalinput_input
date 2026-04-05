@@ -27,6 +27,8 @@ public:
     virtual std::shared_ptr<PointerEvent> OnEvent(struct libinput_event *event) = 0;
     virtual std::shared_ptr<PointerEvent> GetPointerEvent() = 0;
     virtual void OnDeviceRemoved() = 0;
+    virtual void OnDeviceEnabled() {}
+    virtual void OnDeviceDisabled() {}
 };
 } // namespace MMI
 } // namespace OHOS

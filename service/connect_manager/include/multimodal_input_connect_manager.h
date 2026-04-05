@@ -113,6 +113,7 @@ public:
     int32_t InjectTouchPadEvent(std::shared_ptr<PointerEvent> pointerEvent, const TouchpadCDG &touchpadCDG,
         bool isNativeInject);
     int32_t CreateMouseController();
+    int32_t CreateKeyboardController();
     int32_t SetAnrObserver();
     int32_t GetFunctionKeyState(int32_t funcKey, bool &state);
     int32_t SetFunctionKeyState(int32_t funcKey, bool enable);
@@ -185,6 +186,7 @@ public:
 
     int32_t GetAllSystemHotkeys(std::vector<std::unique_ptr<KeyOption>> &keyOptions);
     int32_t SetInputDeviceEnabled(int32_t deviceId, bool enable, int32_t index);
+    int32_t DisableInputEventDispatch(bool disabled);
     int32_t ShiftAppPointerEvent(const ShiftWindowParam &param, bool autoGenDown);
     int32_t SetMultiWindowScreenId(uint64_t screenId, uint64_t displayNodeScreenId);
     int32_t SetKnuckleSwitch(bool knuckleSwitch);

@@ -154,11 +154,11 @@ ani_object TaiheInputDeviceUtils::WrapBusinessError(ani_env* env, const std::str
         return nullptr;
     }
 
-    if ((status = env->FindClass("escompat.Error", &cls)) != ANI_OK) {
+    if ((status = env->FindClass("std.core.Error", &cls)) != ANI_OK) {
         MMI_HILOGE("The ani function call failed, status:%{public}d", status);
         return nullptr;
     }
-    if ((status = env->Class_FindMethod(cls, "<ctor>", "C{std.core.String}C{escompat.ErrorOptions}:", &method)) !=
+    if ((status = env->Class_FindMethod(cls, "<ctor>", "C{std.core.String}C{std.core.ErrorOptions}:", &method)) !=
         ANI_OK) {
         MMI_HILOGE("The ani function call failed, status:%{public}d", status);
         return nullptr;
@@ -180,7 +180,7 @@ ani_ref TaiheInputDeviceUtils::CreateBusinessError(ani_env* env, ani_int code, c
         return nullptr;
     }
     ani_method ctor;
-    if ((status = env->Class_FindMethod(cls, "<ctor>", "iC{escompat.Error}:", &ctor)) != ANI_OK) {
+    if ((status = env->Class_FindMethod(cls, "<ctor>", "iC{std.core.Error}:", &ctor)) != ANI_OK) {
         MMI_HILOGE("The ani function call failed, status:%{public}d", status);
         return nullptr;
     }

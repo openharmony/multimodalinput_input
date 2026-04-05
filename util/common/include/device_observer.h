@@ -30,6 +30,8 @@ public:
     virtual void OnDeviceRemoved(int32_t deviceId) {}
     virtual void UpdatePointerDevice(bool hasPointerDevice, bool isVisible, bool isHotPlug) = 0;
     virtual void OnDeviceFirstReportEvent(int32_t deviceId) {}
+    virtual void OnDeviceEnabled(int32_t deviceId) {}
+    virtual void OnDeviceDisabled(int32_t deviceId) {}
 };
 } // namespace MMI
 } // namespace OHOS

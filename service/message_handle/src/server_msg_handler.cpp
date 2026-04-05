@@ -36,6 +36,8 @@
 #endif // SHORTCUT_KEY_MANAGER_ENABLED
 #include "long_press_subscriber_handler.h"
 #include "libinput_adapter.h"
+#include "mouse_event_interface.h"
+#include "permission_helper.h"
 #include "pointer_device_manager.h"
 #include "pointer_motion_acceleration.h"
 #include "time_cost_chk.h"
@@ -135,6 +137,10 @@ void ServerMsgHandler::OnMsgHandler(SessionPtr sess, NetPacket& pkt)
 int32_t ServerMsgHandler::OnInjectKeyEvent(const std::shared_ptr<KeyEvent> keyEvent, int32_t pid, bool isNativeInject)
 {
     CALL_DEBUG_ENTER;
+    if (INPUT_DEV_MGR->IsEduInputDisabled()) {
+        MMI_HILOGW("Edu input is disabled, rejecting event injection for pid=%{public}d", getpid());
+        return ERROR_EDU_INPUT_DISABLED;
+    }
     CHKPR(keyEvent, ERROR_NULL_POINTER);
     keyEvent->UpdateId();
     LogTracer lt(keyEvent->GetId(), keyEvent->GetEventType(), keyEvent->GetKeyAction());
@@ -243,6 +249,10 @@ int32_t ServerMsgHandler::OnInjectPointerEvent(int32_t userId, const std::shared
     int32_t pid, bool isNativeInject, bool isShell, int32_t useCoordinate)
 {
     CALL_DEBUG_ENTER;
+    if (INPUT_DEV_MGR->IsEduInputDisabled()) {
+        MMI_HILOGW("Edu input is disabled, rejecting event injection for pid=%{public}d", getpid());
+        return ERROR_EDU_INPUT_DISABLED;
+    }
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
     LogTracer lt(pointerEvent->GetId(), pointerEvent->GetEventType(), pointerEvent->GetPointerAction());
     if (isNativeInject) {
@@ -258,6 +268,10 @@ int32_t ServerMsgHandler::OnInjectTouchPadEvent(int32_t userId, const std::share
     int32_t pid, const TouchpadCDG& touchpadCDG, bool isNativeInject, bool isShell)
 {
     CALL_DEBUG_ENTER;
+    if (INPUT_DEV_MGR->IsEduInputDisabled()) {
+        MMI_HILOGW("Edu input is disabled, rejecting touchpad event injection for pid=%{public}d", getpid());
+        return ERROR_EDU_INPUT_DISABLED;
+    }
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
     LogTracer lt(pointerEvent->GetId(), pointerEvent->GetEventType(), pointerEvent->GetPointerAction());
     if (isNativeInject) {
@@ -347,6 +361,35 @@ int32_t ServerMsgHandler::OnInjectPointerEventExt(int32_t userId,
     EndLogTraceId(pointerEvent->GetId());
     pointerEvent->UpdateId();
     LogTracer lt(pointerEvent->GetId(), pointerEvent->GetEventType(), pointerEvent->GetPointerAction());
+
+    if (pointerEvent->HasFlag(InputEvent::EVENT_FLAG_CALIBRATE_POSITION)) {
+        MMI_HILOGD("Calibrating position for injected event");
+
+        int32_t currentDisplayId = 0;
+        double currentX = 0.0;
+        double currentY = 0.0;
+
+        int32_t ret = MouseEventHdr->GetPointerLocation(currentDisplayId, currentX, currentY);
+        if (ret == RET_OK) {
+            PointerEvent::PointerItem item;
+            if (pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), item)) {
+                item.SetDisplayX(static_cast<int32_t>(currentX));
+                item.SetDisplayY(static_cast<int32_t>(currentY));
+                pointerEvent->UpdatePointerItem(pointerEvent->GetPointerId(), item);
+                pointerEvent->SetTargetDisplayId(currentDisplayId);
+
+                MMI_HILOGD("Position calibrated to displayId=%{public}d, x=%{public}d, y=%{public}d",
+                    currentDisplayId, static_cast<int32_t>(currentX), static_cast<int32_t>(currentY));
+            } else {
+                MMI_HILOGE("Failed to get pointer item for calibration");
+            }
+        } else {
+            MMI_HILOGE("Failed to get current pointer location for calibration, ret=%{public}d", ret);
+        }
+
+        pointerEvent->ClearFlag(InputEvent::EVENT_FLAG_CALIBRATE_POSITION);
+    }
+
     auto inputEventNormalizeHandler = InputHandler->GetEventNormalizeHandler();
     CHKPR(inputEventNormalizeHandler, ERROR_NULL_POINTER);
     switch (pointerEvent->GetSourceType()) {

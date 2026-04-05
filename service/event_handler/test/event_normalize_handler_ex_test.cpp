@@ -141,7 +141,7 @@ public:
     void HandleTouchEvent(const std::shared_ptr<PointerEvent> pointerEvent) {}
 };
 
-bool InputDeviceManager::IsInputDeviceEnable(int32_t deviceId)
+bool InputDeviceManager::IsInputDeviceEnable(int32_t deviceId) const
 {
     return true;
 }

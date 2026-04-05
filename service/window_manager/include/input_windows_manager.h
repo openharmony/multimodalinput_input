@@ -310,6 +310,7 @@ private:
         const std::vector<WindowInfo> &newWindowsInfo);
     void UpdateDisplayIdAndName();
     void UpdateCustomStyle(int32_t windowId, PointerStyle pointerStyle);
+    bool ShouldTransformAction(int32_t sourceType, int32_t toolType);
     void UpdatePointerAction(std::shared_ptr<PointerEvent> pointerEvent);
     bool IsNeedDrawPointer(PointerEvent::PointerItem &pointerItem) const;
     bool IsWritePen(PointerEvent::PointerItem &pointerItem) const;
@@ -688,6 +689,7 @@ private:
     std::map<float, std::optional<WindowInfo>> axisBeginWindowInfoMap_;
     std::map<int32_t, int32_t> windowLastEventIdMap_;
     std::shared_ptr<PointerEvent> lastPointerEventRedispatch_ { nullptr };
+    int32_t activeDragToolType_ { -1 };
 };
 } // namespace MMI
 } // namespace OHOS

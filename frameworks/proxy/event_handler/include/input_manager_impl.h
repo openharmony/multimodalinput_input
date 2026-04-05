@@ -132,8 +132,19 @@ public:
     void SimulateTouchPadEvent(std::shared_ptr<PointerEvent> pointerEvent, bool isNativeInject = false);
     void SimulateTouchPadInputEvent(std::shared_ptr<PointerEvent> pointerEvent,
         const TouchpadCDG &touchpadCDG);
-    int32_t CreateMouseController();
-    int32_t CreateKeyboardController();
+
+    /**
+     * @brief Check permission for creating mouse controller (for NAPI layer)
+     * @return RET_OK on success, error code otherwise
+     */
+    int32_t CheckMouseControllerPermission();
+
+    /**
+     * @brief Check permission for creating keyboard controller (for NAPI layer)
+     * @return RET_OK on success, error code otherwise
+     */
+    int32_t CheckKeyboardControllerPermission();
+
     void OnConnected();
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     template<typename T>
@@ -255,6 +266,7 @@ public:
     int32_t GetIntervalSinceLastInput(int64_t &timeInterval);
     int32_t ConvertToCapiKeyAction(int32_t keyAction);
     int32_t SetInputDeviceEnabled(int32_t deviceId, bool enable, std::function<void(int32_t)> callback);
+    int32_t DisableInputEventDispatch(bool disabled);
     int32_t ShiftAppPointerEvent(const ShiftWindowParam &param, bool autoGenDown);
     int32_t CheckKnuckleEvent(float pointX, float pointY, bool &touchType);
     int32_t LaunchAiScreenAbility();
@@ -280,6 +292,19 @@ public:
 #ifdef OHOS_BUILD_ENABLE_ANCO_GAME_EVENT_MAPPING
     int32_t ControlMouseEventToAnco(int32_t windowId, bool enable);
 #endif // OHOS_BUILD_ENABLE_ANCO_GAME_EVENT_MAPPING
+
+    /**
+     * @brief Create mouse controller
+     * @return Shared pointer to MouseControllerImpl, nullptr on failure
+     */
+    std::shared_ptr<class MouseControllerImpl> CreateMouseController();
+
+    /**
+     * @brief Create keyboard controller
+     * @return Shared pointer to KeyboardControllerImpl, nullptr on failure
+     */
+    std::shared_ptr<class KeyboardControllerImpl> CreateKeyboardController();
+
 private:
     int32_t PackScreensInfo(NetPacket &pkt, const std::vector<ScreenInfo>& screens);
     int32_t PackDisplayGroupsInfo(NetPacket &pkt, const std::vector<DisplayGroupInfo> &displayGroups);
