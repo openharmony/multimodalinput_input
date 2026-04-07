@@ -1381,6 +1381,12 @@ CursorPosition InputWindowsManager::ResetCursorPos(const OLD::DisplayGroupInfo &
 #endif // OHOS_BUILD_ENABLE_EXTERNAL_SCREEN
         int32_t x = displayInfo.validWidth * HALF_RATIO;
         int32_t y = displayInfo.validHeight * HALF_RATIO;
+#ifdef OHOS_BUILD_ENABLE_VKEYBOARD
+    if (IsPointerActiveRectValid(displayInfo)) {
+        x = displayInfo->pointerActiveWidth * HALF_RATIO;
+        y = displayInfo->pointerActiveHeight * HALF_RATIO;
+    }
+#endif // OHOS_BUILD_ENABLE_VKEYBOARD
         Direction direction = GetDisplayDirection(&displayInfo);
         if (direction == DIRECTION90 || direction == DIRECTION270) {
             std::swap(x, y);
@@ -7239,6 +7245,12 @@ CursorPosition InputWindowsManager::ResetCursorPos()
 #endif // OHOS_BUILD_ENABLE_EXTERNAL_SCREEN
         int32_t x = displayInfo.validWidth * HALF_RATIO;
         int32_t y = displayInfo.validHeight * HALF_RATIO;
+#ifdef OHOS_BUILD_ENABLE_VKEYBOARD
+    if (IsPointerActiveRectValid(displayInfo)) {
+        x = displayInfo->pointerActiveWidth * HALF_RATIO;
+        y = displayInfo->pointerActiveHeight * HALF_RATIO;
+    }
+#endif // OHOS_BUILD_ENABLE_VKEYBOARD
         Direction displayDirection = GetDisplayDirection(&displayInfo);
         if (displayDirection == DIRECTION90 || displayDirection == DIRECTION270) {
             std::swap(x, y);
