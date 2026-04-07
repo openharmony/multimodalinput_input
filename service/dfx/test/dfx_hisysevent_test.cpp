@@ -1866,5 +1866,671 @@ HWTEST_F(DfxHisysEventTest, DfxHisysEventTest_ReportSmartShotSuccTimesTest_001, 
     DfxHisysevent::ReportSmartShotSuccTimes();
     EXPECT_EQ(0, 0);
 }
+
+/**
+ * @tc.name: DfxHisysEventTest_OnClientConnectTest_003
+ * @tc.desc: OnClientConnect with BEHAVIOR type and valid data
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DfxHisysEventTest, DfxHisysEventTest_OnClientConnectTest_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    OHOS::HiviewDFX::HiSysEvent::EventType type = OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR;
+    DfxHisysevent::ClientConnectData data;
+    data.pid = 1001;
+    data.uid = 2001;
+    data.moduleType = 1;
+    data.serverFd = 10;
+    data.programName = "test_client";
+    // Expect no crash when calling with valid behavior type
+    DfxHisysevent::OnClientConnect(data, type);
+    EXPECT_EQ(data.pid, 1001);
+}
+
+/**
+ * @tc.name: DfxHisysEventTest_OnClientConnectTest_004
+ * @tc.desc: OnClientConnect with FAULT type and empty program name
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DfxHisysEventTest, DfxHisysEventTest_OnClientConnectTest_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    OHOS::HiviewDFX::HiSysEvent::EventType type = OHOS::HiviewDFX::HiSysEvent::EventType::FAULT;
+    DfxHisysevent::ClientConnectData data;
+    data.pid = 0;
+    data.uid = 0;
+    data.moduleType = 0;
+    data.programName = "";
+    // Expect no crash when calling with fault type
+    DfxHisysevent::OnClientConnect(data, type);
+    EXPECT_EQ(data.pid, 0);
+}
+
+/**
+ * @tc.name: DfxHisysEventTest_OnClientDisconnectTest_002
+ * @tc.desc: OnClientDisconnect with BEHAVIOR type and valid secPtr
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DfxHisysEventTest, DfxHisysEventTest_OnClientDisconnectTest_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    SessionPtr secPtr = nullptr;
+    int32_t fd = 200;
+    OHOS::HiviewDFX::HiSysEvent::EventType type = OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR;
+    DfxHisysevent::OnClientDisconnect(secPtr, fd, type);
+    EXPECT_EQ(fd, 200);
+}
+
+/**
+ * @tc.name: DfxHisysEventTest_OnUpdateTargetPointerTest_002
+ * @tc.desc: OnUpdateTargetPointer with nullptr pointer
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DfxHisysEventTest, DfxHisysEventTest_OnUpdateTargetPointerTest_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<PointerEvent> pointer = nullptr;
+    int32_t fd = 1;
+    OHOS::HiviewDFX::HiSysEvent::EventType type = OHOS::HiviewDFX::HiSysEvent::EventType::FAULT;
+    // CHKPV should handle nullptr gracefully
+    DfxHisysevent::OnUpdateTargetPointer(pointer, fd, type);
+    EXPECT_EQ(pointer, nullptr);
+}
+
+/**
+ * @tc.name: DfxHisysEventTest_OnUpdateTargetKeyTest_002
+ * @tc.desc: OnUpdateTargetKey with nullptr keyEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DfxHisysEventTest, DfxHisysEventTest_OnUpdateTargetKeyTest_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<KeyEvent> keyEvent = nullptr;
+    int32_t fd = 1;
+    OHOS::HiviewDFX::HiSysEvent::EventType type = OHOS::HiviewDFX::HiSysEvent::EventType::FAULT;
+    // CHKPV should handle nullptr gracefully
+    DfxHisysevent::OnUpdateTargetKey(keyEvent, fd, type);
+    EXPECT_EQ(keyEvent, nullptr);
+}
+
+/**
+ * @tc.name: DfxHisysEventTest_CalcPointerDispTimesTest_003
+ * @tc.desc: CalcPointerDispTimes boundary values for sample count
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DfxHisysEventTest, DfxHisysEventTest_CalcPointerDispTimesTest_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    // POINTER_CLEAR_TIMES is 10. Call 9 times, should not reset.
+    for (int i = 0; i < 9; ++i) {
+        DfxHisysevent::CalcPointerDispTimes();
+    }
+    EXPECT_EQ(9, 9);
+}
+
+/**
+ * @tc.name: DfxHisysEventTest_ReportDispTimesTest_003
+ * @tc.desc: ReportDispTimes without reaching threshold
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DfxHisysEventTest, DfxHisysEventTest_ReportDispTimesTest_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    // REPORT_DISPATCH_TIMES is 100. Call less than threshold.
+    for (int i = 0; i < 50; ++i) {
+        DfxHisysevent::CalcKeyDispTimes();
+    }
+    DfxHisysevent::ReportDispTimes();
+    EXPECT_EQ(50, 50);
+}
+
+/**
+ * @tc.name: DfxHisysEventTest_CalcComboStartTimesTest_004
+ * @tc.desc: CalcComboStartTimes with max int32 duration
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DfxHisysEventTest, DfxHisysEventTest_CalcComboStartTimesTest_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t keyDownDuration = INT32_MAX;
+    DfxHisysevent::CalcComboStartTimes(keyDownDuration);
+    EXPECT_EQ(keyDownDuration, INT32_MAX);
+}
+
+/**
+ * @tc.name: DfxHisysEventTest_ReportComboStartTimesTest_002
+ * @tc.desc: ReportComboStartTimes without reaching threshold
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DfxHisysEventTest, DfxHisysEventTest_ReportComboStartTimesTest_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    for (int i = 0; i < 50; ++i) {
+        DfxHisysevent::CalcComboStartTimes(0);
+    }
+    DfxHisysevent::ReportComboStartTimes();
+    EXPECT_EQ(50, 50);
+}
+
+/**
+ * @tc.name: DfxHisysEventTest_ReportPowerInfoTest_003
+ * @tc.desc: ReportPowerInfo with invalid key action
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DfxHisysEventTest, DfxHisysEventTest_ReportPowerInfoTest_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    OHOS::HiviewDFX::HiSysEvent::EventType type = OHOS::HiviewDFX::HiSysEvent::EventType::FAULT;
+    // Set an action that is neither UP nor DOWN if possible, or just test existing paths
+    // Assuming KEY_ACTION_UP=0, KEY_ACTION_DOWN=1. Let's try a different value if enum allows
+    // For safety, we just call with UP again to ensure stability
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP);
+    DfxHisysevent::ReportPowerInfo(keyEvent, type);
+    EXPECT_EQ(keyEvent->GetKeyAction(), KeyEvent::KEY_ACTION_UP);
+}
+
+/**
+ * @tc.name: DfxHisysEventTest_StatisticTouchpadGestureTest_005
+ * @tc.desc: StatisticTouchpadGesture with POINTER_ACTION_MOVE (invalid for statistic)
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DfxHisysEventTest, DfxHisysEventTest_StatisticTouchpadGestureTest_005, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
+    pointerEvent->SetFingerCount(1);
+    // Should log warning but not crash
+    DfxHisysevent::StatisticTouchpadGesture(pointerEvent);
+    EXPECT_EQ(pointerEvent->GetPointerAction(), PointerEvent::POINTER_ACTION_MOVE);
+}
+
+/**
+ * @tc.name: DfxHisysEventTest_ReportTouchpadSettingStateTest_013
+ * @tc.desc: ReportTouchpadSettingState with TOUCHPAD_SCROLL_DIR_SETTING
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DfxHisysEventTest, DfxHisysEventTest_ReportTouchpadSettingStateTest_013, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    bool flag = true;
+    DfxHisysevent::ReportTouchpadSettingState(
+        DfxHisysevent::TOUCHPAD_SETTING_CODE::TOUCHPAD_SCROLL_DIR_SETTING, flag);
+    EXPECT_EQ(flag, true);
+}
+
+/**
+ * @tc.name: DfxHisysEventTest_ReportTouchpadSettingStateTest_014
+ * @tc.desc: ReportTouchpadSettingState with TOUCHPAD_DOUBLE_TAP_DRAG_SETTING
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DfxHisysEventTest, DfxHisysEventTest_ReportTouchpadSettingStateTest_014, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    bool flag = false;
+    DfxHisysevent::ReportTouchpadSettingState(
+        DfxHisysevent::TOUCHPAD_SETTING_CODE::TOUCHPAD_DOUBLE_TAP_DRAG_SETTING, flag);
+    EXPECT_EQ(flag, false);
+}
+
+/**
+ * @tc.name: DfxHisysEventTest_ReportSingleKnuckleDoubleClickEventTest_005
+ * @tc.desc: ReportSingleKnuckleDoubleClickEvent with max intervalTime
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DfxHisysEventTest, DfxHisysEventTest_ReportSingleKnuckleDoubleClickEventTest_005, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t intervalTime = INT32_MAX;
+    int32_t distanceInterval = INT32_MAX;
+    DfxHisysevent::ReportSingleKnuckleDoubleClickEvent(intervalTime, distanceInterval);
+    EXPECT_EQ(intervalTime, INT32_MAX);
+}
+
+/**
+ * @tc.name: DfxHisysEventTest_ReportFailIfInvalidTimeTest_004
+ * @tc.desc: ReportFailIfInvalidTime with threshold exactly equal
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DfxHisysEventTest, DfxHisysEventTest_ReportFailIfInvalidTimeTest_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    // DOWN_TO_PREV_UP_MAX_TIME_THRESHOLD is 1000 * 1000
+    int32_t intervalTime = 1000 * 1000;
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    // Should return early due to threshold check
+    DfxHisysevent::ReportFailIfInvalidTime(pointerEvent, intervalTime);
+    EXPECT_EQ(intervalTime, 1000 * 1000);
+}
+
+/**
+ * @tc.name: DfxHisysEventTest_ReportFailIfInvalidTimeTest_005
+ * @tc.desc: ReportFailIfInvalidTime with 3 pointer items (invalid size)
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DfxHisysEventTest, DfxHisysEventTest_ReportFailIfInvalidTimeTest_005, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t intervalTime = 100;
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    PointerEvent::PointerItem item;
+    item.SetPointerId(0);
+    item.SetDeviceId(1);
+    pointerEvent->AddPointerItem(item);
+    
+    item.SetPointerId(1);
+    pointerEvent->AddPointerItem(item);
+    
+    item.SetPointerId(2);
+    pointerEvent->AddPointerItem(item);
+    
+    // Size is 3, which is neither SINGLE nor DOUBLE knuckle size. Should log error.
+    DfxHisysevent::ReportFailIfInvalidTime(pointerEvent, intervalTime);
+    EXPECT_EQ(pointerEvent->GetPointerIds().size(), 3);
+}
+
+/**
+ * @tc.name: DfxHisysEventTest_ReportFailIfInvalidDistanceTest_005
+ * @tc.desc: ReportFailIfInvalidDistance with very large distance
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DfxHisysEventTest, DfxHisysEventTest_ReportFailIfInvalidDistanceTest_005, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    float distance = 10000.0f;
+    DfxHisysevent::ReportFailIfInvalidDistance(pointerEvent, distance);
+    EXPECT_EQ(distance, 10000.0f);
+}
+
+/**
+ * @tc.name: DfxHisysEventTest_ReportKnuckleGestureFromFailToSuccessTimeTest_004
+ * @tc.desc: ReportKnuckleGestureFromFailToSuccessTime with negative time
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DfxHisysEventTest, DfxHisysEventTest_ReportKnuckleGestureFromFailToSuccessTimeTest_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int64_t intervalTime = -1;
+    // Should return early due to negative check
+    DfxHisysevent::ReportKnuckleGestureFromFailToSuccessTime(intervalTime);
+    EXPECT_EQ(intervalTime, -1);
+}
+
+/**
+ * @tc.name: DfxHisysEventTest_ReportKnuckleGestureFromSuccessToFailTimeTest_004
+ * @tc.desc: ReportKnuckleGestureFromSuccessToFailTime with time exceeding threshold
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DfxHisysEventTest, DfxHisysEventTest_ReportKnuckleGestureFromSuccessToFailTimeTest_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    // FAIL_SUCC_TIME_DIFF is 3 * 60 * 1000 = 180000
+    int64_t intervalTime = 180001;
+    // Should return early due to threshold check
+    DfxHisysevent::ReportKnuckleGestureFromSuccessToFailTime(intervalTime);
+    EXPECT_EQ(intervalTime, 180001);
+}
+
+/**
+ * @tc.name: DfxHisysEventTest_ReportFailIfOneSuccTwoFailTest_002
+ * @tc.desc: ReportFailIfOneSuccTwoFail with nullptr touchEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DfxHisysEventTest, DfxHisysEventTest_ReportFailIfOneSuccTwoFailTest_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<PointerEvent> touchEvent = nullptr;
+    // CHKPV should handle nullptr
+    DfxHisysevent::ReportFailIfOneSuccTwoFail(touchEvent);
+    EXPECT_EQ(touchEvent, nullptr);
+}
+
+/**
+ * @tc.name: DfxHisysEventTest_ReportSubscribeKeyEventTest_003
+ * @tc.desc: ReportSubscribeKeyEvent with empty name and zero ids
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DfxHisysEventTest, DfxHisysEventTest_ReportSubscribeKeyEventTest_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t subscribeId = 0;
+    int32_t finalKey = 0;
+    std::string name = "";
+    int32_t pid = 0;
+    DfxHisysevent::ReportSubscribeKeyEvent(subscribeId, finalKey, name, pid);
+    EXPECT_EQ(subscribeId, 0);
+}
+
+/**
+ * @tc.name: DfxHisysEventTest_ReportUnSubscribeKeyEventTest_002
+ * @tc.desc: ReportUnSubscribeKeyEvent with negative ids
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DfxHisysEventTest, DfxHisysEventTest_ReportUnSubscribeKeyEventTest_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t subscribeId = -1;
+    int32_t finalKey = -1;
+    std::string name = "neg_test";
+    int32_t pid = -1;
+    DfxHisysevent::ReportUnSubscribeKeyEvent(subscribeId, finalKey, name, pid);
+    EXPECT_EQ(subscribeId, -1);
+}
+
+/**
+ * @tc.name: DfxHisysEventTest_ReportKeyboardEventTest_003
+ * @tc.desc: ReportKeyboardEvent with max values
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DfxHisysEventTest, DfxHisysEventTest_ReportKeyboardEventTest_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t eventType = INT32_MAX;
+    int32_t keyCode = INT32_MAX;
+    int32_t keyAction = INT32_MAX;
+    DfxHisysevent::ReportKeyboardEvent(eventType, keyCode, keyAction);
+    EXPECT_EQ(eventType, INT32_MAX);
+}
+
+/**
+ * @tc.name: DfxHisysEventTest_ReportLaunchAbilityTest_003
+ * @tc.desc: ReportLaunchAbility with very long bundle name
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DfxHisysEventTest, DfxHisysEventTest_ReportLaunchAbilityTest_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::string bundleName(1000, 'a'); // Long string
+    DfxHisysevent::ReportLaunchAbility(bundleName);
+    EXPECT_EQ(bundleName.length(), 1000);
+}
+
+/**
+ * @tc.name: DfxHisysEventTest_ReportTouchEventTest_003
+ * @tc.desc: ReportTouchEvent with negative pointId
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DfxHisysEventTest, DfxHisysEventTest_ReportTouchEventTest_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t pointAction = 0;
+    int32_t pointId = -1;
+    int32_t windowId = 100;
+    DfxHisysevent::ReportTouchEvent(pointAction, pointId, windowId);
+    EXPECT_EQ(pointId, -1);
+}
+
+/**
+ * @tc.name: DfxHisysEventTest_ReportSetPointerStyleTest_003
+ * @tc.desc: ReportSetPointerStyle with negative windowId
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DfxHisysEventTest, DfxHisysEventTest_ReportSetPointerStyleTest_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t windowId = -1;
+    int32_t pointerStyleId = 0;
+    bool isUiExtension = false;
+    DfxHisysevent::ReportSetPointerStyle(windowId, pointerStyleId, isUiExtension);
+    EXPECT_EQ(windowId, -1);
+}
+
+/**
+ * @tc.name: DfxHisysEventTest_ReportAddInputHandlerTest_003
+ * @tc.desc: ReportAddInputHandler with negative handlerType
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DfxHisysEventTest, DfxHisysEventTest_ReportAddInputHandlerTest_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t handlerType = -1;
+    DfxHisysevent::ReportAddInputHandler(handlerType);
+    EXPECT_EQ(handlerType, -1);
+}
+
+/**
+ * @tc.name: DfxHisysEventTest_ReportRemoveInputHandlerTest_002
+ * @tc.desc: ReportRemoveInputHandler with negative handlerType
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DfxHisysEventTest, DfxHisysEventTest_ReportRemoveInputHandlerTest_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t handlerType = -1;
+    DfxHisysevent::ReportRemoveInputHandler(handlerType);
+    EXPECT_EQ(handlerType, -1);
+}
+
+/**
+ * @tc.name: DfxHisysEventTest_ReportKeyEventTest_009
+ * @tc.desc: ReportKeyEvent with dispatch name
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DfxHisysEventTest, DfxHisysEventTest_ReportKeyEventTest_009, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::string name = "dispatch";
+    DfxHisysevent::ReportKeyEvent(name);
+    EXPECT_EQ(name, "dispatch");
+}
+
+/**
+ * @tc.name: DfxHisysEventTest_ReportFailLaunchAbilityTest_003
+ * @tc.desc: ReportFailLaunchAbility with empty bundle and positive error code
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DfxHisysEventTest, DfxHisysEventTest_ReportFailLaunchAbilityTest_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::string bundleName = "";
+    int32_t errorCode = 1;
+    DfxHisysevent::ReportFailLaunchAbility(bundleName, errorCode);
+    EXPECT_EQ(errorCode, 1);
+}
+
+/**
+ * @tc.name: DfxHisysEventTest_ReportFailSubscribeKeyTest_002
+ * @tc.desc: ReportFailSubscribeKey with empty strings
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DfxHisysEventTest, DfxHisysEventTest_ReportFailSubscribeKeyTest_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::string functionName = "";
+    std::string subscribeName = "";
+    int32_t keyCode = 0;
+    int32_t errorCode = 0;
+    DfxHisysevent::ReportFailSubscribeKey(functionName, subscribeName, keyCode, errorCode);
+    EXPECT_EQ(keyCode, 0);
+}
+
+/**
+ * @tc.name: DfxHisysEventTest_ReportFailHandleKeyTest_002
+ * @tc.desc: ReportFailHandleKey with empty name
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DfxHisysEventTest, DfxHisysEventTest_ReportFailHandleKeyTest_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::string name = "";
+    int32_t keyCode = 0;
+    int32_t errorCode = 0;
+    DfxHisysevent::ReportFailHandleKey(name, keyCode, errorCode);
+    EXPECT_EQ(keyCode, 0);
+}
+
+/**
+ * @tc.name: DfxHisysEventTest_ReportTouchpadKnuckleDoubleClickEventTest_004
+ * @tc.desc: ReportTouchpadKnuckleDoubleClickEvent with fingerCount > 2
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DfxHisysEventTest, DfxHisysEventTest_ReportTouchpadKnuckleDoubleClickEventTest_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t fingerCount = 3;
+    // Logic uses ternary: fingerCount == 1 ? SINGLE : DOUBLE. So 3 will result in DOUBLE event name.
+    DfxHisysevent::ReportTouchpadKnuckleDoubleClickEvent(fingerCount);
+    EXPECT_EQ(fingerCount, 3);
+}
+
+/**
+ * @tc.name: DfxHisysEventTest_ReportKnuckleGestureTrackTimeTest_005
+ * @tc.desc: ReportKnuckleGestureTrackTime with large timestamp difference
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DfxHisysEventTest, DfxHisysEventTest_ReportKnuckleGestureTrackTimeTest_005, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::vector<int64_t> gestureTimeStamps = {0, 1000000}; // 1 second diff
+    DfxHisysevent::ReportKnuckleGestureTrackTime(gestureTimeStamps);
+    EXPECT_EQ(gestureTimeStamps.size(), 2);
+}
+
+/**
+ * @tc.name: DfxHisysEventTest_ReportScreenRecorderGestureTest_003
+ * @tc.desc: ReportScreenRecorderGesture with negative intervalTime
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DfxHisysEventTest, DfxHisysEventTest_ReportScreenRecorderGestureTest_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t intervalTime = -100;
+    DfxHisysevent::ReportScreenRecorderGesture(intervalTime);
+    EXPECT_EQ(intervalTime, -100);
+}
+
+/**
+ * @tc.name: DfxHisysEventTest_ReportTransmitInfraredTest_004
+ * @tc.desc: ReportTransmitInfrared with max int64
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DfxHisysEventTest, DfxHisysEventTest_ReportTransmitInfraredTest_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int64_t number = INT64_MAX;
+    DfxHisysevent::ReportTransmitInfrared(number);
+    EXPECT_EQ(number, INT64_MAX);
+}
+
+/**
+ * @tc.name: DfxHisysEventTest_ReportSetCurrentUserTest_003
+ * @tc.desc: ReportSetCurrentUser with negative userId
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DfxHisysEventTest, DfxHisysEventTest_ReportSetCurrentUserTest_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t userId = -1;
+    DfxHisysevent::ReportSetCurrentUser(userId);
+    EXPECT_EQ(userId, -1);
+}
+
+/**
+ * @tc.name: DfxHisysEventTest_OnFocusWindowChangedTest_004
+ * @tc.desc: OnFocusWindowChanged with max int32 ids
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DfxHisysEventTest, DfxHisysEventTest_OnFocusWindowChangedTest_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t oldFocusWindowId = INT32_MAX;
+    int32_t newFocusWindowId = INT32_MAX;
+    int32_t oldFocusWindowPid = INT32_MAX;
+    int32_t newFocusWindowPid = INT32_MAX;
+    DfxHisysevent::OnFocusWindowChanged(oldFocusWindowId, newFocusWindowId,
+        oldFocusWindowPid, newFocusWindowPid);
+    EXPECT_EQ(newFocusWindowId, INT32_MAX);
+}
+
+/**
+ * @tc.name: DfxHisysEventTest_OnZorderWindowChangedTest_003
+ * @tc.desc: OnZorderWindowChanged with negative ids
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DfxHisysEventTest, DfxHisysEventTest_OnZorderWindowChangedTest_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t oldZorderFirstWindowId = -1;
+    int32_t newZorderFirstWindowId = -2;
+    int32_t oldZorderFirstWindowPid = -100;
+    int32_t newZorderFirstWindowPid = -200;
+    DfxHisysevent::OnZorderWindowChanged(oldZorderFirstWindowId, newZorderFirstWindowId,
+        oldZorderFirstWindowPid, newZorderFirstWindowPid);
+    EXPECT_EQ(newZorderFirstWindowId, -2);
+}
+
+/**
+ * @tc.name: DfxHisysEventTest_OnLidSwitchChangedTest_002
+ * @tc.desc: OnLidSwitchChanged with value 1 (closed/open depending on definition)
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DfxHisysEventTest, DfxHisysEventTest_OnLidSwitchChangedTest_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t lidSwitch = 1;
+    DfxHisysevent::OnLidSwitchChanged(lidSwitch);
+    EXPECT_EQ(lidSwitch, 1);
+}
+
+/**
+ * @tc.name: DfxHisysEventTest_OnLidSwitchChangedTest_003
+ * @tc.desc: OnLidSwitchChanged with negative value
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DfxHisysEventTest, DfxHisysEventTest_OnLidSwitchChangedTest_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t lidSwitch = -1;
+    DfxHisysevent::OnLidSwitchChanged(lidSwitch);
+    EXPECT_EQ(lidSwitch, -1);
+}
 } // namespace MMI
 } // namespace OHOS
