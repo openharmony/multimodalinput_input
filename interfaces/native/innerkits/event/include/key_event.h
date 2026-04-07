@@ -3201,7 +3201,7 @@ public:
     /**
      * Single tapping the smart phone's touch screen event, which is used when the Always On Display is enabled
      *
-     * @since 24
+     * @since 26.0.0
      */
     static const int32_t KEYCODE_AOD_SINGLE_CLICK;
 
