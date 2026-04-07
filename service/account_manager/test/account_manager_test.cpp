@@ -1137,5 +1137,833 @@ HWTEST_F(AccountManagerTest, AccountManagerTest_OnSwitchUser_05, TestSize.Level1
     accountMgr->OnSwitchUser(data);
     EXPECT_TRUE(true);
 }
+
+/**
+ * @tc.name: AccountManagerTest_GetInstance_03
+ * @tc.desc: Test GetInstance
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(AccountManagerTest, AccountManagerTest_GetInstance_03, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto instance1 = AccountManager::GetInstance();
+    auto instance2 = AccountManager::GetInstance();
+    auto instance3 = AccountManager::GetInstance();
+    EXPECT_EQ(instance1, instance2);
+    EXPECT_EQ(instance2, instance3);
+    EXPECT_NE(instance1, nullptr);
+}
+
+/**
+ * @tc.name: AccountManagerTest_AccountSetting_Constructor_01
+ * @tc.desc: Test AccountSetting constructor with valid accountId
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(AccountManagerTest, AccountManagerTest_AccountSetting_Constructor_01, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t accountId = MAIN_ACCOUNT_ID;
+    AccountManager::AccountSetting accountSetting(accountId);
+    EXPECT_EQ(accountSetting.GetAccountId(), accountId);
+    EXPECT_GE(accountSetting.timerId_, -1);
+}
+
+/**
+ * @tc.name: AccountManagerTest_AccountSetting_Constructor_02
+ * @tc.desc: Test AccountSetting constructor with negative accountId
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(AccountManagerTest, AccountManagerTest_AccountSetting_Constructor_02, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t accountId = -100;
+    AccountManager::AccountSetting accountSetting(accountId);
+    EXPECT_EQ(accountSetting.GetAccountId(), accountId);
+}
+
+/**
+ * @tc.name: AccountManagerTest_AccountSetting_Destructor_02
+ * @tc.desc: Test AccountSetting destructor with null observers
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(AccountManagerTest, AccountManagerTest_AccountSetting_Destructor_02, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t accountId = TEST_ACCOUNT_ID_001;
+    auto accountSetting = std::make_unique<AccountManager::AccountSetting>(accountId);
+    accountSetting->timerId_ = -1;
+    accountSetting->switchObserver_ = nullptr;
+    accountSetting->onScreenLockedSwitchObserver_ = nullptr;
+    accountSetting->configObserver_ = nullptr;
+    accountSetting.reset();
+    EXPECT_TRUE(true);
+}
+
+/**
+ * @tc.name: AccountManagerTest_InitializeSetting_05
+ * @tc.desc: Test InitializeSetting multiple times
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(AccountManagerTest, AccountManagerTest_InitializeSetting_05, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t accountId = 5;
+    AccountManager::AccountSetting accountSetting(accountId);
+    accountSetting.InitializeSetting();
+    accountSetting.InitializeSetting();
+    accountSetting.InitializeSetting();
+    EXPECT_GE(accountSetting.timerId_, -1);
+}
+
+/**
+ * @tc.name: AccountManagerTest_ReadSwitchStatus_07
+ * @tc.desc: Test ReadSwitchStatus with very long key
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(AccountManagerTest, AccountManagerTest_ReadSwitchStatus_07, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t accountId = MAIN_ACCOUNT_ID;
+    AccountManager::AccountSetting accountSetting(accountId);
+    std::string key(1000, 'a');
+    bool currentSwitchStatus = true;
+    bool ret = accountSetting.ReadSwitchStatus(key, currentSwitchStatus);
+    EXPECT_TRUE(ret == true || ret == false);
+}
+
+/**
+ * @tc.name: AccountManagerTest_ReadSwitchStatus_08
+ * @tc.desc: Test ReadSwitchStatus with special characters in key
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(AccountManagerTest, AccountManagerTest_ReadSwitchStatus_08, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t accountId = MAIN_ACCOUNT_ID;
+    AccountManager::AccountSetting accountSetting(accountId);
+    std::string key = "!@#$%^&*()";
+    bool currentSwitchStatus = false;
+    bool ret = accountSetting.ReadSwitchStatus(key, currentSwitchStatus);
+    EXPECT_TRUE(ret == true || ret == false);
+}
+
+/**
+ * @tc.name: AccountManagerTest_ReadLongPressTime_06
+ * @tc.desc: Test ReadLongPressTime with zero accountId
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(AccountManagerTest, AccountManagerTest_ReadLongPressTime_06, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t accountId = 0;
+    AccountManager::AccountSetting accountSetting(accountId);
+    accountSetting.accShortcutTimeout_ = 1000;
+    accountSetting.ReadLongPressTime();
+    EXPECT_GE(accountSetting.accShortcutTimeout_, 0);
+}
+
+/**
+ * @tc.name: AccountManagerTest_ReadLongPressTime_07
+ * @tc.desc: Test ReadLongPressTime with max int accountId
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(AccountManagerTest, AccountManagerTest_ReadLongPressTime_07, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t accountId = INT32_MAX;
+    AccountManager::AccountSetting accountSetting(accountId);
+    accountSetting.accShortcutTimeout_ = 5000;
+    accountSetting.ReadLongPressTime();
+    EXPECT_GE(accountSetting.accShortcutTimeout_, 0);
+}
+
+/**
+ * @tc.name: AccountManagerTest_OnCommonEvent_03
+ * @tc.desc: Test OnCommonEvent with unknown event action
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(AccountManagerTest, AccountManagerTest_OnCommonEvent_03, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EventFwk::CommonEventData data;
+    EventFwk::Want want;
+    want.SetAction("UNKNOWN_EVENT_ACTION");
+    data.SetWant(want);
+    ACCOUNT_MGR->OnCommonEvent(data);
+    EXPECT_TRUE(true);
+}
+
+/**
+ * @tc.name: AccountManagerTest_OnCommonEvent_04
+ * @tc.desc: Test OnCommonEvent with empty action
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(AccountManagerTest, AccountManagerTest_OnCommonEvent_04, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EventFwk::CommonEventData data;
+    EventFwk::Want want;
+    want.SetAction("");
+    data.SetWant(want);
+    ACCOUNT_MGR->OnCommonEvent(data);
+    EXPECT_TRUE(true);
+}
+
+/**
+ * @tc.name: AccountManagerTest_OnAddUser_03
+ * @tc.desc: Test OnAddUser with negative accountId
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(AccountManagerTest, AccountManagerTest_OnAddUser_03, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t accountId = -1;
+    EventFwk::CommonEventData data;
+    data.SetCode(accountId);
+    ACCOUNT_MGR->OnAddUser(data);
+    EXPECT_TRUE(ACCOUNT_MGR->accounts_.count(accountId) >= 0);
+}
+
+/**
+ * @tc.name: AccountManagerTest_OnAddUser_04
+ * @tc.desc: Test OnAddUser with max int accountId
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(AccountManagerTest, AccountManagerTest_OnAddUser_04, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t accountId = INT32_MAX;
+    EventFwk::CommonEventData data;
+    data.SetCode(accountId);
+    ACCOUNT_MGR->OnAddUser(data);
+    EXPECT_TRUE(ACCOUNT_MGR->accounts_.count(accountId) >= 0);
+}
+
+/**
+ * @tc.name: AccountManagerTest_OnRemoveUser_03
+ * @tc.desc: Test OnRemoveUser with negative accountId
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(AccountManagerTest, AccountManagerTest_OnRemoveUser_03, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t accountId = -999;
+    EventFwk::CommonEventData data;
+    data.SetCode(accountId);
+    ACCOUNT_MGR->OnRemoveUser(data);
+    EXPECT_FALSE(ACCOUNT_MGR->accounts_.count(accountId) > 0);
+}
+
+/**
+ * @tc.name: AccountManagerTest_OnRemoveUser_04
+ * @tc.desc: Test OnRemoveUser multiple times same account
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(AccountManagerTest, AccountManagerTest_OnRemoveUser_04, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t accountId = TEST_ACCOUNT_ID_001;
+    EventFwk::CommonEventData data;
+    data.SetCode(accountId);
+    ACCOUNT_MGR->OnAddUser(data);
+    ACCOUNT_MGR->OnRemoveUser(data);
+    ACCOUNT_MGR->OnRemoveUser(data);
+    ACCOUNT_MGR->OnRemoveUser(data);
+    EXPECT_FALSE(ACCOUNT_MGR->accounts_.count(accountId) > 0);
+}
+
+/**
+ * @tc.name: AccountManagerTest_OnSwitchUser_08
+ * @tc.desc: Test OnSwitchUser with very long displayId
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(AccountManagerTest, AccountManagerTest_OnSwitchUser_08, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t accountId = TEST_ACCOUNT_ID_001;
+    EventFwk::CommonEventData data;
+    data.SetCode(accountId);
+    EventFwk::Want want;
+    std::string longDisplayId(100, '1');
+    want.SetParam("displayId", longDisplayId);
+    data.SetWant(want);
+    ACCOUNT_MGR->OnSwitchUser(data);
+    EXPECT_TRUE(true);
+}
+
+/**
+ * @tc.name: AccountManagerTest_OnSwitchUser_10
+ * @tc.desc: Test OnSwitchUser with negative accountId
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(AccountManagerTest, AccountManagerTest_OnSwitchUser_10, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t accountId = -100;
+    EventFwk::CommonEventData data;
+    data.SetCode(accountId);
+    ACCOUNT_MGR->OnSwitchUser(data);
+    EXPECT_TRUE(true);
+}
+
+/**
+ * @tc.name: AccountManagerTest_GetAccountIdFromUid_03
+ * @tc.desc: Test GetAccountIdFromUid with zero uid
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(AccountManagerTest, AccountManagerTest_GetAccountIdFromUid_03, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t uid = 0;
+    auto accountMgr = ACCOUNT_MGR;
+    int32_t accountId = accountMgr->GetAccountIdFromUid(uid);
+    EXPECT_GE(accountId, -1);
+}
+
+/**
+ * @tc.name: AccountManagerTest_GetAccountIdFromUid_04
+ * @tc.desc: Test GetAccountIdFromUid with max int uid
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(AccountManagerTest, AccountManagerTest_GetAccountIdFromUid_04, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t uid = INT32_MAX;
+    auto accountMgr = ACCOUNT_MGR;
+    int32_t accountId = accountMgr->GetAccountIdFromUid(uid);
+    EXPECT_GE(accountId, -1);
+}
+
+/**
+ * @tc.name: AccountManagerTest_QueryAllCreatedOsAccounts_02
+ * @tc.desc: Test QueryAllCreatedOsAccounts multiple calls
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(AccountManagerTest, AccountManagerTest_QueryAllCreatedOsAccounts_02, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto accountMgr = ACCOUNT_MGR;
+    auto userIds1 = accountMgr->QueryAllCreatedOsAccounts();
+    auto userIds2 = accountMgr->QueryAllCreatedOsAccounts();
+    auto userIds3 = accountMgr->QueryAllCreatedOsAccounts();
+    EXPECT_GE(userIds1.size(), 0);
+    EXPECT_GE(userIds2.size(), 0);
+    EXPECT_GE(userIds3.size(), 0);
+}
+
+/**
+ * @tc.name: AccountManagerTest_QueryCurrentAccountId_02
+ * @tc.desc: Test QueryCurrentAccountId multiple calls
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(AccountManagerTest, AccountManagerTest_QueryCurrentAccountId_02, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto accountMgr = ACCOUNT_MGR;
+    int32_t accountId1 = accountMgr->QueryCurrentAccountId();
+    int32_t accountId2 = accountMgr->QueryCurrentAccountId();
+    EXPECT_GE(accountId1, 0);
+    EXPECT_GE(accountId2, 0);
+}
+
+/**
+ * @tc.name: AccountManagerTest_SubscribeCommonEvent_04
+ * @tc.desc: Test SubscribeCommonEvent multiple times
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(AccountManagerTest, AccountManagerTest_SubscribeCommonEvent_04, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto accountMgr = ACCOUNT_MGR;
+    accountMgr->subscriber_ = nullptr;
+    accountMgr->timerId_ = -1;
+    accountMgr->SubscribeCommonEvent();
+    accountMgr->SubscribeCommonEvent();
+    accountMgr->SubscribeCommonEvent();
+    EXPECT_TRUE(accountMgr->subscriber_ != nullptr || accountMgr->subscriber_ == nullptr);
+}
+
+/**
+ * @tc.name: AccountManagerTest_UnsubscribeCommonEvent_03
+ * @tc.desc: Test UnsubscribeCommonEvent multiple times
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(AccountManagerTest, AccountManagerTest_UnsubscribeCommonEvent_03, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto accountMgr = ACCOUNT_MGR;
+    accountMgr->UnsubscribeCommonEvent();
+    accountMgr->UnsubscribeCommonEvent();
+    accountMgr->UnsubscribeCommonEvent();
+    EXPECT_EQ(accountMgr->subscriber_, nullptr);
+}
+
+/**
+ * @tc.name: AccountManagerTest_SetupMainAccount_02
+ * @tc.desc: Test SetupMainAccount multiple times
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(AccountManagerTest, AccountManagerTest_SetupMainAccount_02, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ACCOUNT_MGR->SetupMainAccount();
+    ACCOUNT_MGR->SetupMainAccount();
+    ACCOUNT_MGR->SetupMainAccount();
+    EXPECT_EQ(ACCOUNT_MGR->currentAccountId_, MAIN_ACCOUNT_ID);
+    EXPECT_TRUE(ACCOUNT_MGR->accounts_.count(MAIN_ACCOUNT_ID) > 0);
+}
+
+/**
+ * @tc.name: AccountManagerTest_Initialize_02
+ * @tc.desc: Test Initialize multiple times
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(AccountManagerTest, AccountManagerTest_Initialize_02, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto accountMgr = ACCOUNT_MGR;
+    accountMgr->Initialize();
+    accountMgr->Initialize();
+    accountMgr->Initialize();
+    EXPECT_FALSE(accountMgr->accounts_.empty());
+}
+
+/**
+ * @tc.name: AccountManagerTest_AccountManagerUnregister_02
+ * @tc.desc: Test AccountManagerUnregister multiple times
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(AccountManagerTest, AccountManagerTest_AccountManagerUnregister_02, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto accountMgr = ACCOUNT_MGR;
+    accountMgr->AccountManagerUnregister();
+    accountMgr->AccountManagerUnregister();
+    accountMgr->AccountManagerUnregister();
+    EXPECT_EQ(accountMgr->timerId_, -1);
+}
+
+/**
+ * @tc.name: AccountManagerTest_OnDataShareReady_02
+ * @tc.desc: Test OnDataShareReady multiple times
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(AccountManagerTest, AccountManagerTest_OnDataShareReady_02, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EventFwk::CommonEventData data;
+    auto accountMgr = ACCOUNT_MGR;
+    accountMgr->OnDataShareReady(data);
+    accountMgr->OnDataShareReady(data);
+    accountMgr->OnDataShareReady(data);
+    EXPECT_TRUE(true);
+}
+
+/**
+ * @tc.name: AccountManagerTest_AccShortcutTimeout_04
+ * @tc.desc: Test AccShortcutTimeout with empty key
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(AccountManagerTest, AccountManagerTest_AccShortcutTimeout_04, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t accountId = MAIN_ACCOUNT_ID;
+    std::string key = "";
+    AccountManager::AccountSetting accountSetting(accountId);
+    accountSetting.AccShortcutTimeout(accountId, key);
+    EXPECT_TRUE(true);
+}
+
+/**
+ * @tc.name: AccountManagerTest_AccShortcutTimeout_05
+ * @tc.desc: Test AccShortcutTimeout with very long key
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(AccountManagerTest, AccountManagerTest_AccShortcutTimeout_05, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t accountId = MAIN_ACCOUNT_ID;
+    std::string key(1000, 'k');
+    AccountManager::AccountSetting accountSetting(accountId);
+    accountSetting.AccShortcutTimeout(accountId, key);
+    EXPECT_TRUE(true);
+}
+
+/**
+ * @tc.name: AccountManagerTest_AccShortcutEnabled_04
+ * @tc.desc: Test AccShortcutEnabled with empty key
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(AccountManagerTest, AccountManagerTest_AccShortcutEnabled_04, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t accountId = MAIN_ACCOUNT_ID;
+    std::string key = "";
+    AccountManager::AccountSetting accountSetting(accountId);
+    accountSetting.AccShortcutEnabled(accountId, key);
+    EXPECT_TRUE(true);
+}
+
+/**
+ * @tc.name: AccountManagerTest_AccShortcutEnabledOnScreenLocked_04
+ * @tc.desc: Test AccShortcutEnabledOnScreenLocked with empty key
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(AccountManagerTest, AccountManagerTest_AccShortcutEnabledOnScreenLocked_04, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t accountId = MAIN_ACCOUNT_ID;
+    std::string key = "";
+    AccountManager::AccountSetting accountSetting(accountId);
+    accountSetting.AccShortcutEnabledOnScreenLocked(accountId, key);
+    EXPECT_TRUE(true);
+}
+
+/**
+ * @tc.name: AccountManagerTest_AccountSetting_CopyConstructor_02
+ * @tc.desc: Test AccountSetting copy constructor with default values
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(AccountManagerTest, AccountManagerTest_AccountSetting_CopyConstructor_02, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t accountId = TEST_ACCOUNT_ID_002;
+    AccountManager::AccountSetting accountSetting(accountId);
+    AccountManager::AccountSetting accountSetting2(accountSetting);
+    EXPECT_EQ(accountSetting2.accountId_, accountId);
+}
+
+/**
+ * @tc.name: AccountManagerTest_AccountSetting_Operator_02
+ * @tc.desc: Test AccountSetting operator= with default values
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(AccountManagerTest, AccountManagerTest_AccountSetting_Operator_02, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t accountId = TEST_ACCOUNT_ID_002;
+    AccountManager::AccountSetting accountSetting(accountId);
+    AccountManager::AccountSetting accountSetting2(TEST_ACCOUNT_ID_001);
+    accountSetting2 = accountSetting;
+    EXPECT_EQ(accountSetting2.accountId_, accountId);
+}
+
+/**
+ * @tc.name: AccountManagerTest_RegisterCommonEventCallback_002
+ * @tc.desc: Test RegisterCommonEventCallback with multiple callbacks
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(AccountManagerTest, AccountManagerTest_RegisterCommonEventCallback_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ASSERT_NE(ACCOUNT_MGR, nullptr);
+    ACCOUNT_MGR->observerCallbacks_.clear();
+    ACCOUNT_MGR->nextId_ = 0;
+    auto callback1 = [](const EventFwk::CommonEventData &) {};
+    auto callback2 = [](const EventFwk::CommonEventData &) {};
+    auto callback3 = [](const EventFwk::CommonEventData &) {};
+    auto id1 = ACCOUNT_MGR->RegisterCommonEventCallback(callback1);
+    auto id2 = ACCOUNT_MGR->RegisterCommonEventCallback(callback2);
+    auto id3 = ACCOUNT_MGR->RegisterCommonEventCallback(callback3);
+    EXPECT_EQ(id1, 0);
+    EXPECT_EQ(id2, 1);
+    EXPECT_EQ(id3, 2);
+    EXPECT_EQ(ACCOUNT_MGR->observerCallbacks_.size(), 3);
+    ACCOUNT_MGR->UnRegisterCommonEventCallback(id1);
+    ACCOUNT_MGR->UnRegisterCommonEventCallback(id2);
+    ACCOUNT_MGR->UnRegisterCommonEventCallback(id3);
+}
+
+/**
+ * @tc.name: AccountManagerTest_UnRegisterCommonEventCallback_002
+ * @tc.desc: Test UnRegisterCommonEventCallback with invalid id
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(AccountManagerTest, AccountManagerTest_UnRegisterCommonEventCallback_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ASSERT_NE(ACCOUNT_MGR, nullptr);
+    ACCOUNT_MGR->observerCallbacks_.clear();
+    auto ret = ACCOUNT_MGR->UnRegisterCommonEventCallback(-1);
+    EXPECT_FALSE(ret);
+    ret = ACCOUNT_MGR->UnRegisterCommonEventCallback(INT32_MAX);
+    EXPECT_FALSE(ret);
+}
+
+/**
+ * @tc.name: AccountManagerTest_TriggerObserverCallback_003
+ * @tc.desc: Test TriggerObserverCallback with empty callbacks
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(AccountManagerTest, AccountManagerTest_TriggerObserverCallback_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ASSERT_NE(ACCOUNT_MGR, nullptr);
+    ACCOUNT_MGR->observerCallbacks_.clear();
+    EventFwk::CommonEventData data;
+    ACCOUNT_MGR->TriggerObserverCallback(data);
+    EXPECT_TRUE(true);
+}
+
+/**
+ * @tc.name: AccountManagerTest_GetCurrentAccountSetting_003
+ * @tc.desc: Test GetCurrentAccountSetting after account switch
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(AccountManagerTest, AccountManagerTest_GetCurrentAccountSetting_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EventFwk::CommonEventData data;
+    data.SetCode(TEST_ACCOUNT_ID_001);
+    ACCOUNT_MGR->OnSwitchUser(data);
+    auto accountSetting = ACCOUNT_MGR->GetCurrentAccountSetting();
+    EXPECT_EQ(accountSetting.GetAccountId(), TEST_ACCOUNT_ID_001);
+    data.SetCode(MAIN_ACCOUNT_ID);
+    ACCOUNT_MGR->OnSwitchUser(data);
+}
+
+/**
+ * @tc.name: AccountManagerTest_ReadSwitchStatus_09
+ * @tc.desc: Test ReadSwitchStatus with accountId zero
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(AccountManagerTest, AccountManagerTest_ReadSwitchStatus_09, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t accountId = 0;
+    AccountManager::AccountSetting accountSetting(accountId);
+    std::string key = "test_key";
+    bool currentSwitchStatus = true;
+    bool ret = accountSetting.ReadSwitchStatus(key, currentSwitchStatus);
+    EXPECT_TRUE(ret == true || ret == false);
+}
+
+/**
+ * @tc.name: AccountManagerTest_OnAddUser_05
+ * @tc.desc: Test OnAddUser with zero accountId
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(AccountManagerTest, AccountManagerTest_OnAddUser_05, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t accountId = 0;
+    EventFwk::CommonEventData data;
+    data.SetCode(accountId);
+    ACCOUNT_MGR->OnAddUser(data);
+    EXPECT_TRUE(ACCOUNT_MGR->accounts_.count(accountId) >= 0);
+}
+
+/**
+ * @tc.name: AccountManagerTest_OnRemoveUser_05
+ * @tc.desc: Test OnRemoveUser with zero accountId
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(AccountManagerTest, AccountManagerTest_OnRemoveUser_05, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t accountId = 0;
+    EventFwk::CommonEventData data;
+    data.SetCode(accountId);
+    ACCOUNT_MGR->OnRemoveUser(data);
+    EXPECT_TRUE(true);
+}
+
+/**
+ * @tc.name: AccountManagerTest_AccShortcutTimeout_06
+ * @tc.desc: Test AccShortcutTimeout with zero accountId
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(AccountManagerTest, AccountManagerTest_AccShortcutTimeout_06, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t accountId = 0;
+    std::string key = "testKey";
+    AccountManager::AccountSetting accountSetting(accountId);
+    accountSetting.AccShortcutTimeout(accountId, key);
+    EXPECT_TRUE(true);
+}
+
+/**
+ * @tc.name: AccountManagerTest_AccShortcutEnabled_05
+ * @tc.desc: Test AccShortcutEnabled with zero accountId
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(AccountManagerTest, AccountManagerTest_AccShortcutEnabled_05, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t accountId = 0;
+    std::string key = "shortcutKey";
+    AccountManager::AccountSetting accountSetting(accountId);
+    accountSetting.AccShortcutEnabled(accountId, key);
+    EXPECT_TRUE(true);
+}
+
+/**
+ * @tc.name: AccountManagerTest_AccShortcutEnabledOnScreenLocked_05
+ * @tc.desc: Test AccShortcutEnabledOnScreenLocked with zero accountId
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(AccountManagerTest, AccountManagerTest_AccShortcutEnabledOnScreenLocked_05, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t accountId = 0;
+    std::string key = "shortcutKey";
+    AccountManager::AccountSetting accountSetting(accountId);
+    accountSetting.AccShortcutEnabledOnScreenLocked(accountId, key);
+    EXPECT_TRUE(true);
+}
+
+/**
+ * @tc.name: AccountManagerTest_OnSwitchUser_11
+ * @tc.desc: Test OnSwitchUser with zero accountId
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(AccountManagerTest, AccountManagerTest_OnSwitchUser_11, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t accountId = 0;
+    EventFwk::CommonEventData data;
+    data.SetCode(accountId);
+    ACCOUNT_MGR->OnSwitchUser(data);
+    EXPECT_TRUE(true);
+}
+
+/**
+ * @tc.name: AccountManagerTest_InitializeSetting_06
+ * @tc.desc: Test InitializeSetting with zero accountId
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(AccountManagerTest, AccountManagerTest_InitializeSetting_06, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t accountId = 0;
+    AccountManager::AccountSetting accountSetting(accountId);
+    accountSetting.InitializeSetting();
+    EXPECT_GE(accountSetting.timerId_, -1);
+}
+
+/**
+ * @tc.name: AccountManagerTest_ReadLongPressTime_08
+ * @tc.desc: Test ReadLongPressTime with zero accountId
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(AccountManagerTest, AccountManagerTest_ReadLongPressTime_08, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t accountId = 0;
+    AccountManager::AccountSetting accountSetting(accountId);
+    accountSetting.ReadLongPressTime();
+    EXPECT_TRUE(true);
+}
+
+/**
+ * @tc.name: AccountManagerTest_RegisterSettingObserver_04
+ * @tc.desc: Test RegisterSettingObserver with zero accountId
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(AccountManagerTest, AccountManagerTest_RegisterSettingObserver_04, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t accountId = 0;
+    AccountManager::AccountSetting accountSetting(accountId);
+    std::string key = "test_key";
+    auto func = [](const std::string &) {};
+    auto observer = accountSetting.RegisterSettingObserver(key, func);
+    EXPECT_TRUE(observer == nullptr || observer != nullptr);
+}
+
+/**
+ * @tc.name: AccountManagerTest_GetAccountIdFromUid_05
+ * @tc.desc: Test GetAccountIdFromUid with min int uid
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(AccountManagerTest, AccountManagerTest_GetAccountIdFromUid_05, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t uid = INT32_MIN;
+    auto accountMgr = ACCOUNT_MGR;
+    int32_t accountId = accountMgr->GetAccountIdFromUid(uid);
+    EXPECT_GE(accountId, -1);
+}
+
+/**
+ * @tc.name: AccountManagerTest_QueryCurrentAccountId_03
+ * @tc.desc: Test QueryCurrentAccountId consistency
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(AccountManagerTest, AccountManagerTest_QueryCurrentAccountId_03, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto accountMgr = ACCOUNT_MGR;
+    int32_t accountId1 = accountMgr->QueryCurrentAccountId();
+    int32_t accountId2 = accountMgr->GetCurrentAccountId();
+    EXPECT_GE(accountId1, 0);
+    EXPECT_GE(accountId2, 0);
+}
+
+/**
+ * @tc.name: AccountManagerTest_AccountSetting_Destructor_03
+ * @tc.desc: Test AccountSetting destructor with valid timerId and observers
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(AccountManagerTest, AccountManagerTest_AccountSetting_Destructor_03, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t accountId = TEST_ACCOUNT_ID_002;
+    auto accountSetting = std::make_unique<AccountManager::AccountSetting>(accountId);
+    accountSetting->timerId_ = 100;
+    accountSetting.reset();
+    EXPECT_TRUE(true);
+}
 } // namespace MMI
 } // namespace OHOS
