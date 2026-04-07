@@ -1660,9 +1660,13 @@ void PointerDrawingManager::AttachToDisplay()
 {
     CALL_DEBUG_ENTER;
     CHKPV(GetSurfaceNode());
-    if (IsSingleDisplayFoldDevice() && (WIN_MGR->GetDisplayMode() == DisplayMode::MAIN)
-        && (screenId_ == FOLD_SCREEN_ID_FULL)) {
-        screenId_ = FOLD_SCREEN_ID_MAIN;
+    if (IsSingleDisplayFoldDevice()) {
+        auto displayMode = WIN_MGR->GetDisplayMode();
+        if (displayMode == DisplayMode::MAIN && screenId_ == FOLD_SCREEN_ID_FULL) {
+            screenId_ = FOLD_SCREEN_ID_MAIN;
+        } else if (displayMode == DisplayMode::FULL && screenId_ == FOLD_SCREEN_ID_MAIN) {
+            screenId_ = FOLD_SCREEN_ID_FULL;
+        }
     }
     MMI_HILOGI("The screenId_:%{public}" PRIu64"", screenId_);
 
