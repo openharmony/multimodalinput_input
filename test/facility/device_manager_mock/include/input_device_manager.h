@@ -36,6 +36,7 @@ public:
         MOCK_METHOD(struct libinput_device*, GetRawDevice, (), (const));
         MOCK_METHOD(std::string, GetName, (), (const));
         MOCK_METHOD(bool, IsJoystick, (), (const));
+        MOCK_METHOD(bool, IsMouse, (), (const));
     };
 
     void AddInputDevice(int32_t deviceId, std::shared_ptr<IInputDevice> dev);

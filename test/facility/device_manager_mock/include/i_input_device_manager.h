@@ -33,6 +33,7 @@ public:
         virtual struct libinput_device* GetRawDevice() const = 0;
         virtual std::string GetName() const = 0;
         virtual bool IsJoystick() const = 0;
+        virtual bool IsMouse() const = 0;
     };
 
     virtual bool CheckDevice(int32_t deviceId, std::function<bool(const IInputDevice&)> pred) const = 0;

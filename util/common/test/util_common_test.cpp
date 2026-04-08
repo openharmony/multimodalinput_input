@@ -15,6 +15,11 @@
 
 #include <gtest/gtest.h>
 
+#include <fstream>
+
+#include <cJSON.h>
+
+#include "config_policy_utils.h"
 #include "util.h"
 
 #include "accesstoken_kit.h"
@@ -43,14 +48,21 @@ int AccessTokenKit::GetHapTokenInfo(AccessTokenID callerToken, HapTokenInfo& hap
 namespace OHOS {
 namespace MMI {
 namespace {
+using namespace testing;
 using namespace testing::ext;
-using namespace OHOS;
+char g_cfgName[] { "custom_config.json" };
+constexpr std::uintmax_t MAX_SIZE_OF_CONFIG_FILE { 524288 }; // 512KB
 } // namespace
 
 class UtilCommonTest : public testing::Test {
 public:
     static void SetUpTestCase(void) {}
     static void TearDownTestCase(void) {}
+
+private:
+    void SerializeConfig(cJSON *jsonConfig);
+    void BuildConfig4();
+    void BuildConfig5();
 };
 
 /**
@@ -122,6 +134,163 @@ HWTEST_F(UtilCommonTest, GetBundleName_003, TestSize.Level1)
     uint32_t tokenId = 1;
     std::string ret = GetBundleName(tokenId);
     EXPECT_EQ(ret, g_mockBundleName);
+}
+
+/**
+ * @tc.name: LoadConfig_001
+ * @tc.desc: NA
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(UtilCommonTest, LoadConfig_001, TestSize.Level1)
+{
+    NiceMock<ConfigPolicyUtilsMock> cfgPolicyUtils;
+    EXPECT_CALL(cfgPolicyUtils, GetCfgFiles).WillRepeatedly(Return(nullptr));
+
+    char cfgName[] { "config.json" };
+    EXPECT_FALSE(LoadConfig(cfgName, nullptr));
+}
+
+/**
+ * @tc.name: LoadConfig_002
+ * @tc.desc: NA
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(UtilCommonTest, LoadConfig_002, TestSize.Level1)
+{
+    struct CfgFiles cfgFiles {};
+    cfgFiles.paths[0] = g_cfgName;
+
+    NiceMock<ConfigPolicyUtilsMock> cfgPolicyUtils;
+    EXPECT_CALL(cfgPolicyUtils, GetCfgFiles).WillRepeatedly(Return(&cfgFiles));
+
+    char cfgName[] { "config.json" };
+    EXPECT_FALSE(LoadConfig(cfgName, nullptr));
+}
+
+/**
+ * @tc.name: LoadConfig_003
+ * @tc.desc: NA
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(UtilCommonTest, LoadConfig_003, TestSize.Level1)
+{
+    struct CfgFiles cfgFiles {};
+    cfgFiles.paths[0] = g_cfgName;
+
+    NiceMock<ConfigPolicyUtilsMock> cfgPolicyUtils;
+    EXPECT_CALL(cfgPolicyUtils, GetCfgFiles).WillRepeatedly(Return(&cfgFiles));
+
+    char cfgName[] { "config.json" };
+    EXPECT_FALSE(LoadConfig(cfgName,
+        [](const char *cfgPath, cJSON *jsonCfg) {
+            return false;
+        }));
+}
+
+void UtilCommonTest::BuildConfig4()
+{
+    const std::ofstream::pos_type tailPos { MAX_SIZE_OF_CONFIG_FILE };
+    std::ofstream ofs(g_cfgName, std::ios_base::out);
+    if (ofs.is_open()) {
+        ofs.seekp(tailPos);
+        ofs << "tail";
+        ofs.flush();
+        ofs.close();
+    }
+}
+
+/**
+ * @tc.name: LoadConfig_004
+ * @tc.desc: NA
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(UtilCommonTest, LoadConfig_004, TestSize.Level1)
+{
+    BuildConfig4();
+
+    struct CfgFiles cfgFiles {};
+    cfgFiles.paths[0] = g_cfgName;
+
+    NiceMock<ConfigPolicyUtilsMock> cfgPolicyUtils;
+    EXPECT_CALL(cfgPolicyUtils, GetCfgFiles).WillRepeatedly(Return(&cfgFiles));
+
+    char cfgName[] { "config.json" };
+    EXPECT_FALSE(LoadConfig(cfgName,
+        [](const char *cfgPath, cJSON *jsonCfg) {
+            return false;
+        }));
+    std::filesystem::remove(g_cfgName);
+}
+
+void UtilCommonTest::SerializeConfig(cJSON *jsonConfig)
+{
+    if (jsonConfig == nullptr) {
+        return;
+    }
+    auto sConfig = std::unique_ptr<char, std::function<void(char *)>>(
+        cJSON_Print(jsonConfig),
+        [](char *object) {
+            if (object != nullptr) {
+                cJSON_free(object);
+            }
+        });
+    std::ofstream ofs(g_cfgName, std::ios_base::out);
+    if (ofs.is_open()) {
+        ofs << sConfig.get();
+        ofs.flush();
+        ofs.close();
+    }
+}
+
+void UtilCommonTest::BuildConfig5()
+{
+    auto jsonConfig = std::unique_ptr<cJSON, std::function<void(cJSON *)>>(
+        cJSON_CreateObject(),
+        [](cJSON *object) {
+            if (object != nullptr) {
+                cJSON_Delete(object);
+            }
+        });
+    if (jsonConfig == nullptr) {
+        return;
+    }
+    auto jsonTouchscreen = cJSON_CreateObject();
+    if (jsonTouchscreen == nullptr) {
+        return;
+    }
+    if (!cJSON_AddItemToObject(jsonConfig.get(), "touchscreen", jsonTouchscreen)) {
+        cJSON_Delete(jsonTouchscreen);
+        return;
+    }
+    SerializeConfig(jsonConfig.get());
+}
+
+/**
+ * @tc.name: LoadConfig_005
+ * @tc.desc: NA
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(UtilCommonTest, LoadConfig_005, TestSize.Level1)
+{
+    BuildConfig5();
+
+    struct CfgFiles cfgFiles {};
+    cfgFiles.paths[0] = g_cfgName;
+
+    NiceMock<ConfigPolicyUtilsMock> cfgPolicyUtils;
+    EXPECT_CALL(cfgPolicyUtils, GetCfgFiles).WillRepeatedly(Return(&cfgFiles));
+
+    char cfgName[] { "config.json" };
+    EXPECT_TRUE(LoadConfig(cfgName,
+        [](const char *cfgPath, cJSON *jsonCfg) {
+            return true;
+        }));
+    std::filesystem::remove(g_cfgName);
 }
 } // namespace MMI
 } // namespace OHOS
