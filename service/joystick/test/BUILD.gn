@@ -58,7 +58,6 @@ ohos_unittest("JoystickLayoutMapTest") {
     "${mmi_path}/service/joystick/src/joystick_layout_map.cpp",
     "${mmi_path}/service/common/timer_manager/src/timer_manager.cpp",
     "${mmi_path}/service/module_loader/src/input_service_context.cpp",
-    "src/joystick_event_interface_test.cpp",
     "src/joystick_event_normalize_test.cpp",
     "src/joystick_event_processor_test.cpp",
     "src/joystick_layout_map_builder.cpp",

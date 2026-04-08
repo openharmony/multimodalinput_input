@@ -50,6 +50,7 @@ public:
     void BypassChainAndDispatchDirectly(std::shared_ptr<PointerEvent> pointerEvent);
 
 private:
+    bool ShouldDispatchOnDeviceDisabled(struct libinput_event *event) const;
     int32_t OnEventDeviceAdded(libinput_event *event);
     int32_t OnEventDeviceRemoved(libinput_event *event);
     int32_t HandleKeyboardEvent(libinput_event* event);
