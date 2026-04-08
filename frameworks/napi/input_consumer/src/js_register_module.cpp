@@ -47,6 +47,13 @@ static Callbacks callbacks = {};
 static Callbacks hotkeyCallbacks = {};
 static Callbacks keyCommandCallbacks = {};  // SDK 26.0.0 新增：key command 回调
 std::mutex sCallBacksMutex;
+
+// SDK 26.0.0 新增：Key Command 异步工作结构体
+struct KeyCommandWork {
+    sptr<KeyEventMonitorInfo> eventInfo;
+    std::shared_ptr<KeyEvent> keyEvent;
+    uv_work_t work;
+};
 static const std::vector<int32_t> pressKeyCodes = {
     KeyEvent::KEYCODE_ALT_LEFT,
     KeyEvent::KEYCODE_ALT_RIGHT,
@@ -630,9 +637,10 @@ static void OnKeyTriggerCallback(std::shared_ptr<KeyEvent> keyEvent, std::shared
 
     // 判断是否应该消费事件
     if (dispatcher->ShouldConsume(keyOption, keyEvent)) {
-        MMI_HILOGD("Event consumed, not passing to other applications");
-        // 这里应该消费事件，不让它传递给其他应用
-        // 暂时只打印日志，实际消费逻辑需要在 InputManager 层实现
+        MMI_HILOGD("Event consumed, marking as consumed");
+        // 标记事件为已消费，防止传递给其他应用
+        keyEvent->MarkConsumed();
+        return;
     }
 
     // 生成订阅键，查找对应的回调
@@ -661,6 +669,87 @@ static void OnKeyTriggerCallback(std::shared_ptr<KeyEvent> keyEvent, std::shared
     }
 }
 
+// SDK 26.0.0 新增：异步回调执行函数（在主线程中执行）
+static void ExecuteAsyncCallback(uv_work_t* work, int32_t status)
+{
+    CALL_DEBUG_ENTER;
+    CHKPV(work);
+
+    // 获取工作数据
+    KeyCommandWork* cmdWork = reinterpret_cast<KeyCommandWork*>(work->data);
+    CHKPV(cmdWork);
+
+    auto event = cmdWork->eventInfo;
+    auto keyEvent = cmdWork->keyEvent;
+
+    if (event == nullptr || keyEvent == nullptr) {
+        MMI_HILOGE("EventInfo or KeyEvent is nullptr");
+        delete cmdWork;
+        return;
+    }
+
+    napi_env env = event->env;
+    if (env == nullptr) {
+        MMI_HILOGE("Env is nullptr");
+        delete cmdWork;
+        return;
+    }
+
+    // 检查回调是否有效
+    if (event->callback == nullptr) {
+        MMI_HILOGE("Callback is nullptr");
+        delete cmdWork;
+        return;
+    }
+
+    // 在NAPI环境中执行回调
+    napi_handle_scope scope = nullptr;
+    napi_status statusResult = napi_open_handle_scope(env, &scope);
+    if (statusResult != napi_ok) {
+        MMI_HILOGE("Failed to open handle scope");
+        delete cmdWork;
+        return;
+    }
+
+    // 获取回调函数
+    napi_value callback = nullptr;
+    statusResult = napi_get_reference_value(env, event->callback, &callback);
+    if (statusResult != napi_ok || callback == nullptr) {
+        MMI_HILOGE("Failed to get callback reference");
+        napi_close_handle_scope(env, scope);
+        delete cmdWork;
+        return;
+    }
+
+    // 将KeyEvent转换为JavaScript对象
+    napi_value jsKeyEvent = nullptr;
+    if (!KeyEvent2JsKeyEvent(env, keyEvent, jsKeyEvent)) {
+        MMI_HILOGE("Failed to convert KeyEvent to JavaScript object");
+        napi_close_handle_scope(env, scope);
+        delete cmdWork;
+        return;
+    }
+
+    // 调用JavaScript回调函数
+    napi_value result = nullptr;
+    statusResult = napi_call_function(env, nullptr, callback, 1, &jsKeyEvent, &result);
+    if (statusResult != napi_ok) {
+        MMI_HILOGE("Failed to call JavaScript callback");
+    }
+
+    napi_close_handle_scope(env, scope);
+    delete cmdWork;
+}
+
+// SDK 26.0.0 新增：异步工作执行函数（在工作线程中执行）
+static void ExecuteAsyncWork(uv_work_t* work)
+{
+    CALL_DEBUG_ENTER;
+    MMI_HILOGD("KeyCommand async work executing");
+    // 此函数在工作线程中执行，目前不需要额外处理
+    // 实际的回调执行在 ExecuteAsyncCallback 中进行
+}
+
 // SDK 26.0.0 新增：带事件参数的异步回调函数
 void EmitAsyncCallbackWorkWithEvent(sptr<KeyEventMonitorInfo> event, std::shared_ptr<KeyEvent> keyEvent)
 {
@@ -673,16 +762,46 @@ void EmitAsyncCallbackWorkWithEvent(sptr<KeyEventMonitorInfo> event, std::shared
         return;
     }
 
-    // 创建异步工作
+    // 获取环境
     napi_env env = event->env;
     if (env == nullptr) {
         MMI_HILOGE("Env is nullptr");
         return;
     }
 
-    // 这里需要实现异步回调逻辑，暂时简化处理
-    // 实际实现需要使用 uv_queue_work 或 napi_threadsafe_function
-    MMI_HILOGD("EmitAsyncCallbackWorkWithEvent called");
+    // 获取事件循环
+    uv_loop_s* loop = nullptr;
+    napi_status status = napi_get_uv_event_loop(env, &loop);
+    if (status != napi_ok || loop == nullptr) {
+        MMI_HILOGE("Failed to get UV event loop");
+        return;
+    }
+
+    // 创建异步工作数据
+    KeyCommandWork* cmdWork = new (std::nothrow) KeyCommandWork;
+    CHKPV(cmdWork);
+
+    cmdWork->eventInfo = event;
+    cmdWork->keyEvent = keyEvent;
+    cmdWork->work.data = cmdWork;
+
+    // 将工作加入异步队列
+    int ret = uv_queue_work_with_qos_internal(
+        loop,
+        &cmdWork->work,
+        ExecuteAsyncWork,
+        ExecuteAsyncCallback,
+        uv_qos_user_initiated,
+        "onKeyCommand"
+    );
+
+    if (ret != 0) {
+        MMI_HILOGE("Failed to queue async work, error: %{public}d", ret);
+        delete cmdWork;
+        return;
+    }
+
+    MMI_HILOGD("KeyCommand async work queued successfully");
 }
 
 // SDK 26.0.0 新增：订阅 key command 事件
@@ -726,6 +845,61 @@ napi_value SubscribeKeyCommand(napi_env env, napi_callback_info info, sptr<KeyEv
     napi_value ret;
     CHKRP(napi_create_int32(env, RET_OK, &ret), CREATE_INT32);
     return ret;
+}
+
+// SDK 26.0.0 新增：将KeyEvent转换为JavaScript对象
+static bool KeyEvent2JsKeyEvent(napi_env env, std::shared_ptr<KeyEvent> keyEvent, napi_value& jsKeyEvent)
+{
+    CALL_DEBUG_ENTER;
+    CHKPF(keyEvent);
+
+    napi_status status = napi_create_object(env, &jsKeyEvent);
+    if (status != napi_ok) {
+        MMI_HILOGE("Failed to create JavaScript object");
+        return false;
+    }
+
+    // 设置基本属性
+    UtilNapi::SetNamedProperty(env, jsKeyEvent, std::string("keyCode"), keyEvent->GetKeyCode());
+    UtilNapi::SetNamedProperty(env, jsKeyEvent, std::string("action"), keyEvent->GetKeyAction());
+
+    // 获取并设置keyItems属性
+    std::vector<KeyEvent::KeyItem> keyItems;
+    if (keyEvent->GetKeyItems(keyItems)) {
+        napi_value jsKeyItemsArray = nullptr;
+        status = napi_create_array(env, &jsKeyItemsArray);
+        if (status == napi_ok) {
+            for (size_t i = 0; i < keyItems.size(); i++) {
+                napi_value jsKeyItem = nullptr;
+                if (KeyItem2JsKey(env, keyItems[i], jsKeyItem)) {
+                    napi_set_element(env, jsKeyItemsArray, i, jsKeyItem);
+                }
+            }
+            napi_set_named_property(env, jsKeyEvent, "keyItems", jsKeyItemsArray);
+        }
+    }
+
+    MMI_HILOGD("KeyEvent converted to JavaScript object successfully");
+    return true;
+}
+
+// SDK 26.0.0 新增：将KeyItem转换为JavaScript对象
+static bool KeyItem2JsKey(napi_env env, const KeyEvent::KeyItem& keyItem, napi_value& jsKey)
+{
+    CALL_DEBUG_ENTER;
+
+    napi_status status = napi_create_object(env, &jsKey);
+    if (status != napi_ok) {
+        MMI_HILOGE("Failed to create JavaScript object for KeyItem");
+        return false;
+    }
+
+    UtilNapi::SetNamedProperty(env, jsKey, std::string("keyCode"), keyItem.GetKeyCode());
+    UtilNapi::SetNamedProperty(env, jsKey, std::string("action"), keyItem.GetAction());
+    UtilNapi::SetNamedProperty(env, jsKey, std::string("downTime"), keyItem.GetDownTime());
+    UtilNapi::SetNamedProperty(env, jsKey, std::string("deviceId"), keyItem.GetDeviceId());
+
+    return true;
 }
 
 bool GetEventType(napi_env env, napi_callback_info info, sptr<KeyEventMonitorInfo> event, std::string &keyType)
