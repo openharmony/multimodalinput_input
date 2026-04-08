@@ -94,6 +94,16 @@ void KeyOption::SetPriority(int32_t priority)
     priority_ = priority;
 }
 
+int32_t KeyOption::GetTriggerType() const
+{
+    return triggerType_;
+}
+
+void KeyOption::SetTriggerType(int32_t triggerType)
+{
+    triggerType_ = triggerType;
+}
+
 bool KeyOption::ReadFromParcel(Parcel &in)
 {
     int32_t preKeysSize = 0;
@@ -117,7 +127,8 @@ bool KeyOption::ReadFromParcel(Parcel &in)
         in.ReadInt32(finalKeyDownDuration_) &&
         in.ReadInt32(finalKeyUpDelay_) &&
         in.ReadBool(isRepeat_) &&
-        in.ReadInt32(priority_)
+        in.ReadInt32(priority_) &&
+        in.ReadInt32(triggerType_)  // 新增：读取 triggerType
     );
 }
 
@@ -139,7 +150,8 @@ bool KeyOption::WriteToParcel(Parcel &out) const
         out.WriteInt32(finalKeyDownDuration_) &&
         out.WriteInt32(finalKeyUpDelay_) &&
         out.WriteBool(isRepeat_) &&
-        out.WriteInt32(priority_)
+        out.WriteInt32(priority_) &&
+        out.WriteInt32(triggerType_)  // 新增：写入 triggerType
     );
 }
 
