@@ -43,6 +43,7 @@ enum NapiErrorCode : int32_t {
     COMMON_KEYBOARD_DEVICE_NOT_EXIST = 3900002,
     COMMON_NON_INPUT_APPLICATION = 3900003,
     ERROR_WINDOW_ID_PERMISSION_DENIED = 26500001,
+    INPUT_SERVICE_EXCEPTION = 38000001,
 };
 
 const std::map<int32_t, NapiError> NAPI_ERRORS = {
@@ -61,6 +62,7 @@ const std::map<int32_t, NapiError> NAPI_ERRORS = {
     { PRE_KEY_NOT_SUPPORTED, { PRE_KEY_NOT_SUPPORTED, "Invalid combination of keys." } },
     { INPUT_OCCUPIED_BY_SYSTEM, { INPUT_OCCUPIED_BY_SYSTEM, "The hotkey has been subscribed by system." } },
     { INPUT_OCCUPIED_BY_OTHER, { INPUT_OCCUPIED_BY_OTHER, "The hotkey has been subscribed by other one." } },
+    { INPUT_SERVICE_EXCEPTION, { INPUT_SERVICE_EXCEPTION, "Input service exception." } },
 };
 
 #define THROWERR_CUSTOM(env, code, msg) \
