@@ -1142,8 +1142,7 @@ public:
      * @brief Enables or disables input event dispatch.
      * @param disabled true to disable input event dispatch, false to enable.
      * @return Returns <b>0</b> if success; returns a non-0 value otherwise.
-     * @permission ohos.permission.MANAGE_EDM_POLICY (system_core)
-     * @since 15
+     * @since 26
      */
     int32_t DisableInputEventDispatch(bool disabled);
 
