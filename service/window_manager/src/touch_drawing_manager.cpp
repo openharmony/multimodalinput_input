@@ -321,13 +321,10 @@ void TouchDrawingManager::SetMultiWindowScreenId(uint64_t screenId, uint64_t dis
         screenId, displayNodeScreenId);
     auto touchDrawingHandler = GetTouchDrawingHandler();
     if (touchDrawingHandler != nullptr) {
-        windowScreenId_ = screenId;
-        displayNodeScreenId_ = displayNodeScreenId;
         touchDrawingHandler->SetMultiWindowScreenId(screenId, displayNodeScreenId);
-    } else {
-        windowScreenId_ = screenId;
-        displayNodeScreenId_ = displayNodeScreenId;
     }
+    windowScreenId_ = screenId;
+    displayNodeScreenId_ = displayNodeScreenId;
 }
 
 ITouchDrawingHandler* TouchDrawingManager::LoadTouchDrawingHandler()
