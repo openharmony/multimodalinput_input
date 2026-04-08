@@ -41,6 +41,13 @@ constexpr int32_t BOOLEAN_TRUE { 1 };
 constexpr int32_t BOOLEAN_FALSE { 0 };
 constexpr int32_t BOOLEAN_NONE { -1 };
 constexpr uint32_t DEFAULT_REFERENCE_COUNT { 1 };
+// SDK 26.0.0 新增：triggerType 相关常量
+constexpr int32_t TRIGGER_TYPE_NOT_SET { 0 };
+constexpr int32_t TRIGGER_TYPE_PRESSED { 1 };
+constexpr int32_t TRIGGER_TYPE_REPEAT_PRESSED { 2 };
+constexpr int32_t TRIGGER_TYPE_ALL_RELEASED { 3 };
+constexpr int32_t TRIGGER_TYPE_MIN { 0 };
+constexpr int32_t TRIGGER_TYPE_MAX { 3 };
 } // namespace
 
 static Callbacks callbacks = {};
@@ -335,7 +342,7 @@ napi_value GetEventInfoAPI26(napi_env env, napi_callback_info info, sptr<KeyEven
         return nullptr;
     }
     int32_t triggerType = tempTriggerType.value();
-    if (triggerType < 0 || triggerType > 3) {
+    if (triggerType < TRIGGER_TYPE_MIN || triggerType > TRIGGER_TYPE_MAX) {
         MMI_HILOGE("triggerType:%{public}d is invalid, must be 0-3", triggerType);
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "triggerType must be 0-3");
         return nullptr;
@@ -361,7 +368,7 @@ napi_value GetEventInfoAPI26(napi_env env, napi_callback_info info, sptr<KeyEven
     MMI_HILOGD("FinalKeyDownDuration:%{public}d", finalKeyDownDuration);
 
     // triggerType 优先级：如果设置 triggerType (1-3)，则忽略 isFinalKeyDown 和 isRepeat
-    if (triggerType == 0) {
+    if (triggerType == TRIGGER_TYPE_NOT_SET) {
         // 未设置 triggerType，使用旧的 isFinalKeyDown 和 isRepeat 参数
         bool isFinalKeyDown;
         if (!GetNamedPropertyBool(env, argv[1], "isFinalKeyDown", isFinalKeyDown)) {
@@ -1066,6 +1073,63 @@ static napi_value JsOff(napi_env env, napi_callback_info info)
     return nullptr;
 }
 
+// SDK 26.0.0 新增：验证onKey参数
+static bool ValidateOnKeyParameters(napi_env env, size_t argc, napi_value* argv, std::string& keyType)
+{
+    CALL_DEBUG_ENTER;
+    if (argc < INPUT_PARAMETER_MAX) {
+        MMI_HILOGE("Parameter number error argc:%{public}zu", argc);
+        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "parameter number error");
+        return false;
+    }
+
+    if (!UtilNapi::TypeOf(env, argv[0], napi_string)) {
+        MMI_HILOGE("The first parameter is not string");
+        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "type", "string");
+        return false;
+    }
+
+    if (!UtilNapi::TypeOf(env, argv[1], napi_object)) {
+        MMI_HILOGE("The second parameter is not napi_object");
+        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "keyOptions", "object");
+        return false;
+    }
+
+    if (argc >= INPUT_PARAMETER_MAX && !UtilNapi::TypeOf(env, argv[INPUT_PARAMETER_MIDDLE], napi_function)) {
+        MMI_HILOGE("The third parameter is not napi_function");
+        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "callback", "function");
+        return false;
+    }
+
+    char eventType[EVENT_NAME_LEN] = { 0 };
+    size_t typeLen = 0;
+    CHKRF(napi_get_value_string_utf8(env, argv[0], eventType, EVENT_NAME_LEN - 1, &typeLen), GET_VALUE_STRING_UTF8);
+    keyType = eventType;
+
+    if (keyType != "key") {
+        MMI_HILOGE("Type must be 'key'");
+        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Type must be 'key'");
+        return false;
+    }
+
+    return true;
+}
+
+// SDK 26.0.0 新增：保存onKey回调引用
+static bool SaveOnKeyCallback(napi_env env, size_t argc, napi_value* argv, sptr<KeyEventMonitorInfo> event)
+{
+    CALL_DEBUG_ENTER;
+    CHKPF(event);
+
+    if (argc == INPUT_PARAMETER_MAX) {
+        CHKRF(napi_create_reference(env, argv[INPUT_PARAMETER_MIDDLE], 1, &event->callback), REFERENCE_REF);
+    } else {
+        event->callback = nullptr;
+    }
+
+    return true;
+}
+
 // SDK 26.0.0 新增：onKey 函数
 static napi_value JsOnKey(napi_env env, napi_callback_info info)
 {
@@ -1075,39 +1139,47 @@ static napi_value JsOnKey(napi_env env, napi_callback_info info)
     auto keyOption = std::make_shared<KeyOption>();
     std::string keyType;
 
-    size_t argc = 3;
-    napi_value argv[3] = { 0 };
+    size_t argc = INPUT_PARAMETER_MAX;
+    napi_value argv[INPUT_PARAMETER_MAX] = { 0 };
     if (napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr) != napi_ok) {
         MMI_HILOGE("GET_CB_INFO failed");
         return nullptr;
     }
 
-    if (argc < INPUT_PARAMETER_MAX) {
-        MMI_HILOGE("Parameter number error argc:%{public}zu", argc);
-        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "parameter number error");
+    if (!ValidateOnKeyParameters(env, argc, argv, keyType)) {
         return nullptr;
     }
 
-    // 参数验证
+    event->name = keyType;
+
+    if (!SaveOnKeyCallback(env, argc, argv, event)) {
+        return nullptr;
+    }
+
+    if (SubscribeKeyCommand(env, info, event, keyOption) == nullptr) {
+        MMI_HILOGE("SubscribeKeyCommand failed");
+        return nullptr;
+    }
+
+    return nullptr;
+}
+
+// SDK 26.0.0 新增：验证offKey参数
+static bool ValidateOffKeyParameters(napi_env env, size_t argc, napi_value* argv, std::string& keyType)
+{
+    CALL_DEBUG_ENTER;
     if (!UtilNapi::TypeOf(env, argv[0], napi_string)) {
         MMI_HILOGE("The first parameter is not string");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "type", "string");
-        return nullptr;
+        return false;
     }
 
     if (!UtilNapi::TypeOf(env, argv[1], napi_object)) {
         MMI_HILOGE("The second parameter is not napi_object");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "keyOptions", "object");
-        return nullptr;
+        return false;
     }
 
-    if (argc >= INPUT_PARAMETER_MAX && !UtilNapi::TypeOf(env, argv[INPUT_PARAMETER_MIDDLE], napi_function)) {
-        MMI_HILOGE("The third parameter is not napi_function");
-        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "callback", "function");
-        return nullptr;
-    }
-
-    // 获取 type 参数
     char eventType[EVENT_NAME_LEN] = { 0 };
     size_t typeLen = 0;
     CHKRF(napi_get_value_string_utf8(env, argv[0], eventType, EVENT_NAME_LEN - 1, &typeLen), GET_VALUE_STRING_UTF8);
@@ -1116,25 +1188,33 @@ static napi_value JsOnKey(napi_env env, napi_callback_info info)
     if (keyType != "key") {
         MMI_HILOGE("Type must be 'key'");
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Type must be 'key'");
-        return nullptr;
+        return false;
     }
 
-    event->name = keyType;
+    return true;
+}
 
-    // 保存回调引用
-    if (argc == INPUT_PARAMETER_MAX) {
-        CHKRF(napi_create_reference(env, argv[INPUT_PARAMETER_MIDDLE], 1, &event->callback), REFERENCE_REF);
-    } else {
-        event->callback = nullptr;
+// SDK 26.0.0 新增：执行offKey取消订阅
+static bool UnsubscribeKeyCommand(napi_env env, sptr<KeyEventMonitorInfo> event, std::shared_ptr<KeyOption> keyOption)
+{
+    CALL_DEBUG_ENTER;
+    CHKPF(event);
+    CHKPF(keyOption);
+
+    int32_t subscribeId = INVALID_SUBSCRIBER_ID;
+    if (DelEventCallback(env, keyCommandCallbacks, event, subscribeId) < 0) {
+        MMI_HILOGE("DelEventCallback failed");
+        return false;
     }
 
-    // 使用 SubscribeKeyCommand 订阅
-    if (SubscribeKeyCommand(env, info, event, keyOption) == nullptr) {
-        MMI_HILOGE("SubscribeKeyCommand failed");
-        return nullptr;
-    }
+    MMI_HILOGI("Unsubscribe key command(%{public}d)", subscribeId);
+    InputManager::GetInstance()->UnsubscribeKeyEvent(subscribeId);
 
-    return nullptr;
+    // 清理状态
+    std::string subscribeKey = GenerateKeyOptionKey(keyOption);
+    TriggerEventDispatcher::GetInstance()->ClearSubscribeState(subscribeKey);
+
+    return true;
 }
 
 // SDK 26.0.0 新增：offKey 函数
@@ -1146,58 +1226,27 @@ static napi_value JsOffKey(napi_env env, napi_callback_info info)
     auto keyOption = std::make_shared<KeyOption>();
     std::string keyType;
 
-    size_t argc = 3;
-    napi_value argv[3] = { 0 };
+    size_t argc = INPUT_PARAMETER_MAX;
+    napi_value argv[INPUT_PARAMETER_MAX] = { 0 };
     if (napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr) != napi_ok) {
         MMI_HILOGE("GET_CB_INFO failed");
         return nullptr;
     }
 
-    // 参数验证
-    if (!UtilNapi::TypeOf(env, argv[0], napi_string)) {
-        MMI_HILOGE("The first parameter is not string");
-        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "type", "string");
-        return nullptr;
-    }
-
-    if (!UtilNapi::TypeOf(env, argv[1], napi_object)) {
-        MMI_HILOGE("The second parameter is not napi_object");
-        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "keyOptions", "object");
-        return nullptr;
-    }
-
-    // 获取 type 参数
-    char eventType[EVENT_NAME_LEN] = { 0 };
-    size_t typeLen = 0;
-    CHKRF(napi_get_value_string_utf8(env, argv[0], eventType, EVENT_NAME_LEN - 1, &typeLen), GET_VALUE_STRING_UTF8);
-    keyType = eventType;
-
-    if (keyType != "key") {
-        MMI_HILOGE("Type must be 'key'");
-        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Type must be 'key'");
+    if (!ValidateOffKeyParameters(env, argc, argv, keyType)) {
         return nullptr;
     }
 
     event->name = keyType;
 
-    // 使用 GetEventInfoAPI26 解析参数（为了生成正确的订阅键）
     if (GetEventInfoAPI26(env, info, event, keyOption) == nullptr) {
         MMI_HILOGE("GetEventInfoAPI26 failed");
         return nullptr;
     }
 
-    int32_t subscribeId = -1;
-    if (DelEventCallback(env, keyCommandCallbacks, event, subscribeId) < 0) {
-        MMI_HILOGE("DelEventCallback failed");
+    if (!UnsubscribeKeyCommand(env, event, keyOption)) {
         return nullptr;
     }
-
-    MMI_HILOGI("Unsubscribe key command(%{public}d)", subscribeId);
-    InputManager::GetInstance()->UnsubscribeKeyEvent(subscribeId);
-
-    // 清理状态
-    std::string subscribeKey = GenerateKeyOptionKey(keyOption);
-    TriggerEventDispatcher::GetInstance()->ClearSubscribeState(subscribeKey);
 
     return nullptr;
 }
