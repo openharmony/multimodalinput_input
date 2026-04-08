@@ -35,7 +35,7 @@ TriggerEventDispatcher* TriggerEventDispatcher::GetInstance()
 }
 
 bool TriggerEventDispatcher::ShouldDispatch(std::shared_ptr<KeyOption> keyOption,
-                                            std::shared_ptr<KeyEvent> keyEvent)
+    std::shared_ptr<KeyEvent> keyEvent)
 {
     if (keyOption == nullptr || keyEvent == nullptr) {
         MMI_HILOGE("keyOption or keyEvent is nullptr");
@@ -44,17 +44,13 @@ bool TriggerEventDispatcher::ShouldDispatch(std::shared_ptr<KeyOption> keyOption
 
     std::lock_guard<std::mutex> lock(mutex_);
     int32_t triggerType = keyOption->GetTriggerType();
-
     switch (triggerType) {
-        case 1:  // PRESSED
+        case PRESSED:
             return ShouldDispatchPRESSED(keyOption, keyEvent);
-
-        case 2:  // REPEAT_PRESSED
+        case REPEAT_PRESSED:
             return ShouldDispatchREPEAT_PRESSED(keyOption, keyEvent);
-
-        case 3:  // ALL_RELEASED
+        case ALL_RELEASED:
             return ShouldDispatchALL_RELEASED(keyOption, keyEvent);
-
         default:
             MMI_HILOGE("Unknown triggerType: %{public}d", triggerType);
             return false;
@@ -62,57 +58,52 @@ bool TriggerEventDispatcher::ShouldDispatch(std::shared_ptr<KeyOption> keyOption
 }
 
 bool TriggerEventDispatcher::ShouldConsume(std::shared_ptr<KeyOption> keyOption,
-                                            std::shared_ptr<KeyEvent> keyEvent)
+    std::shared_ptr<KeyEvent> keyEvent)
 {
     if (keyOption == nullptr || keyEvent == nullptr) {
         MMI_HILOGE("keyOption or keyEvent is nullptr");
         return false;
     }
-
     std::lock_guard<std::mutex> lock(mutex_);
     int32_t triggerType = keyOption->GetTriggerType();
     int32_t keyCode = keyEvent->GetKeyCode();
     int32_t action = keyEvent->GetKeyAction();
-
     // 1. PRESSED 模式：消费所有相关事件
-    if (triggerType == 1) {
+    if (triggerType == PRESSED) {
         if (keyCode == keyOption->GetFinalKey()) {
             MMI_HILOGD("PRESSED mode: consuming finalKey event");
-            return true;  // 消费所有 finalKey 事件
+            return true;
         }
         const auto& preKeys = keyOption->GetPreKeys();
-        if (preKeys.find(keyCode) != preKeys.end() && action == 1) {
+        if (preKeys.find(keyCode) != preKeys.end() && action == KeyEvent::KEY_ACTION_UP) {
             MMI_HILOGD("PRESSED mode: consuming preKey up event");
-            return true;  // 消费 preKeys 的 up 事件
+            return true;
         }
     }
-
     // 2. REPEAT_PRESSED 模式：消费所有相关事件
-    if (triggerType == 2) {
+    if (triggerType == REPEAT_PRESSED) {
         if (keyCode == keyOption->GetFinalKey()) {
             MMI_HILOGD("REPEAT_PRESSED mode: consuming finalKey event");
-            return true;  // 消费所有 finalKey 事件
+            return true;
         }
         const auto& preKeys = keyOption->GetPreKeys();
-        if (preKeys.find(keyCode) != preKeys.end() && action == 1) {
+        if (preKeys.find(keyCode) != preKeys.end() && action == KeyEvent::KEY_ACTION_UP) {
             MMI_HILOGD("REPEAT_PRESSED mode: consuming preKey up event");
-            return true;  // 消费 preKeys 的 up 事件
+            return true;
         }
     }
-
     // 3. ALL_RELEASED 模式：消费所有相关事件
-    if (triggerType == 3) {
+    if (triggerType == ALL_RELEASED) {
         if (keyCode == keyOption->GetFinalKey()) {
             MMI_HILOGD("ALL_RELEASED mode: consuming finalKey event");
-            return true;  // 消费所有 finalKey 事件
+            return true;
         }
         const auto& preKeys = keyOption->GetPreKeys();
         if (preKeys.find(keyCode) != preKeys.end()) {
             MMI_HILOGD("ALL_RELEASED mode: consuming preKey event");
-            return true;  // 消费所有 preKeys 事件
+            return true;
         }
     }
-
     MMI_HILOGD("Event not consumed");
     return false;
 }
@@ -149,7 +140,7 @@ void TriggerEventDispatcher::ClearSubscribeState(const std::string& subscribeKey
 }
 
 bool TriggerEventDispatcher::ShouldDispatchPRESSED(std::shared_ptr<KeyOption> keyOption,
-                                                     std::shared_ptr<KeyEvent> keyEvent)
+    std::shared_ptr<KeyEvent> keyEvent)
 {
     int32_t keyCode = keyEvent->GetKeyCode();
     int32_t action = keyEvent->GetKeyAction();  // 0=down, 1=up, 2=cancel
@@ -160,8 +151,8 @@ bool TriggerEventDispatcher::ShouldDispatchPRESSED(std::shared_ptr<KeyOption> ke
     }
 
     // 2. 只处理 down 事件
-    if (action != 0) {
-        return false;  // up 事件不分发
+    if (action != KeyEvent::KEY_ACTION_DOWN) {
+        return false;
     }
 
     // 3. 检查 preKeys 是否匹配
@@ -204,7 +195,7 @@ std::string TriggerEventDispatcher::GenerateSubscribeKey(std::shared_ptr<KeyOpti
 }
 
 bool TriggerEventDispatcher::ShouldDispatchREPEAT_PRESSED(std::shared_ptr<KeyOption> keyOption,
-                                                        std::shared_ptr<KeyEvent> keyEvent)
+    std::shared_ptr<KeyEvent> keyEvent)
 {
     int32_t keyCode = keyEvent->GetKeyCode();
     int32_t action = keyEvent->GetKeyAction();
@@ -215,8 +206,8 @@ bool TriggerEventDispatcher::ShouldDispatchREPEAT_PRESSED(std::shared_ptr<KeyOpt
     }
 
     // 2. 只处理 down 事件
-    if (action != 0) {
-        return false;  // up 事件不分发
+    if (action != KeyEvent::KEY_ACTION_DOWN) {
+        return false;
     }
 
     // 3. 检查 preKeys 是否匹配
@@ -235,7 +226,7 @@ bool TriggerEventDispatcher::ShouldDispatchREPEAT_PRESSED(std::shared_ptr<KeyOpt
 }
 
 bool TriggerEventDispatcher::ShouldDispatchALL_RELEASED(std::shared_ptr<KeyOption> keyOption,
-                                                    std::shared_ptr<KeyEvent> keyEvent)
+    std::shared_ptr<KeyEvent> keyEvent)
 {
     int32_t keyCode = keyEvent->GetKeyCode();
     int32_t action = keyEvent->GetKeyAction();
@@ -261,7 +252,7 @@ bool TriggerEventDispatcher::ShouldDispatchALL_RELEASED(std::shared_ptr<KeyOptio
     const auto& preKeys = keyOption->GetPreKeys();
     if (preKeys.find(keyCode) != preKeys.end()) {
         // 2.1 只分发 up 事件
-        if (action == 1) {  // up
+        if (action == KeyEvent::KEY_ACTION_UP) {
             MMI_HILOGD("ALL_RELEASED mode: dispatching preKey up event (keyCode: %{public}d)", keyCode);
             return true;
         }
@@ -271,7 +262,7 @@ bool TriggerEventDispatcher::ShouldDispatchALL_RELEASED(std::shared_ptr<KeyOptio
 }
 
 bool TriggerEventDispatcher::MatchPreKeys(std::shared_ptr<KeyOption> keyOption,
-                                        std::shared_ptr<KeyEvent> keyEvent)
+    std::shared_ptr<KeyEvent> keyEvent)
 {
     const auto& preKeys = keyOption->GetPreKeys();
     if (preKeys.empty()) {
@@ -289,14 +280,14 @@ bool TriggerEventDispatcher::MatchPreKeys(std::shared_ptr<KeyOption> keyOption,
     for (int32_t preKey : preKeys) {
         bool found = false;
         for (const auto& item : keyItems) {
-            if (item.GetKeyCode() == preKey && item.GetAction() == 0) {
+            if (item.GetKeyCode() == preKey && item.GetAction() == KeyEvent::KEY_ACTION_DOWN) {
                 found = true;
                 break;
             }
         }
         if (!found) {
             MMI_HILOGD("PreKey not matched: %{public}d", preKey);
-            return false;  // preKey 不满足
+            return false;
         }
     }
 
@@ -305,10 +296,9 @@ bool TriggerEventDispatcher::MatchPreKeys(std::shared_ptr<KeyOption> keyOption,
 }
 
 bool TriggerEventDispatcher::CheckDuration(std::shared_ptr<KeyOption> keyOption,
-                                       std::shared_ptr<KeyEvent> keyEvent)
+    std::shared_ptr<KeyEvent> keyEvent)
 {
     int32_t duration = keyOption->GetFinalKeyDownDuration();
-
     // 1. 如果 duration 为 0，立即满足条件
     if (duration == 0) {
         MMI_HILOGD("Duration is 0, immediate trigger");
