@@ -2555,6 +2555,8 @@ void PointerDrawingManager::UpdatePointerDevice(bool hasPointerDevice, bool isPo
         surfaceNodePtr->DetachToDisplay(screenId_);
         SetSurfaceNode(nullptr);
         MMI_HILOGI("Detach screenId:%{public}" PRIu64, screenId_);
+        // record pointer visible status for unload libcursor_drawing_adapter.z.so when pointer device has all removed
+        RecordCursorVisibleStatus(false);
     }
     Rosen::RSTransaction::FlushImplicitTransaction();
     MMI_HILOGD("Pointer window destroy success");
