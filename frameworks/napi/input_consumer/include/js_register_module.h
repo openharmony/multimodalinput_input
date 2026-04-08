@@ -38,6 +38,14 @@ enum JS_CALLBACK_EVENT {
 
 namespace OHOS {
 namespace MMI {
+
+// KeyCommandTriggerType 枚举定义（SDK 26.0.0 新增）
+enum KeyCommandTriggerType {
+    PRESSED = 1,         // 首次按下触发
+    REPEAT_PRESSED = 2,  // 重复按下触发
+    ALL_RELEASED = 3      // 所有键释放时触发
+};
+
 extern std::mutex sCallBacksMutex;
 class JsCommon {
 public:
