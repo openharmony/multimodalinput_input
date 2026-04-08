@@ -583,7 +583,10 @@ int32_t OH_Input_GetKeySwitch(const struct Input_KeyState* keyState);
 
 /**
  * @brief Inject system keys.
+ *        Callers without this permission can inject after OH_Input_RequestInjection
+ *        completes dialog authorization.
  *
+ * @permission ohos.permission.CONTROL_DEVICE
  * @param keyEvent - the key event to be injected.
  * @return 0 - Success.
  *         201 - Missing permissions.
@@ -783,7 +786,10 @@ Input_Result OH_Input_DispatchToNextHandler(int32_t eventId);
 
 /**
  * @brief Inject mouse event.
+ *        Callers without this permission can inject after OH_Input_RequestInjection
+ *        completes dialog authorization.
  *
+ * @permission ohos.permission.CONTROL_DEVICE
  * @param mouseEvent - the mouse event to be injected.
  * @return 0 - Success.
  *         201 - Missing permissions.
@@ -795,7 +801,10 @@ int32_t OH_Input_InjectMouseEvent(const struct Input_MouseEvent* mouseEvent);
 
 /**
  * @brief Inject mouse event using global coordinate.
+ *        Callers without this permission can inject after OH_Input_RequestInjection
+ *        completes dialog authorization.
  *
+ * @permission ohos.permission.CONTROL_DEVICE
  * @param mouseEvent - the mouse event to be injected, set up effective globalX globalY.
  * @return OH_Input_InjectMouseEventGlobal function result code.
  *         {@link INPUT_SUCCESS} inject mouseEvent success.\n
@@ -1047,7 +1056,10 @@ int32_t OH_Input_GetMouseEventGlobalY(const struct Input_MouseEvent* mouseEvent)
 
 /**
  * @brief Inject touch event.
+ *        Callers without this permission can inject after OH_Input_RequestInjection
+ *        completes dialog authorization.
  *
+ * @permission ohos.permission.CONTROL_DEVICE
  * @param touchEvent - the touch event to be injected.
  * @return 0 - Success.
  *         201 - Missing permissions.
@@ -1059,7 +1071,10 @@ int32_t OH_Input_InjectTouchEvent(const struct Input_TouchEvent* touchEvent);
 
 /**
  * @brief Inject touch event using global coordinate.
+ *        Callers without this permission can inject after OH_Input_RequestInjection
+ *        completes dialog authorization.
  *
+ * @permission ohos.permission.CONTROL_DEVICE
  * @param touchEvent - the touch event to be injected, set up effective globalX globalY.
  * @return OH_Input_InjectTouchEventGlobal function result code.
  *         {@link INPUT_SUCCESS} inject touchEvent success.\n
@@ -2291,6 +2306,8 @@ Input_Result OH_Input_QueryMaxTouchPoints(int32_t *count);
 
 /**
  * @brief Requests for injection authorization.
+ *        This API always follows the dialog authorization flow, even if the
+ *        caller already has ohos.permission.CONTROL_DEVICE.
  *
  * @param callback - callback used to return the result.
  * @return OH_Input_RequestInjection function result code.
@@ -2309,6 +2326,9 @@ Input_Result OH_Input_RequestInjection(Input_InjectAuthorizeCallback callback);
 
 /**
  * @brief Queries the injection authorization status.
+ *        This API returns dialog authorization status only.
+ *        It does not indicate whether the caller can inject through
+ *        ohos.permission.CONTROL_DEVICE.
  *
  * @param status Injection authorization status. For details, see {@Link Input_InjectionStatus}.
  * @return OH_Input_QueryAuthorizedStatus function result code.
