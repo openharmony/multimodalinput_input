@@ -35,6 +35,8 @@ constexpr int32_t UDS_PID = 100;
 constexpr int32_t CAST_INPUT_DEVICEID { 0xAAAAAAFF };
 constexpr int32_t CAST_SCREEN_DEVICEID { 0xAAAAAAFE };
 constexpr double HALF_RATIO { 0.5 };
+constexpr int32_t TEST_DEVICE_ID { 1 };
+constexpr int32_t TEST_DEVICE_ID_2 { 2 };
 } // namespace
 
 class InputWindowsManagerTest : public testing::Test {
@@ -4718,6 +4720,123 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_RemoveActiveWindow_002
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager->RemoveActiveWindow(pointerEvent));
     pointerEvent->SetPointerId(pointerIdA);
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager->RemoveActiveWindow(pointerEvent));
+}
+
+/**
+ * @tc.name: IsWriteTablet_001
+ * @tc.desc: Test IsWriteTablet with non-pen tool type
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, IsWriteTablet_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<InputWindowsManager> inputWindowsManager =
+        std::static_pointer_cast<InputWindowsManager>(WIN_MGR);
+    ASSERT_NE(inputWindowsManager, nullptr);
+    PointerEvent::PointerItem pointerItem;
+    pointerItem.SetToolType(PointerEvent::TOOL_TYPE_FINGER);
+    bool result = inputWindowsManager->IsWriteTablet(pointerItem);
+    EXPECT_FALSE(result);
+}
+
+/**
+ * @tc.name: IsWriteTablet_002
+ * @tc.desc: Test IsWriteTablet with pen tool type and USB bus
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, IsWriteTablet_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t deviceId { 882 };
+    struct libinput_device rawDev {
+        .busType = BUS_USB,
+    };
+    InputDeviceManager::InputDeviceInfo devInfo {
+        .inputDeviceOrigin = &rawDev,
+        .isPointerDevice = false,
+    };
+    INPUT_DEV_MGR->AddPhysicalInputDeviceInner(deviceId, devInfo);
+
+    auto inputDevice = std::make_shared<InputDevice>();
+    inputDevice->SetBus(BUS_USB);
+    EXPECT_CALL(*messageParcelMock_, GetInputDevice(_, _)).WillOnce(Return(inputDevice));
+
+    PointerEvent::PointerItem pointerItem {};
+    pointerItem.SetToolType(PointerEvent::TOOL_TYPE_PEN);
+    pointerItem.SetDeviceId(deviceId);
+
+    auto inputWindowsManager = std::static_pointer_cast<InputWindowsManager>(WIN_MGR);
+    ASSERT_NE(inputWindowsManager, nullptr);
+    bool result = inputWindowsManager->IsWriteTablet(pointerItem);
+    EXPECT_TRUE(result);
+}
+
+/**
+ * @tc.name: IsWriteTablet_003
+ * @tc.desc: Test IsWriteTablet with pen tool type, non-USB bus, and isTablet true
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, IsWriteTablet_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t deviceId { 883 };
+    struct libinput_device rawDev {
+        .busType = BUS_BLUETOOTH,
+    };
+    InputDeviceManager::InputDeviceInfo devInfo {
+        .inputDeviceOrigin = &rawDev,
+        .isPointerDevice = true,
+    };
+    INPUT_DEV_MGR->AddPhysicalInputDeviceInner(deviceId, devInfo);
+
+    auto inputDevice = std::make_shared<InputDevice>();
+    inputDevice->SetBus(BUS_BLUETOOTH);
+    EXPECT_CALL(*messageParcelMock_, GetInputDevice(_, _)).WillOnce(Return(inputDevice));
+
+    PointerEvent::PointerItem pointerItem {};
+    pointerItem.SetToolType(PointerEvent::TOOL_TYPE_PEN);
+    pointerItem.SetDeviceId(deviceId);
+
+    auto inputWindowsManager = std::static_pointer_cast<InputWindowsManager>(WIN_MGR);
+    ASSERT_NE(inputWindowsManager, nullptr);
+    bool result = inputWindowsManager->IsWriteTablet(pointerItem);
+    EXPECT_TRUE(result);
+}
+
+/**
+ * @tc.name: IsWriteTablet_004
+ * @tc.desc: Test IsWriteTablet with pen tool type, non-USB bus, and isTablet false
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, IsWriteTablet_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t deviceId { 884 };
+    struct libinput_device rawDev {
+        .busType = BUS_BLUETOOTH,
+    };
+    InputDeviceManager::InputDeviceInfo devInfo {
+        .inputDeviceOrigin = &rawDev,
+        .isPointerDevice = false,
+    };
+    INPUT_DEV_MGR->AddPhysicalInputDeviceInner(deviceId, devInfo);
+
+    auto inputDevice = std::make_shared<InputDevice>();
+    inputDevice->SetBus(BUS_BLUETOOTH);
+    EXPECT_CALL(*messageParcelMock_, GetInputDevice(_, _)).WillOnce(Return(inputDevice));
+
+    PointerEvent::PointerItem pointerItem {};
+    pointerItem.SetToolType(PointerEvent::TOOL_TYPE_PEN);
+    pointerItem.SetDeviceId(deviceId);
+
+    auto inputWindowsManager = std::static_pointer_cast<InputWindowsManager>(WIN_MGR);
+    ASSERT_NE(inputWindowsManager, nullptr);
+    bool result = inputWindowsManager->IsWriteTablet(pointerItem);
+    EXPECT_FALSE(result);
 }
 
 #ifdef OHOS_BUILD_ENABLE_POINTER
