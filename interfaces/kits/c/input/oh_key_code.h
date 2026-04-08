@@ -1400,7 +1400,12 @@ typedef enum {
      * Smart watch's left button
      * @since 22
      */
-    KEYCODE_DIV = 3220
+    KEYCODE_DIV = 3220,
+    /**
+     * XKEY
+     * @since 26.0.0
+     */
+    KEYCODE_XKEY = 3232
 } Input_KeyCode;
 
 #ifdef __cplusplus
