@@ -317,13 +317,14 @@ void TouchDrawingManager::SetDelegateProxy(std::shared_ptr<IDelegateInterface> p
 
 void TouchDrawingManager::SetMultiWindowScreenId(uint64_t screenId, uint64_t displayNodeScreenId)
 {
+    MMI_HILOGI("Setting screen:%{public}" PRIu64 ", displayNodeScreen:%{public}" PRIu64,
+        screenId, displayNodeScreenId);
     auto touchDrawingHandler = GetTouchDrawingHandler();
     if (touchDrawingHandler != nullptr) {
         touchDrawingHandler->SetMultiWindowScreenId(screenId, displayNodeScreenId);
-    } else {
-        windowScreenId_ = screenId;
-        displayNodeScreenId_ = displayNodeScreenId;
     }
+    windowScreenId_ = screenId;
+    displayNodeScreenId_ = displayNodeScreenId;
 }
 
 ITouchDrawingHandler* TouchDrawingManager::LoadTouchDrawingHandler()
