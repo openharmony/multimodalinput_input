@@ -3906,6 +3906,10 @@ void PointerDrawingManager::GetValidWidthAndHeight(
     const OLD::DisplayInfo *displayInfo, int32_t &validWidth, int32_t &validHeight)
 {
     CALL_DEBUG_ENTER;
+    if (displayInfo == nullptr) {
+        MMI_HILOGI("param displayInfo is nullptr");
+        return;
+    }
     validWidth = displayInfo->validWidth;
     validHeight = displayInfo->validHeight;
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
