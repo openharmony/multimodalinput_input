@@ -267,6 +267,7 @@ group("mmi_tests") {
     "service:PropertyNameMapperTest",
     "service:ServerMsgHandlerTest",
     "service:SettingDataMigratorTest",
+    "service:BundleNameParserTest",
     "service:SpecialInputDeviceParserTest",
     "service:StylusKeyTest",
     "service:StylusKeyTest",
