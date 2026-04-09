@@ -133,16 +133,7 @@ public:
     void SimulateTouchPadInputEvent(std::shared_ptr<PointerEvent> pointerEvent,
         const TouchpadCDG &touchpadCDG);
 
-    /**
-     * @brief Check permission for creating mouse controller (for NAPI layer)
-     * @return RET_OK on success, error code otherwise
-     */
     int32_t CheckMouseControllerPermission();
-
-    /**
-     * @brief Check permission for creating keyboard controller (for NAPI layer)
-     * @return RET_OK on success, error code otherwise
-     */
     int32_t CheckKeyboardControllerPermission();
 
     void OnConnected();
@@ -293,16 +284,7 @@ public:
     int32_t ControlMouseEventToAnco(int32_t windowId, bool enable);
 #endif // OHOS_BUILD_ENABLE_ANCO_GAME_EVENT_MAPPING
 
-    /**
-     * @brief Create mouse controller
-     * @return Shared pointer to MouseControllerImpl, nullptr on failure
-     */
     std::shared_ptr<class MouseControllerImpl> CreateMouseController();
-
-    /**
-     * @brief Create keyboard controller
-     * @return Shared pointer to KeyboardControllerImpl, nullptr on failure
-     */
     std::shared_ptr<class KeyboardControllerImpl> CreateKeyboardController();
 
 private:

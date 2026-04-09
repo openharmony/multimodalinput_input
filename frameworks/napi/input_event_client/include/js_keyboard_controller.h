@@ -23,33 +23,15 @@
 namespace OHOS {
 namespace MMI {
 
-/**
- * @brief NAPI wrapper for KeyboardControllerImpl
- *
- * This class is a thin adapter layer that converts JS parameters to C++ calls.
- * All core logic is delegated to KeyboardControllerImpl.
- */
 class JsKeyboardController {
 public:
     JsKeyboardController();
     ~JsKeyboardController() = default;
 
-    /**
-     * @brief Press a key
-     * @param keyCode Key code
-     * @return RET_OK on success, error code otherwise
-     */
     int32_t PressKey(int32_t keyCode);
-
-    /**
-     * @brief Release a key
-     * @param keyCode Key code
-     * @return RET_OK on success, error code otherwise
-     */
     int32_t ReleaseKey(int32_t keyCode);
 
 private:
-    // Core implementation instance
     std::shared_ptr<KeyboardControllerImpl> impl_;
 };
 

@@ -421,6 +421,19 @@ HWTEST_F(PermissionHelperTest, PermissionHelperTest_CheckAuthorize001, TestSize.
 }
 
 /**
+ * @tc.name: PermissionHelperTest_CheckControlDevicePermission001
+ * @tc.desc: Test CheckControlDevicePermission
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PermissionHelperTest, PermissionHelperTest_CheckControlDevicePermission001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    bool result = PER_HELPER->CheckControlDevicePermission();
+    EXPECT_TRUE(result);
+}
+
+/**
  * @tc.name: PermissionHelperTest_RequestFromShell001
  * @tc.desc: Test RequestFromShell
  * @tc.type: FUNC

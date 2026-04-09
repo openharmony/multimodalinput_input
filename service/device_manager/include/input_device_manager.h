@@ -78,6 +78,7 @@ private:
         void ForeachInputDevice(std::function<void(int32_t)> callback) const;
         bool IsPointerDevice() const;
         static std::string GetId(struct libinput_device* device);
+        static std::string GetSyspath(struct libinput_device* device);
 
     private:
         void UpdateTags(struct libinput_device* device);

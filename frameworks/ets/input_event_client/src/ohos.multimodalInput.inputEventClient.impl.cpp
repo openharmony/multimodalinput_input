@@ -533,6 +533,8 @@ void PermitInjectionSync(bool result)
     }
     InputManager::GetInstance()->Authorize(result);
 }
+
+
 } // namespace
 
 // Since these macros are auto-generate, lint will cause false positive.

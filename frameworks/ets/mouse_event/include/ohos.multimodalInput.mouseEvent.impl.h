@@ -13,21 +13,4 @@
  * limitations under the License.
  */
 
-#include "ohos.multimodalInput.mouseEvent.proj.hpp"
-#include "ohos.multimodalInput.mouseEvent.impl.hpp"
-
-#include <stdexcept>
-
-#include "taihe/runtime.hpp"
-
-using namespace taihe;
-using namespace ohos::multimodalInput::mouseEvent;
-
-namespace {
-
-    
-} // namespace
-
-// Since these macros are auto-generate, lint will cause false positive.
-// NOLINTBEGIN
-// NOLINTEND
+ 

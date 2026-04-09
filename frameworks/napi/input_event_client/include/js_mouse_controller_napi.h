@@ -21,42 +21,12 @@
 namespace OHOS {
 namespace MMI {
 
-/**
- * @brief Create MouseController instance
- * @param env NAPI environment
- * @param info Callback info
- * @return Promise<MouseController>
- */
 napi_value CreateMouseController(napi_env env, napi_callback_info info);
-
-/**
- * @brief MouseController.moveTo() NAPI wrapper
- */
 napi_value MouseControllerMoveTo(napi_env env, napi_callback_info info);
-
-/**
- * @brief MouseController.pressButton() NAPI wrapper
- */
 napi_value MouseControllerPressButton(napi_env env, napi_callback_info info);
-
-/**
- * @brief MouseController.releaseButton() NAPI wrapper
- */
 napi_value MouseControllerReleaseButton(napi_env env, napi_callback_info info);
-
-/**
- * @brief MouseController.beginAxis() NAPI wrapper
- */
 napi_value MouseControllerBeginAxis(napi_env env, napi_callback_info info);
-
-/**
- * @brief MouseController.updateAxis() NAPI wrapper
- */
 napi_value MouseControllerUpdateAxis(napi_env env, napi_callback_info info);
-
-/**
- * @brief MouseController.endAxis() NAPI wrapper
- */
 napi_value MouseControllerEndAxis(napi_env env, napi_callback_info info);
 
 } // namespace MMI

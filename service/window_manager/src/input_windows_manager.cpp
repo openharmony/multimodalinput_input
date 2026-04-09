@@ -1381,6 +1381,12 @@ CursorPosition InputWindowsManager::ResetCursorPos(const OLD::DisplayGroupInfo &
 #endif // OHOS_BUILD_ENABLE_EXTERNAL_SCREEN
         int32_t x = displayInfo.validWidth * HALF_RATIO;
         int32_t y = displayInfo.validHeight * HALF_RATIO;
+#ifdef OHOS_BUILD_ENABLE_VKEYBOARD
+        if (IsPointerActiveRectValid(displayInfo)) {
+            x = displayInfo.pointerActiveWidth * HALF_RATIO;
+            y = displayInfo.pointerActiveHeight * HALF_RATIO;
+        }
+#endif // OHOS_BUILD_ENABLE_VKEYBOARD
         Direction direction = GetDisplayDirection(&displayInfo);
         if (direction == DIRECTION90 || direction == DIRECTION270) {
             std::swap(x, y);
@@ -5066,15 +5072,29 @@ bool InputWindowsManager::IsWriteTablet(PointerEvent::PointerItem &pointerItem) 
 {
     if (pointerItem.GetToolType() == PointerEvent::TOOL_TYPE_PEN) {
         static int32_t lastDeviceId = -1;
+        static std::shared_ptr<InputDevice> inputDevice = nullptr;
         static bool isTablet = false;
 
         auto nowId = pointerItem.GetDeviceId();
         if (lastDeviceId != nowId) {
+            inputDevice = INPUT_DEV_MGR->GetInputDevice(nowId);
+            CHKPF(inputDevice);
+            lastDeviceId = nowId;
             isTablet = INPUT_DEV_MGR->CheckDevice(nowId,
                 [](const IInputDeviceManager::IInputDevice &dev) {
                     return dev.IsMouse();
                 });
-            lastDeviceId = nowId;
+        }
+        if (inputDevice != nullptr) {
+            MMI_HILOGD("name:%{public}s type:%{public}d bus:%{public}d, "
+                "version:%{public}d product:%{public}d vendor:%{public}d, "
+                "phys:%{public}s uniq:%{public}s",
+                inputDevice->GetName().c_str(), inputDevice->GetType(), inputDevice->GetBus(),
+                inputDevice->GetVersion(), inputDevice->GetProduct(), inputDevice->GetVendor(),
+                inputDevice->GetPhys().c_str(), inputDevice->GetUniq().c_str());
+        }
+        if (inputDevice != nullptr && inputDevice->GetBus() == BUS_USB) {
+            return true;
         }
         return isTablet;
     }
@@ -7239,6 +7259,12 @@ CursorPosition InputWindowsManager::ResetCursorPos()
 #endif // OHOS_BUILD_ENABLE_EXTERNAL_SCREEN
         int32_t x = displayInfo.validWidth * HALF_RATIO;
         int32_t y = displayInfo.validHeight * HALF_RATIO;
+#ifdef OHOS_BUILD_ENABLE_VKEYBOARD
+        if (IsPointerActiveRectValid(displayInfo)) {
+            x = displayInfo.pointerActiveWidth * HALF_RATIO;
+            y = displayInfo.pointerActiveHeight * HALF_RATIO;
+        }
+#endif // OHOS_BUILD_ENABLE_VKEYBOARD
         Direction displayDirection = GetDisplayDirection(&displayInfo);
         if (displayDirection == DIRECTION90 || displayDirection == DIRECTION270) {
             std::swap(x, y);

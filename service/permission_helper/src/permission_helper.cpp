@@ -30,6 +30,7 @@ namespace OHOS {
 namespace MMI {
 namespace {
     const std::string INJECT_PERMISSION_CODE = "ohos.permission.INJECT_INPUT_EVENT";
+    const std::string CONTROL_DEVICE_PERMISSION_CODE = "ohos.permission.CONTROL_DEVICE";
     const std::string MONITOR_PERMISSION_CODE = "ohos.permission.INPUT_MONITORING";
     const std::string INTERCEPT_PERMISSION_CODE = "ohos.permission.INTERCEPT_INPUT_EVENT";
     const std::string INFRAREDEMITTER_PERMISSION_CODE = "ohos.permission.MANAGE_INPUT_INFRARED_EMITTER";
@@ -39,7 +40,6 @@ namespace {
     const std::string DEVICE_CONTROLLER_PERMISSION_CODE = "ohos.permission.INPUT_DEVICE_CONTROLLER";
     const std::string KEYBOARD_CONTROLLER_PERMISSION_CODE = "ohos.permission.INPUT_KEYBOARD_CONTROLLER";
     const std::string KEY_EVENT_HOOK_PERMISSION_CODE = "ohos.permission.HOOK_KEY_EVENT";
-    const std::string CONTROL_DEVICE_PERMISSION_CODE = "ohos.permission.CONTROL_DEVICE";
     const std::string MANAGE_EDM_POLICY_PERMISSION_CODE = "ohos.permission.MANAGE_EDM_POLICY";
 } // namespace
 bool PermissionHelper::VerifySystemApp()
@@ -102,6 +102,20 @@ bool PermissionHelper::CheckAuthorize()
 {
     CALL_DEBUG_ENTER;
     return CheckHapPermission(INJECT_PERMISSION_CODE);
+}
+
+bool PermissionHelper::CheckControlDevicePermission()
+{
+    CALL_DEBUG_ENTER;
+    auto tokenId = IPCSkeleton::GetCallingTokenID();
+    if (!CheckHapPermission(CONTROL_DEVICE_PERMISSION_CODE)) {
+        MMI_HILOGE("CheckHapPermission %{public}s failed", CONTROL_DEVICE_PERMISSION_CODE.c_str());
+        AddPermissionUsedRecord(tokenId, CONTROL_DEVICE_PERMISSION_CODE, 0, 1);
+        return false;
+    }
+    MMI_HILOGI("CheckHapPermission %{public}s success", CONTROL_DEVICE_PERMISSION_CODE.c_str());
+    AddPermissionUsedRecord(tokenId, CONTROL_DEVICE_PERMISSION_CODE, 1, 0);
+    return true;
 }
 
 bool PermissionHelper::CheckKeyEventHook()
@@ -237,12 +251,6 @@ bool PermissionHelper::CheckFunctionKeyEnabled()
 {
     CALL_DEBUG_ENTER;
     return CheckHapPermission(KEYBOARD_CONTROLLER_PERMISSION_CODE);
-}
-
-bool PermissionHelper::CheckControlDevice()
-{
-    CALL_DEBUG_ENTER;
-    return CheckHapPermission(CONTROL_DEVICE_PERMISSION_CODE);
 }
 
 bool PermissionHelper::CheckManageEdmPolicy()

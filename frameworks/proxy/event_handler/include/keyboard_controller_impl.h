@@ -26,52 +26,24 @@
 namespace OHOS {
 namespace MMI {
 
-/**
- * @brief Keyboard controller implementation (core logic)
- * @note Thread-safe, can be used by multiple API layers (NAPI, ANI, NDK)
- */
 class KeyboardControllerImpl {
 public:
     KeyboardControllerImpl();
     ~KeyboardControllerImpl();
 
-    /**
-     * @brief Press key down
-     * @param keyCode Key code
-     * @return RET_OK on success, error code otherwise
-     */
     int32_t PressKey(int32_t keyCode);
-
-    /**
-     * @brief Release key up
-     * @param keyCode Key code
-     * @return RET_OK on success, error code otherwise
-     */
     int32_t ReleaseKey(int32_t keyCode);
 
 private:
-    /**
-     * @brief Create key event with specified action and key code
-     * @param action Key action (KEY_ACTION_DOWN / KEY_ACTION_UP)
-     * @param keyCode Key code
-     * @return Shared pointer to KeyEvent, nullptr on failure
-     */
     std::shared_ptr<KeyEvent> CreateKeyEvent(int32_t action, int32_t keyCode);
-
-    /**
-     * @brief Inject key event to input system
-     * @param event Key event to inject
-     * @return RET_OK on success, error code otherwise
-     */
     int32_t InjectKeyEvent(std::shared_ptr<KeyEvent> event);
 
-    // State management
-    std::vector<int32_t> pressedKeys_;           // Currently pressed keys (in order)
-    std::map<int32_t, int64_t> keyDownTimes_;    // Key down timestamps
+    std::vector<int32_t> pressedKeys_;
+    std::map<int32_t, int64_t> keyDownTimes_;
 
-    mutable std::mutex mutex_;  // Thread safety
+    mutable std::mutex mutex_;
 
-    static constexpr size_t MAX_PRESSED_KEYS = 10;  // Maximum simultaneous pressed keys
+    static constexpr size_t MAX_PRESSED_KEYS = 10;
 };
 
 } // namespace MMI

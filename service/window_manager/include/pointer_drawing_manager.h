@@ -307,6 +307,7 @@ private:
     bool GetCursorBlurEnabled();
     void UpdateCursorBlurEnabled();
     uint64_t GetResampleTimestamp(uint64_t timestamp);
+    void GetValidWidthAndHeight(const OLD::DisplayInfo *displayInfo, int32_t &validWidth, int32_t &validHeight);
 private:
     bool hasDisplay_ { false };
     bool hasPointerDevice_ { false };

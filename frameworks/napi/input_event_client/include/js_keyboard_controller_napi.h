@@ -21,22 +21,8 @@
 namespace OHOS {
 namespace MMI {
 
-/**
- * @brief Create KeyboardController instance
- * @param env NAPI environment
- * @param info Callback info
- * @return Promise<KeyboardController>
- */
 napi_value CreateKeyboardController(napi_env env, napi_callback_info info);
-
-/**
- * @brief KeyboardController.pressKey() NAPI wrapper
- */
 napi_value KeyboardControllerPressKey(napi_env env, napi_callback_info info);
-
-/**
- * @brief KeyboardController.releaseKey() NAPI wrapper
- */
 napi_value KeyboardControllerReleaseKey(napi_env env, napi_callback_info info);
 
 } // namespace MMI

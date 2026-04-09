@@ -37,13 +37,19 @@ JsKeyboardController::JsKeyboardController()
 
 int32_t JsKeyboardController::PressKey(int32_t keyCode)
 {
-    CHKPR(impl_, RET_ERR);
+    if (impl_ == nullptr) {
+        MMI_HILOGE("KeyboardControllerImpl is null");
+        return RET_ERR;
+    }
     return impl_->PressKey(keyCode);
 }
 
 int32_t JsKeyboardController::ReleaseKey(int32_t keyCode)
 {
-    CHKPR(impl_, RET_ERR);
+    if (impl_ == nullptr) {
+        MMI_HILOGE("KeyboardControllerImpl is null");
+        return RET_ERR;
+    }
     return impl_->ReleaseKey(keyCode);
 }
 
