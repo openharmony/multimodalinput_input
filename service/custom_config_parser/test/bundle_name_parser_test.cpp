@@ -21,6 +21,8 @@
 #include <map>
 #include <fstream>
 #include <sstream>
+#include <sys/stat.h>
+#include <cerrno>
 
 #include "bundle_name_parser.h"
 #include "json_parser.h"
@@ -37,6 +39,28 @@ constexpr int32_t EXCEED_MAX_ARRAY_SIZE = 150;
 constexpr int32_t RET_OK_VALUE = 0;
 constexpr int32_t RET_ERR_VALUE = -1;
 constexpr int32_t FIVE_ITEMS_ARRAY_SIZE = 5;
+
+static bool CreateDirectoryRecursive(const std::string& path)
+{
+    if (path.empty()) {
+        return false;
+    }
+    std::string::size_type pos = 0;
+    do {
+        pos = path.find('/', pos + 1);
+        std::string parent = (pos == std::string::npos) ? path : path.substr(0, pos);
+        if (parent.empty()) {
+            continue;
+        }
+        struct stat st;
+        if (stat(parent.c_str(), &st) != 0) {
+            if (mkdir(parent.c_str(), 0755) != 0 && errno != EEXIST) {
+                return false;
+            }
+        }
+    } while (pos != std::string::npos);
+    return true;
+}
 
 class BundleNameParserTest : public testing::Test {
 public:
@@ -833,7 +857,7 @@ HWTEST_F(BundleNameParserTest, BundleNameParser_InitializeImpl_NotObject_001, Te
     const std::string configDir = "/etc/multimodalinput";
     const std::string configFile = configDir + "/bundle_name_config.json";
     
-    system(("mkdir -p " + configDir).c_str());
+    CreateDirectoryRecursive(configDir);
     
     std::string originalContent;
     bool fileExists = false;
@@ -867,7 +891,9 @@ HWTEST_F(BundleNameParserTest, BundleNameParser_InitializeImpl_NotObject_001, Te
             GTEST_LOG_(ERROR) << "Failed to restore config file: " << configFile;
         }
     } else {
-        remove(configFile.c_str());
+        if (remove(configFile.c_str()) != 0) {
+            GTEST_LOG_(ERROR) << "Failed to remove config file: " << configFile;
+        }
     }
 }
 
@@ -882,7 +908,7 @@ HWTEST_F(BundleNameParserTest, BundleNameParser_InitializeImpl_EmptyArray_001, T
     const std::string configDir = "/etc/multimodalinput";
     const std::string configFile = configDir + "/bundle_name_config.json";
     
-    system(("mkdir -p " + configDir).c_str());
+    CreateDirectoryRecursive(configDir);
     
     std::string originalContent;
     bool fileExists = false;
@@ -920,7 +946,9 @@ HWTEST_F(BundleNameParserTest, BundleNameParser_InitializeImpl_EmptyArray_001, T
             GTEST_LOG_(ERROR) << "Failed to restore config file: " << configFile;
         }
     } else {
-        remove(configFile.c_str());
+        if (remove(configFile.c_str()) != 0) {
+            GTEST_LOG_(ERROR) << "Failed to remove config file: " << configFile;
+        }
     }
 }
 
@@ -935,7 +963,7 @@ HWTEST_F(BundleNameParserTest, BundleNameParser_InitializeImpl_MissingKey_001, T
     const std::string configDir = "/etc/multimodalinput";
     const std::string configFile = configDir + "/bundle_name_config.json";
     
-    system(("mkdir -p " + configDir).c_str());
+    CreateDirectoryRecursive(configDir);
     
     std::string originalContent;
     bool fileExists = false;
@@ -972,7 +1000,9 @@ HWTEST_F(BundleNameParserTest, BundleNameParser_InitializeImpl_MissingKey_001, T
             GTEST_LOG_(ERROR) << "Failed to restore config file: " << configFile;
         }
     } else {
-        remove(configFile.c_str());
+        if (remove(configFile.c_str()) != 0) {
+            GTEST_LOG_(ERROR) << "Failed to remove config file: " << configFile;
+        }
     }
 }
 
@@ -987,7 +1017,7 @@ HWTEST_F(BundleNameParserTest, BundleNameParser_InitializeImpl_NotArray_001, Tes
     const std::string configDir = "/etc/multimodalinput";
     const std::string configFile = configDir + "/bundle_name_config.json";
     
-    system(("mkdir -p " + configDir).c_str());
+    CreateDirectoryRecursive(configDir);
     
     std::string originalContent;
     bool fileExists = false;
@@ -1024,7 +1054,9 @@ HWTEST_F(BundleNameParserTest, BundleNameParser_InitializeImpl_NotArray_001, Tes
             GTEST_LOG_(ERROR) << "Failed to restore config file: " << configFile;
         }
     } else {
-        remove(configFile.c_str());
+        if (remove(configFile.c_str()) != 0) {
+            GTEST_LOG_(ERROR) << "Failed to remove config file: " << configFile;
+        }
     }
 }
 
@@ -1039,7 +1071,7 @@ HWTEST_F(BundleNameParserTest, BundleNameParser_InitializeImpl_MultipleItems_001
     const std::string configDir = "/etc/multimodalinput";
     const std::string configFile = configDir + "/bundle_name_config.json";
     
-    system(("mkdir -p " + configDir).c_str());
+    CreateDirectoryRecursive(configDir);
     
     std::string originalContent;
     bool fileExists = false;
@@ -1102,7 +1134,9 @@ HWTEST_F(BundleNameParserTest, BundleNameParser_InitializeImpl_MultipleItems_001
             GTEST_LOG_(ERROR) << "Failed to restore config file: " << configFile;
         }
     } else {
-        remove(configFile.c_str());
+        if (remove(configFile.c_str()) != 0) {
+            GTEST_LOG_(ERROR) << "Failed to remove config file: " << configFile;
+        }
     }
 }
 
@@ -1117,7 +1151,7 @@ HWTEST_F(BundleNameParserTest, BundleNameParser_InitializeImpl_InvalidItem_001, 
     const std::string configDir = "/etc/multimodalinput";
     const std::string configFile = configDir + "/bundle_name_config.json";
     
-    system(("mkdir -p " + configDir).c_str());
+    CreateDirectoryRecursive(configDir);
     
     std::string originalContent;
     bool fileExists = false;
@@ -1162,7 +1196,9 @@ HWTEST_F(BundleNameParserTest, BundleNameParser_InitializeImpl_InvalidItem_001, 
             GTEST_LOG_(ERROR) << "Failed to restore config file: " << configFile;
         }
     } else {
-        remove(configFile.c_str());
+        if (remove(configFile.c_str()) != 0) {
+            GTEST_LOG_(ERROR) << "Failed to remove config file: " << configFile;
+        }
     }
 }
 
@@ -1177,7 +1213,7 @@ HWTEST_F(BundleNameParserTest, BundleNameParser_InitializeImpl_InvalidItem_002, 
     const std::string configDir = "/etc/multimodalinput";
     const std::string configFile = configDir + "/bundle_name_config.json";
     
-    system(("mkdir -p " + configDir).c_str());
+    CreateDirectoryRecursive(configDir);
     
     std::string originalContent;
     bool fileExists = false;
@@ -1222,7 +1258,9 @@ HWTEST_F(BundleNameParserTest, BundleNameParser_InitializeImpl_InvalidItem_002, 
             GTEST_LOG_(ERROR) << "Failed to restore config file: " << configFile;
         }
     } else {
-        remove(configFile.c_str());
+        if (remove(configFile.c_str()) != 0) {
+            GTEST_LOG_(ERROR) << "Failed to remove config file: " << configFile;
+        }
     }
 }
 
@@ -1237,7 +1275,7 @@ HWTEST_F(BundleNameParserTest, BundleNameParser_InitializeImpl_NonStringPlacehol
     const std::string configDir = "/etc/multimodalinput";
     const std::string configFile = configDir + "/bundle_name_config.json";
     
-    system(("mkdir -p " + configDir).c_str());
+    CreateDirectoryRecursive(configDir);
     
     std::string originalContent;
     bool fileExists = false;
@@ -1284,7 +1322,9 @@ HWTEST_F(BundleNameParserTest, BundleNameParser_InitializeImpl_NonStringPlacehol
             GTEST_LOG_(ERROR) << "Failed to restore config file: " << configFile;
         }
     } else {
-        remove(configFile.c_str());
+        if (remove(configFile.c_str()) != 0) {
+            GTEST_LOG_(ERROR) << "Failed to remove config file: " << configFile;
+        }
     }
 }
 
@@ -1299,7 +1339,7 @@ HWTEST_F(BundleNameParserTest, BundleNameParser_InitializeImpl_NonStringBundleNa
     const std::string configDir = "/etc/multimodalinput";
     const std::string configFile = configDir + "/bundle_name_config.json";
     
-    system(("mkdir -p " + configDir).c_str());
+    CreateDirectoryRecursive(configDir);
     
     std::string originalContent;
     bool fileExists = false;
@@ -1346,7 +1386,9 @@ HWTEST_F(BundleNameParserTest, BundleNameParser_InitializeImpl_NonStringBundleNa
             GTEST_LOG_(ERROR) << "Failed to restore config file: " << configFile;
         }
     } else {
-        remove(configFile.c_str());
+        if (remove(configFile.c_str()) != 0) {
+            GTEST_LOG_(ERROR) << "Failed to remove config file: " << configFile;
+        }
     }
 }
 
@@ -1361,7 +1403,7 @@ HWTEST_F(BundleNameParserTest, BundleNameParser_InitializeImpl_MaxSize_001, Test
     const std::string configDir = "/etc/multimodalinput";
     const std::string configFile = configDir + "/bundle_name_config.json";
     
-    system(("mkdir -p " + configDir).c_str());
+    CreateDirectoryRecursive(configDir);
     
     std::string originalContent;
     bool fileExists = false;
@@ -1407,7 +1449,9 @@ HWTEST_F(BundleNameParserTest, BundleNameParser_InitializeImpl_MaxSize_001, Test
             GTEST_LOG_(ERROR) << "Failed to restore config file: " << configFile;
         }
     } else {
-        remove(configFile.c_str());
+        if (remove(configFile.c_str()) != 0) {
+            GTEST_LOG_(ERROR) << "Failed to remove config file: " << configFile;
+        }
     }
 }
 
@@ -1422,7 +1466,7 @@ HWTEST_F(BundleNameParserTest, BundleNameParser_InitializeImpl_ExceedMaxSize_001
     const std::string configDir = "/etc/multimodalinput";
     const std::string configFile = configDir + "/bundle_name_config.json";
     
-    system(("mkdir -p " + configDir).c_str());
+    CreateDirectoryRecursive(configDir);
     
     std::string originalContent;
     bool fileExists = false;
@@ -1468,7 +1512,9 @@ HWTEST_F(BundleNameParserTest, BundleNameParser_InitializeImpl_ExceedMaxSize_001
             GTEST_LOG_(ERROR) << "Failed to restore config file: " << configFile;
         }
     } else {
-        remove(configFile.c_str());
+        if (remove(configFile.c_str()) != 0) {
+            GTEST_LOG_(ERROR) << "Failed to remove config file: " << configFile;
+        }
     }
 }
 
@@ -1483,7 +1529,7 @@ HWTEST_F(BundleNameParserTest, BundleNameParser_InitializeImpl_MixedValidInvalid
     const std::string configDir = "/etc/multimodalinput";
     const std::string configFile = configDir + "/bundle_name_config.json";
     
-    system(("mkdir -p " + configDir).c_str());
+    CreateDirectoryRecursive(configDir);
     
     std::string originalContent;
     bool fileExists = false;
@@ -1529,7 +1575,9 @@ HWTEST_F(BundleNameParserTest, BundleNameParser_InitializeImpl_MixedValidInvalid
             GTEST_LOG_(ERROR) << "Failed to restore config file: " << configFile;
         }
     } else {
-        remove(configFile.c_str());
+        if (remove(configFile.c_str()) != 0) {
+            GTEST_LOG_(ERROR) << "Failed to remove config file: " << configFile;
+        }
     }
 }
 
@@ -1544,7 +1592,7 @@ HWTEST_F(BundleNameParserTest, BundleNameParser_InitializeImpl_DuplicateKeys_001
     const std::string configDir = "/etc/multimodalinput";
     const std::string configFile = configDir + "/bundle_name_config.json";
     
-    system(("mkdir -p " + configDir).c_str());
+    CreateDirectoryRecursive(configDir);
     
     std::string originalContent;
     bool fileExists = false;
@@ -1587,7 +1635,9 @@ HWTEST_F(BundleNameParserTest, BundleNameParser_InitializeImpl_DuplicateKeys_001
             GTEST_LOG_(ERROR) << "Failed to restore config file: " << configFile;
         }
     } else {
-        remove(configFile.c_str());
+        if (remove(configFile.c_str()) != 0) {
+            GTEST_LOG_(ERROR) << "Failed to remove config file: " << configFile;
+        }
     }
 }
 
@@ -1602,7 +1652,7 @@ HWTEST_F(BundleNameParserTest, BundleNameParser_InitializeImpl_EmptyStrings_001,
     const std::string configDir = "/etc/multimodalinput";
     const std::string configFile = configDir + "/bundle_name_config.json";
     
-    system(("mkdir -p " + configDir).c_str());
+    CreateDirectoryRecursive(configDir);
     
     std::string originalContent;
     bool fileExists = false;
@@ -1652,7 +1702,9 @@ HWTEST_F(BundleNameParserTest, BundleNameParser_InitializeImpl_EmptyStrings_001,
             GTEST_LOG_(ERROR) << "Failed to restore config file: " << configFile;
         }
     } else {
-        remove(configFile.c_str());
+        if (remove(configFile.c_str()) != 0) {
+            GTEST_LOG_(ERROR) << "Failed to remove config file: " << configFile;
+        }
     }
 }
 
@@ -1667,7 +1719,7 @@ HWTEST_F(BundleNameParserTest, BundleNameParser_InitializeImpl_SpecialChars_001,
     const std::string configDir = "/etc/multimodalinput";
     const std::string configFile = configDir + "/bundle_name_config.json";
     
-    system(("mkdir -p " + configDir).c_str());
+    CreateDirectoryRecursive(configDir);
     
     std::string originalContent;
     bool fileExists = false;
@@ -1715,7 +1767,9 @@ HWTEST_F(BundleNameParserTest, BundleNameParser_InitializeImpl_SpecialChars_001,
             GTEST_LOG_(ERROR) << "Failed to restore config file: " << configFile;
         }
     } else {
-        remove(configFile.c_str());
+        if (remove(configFile.c_str()) != 0) {
+            GTEST_LOG_(ERROR) << "Failed to remove config file: " << configFile;
+        }
     }
 }
 
@@ -1730,7 +1784,7 @@ HWTEST_F(BundleNameParserTest, BundleNameParser_InitializeImpl_NullItem_001, Tes
     const std::string configDir = "/etc/multimodalinput";
     const std::string configFile = configDir + "/bundle_name_config.json";
     
-    system(("mkdir -p " + configDir).c_str());
+    CreateDirectoryRecursive(configDir);
     
     std::string originalContent;
     bool fileExists = false;
@@ -1776,7 +1830,9 @@ HWTEST_F(BundleNameParserTest, BundleNameParser_InitializeImpl_NullItem_001, Tes
             GTEST_LOG_(ERROR) << "Failed to restore config file: " << configFile;
         }
     } else {
-        remove(configFile.c_str());
+        if (remove(configFile.c_str()) != 0) {
+            GTEST_LOG_(ERROR) << "Failed to remove config file: " << configFile;
+        }
     }
 }
 
@@ -1809,7 +1865,7 @@ HWTEST_F(BundleNameParserTest, BundleNameParser_GetBundleName_AfterInit_001, Tes
     const std::string configDir = "/etc/multimodalinput";
     const std::string configFile = configDir + "/bundle_name_config.json";
     
-    system(("mkdir -p " + configDir).c_str());
+    CreateDirectoryRecursive(configDir);
     
     std::string originalContent;
     bool fileExists = false;
@@ -1837,9 +1893,11 @@ HWTEST_F(BundleNameParserTest, BundleNameParser_GetBundleName_AfterInit_001, Tes
     
     BundleNameParser& parser = BundleNameParser::GetInstance();
     
+    int32_t initResult = parser.Init();
+    
     std::string result = parser.GetBundleName("test_key");
     
-    if (parser.Init() == RET_OK_VALUE) {
+    if (initResult == RET_OK_VALUE) {
         EXPECT_EQ(result, "com.test.bundle");
     } else {
         EXPECT_EQ(result, "");
@@ -1855,7 +1913,9 @@ HWTEST_F(BundleNameParserTest, BundleNameParser_GetBundleName_AfterInit_001, Tes
             GTEST_LOG_(ERROR) << "Failed to restore config file: " << configFile;
         }
     } else {
-        remove(configFile.c_str());
+        if (remove(configFile.c_str()) != 0) {
+            GTEST_LOG_(ERROR) << "Failed to remove config file: " << configFile;
+        }
     }
 }
 
