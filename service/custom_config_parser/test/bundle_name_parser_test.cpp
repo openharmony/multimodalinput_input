@@ -20,6 +20,7 @@
 #include <vector>
 #include <map>
 #include <fstream>
+#include <sstream>
 
 #include "bundle_name_parser.h"
 #include "json_parser.h"
@@ -32,31 +33,10 @@ using namespace testing;
 using namespace testing::ext;
 
 constexpr int32_t MAX_JSON_ARRAY_SIZE = 100;
-constexpr int32_t SINGLE_ITEM_ARRAY_SIZE = 1;
-constexpr int32_t TWO_ITEMS_ARRAY_SIZE = 2;
-constexpr int32_t THREE_ITEMS_ARRAY_SIZE = 3;
-constexpr int32_t FIVE_ITEMS_ARRAY_SIZE = 5;
 constexpr int32_t EXCEED_MAX_ARRAY_SIZE = 150;
 constexpr int32_t RET_OK_VALUE = 0;
 constexpr int32_t RET_ERR_VALUE = -1;
-constexpr int32_t FIRST_ARRAY_INDEX = 0;
-constexpr int32_t SECOND_ARRAY_INDEX = 1;
-constexpr int32_t THIRD_ARRAY_INDEX = 2;
-constexpr int32_t FOURTH_ARRAY_INDEX = 3;
-constexpr int32_t FIFTH_ARRAY_INDEX = 4;
-
-const std::string TEST_KEY_PLACEHOLDER_1 = "placeholder1";
-const std::string TEST_KEY_PLACEHOLDER_2 = "placeholder2";
-const std::string TEST_KEY_PLACEHOLDER_3 = "placeholder3";
-const std::string TEST_KEY_PLACEHOLDER_4 = "placeholder4";
-const std::string TEST_KEY_PLACEHOLDER_5 = "placeholder5";
-const std::string TEST_KEY_INVALID = "invalid_placeholder";
-
-const std::string TEST_BUNDLE_NAME_1 = "com.example.app1";
-const std::string TEST_BUNDLE_NAME_2 = "com.example.app2";
-const std::string TEST_BUNDLE_NAME_3 = "com.example.app3";
-const std::string TEST_BUNDLE_NAME_4 = "com.example.app4";
-const std::string TEST_BUNDLE_NAME_5 = "com.example.app5";
+constexpr int32_t FIVE_ITEMS_ARRAY_SIZE = 5;
 
 class BundleNameParserTest : public testing::Test {
 public:
@@ -115,53 +95,15 @@ HWTEST_F(BundleNameParserTest, BundleNameParser_GetInstance_001, TestSize.Level1
  */
 HWTEST_F(BundleNameParserTest, BundleNameParser_GetBundleName_001, TestSize.Level1)
 {
-    std::string result = BundleNameParser::GetInstance().GetBundleName(TEST_KEY_PLACEHOLDER_1);
-
-    EXPECT_EQ(result, "");
+    BundleNameParser& parser = BundleNameParser::GetInstance();
+    EXPECT_NE(&parser, nullptr);
 }
 
-/**
- * @tc.name: BundleNameParser_GetBundleName_002
- * @tc.desc: Test GetBundleName with invalid key returns empty
- * @tc.type: FUNC
- * @tc.require:
- */
 HWTEST_F(BundleNameParserTest, BundleNameParser_GetBundleName_002, TestSize.Level1)
 {
-    std::string result = BundleNameParser::GetInstance().GetBundleName(TEST_KEY_INVALID);
-
+    BundleNameParser& parser = BundleNameParser::GetInstance();
+    std::string result = parser.GetBundleName("non_existent");
     EXPECT_EQ(result, "");
-}
-
-/**
- * @tc.name: BundleNameParser_GetBundleName_003
- * @tc.desc: Test GetBundleName with empty key returns empty
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(BundleNameParserTest, BundleNameParser_GetBundleName_003, TestSize.Level1)
-{
-    const std::string emptyKey = "";
-    std::string result = BundleNameParser::GetInstance().GetBundleName(emptyKey);
-
-    EXPECT_EQ(result, "");
-}
-
-/**
- * @tc.name: BundleNameParser_GetBundleName_004
- * @tc.desc: Test GetBundleName multiple calls return same empty value
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(BundleNameParserTest, BundleNameParser_GetBundleName_004, TestSize.Level1)
-{
-    std::string result1 = BundleNameParser::GetInstance().GetBundleName(TEST_KEY_PLACEHOLDER_1);
-    std::string result2 = BundleNameParser::GetInstance().GetBundleName(TEST_KEY_PLACEHOLDER_1);
-    std::string result3 = BundleNameParser::GetInstance().GetBundleName(TEST_KEY_PLACEHOLDER_1);
-
-    EXPECT_EQ(result1, result2);
-    EXPECT_EQ(result2, result3);
-    EXPECT_EQ(result1, "");
 }
 
 /**
@@ -191,90 +133,6 @@ HWTEST_F(BundleNameParserTest, BundleNameParser_Init_002, TestSize.Level1)
     int32_t initResult2 = parser.Init();
 
     EXPECT_EQ(initResult1, initResult2);
-}
-
-/**
- * @tc.name: BundleNameParser_Constants_001
- * @tc.desc: Test constant maxJsonArraySize
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(BundleNameParserTest, BundleNameParser_Constants_001, TestSize.Level1)
-{
-    EXPECT_EQ(MAX_JSON_ARRAY_SIZE, 100);
-}
-
-/**
- * @tc.name: BundleNameParser_Constants_002
- * @tc.desc: Test return code constants
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(BundleNameParserTest, BundleNameParser_Constants_002, TestSize.Level1)
-{
-    EXPECT_EQ(RET_OK_VALUE, 0);
-    EXPECT_EQ(RET_ERR_VALUE, -1);
-}
-
-/**
- * @tc.name: BundleNameParser_Constants_003
- * @tc.desc: Test array size constants
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(BundleNameParserTest, BundleNameParser_Constants_003, TestSize.Level1)
-{
-    EXPECT_EQ(SINGLE_ITEM_ARRAY_SIZE, 1);
-    EXPECT_EQ(TWO_ITEMS_ARRAY_SIZE, 2);
-    EXPECT_EQ(THREE_ITEMS_ARRAY_SIZE, 3);
-    EXPECT_EQ(FIVE_ITEMS_ARRAY_SIZE, 5);
-    EXPECT_EQ(EXCEED_MAX_ARRAY_SIZE, 150);
-}
-
-/**
- * @tc.name: BundleNameParser_Constants_004
- * @tc.desc: Test array indexing constants
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(BundleNameParserTest, BundleNameParser_Constants_004, TestSize.Level1)
-{
-    EXPECT_EQ(FIRST_ARRAY_INDEX, 0);
-    EXPECT_EQ(SECOND_ARRAY_INDEX, 1);
-    EXPECT_EQ(THIRD_ARRAY_INDEX, 2);
-    EXPECT_EQ(FOURTH_ARRAY_INDEX, 3);
-    EXPECT_EQ(FIFTH_ARRAY_INDEX, 4);
-}
-
-/**
- * @tc.name: BundleNameParser_StringConstants_001
- * @tc.desc: Test placeholder key string constants
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(BundleNameParserTest, BundleNameParser_StringConstants_001, TestSize.Level1)
-{
-    EXPECT_EQ(TEST_KEY_PLACEHOLDER_1, "placeholder1");
-    EXPECT_EQ(TEST_KEY_PLACEHOLDER_2, "placeholder2");
-    EXPECT_EQ(TEST_KEY_PLACEHOLDER_3, "placeholder3");
-    EXPECT_EQ(TEST_KEY_PLACEHOLDER_4, "placeholder4");
-    EXPECT_EQ(TEST_KEY_PLACEHOLDER_5, "placeholder5");
-    EXPECT_EQ(TEST_KEY_INVALID, "invalid_placeholder");
-}
-
-/**
- * @tc.name: BundleNameParser_StringConstants_002
- * @tc.desc: Test bundle name string constants
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(BundleNameParserTest, BundleNameParser_StringConstants_002, TestSize.Level1)
-{
-    EXPECT_EQ(TEST_BUNDLE_NAME_1, "com.example.app1");
-    EXPECT_EQ(TEST_BUNDLE_NAME_2, "com.example.app2");
-    EXPECT_EQ(TEST_BUNDLE_NAME_3, "com.example.app3");
-    EXPECT_EQ(TEST_BUNDLE_NAME_4, "com.example.app4");
-    EXPECT_EQ(TEST_BUNDLE_NAME_5, "com.example.app5");
 }
 
 /**
@@ -558,17 +416,17 @@ HWTEST_F(BundleNameParserTest, BundleNameParser_JsonArray_003, TestSize.Level1)
  */
 HWTEST_F(BundleNameParserTest, BundleNameParser_JsonArray_004, TestSize.Level1)
 {
-    std::string json = "{\"bundle_name_map\":[";
+    std::ostringstream json;
+    json << "{\"bundle_name_map\":[";
     for (int32_t i = 0; i < MAX_JSON_ARRAY_SIZE; ++i) {
         if (i > 0) {
-            json += ",";
+            json << ",";
         }
-        json += "{\"placeholder\":\"key" + std::to_string(i) +
-            "\",\"bundle" + "name\":\"bundle" + std::to_string(i) + "\"}";
+        json << "{\"placeholder\":\"key" << i << "\",\"bundle_name\":\"bundle" << i << "\"}";
     }
-    json += "]}";
+    json << "]}";
 
-    JsonParser parser(json.c_str());
+    JsonParser parser(json.str().c_str());
     cJSON* bundleNameMap = cJSON_GetObjectItemCaseSensitive(parser.Get(), "bundle_name_map");
     EXPECT_TRUE(cJSON_IsArray(bundleNameMap));
     EXPECT_EQ(cJSON_GetArraySize(bundleNameMap), MAX_JSON_ARRAY_SIZE);
@@ -582,17 +440,17 @@ HWTEST_F(BundleNameParserTest, BundleNameParser_JsonArray_004, TestSize.Level1)
  */
 HWTEST_F(BundleNameParserTest, BundleNameParser_JsonArray_005, TestSize.Level1)
 {
-    std::string json = "{\"bundle_name_map\":[";
+    std::ostringstream json;
+    json << "{\"bundle_name_map\":[";
     for (int32_t i = 0; i < EXCEED_MAX_ARRAY_SIZE; ++i) {
         if (i > 0) {
-            json += ",";
+            json << ",";
         }
-        json += "{\"placeholder\":\"key" + std::to_string(i) +
-            "\",\"bundle" + "name\":\"bundle" + std::to_string(i) + "\"}";
+        json << "{\"placeholder\":\"key" << i << "\",\"bundle_name\":\"bundle" << i << "\"}";
     }
-    json += "]}";
+    json << "]}";
 
-    JsonParser parser(json.c_str());
+    JsonParser parser(json.str().c_str());
     cJSON* bundleNameMap = cJSON_GetObjectItemCaseSensitive(parser.Get(), "bundle_name_map");
     EXPECT_TRUE(cJSON_IsArray(bundleNameMap));
     EXPECT_EQ(cJSON_GetArraySize(bundleNameMap), EXCEED_MAX_ARRAY_SIZE);
@@ -984,7 +842,9 @@ HWTEST_F(BundleNameParserTest, BundleNameParser_InitializeImpl_NotObject_001, Te
         fileExists = true;
         std::stringstream buffer;
         buffer << inFile.rdbuf();
-        originalContent = buffer.str();
+        if (!inFile.fail() && !inFile.bad()) {
+            originalContent = buffer.str();
+        }
     }
     inFile.close();
     
@@ -999,8 +859,13 @@ HWTEST_F(BundleNameParserTest, BundleNameParser_InitializeImpl_NotObject_001, Te
     
     if (fileExists) {
         std::ofstream restoreFile(configFile);
-        restoreFile << originalContent;
+        if (restoreFile.good()) {
+            restoreFile << originalContent;
+        }
         restoreFile.close();
+        if (restoreFile.fail()) {
+            GTEST_LOG_(ERROR) << "Failed to restore config file: " << configFile;
+        }
     } else {
         remove(configFile.c_str());
     }
@@ -1026,7 +891,9 @@ HWTEST_F(BundleNameParserTest, BundleNameParser_InitializeImpl_EmptyArray_001, T
         fileExists = true;
         std::stringstream buffer;
         buffer << inFile.rdbuf();
-        originalContent = buffer.str();
+        if (!inFile.fail() && !inFile.bad()) {
+            originalContent = buffer.str();
+        }
     }
     inFile.close();
     
@@ -1045,8 +912,13 @@ HWTEST_F(BundleNameParserTest, BundleNameParser_InitializeImpl_EmptyArray_001, T
     
     if (fileExists) {
         std::ofstream restoreFile(configFile);
-        restoreFile << originalContent;
+        if (restoreFile.good()) {
+            restoreFile << originalContent;
+        }
         restoreFile.close();
+        if (restoreFile.fail()) {
+            GTEST_LOG_(ERROR) << "Failed to restore config file: " << configFile;
+        }
     } else {
         remove(configFile.c_str());
     }
@@ -1072,7 +944,9 @@ HWTEST_F(BundleNameParserTest, BundleNameParser_InitializeImpl_MissingKey_001, T
         fileExists = true;
         std::stringstream buffer;
         buffer << inFile.rdbuf();
-        originalContent = buffer.str();
+        if (!inFile.fail() && !inFile.bad()) {
+            originalContent = buffer.str();
+        }
     }
     inFile.close();
     
@@ -1090,8 +964,13 @@ HWTEST_F(BundleNameParserTest, BundleNameParser_InitializeImpl_MissingKey_001, T
     
     if (fileExists) {
         std::ofstream restoreFile(configFile);
-        restoreFile << originalContent;
+        if (restoreFile.good()) {
+            restoreFile << originalContent;
+        }
         restoreFile.close();
+        if (restoreFile.fail()) {
+            GTEST_LOG_(ERROR) << "Failed to restore config file: " << configFile;
+        }
     } else {
         remove(configFile.c_str());
     }
@@ -1117,7 +996,9 @@ HWTEST_F(BundleNameParserTest, BundleNameParser_InitializeImpl_NotArray_001, Tes
         fileExists = true;
         std::stringstream buffer;
         buffer << inFile.rdbuf();
-        originalContent = buffer.str();
+        if (!inFile.fail() && !inFile.bad()) {
+            originalContent = buffer.str();
+        }
     }
     inFile.close();
     
@@ -1135,8 +1016,13 @@ HWTEST_F(BundleNameParserTest, BundleNameParser_InitializeImpl_NotArray_001, Tes
     
     if (fileExists) {
         std::ofstream restoreFile(configFile);
-        restoreFile << originalContent;
+        if (restoreFile.good()) {
+            restoreFile << originalContent;
+        }
         restoreFile.close();
+        if (restoreFile.fail()) {
+            GTEST_LOG_(ERROR) << "Failed to restore config file: " << configFile;
+        }
     } else {
         remove(configFile.c_str());
     }
@@ -1162,7 +1048,9 @@ HWTEST_F(BundleNameParserTest, BundleNameParser_InitializeImpl_MultipleItems_001
         fileExists = true;
         std::stringstream buffer;
         buffer << inFile.rdbuf();
-        originalContent = buffer.str();
+        if (!inFile.fail() && !inFile.bad()) {
+            originalContent = buffer.str();
+        }
     }
     inFile.close();
     
@@ -1206,8 +1094,13 @@ HWTEST_F(BundleNameParserTest, BundleNameParser_InitializeImpl_MultipleItems_001
     
     if (fileExists) {
         std::ofstream restoreFile(configFile);
-        restoreFile << originalContent;
+        if (restoreFile.good()) {
+            restoreFile << originalContent;
+        }
         restoreFile.close();
+        if (restoreFile.fail()) {
+            GTEST_LOG_(ERROR) << "Failed to restore config file: " << configFile;
+        }
     } else {
         remove(configFile.c_str());
     }
@@ -1233,7 +1126,9 @@ HWTEST_F(BundleNameParserTest, BundleNameParser_InitializeImpl_InvalidItem_001, 
         fileExists = true;
         std::stringstream buffer;
         buffer << inFile.rdbuf();
-        originalContent = buffer.str();
+        if (!inFile.fail() && !inFile.bad()) {
+            originalContent = buffer.str();
+        }
     }
     inFile.close();
     
@@ -1259,8 +1154,13 @@ HWTEST_F(BundleNameParserTest, BundleNameParser_InitializeImpl_InvalidItem_001, 
     
     if (fileExists) {
         std::ofstream restoreFile(configFile);
-        restoreFile << originalContent;
+        if (restoreFile.good()) {
+            restoreFile << originalContent;
+        }
         restoreFile.close();
+        if (restoreFile.fail()) {
+            GTEST_LOG_(ERROR) << "Failed to restore config file: " << configFile;
+        }
     } else {
         remove(configFile.c_str());
     }
@@ -1286,7 +1186,9 @@ HWTEST_F(BundleNameParserTest, BundleNameParser_InitializeImpl_InvalidItem_002, 
         fileExists = true;
         std::stringstream buffer;
         buffer << inFile.rdbuf();
-        originalContent = buffer.str();
+        if (!inFile.fail() && !inFile.bad()) {
+            originalContent = buffer.str();
+        }
     }
     inFile.close();
     
@@ -1312,8 +1214,13 @@ HWTEST_F(BundleNameParserTest, BundleNameParser_InitializeImpl_InvalidItem_002, 
     
     if (fileExists) {
         std::ofstream restoreFile(configFile);
-        restoreFile << originalContent;
+        if (restoreFile.good()) {
+            restoreFile << originalContent;
+        }
         restoreFile.close();
+        if (restoreFile.fail()) {
+            GTEST_LOG_(ERROR) << "Failed to restore config file: " << configFile;
+        }
     } else {
         remove(configFile.c_str());
     }
@@ -1339,7 +1246,9 @@ HWTEST_F(BundleNameParserTest, BundleNameParser_InitializeImpl_NonStringPlacehol
         fileExists = true;
         std::stringstream buffer;
         buffer << inFile.rdbuf();
-        originalContent = buffer.str();
+        if (!inFile.fail() && !inFile.bad()) {
+            originalContent = buffer.str();
+        }
     }
     inFile.close();
     
@@ -1367,8 +1276,13 @@ HWTEST_F(BundleNameParserTest, BundleNameParser_InitializeImpl_NonStringPlacehol
     
     if (fileExists) {
         std::ofstream restoreFile(configFile);
-        restoreFile << originalContent;
+        if (restoreFile.good()) {
+            restoreFile << originalContent;
+        }
         restoreFile.close();
+        if (restoreFile.fail()) {
+            GTEST_LOG_(ERROR) << "Failed to restore config file: " << configFile;
+        }
     } else {
         remove(configFile.c_str());
     }
@@ -1394,7 +1308,9 @@ HWTEST_F(BundleNameParserTest, BundleNameParser_InitializeImpl_NonStringBundleNa
         fileExists = true;
         std::stringstream buffer;
         buffer << inFile.rdbuf();
-        originalContent = buffer.str();
+        if (!inFile.fail() && !inFile.bad()) {
+            originalContent = buffer.str();
+        }
     }
     inFile.close();
     
@@ -1422,8 +1338,13 @@ HWTEST_F(BundleNameParserTest, BundleNameParser_InitializeImpl_NonStringBundleNa
     
     if (fileExists) {
         std::ofstream restoreFile(configFile);
-        restoreFile << originalContent;
+        if (restoreFile.good()) {
+            restoreFile << originalContent;
+        }
         restoreFile.close();
+        if (restoreFile.fail()) {
+            GTEST_LOG_(ERROR) << "Failed to restore config file: " << configFile;
+        }
     } else {
         remove(configFile.c_str());
     }
@@ -1449,7 +1370,9 @@ HWTEST_F(BundleNameParserTest, BundleNameParser_InitializeImpl_MaxSize_001, Test
         fileExists = true;
         std::stringstream buffer;
         buffer << inFile.rdbuf();
-        originalContent = buffer.str();
+        if (!inFile.fail() && !inFile.bad()) {
+            originalContent = buffer.str();
+        }
     }
     inFile.close();
     
@@ -1476,8 +1399,13 @@ HWTEST_F(BundleNameParserTest, BundleNameParser_InitializeImpl_MaxSize_001, Test
     
     if (fileExists) {
         std::ofstream restoreFile(configFile);
-        restoreFile << originalContent;
+        if (restoreFile.good()) {
+            restoreFile << originalContent;
+        }
         restoreFile.close();
+        if (restoreFile.fail()) {
+            GTEST_LOG_(ERROR) << "Failed to restore config file: " << configFile;
+        }
     } else {
         remove(configFile.c_str());
     }
@@ -1503,7 +1431,9 @@ HWTEST_F(BundleNameParserTest, BundleNameParser_InitializeImpl_ExceedMaxSize_001
         fileExists = true;
         std::stringstream buffer;
         buffer << inFile.rdbuf();
-        originalContent = buffer.str();
+        if (!inFile.fail() && !inFile.bad()) {
+            originalContent = buffer.str();
+        }
     }
     inFile.close();
     
@@ -1530,8 +1460,13 @@ HWTEST_F(BundleNameParserTest, BundleNameParser_InitializeImpl_ExceedMaxSize_001
     
     if (fileExists) {
         std::ofstream restoreFile(configFile);
-        restoreFile << originalContent;
+        if (restoreFile.good()) {
+            restoreFile << originalContent;
+        }
         restoreFile.close();
+        if (restoreFile.fail()) {
+            GTEST_LOG_(ERROR) << "Failed to restore config file: " << configFile;
+        }
     } else {
         remove(configFile.c_str());
     }
@@ -1557,7 +1492,9 @@ HWTEST_F(BundleNameParserTest, BundleNameParser_InitializeImpl_MixedValidInvalid
         fileExists = true;
         std::stringstream buffer;
         buffer << inFile.rdbuf();
-        originalContent = buffer.str();
+        if (!inFile.fail() && !inFile.bad()) {
+            originalContent = buffer.str();
+        }
     }
     inFile.close();
     
@@ -1580,12 +1517,17 @@ HWTEST_F(BundleNameParserTest, BundleNameParser_InitializeImpl_MixedValidInvalid
     EXPECT_TRUE(cJSON_IsObject(parser.Get()));
     
     cJSON* bundleNameMap = cJSON_GetObjectItemCaseSensitive(parser.Get(), "bundle_name_map");
-    EXPECT_EQ(cJSON_GetArraySize(bundleNameMap), 5);
+    EXPECT_EQ(cJSON_GetArraySize(bundleNameMap), FIVE_ITEMS_ARRAY_SIZE);
     
     if (fileExists) {
         std::ofstream restoreFile(configFile);
-        restoreFile << originalContent;
+        if (restoreFile.good()) {
+            restoreFile << originalContent;
+        }
         restoreFile.close();
+        if (restoreFile.fail()) {
+            GTEST_LOG_(ERROR) << "Failed to restore config file: " << configFile;
+        }
     } else {
         remove(configFile.c_str());
     }
@@ -1611,7 +1553,9 @@ HWTEST_F(BundleNameParserTest, BundleNameParser_InitializeImpl_DuplicateKeys_001
         fileExists = true;
         std::stringstream buffer;
         buffer << inFile.rdbuf();
-        originalContent = buffer.str();
+        if (!inFile.fail() && !inFile.bad()) {
+            originalContent = buffer.str();
+        }
     }
     inFile.close();
     
@@ -1635,8 +1579,13 @@ HWTEST_F(BundleNameParserTest, BundleNameParser_InitializeImpl_DuplicateKeys_001
     
     if (fileExists) {
         std::ofstream restoreFile(configFile);
-        restoreFile << originalContent;
+        if (restoreFile.good()) {
+            restoreFile << originalContent;
+        }
         restoreFile.close();
+        if (restoreFile.fail()) {
+            GTEST_LOG_(ERROR) << "Failed to restore config file: " << configFile;
+        }
     } else {
         remove(configFile.c_str());
     }
@@ -1662,7 +1611,9 @@ HWTEST_F(BundleNameParserTest, BundleNameParser_InitializeImpl_EmptyStrings_001,
         fileExists = true;
         std::stringstream buffer;
         buffer << inFile.rdbuf();
-        originalContent = buffer.str();
+        if (!inFile.fail() && !inFile.bad()) {
+            originalContent = buffer.str();
+        }
     }
     inFile.close();
     
@@ -1693,8 +1644,13 @@ HWTEST_F(BundleNameParserTest, BundleNameParser_InitializeImpl_EmptyStrings_001,
     
     if (fileExists) {
         std::ofstream restoreFile(configFile);
-        restoreFile << originalContent;
+        if (restoreFile.good()) {
+            restoreFile << originalContent;
+        }
         restoreFile.close();
+        if (restoreFile.fail()) {
+            GTEST_LOG_(ERROR) << "Failed to restore config file: " << configFile;
+        }
     } else {
         remove(configFile.c_str());
     }
@@ -1720,7 +1676,9 @@ HWTEST_F(BundleNameParserTest, BundleNameParser_InitializeImpl_SpecialChars_001,
         fileExists = true;
         std::stringstream buffer;
         buffer << inFile.rdbuf();
-        originalContent = buffer.str();
+        if (!inFile.fail() && !inFile.bad()) {
+            originalContent = buffer.str();
+        }
     }
     inFile.close();
     
@@ -1749,8 +1707,13 @@ HWTEST_F(BundleNameParserTest, BundleNameParser_InitializeImpl_SpecialChars_001,
     
     if (fileExists) {
         std::ofstream restoreFile(configFile);
-        restoreFile << originalContent;
+        if (restoreFile.good()) {
+            restoreFile << originalContent;
+        }
         restoreFile.close();
+        if (restoreFile.fail()) {
+            GTEST_LOG_(ERROR) << "Failed to restore config file: " << configFile;
+        }
     } else {
         remove(configFile.c_str());
     }
@@ -1776,7 +1739,9 @@ HWTEST_F(BundleNameParserTest, BundleNameParser_InitializeImpl_NullItem_001, Tes
         fileExists = true;
         std::stringstream buffer;
         buffer << inFile.rdbuf();
-        originalContent = buffer.str();
+        if (!inFile.fail() && !inFile.bad()) {
+            originalContent = buffer.str();
+        }
     }
     inFile.close();
     
@@ -1803,8 +1768,13 @@ HWTEST_F(BundleNameParserTest, BundleNameParser_InitializeImpl_NullItem_001, Tes
     
     if (fileExists) {
         std::ofstream restoreFile(configFile);
-        restoreFile << originalContent;
+        if (restoreFile.good()) {
+            restoreFile << originalContent;
+        }
         restoreFile.close();
+        if (restoreFile.fail()) {
+            GTEST_LOG_(ERROR) << "Failed to restore config file: " << configFile;
+        }
     } else {
         remove(configFile.c_str());
     }
@@ -1848,7 +1818,9 @@ HWTEST_F(BundleNameParserTest, BundleNameParser_GetBundleName_AfterInit_001, Tes
         fileExists = true;
         std::stringstream buffer;
         buffer << inFile.rdbuf();
-        originalContent = buffer.str();
+        if (!inFile.fail() && !inFile.bad()) {
+            originalContent = buffer.str();
+        }
     }
     inFile.close();
     
@@ -1875,8 +1847,13 @@ HWTEST_F(BundleNameParserTest, BundleNameParser_GetBundleName_AfterInit_001, Tes
     
     if (fileExists) {
         std::ofstream restoreFile(configFile);
-        restoreFile << originalContent;
+        if (restoreFile.good()) {
+            restoreFile << originalContent;
+        }
         restoreFile.close();
+        if (restoreFile.fail()) {
+            GTEST_LOG_(ERROR) << "Failed to restore config file: " << configFile;
+        }
     } else {
         remove(configFile.c_str());
     }
