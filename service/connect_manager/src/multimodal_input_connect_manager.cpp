@@ -1162,6 +1162,14 @@ int32_t MultimodalInputConnectManager::DisableInputEventDispatch(bool disabled)
     return multimodalInputConnectService_->DisableInputEventDispatch(disabled);
 }
 
+int32_t MultimodalInputConnectManager::EnableInputExtension(const std::string &uuid, bool enabled)
+{
+    CALL_INFO_TRACE;
+    std::lock_guard<std::mutex> guard(lock_);
+    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    return multimodalInputConnectService_->EnableInputExtension(uuid, enabled);
+}
+
 int32_t MultimodalInputConnectManager::ShiftAppPointerEvent(const ShiftWindowParam &param, bool autoGenDown)
 {
     CALL_INFO_TRACE;
