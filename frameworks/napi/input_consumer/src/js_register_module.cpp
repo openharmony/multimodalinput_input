@@ -1203,14 +1203,11 @@ static napi_value JsOnKey(napi_env env, napi_callback_info info)
         MMI_HILOGE("ValidateOnKeyParameters failed");
         return nullptr;
     }
-
     event->name = keyType;
-
     if (!SaveOnKeyCallback(env, argc, argv, event)) {
         MMI_HILOGE("SaveOnKeyCallback failed");
         return nullptr;
     }
-
     if (SubscribeKeyCommand(env, info, event, keyOption) == nullptr) {
         MMI_HILOGE("SubscribeKeyCommand failed");
         return nullptr;
@@ -1299,12 +1296,10 @@ static napi_value JsOffKey(napi_env env, napi_callback_info info)
         MMI_HILOGE("GetEventInfoAPI26 failed");
         return nullptr;
     }
-
     if (!UnsubscribeKeyCommand(env, event, keyOption)) {
         MMI_HILOGE("UnsubscribeKeyCommand failed");
         return nullptr;
     }
-
     return nullptr;
 }
 

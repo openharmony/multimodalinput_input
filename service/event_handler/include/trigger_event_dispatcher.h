@@ -79,17 +79,14 @@ private:
 
     // 检查是否在 duration 窗口内有其他按键
     bool HasOtherKeyPressedInWindow(const std::string& subscribeKey);
-
     // 记录 duration 窗口开始
     void StartDurationWindow(const std::string& subscribeKey, int32_t duration);
-
     // 标记 duration 窗口已通过
     void MarkDurationPassed(const std::string& subscribeKey);
 
 private:
     // 检查duration窗口是否已通过
     bool CheckDurationWindowPassed(const std::string& subscribeKey);
-
     // 检查duration窗口内是否有其他按键
     bool CheckDurationWindowWithOtherKey(const std::string& subscribeKey);
 
@@ -102,7 +99,6 @@ private:
     std::map<std::string, bool> durationPassed_;       // duration 窗口是否已通过
     std::map<std::string, bool> hasOtherKey_;          // duration 窗口内是否有其他按键
 };
-
 } // namespace MMI
 } // namespace OHOS
 
