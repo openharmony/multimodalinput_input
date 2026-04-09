@@ -583,16 +583,35 @@ int32_t OH_Input_GetKeySwitch(const struct Input_KeyState* keyState);
 
 /**
  * @brief Inject system keys.
- *        Callers without this permission can inject after OH_Input_RequestInjection
- *        completes dialog authorization.
+ * since API 20, it is recommended to use OH_Input_RequestInjection
+ * to request authorization before using the interface,
+ * and then use OH_Input_QueryAuthorizedStatus to query the authorization status.
+ * When the authorization status is AUTHORIZED, use the interface.
+ *
+ * @param keyEvent - the key event to be injected.
+ * @return OH_Input_InjectKeyEvent function result code.
+ *         {@link INPUT_SUCCESS} inject keyEvent success.\n
+ *         {@link INPUT_PERMISSION_DENIED} Permission verification failed.\n
+ *         {@link INPUT_PARAMETER_ERROR} keyCode is less 0, can not process.\n
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 12
+ */
+/**
+ * @brief Inject system keys.
+ * since API 20, it is recommended to use OH_Input_RequestInjection
+ * to request authorization before using the interface,
+ * and then use OH_Input_QueryAuthorizedStatus to query the authorization status.
+ * When the authorization status is AUTHORIZED, use the interface.
+ * 自 API version 26.0.0 起，拥有 ohos.permission.CONTROL_DEVICE 权限的调用方也可以直接使用本接口。
  *
  * @permission ohos.permission.CONTROL_DEVICE
  * @param keyEvent - the key event to be injected.
- * @return 0 - Success.
- *         201 - Missing permissions.
- *         401 - Parameter error.
+ * @return OH_Input_InjectKeyEvent function result code.
+ *         {@link INPUT_SUCCESS} inject keyEvent success.\n
+ *         {@link INPUT_PERMISSION_DENIED} Permission verification failed.\n
+ *         {@link INPUT_PARAMETER_ERROR} keyCode is less 0, can not process.\n
  * @syscap SystemCapability.MultimodalInput.Input.Core
- * @since 12
+ * @since 26.0.0
  */
 int32_t OH_Input_InjectKeyEvent(const struct Input_KeyEvent* keyEvent);
 
@@ -786,23 +805,59 @@ Input_Result OH_Input_DispatchToNextHandler(int32_t eventId);
 
 /**
  * @brief Inject mouse event.
- *        Callers without this permission can inject after OH_Input_RequestInjection
- *        completes dialog authorization.
+ * since API 20, it is recommended to use OH_Input_RequestInjection
+ * to request authorization before using the interface,
+ * and then use OH_Input_QueryAuthorizedStatus to query the authorization status.
+ * When the authorization status is AUTHORIZED, use the interface.
+ *
+ * @param mouseEvent - the mouse event to be injected.
+ * @return OH_Input_InjectMouseEvent function result code.
+ *         {@link INPUT_SUCCESS} inject mouseEvent success.\n
+ *         {@link INPUT_PERMISSION_DENIED} Permission verification failed.\n
+ *         {@link INPUT_PARAMETER_ERROR} Parameter check failed.\n
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 12
+ */
+/**
+ * @brief Inject mouse event.
+ * since API 20, it is recommended to use OH_Input_RequestInjection
+ * to request authorization before using the interface,
+ * and then use OH_Input_QueryAuthorizedStatus to query the authorization status.
+ * When the authorization status is AUTHORIZED, use the interface.
+ * 自 API version 26.0.0 起，拥有 ohos.permission.CONTROL_DEVICE 权限的调用方也可以直接使用本接口。
  *
  * @permission ohos.permission.CONTROL_DEVICE
  * @param mouseEvent - the mouse event to be injected.
- * @return 0 - Success.
- *         201 - Missing permissions.
- *         401 - Parameter error.
+ * @return OH_Input_InjectMouseEvent function result code.
+ *         {@link INPUT_SUCCESS} inject mouseEvent success.\n
+ *         {@link INPUT_PERMISSION_DENIED} Permission verification failed.\n
+ *         {@link INPUT_PARAMETER_ERROR} Parameter check failed.\n
  * @syscap SystemCapability.MultimodalInput.Input.Core
- * @since 12
+ * @since 26.0.0
  */
 int32_t OH_Input_InjectMouseEvent(const struct Input_MouseEvent* mouseEvent);
 
 /**
  * @brief Inject mouse event using global coordinate.
- *        Callers without this permission can inject after OH_Input_RequestInjection
- *        completes dialog authorization.
+ * since API 20, it is recommended to use OH_Input_RequestInjection
+ * to request authorization before using the interface,
+ * and then use OH_Input_QueryAuthorizedStatus to query the authorization status.
+ * When the authorization status is AUTHORIZED, use the interface.
+ *
+ * @param mouseEvent - the mouse event to be injected, set up effective globalX globalY.
+ * @return OH_Input_InjectMouseEventGlobal function result code.
+ *         {@link INPUT_SUCCESS} inject mouseEvent success.\n
+ *         {@link INPUT_PERMISSION_DENIED} Permission verification failed.\n
+ *         {@link INPUT_PARAMETER_ERROR} Parameter check failed.\n
+ * @since 20
+ */
+/**
+ * @brief Inject mouse event using global coordinate.
+ * since API 20, it is recommended to use OH_Input_RequestInjection
+ * to request authorization before using the interface,
+ * and then use OH_Input_QueryAuthorizedStatus to query the authorization status.
+ * When the authorization status is AUTHORIZED, use the interface.
+ * 自 API version 26.0.0 起，拥有 ohos.permission.CONTROL_DEVICE 权限的调用方也可以直接使用本接口。
  *
  * @permission ohos.permission.CONTROL_DEVICE
  * @param mouseEvent - the mouse event to be injected, set up effective globalX globalY.
@@ -810,7 +865,7 @@ int32_t OH_Input_InjectMouseEvent(const struct Input_MouseEvent* mouseEvent);
  *         {@link INPUT_SUCCESS} inject mouseEvent success.\n
  *         {@link INPUT_PERMISSION_DENIED} Permission verification failed.\n
  *         {@link INPUT_PARAMETER_ERROR} Parameter check failed.\n
- * @since 20
+ * @since 26.0.0
  */
 int32_t OH_Input_InjectMouseEventGlobal(const struct Input_MouseEvent* mouseEvent);
 
@@ -1056,30 +1111,65 @@ int32_t OH_Input_GetMouseEventGlobalY(const struct Input_MouseEvent* mouseEvent)
 
 /**
  * @brief Inject touch event.
- *        Callers without this permission can inject after OH_Input_RequestInjection
- *        completes dialog authorization.
+ * since API 20, it is recommended to use OH_Input_RequestInjection
+ * to request authorization before using the interface,
+ * and then use OH_Input_QueryAuthorizedStatus to query the authorization status.
+ * When the authorization status is AUTHORIZED, use the interface.
+ *
+ * @param touchEvent - the touch event to be injected.
+ * @return OH_Input_InjectTouchEvent function result code.
+ *         {@link INPUT_SUCCESS} inject touchEvent success.\n
+ *         {@link INPUT_PARAMETER_ERROR} Parameter check failed.\n
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 12
+ */
+/**
+ * @brief Inject touch event.
+ * since API 20, it is recommended to use OH_Input_RequestInjection
+ * to request authorization before using the interface,
+ * and then use OH_Input_QueryAuthorizedStatus to query the authorization status.
+ * When the authorization status is AUTHORIZED, use the interface.
+ * 自 API version 26.0.0 起，拥有 ohos.permission.CONTROL_DEVICE 权限的调用方也可以直接使用本接口。
  *
  * @permission ohos.permission.CONTROL_DEVICE
  * @param touchEvent - the touch event to be injected.
- * @return 0 - Success.
- *         201 - Missing permissions.
- *         401 - Parameter error.
+ * @return OH_Input_InjectTouchEvent function result code.
+ *         {@link INPUT_SUCCESS} inject touchEvent success.\n
+ *         {@link INPUT_PARAMETER_ERROR} Parameter check failed.\n
  * @syscap SystemCapability.MultimodalInput.Input.Core
- * @since 12
+ * @since 26.0.0
  */
 int32_t OH_Input_InjectTouchEvent(const struct Input_TouchEvent* touchEvent);
 
 /**
  * @brief Inject touch event using global coordinate.
- *        Callers without this permission can inject after OH_Input_RequestInjection
- *        completes dialog authorization.
+ * since API 20, it is recommended to use OH_Input_RequestInjection
+ * to request authorization before using the interface,
+ * and then use OH_Input_QueryAuthorizedStatus to query the authorization status.
+ * When the authorization status is AUTHORIZED, use the interface.
+ *
+ * @param touchEvent - the touch event to be injected, set up effective globalX globalY.
+ * @return OH_Input_InjectTouchEventGlobal function result code.
+ *         {@link INPUT_SUCCESS} inject touchEvent success.\n
+ *         {@link INPUT_PARAMETER_ERROR} Parameter check failed.\n
+ *         {@link INPUT_PERMISSION_DENIED} Permission verification failed.\n
+ * @since 20
+ */
+/**
+ * @brief Inject touch event using global coordinate.
+ * since API 20, it is recommended to use OH_Input_RequestInjection
+ * to request authorization before using the interface,
+ * and then use OH_Input_QueryAuthorizedStatus to query the authorization status.
+ * When the authorization status is AUTHORIZED, use the interface.
+ * 自 API version 26.0.0 起，拥有 ohos.permission.CONTROL_DEVICE 权限的调用方也可以直接使用本接口。
  *
  * @permission ohos.permission.CONTROL_DEVICE
  * @param touchEvent - the touch event to be injected, set up effective globalX globalY.
  * @return OH_Input_InjectTouchEventGlobal function result code.
  *         {@link INPUT_SUCCESS} inject touchEvent success.\n
  *         {@link INPUT_PARAMETER_ERROR} Parameter check failed.\n
- * @since 20
+ *         {@link INPUT_PERMISSION_DENIED} Permission verification failed.\n
+ * @since 26.0.0
  */
 int32_t OH_Input_InjectTouchEventGlobal(const struct Input_TouchEvent* touchEvent);
 
@@ -2306,8 +2396,6 @@ Input_Result OH_Input_QueryMaxTouchPoints(int32_t *count);
 
 /**
  * @brief Requests for injection authorization.
- *        This API always follows the dialog authorization flow, even if the
- *        caller already has ohos.permission.CONTROL_DEVICE.
  *
  * @param callback - callback used to return the result.
  * @return OH_Input_RequestInjection function result code.
@@ -2319,24 +2407,47 @@ Input_Result OH_Input_QueryMaxTouchPoints(int32_t *count);
  *         {@link INPUT_INJECTION_OPERATION_FREQUENT} Too many operations.\n
  *         {@link INPUT_INJECTION_AUTHORIZED} Authorized.\n
  *         {@link INPUT_INJECTION_AUTHORIZED_OTHERS} Authorized to other applications.\n
- * @syscap SystemCapability.MultimodalInput.Input.Core
  * @since 20
+ */
+/**
+ * @brief Requests for injection authorization.
+ * 自 API version 26.0.0 起，申请到 ohos.permission.CONTROL_DEVICE 权限后，
+ * 无需调用本接口进行注入授权。本接口行为与 ohos.permission.CONTROL_DEVICE 权限无关。
+ *
+ * @param callback - callback used to return the result.
+ * @return OH_Input_RequestInjection function result code.
+ *         {@link INPUT_SUCCESS} Success.\n
+ *         {@link INPUT_PARAMETER_ERROR} The callback is NULL.\n
+ *         {@link INPUT_DEVICE_NOT_SUPPORTED} Capability not supported.\n
+ *         {@link INPUT_SERVICE_EXCEPTION} Service error.\n
+ *         {@link INPUT_INJECTION_AUTHORIZING} Authorizing.\n
+ *         {@link INPUT_INJECTION_OPERATION_FREQUENT} Too many operations.\n
+ *         {@link INPUT_INJECTION_AUTHORIZED} Authorized.\n
+ *         {@link INPUT_INJECTION_AUTHORIZED_OTHERS} Authorized to other applications.\n
+ * @since 26.0.0
  */
 Input_Result OH_Input_RequestInjection(Input_InjectAuthorizeCallback callback);
 
 /**
  * @brief Queries the injection authorization status.
- *        This API returns dialog authorization status only.
- *        It does not indicate whether the caller can inject through
- *        ohos.permission.CONTROL_DEVICE.
  *
  * @param status Injection authorization status. For details, see {@Link Input_InjectionStatus}.
  * @return OH_Input_QueryAuthorizedStatus function result code.
  *         {@link INPUT_SUCCESS} Success.\n
  *         {@link INPUT_PARAMETER_ERROR} The status is NULL\n
  *         {@link INPUT_SERVICE_EXCEPTION} Service error.\n
- * @syscap SystemCapability.MultimodalInput.Input.Core
  * @since 20
+ */
+/**
+ * @brief Queries the injection authorization status.
+ * 自 API version 26.0.0 起，本接口返回的仅为弹窗授权状态，不表示调用方是否因持有 ohos.permission.CONTROL_DEVICE 权限而具备注入能力。
+ *
+ * @param status Injection authorization status. For details, see {@Link Input_InjectionStatus}.
+ * @return OH_Input_QueryAuthorizedStatus function result code.
+ *         {@link INPUT_SUCCESS} Success.\n
+ *         {@link INPUT_PARAMETER_ERROR} The status is NULL\n
+ *         {@link INPUT_SERVICE_EXCEPTION} Service error.\n
+ * @since 26.0.0
  */
 Input_Result OH_Input_QueryAuthorizedStatus(Input_InjectionStatus* status);
 
