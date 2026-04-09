@@ -76,7 +76,6 @@ private:
     // 检查 finalKeyDownDuration 条件
     bool CheckDuration(std::shared_ptr<KeyOption> keyOption,
                        std::shared_ptr<KeyEvent> keyEvent);
-
     // 检查是否在 duration 窗口内有其他按键
     bool HasOtherKeyPressedInWindow(const std::string& subscribeKey);
     // 记录 duration 窗口开始

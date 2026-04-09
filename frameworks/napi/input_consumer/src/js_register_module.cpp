@@ -1212,10 +1212,8 @@ static napi_value JsOnKey(napi_env env, napi_callback_info info)
         MMI_HILOGE("SubscribeKeyCommand failed");
         return nullptr;
     }
-
     return nullptr;
 }
-
 // SDK 26.0.0 新增：验证offKey参数
 static bool ValidateOffKeyParameters(napi_env env, size_t argc, napi_value* argv, std::string& keyType)
 {
@@ -1289,9 +1287,7 @@ static napi_value JsOffKey(napi_env env, napi_callback_info info)
         MMI_HILOGE("ValidateOffKeyParameters failed");
         return nullptr;
     }
-
     event->name = keyType;
-
     if (GetEventInfoAPI26(env, info, event, keyOption) == nullptr) {
         MMI_HILOGE("GetEventInfoAPI26 failed");
         return nullptr;
@@ -1302,7 +1298,6 @@ static napi_value JsOffKey(napi_env env, napi_callback_info info)
     }
     return nullptr;
 }
-
 static napi_value SetShieldStatus(napi_env env, napi_callback_info info)
 {
     CALL_DEBUG_ENTER;

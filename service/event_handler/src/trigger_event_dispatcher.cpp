@@ -126,7 +126,6 @@ void TriggerEventDispatcher::ClearSubscribeState(const std::string& subscribeKey
     if (iter3 != durationPassed_.end()) {
         durationPassed_.erase(iter3);
     }
-
     // 4. 清理 hasOtherKey 状态
     auto iter4 = hasOtherKey_.find(subscribeKey);
     if (iter4 != hasOtherKey_.end()) {
@@ -153,7 +152,6 @@ bool TriggerEventDispatcher::ShouldDispatchPRESSED(std::shared_ptr<KeyOption> ke
     if (!MatchPreKeys(keyOption, keyEvent)) {
         return false;
     }
-
     // 4. 检查是否满足 finalKeyDownDuration 条件
     if (!CheckDuration(keyOption, keyEvent)) {
         return false;
@@ -204,7 +202,6 @@ bool TriggerEventDispatcher::ShouldDispatchREPEAT_PRESSED(std::shared_ptr<KeyOpt
     if (!MatchPreKeys(keyOption, keyEvent)) {
         return false;
     }
-
     // 4. 检查是否满足 finalKeyDownDuration 条件
     if (!CheckDuration(keyOption, keyEvent)) {
         return false;
@@ -276,7 +273,6 @@ bool TriggerEventDispatcher::MatchPreKeys(std::shared_ptr<KeyOption> keyOption,
             return false;
         }
     }
-
     MMI_HILOGD("All preKeys matched");
     return true;
 }
