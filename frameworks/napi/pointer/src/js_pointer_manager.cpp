@@ -1173,6 +1173,16 @@ napi_value JsPointerManager::SetMouseScrollDirection(napi_env env, bool state)
         THROWERR_CUSTOM(env, COMMON_USE_SYSAPI_ERROR, "Non system applications use system API");
         return nullptr;
     }
+    if (asyncContext->errorCode == -COMMON_PERMISSION_CHECK_ERROR) {
+        MMI_HILOGE("Permission Denied");
+        THROWERR_CUSTOM(env, COMMON_PERMISSION_CHECK_ERROR, "Permission Denied");
+        return nullptr;
+    }
+    if (asyncContext->errorCode < RET_OK) {
+        MMI_HILOGE("Input Service Exception, errorCode: %{public}d", asyncContext->errorCode);
+        THROWERR_CUSTOM(env, INPUT_SERVICE_EXCEPTION, "Input Service Exception");
+        return nullptr;
+    }
     asyncContext->reserve << ReturnType::VOID;
     napi_value promise = nullptr;
     if (napi_create_promise(env, &asyncContext->deferred, &promise) != napi_ok) {
@@ -1193,6 +1203,16 @@ napi_value JsPointerManager::GetMouseScrollDirection(napi_env env)
     if (asyncContext->errorCode == COMMON_USE_SYSAPI_ERROR) {
         MMI_HILOGE("Non system applications use system API");
         THROWERR_CUSTOM(env, COMMON_USE_SYSAPI_ERROR, "Non system applications use system API");
+        return nullptr;
+    }
+    if (asyncContext->errorCode == -COMMON_PERMISSION_CHECK_ERROR) {
+        MMI_HILOGE("Permission Denied");
+        THROWERR_CUSTOM(env, COMMON_PERMISSION_CHECK_ERROR, "Permission Denied");
+        return nullptr;
+    }
+    if (asyncContext->errorCode < RET_OK) {
+        MMI_HILOGE("Input Service Exception, errorCode: %{public}d", asyncContext->errorCode);
+        THROWERR_CUSTOM(env, INPUT_SERVICE_EXCEPTION, "Input Service Exception");
         return nullptr;
     }
     asyncContext->reserve << ReturnType::BOOL << state;

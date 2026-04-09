@@ -82,41 +82,59 @@ int32_t JsMouseController::ConvertJsAxisToNative(int32_t jsAxis)
 
 int32_t JsMouseController::MoveTo(int32_t displayId, int32_t x, int32_t y)
 {
-    CHKPR(impl_, RET_ERR);
+    if (impl_ == nullptr) {
+        MMI_HILOGE("MouseControllerImpl is null");
+        return RET_ERR;
+    }
     return impl_->MoveTo(displayId, x, y);
 }
 
 int32_t JsMouseController::PressButton(int32_t button)
 {
-    CHKPR(impl_, RET_ERR);
+    if (impl_ == nullptr) {
+        MMI_HILOGE("MouseControllerImpl is null");
+        return RET_ERR;
+    }
     int32_t nativeButton = ConvertJsButtonToNative(button);
     return impl_->PressButton(nativeButton);
 }
 
 int32_t JsMouseController::ReleaseButton(int32_t button)
 {
-    CHKPR(impl_, RET_ERR);
+    if (impl_ == nullptr) {
+        MMI_HILOGE("MouseControllerImpl is null");
+        return RET_ERR;
+    }
     int32_t nativeButton = ConvertJsButtonToNative(button);
     return impl_->ReleaseButton(nativeButton);
 }
 
 int32_t JsMouseController::BeginAxis(int32_t axis, int32_t value)
 {
-    CHKPR(impl_, RET_ERR);
+    if (impl_ == nullptr) {
+        MMI_HILOGE("MouseControllerImpl is null");
+        return RET_ERR;
+    }
     int32_t nativeAxis = ConvertJsAxisToNative(axis);
     return impl_->BeginAxis(nativeAxis, value);
 }
 
 int32_t JsMouseController::UpdateAxis(int32_t axis, int32_t value)
 {
-    CHKPR(impl_, RET_ERR);
+    if (impl_ == nullptr) {
+        MMI_HILOGE("MouseControllerImpl is null");
+        return RET_ERR;
+    }
     int32_t nativeAxis = ConvertJsAxisToNative(axis);
     return impl_->UpdateAxis(nativeAxis, value);
 }
 
 int32_t JsMouseController::EndAxis(int32_t axis)
 {
-    CHKPR(impl_, RET_ERR);
+    if (impl_ == nullptr) {
+        MMI_HILOGE("MouseControllerImpl is null");
+        return RET_ERR;
+    }
     int32_t nativeAxis = ConvertJsAxisToNative(axis);
     return impl_->EndAxis(nativeAxis);
 }

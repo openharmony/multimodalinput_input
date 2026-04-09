@@ -69,7 +69,11 @@ napi_value CreateMouseController(napi_env env, napi_callback_info info)
 
     // Create MouseController object
     napi_value mouseController;
-    CHKRP(napi_create_object(env, &mouseController), CREATE_OBJECT);
+    napi_status status = napi_create_object(env, &mouseController);
+    if (status != napi_ok) {
+        MMI_HILOGE("CREATE_OBJECT failed");
+        return nullptr;
+    }
 
     // Create C++ instance
     auto* controller = new (std::nothrow) JsMouseController();
@@ -108,14 +112,27 @@ napi_value CreateMouseController(napi_env env, napi_callback_info info)
         DECLARE_NAPI_FUNCTION("endAxis", MouseControllerEndAxis),
     };
 
-    CHKRP(napi_define_properties(env, mouseController,
-        sizeof(descriptors) / sizeof(descriptors[0]), descriptors), DEFINE_PROPERTIES);
+    status = napi_define_properties(env, mouseController,
+        sizeof(descriptors) / sizeof(descriptors[0]), descriptors);
+    if (status != napi_ok) {
+        MMI_HILOGE("DEFINE_PROPERTIES failed");
+        return nullptr;
+    }
 
     // Create and return Promise
     napi_deferred deferred;
     napi_value promise;
-    CHKRP(napi_create_promise(env, &deferred, &promise), CREATE_PROMISE);
-    CHKRP(napi_resolve_deferred(env, deferred, mouseController), RESOLVE_DEFERRED);
+    status = napi_create_promise(env, &deferred, &promise);
+    if (status != napi_ok) {
+        MMI_HILOGE("CREATE_PROMISE failed");
+        return nullptr;
+    }
+
+    status = napi_resolve_deferred(env, deferred, mouseController);
+    if (status != napi_ok) {
+        MMI_HILOGE("RESOLVE_DEFERRED failed");
+        return nullptr;
+    }
 
     MMI_HILOGD("CreateMouseController success");
     return promise;
@@ -129,7 +146,11 @@ napi_value MouseControllerMoveTo(napi_env env, napi_callback_info info)
     size_t argc = 3;
     napi_value argv[3];
     napi_value thisVar;
-    CHKRP(napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr), GET_CB_INFO);
+    napi_status status = napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
+    if (status != napi_ok) {
+        MMI_HILOGE("GET_CB_INFO failed");
+        return nullptr;
+    }
 
     // Validate parameter count
     if (argc != 3) {
@@ -139,13 +160,29 @@ napi_value MouseControllerMoveTo(napi_env env, napi_callback_info info)
 
     // Extract parameters
     int32_t displayId, x, y;
-    CHKRP(napi_get_value_int32(env, argv[0], &displayId), GET_VALUE_INT32);
-    CHKRP(napi_get_value_int32(env, argv[1], &x), GET_VALUE_INT32);
-    CHKRP(napi_get_value_int32(env, argv[2], &y), GET_VALUE_INT32);
+    status = napi_get_value_int32(env, argv[0], &displayId);
+    if (status != napi_ok) {
+        MMI_HILOGE("GET_VALUE_INT32 failed");
+        return nullptr;
+    }
+    status = napi_get_value_int32(env, argv[1], &x);
+    if (status != napi_ok) {
+        MMI_HILOGE("GET_VALUE_INT32 failed");
+        return nullptr;
+    }
+    status = napi_get_value_int32(env, argv[2], &y);
+    if (status != napi_ok) {
+        MMI_HILOGE("GET_VALUE_INT32 failed");
+        return nullptr;
+    }
 
     // Get C++ instance
     JsMouseController* controller = nullptr;
-    CHKRP(napi_unwrap(env, thisVar, reinterpret_cast<void**>(&controller)), UNWRAP);
+    status = napi_unwrap(env, thisVar, reinterpret_cast<void**>(&controller));
+    if (status != napi_ok) {
+        MMI_HILOGE("UNWRAP failed");
+        return nullptr;
+    }
     if (controller == nullptr) {
         THROWERR_CUSTOM(env, INPUT_SERVICE_EXCEPTION, "Input service exception");
         return nullptr;
@@ -157,13 +194,25 @@ napi_value MouseControllerMoveTo(napi_env env, napi_callback_info info)
     // Create Promise
     napi_deferred deferred;
     napi_value promise;
-    CHKRP(napi_create_promise(env, &deferred, &promise), CREATE_PROMISE);
+    status = napi_create_promise(env, &deferred, &promise);
+    if (status != napi_ok) {
+        MMI_HILOGE("CREATE_PROMISE failed");
+        return nullptr;
+    }
 
     if (result == RET_OK) {
-        CHKRP(napi_resolve_deferred(env, deferred, nullptr), RESOLVE_DEFERRED);
+        status = napi_resolve_deferred(env, deferred, nullptr);
+        if (status != napi_ok) {
+            MMI_HILOGE("RESOLVE_DEFERRED failed");
+            return nullptr;
+        }
     } else {
         napi_value error = CreateBusinessError(env, result, "MoveTo failed");
-        CHKRP(napi_reject_deferred(env, deferred, error), REJECT_DEFERRED);
+        status = napi_reject_deferred(env, deferred, error);
+        if (status != napi_ok) {
+            MMI_HILOGE("REJECT_DEFERRED failed");
+            return nullptr;
+        }
     }
 
     return promise;
@@ -177,7 +226,11 @@ napi_value MouseControllerPressButton(napi_env env, napi_callback_info info)
     size_t argc = 1;
     napi_value argv[1];
     napi_value thisVar;
-    CHKRP(napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr), GET_CB_INFO);
+    napi_status status = napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
+    if (status != napi_ok) {
+        MMI_HILOGE("GET_CB_INFO failed");
+        return nullptr;
+    }
 
     if (argc != 1) {
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Invalid parameter count");
@@ -185,10 +238,18 @@ napi_value MouseControllerPressButton(napi_env env, napi_callback_info info)
     }
 
     int32_t button;
-    CHKRP(napi_get_value_int32(env, argv[0], &button), GET_VALUE_INT32);
+    status = napi_get_value_int32(env, argv[0], &button);
+    if (status != napi_ok) {
+        MMI_HILOGE("GET_VALUE_INT32 failed");
+        return nullptr;
+    }
 
     JsMouseController* controller = nullptr;
-    CHKRP(napi_unwrap(env, thisVar, reinterpret_cast<void**>(&controller)), UNWRAP);
+    status = napi_unwrap(env, thisVar, reinterpret_cast<void**>(&controller));
+    if (status != napi_ok) {
+        MMI_HILOGE("UNWRAP failed");
+        return nullptr;
+    }
     if (controller == nullptr) {
         THROWERR_CUSTOM(env, INPUT_SERVICE_EXCEPTION, "Input service exception");
         return nullptr;
@@ -200,13 +261,25 @@ napi_value MouseControllerPressButton(napi_env env, napi_callback_info info)
     // Create Promise
     napi_deferred deferred;
     napi_value promise;
-    CHKRP(napi_create_promise(env, &deferred, &promise), CREATE_PROMISE);
+    status = napi_create_promise(env, &deferred, &promise);
+    if (status != napi_ok) {
+        MMI_HILOGE("CREATE_PROMISE failed");
+        return nullptr;
+    }
 
     if (result == RET_OK) {
-        CHKRP(napi_resolve_deferred(env, deferred, nullptr), RESOLVE_DEFERRED);
+        status = napi_resolve_deferred(env, deferred, nullptr);
+        if (status != napi_ok) {
+            MMI_HILOGE("RESOLVE_DEFERRED failed");
+            return nullptr;
+        }
     } else {
         napi_value error = CreateBusinessError(env, result, "PressButton failed");
-        CHKRP(napi_reject_deferred(env, deferred, error), REJECT_DEFERRED);
+        status = napi_reject_deferred(env, deferred, error);
+        if (status != napi_ok) {
+            MMI_HILOGE("REJECT_DEFERRED failed");
+            return nullptr;
+        }
     }
 
     return promise;
@@ -219,7 +292,11 @@ napi_value MouseControllerReleaseButton(napi_env env, napi_callback_info info)
     size_t argc = 1;
     napi_value argv[1];
     napi_value thisVar;
-    CHKRP(napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr), GET_CB_INFO);
+    napi_status status = napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
+    if (status != napi_ok) {
+        MMI_HILOGE("GET_CB_INFO failed");
+        return nullptr;
+    }
 
     if (argc != 1) {
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Invalid parameter count");
@@ -227,10 +304,18 @@ napi_value MouseControllerReleaseButton(napi_env env, napi_callback_info info)
     }
 
     int32_t button;
-    CHKRP(napi_get_value_int32(env, argv[0], &button), GET_VALUE_INT32);
+    status = napi_get_value_int32(env, argv[0], &button);
+    if (status != napi_ok) {
+        MMI_HILOGE("GET_VALUE_INT32 failed");
+        return nullptr;
+    }
 
     JsMouseController* controller = nullptr;
-    CHKRP(napi_unwrap(env, thisVar, reinterpret_cast<void**>(&controller)), UNWRAP);
+    status = napi_unwrap(env, thisVar, reinterpret_cast<void**>(&controller));
+    if (status != napi_ok) {
+        MMI_HILOGE("UNWRAP failed");
+        return nullptr;
+    }
     if (controller == nullptr) {
         THROWERR_CUSTOM(env, INPUT_SERVICE_EXCEPTION, "Input service exception");
         return nullptr;
@@ -242,13 +327,25 @@ napi_value MouseControllerReleaseButton(napi_env env, napi_callback_info info)
     // Create Promise
     napi_deferred deferred;
     napi_value promise;
-    CHKRP(napi_create_promise(env, &deferred, &promise), CREATE_PROMISE);
+    status = napi_create_promise(env, &deferred, &promise);
+    if (status != napi_ok) {
+        MMI_HILOGE("CREATE_PROMISE failed");
+        return nullptr;
+    }
 
     if (result == RET_OK) {
-        CHKRP(napi_resolve_deferred(env, deferred, nullptr), RESOLVE_DEFERRED);
+        status = napi_resolve_deferred(env, deferred, nullptr);
+        if (status != napi_ok) {
+            MMI_HILOGE("RESOLVE_DEFERRED failed");
+            return nullptr;
+        }
     } else {
         napi_value error = CreateBusinessError(env, result, "ReleaseButton failed");
-        CHKRP(napi_reject_deferred(env, deferred, error), REJECT_DEFERRED);
+        status = napi_reject_deferred(env, deferred, error);
+        if (status != napi_ok) {
+            MMI_HILOGE("REJECT_DEFERRED failed");
+            return nullptr;
+        }
     }
 
     return promise;
@@ -261,7 +358,11 @@ napi_value MouseControllerBeginAxis(napi_env env, napi_callback_info info)
     size_t argc = 2;
     napi_value argv[2];
     napi_value thisVar;
-    CHKRP(napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr), GET_CB_INFO);
+    napi_status status = napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
+    if (status != napi_ok) {
+        MMI_HILOGE("GET_CB_INFO failed");
+        return nullptr;
+    }
 
     if (argc != 2) {
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Invalid parameter count");
@@ -269,11 +370,23 @@ napi_value MouseControllerBeginAxis(napi_env env, napi_callback_info info)
     }
 
     int32_t axis, value;
-    CHKRP(napi_get_value_int32(env, argv[0], &axis), GET_VALUE_INT32);
-    CHKRP(napi_get_value_int32(env, argv[1], &value), GET_VALUE_INT32);
+    status = napi_get_value_int32(env, argv[0], &axis);
+    if (status != napi_ok) {
+        MMI_HILOGE("GET_VALUE_INT32 failed");
+        return nullptr;
+    }
+    status = napi_get_value_int32(env, argv[1], &value);
+    if (status != napi_ok) {
+        MMI_HILOGE("GET_VALUE_INT32 failed");
+        return nullptr;
+    }
 
     JsMouseController* controller = nullptr;
-    CHKRP(napi_unwrap(env, thisVar, reinterpret_cast<void**>(&controller)), UNWRAP);
+    status = napi_unwrap(env, thisVar, reinterpret_cast<void**>(&controller));
+    if (status != napi_ok) {
+        MMI_HILOGE("UNWRAP failed");
+        return nullptr;
+    }
     if (controller == nullptr) {
         THROWERR_CUSTOM(env, INPUT_SERVICE_EXCEPTION, "Input service exception");
         return nullptr;
@@ -285,13 +398,25 @@ napi_value MouseControllerBeginAxis(napi_env env, napi_callback_info info)
     // Create Promise
     napi_deferred deferred;
     napi_value promise;
-    CHKRP(napi_create_promise(env, &deferred, &promise), CREATE_PROMISE);
+    status = napi_create_promise(env, &deferred, &promise);
+    if (status != napi_ok) {
+        MMI_HILOGE("CREATE_PROMISE failed");
+        return nullptr;
+    }
 
     if (result == RET_OK) {
-        CHKRP(napi_resolve_deferred(env, deferred, nullptr), RESOLVE_DEFERRED);
+        status = napi_resolve_deferred(env, deferred, nullptr);
+        if (status != napi_ok) {
+            MMI_HILOGE("RESOLVE_DEFERRED failed");
+            return nullptr;
+        }
     } else {
         napi_value error = CreateBusinessError(env, result, "BeginAxis failed");
-        CHKRP(napi_reject_deferred(env, deferred, error), REJECT_DEFERRED);
+        status = napi_reject_deferred(env, deferred, error);
+        if (status != napi_ok) {
+            MMI_HILOGE("REJECT_DEFERRED failed");
+            return nullptr;
+        }
     }
 
     return promise;
@@ -304,7 +429,11 @@ napi_value MouseControllerUpdateAxis(napi_env env, napi_callback_info info)
     size_t argc = 2;
     napi_value argv[2];
     napi_value thisVar;
-    CHKRP(napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr), GET_CB_INFO);
+    napi_status status = napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
+    if (status != napi_ok) {
+        MMI_HILOGE("GET_CB_INFO failed");
+        return nullptr;
+    }
 
     if (argc != 2) {
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Invalid parameter count");
@@ -312,11 +441,23 @@ napi_value MouseControllerUpdateAxis(napi_env env, napi_callback_info info)
     }
 
     int32_t axis, value;
-    CHKRP(napi_get_value_int32(env, argv[0], &axis), GET_VALUE_INT32);
-    CHKRP(napi_get_value_int32(env, argv[1], &value), GET_VALUE_INT32);
+    status = napi_get_value_int32(env, argv[0], &axis);
+    if (status != napi_ok) {
+        MMI_HILOGE("GET_VALUE_INT32 failed");
+        return nullptr;
+    }
+    status = napi_get_value_int32(env, argv[1], &value);
+    if (status != napi_ok) {
+        MMI_HILOGE("GET_VALUE_INT32 failed");
+        return nullptr;
+    }
 
     JsMouseController* controller = nullptr;
-    CHKRP(napi_unwrap(env, thisVar, reinterpret_cast<void**>(&controller)), UNWRAP);
+    status = napi_unwrap(env, thisVar, reinterpret_cast<void**>(&controller));
+    if (status != napi_ok) {
+        MMI_HILOGE("UNWRAP failed");
+        return nullptr;
+    }
     if (controller == nullptr) {
         THROWERR_CUSTOM(env, INPUT_SERVICE_EXCEPTION, "Input service exception");
         return nullptr;
@@ -328,13 +469,25 @@ napi_value MouseControllerUpdateAxis(napi_env env, napi_callback_info info)
     // Create Promise
     napi_deferred deferred;
     napi_value promise;
-    CHKRP(napi_create_promise(env, &deferred, &promise), CREATE_PROMISE);
+    status = napi_create_promise(env, &deferred, &promise);
+    if (status != napi_ok) {
+        MMI_HILOGE("CREATE_PROMISE failed");
+        return nullptr;
+    }
 
     if (result == RET_OK) {
-        CHKRP(napi_resolve_deferred(env, deferred, nullptr), RESOLVE_DEFERRED);
+        status = napi_resolve_deferred(env, deferred, nullptr);
+        if (status != napi_ok) {
+            MMI_HILOGE("RESOLVE_DEFERRED failed");
+            return nullptr;
+        }
     } else {
         napi_value error = CreateBusinessError(env, result, "UpdateAxis failed");
-        CHKRP(napi_reject_deferred(env, deferred, error), REJECT_DEFERRED);
+        status = napi_reject_deferred(env, deferred, error);
+        if (status != napi_ok) {
+            MMI_HILOGE("REJECT_DEFERRED failed");
+            return nullptr;
+        }
     }
 
     return promise;
@@ -347,7 +500,11 @@ napi_value MouseControllerEndAxis(napi_env env, napi_callback_info info)
     size_t argc = 1;
     napi_value argv[1];
     napi_value thisVar;
-    CHKRP(napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr), GET_CB_INFO);
+    napi_status status = napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
+    if (status != napi_ok) {
+        MMI_HILOGE("GET_CB_INFO failed");
+        return nullptr;
+    }
 
     if (argc != 1) {
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Invalid parameter count");
@@ -355,10 +512,18 @@ napi_value MouseControllerEndAxis(napi_env env, napi_callback_info info)
     }
 
     int32_t axis;
-    CHKRP(napi_get_value_int32(env, argv[0], &axis), GET_VALUE_INT32);
+    status = napi_get_value_int32(env, argv[0], &axis);
+    if (status != napi_ok) {
+        MMI_HILOGE("GET_VALUE_INT32 failed");
+        return nullptr;
+    }
 
     JsMouseController* controller = nullptr;
-    CHKRP(napi_unwrap(env, thisVar, reinterpret_cast<void**>(&controller)), UNWRAP);
+    status = napi_unwrap(env, thisVar, reinterpret_cast<void**>(&controller));
+    if (status != napi_ok) {
+        MMI_HILOGE("UNWRAP failed");
+        return nullptr;
+    }
     if (controller == nullptr) {
         THROWERR_CUSTOM(env, INPUT_SERVICE_EXCEPTION, "Input service exception");
         return nullptr;
@@ -370,13 +535,25 @@ napi_value MouseControllerEndAxis(napi_env env, napi_callback_info info)
     // Create Promise
     napi_deferred deferred;
     napi_value promise;
-    CHKRP(napi_create_promise(env, &deferred, &promise), CREATE_PROMISE);
+    status = napi_create_promise(env, &deferred, &promise);
+    if (status != napi_ok) {
+        MMI_HILOGE("CREATE_PROMISE failed");
+        return nullptr;
+    }
 
     if (result == RET_OK) {
-        CHKRP(napi_resolve_deferred(env, deferred, nullptr), RESOLVE_DEFERRED);
+        status = napi_resolve_deferred(env, deferred, nullptr);
+        if (status != napi_ok) {
+            MMI_HILOGE("RESOLVE_DEFERRED failed");
+            return nullptr;
+        }
     } else {
         napi_value error = CreateBusinessError(env, result, "EndAxis failed");
-        CHKRP(napi_reject_deferred(env, deferred, error), REJECT_DEFERRED);
+        status = napi_reject_deferred(env, deferred, error);
+        if (status != napi_ok) {
+            MMI_HILOGE("REJECT_DEFERRED failed");
+            return nullptr;
+        }
     }
 
     return promise;

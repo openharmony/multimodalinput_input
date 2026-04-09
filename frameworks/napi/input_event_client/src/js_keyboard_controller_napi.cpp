@@ -68,7 +68,11 @@ napi_value CreateKeyboardController(napi_env env, napi_callback_info info)
 
     // Create KeyboardController object
     napi_value keyboardController;
-    CHKRP(napi_create_object(env, &keyboardController), CREATE_OBJECT);
+    napi_status status = napi_create_object(env, &keyboardController);
+    if (status != napi_ok) {
+        MMI_HILOGE("CREATE_OBJECT failed");
+        return nullptr;
+    }
 
     // Create C++ instance
     auto* controller = new (std::nothrow) JsKeyboardController();
@@ -103,14 +107,27 @@ napi_value CreateKeyboardController(napi_env env, napi_callback_info info)
         DECLARE_NAPI_FUNCTION("releaseKey", KeyboardControllerReleaseKey),
     };
 
-    CHKRP(napi_define_properties(env, keyboardController,
-        sizeof(descriptors) / sizeof(descriptors[0]), descriptors), DEFINE_PROPERTIES);
+    status = napi_define_properties(env, keyboardController,
+        sizeof(descriptors) / sizeof(descriptors[0]), descriptors);
+    if (status != napi_ok) {
+        MMI_HILOGE("DEFINE_PROPERTIES failed");
+        return nullptr;
+    }
 
     // Create and return Promise
     napi_deferred deferred;
     napi_value promise;
-    CHKRP(napi_create_promise(env, &deferred, &promise), CREATE_PROMISE);
-    CHKRP(napi_resolve_deferred(env, deferred, keyboardController), RESOLVE_DEFERRED);
+    status = napi_create_promise(env, &deferred, &promise);
+    if (status != napi_ok) {
+        MMI_HILOGE("CREATE_PROMISE failed");
+        return nullptr;
+    }
+
+    status = napi_resolve_deferred(env, deferred, keyboardController);
+    if (status != napi_ok) {
+        MMI_HILOGE("RESOLVE_DEFERRED failed");
+        return nullptr;
+    }
 
     MMI_HILOGD("CreateKeyboardController success");
     return promise;
@@ -124,7 +141,11 @@ napi_value KeyboardControllerPressKey(napi_env env, napi_callback_info info)
     size_t argc = 1;
     napi_value argv[1];
     napi_value thisVar;
-    CHKRP(napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr), GET_CB_INFO);
+    napi_status status = napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
+    if (status != napi_ok) {
+        MMI_HILOGE("GET_CB_INFO failed");
+        return nullptr;
+    }
 
     // Validate parameter count
     if (argc != 1) {
@@ -134,11 +155,19 @@ napi_value KeyboardControllerPressKey(napi_env env, napi_callback_info info)
 
     // Extract keyCode parameter
     int32_t keyCode;
-    CHKRP(napi_get_value_int32(env, argv[0], &keyCode), GET_VALUE_INT32);
+    status = napi_get_value_int32(env, argv[0], &keyCode);
+    if (status != napi_ok) {
+        MMI_HILOGE("GET_VALUE_INT32 failed");
+        return nullptr;
+    }
 
     // Get C++ instance
     JsKeyboardController* controller = nullptr;
-    CHKRP(napi_unwrap(env, thisVar, reinterpret_cast<void**>(&controller)), UNWRAP);
+    status = napi_unwrap(env, thisVar, reinterpret_cast<void**>(&controller));
+    if (status != napi_ok) {
+        MMI_HILOGE("UNWRAP failed");
+        return nullptr;
+    }
     if (controller == nullptr) {
         THROWERR_CUSTOM(env, INPUT_SERVICE_EXCEPTION, "Input service exception");
         return nullptr;
@@ -150,13 +179,25 @@ napi_value KeyboardControllerPressKey(napi_env env, napi_callback_info info)
     // Create Promise
     napi_deferred deferred;
     napi_value promise;
-    CHKRP(napi_create_promise(env, &deferred, &promise), CREATE_PROMISE);
+    status = napi_create_promise(env, &deferred, &promise);
+    if (status != napi_ok) {
+        MMI_HILOGE("CREATE_PROMISE failed");
+        return nullptr;
+    }
 
     if (result == RET_OK) {
-        CHKRP(napi_resolve_deferred(env, deferred, nullptr), RESOLVE_DEFERRED);
+        status = napi_resolve_deferred(env, deferred, nullptr);
+        if (status != napi_ok) {
+            MMI_HILOGE("RESOLVE_DEFERRED failed");
+            return nullptr;
+        }
     } else {
         napi_value error = CreateBusinessError(env, result, "PressKey failed");
-        CHKRP(napi_reject_deferred(env, deferred, error), REJECT_DEFERRED);
+        status = napi_reject_deferred(env, deferred, error);
+        if (status != napi_ok) {
+            MMI_HILOGE("REJECT_DEFERRED failed");
+            return nullptr;
+        }
     }
 
     return promise;
@@ -170,7 +211,11 @@ napi_value KeyboardControllerReleaseKey(napi_env env, napi_callback_info info)
     size_t argc = 1;
     napi_value argv[1];
     napi_value thisVar;
-    CHKRP(napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr), GET_CB_INFO);
+    napi_status status = napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
+    if (status != napi_ok) {
+        MMI_HILOGE("GET_CB_INFO failed");
+        return nullptr;
+    }
 
     // Validate parameter count
     if (argc != 1) {
@@ -180,11 +225,19 @@ napi_value KeyboardControllerReleaseKey(napi_env env, napi_callback_info info)
 
     // Extract keyCode parameter
     int32_t keyCode;
-    CHKRP(napi_get_value_int32(env, argv[0], &keyCode), GET_VALUE_INT32);
+    status = napi_get_value_int32(env, argv[0], &keyCode);
+    if (status != napi_ok) {
+        MMI_HILOGE("GET_VALUE_INT32 failed");
+        return nullptr;
+    }
 
     // Get C++ instance
     JsKeyboardController* controller = nullptr;
-    CHKRP(napi_unwrap(env, thisVar, reinterpret_cast<void**>(&controller)), UNWRAP);
+    status = napi_unwrap(env, thisVar, reinterpret_cast<void**>(&controller));
+    if (status != napi_ok) {
+        MMI_HILOGE("UNWRAP failed");
+        return nullptr;
+    }
     if (controller == nullptr) {
         THROWERR_CUSTOM(env, INPUT_SERVICE_EXCEPTION, "Input service exception");
         return nullptr;
@@ -196,13 +249,25 @@ napi_value KeyboardControllerReleaseKey(napi_env env, napi_callback_info info)
     // Create Promise
     napi_deferred deferred;
     napi_value promise;
-    CHKRP(napi_create_promise(env, &deferred, &promise), CREATE_PROMISE);
+    status = napi_create_promise(env, &deferred, &promise);
+    if (status != napi_ok) {
+        MMI_HILOGE("CREATE_PROMISE failed");
+        return nullptr;
+    }
 
     if (result == RET_OK) {
-        CHKRP(napi_resolve_deferred(env, deferred, nullptr), RESOLVE_DEFERRED);
+        status = napi_resolve_deferred(env, deferred, nullptr);
+        if (status != napi_ok) {
+            MMI_HILOGE("RESOLVE_DEFERRED failed");
+            return nullptr;
+        }
     } else {
         napi_value error = CreateBusinessError(env, result, "ReleaseKey failed");
-        CHKRP(napi_reject_deferred(env, deferred, error), REJECT_DEFERRED);
+        status = napi_reject_deferred(env, deferred, error);
+        if (status != napi_ok) {
+            MMI_HILOGE("REJECT_DEFERRED failed");
+            return nullptr;
+        }
     }
 
     return promise;

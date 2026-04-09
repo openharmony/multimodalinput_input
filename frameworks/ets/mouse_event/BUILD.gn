@@ -24,6 +24,7 @@ config("mouseEvent_config") {
   visibility = [ ":*" ]
 
   include_dirs = [
+    
     "${mmi_path}/util/common/include",
     "${mmi_path}/util/network/include",
   ]
