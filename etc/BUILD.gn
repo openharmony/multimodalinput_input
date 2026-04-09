@@ -38,8 +38,15 @@ ohos_prebuilt_etc("triple_finger_snapshot") {
   subsystem_name = "${mmi_subsystem_name}"
 }
 
+ohos_prebuilt_etc("multimodal_input_plugins_config") {
+  source = "multimodal_input_plugins_config.json"
+  relative_install_dir = "multimodalinput"
+  part_name = "${mmi_part_name}"
+  subsystem_name = "${mmi_subsystem_name}"
+}
+
 group("input_system_etc") {
-  deps = []
+  deps = [ ":multimodal_input_plugins_config" ]
 
   if (input_feature_mouse) {
     deps += [ ":pointer_motion_acceleration_config" ]

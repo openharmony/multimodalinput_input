@@ -15,10 +15,13 @@
 
 #include <iostream>
 #include <memory>
+#include <filesystem>
 
 #include "multimodal_input_plugin_manager.h"
 
 #include "app_mgr_client.h"
+#include "cJSON.h"
+#include "ffrt.h"
 #include "i_input_event_handler.h"
 #include "input_event_handler.h"
 #include "input_windows_manager.h"
@@ -29,6 +32,7 @@
 #include "account_manager.h"
 #include "common_event_data.h"
 #include "bytrace_adapter.h"
+#include "util.h"
 
 #undef MMI_LOG_DOMAIN
 #define MMI_LOG_DOMAIN MMI_LOG_SERVER
@@ -37,16 +41,39 @@
 
 namespace OHOS {
 namespace MMI {
-
+namespace {
 const char *FILE_EXTENSION = ".so";
 const char *FOLDER_PATH = "/system/lib64/multimodalinput/autorun";
+const char DYNAMIC_FOLDER_PATH[] { "/system/lib64/multimodalinput/dynamic" };
+const char PLUGIN_CONFIG_FILE[] { "etc/multimodalinput/multimodal_input_plugins_config.json" };
 const int32_t TIMEOUT_US = 300;
 const int32_t TIMEOUT_USE_EVENT_US = 2500;
 const int32_t MAX_TIMER = 3;
+} // namespace
+
+bool InputPluginManager::PluginConfig::IsValid() const
+{
+    if ((uuid_.empty()) || (name_.empty())) {
+        return false;
+    }
+    if ((mode_ != "autorun") && (mode_ != "dynamic")) {
+        return false;
+    }
+
+    std::filesystem::path pluginPath { DYNAMIC_FOLDER_PATH };
+    pluginPath /= name_;
+
+    std::error_code ec;
+    return std::filesystem::exists(pluginPath, ec);
+}
 
 InputPluginManager::~InputPluginManager()
 {
     // LCOV_EXCL_START
+    for (auto &[name, plugin] : dynamicPlugins_) {
+        plugin->UnInit();
+    }
+    dynamicPlugins_.clear();
     plugins_.clear();
     if (instance_ != nullptr) {
         instance_ = nullptr;
@@ -67,6 +94,12 @@ InputPluginManager* InputPluginManager::GetInstance(const std::string &directory
     return instance_;
 }
 
+void InputPluginManager::AttachDelegateInterface(std::shared_ptr<IDelegateInterface> delegate)
+{
+    delegate_ = delegate;
+    MMI_HILOGI("InputPluginManager attached delegate interface");
+}
+
 int32_t InputPluginManager::Init(UDSServer& udsServer)
 {
     CALL_DEBUG_ENTER;
@@ -78,62 +111,76 @@ int32_t InputPluginManager::Init(UDSServer& udsServer)
     }
     struct dirent *entry;
     while ((entry = readdir(dir)) != nullptr) {
-        if (entry->d_type == DT_REG && std::string(entry->d_name) != "." && std::string(entry->d_name) != "..") {
-            std::string path = directory_ + "/" + entry->d_name;
-            if (path.length() >= strlen(FILE_EXTENSION) &&
-                path.substr(path.size() - strlen(FILE_EXTENSION)) == FILE_EXTENSION) {
-                LoadPlugin(path);
+        if ((entry->d_type != DT_REG) ||
+            (std::string(entry->d_name) == ".") ||
+            (std::string(entry->d_name) == "..")) {
+            continue;
+        }
+
+        std::string path = directory_ + "/" + entry->d_name;
+        if (path.length() >= strlen(FILE_EXTENSION) &&
+            path.substr(path.size() - strlen(FILE_EXTENSION)) == FILE_EXTENSION) {
+            auto plugin = LoadPlugin(path);
+            if (plugin != nullptr) {
+                AddPluginToStages(plugin);
             }
         }
     }
     closedir(dir);
+    LoadPluginConfig();
     PrintPlugins();
     return RET_OK;
 }
 
-bool InputPluginManager::LoadPlugin(const std::string &path)
+std::shared_ptr<InputPlugin> InputPluginManager::LoadPlugin(const std::string &path)
 {
     CALL_DEBUG_ENTER;
     void *handle = dlopen(path.c_str(), RTLD_LAZY);
     if (!handle) {
         MMI_HILOGE("Failed to load directory: %{private}s", dlerror());
-        return false;
+        return nullptr;
+    }
+
+    std::shared_ptr<InputPlugin> cPin = std::make_shared<InputPlugin>(handle);
+    if (!cPin) {
+        dlclose(handle);
+        return nullptr;
     }
 
     InitPlugin func = reinterpret_cast<InitPlugin>(dlsym(handle, "InitPlugin"));
     if (!func) {
         MMI_HILOGE("Failed to find symbol InitPlugin in: %{private}s", dlerror());
-        dlclose(handle);
-        return false;
-    }
-
-    std::shared_ptr<InputPlugin> cPin = std::make_shared<InputPlugin>();
-    if (!cPin) {
-        dlclose(handle);
-        return false;
+        return nullptr;
     }
 
     cPin->unintPlugin_ = reinterpret_cast<UnintPlugin>(dlsym(handle, "UnintPlugin"));
     if (!cPin->unintPlugin_) {
         MMI_HILOGE("Failed to find symbol UnintPlugin in: %{private}s", dlerror());
-        dlclose(handle);
-        return false;
+        return nullptr;
     }
     std::shared_ptr<IInputPlugin> iPin;
     int32_t ret = func(cPin, iPin);
     if (ret != 0 || !iPin) {
         MMI_HILOGE("Failed to InitPlugin plugin.");
-        dlclose(handle);
-        return false;
+        return nullptr;
     }
     ret = cPin->Init(iPin);
     if (ret != 0) {
         MMI_HILOGE("Failed to Init plugin.");
-        dlclose(handle);
-        return false;
+        return nullptr;
     }
-    cPin->handle_ = handle;
+    return cPin;
+}
 
+void InputPluginManager::AddPluginToStages(const std::shared_ptr<IPluginContext> &cPin)
+{
+    if (cPin == nullptr) {
+        return;
+    }
+    auto iPin = cPin->GetPlugin();
+    if (iPin == nullptr) {
+        return;
+    }
     for (const auto& stage : iPin->GetStages()) {
         auto result = plugins_.insert({stage, {cPin}});
         if (!result.second) {
@@ -144,7 +191,6 @@ bool InputPluginManager::LoadPlugin(const std::string &path)
             result.first->second.insert(it, cPin);
         }
     }
-    return true;
 }
 
 void InputPluginManager::PrintPlugins()
@@ -312,6 +358,218 @@ bool InputPluginManager::IntermediateEndEvent(PluginEventType pluginEvent)
             break;
     }
     return false;
+}
+
+void InputPluginManager::LoadPluginConfig()
+{
+    CALL_DEBUG_ENTER;
+    auto result = LoadConfig(PLUGIN_CONFIG_FILE,
+        [this](const char *cfgPath, cJSON *jsonCfg) {
+            return ParsePluginConfig(cfgPath, jsonCfg);
+        });
+    if (!result) {
+        MMI_HILOGW("Failed to load plugin config from %{private}s", PLUGIN_CONFIG_FILE);
+    }
+}
+
+bool InputPluginManager::ParsePluginConfig(const char *cfgPath, cJSON *jsonCfg)
+{
+    cJSON *plugins = cJSON_GetObjectItemCaseSensitive(jsonCfg, "input_plugins");
+    if ((plugins == nullptr) || !cJSON_IsArray(plugins)) {
+        MMI_HILOGE("No 'input_plugins' array in config");
+        return false;
+    }
+    int32_t count = cJSON_GetArraySize(plugins);
+    for (int32_t index = 0; index < count; ++index) {
+        cJSON *item = cJSON_GetArrayItem(plugins, index);
+        if (item == nullptr) {
+            continue;
+        }
+        ParsePluginItem(item);
+    }
+    return true;
+}
+
+bool InputPluginManager::ReadStringField(cJSON *obj, const char *field, std::string &out)
+{
+    cJSON *json = cJSON_GetObjectItemCaseSensitive(obj, field);
+    if ((json == nullptr) || !cJSON_IsString(json)) {
+        MMI_HILOGE("Invalid or missing '%{public}s' field", field);
+        return false;
+    }
+    char *str = cJSON_GetStringValue(json);
+    if ((str == nullptr) || (std::strlen(str) == 0)) {
+        MMI_HILOGE("Invalid or empty '%{public}s' value", field);
+        return false;
+    }
+    out = str;
+    return true;
+}
+
+bool InputPluginManager::ReadNumberField(cJSON *obj, const char *field, int32_t &out)
+{
+    cJSON *json = cJSON_GetObjectItemCaseSensitive(obj, field);
+    if ((json == nullptr) || !cJSON_IsNumber(json)) {
+        MMI_HILOGE("Invalid or missing '%{public}s' field", field);
+        return false;
+    }
+    out = static_cast<int32_t>(cJSON_GetNumberValue(json));
+    return true;
+}
+
+bool InputPluginManager::ParsePluginItem(cJSON *item)
+{
+    PluginConfig config {};
+    if (!ReadStringField(item, "uuid", config.uuid_)) {
+        return false;
+    }
+    if (!ReadNumberField(item, "uid", config.uid_)) {
+        return false;
+    }
+    if (!ReadStringField(item, "name", config.name_)) {
+        return false;
+    }
+    if (!ReadStringField(item, "mode", config.mode_)) {
+        return false;
+    }
+    if (!config.IsValid()) {
+        MMI_HILOGE("Invalid plugin config: uuid=%{private}s", config.uuid_.c_str());
+        return false;
+    }
+    if (pluginConfigs_.find(config.uuid_) != pluginConfigs_.end()) {
+        MMI_HILOGE("Duplicate plugin uuid: %{private}s", config.uuid_.c_str());
+        return false;
+    }
+    MMI_HILOGI("Plugin config: uuid=%{private}s, uid=%{private}d, name=%{private}s, mode=%{public}s",
+        config.uuid_.c_str(), config.uid_, config.name_.c_str(), config.mode_.c_str());
+    pluginConfigs_[config.uuid_] = config;
+    return true;
+}
+
+InputPluginManager::PluginConfig* InputPluginManager::FindPluginConfig(const std::string &uuid)
+{
+    auto it = pluginConfigs_.find(uuid);
+    if (it == pluginConfigs_.end()) {
+        return nullptr;
+    }
+    return &it->second;
+}
+
+int32_t InputPluginManager::LoadDynamicPlugin(int32_t uid, const std::string &uuid)
+{
+    CALL_DEBUG_ENTER;
+    if (uuid.empty()) {
+        MMI_HILOGE("Plugin uuid is empty");
+        return PARAM_INPUT_INVALID;
+    }
+    auto config = FindPluginConfig(uuid);
+    if (config == nullptr) {
+        MMI_HILOGE("Plugin config not found for uuid: %{private}s", uuid.c_str());
+        return PARAM_INPUT_INVALID;
+    }
+    if (config->uid_ != uid) {
+        MMI_HILOGE("Permission denied: uid=%{private}d, required=%{private}d", uid, config->uid_);
+        return ERROR_NO_PERMISSION;
+    }
+
+    auto it = dynamicPlugins_.find(uuid);
+    if (it != dynamicPlugins_.end()) {
+        MMI_HILOGI("Plugin %{private}s already loaded", uuid.c_str());
+        return RET_OK;
+    }
+
+    std::error_code ec {};
+    std::filesystem::path pluginPath { DYNAMIC_FOLDER_PATH };
+    pluginPath /= config->name_;
+
+    if (!std::filesystem::exists(pluginPath, ec)) {
+        MMI_HILOGE("Plugin file not found: %{private}s", pluginPath.string().c_str());
+        return PARAM_INPUT_INVALID;
+    }
+
+    ffrt::submit([delegate = delegate_.lock(), uuid, pluginPath] {
+        auto pluginMgr = InputPluginManager::GetInstance();
+        if (pluginMgr == nullptr) {
+            MMI_HILOGE("InputPluginManager is null");
+            return;
+        }
+        if (pluginMgr->loading_.load()) {
+            return;
+        }
+
+        pluginMgr->loading_.store(true);
+        pluginMgr->LoadPluginAsync(delegate, uuid, pluginPath.string());
+        pluginMgr->loading_.store(false);
+    });
+    return RET_OK;
+}
+
+void InputPluginManager::LoadPluginAsync(std::shared_ptr<IDelegateInterface> delegate,
+    const std::string &uuid, const std::string &pluginPath)
+{
+    if (delegate == nullptr) {
+        MMI_HILOGE("No delegate attached");
+        return;
+    }
+
+    MMI_HILOGI("Start loading plugin (uuid:%{private}s, name:%{private}s)", uuid.c_str(), pluginPath.c_str());
+    auto plugin = LoadPlugin(pluginPath);
+    if (plugin == nullptr) {
+        MMI_HILOGE("Failed to load dynamic plugin: %{private}s", uuid.c_str());
+        return;
+    }
+
+    delegate->OnPostSyncTask([this, uuid, plugin]() {
+        OnPluginLoaded(uuid, plugin);
+        return RET_OK;
+    });
+}
+
+void InputPluginManager::OnPluginLoaded(const std::string &uuid, std::shared_ptr<InputPlugin> plugin)
+{
+    MMI_HILOGI("Dynamic plugin %{private}s loaded successfully", uuid.c_str());
+    AddPluginToStages(plugin);
+    dynamicPlugins_[uuid] = plugin;
+    PrintPlugins();
+}
+
+int32_t InputPluginManager::UnloadDynamicPlugin(int32_t uid, const std::string &uuid)
+{
+    CALL_DEBUG_ENTER;
+    if (uuid.empty()) {
+        MMI_HILOGE("Plugin uuid is empty");
+        return PARAM_INPUT_INVALID;
+    }
+    auto config = FindPluginConfig(uuid);
+    if (config == nullptr) {
+        MMI_HILOGE("Plugin config not found for uuid: %{private}s", uuid.c_str());
+        return PARAM_INPUT_INVALID;
+    }
+    if (config->uid_ != uid) {
+        MMI_HILOGE("Permission denied: uid=%{private}d, required=%{private}d", uid, config->uid_);
+        return ERROR_NO_PERMISSION;
+    }
+    auto it = dynamicPlugins_.find(uuid);
+    if (it == dynamicPlugins_.end()) {
+        MMI_HILOGW("Dynamic plugin %{private}s not found", uuid.c_str());
+        return RET_ERR;
+    }
+    auto &plugin = it->second;
+    RemovePluginFromStages(plugin);
+    plugin->UnInit();
+    dynamicPlugins_.erase(it);
+    MMI_HILOGI("Dynamic plugin %{private}s unloaded successfully", uuid.c_str());
+    PrintPlugins();
+    return RET_OK;
+}
+
+void InputPluginManager::RemovePluginFromStages(const std::shared_ptr<IPluginContext> &plugin)
+{
+    for (auto &[stage, pluginList] : plugins_) {
+        pluginList.remove_if([&plugin](const std::shared_ptr<IPluginContext> &item) {
+            return (item.get() == plugin.get());
+        });
+    }
 }
 
 int32_t InputPluginManager::GetExternalObject(const std::string &pluginName, sptr<IRemoteObject> &pluginRemoteStub)
@@ -625,10 +883,13 @@ std::shared_ptr<IInputPlugin> InputPlugin::GetPlugin()
     return plugin_;
 }
 
+InputPlugin::InputPlugin(void *handle)
+    : handle_(handle) {}
+
 InputPlugin::~InputPlugin()
 {
     // LCOV_EXCL_START
-    if (handle_) {
+    if (handle_ != nullptr) {
         dlclose(handle_);
         handle_ = nullptr;
     }
