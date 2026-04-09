@@ -59,11 +59,22 @@ private:
         bool IsValid() const;
     };
 
+    struct AxisCurve {
+        std::vector<double> speeds;
+        std::vector<double> slopes;
+        std::vector<double> diffNums;
+
+        bool IsValid() const;
+    };
+
+    using AxisCurveCollection = std::vector<AxisCurve>;
+
 public:
     static int32_t DynamicAccelerateMouse(const Offset &offset, bool mode, size_t speed,
         uint64_t deltaTime, double displayPPI, double factor, double &absX, double &absY);
     static int32_t DynamicAccelerateTouchpad(const Offset &offset, bool mode, size_t speed,
         double displaySize, double touchpadSize, double touchpadPPI, int32_t frequency, double &absX, double &absY);
+    static int32_t DynamicAccelerateTouchpadAxis(double &axisSpeed, bool mode, DeviceType deviceType);
     static int32_t AccelerateMouse(
         const Offset &offset, bool mode, size_t speed, DeviceType deviceType, double &absX, double &absY);
     static int32_t AccelerateTouchpad(
@@ -86,18 +97,22 @@ private:
         double vin, size_t speed, double displayPPI, double &gain);
     static bool CalcDynamicTouchpadGain(const DynamicTouchpadCurve &curve, double vin, size_t speed,
         double displaySize, double touchpadSize, double touchpadPPI, int32_t frequency, double &gain);
+    static bool CalcAxisGainTouchpad(const AxisCurve &curve, double axisSpeed, double &gain);
     static std::string GetMouseConfigName(DeviceType devType);
     static std::string GetTouchpadConfigName(DeviceType devType);
     static bool LoadAccelerationCurve(const char *cfgPath, cJSON *jsonCfg, const std::string &name);
+    static bool LoadAxisCurve(const char *cfgPath, cJSON *jsonCfg);
     static double CalculateVin(const Offset &offset);
     static bool CalculateSpeedGain(const CurveCollection &curves, double vin, size_t speed, double &gain);
     static const Curve* MatchCurve(const CurveCollection &curves, size_t speed);
+    static const AxisCurve* MatchAxisCurve(const AxisCurveCollection &curves, DeviceType devType);
+    static void DumpAxisCurves(int32_t fd);
 
-    static std::shared_mutex mutex_;
     static std::atomic_bool loading_;
     static std::optional<DynamicMouseCurve> dynamicMouseCurve_;
     static std::optional<DynamicTouchpadCurve> dynamicTouchpadCurve_;
     static std::unordered_map<std::string, CurveCollection> curves_;
+    static std::optional<AxisCurveCollection> axisCurves_;
     static Offset compensateTouchpad_;
 };
 } // namespace MMI
