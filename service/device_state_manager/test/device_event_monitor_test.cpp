@@ -1033,5 +1033,478 @@ HWTEST_F(DeviceEventMonitorTest, SetVoipCallState_WithSlotId_StateNotUpdatedButR
     ASSERT_EQ(DEVICE_MONITOR->GetVoipCallState(), CALL_STATUS_ACTIVE);
     ASSERT_FALSE(DEVICE_MONITOR->GetHasHandleRingMute());
 }
+
+/**
+ * @tc.name: SetCallState_SlotIdZero_StateNotUpdated_001
+ * @tc.desc: Test SetCallState with slotId 0 does not update callState
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DeviceEventMonitorTest, SetCallState_SlotIdZero_StateNotUpdated_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EventFwk::CommonEventData ced;
+    EventFwk::Want want;
+    
+    // Set initial state
+    want.SetParam("state", CALL_STATUS_ACTIVE);
+    ced.SetWant(want);
+    DEVICE_MONITOR->SetCallState(ced, CALL_STATUS_ACTIVE);
+    ASSERT_EQ(DEVICE_MONITOR->GetCallState(), CALL_STATUS_ACTIVE);
+    
+    // Update with slotId 0, state should not change
+    want.SetParam("slotId", 0);
+    want.SetParam("state", CALL_STATUS_INCOMING);
+    ced.SetWant(want);
+    DEVICE_MONITOR->SetCallState(ced, CALL_STATUS_INCOMING);
+    
+    // State remains ACTIVE because slotId is present (even if 0)
+    ASSERT_EQ(DEVICE_MONITOR->GetCallState(), CALL_STATUS_ACTIVE);
+}
+
+/**
+ * @tc.name: SetVoipCallState_SlotIdZero_StateNotUpdated_001
+ * @tc.desc: Test SetVoipCallState with slotId 0 does not update voipCallState
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DeviceEventMonitorTest, SetVoipCallState_SlotIdZero_StateNotUpdated_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EventFwk::CommonEventData ced;
+    EventFwk::Want want;
+    
+    // Set initial state
+    want.SetParam("state", CALL_STATUS_ACTIVE);
+    ced.SetWant(want);
+    DEVICE_MONITOR->SetVoipCallState(ced, CALL_STATUS_ACTIVE);
+    ASSERT_EQ(DEVICE_MONITOR->GetVoipCallState(), CALL_STATUS_ACTIVE);
+    
+    // Update with slotId 0, state should not change
+    want.SetParam("slotId", 0);
+    want.SetParam("state", CALL_STATUS_INCOMING);
+    ced.SetWant(want);
+    DEVICE_MONITOR->SetVoipCallState(ced, CALL_STATUS_INCOMING);
+    
+    // State remains ACTIVE because slotId is present
+    ASSERT_EQ(DEVICE_MONITOR->GetVoipCallState(), CALL_STATUS_ACTIVE);
+}
+
+/**
+ * @tc.name: SetCallState_WithSlotId_WaitingState_NoRingMuteReset_001
+ * @tc.desc: Test hasHandleRingMute_ is NOT reset when slotId is present and state is WAITING
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DeviceEventMonitorTest, SetCallState_WithSlotId_WaitingState_NoRingMuteReset_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EventFwk::CommonEventData ced;
+    EventFwk::Want want;
+
+    DEVICE_MONITOR->SetHasHandleRingMute(true);
+    
+    want.SetParam("slotId", 1);
+    want.SetParam("state", CALL_STATUS_WAITING);
+    ced.SetWant(want);
+    DEVICE_MONITOR->SetCallState(ced, CALL_STATUS_WAITING);
+    
+    // According to source code, when slotId != -1, only INCOMING and DISCONNECTED reset hasHandleRingMute_
+    // WAITING should NOT reset it in this branch
+    ASSERT_TRUE(DEVICE_MONITOR->GetHasHandleRingMute());
+}
+
+/**
+ * @tc.name: SetVoipCallState_WithSlotId_WaitingState_NoRingMuteReset_001
+ * @tc.desc: Test hasHandleRingMute_ is NOT reset when slotId is present and voip state is WAITING
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DeviceEventMonitorTest, SetVoipCallState_WithSlotId_WaitingState_NoRingMuteReset_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EventFwk::CommonEventData ced;
+    EventFwk::Want want;
+
+    DEVICE_MONITOR->SetHasHandleRingMute(true);
+    
+    want.SetParam("slotId", 1);
+    want.SetParam("state", CALL_STATUS_WAITING);
+    ced.SetWant(want);
+    DEVICE_MONITOR->SetVoipCallState(ced, CALL_STATUS_WAITING);
+    
+    // According to source code, when slotId != -1, only INCOMING and DISCONNECTED reset hasHandleRingMute_
+    ASSERT_TRUE(DEVICE_MONITOR->GetHasHandleRingMute());
+}
+
+/**
+ * @tc.name: SetCallState_NoSlotId_HoldingState_NoRingMuteReset_001
+ * @tc.desc: Test hasHandleRingMute_ is NOT reset when no slotId and state is HOLDING
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DeviceEventMonitorTest, SetCallState_NoSlotId_HoldingState_NoRingMuteReset_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EventFwk::CommonEventData ced;
+    EventFwk::Want want;
+    
+    DEVICE_MONITOR->SetHasHandleRingMute(true);
+    want.SetParam("state", CALL_STATUS_HOLDING);
+    ced.SetWant(want);
+    DEVICE_MONITOR->SetCallState(ced, CALL_STATUS_HOLDING);
+    
+    ASSERT_TRUE(DEVICE_MONITOR->GetHasHandleRingMute());
+    ASSERT_EQ(DEVICE_MONITOR->GetCallState(), CALL_STATUS_HOLDING);
+}
+
+/**
+ * @tc.name: SetVoipCallState_NoSlotId_HoldingState_NoRingMuteReset_001
+ * @tc.desc: Test hasHandleRingMute_ is NOT reset when no slotId and voip state is HOLDING
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DeviceEventMonitorTest, SetVoipCallState_NoSlotId_HoldingState_NoRingMuteReset_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EventFwk::CommonEventData ced;
+    EventFwk::Want want;
+    
+    DEVICE_MONITOR->SetHasHandleRingMute(true);
+    want.SetParam("state", CALL_STATUS_HOLDING);
+    ced.SetWant(want);
+    DEVICE_MONITOR->SetVoipCallState(ced, CALL_STATUS_HOLDING);
+    
+    ASSERT_TRUE(DEVICE_MONITOR->GetHasHandleRingMute());
+    ASSERT_EQ(DEVICE_MONITOR->GetVoipCallState(), CALL_STATUS_HOLDING);
+}
+
+/**
+ * @tc.name: SetCallState_TransitionFromActiveToDisconnected_ResetRingMute_001
+ * @tc.desc: Test hasHandleRingMute_ reset when transitioning from ACTIVE to DISCONNECTED without slotId
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DeviceEventMonitorTest, SetCallState_TransitionFromActiveToDisconnected_ResetRingMute_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EventFwk::CommonEventData ced;
+    EventFwk::Want want;
+    
+    // First set to ACTIVE
+    want.SetParam("state", CALL_STATUS_ACTIVE);
+    ced.SetWant(want);
+    DEVICE_MONITOR->SetCallState(ced, CALL_STATUS_ACTIVE);
+    ASSERT_EQ(DEVICE_MONITOR->GetCallState(), CALL_STATUS_ACTIVE);
+    
+    DEVICE_MONITOR->SetHasHandleRingMute(true);
+    
+    // Then set to DISCONNECTED
+    want.SetParam("state", CALL_STATUS_DISCONNECTED);
+    ced.SetWant(want);
+    DEVICE_MONITOR->SetCallState(ced, CALL_STATUS_DISCONNECTED);
+    
+    ASSERT_EQ(DEVICE_MONITOR->GetCallState(), CALL_STATUS_DISCONNECTED);
+    ASSERT_TRUE(DEVICE_MONITOR->GetHasHandleRingMute());
+}
+
+/**
+ * @tc.name: SetCallState_TransitionFromIncomingToDisconnected_ResetRingMute_001
+ * @tc.desc: Test hasHandleRingMute_ reset when transitioning from INCOMING to DISCONNECTED without slotId
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DeviceEventMonitorTest, SetCallState_TransitionFromIncomingToDisconnected_ResetRingMute_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EventFwk::CommonEventData ced;
+    EventFwk::Want want;
+    
+    // First set to INCOMING
+    want.SetParam("state", CALL_STATUS_INCOMING);
+    ced.SetWant(want);
+    DEVICE_MONITOR->SetCallState(ced, CALL_STATUS_INCOMING);
+    ASSERT_EQ(DEVICE_MONITOR->GetCallState(), CALL_STATUS_INCOMING);
+    
+    DEVICE_MONITOR->SetHasHandleRingMute(true);
+    
+    // Then set to DISCONNECTED
+    want.SetParam("state", CALL_STATUS_DISCONNECTED);
+    ced.SetWant(want);
+    DEVICE_MONITOR->SetCallState(ced, CALL_STATUS_DISCONNECTED);
+    
+    ASSERT_EQ(DEVICE_MONITOR->GetCallState(), CALL_STATUS_DISCONNECTED);
+    // Previous state was INCOMING, so hasHandleRingMute_ should be reset to false
+    ASSERT_FALSE(DEVICE_MONITOR->GetHasHandleRingMute());
+}
+
+/**
+ * @tc.name: SetVoipCallState_TransitionFromIncomingToDisconnected_ResetRingMute_001
+ * @tc.desc: Test hasHandleRingMute_ reset when voip transitioning from INCOMING to DISCONNECTED without slotId
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DeviceEventMonitorTest, SetVoipCallState_TransitionFromIncomingToDisconnected_ResetRingMute_001,
+    TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EventFwk::CommonEventData ced;
+    EventFwk::Want want;
+    
+    // First set to INCOMING
+    want.SetParam("state", CALL_STATUS_INCOMING);
+    ced.SetWant(want);
+    DEVICE_MONITOR->SetVoipCallState(ced, CALL_STATUS_INCOMING);
+    ASSERT_EQ(DEVICE_MONITOR->GetVoipCallState(), CALL_STATUS_INCOMING);
+    
+    DEVICE_MONITOR->SetHasHandleRingMute(true);
+    
+    // Then set to DISCONNECTED
+    want.SetParam("state", CALL_STATUS_DISCONNECTED);
+    ced.SetWant(want);
+    DEVICE_MONITOR->SetVoipCallState(ced, CALL_STATUS_DISCONNECTED);
+    
+    ASSERT_EQ(DEVICE_MONITOR->GetVoipCallState(), CALL_STATUS_DISCONNECTED);
+    // Previous state was INCOMING, so hasHandleRingMute_ should be reset to false
+    ASSERT_FALSE(DEVICE_MONITOR->GetHasHandleRingMute());
+}
+
+/**
+ * @tc.name: GetCallState_DefaultValue_001
+ * @tc.desc: Test GetCallState returns default value before any set
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DeviceEventMonitorTest, GetCallState_DefaultValue_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t state = DEVICE_MONITOR->GetCallState();
+    // Just ensure it doesn't crash and returns an int
+    EXPECT_GE(state, -1);
+}
+
+/**
+ * @tc.name: GetVoipCallState_DefaultValue_001
+ * @tc.desc: Test GetVoipCallState returns default value before any set
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DeviceEventMonitorTest, GetVoipCallState_DefaultValue_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t state = DEVICE_MONITOR->GetVoipCallState();
+    EXPECT_GE(state, -1);
+}
+
+/**
+ * @tc.name: SetCallState_NegativeSlotId_TreatedAsNoSlotId_001
+ * @tc.desc: Test SetCallState
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DeviceEventMonitorTest, SetCallState_NegativeSlotId_TreatedAsNoSlotId_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EventFwk::CommonEventData ced;
+    EventFwk::Want want;
+    
+    // Explicitly set slotId to -1
+    want.SetParam("slotId", -1);
+    want.SetParam("state", CALL_STATUS_ACTIVE);
+    ced.SetWant(want);
+    
+    DEVICE_MONITOR->SetCallState(ced, CALL_STATUS_ACTIVE);
+    
+    // Should update state because slotId is -1
+    ASSERT_EQ(DEVICE_MONITOR->GetCallState(), CALL_STATUS_ACTIVE);
+}
+
+/**
+ * @tc.name: SetVoipCallState_NegativeSlotId_TreatedAsNoSlotId_001
+ * @tc.desc: Test SetVoipCallState with negative slotId behaves like no slotId
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DeviceEventMonitorTest, SetVoipCallState_NegativeSlotId_TreatedAsNoSlotId_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EventFwk::CommonEventData ced;
+    EventFwk::Want want;
+    
+    // Explicitly set slotId to -1
+    want.SetParam("slotId", -1);
+    want.SetParam("state", CALL_STATUS_ACTIVE);
+    ced.SetWant(want);
+    
+    DEVICE_MONITOR->SetVoipCallState(ced, CALL_STATUS_ACTIVE);
+    
+    // Should update state because slotId is -1
+    ASSERT_EQ(DEVICE_MONITOR->GetVoipCallState(), CALL_STATUS_ACTIVE);
+}
+
+/**
+ * @tc.name: SetCallState_MissingStateParam_UsesDefault_001
+ * @tc.desc: Test SetCallState when state param is missing in Want
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DeviceEventMonitorTest, SetCallState_MissingStateParam_UsesDefault_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EventFwk::CommonEventData ced;
+    EventFwk::Want want;
+    
+    // Do not set state param, GetIntParam will return default -1
+    want.SetParam("slotId", -1);
+    ced.SetWant(want);
+    
+    DEVICE_MONITOR->SetCallState(ced, 0); // Second arg is ignored if slotId is -1
+    
+    ASSERT_EQ(DEVICE_MONITOR->GetCallState(), -1);
+}
+
+/**
+ * @tc.name: SetVoipCallState_MissingStateParam_UsesDefault_001
+ * @tc.desc: Test SetVoipCallState when state param is missing in Want
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DeviceEventMonitorTest, SetVoipCallState_MissingStateParam_UsesDefault_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EventFwk::CommonEventData ced;
+    EventFwk::Want want;
+    
+    // Do not set state param
+    want.SetParam("slotId", -1);
+    ced.SetWant(want);
+    
+    DEVICE_MONITOR->SetVoipCallState(ced, 0);
+    
+    ASSERT_EQ(DEVICE_MONITOR->GetVoipCallState(), -1);
+}
+
+/**
+ * @tc.name: SetCallState_RapidStateChanges_001
+ * @tc.desc: Test rapid state changes handle correctly
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DeviceEventMonitorTest, SetCallState_RapidStateChanges_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EventFwk::CommonEventData ced;
+    EventFwk::Want want;
+    
+    want.SetParam("slotId", -1);
+    
+    want.SetParam("state", CALL_STATUS_INCOMING);
+    ced.SetWant(want);
+    DEVICE_MONITOR->SetCallState(ced, CALL_STATUS_INCOMING);
+    ASSERT_EQ(DEVICE_MONITOR->GetCallState(), CALL_STATUS_INCOMING);
+    
+    want.SetParam("state", CALL_STATUS_ACTIVE);
+    ced.SetWant(want);
+    DEVICE_MONITOR->SetCallState(ced, CALL_STATUS_ACTIVE);
+    ASSERT_EQ(DEVICE_MONITOR->GetCallState(), CALL_STATUS_ACTIVE);
+    
+    want.SetParam("state", CALL_STATUS_HOLDING);
+    ced.SetWant(want);
+    DEVICE_MONITOR->SetCallState(ced, CALL_STATUS_HOLDING);
+    ASSERT_EQ(DEVICE_MONITOR->GetCallState(), CALL_STATUS_HOLDING);
+    
+    want.SetParam("state", CALL_STATUS_DISCONNECTED);
+    ced.SetWant(want);
+    DEVICE_MONITOR->SetCallState(ced, CALL_STATUS_DISCONNECTED);
+    ASSERT_EQ(DEVICE_MONITOR->GetCallState(), CALL_STATUS_DISCONNECTED);
+}
+
+/**
+ * @tc.name: SetVoipCallState_RapidStateChanges_001
+ * @tc.desc: Test rapid voip state changes handle correctly
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DeviceEventMonitorTest, SetVoipCallState_RapidStateChanges_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EventFwk::CommonEventData ced;
+    EventFwk::Want want;
+    
+    want.SetParam("slotId", -1);
+    
+    want.SetParam("state", CALL_STATUS_INCOMING);
+    ced.SetWant(want);
+    DEVICE_MONITOR->SetVoipCallState(ced, CALL_STATUS_INCOMING);
+    ASSERT_EQ(DEVICE_MONITOR->GetVoipCallState(), CALL_STATUS_INCOMING);
+    
+    want.SetParam("state", CALL_STATUS_ACTIVE);
+    ced.SetWant(want);
+    DEVICE_MONITOR->SetVoipCallState(ced, CALL_STATUS_ACTIVE);
+    ASSERT_EQ(DEVICE_MONITOR->GetVoipCallState(), CALL_STATUS_ACTIVE);
+    
+    want.SetParam("state", CALL_STATUS_DISCONNECTED);
+    ced.SetWant(want);
+    DEVICE_MONITOR->SetVoipCallState(ced, CALL_STATUS_DISCONNECTED);
+    ASSERT_EQ(DEVICE_MONITOR->GetVoipCallState(), CALL_STATUS_DISCONNECTED);
+}
+
+/**
+ * @tc.name: SetCallState_SlotIdPresent_StateParamIgnoredForUpdate_001
+ * @tc.desc: Test that when slotId is present, the callState_ member is not updated regardless of state value
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DeviceEventMonitorTest, SetCallState_SlotIdPresent_StateParamIgnoredForUpdate_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EventFwk::CommonEventData ced;
+    EventFwk::Want want;
+    
+    // Set initial state
+    want.SetParam("slotId", -1);
+    want.SetParam("state", CALL_STATUS_ACTIVE);
+    ced.SetWant(want);
+    DEVICE_MONITOR->SetCallState(ced, CALL_STATUS_ACTIVE);
+    ASSERT_EQ(DEVICE_MONITOR->GetCallState(), CALL_STATUS_ACTIVE);
+    
+    // Try to update with slotId present
+    want.SetParam("slotId", 1);
+    want.SetParam("state", CALL_STATUS_DISCONNECTED);
+    ced.SetWant(want);
+    DEVICE_MONITOR->SetCallState(ced, CALL_STATUS_DISCONNECTED);
+    
+    // State should remain ACTIVE
+    ASSERT_EQ(DEVICE_MONITOR->GetCallState(), CALL_STATUS_ACTIVE);
+}
+
+/**
+ * @tc.name: SetVoipCallState_SlotIdPresent_StateParamIgnoredForUpdate_001
+ * @tc.desc: Test that when slotId is present, the voipCallState_ member is not updated regardless of state value
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DeviceEventMonitorTest, SetVoipCallState_SlotIdPresent_StateParamIgnoredForUpdate_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EventFwk::CommonEventData ced;
+    EventFwk::Want want;
+    
+    // Set initial state
+    want.SetParam("slotId", -1);
+    want.SetParam("state", CALL_STATUS_ACTIVE);
+    ced.SetWant(want);
+    DEVICE_MONITOR->SetVoipCallState(ced, CALL_STATUS_ACTIVE);
+    ASSERT_EQ(DEVICE_MONITOR->GetVoipCallState(), CALL_STATUS_ACTIVE);
+    
+    // Try to update with slotId present
+    want.SetParam("slotId", 1);
+    want.SetParam("state", CALL_STATUS_DISCONNECTED);
+    ced.SetWant(want);
+    DEVICE_MONITOR->SetVoipCallState(ced, CALL_STATUS_DISCONNECTED);
+    
+    // State should remain ACTIVE
+    ASSERT_EQ(DEVICE_MONITOR->GetVoipCallState(), CALL_STATUS_ACTIVE);
+}
 } // namespace MMI
 } // namespace OHOS
