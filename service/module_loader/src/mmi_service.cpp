@@ -436,6 +436,10 @@ bool MMIService::InitDelegateTasks()
     if (serviceContext_ != nullptr) {
         serviceContext_->AttachDelegateInterface(delegateInterface_);
     }
+    auto pluginMgr = InputPluginManager::GetInstance();
+    if (pluginMgr != nullptr) {
+        pluginMgr->AttachDelegateInterface(delegateInterface_);
+    }
     MMI_HILOGI("AddEpoll, epollfd:%{public}d, fd:%{public}d", mmiFd_, delegateTasks_.GetReadFd());
     return true;
     // LCOV_EXCL_STOP
@@ -5367,6 +5371,10 @@ ErrCode MMIService::EnableInputExtension(const std::string &uuid, bool enabled)
     if (!IsRunning()) {
         MMI_HILOGE("Service is not running");
         return MMISERVICE_NOT_RUNNING;
+    }
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
     }
     auto uid = GetCallingUid();
     int32_t ret = delegateTasks_.PostSyncTask(
