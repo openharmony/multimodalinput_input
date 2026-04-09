@@ -129,7 +129,7 @@ public:
     /**
      * @brief Obtains the trigger type for key command.
      * @return Returns the trigger type. 0=not set, 1=PRESSED, 2=REPEAT_PRESSED, 3=ALL_RELEASED
-     * @since 26
+     * @since 26.0.0
      */
     int32_t GetTriggerType() const;
 
@@ -137,7 +137,7 @@ public:
      * @brief Sets the trigger type for key command.
      * @param triggerType Indicates the trigger type. 1=PRESSED, 2=REPEAT_PRESSED, 3=ALL_RELEASED
      * @return void
-     * @since 26
+     * @since 26.0.0
      */
     void SetTriggerType(int32_t triggerType);
 

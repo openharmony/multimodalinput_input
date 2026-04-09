@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -167,7 +167,6 @@ bool TriggerEventDispatcher::ShouldDispatchPRESSED(std::shared_ptr<KeyOption> ke
 
     // 5. 生成订阅键
     std::string subscribeKey = GenerateSubscribeKey(keyOption);
-
     // 6. 检查是否已发送过首次 down
     if (firstDownSent_[subscribeKey]) {
         MMI_HILOGD("First down already sent, ignore auto-repeat");
@@ -303,11 +302,8 @@ bool TriggerEventDispatcher::CheckDuration(std::shared_ptr<KeyOption> keyOption,
     if (duration == 0) {
         MMI_HILOGD("Duration is 0, immediate trigger");
         return true;
-    }
-
     // 2. 生成订阅键
     std::string subscribeKey = GenerateSubscribeKey(keyOption);
-
     // 3. 检查是否在 duration 窗口内
     if (durationPassed_.find(subscribeKey) != durationPassed_.end()) {
         // duration 窗口已通过
