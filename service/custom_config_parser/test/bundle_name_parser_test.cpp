@@ -62,6 +62,48 @@ static bool CreateDirectoryRecursive(const std::string& path)
     return true;
 }
 
+class ScopedFileRestorer {
+public:
+    explicit ScopedFileRestorer(const std::string& filePath)
+        : filePath_(filePath), fileExists_(false) {
+        std::ifstream inFile(filePath_);
+        if (inFile.good()) {
+            fileExists_ = true;
+            std::stringstream buffer;
+            buffer << inFile.rdbuf();
+            if (!inFile.fail() && !inFile.bad()) {
+                originalContent_ = buffer.str();
+            }
+        }
+        inFile.close();
+    }
+
+    ~ScopedFileRestorer() {
+        if (fileExists_) {
+            std::ofstream restoreFile(filePath_);
+            if (restoreFile.good()) {
+                restoreFile << originalContent_;
+            }
+            restoreFile.close();
+            if (restoreFile.fail()) {
+                GTEST_LOG_(ERROR) << "Failed to restore config file: " << filePath_;
+            }
+        } else {
+            if (remove(filePath_.c_str()) != 0) {
+                GTEST_LOG_(ERROR) << "Failed to remove config file: " << filePath_;
+            }
+        }
+    }
+
+    ScopedFileRestorer(const ScopedFileRestorer&) = delete;
+    ScopedFileRestorer& operator=(const ScopedFileRestorer&) = delete;
+
+private:
+    std::string filePath_;
+    bool fileExists_;
+    std::string originalContent_;
+};
+
 class BundleNameParserTest : public testing::Test {
 public:
     static void SetUpTestCase(void);
@@ -442,7 +484,7 @@ HWTEST_F(BundleNameParserTest, BundleNameParser_JsonArray_004, TestSize.Level1)
 {
     std::ostringstream json;
     json << "{\"bundle_name_map\":[";
-    for (int32_t i = 0; i < MAX_JSON_ARRAY_SIZE; ++i) {
+    for (size_t i = 0; i < MAX_JSON_ARRAY_SIZE; ++i) {
         if (i > 0) {
             json << ",";
         }
@@ -466,7 +508,7 @@ HWTEST_F(BundleNameParserTest, BundleNameParser_JsonArray_005, TestSize.Level1)
 {
     std::ostringstream json;
     json << "{\"bundle_name_map\":[";
-    for (int32_t i = 0; i < EXCEED_MAX_ARRAY_SIZE; ++i) {
+    for (size_t i = 0; i < EXCEED_MAX_ARRAY_SIZE; ++i) {
         if (i > 0) {
             json << ",";
         }
@@ -1419,7 +1461,7 @@ HWTEST_F(BundleNameParserTest, BundleNameParser_InitializeImpl_MaxSize_001, Test
     inFile.close();
     
     std::string maxSizeConfig = "{\"bundle_name_map\":[";
-    for (int32_t i = 0; i < MAX_JSON_ARRAY_SIZE; ++i) {
+    for (size_t i = 0; i < MAX_JSON_ARRAY_SIZE; ++i) {
         if (i > 0) {
             maxSizeConfig += ",";
         }
@@ -1482,7 +1524,7 @@ HWTEST_F(BundleNameParserTest, BundleNameParser_InitializeImpl_ExceedMaxSize_001
     inFile.close();
     
     std::string exceedMaxConfig = "{\"bundle_name_map\":[";
-    for (int32_t i = 0; i < EXCEED_MAX_ARRAY_SIZE; ++i) {
+    for (size_t i = 0; i < EXCEED_MAX_ARRAY_SIZE; ++i) {
         if (i > 0) {
             exceedMaxConfig += ",";
         }
