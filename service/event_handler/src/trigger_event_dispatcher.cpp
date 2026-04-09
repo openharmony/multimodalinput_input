@@ -294,6 +294,34 @@ bool TriggerEventDispatcher::MatchPreKeys(std::shared_ptr<KeyOption> keyOption,
     return true;
 }
 
+bool TriggerEventDispatcher::CheckDurationWindowPassed(const std::string& subscribeKey)
+{
+    CALL_DEBUG_ENTER;
+    auto iter = durationPassed_.find(subscribeKey);
+    if (iter == durationPassed_.end()) {
+        return false;
+    }
+    if (iter->second) {
+        MMI_HILOGD("Duration window already passed");
+        return true;
+    } else {
+        MMI_HILOGD("Duration window not yet passed");
+        return false;
+    }
+}
+
+bool TriggerEventDispatcher::CheckDurationWindowWithOtherKey(const std::string& subscribeKey)
+{
+    CALL_DEBUG_ENTER;
+    if (!HasOtherKeyPressedInWindow(subscribeKey)) {
+        MMI_HILOGD("No other key pressed in window");
+        return true;
+    } else {
+        MMI_HILOGD("Other key pressed during duration window");
+        return false;
+    }
+}
+
 bool TriggerEventDispatcher::CheckDuration(std::shared_ptr<KeyOption> keyOption,
     std::shared_ptr<KeyEvent> keyEvent)
 {
@@ -302,37 +330,21 @@ bool TriggerEventDispatcher::CheckDuration(std::shared_ptr<KeyOption> keyOption,
     if (duration == 0) {
         MMI_HILOGD("Duration is 0, immediate trigger");
         return true;
+    }
     // 2. 生成订阅键
     std::string subscribeKey = GenerateSubscribeKey(keyOption);
     // 3. 检查是否在 duration 窗口内
-    if (durationPassed_.find(subscribeKey) != durationPassed_.end()) {
-        // duration 窗口已通过
-        if (durationPassed_[subscribeKey]) {
-            MMI_HILOGD("Duration window already passed");
-            // 检查窗口内是否有其他按键
-            if (!HasOtherKeyPressedInWindow(subscribeKey)) {
-                MMI_HILOGD("No other key pressed in window");
-                return true;
-            } else {
-                MMI_HILOGD("Other key pressed during duration window");
-                return false;
-            }
-        } else {
-            MMI_HILOGD("Duration window not yet passed");
-            return false;
-        }
+    if (!CheckDurationWindowPassed(subscribeKey)) {
+        return false;
     }
-
     // 4. 首次检查，启动 duration 窗口
     if (downStartTime_.find(subscribeKey) == downStartTime_.end()) {
         StartDurationWindow(subscribeKey, duration);
         MMI_HILOGD("Duration window started, will wait %{public}d microseconds", duration);
-        return false;  // 等待定时器到期
+        return false;
     }
-
-    // 5. duration 窗口还未到期
-    MMI_HILOGD("Duration window not yet passed");
-    return false;
+    // 5. 检查窗口内是否有其他按键
+    return CheckDurationWindowWithOtherKey(subscribeKey);
 }
 
 bool TriggerEventDispatcher::HasOtherKeyPressedInWindow(const std::string& subscribeKey)
@@ -366,7 +378,6 @@ void TriggerEventDispatcher::StartDurationWindow(const std::string& subscribeKey
         }
     }).detach();
 }
-
 void TriggerEventDispatcher::MarkDurationPassed(const std::string& subscribeKey)
 {
     std::lock_guard<std::mutex> lock(mutex_);

@@ -87,6 +87,13 @@ private:
     void MarkDurationPassed(const std::string& subscribeKey);
 
 private:
+    // 检查duration窗口是否已通过
+    bool CheckDurationWindowPassed(const std::string& subscribeKey);
+
+    // 检查duration窗口内是否有其他按键
+    bool CheckDurationWindowWithOtherKey(const std::string& subscribeKey);
+
+private:
     std::mutex mutex_;
 
     // 状态跟踪
