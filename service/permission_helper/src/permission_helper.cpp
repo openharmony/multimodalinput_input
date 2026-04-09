@@ -30,6 +30,7 @@ namespace OHOS {
 namespace MMI {
 namespace {
     const std::string INJECT_PERMISSION_CODE = "ohos.permission.INJECT_INPUT_EVENT";
+    const std::string CONTROL_DEVICE_PERMISSION_CODE = "ohos.permission.CONTROL_DEVICE";
     const std::string MONITOR_PERMISSION_CODE = "ohos.permission.INPUT_MONITORING";
     const std::string INTERCEPT_PERMISSION_CODE = "ohos.permission.INTERCEPT_INPUT_EVENT";
     const std::string INFRAREDEMITTER_PERMISSION_CODE = "ohos.permission.MANAGE_INPUT_INFRARED_EMITTER";
@@ -101,6 +102,20 @@ bool PermissionHelper::CheckAuthorize()
 {
     CALL_DEBUG_ENTER;
     return CheckHapPermission(INJECT_PERMISSION_CODE);
+}
+
+bool PermissionHelper::CheckControlDevicePermission()
+{
+    CALL_DEBUG_ENTER;
+    auto tokenId = IPCSkeleton::GetCallingTokenID();
+    if (!CheckHapPermission(CONTROL_DEVICE_PERMISSION_CODE)) {
+        MMI_HILOGE("CheckHapPermission %{public}s failed", CONTROL_DEVICE_PERMISSION_CODE.c_str());
+        AddPermissionUsedRecord(tokenId, CONTROL_DEVICE_PERMISSION_CODE, 0, 1);
+        return false;
+    }
+    MMI_HILOGI("CheckHapPermission %{public}s success", CONTROL_DEVICE_PERMISSION_CODE.c_str());
+    AddPermissionUsedRecord(tokenId, CONTROL_DEVICE_PERMISSION_CODE, 1, 0);
+    return true;
 }
 
 bool PermissionHelper::CheckKeyEventHook()

@@ -47,6 +47,7 @@ public:
     bool CheckMouseCursor();
     bool CheckInputEventFilter();
     bool CheckAuthorize();
+    bool CheckControlDevicePermission();
     bool CheckKeyEventHook();
     bool CheckInputDeviceController();
     bool CheckFunctionKeyEnabled();
