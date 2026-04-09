@@ -36,6 +36,7 @@
 #endif // SHORTCUT_KEY_MANAGER_ENABLED
 #include "long_press_subscriber_handler.h"
 #include "libinput_adapter.h"
+#include "permission_helper.h"
 #include "pointer_device_manager.h"
 #include "pointer_motion_acceleration.h"
 #include "time_cost_chk.h"
@@ -1779,6 +1780,10 @@ int32_t ServerMsgHandler::NativeInjectCheck(int32_t pid)
         MMI_HILOGW("Invalid process id pid:%{public}d", pid);
         return COMMON_PERMISSION_CHECK_ERROR;
     }
+    if (PER_HELPER->CheckControlDevicePermission()) {
+        MMI_HILOGI("Native inject permitted by CONTROL_DEVICE permission, pid:%{public}d", pid);
+        return RET_OK;
+    }
     auto state = AUTHORIZE_HELPER->GetAuthorizeState();
     MMI_HILOGI("The process is already being processed,s:%{public}d,pid:%{public}d,inputPid:%{public}d",
         state, AUTHORIZE_HELPER->GetAuthorizePid(), pid);
@@ -1806,6 +1811,7 @@ int32_t ServerMsgHandler::NativeInjectCheck(int32_t pid)
         MMI_HILOGI("Other processes have been authorized");
         return COMMON_PERMISSION_CHECK_ERROR;
     }
+    MMI_HILOGI("Native inject permitted by dialog authorization, pid:%{public}d", pid);
     return RET_OK;
 }
 } // namespace MMI
