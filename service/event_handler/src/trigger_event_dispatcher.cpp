@@ -111,19 +111,16 @@ bool TriggerEventDispatcher::ShouldConsume(std::shared_ptr<KeyOption> keyOption,
 void TriggerEventDispatcher::ClearSubscribeState(const std::string& subscribeKey)
 {
     std::lock_guard<std::mutex> lock(mutex_);
-
     // 1. 清理 firstDownSent 状态
     auto iter1 = firstDownSent_.find(subscribeKey);
     if (iter1 != firstDownSent_.end()) {
         firstDownSent_.erase(iter1);
     }
-
     // 2. 清理 downStartTime 状态
     auto iter2 = downStartTime_.find(subscribeKey);
     if (iter2 != downStartTime_.end()) {
         downStartTime_.erase(iter2);
     }
-
     // 3. 清理 durationPassed 状态
     auto iter3 = durationPassed_.find(subscribeKey);
     if (iter3 != durationPassed_.end()) {
@@ -135,7 +132,6 @@ void TriggerEventDispatcher::ClearSubscribeState(const std::string& subscribeKey
     if (iter4 != hasOtherKey_.end()) {
         hasOtherKey_.erase(iter4);
     }
-
     MMI_HILOGD("Subscribe state cleared for %{public}s", subscribeKey.c_str());
 }
 
@@ -149,12 +145,10 @@ bool TriggerEventDispatcher::ShouldDispatchPRESSED(std::shared_ptr<KeyOption> ke
     if (keyCode != keyOption->GetFinalKey()) {
         return false;
     }
-
     // 2. 只处理 down 事件
     if (action != KeyEvent::KEY_ACTION_DOWN) {
         return false;
     }
-
     // 3. 检查 preKeys 是否匹配
     if (!MatchPreKeys(keyOption, keyEvent)) {
         return false;
@@ -164,7 +158,6 @@ bool TriggerEventDispatcher::ShouldDispatchPRESSED(std::shared_ptr<KeyOption> ke
     if (!CheckDuration(keyOption, keyEvent)) {
         return false;
     }
-
     // 5. 生成订阅键
     std::string subscribeKey = GenerateSubscribeKey(keyOption);
     // 6. 检查是否已发送过首次 down
@@ -203,12 +196,10 @@ bool TriggerEventDispatcher::ShouldDispatchREPEAT_PRESSED(std::shared_ptr<KeyOpt
     if (keyCode != keyOption->GetFinalKey()) {
         return false;
     }
-
     // 2. 只处理 down 事件
     if (action != KeyEvent::KEY_ACTION_DOWN) {
         return false;
     }
-
     // 3. 检查 preKeys 是否匹配
     if (!MatchPreKeys(keyOption, keyEvent)) {
         return false;
@@ -218,18 +209,15 @@ bool TriggerEventDispatcher::ShouldDispatchREPEAT_PRESSED(std::shared_ptr<KeyOpt
     if (!CheckDuration(keyOption, keyEvent)) {
         return false;
     }
-
     // 5. 所有 down 事件都分发（包括自动重复）
     MMI_HILOGD("REPEAT_PRESSED mode: dispatching down event (including auto-repeat)");
     return true;
 }
-
 bool TriggerEventDispatcher::ShouldDispatchALL_RELEASED(std::shared_ptr<KeyOption> keyOption,
     std::shared_ptr<KeyEvent> keyEvent)
 {
     int32_t keyCode = keyEvent->GetKeyCode();
     int32_t action = keyEvent->GetKeyAction();
-
     // 1. 处理 finalKey 的事件
     if (keyCode == keyOption->GetFinalKey()) {
         // 1.1 检查 down 事件的条件
@@ -256,7 +244,6 @@ bool TriggerEventDispatcher::ShouldDispatchALL_RELEASED(std::shared_ptr<KeyOptio
             return true;
         }
     }
-
     return false;
 }
 
@@ -384,6 +371,5 @@ void TriggerEventDispatcher::MarkDurationPassed(const std::string& subscribeKey)
     durationPassed_[subscribeKey] = true;
     MMI_HILOGD("Mark duration passed for %{public}s", subscribeKey.c_str());
 }
-
 } // namespace MMI
 } // namespace OHOS
