@@ -629,14 +629,19 @@ napi_value SubscribeHotkey(napi_env env, napi_callback_info info, sptr<KeyEventM
 static void OnKeyTriggerCallback(std::shared_ptr<KeyEvent> keyEvent, std::shared_ptr<KeyOption> keyOption)
 {
     CALL_DEBUG_ENTER;
-    CHKPV(keyEvent);
-    CHKPV(keyOption);
-
-    // 获取 TriggerEventDispatcher 单例
+    if (keyEvent == nullptr) {
+        MMI_HILOGE("keyEvent is nullptr");
+        return;
+    }
+    if (keyOption == nullptr) {
+        MMI_HILOGE("keyOption is nullptr");
+        return;
+    }
     auto* dispatcher = TriggerEventDispatcher::GetInstance();
-    CHKPV(dispatcher);
-
-    // 判断是否应该分发事件
+    if (dispatcher == nullptr) {
+        MMI_HILOGE("dispatcher is nullptr");
+        return;
+    }
     if (!dispatcher->ShouldDispatch(keyOption, keyEvent)) {
         MMI_HILOGD("Event should not be dispatched");
         return;
@@ -680,29 +685,28 @@ static void OnKeyTriggerCallback(std::shared_ptr<KeyEvent> keyEvent, std::shared
 static void ExecuteAsyncCallback(uv_work_t* work, int32_t status)
 {
     CALL_DEBUG_ENTER;
-    CHKPV(work);
-
-    // 获取工作数据
+    if (work == nullptr) {
+        MMI_HILOGE("work is nullptr");
+        return;
+    }
     KeyCommandWork* cmdWork = reinterpret_cast<KeyCommandWork*>(work->data);
-    CHKPV(cmdWork);
-
+    if (cmdWork == nullptr) {
+        MMI_HILOGE("cmdWork is nullptr");
+        return;
+    }
     auto event = cmdWork->eventInfo;
     auto keyEvent = cmdWork->keyEvent;
-
     if (event == nullptr || keyEvent == nullptr) {
         MMI_HILOGE("EventInfo or KeyEvent is nullptr");
         delete cmdWork;
         return;
     }
-
     napi_env env = event->env;
     if (env == nullptr) {
         MMI_HILOGE("Env is nullptr");
         delete cmdWork;
         return;
     }
-
-    // 检查回调是否有效
     if (event->callback == nullptr) {
         MMI_HILOGE("Callback is nullptr");
         delete cmdWork;
@@ -753,46 +757,43 @@ static void ExecuteAsyncWork(uv_work_t* work)
 {
     CALL_DEBUG_ENTER;
     MMI_HILOGD("KeyCommand async work executing");
-    // 此函数在工作线程中执行，目前不需要额外处理
-    // 实际的回调执行在 ExecuteAsyncCallback 中进行
 }
 
 // SDK 26.0.0 新增：带事件参数的异步回调函数
 void EmitAsyncCallbackWorkWithEvent(sptr<KeyEventMonitorInfo> event, std::shared_ptr<KeyEvent> keyEvent)
 {
     CALL_DEBUG_ENTER;
-    CHKPV(event);
-    CHKPV(keyEvent);
-
+    if (event == nullptr) {
+        MMI_HILOGE("event is nullptr");
+        return;
+    }
+    if (keyEvent == nullptr) {
+        MMI_HILOGE("keyEvent is nullptr");
+        return;
+    }
     if (event->callback == nullptr) {
         MMI_HILOGE("Callback is nullptr");
         return;
     }
-
-    // 获取环境
     napi_env env = event->env;
     if (env == nullptr) {
         MMI_HILOGE("Env is nullptr");
         return;
     }
-
-    // 获取事件循环
     uv_loop_s* loop = nullptr;
     napi_status status = napi_get_uv_event_loop(env, &loop);
     if (status != napi_ok || loop == nullptr) {
         MMI_HILOGE("Failed to get UV event loop");
         return;
     }
-
-    // 创建异步工作数据
     KeyCommandWork* cmdWork = new (std::nothrow) KeyCommandWork;
-    CHKPV(cmdWork);
-
+    if (cmdWork == nullptr) {
+        MMI_HILOGE("Failed to create KeyCommandWork");
+        return;
+    }
     cmdWork->eventInfo = event;
     cmdWork->keyEvent = keyEvent;
     cmdWork->work.data = cmdWork;
-
-    // 将工作加入异步队列
     int ret = uv_queue_work_with_qos_internal(
         loop,
         &cmdWork->work,
@@ -801,13 +802,11 @@ void EmitAsyncCallbackWorkWithEvent(sptr<KeyEventMonitorInfo> event, std::shared
         uv_qos_user_initiated,
         "onKeyCommand"
     );
-
     if (ret != 0) {
         MMI_HILOGE("Failed to queue async work, error: %{public}d", ret);
         delete cmdWork;
         return;
     }
-
     MMI_HILOGD("KeyCommand async work queued successfully");
 }
 
@@ -858,8 +857,10 @@ napi_value SubscribeKeyCommand(napi_env env, napi_callback_info info, sptr<KeyEv
 static bool KeyEvent2JsKeyEvent(napi_env env, std::shared_ptr<KeyEvent> keyEvent, napi_value& jsKeyEvent)
 {
     CALL_DEBUG_ENTER;
-    CHKPF(keyEvent);
-
+    if (keyEvent == nullptr) {
+        MMI_HILOGE("keyEvent is nullptr");
+        return false;
+    }
     napi_status status = napi_create_object(env, &jsKeyEvent);
     if (status != napi_ok) {
         MMI_HILOGE("Failed to create JavaScript object");
@@ -894,18 +895,15 @@ static bool KeyEvent2JsKeyEvent(napi_env env, std::shared_ptr<KeyEvent> keyEvent
 static bool KeyItem2JsKey(napi_env env, const KeyEvent::KeyItem& keyItem, napi_value& jsKey)
 {
     CALL_DEBUG_ENTER;
-
     napi_status status = napi_create_object(env, &jsKey);
     if (status != napi_ok) {
         MMI_HILOGE("Failed to create JavaScript object for KeyItem");
         return false;
     }
-
     UtilNapi::SetNamedProperty(env, jsKey, std::string("keyCode"), keyItem.GetKeyCode());
     UtilNapi::SetNamedProperty(env, jsKey, std::string("action"), keyItem.GetAction());
     UtilNapi::SetNamedProperty(env, jsKey, std::string("downTime"), keyItem.GetDownTime());
     UtilNapi::SetNamedProperty(env, jsKey, std::string("deviceId"), keyItem.GetDeviceId());
-
     return true;
 }
 
@@ -1147,12 +1145,14 @@ static napi_value JsOnKey(napi_env env, napi_callback_info info)
     }
 
     if (!ValidateOnKeyParameters(env, argc, argv, keyType)) {
+        MMI_HILOGE("ValidateOnKeyParameters failed");
         return nullptr;
     }
 
     event->name = keyType;
 
     if (!SaveOnKeyCallback(env, argc, argv, event)) {
+        MMI_HILOGE("SaveOnKeyCallback failed");
         return nullptr;
     }
 
@@ -1234,6 +1234,7 @@ static napi_value JsOffKey(napi_env env, napi_callback_info info)
     }
 
     if (!ValidateOffKeyParameters(env, argc, argv, keyType)) {
+        MMI_HILOGE("ValidateOffKeyParameters failed");
         return nullptr;
     }
 
@@ -1245,6 +1246,7 @@ static napi_value JsOffKey(napi_env env, napi_callback_info info)
     }
 
     if (!UnsubscribeKeyCommand(env, event, keyOption)) {
+        MMI_HILOGE("UnsubscribeKeyCommand failed");
         return nullptr;
     }
 
