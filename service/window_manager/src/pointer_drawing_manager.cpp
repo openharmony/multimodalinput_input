@@ -3599,8 +3599,9 @@ void PointerDrawingManager::DrawScreenCenterPointer(const PointerStyle& pointerS
             AttachToDisplay();
             Rosen::RSTransaction::FlushImplicitTransaction();
         }
-        int32_t validWidth = displayInfo_.validWidth;
-        int32_t validHeight = displayInfo_.validHeight;
+        int32_t validWidth = 0;
+        int32_t validHeight = 0;
+        GetValidWidthAndHeight(&displayInfo_, validWidth, validHeight);
         Direction direction = GetDisplayDirection(&displayInfo_);
         if (direction == DIRECTION90 || direction == DIRECTION270) {
             std::swap(validWidth, validHeight);
@@ -3901,6 +3902,24 @@ uint64_t PointerDrawingManager::GetResampleTimestamp(uint64_t timestamp)
         timestamp - static_cast<uint64_t>(period) + NS_IN_MS : NS_IN_MS;
     auto resampleTime = time > compensation ? time - compensation : 0;
     return resampleTime;
+}
+
+void PointerDrawingManager::GetValidWidthAndHeight(
+    const OLD::DisplayInfo *displayInfo, int32_t &validWidth, int32_t &validHeight)
+{
+    CALL_DEBUG_ENTER;
+    if (displayInfo == nullptr) {
+        MMI_HILOGI("param displayInfo is nullptr");
+        return;
+    }
+    validWidth = displayInfo->validWidth;
+    validHeight = displayInfo->validHeight;
+#ifdef OHOS_BUILD_ENABLE_VKEYBOARD
+    if (displayInfo->pointerActiveWidth > 0 && displayInfo->pointerActiveHeight > 0) {
+        validWidth = displayInfo->pointerActiveWidth;
+        validHeight = displayInfo->pointerActiveHeight;
+    }
+#endif // OHOS_BUILD_ENABLE_VKEYBOARD
 }
 
 void ResampleAlgorithm::AddPoint(int32_t physicalX, int32_t physicalY, uint64_t displayId)
