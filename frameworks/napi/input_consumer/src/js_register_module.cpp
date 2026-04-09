@@ -285,115 +285,161 @@ napi_value GetEventInfoAPI9(napi_env env, napi_callback_info info, sptr<KeyEvent
     return ret;
 }
 
-napi_value GetEventInfoAPI26(napi_env env, napi_callback_info info, sptr<KeyEventMonitorInfo> event,
-    std::shared_ptr<KeyOption> keyOption)
+// SDK 26.0.0 新增：解析preKeys参数
+static bool ParsePreKeysParameter(napi_env env, napi_value argv, std::shared_ptr<KeyOption> keyOption,
+    std::string& subKeyNames)
 {
     CALL_DEBUG_ENTER;
-    CHKPP(event);
-    CHKPP(keyOption);
-    size_t argc = 3;
-    napi_value argv[3] = { 0 };
-    CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
     napi_value receiveValue = nullptr;
-    CHKRP(napi_get_named_property(env, argv[1], "preKeys", &receiveValue), GET_NAMED_PROPERTY);
+    CHKRP(napi_get_named_property(env, argv, "preKeys", &receiveValue), GET_NAMED_PROPERTY);
     if (receiveValue == nullptr) {
-        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "preKeys not found");
-        return nullptr;
+        return false;
     }
     std::set<int32_t> preKeys;
     if (GetPreKeys(env, receiveValue, preKeys) == nullptr) {
         MMI_HILOGE("Get preKeys failed");
-        return nullptr;
+        return false;
     }
     if (preKeys.size() > PRE_KEYS_SIZE) {
         MMI_HILOGE("PreKeys size invalid");
-        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "preKeys size invalid");
-        return nullptr;
+        return false;
     }
     MMI_HILOGD("PreKeys size:%{public}zu", preKeys.size());
     keyOption->SetPreKeys(preKeys);
-    std::string subKeyNames = "";
     for (const auto &item : preKeys) {
         subKeyNames += std::to_string(item);
         subKeyNames += ",";
         MMI_HILOGD("preKeys:%{private}d", item);
     }
-    std::optional<int32_t> tempFinalKey = GetNamedPropertyInt32(env, argv[1], "finalKey");
+    return true;
+}
+
+// SDK 26.0.0 新增：解析finalKey参数
+static bool ParseFinalKeyParameter(napi_env env, napi_value argv, std::shared_ptr<KeyOption> keyOption,
+    std::string& subKeyNames)
+{
+    CALL_DEBUG_ENTER;
+    std::optional<int32_t> tempFinalKey = GetNamedPropertyInt32(env, argv, "finalKey");
     if (!tempFinalKey) {
         MMI_HILOGE("GetNamedPropertyInt32 failed");
-        return nullptr;
+        return false;
     }
     int32_t finalKey = tempFinalKey.value();
     if (finalKey < 0) {
         MMI_HILOGE("finalKey:%{private}d is less 0, can not process", finalKey);
-        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "finalKey must be greater than or equal to 0");
-        return nullptr;
+        return false;
     }
     subKeyNames += std::to_string(finalKey);
     subKeyNames += ",";
     keyOption->SetFinalKey(finalKey);
     MMI_HILOGD("FinalKey:%{private}d", finalKey);
+    return true;
+}
 
-    // 解析 triggerType 参数（SDK 26.0.0 新增）
-    std::optional<int32_t> tempTriggerType = GetNamedPropertyInt32(env, argv[1], "triggerType");
+// SDK 26.0.0 新增：解析triggerType参数
+static bool ParseTriggerTypeParameter(napi_env env, napi_value argv, std::shared_ptr<KeyOption> keyOption)
+{
+    CALL_DEBUG_ENTER;
+    std::optional<int32_t> tempTriggerType = GetNamedPropertyInt32(env, argv, "triggerType");
     if (!tempTriggerType) {
         MMI_HILOGE("GetNamedPropertyInt32 failed for triggerType");
-        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "triggerType is required");
-        return nullptr;
+        return false;
     }
     int32_t triggerType = tempTriggerType.value();
     if (triggerType < TRIGGER_TYPE_MIN || triggerType > TRIGGER_TYPE_MAX) {
         MMI_HILOGE("triggerType:%{public}d is invalid, must be 0-3", triggerType);
-        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "triggerType must be 0-3");
-        return nullptr;
+        return false;
     }
     keyOption->SetTriggerType(triggerType);
     MMI_HILOGD("TriggerType:%{public}d", triggerType);
+    return true;
+}
 
-    // 解析 finalKeyDownDuration（triggerType 需要此参数）
-    std::optional<int32_t> tempKeyDownDuration = GetNamedPropertyInt32(env, argv[1], "finalKeyDownDuration");
+// SDK 26.0.0 新增：解析finalKeyDownDuration参数
+static bool ParseFinalKeyDownDurationParameter(napi_env env, napi_value argv, std::shared_ptr<KeyOption> keyOption,
+    std::string& subKeyNames)
+{
+    CALL_DEBUG_ENTER;
+    std::optional<int32_t> tempKeyDownDuration = GetNamedPropertyInt32(env, argv, "finalKeyDownDuration");
     if (!tempKeyDownDuration) {
         MMI_HILOGE("GetNamedPropertyInt32 failed");
-        return nullptr;
+        return false;
     }
     int32_t finalKeyDownDuration = tempKeyDownDuration.value();
     if (finalKeyDownDuration < 0) {
         MMI_HILOGE("finalKeyDownDuration:%{public}d is less 0, can not process", finalKeyDownDuration);
-        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "finalKeyDownDuration must be greater than or equal to 0");
-        return nullptr;
+        return false;
     }
     subKeyNames += std::to_string(finalKeyDownDuration);
     subKeyNames += ",";
     keyOption->SetFinalKeyDownDuration(finalKeyDownDuration);
     MMI_HILOGD("FinalKeyDownDuration:%{public}d", finalKeyDownDuration);
+    return true;
+}
 
-    // triggerType 优先级：如果设置 triggerType (1-3)，则忽略 isFinalKeyDown 和 isRepeat
+// SDK 26.0.0 新增：解析旧的isFinalKeyDown和isRepeat参数
+static bool ParseLegacyParameters(napi_env env, napi_value argv, std::shared_ptr<KeyOption> keyOption,
+    std::string& subKeyNames)
+{
+    CALL_DEBUG_ENTER;
+    bool isFinalKeyDown;
+    if (!GetNamedPropertyBool(env, argv, "isFinalKeyDown", isFinalKeyDown)) {
+        MMI_HILOGE("GetNamedPropertyBool failed");
+        return false;
+    }
+    subKeyNames += std::to_string(isFinalKeyDown);
+    subKeyNames += ",";
+    keyOption->SetFinalKeyDown(isFinalKeyDown);
+    MMI_HILOGD("IsFinalKeyDown:%{private}d", (isFinalKeyDown == true ? 1 : 0));
+    bool isRepeat = true;
+    if (!GetNamedPropertyBool(env, argv, "isRepeat", isRepeat)) {
+        MMI_HILOGD("IsRepeat field is default");
+    }
+    subKeyNames += std::to_string(isRepeat);
+    keyOption->SetRepeat(isRepeat);
+    MMI_HILOGD("IsRepeat:%{public}s", (isRepeat ? "true" : "false"));
+    return true;
+}
+
+napi_value GetEventInfoAPI26(napi_env env, napi_callback_info info, sptr<KeyEventMonitorInfo> event,
+    std::shared_ptr<KeyOption> keyOption)
+{
+    CALL_DEBUG_ENTER;
+    if (event == nullptr || keyOption == nullptr) {
+        MMI_HILOGE("event or keyOption is nullptr");
+        return nullptr;
+    }
+    size_t argc = INPUT_PARAMETER_MAX;
+    napi_value argv[INPUT_PARAMETER_MAX] = { 0 };
+    CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
+    std::string subKeyNames = "";
+    if (!ParsePreKeysParameter(env, argv[1], keyOption, subKeyNames)) {
+        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "preKeys parameter error");
+        return nullptr;
+    }
+    if (!ParseFinalKeyParameter(env, argv[1], keyOption, subKeyNames)) {
+        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "finalKey parameter error");
+        return nullptr;
+    }
+    if (!ParseTriggerTypeParameter(env, argv[1], keyOption)) {
+        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "triggerType parameter error");
+        return nullptr;
+    }
+    if (!ParseFinalKeyDownDurationParameter(env, argv[1], keyOption, subKeyNames)) {
+        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "finalKeyDownDuration parameter error");
+        return nullptr;
+    }
+    int32_t triggerType = keyOption->GetTriggerType();
     if (triggerType == TRIGGER_TYPE_NOT_SET) {
-        // 未设置 triggerType，使用旧的 isFinalKeyDown 和 isRepeat 参数
-        bool isFinalKeyDown;
-        if (!GetNamedPropertyBool(env, argv[1], "isFinalKeyDown", isFinalKeyDown)) {
-            MMI_HILOGE("GetNamedPropertyBool failed");
+        if (!ParseLegacyParameters(env, argv[1], keyOption, subKeyNames)) {
+            THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "legacy parameters error");
             return nullptr;
         }
-        subKeyNames += std::to_string(isFinalKeyDown);
-        subKeyNames += ",";
-        keyOption->SetFinalKeyDown(isFinalKeyDown);
-        MMI_HILOGD("IsFinalKeyDown:%{private}d", (isFinalKeyDown == true ? 1 : 0));
-
-        bool isRepeat = true;
-        if (!GetNamedPropertyBool(env, argv[1], "isRepeat", isRepeat)) {
-            MMI_HILOGD("IsRepeat field is default");
-        }
-        subKeyNames += std::to_string(isRepeat);
-        keyOption->SetRepeat(isRepeat);
-        MMI_HILOGD("IsRepeat:%{public}s", (isRepeat ? "true" : "false"));
     } else {
-        // 设置了 triggerType (1-3)，忽略 isFinalKeyDown 和 isRepeat
         subKeyNames += std::to_string(triggerType);
         subKeyNames += ",false,";
         MMI_HILOGD("Using triggerType mode, ignoring isFinalKeyDown and isRepeat");
     }
-
     event->eventType = subKeyNames;
     napi_value ret;
     CHKRP(napi_create_int32(env, RET_OK, &ret), CREATE_INT32);
@@ -681,6 +727,64 @@ static void OnKeyTriggerCallback(std::shared_ptr<KeyEvent> keyEvent, std::shared
     }
 }
 
+// SDK 26.0.0 新增：验证异步工作数据
+static bool ValidateAsyncWorkData(KeyCommandWork* cmdWork, sptr<KeyEventMonitorInfo>& event,
+    std::shared_ptr<KeyEvent>& keyEvent)
+{
+    CALL_DEBUG_ENTER;
+    if (cmdWork == nullptr) {
+        MMI_HILOGE("cmdWork is nullptr");
+        return false;
+    }
+    event = cmdWork->eventInfo;
+    keyEvent = cmdWork->keyEvent;
+    if (event == nullptr || keyEvent == nullptr) {
+        MMI_HILOGE("EventInfo or KeyEvent is nullptr");
+        return false;
+    }
+    if (event->env == nullptr) {
+        MMI_HILOGE("Env is nullptr");
+        return false;
+    }
+    if (event->callback == nullptr) {
+        MMI_HILOGE("Callback is nullptr");
+        return false;
+    }
+    return true;
+}
+
+// SDK 26.0.0 新增：执行JavaScript回调
+static void ExecuteJavaScriptCallback(napi_env env, sptr<KeyEventMonitorInfo> event,
+    std::shared_ptr<KeyEvent> keyEvent)
+{
+    CALL_DEBUG_ENTER;
+    napi_handle_scope scope = nullptr;
+    napi_status statusResult = napi_open_handle_scope(env, &scope);
+    if (statusResult != napi_ok) {
+        MMI_HILOGE("Failed to open handle scope");
+        return;
+    }
+    napi_value callback = nullptr;
+    statusResult = napi_get_reference_value(env, event->callback, &callback);
+    if (statusResult != napi_ok || callback == nullptr) {
+        MMI_HILOGE("Failed to get callback reference");
+        napi_close_handle_scope(env, scope);
+        return;
+    }
+    napi_value jsKeyEvent = nullptr;
+    if (!KeyEvent2JsKeyEvent(env, keyEvent, jsKeyEvent)) {
+        MMI_HILOGE("Failed to convert KeyEvent to JavaScript object");
+        napi_close_handle_scope(env, scope);
+        return;
+    }
+    napi_value result = nullptr;
+    statusResult = napi_call_function(env, nullptr, callback, 1, &jsKeyEvent, &result);
+    if (statusResult != napi_ok) {
+        MMI_HILOGE("Failed to call JavaScript callback");
+    }
+    napi_close_handle_scope(env, scope);
+}
+
 // SDK 26.0.0 新增：异步回调执行函数（在主线程中执行）
 static void ExecuteAsyncCallback(uv_work_t* work, int32_t status)
 {
@@ -690,73 +794,24 @@ static void ExecuteAsyncCallback(uv_work_t* work, int32_t status)
         return;
     }
     KeyCommandWork* cmdWork = reinterpret_cast<KeyCommandWork*>(work->data);
-    if (cmdWork == nullptr) {
-        MMI_HILOGE("cmdWork is nullptr");
-        return;
-    }
-    auto event = cmdWork->eventInfo;
-    auto keyEvent = cmdWork->keyEvent;
-    if (event == nullptr || keyEvent == nullptr) {
-        MMI_HILOGE("EventInfo or KeyEvent is nullptr");
+    sptr<KeyEventMonitorInfo> event;
+    std::shared_ptr<KeyEvent> keyEvent;
+    if (!ValidateAsyncWorkData(cmdWork, event, keyEvent)) {
         delete cmdWork;
         return;
     }
-    napi_env env = event->env;
-    if (env == nullptr) {
-        MMI_HILOGE("Env is nullptr");
-        delete cmdWork;
-        return;
-    }
-    if (event->callback == nullptr) {
-        MMI_HILOGE("Callback is nullptr");
-        delete cmdWork;
-        return;
-    }
-
-    // 在NAPI环境中执行回调
-    napi_handle_scope scope = nullptr;
-    napi_status statusResult = napi_open_handle_scope(env, &scope);
-    if (statusResult != napi_ok) {
-        MMI_HILOGE("Failed to open handle scope");
-        delete cmdWork;
-        return;
-    }
-
-    // 获取回调函数
-    napi_value callback = nullptr;
-    statusResult = napi_get_reference_value(env, event->callback, &callback);
-    if (statusResult != napi_ok || callback == nullptr) {
-        MMI_HILOGE("Failed to get callback reference");
-        napi_close_handle_scope(env, scope);
-        delete cmdWork;
-        return;
-    }
-
-    // 将KeyEvent转换为JavaScript对象
-    napi_value jsKeyEvent = nullptr;
-    if (!KeyEvent2JsKeyEvent(env, keyEvent, jsKeyEvent)) {
-        MMI_HILOGE("Failed to convert KeyEvent to JavaScript object");
-        napi_close_handle_scope(env, scope);
-        delete cmdWork;
-        return;
-    }
-
-    // 调用JavaScript回调函数
-    napi_value result = nullptr;
-    statusResult = napi_call_function(env, nullptr, callback, 1, &jsKeyEvent, &result);
-    if (statusResult != napi_ok) {
-        MMI_HILOGE("Failed to call JavaScript callback");
-    }
-
-    napi_close_handle_scope(env, scope);
+    ExecuteJavaScriptCallback(event->env, event, keyEvent);
     delete cmdWork;
 }
 
 // SDK 26.0.0 新增：异步工作执行函数（在工作线程中执行）
+// 注意：此函数是libuv异步机制的必要组成部分，在线程池中执行
+// 虽然当前实现简单，但保留用于未来的数据处理扩展
 static void ExecuteAsyncWork(uv_work_t* work)
 {
     CALL_DEBUG_ENTER;
-    MMI_HILOGD("KeyCommand async work executing");
+    // 此函数在工作线程中执行，可以在此进行耗时的数据处理操作
+    // 当前实现不需要额外处理，实际的数据处理在主线程的ExecuteAsyncCallback中进行
 }
 
 // SDK 26.0.0 新增：带事件参数的异步回调函数
@@ -794,14 +849,8 @@ void EmitAsyncCallbackWorkWithEvent(sptr<KeyEventMonitorInfo> event, std::shared
     cmdWork->eventInfo = event;
     cmdWork->keyEvent = keyEvent;
     cmdWork->work.data = cmdWork;
-    int ret = uv_queue_work_with_qos_internal(
-        loop,
-        &cmdWork->work,
-        ExecuteAsyncWork,
-        ExecuteAsyncCallback,
-        uv_qos_user_initiated,
-        "onKeyCommand"
-    );
+    int ret = uv_queue_work_with_qos_internal(loop, &cmdWork->work, ExecuteAsyncWork, ExecuteAsyncCallback,
+        uv_qos_user_initiated, "onKeyCommand");
     if (ret != 0) {
         MMI_HILOGE("Failed to queue async work, error: %{public}d", ret);
         delete cmdWork;
@@ -853,6 +902,24 @@ napi_value SubscribeKeyCommand(napi_env env, napi_callback_info info, sptr<KeyEv
     return ret;
 }
 
+// SDK 26.0.0 新增：将KeyItems转换为JavaScript数组
+static bool SetKeyItemsToArray(napi_env env, const std::vector<KeyEvent::KeyItem>& keyItems, napi_value& jsArray)
+{
+    CALL_DEBUG_ENTER;
+    napi_status status = napi_create_array(env, &jsArray);
+    if (status != napi_ok) {
+        MMI_HILOGE("Failed to create JavaScript array");
+        return false;
+    }
+    for (size_t i = 0; i < keyItems.size(); i++) {
+        napi_value jsKeyItem = nullptr;
+        if (KeyItem2JsKey(env, keyItems[i], jsKeyItem)) {
+            napi_set_element(env, jsArray, i, jsKeyItem);
+        }
+    }
+    return true;
+}
+
 // SDK 26.0.0 新增：将KeyEvent转换为JavaScript对象
 static bool KeyEvent2JsKeyEvent(napi_env env, std::shared_ptr<KeyEvent> keyEvent, napi_value& jsKeyEvent)
 {
@@ -866,27 +933,15 @@ static bool KeyEvent2JsKeyEvent(napi_env env, std::shared_ptr<KeyEvent> keyEvent
         MMI_HILOGE("Failed to create JavaScript object");
         return false;
     }
-
-    // 设置基本属性
     UtilNapi::SetNamedProperty(env, jsKeyEvent, std::string("keyCode"), keyEvent->GetKeyCode());
     UtilNapi::SetNamedProperty(env, jsKeyEvent, std::string("action"), keyEvent->GetKeyAction());
-
-    // 获取并设置keyItems属性
     std::vector<KeyEvent::KeyItem> keyItems;
     if (keyEvent->GetKeyItems(keyItems)) {
         napi_value jsKeyItemsArray = nullptr;
-        status = napi_create_array(env, &jsKeyItemsArray);
-        if (status == napi_ok) {
-            for (size_t i = 0; i < keyItems.size(); i++) {
-                napi_value jsKeyItem = nullptr;
-                if (KeyItem2JsKey(env, keyItems[i], jsKeyItem)) {
-                    napi_set_element(env, jsKeyItemsArray, i, jsKeyItem);
-                }
-            }
+        if (SetKeyItemsToArray(env, keyItems, jsKeyItemsArray)) {
             napi_set_named_property(env, jsKeyEvent, "keyItems", jsKeyItemsArray);
         }
     }
-
     MMI_HILOGD("KeyEvent converted to JavaScript object successfully");
     return true;
 }
