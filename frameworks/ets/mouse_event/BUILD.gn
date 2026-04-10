@@ -24,9 +24,10 @@ config("mouseEvent_config") {
   visibility = [ ":*" ]
 
   include_dirs = [
-    
+    "include",
     "${mmi_path}/util/common/include",
     "${mmi_path}/util/network/include",
+    "${mmi_path}/interfaces/native/innerkits/proxy/include",
   ]
 }
 subsystem_name = "multimodalinput"
