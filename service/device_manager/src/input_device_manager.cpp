@@ -1973,27 +1973,6 @@ void InputDeviceManager::NotifyDeviceEnabled(int32_t deviceId)
             observer->OnDeviceEnabled(deviceId);
         }
     }
-
-    auto it = inputDevice_.find(deviceId);
-    if (it == inputDevice_.end() || !it->second.isPointerDevice) {
-        return;
-    }
-
-    bool hasEnabledPointerDevice = HasEnabledPhysicalPointerDevice();
-#if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
-    if (HasVirtualPointerDevice()) {
-        hasEnabledPointerDevice = true;
-    }
-
-    if (hasEnabledPointerDevice && !CursorDrawingComponent::GetInstance().GetMouseDisplayState()) {
-        if (HasTouchDevice()) {
-            CursorDrawingComponent::GetInstance().SetMouseDisplayState(false);
-        } else {
-            CursorDrawingComponent::GetInstance().SetMouseDisplayState(true);
-            WIN_MGR->DispatchPointer(PointerEvent::POINTER_ACTION_ENTER_WINDOW);
-        }
-    }
-#endif
 }
 
 void InputDeviceManager::NotifyDeviceDisabled(int32_t deviceId)
@@ -2004,23 +1983,6 @@ void InputDeviceManager::NotifyDeviceDisabled(int32_t deviceId)
             observer->OnDeviceDisabled(deviceId);
         }
     }
-
-    auto it = inputDevice_.find(deviceId);
-    if (it == inputDevice_.end() || !it->second.isPointerDevice) {
-        return;
-    }
-
-    bool hasEnabledPointerDevice = HasEnabledPhysicalPointerDevice();
-#if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
-    if (HasVirtualPointerDevice()) {
-        hasEnabledPointerDevice = true;
-    }
-
-    if (!hasEnabledPointerDevice && CursorDrawingComponent::GetInstance().GetMouseDisplayState()) {
-        WIN_MGR->DispatchPointer(PointerEvent::POINTER_ACTION_LEAVE_WINDOW);
-        CursorDrawingComponent::GetInstance().SetMouseDisplayState(false);
-    }
-#endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
 }
 
 int32_t InputDeviceManager::EnableInputDevice(int32_t deviceId)
