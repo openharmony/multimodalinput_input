@@ -13,4 +13,23 @@
  * limitations under the License.
  */
 
+#ifndef OHOS_MULTIMODALINPUT_MOUSE_EVENT_IMPL_H
+#define OHOS_MULTIMODALINPUT_MOUSE_EVENT_IMPL_H
  
+#include <map>
+#include <stdexcept>
+ 
+#include "define_multimodal.h"
+#include "taihe/runtime.hpp"
+#include "ohos.multimodalInput.mouseEvent.proj.hpp"
+#include "ohos.multimodalInput.mouseEvent.impl.hpp"
+ 
+namespace OHOS {
+namespace MMI {
+class TaiheMouseButonConverter {
+public:
+    static int32_t ConvertEts2Native(::ohos::multimodalInput::mouseEvent::Button button);
+};
+} // namespace MMI
+} // namespace OHOS
+#endif // OHOS_MULTIMODALINPUT_MOUSE_EVENT_IMPL_H
