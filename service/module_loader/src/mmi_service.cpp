@@ -4932,7 +4932,6 @@ ErrCode MMIService::TransferBinderClientSrv(const sptr<IRemoteObject> &binderCli
 
 void MMIService::CalculateFuntionRunningTime(std::function<void()> func, const std::string &flag)
 {
-
     std::string msg = "Epoll_event_input, event type is: ";
     msg += flag;
     BytraceAdapter::MMIServiceTraceStart(BytraceAdapter::MMI_THREAD_LOOP_DEPTH_THREE, msg);
