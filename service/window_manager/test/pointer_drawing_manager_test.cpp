@@ -237,7 +237,6 @@ HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_SetPointerStyle_01, 
 {
     CALL_TEST_DEBUG;
     PointerDrawingManager pointerDrawingManager;
-    bool isUiExtension = false;
 
     PointerStyle pointerStyle;
     pointerStyle.id = 1;
@@ -249,7 +248,7 @@ HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_SetPointerStyle_01, 
     bool ret = CursorDrawingInformation::GetInstance().IsPointerStyleParamValid(windowId, pointerStyle);
     EXPECT_FALSE(ret);
 
-    int32_t ret2 = CursorDrawingInformation::GetInstance().SetPointerStyle(0, pid, windowId, pointerStyle, isUiExtension);
+    int32_t ret2 = CursorDrawingInformation::GetInstance().SetPointerStyle(0, pid, windowId, pointerStyle);
     EXPECT_EQ(ret2, RET_ERR);
 }
 
@@ -263,7 +262,6 @@ HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_SetPointerStyle_02, 
 {
     CALL_TEST_DEBUG;
     PointerDrawingManager pointerDrawingManager;
-    bool isUiExtension = true;
 
     PointerStyle pointerStyle;
     pointerStyle.id = 1;
@@ -275,7 +273,7 @@ HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_SetPointerStyle_02, 
     bool ret = CursorDrawingInformation::GetInstance().IsPointerStyleParamValid(windowId, pointerStyle);
     EXPECT_TRUE(ret);
 
-    int32_t ret2 = CursorDrawingInformation::GetInstance().SetPointerStyle(0, pid, windowId, pointerStyle, isUiExtension);
+    int32_t ret2 = CursorDrawingInformation::GetInstance().SetPointerStyle(0, pid, windowId, pointerStyle);
     EXPECT_EQ(ret2, RET_OK);
 }
 
@@ -721,12 +719,11 @@ HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_GetPointerStyle_001,
     auto winmgrmock = std::make_shared<InputWindowsManagerMock>();
     int32_t pid = 1;
     int32_t windowId = 2;
-    bool isUiExtension = true;
     PointerStyle pointerStyle;
     EXPECT_CALL(*winmgrmock, GetPointerStyle).WillRepeatedly(testing::Return(RET_ERR));
     int32_t userId = 100;
     int32_t ret = CursorDrawingInformation::GetInstance().GetPointerStyle(userId, pid, windowId, pointerStyle,
-        isUiExtension);
+        nullptr);
     EXPECT_EQ(ret, RET_OK);
     testing::Mock::AllowLeak(winmgrmock.get());
 }
@@ -2402,12 +2399,11 @@ HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_UpdateDefaultPointer
     pointerStyle.id = 0;
     pointerStyle.color = 0;
     pointerStyle.size = 2;
-    bool isUiExtension = true;
     int32_t ret = CursorDrawingInformation::GetInstance().UpdateDefaultPointerStyle(pid, windowId,
-        pointerStyle, isUiExtension);
+        pointerStyle);
     EXPECT_EQ(ret, RET_OK);
     windowId = -1;
-    ret = CursorDrawingInformation::GetInstance().UpdateDefaultPointerStyle(pid, windowId, pointerStyle, isUiExtension);
+    ret = CursorDrawingInformation::GetInstance().UpdateDefaultPointerStyle(pid, windowId, pointerStyle);
 }
 
 /**

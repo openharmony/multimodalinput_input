@@ -105,6 +105,7 @@ public:
     virtual void SetFoldState () = 0;
     virtual bool CheckAppFocused(int32_t pid) = 0;
     virtual bool GetCancelEventFlag(std::shared_ptr<PointerEvent> pointerEvent) = 0;
+    virtual void UpdateUIExtensionInfo(const std::vector<UIExtensionInfo> &uiExtensionInfo) = 0;
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     virtual std::vector<std::pair<int32_t, TargetInfo>> UpdateTarget(std::shared_ptr<KeyEvent> keyEvent) = 0;
     virtual void HandleKeyEventWindowId(std::shared_ptr<KeyEvent> keyEvent) = 0;
@@ -128,9 +129,9 @@ public:
 #endif // OHOS_BUILD_ENABLE_POINTER
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     virtual int32_t SetPointerStyle(int32_t pid, int32_t windowId,
-        PointerStyle pointerStyle, bool isUiExtension = false) = 0;
+        PointerStyle pointerStyle, const sptr<IRemoteObject> &token = nullptr) = 0;
     virtual int32_t GetPointerStyle(int32_t pid, int32_t windowId,
-        PointerStyle &pointerStyle, bool isUiExtension = false) const = 0;
+        PointerStyle &pointerStyle, const sptr<IRemoteObject> &token = nullptr) const = 0;
     virtual void DispatchPointer(int32_t pointerAction, int32_t windowId = -1) = 0;
     virtual void SendPointerEvent(int32_t pointerAction) = 0;
     virtual bool IsMouseSimulate() = 0;

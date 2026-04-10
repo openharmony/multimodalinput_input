@@ -2624,6 +2624,7 @@ ohos_unittest("StylusKeyTest") {
     "googletest:gtest_main",
     "graphic_2d:2d_graphics",
     "hilog:libhilog",
+    "ipc:ipc_single",
     "libinput:libinput-third-mmi",
     "preferences:native_preferences",
   ]

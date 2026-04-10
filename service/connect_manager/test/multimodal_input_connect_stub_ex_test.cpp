@@ -130,11 +130,11 @@ public:
         return speed_;
     }
     int32_t GetPointerSpeed(int32_t &speed) override { return speed_; }
-    int32_t SetPointerStyle(int32_t windowId, PointerStyle pointerStyle, bool isUiExtension = false) override
+    int32_t SetPointerStyle(int32_t windowId, PointerStyle pointerStyle, const sptr<IRemoteObject> &token) override
     {
         return retSetPointerStyle_;
     }
-    int32_t GetPointerStyle(int32_t windowId, PointerStyle &pointerStyle, bool isUiExtension = false) override
+    int32_t GetPointerStyle(int32_t windowId, PointerStyle &pointerStyle, const sptr<IRemoteObject> &token) override
     {
         return windowId;
     }

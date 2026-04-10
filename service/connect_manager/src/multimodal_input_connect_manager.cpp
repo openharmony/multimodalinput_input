@@ -288,11 +288,16 @@ int32_t MultimodalInputConnectManager::GetPointerSpeed(int32_t &speed)
     return multimodalInputConnectService_->GetPointerSpeed(speed);
 }
 
-int32_t MultimodalInputConnectManager::SetPointerStyle(int32_t windowId, PointerStyle pointerStyle, bool isUiExtension)
+int32_t MultimodalInputConnectManager::SetPointerStyle(int32_t windowId, PointerStyle pointerStyle,
+    const sptr<IRemoteObject> &token)
 {
     std::lock_guard<std::mutex> guard(lock_);
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
-    return multimodalInputConnectService_->SetPointerStyle(windowId, pointerStyle, isUiExtension);
+    if (token == nullptr) {
+        return multimodalInputConnectService_->SetPointerStyle(windowId, pointerStyle);
+    } else {
+        return multimodalInputConnectService_->SetUIExtensionPointerStyle(windowId, pointerStyle, token);
+    }
 }
 
 int32_t MultimodalInputConnectManager::ClearWindowPointerStyle(int32_t pid, int32_t windowId)
@@ -302,11 +307,16 @@ int32_t MultimodalInputConnectManager::ClearWindowPointerStyle(int32_t pid, int3
     return multimodalInputConnectService_->ClearWindowPointerStyle(pid, windowId);
 }
 
-int32_t MultimodalInputConnectManager::GetPointerStyle(int32_t windowId, PointerStyle &pointerStyle, bool isUiExtension)
+int32_t MultimodalInputConnectManager::GetPointerStyle(int32_t windowId, PointerStyle &pointerStyle,
+    const sptr<IRemoteObject> &token)
 {
     std::lock_guard<std::mutex> guard(lock_);
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
-    return multimodalInputConnectService_->GetPointerStyle(windowId, pointerStyle, isUiExtension);
+    if (token == nullptr) {
+        return multimodalInputConnectService_->GetPointerStyle(windowId, pointerStyle);
+    } else {
+        return multimodalInputConnectService_->GetUIExtensionPointerStyle(windowId, pointerStyle, token);
+    }
 }
 
 int32_t MultimodalInputConnectManager::RegisterDevListener()
@@ -1144,7 +1154,8 @@ int32_t MultimodalInputConnectManager::ShiftAppPointerEvent(const ShiftWindowPar
     return multimodalInputConnectService_->ShiftAppPointerEvent(param, autoGenDown);
 }
 
-int32_t MultimodalInputConnectManager::SetCustomCursor(int32_t windowId, CustomCursor cursor, CursorOptions options)
+int32_t MultimodalInputConnectManager::SetCustomCursor(int32_t windowId, CustomCursor cursor, CursorOptions options,
+    const sptr<IRemoteObject> &token)
 {
     std::lock_guard<std::mutex> guard(lock_);
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
@@ -1152,7 +1163,11 @@ int32_t MultimodalInputConnectManager::SetCustomCursor(int32_t windowId, CustomC
     CustomCursorParcel curParcel(cursor.pixelMap, cursor.focusX, cursor.focusY);
     CursorOptionsParcel cOptionParcel {};
     cOptionParcel.followSystem = options.followSystem;
-    return multimodalInputConnectService_->SetCustomCursor(windowId, curParcel, cOptionParcel);
+    if (token == nullptr) {
+        return multimodalInputConnectService_->SetCustomCursor(windowId, curParcel, cOptionParcel);
+    } else {
+        return multimodalInputConnectService_->SetUIExtensionCustomCursor(windowId, curParcel, cOptionParcel, token);
+    }
 }
 
 int32_t MultimodalInputConnectManager::SetMultiWindowScreenId(uint64_t screenId, uint64_t displayNodeScreenId)
@@ -1384,6 +1399,17 @@ int32_t MultimodalInputConnectManager::GetMouseScrollDirection(bool &state)
         return INVALID_HANDLER_ID;
     }
     return multimodalInputConnectService_->GetMouseScrollDirection(state);
+}
+
+int32_t MultimodalInputConnectManager::UpdateUIExtensionInfo(const std::vector<UIExtensionInfo> &uiExtensionInfos)
+{
+    CALL_DEBUG_ENTER;
+    std::lock_guard<std::mutex> guard(lock_);
+    if (multimodalInputConnectService_ == nullptr) {
+        MMI_HILOGE("MultimodalInputConnectService_ is nullptr");
+        return INVALID_HANDLER_ID;
+    }
+    return multimodalInputConnectService_->UpdateUIExtensionInfo(uiExtensionInfos);
 }
 } // namespace MMI
 } // namespace OHOS

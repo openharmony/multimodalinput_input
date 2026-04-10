@@ -240,13 +240,12 @@ HWTEST_F(CursorDrawingComponentTest, CursorDrawingComponentTest_SetPointerStyle_
     int32_t windowId = 1;
     PointerStyle pointerStyle;
     pointerStyle.id = 1;
-    bool isUiExtension = false;
-    int32_t ret = instance_->SetPointerStyle(userId, pid, windowId, pointerStyle, isUiExtension);
+    int32_t ret = instance_->SetPointerStyle(userId, pid, windowId, pointerStyle);
     EXPECT_EQ(ret, RET_ERR);
 
     EXPECT_NO_FATAL_FAILURE(instance_->DrawPointerStyle(pointerStyle));
 
-    ret = instance_->GetPointerStyle(userId, pid, windowId, pointerStyle, isUiExtension);
+    ret = instance_->GetPointerStyle(userId, pid, windowId, pointerStyle);
     EXPECT_EQ(ret, RET_OK);
 
     auto style = instance_->GetLastMouseStyle();
@@ -1175,14 +1174,13 @@ HWTEST_F(CursorDrawingComponentTest, CursorDrawingComponentTest_SetPointerStyle_
     int32_t windowId = GLOBAL_WINDOW_ID;
     PointerStyle pointerStyle;
     pointerStyle.id = CURSOR_CIRCLE_STYLE;
-    bool isUiExtension = false;
 
-    int32_t ret = instance_->SetPointerStyle(userId, pid, windowId, pointerStyle, isUiExtension);
+    int32_t ret = instance_->SetPointerStyle(userId, pid, windowId, pointerStyle);
     EXPECT_EQ(ret, RET_OK);
 
     PointerStyle invalidStyle;
     invalidStyle.id = -1;
-    ret = instance_->SetPointerStyle(userId, pid, windowId, invalidStyle, isUiExtension);
+    ret = instance_->SetPointerStyle(userId, pid, windowId, invalidStyle);
     EXPECT_EQ(ret, RET_ERR);
 }
 
@@ -1372,8 +1370,7 @@ HWTEST_F(CursorDrawingComponentTest, CursorDrawingComponentTest_SetPointerStyle_
     int32_t windowId = -2;
     PointerStyle pointerStyle;
     pointerStyle.id = MOUSE_ICON::DEFAULT;
-    bool isUiExtension = false;
-    int32_t ret = instance_->SetPointerStyle(userId, pid, windowId, pointerStyle, isUiExtension);
+    int32_t ret = instance_->SetPointerStyle(userId, pid, windowId, pointerStyle);
     EXPECT_EQ(ret, RET_ERR);
 }
 
@@ -1390,14 +1387,13 @@ HWTEST_F(CursorDrawingComponentTest, CursorDrawingComponentTest_SetPointerStyle_
     int32_t windowId = 1;
     PointerStyle pointerStyle;
     pointerStyle.id = -2;
-    bool isUiExtension = false;
-    int32_t ret = instance_->SetPointerStyle(userId, pid, windowId, pointerStyle, isUiExtension);
+    int32_t ret = instance_->SetPointerStyle(userId, pid, windowId, pointerStyle);
     EXPECT_EQ(ret, RET_ERR);
 }
 
 /**
  * @tc.name: CursorDrawingComponentTest_SetPointerStyle_005
- * @tc.desc: Test SetPointerStyle with isUiExtension true
+ * @tc.desc: Test SetPointerStyle with token
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1408,8 +1404,7 @@ HWTEST_F(CursorDrawingComponentTest, CursorDrawingComponentTest_SetPointerStyle_
     int32_t windowId = 1;
     PointerStyle pointerStyle;
     pointerStyle.id = MOUSE_ICON::DEFAULT;
-    bool isUiExtension = true;
-    int32_t ret = instance_->SetPointerStyle(userId, pid, windowId, pointerStyle, isUiExtension);
+    int32_t ret = instance_->SetPointerStyle(userId, pid, windowId, pointerStyle);
     EXPECT_TRUE(ret == RET_OK || ret == RET_ERR);
 }
 

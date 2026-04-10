@@ -576,14 +576,14 @@ void InputManager::SetAnrObserver(std::shared_ptr<IAnrObserver> observer)
     // LCOV_EXCL_STOP
 }
 
-int32_t InputManager::SetPointerStyle(int32_t windowId, PointerStyle pointerStyle, bool isUiExtension)
+int32_t InputManager::SetPointerStyle(int32_t windowId, PointerStyle pointerStyle, const sptr<IRemoteObject> &token)
 {
-    return InputMgrImpl.SetPointerStyle(windowId, pointerStyle, isUiExtension);
+    return InputMgrImpl.SetPointerStyle(windowId, pointerStyle, token);
 }
 
-int32_t InputManager::GetPointerStyle(int32_t windowId, PointerStyle &pointerStyle, bool isUiExtension)
+int32_t InputManager::GetPointerStyle(int32_t windowId, PointerStyle &pointerStyle, const sptr<IRemoteObject> &token)
 {
-    return InputMgrImpl.GetPointerStyle(windowId, pointerStyle, isUiExtension);
+    return InputMgrImpl.GetPointerStyle(windowId, pointerStyle, token);
 }
 
 int32_t InputManager::GetFunctionKeyState(int32_t funcKey, bool &state)
@@ -972,9 +972,10 @@ int32_t InputManager::ShiftAppPointerEvent(const ShiftWindowParam &param, bool a
     return InputMgrImpl.ShiftAppPointerEvent(param, autoGenDown);
 }
 
-int32_t InputManager::SetCustomCursor(int32_t windowId, CustomCursor cursor, CursorOptions options)
+int32_t InputManager::SetCustomCursor(int32_t windowId, CustomCursor cursor, CursorOptions options,
+    const sptr<IRemoteObject> &token)
 {
-    return InputMgrImpl.SetCustomCursor(windowId, cursor, options);
+    return InputMgrImpl.SetCustomCursor(windowId, cursor, options, token);
 }
 
 int32_t InputManager::CheckKnuckleEvent(float pointX, float pointY, bool &isKnuckleType)
