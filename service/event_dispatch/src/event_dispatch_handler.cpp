@@ -265,6 +265,10 @@ void EventDispatchHandler::HandleMultiWindowPointerEvent(std::shared_ptr<Pointer
         point->GetPointerAction() == PointerEvent::POINTER_ACTION_HOVER_EXIT) {
         WIN_MGR->ClearTargetWindowId(pointerId, point->GetDeviceId());
     }
+    if (point->GetSourceType() == PointerEvent::SOURCE_TYPE_MOUSE &&
+        point->GetPressedButtons().empty()) {
+        WIN_MGR->ClearMouseTargetWindowId();
+    }
 }
 
 void EventDispatchHandler::NotifyPointerEventToRS(int32_t pointAction, const std::string& programName,
