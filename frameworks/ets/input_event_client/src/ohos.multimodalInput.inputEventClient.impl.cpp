@@ -534,6 +534,62 @@ void PermitInjectionSync(bool result)
     InputManager::GetInstance()->Authorize(result);
 }
 
+class MouseControllerImpl {
+public:
+    MouseControllerImpl() {}
+    void MoveToSync(int32_t displayId, int32_t displayX, int32_t displayY)
+    {
+ 
+    }
+ 
+    void PressButtonSync(::ohos::multimodalInput::mouseEvent::Button button)
+    {
+ 
+    }
+ 
+    void ReleaseButtonSync(::ohos::multimodalInput::mouseEvent::Button button)
+    {
+ 
+    }
+ 
+    void BeginAxisSync(::ohos::multimodalInput::mouseEvent::Button button)
+    {
+ 
+    }
+ 
+    void UpdateAxisSync(::ohos::multimodalInput::mouseEvent::Button button)
+    {
+ 
+    }
+ 
+    void EndAxisSync(::ohos::multimodalInput::mouseEvent::Button button)
+    {
+ 
+    }
+};
+ 
+::ohos::multimodalInput::inputEventClient::MouseController CreateMouseControllerSync() {
+    return make_holder<MouseControllerImpl, ::ohos::multimodalInput::inputEventClient::MouseController>();
+}
+ 
+class KeyboardControllerImpl {
+public:
+    KeyboardControllerImpl() {}
+    // TaiheKeyCodeConverter 用这个做转换
+    void PressKeySync(::ohos::multimodalInput::keyCode::KeyCode keyCode)
+    {
+ 
+    }
+ 
+    void ReleaseKeySync(::ohos::multimodalInput::keyCode::KeyCode keyCode)
+    {
+ 
+    }
+};
+ 
+::ohos::multimodalInput::inputEventClient::KeyboardController CreateKeyboardControllerSync() {
+    return make_holder<KeyboardControllerImpl, ::ohos::multimodalInput::inputEventClient::KeyboardController>();
+}
 
 } // namespace
 
@@ -544,4 +600,6 @@ TH_EXPORT_CPP_API_InjectEventSync(InjectEventSync);
 TH_EXPORT_CPP_API_InjectMouseEventSync(InjectMouseEventSync);
 TH_EXPORT_CPP_API_InjectTouchEventSync(InjectTouchEventSync);
 TH_EXPORT_CPP_API_PermitInjectionSync(PermitInjectionSync);
+TH_EXPORT_CPP_API_CreateMouseControllerSync(CreateMouseControllerSync);
+TH_EXPORT_CPP_API_CreateKeyboardControllerSync(CreateKeyboardControllerSync);
 // NOLINTEND
