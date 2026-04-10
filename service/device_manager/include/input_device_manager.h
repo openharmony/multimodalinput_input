@@ -35,7 +35,7 @@ private:
         bool isTouchableDevice { false };
         bool isDeviceReportEvent { false };
         bool enable { false }; // actual enable status
-        bool inputEnable { true }; // enable status set by user
+        bool inputEnable { true }; // enable status set by **SetInputDeviceEnabled**
         bool isLocal { false };
         std::string dhid;
         std::string sysUid;
@@ -228,8 +228,8 @@ private:
     bool sessionLostCallbackInitialized_ { false };
     bool virtualKeyboardEverConnected_ { false };
     std::map<std::string, PhysicalInputDevice> physicalInputDevices_;
-    bool eduInputDisabled_ { false };
-    int32_t eduInputDisabledPid_ { -1 };
+    bool eduInputDisabled_ { false }; // Disable status of global input set by **DisableInputEventDispatch**
+    int32_t eduInputDisabledPid_ { -1 }; // The application that disabled global input
 
     static std::shared_ptr<InputDeviceManager> instance_;
     static std::mutex mutex_;

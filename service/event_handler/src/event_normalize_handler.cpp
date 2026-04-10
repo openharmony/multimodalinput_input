@@ -153,7 +153,7 @@ void EventNormalizeHandler::HandleEvent(libinput_event* event, int64_t frameTime
     auto device = libinput_event_get_device(event);
     CHKPV(device);
 
-    if (LIBINPUT_EVENT_DEVICE_ADDED != type && LIBINPUT_EVENT_DEVICE_REMOVED != type) {
+    if (!ShouldDispatchOnDeviceDisabled(event)) {
         auto deviceId = INPUT_DEV_MGR->FindInputDeviceId(device);
         auto enable = INPUT_DEV_MGR->IsInputDeviceEnable(deviceId);
         if (!enable) {
@@ -317,6 +317,30 @@ void EventNormalizeHandler::HandleEvent(libinput_event* event, int64_t frameTime
     }
     BytraceAdapter::StopHandleInput();
     DfxHisysevent::ReportDispTimes();
+}
+
+bool EventNormalizeHandler::ShouldDispatchOnDeviceDisabled(struct libinput_event *event) const
+{
+    CHKPF(event);
+    auto eventType = libinput_event_get_type(event);
+    switch (eventType) {
+        case LIBINPUT_EVENT_DEVICE_ADDED:
+        case LIBINPUT_EVENT_DEVICE_REMOVED: {
+            return true;
+        }
+        case LIBINPUT_EVENT_SWITCH_TOGGLE: {
+            auto switchEvent = libinput_event_get_switch_event(event);
+            if ((switchEvent != nullptr) &&
+                (libinput_event_switch_get_switch(switchEvent) == LIBINPUT_SWITCH_LID)) {
+                return true;
+            }
+            break;
+        }
+        default: {
+            break;
+        }
+    }
+    return false;
 }
 
 bool EventNormalizeHandler::ProcessNullEvent(libinput_event *event, int64_t frameTime)
