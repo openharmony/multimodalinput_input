@@ -62,7 +62,7 @@ inputConsumer::KeyOptions ConvertTaiheKeyOptions(std::shared_ptr<KeyOption> keyO
     result.isRepeat = taihe::optional<bool>(std::in_place, isRepeatValue);
     if (keyOption->GetTriggerType() != 0) {
         result.triggerType = taihe::optional<inputConsumer::KeyCommandTriggerType>(
-            std::in_place, static_cast<inputConsumer::KeyCommandTriggerType>(keyOption->GetTriggerType()));
+            std::in_place, static_cast<inputConsumer::KeyCommandTriggerType::key_t>(keyOption->GetTriggerType()));
     }
     return result;
 }

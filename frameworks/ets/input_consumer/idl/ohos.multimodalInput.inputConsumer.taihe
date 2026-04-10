@@ -93,10 +93,10 @@ enum ShieldMode: i32 {
     }
 """)
 @!sts_inject("""
-    function onKey(keyOptions: KeyOptions, callback: (keyOptions: KeyOptions, keyEvent?: KeyEvent) => void) {
+    function onKeyCommand(keyOptions: KeyOptions, callback: (keyOptions: KeyOptions, keyEvent?: ohos_multimodalInput_keyEvent.KeyEvent) => void) {
         return onKeyCommandImpl(keyOptions, callback, callback);
     }
-    function offKey(keyOptions: KeyOptions, callback?: (keyOptions: KeyOptions, keyEvent?: KeyEvent) => void) {
+    function offKeyCommand(keyOptions: KeyOptions, callback?: (keyOptions: KeyOptions, keyEvent?: ohos_multimodalInput_keyEvent.KeyEvent) => void) {
         return offKeyCommandImpl(keyOptions, callback);
     }
 """)
