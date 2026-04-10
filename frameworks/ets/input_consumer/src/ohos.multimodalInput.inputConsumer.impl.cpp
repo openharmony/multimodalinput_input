@@ -876,12 +876,10 @@ int32_t GetEventInfoAPI9(KeyOptions const& keyOptions, std::shared_ptr<KeyEventM
     return RET_OK;
 }
 
-int32_t GetEventInfoAPI26(KeyOptions const& keyOptions, std::shared_ptr<KeyEventMonitorInfo> event,
-    std::shared_ptr<KeyOption> keyOption)
+int32_t ParseAPI26PreKeys(KeyOptions const& keyOptions, std::shared_ptr<KeyOption> keyOption,
+    std::string& subKeyNames)
 {
     CALL_DEBUG_ENTER;
-    CHKPR(event, RET_ERR);
-    CHKPR(keyOption, RET_ERR);
     if (keyOptions.preKeys.empty()) {
         taihe::set_business_error(COMMON_PARAMETER_ERROR, "preKeys not found");
         return RET_ERR;
@@ -893,57 +891,40 @@ int32_t GetEventInfoAPI26(KeyOptions const& keyOptions, std::shared_ptr<KeyEvent
         return RET_ERR;
     }
     if (preKeys.size() > PRE_KEYS_SIZE) {
-        MMI_HILOGE("PreKeys size invalid");
         taihe::set_business_error(COMMON_PARAMETER_ERROR, "preKeys size invalid");
         return RET_ERR;
     }
     keyOption->SetPreKeys(preKeys);
-    std::string subKeyNames = "";
     for (const auto &item : preKeys) {
         if (item < 0) {
             taihe::set_business_error(COMMON_PARAMETER_ERROR,
                 "element of preKeys must be greater than or equal to 0");
             return RET_ERR;
         }
-        subKeyNames += std::to_string(item);
-        subKeyNames += ",";
+        subKeyNames += std::to_string(item) + ",";
     }
+    return RET_OK;
+}
 
-    if (keyOptions.finalKey < 0) {
-        MMI_HILOGE("finalKey:%{private}d is less 0", keyOptions.finalKey);
-        taihe::set_business_error(COMMON_PARAMETER_ERROR, "finalKey must be greater than or equal to 0");
-        return RET_ERR;
-    }
-    subKeyNames += std::to_string(keyOptions.finalKey);
-    subKeyNames += ",";
-    keyOption->SetFinalKey(keyOptions.finalKey);
-
-    subKeyNames += std::to_string(keyOptions.finalKeyDownDuration);
-    subKeyNames += ",";
-    keyOption->SetFinalKeyDownDuration(keyOptions.finalKeyDownDuration);
-
+void ParseAPI26TriggerTypeAndLegacy(KeyOptions const& keyOptions, std::shared_ptr<KeyOption> keyOption,
+    std::string& subKeyNames)
+{
+    CALL_DEBUG_ENTER;
     if (keyOptions.triggerType.has_value()) {
         int32_t triggerType = static_cast<int32_t>(keyOptions.triggerType.value().get_value());
-        if (triggerType < TRIGGER_TYPE_MIN || triggerType > TRIGGER_TYPE_MAX) {
-            MMI_HILOGE("triggerType:%{public}d is invalid", triggerType);
-            taihe::set_business_error(COMMON_PARAMETER_ERROR, "triggerType is invalid");
-            return RET_ERR;
+        if (triggerType >= TRIGGER_TYPE_MIN && triggerType <= TRIGGER_TYPE_MAX) {
+            keyOption->SetTriggerType(triggerType);
+            subKeyNames += std::to_string(triggerType) + ",";
+        } else {
+            subKeyNames += "0,";
         }
-        keyOption->SetTriggerType(triggerType);
-        subKeyNames += std::to_string(triggerType);
-        subKeyNames += ",";
     } else {
         subKeyNames += "0,";
     }
-
     if (keyOption->GetTriggerType() == TRIGGER_TYPE_NOT_SET) {
-        subKeyNames += std::to_string(keyOptions.isFinalKeyDown);
-        subKeyNames += ",";
+        subKeyNames += std::to_string(keyOptions.isFinalKeyDown) + ",";
         keyOption->SetFinalKeyDown(keyOptions.isFinalKeyDown);
-        bool isRepeat = true;
-        if (keyOptions.isRepeat.has_value()) {
-            isRepeat = keyOptions.isRepeat.value();
-        }
+        bool isRepeat = keyOptions.isRepeat.has_value() ? keyOptions.isRepeat.value() : true;
         subKeyNames += std::to_string(isRepeat);
         keyOption->SetRepeat(isRepeat);
     } else {
@@ -951,7 +932,27 @@ int32_t GetEventInfoAPI26(KeyOptions const& keyOptions, std::shared_ptr<KeyEvent
         keyOption->SetFinalKeyDown(false);
         keyOption->SetRepeat(false);
     }
+}
 
+int32_t GetEventInfoAPI26(KeyOptions const& keyOptions, std::shared_ptr<KeyEventMonitorInfo> event,
+    std::shared_ptr<KeyOption> keyOption)
+{
+    CALL_DEBUG_ENTER;
+    CHKPR(event, RET_ERR);
+    CHKPR(keyOption, RET_ERR);
+    std::string subKeyNames;
+    if (ParseAPI26PreKeys(keyOptions, keyOption, subKeyNames) != RET_OK) {
+        return RET_ERR;
+    }
+    if (keyOptions.finalKey < 0) {
+        taihe::set_business_error(COMMON_PARAMETER_ERROR, "finalKey must be greater than or equal to 0");
+        return RET_ERR;
+    }
+    subKeyNames += std::to_string(keyOptions.finalKey) + ",";
+    keyOption->SetFinalKey(keyOptions.finalKey);
+    subKeyNames += std::to_string(keyOptions.finalKeyDownDuration) + ",";
+    keyOption->SetFinalKeyDownDuration(keyOptions.finalKeyDownDuration);
+    ParseAPI26TriggerTypeAndLegacy(keyOptions, keyOption, subKeyNames);
     event->eventType = subKeyNames;
     return RET_OK;
 }
