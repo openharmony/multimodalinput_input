@@ -181,7 +181,7 @@ private:
     int32_t finalKeyUpDelay_ { 0 };
     bool isRepeat_ { true };
     int32_t priority_ = SubscribePriority::PRIORITY_0;
-    int32_t triggerType_ { 0 };  // 0=未设置, 1=PRESSED, 2=REPEAT_PRESSED, 3=ALL_RELEASED
+    int32_t triggerType_ { 0 };
 };
 
 class KeyMonitorOption final : public Parcelable {

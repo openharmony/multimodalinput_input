@@ -179,17 +179,17 @@ HWTEST_F(TriggerEventDispatcherTest, TriggerEventDispatcher_MatchPreKeys_001, Te
     std::vector<KeyEvent::KeyItem> keyItems;
     KeyEvent::KeyItem item1;
     item1.SetKeyCode(KeyEvent::KEYCODE_CTRL_LEFT);
-    item1.SetAction(KeyEvent::KEY_ACTION_DOWN);
+    item1.SetPressed(true);
     keyItems.push_back(item1);
 
     KeyEvent::KeyItem item2;
     item2.SetKeyCode(KeyEvent::KEYCODE_SHIFT_LEFT);
-    item2.SetAction(KeyEvent::KEY_ACTION_DOWN);
+    item2.SetPressed(true);
     keyItems.push_back(item2);
 
     KeyEvent::KeyItem item3;
     item3.SetKeyCode(KeyEvent::KEYCODE_A);
-    item3.SetAction(KeyEvent::KEY_ACTION_DOWN);
+    item3.SetPressed(true);
     keyItems.push_back(item3);
 
     keyEvent->SetKeyItems(keyItems);

@@ -41,7 +41,7 @@ constexpr int32_t BOOLEAN_TRUE { 1 };
 constexpr int32_t BOOLEAN_FALSE { 0 };
 constexpr int32_t BOOLEAN_NONE { -1 };
 constexpr uint32_t DEFAULT_REFERENCE_COUNT { 1 };
-// SDK 26.0.0 新增：triggerType 相关常量
+// SDK 26.0.0: triggerType constants
 constexpr int32_t TRIGGER_TYPE_NOT_SET { 0 };
 constexpr int32_t TRIGGER_TYPE_PRESSED { 1 };
 constexpr int32_t TRIGGER_TYPE_REPEAT_PRESSED { 2 };
@@ -52,10 +52,10 @@ constexpr int32_t TRIGGER_TYPE_MAX { 3 };
 
 static Callbacks callbacks = {};
 static Callbacks hotkeyCallbacks = {};
-static Callbacks keyCommandCallbacks = {};  // SDK 26.0.0 新增：key command 回调
+static Callbacks keyCommandCallbacks = {};
 std::mutex sCallBacksMutex;
 
-// SDK 26.0.0 新增：Key Command 异步工作结构体
+// SDK 26.0.0: Key Command async work struct
 struct KeyCommandWork {
     sptr<KeyEventMonitorInfo> eventInfo;
     std::shared_ptr<KeyEvent> keyEvent;
@@ -285,7 +285,7 @@ napi_value GetEventInfoAPI9(napi_env env, napi_callback_info info, sptr<KeyEvent
     return ret;
 }
 
-// SDK 26.0.0 新增：解析preKeys参数
+// SDK 26.0.0: parse preKeys parameter
 static bool ParsePreKeysParameter(napi_env env, napi_value argv, std::shared_ptr<KeyOption> keyOption,
     std::string& subKeyNames)
 {
@@ -314,7 +314,7 @@ static bool ParsePreKeysParameter(napi_env env, napi_value argv, std::shared_ptr
     return true;
 }
 
-// SDK 26.0.0 新增：解析finalKey参数
+// SDK 26.0.0: parse finalKey parameter
 static bool ParseFinalKeyParameter(napi_env env, napi_value argv, std::shared_ptr<KeyOption> keyOption,
     std::string& subKeyNames)
 {
@@ -336,7 +336,7 @@ static bool ParseFinalKeyParameter(napi_env env, napi_value argv, std::shared_pt
     return true;
 }
 
-// SDK 26.0.0 新增：解析triggerType参数
+// SDK 26.0.0: parse triggerType parameter
 static bool ParseTriggerTypeParameter(napi_env env, napi_value argv, std::shared_ptr<KeyOption> keyOption)
 {
     CALL_DEBUG_ENTER;
@@ -355,7 +355,7 @@ static bool ParseTriggerTypeParameter(napi_env env, napi_value argv, std::shared
     return true;
 }
 
-// SDK 26.0.0 新增：解析finalKeyDownDuration参数
+// SDK 26.0.0: parse finalKeyDownDuration parameter
 static bool ParseFinalKeyDownDurationParameter(napi_env env, napi_value argv, std::shared_ptr<KeyOption> keyOption,
     std::string& subKeyNames)
 {
@@ -377,7 +377,7 @@ static bool ParseFinalKeyDownDurationParameter(napi_env env, napi_value argv, st
     return true;
 }
 
-// SDK 26.0.0 新增：解析旧的isFinalKeyDown和isRepeat参数
+// SDK 26.0.0: parse legacy isFinalKeyDown and isRepeat parameters
 static bool ParseLegacyParameters(napi_env env, napi_value argv, std::shared_ptr<KeyOption> keyOption,
     std::string& subKeyNames)
 {
@@ -671,7 +671,7 @@ napi_value SubscribeHotkey(napi_env env, napi_callback_info info, sptr<KeyEventM
     return ret;
 }
 
-// SDK 26.0.0 新增：Key Command 事件回调函数
+// SDK 26.0.0: Key Command event callback
 static void OnKeyTriggerCallback(std::shared_ptr<KeyEvent> keyEvent, std::shared_ptr<KeyOption> keyOption)
 {
     CALL_DEBUG_ENTER;
@@ -693,15 +693,15 @@ static void OnKeyTriggerCallback(std::shared_ptr<KeyEvent> keyEvent, std::shared
         return;
     }
 
-    // 判断是否应该消费事件
+    // Check if event should be consumed
     if (dispatcher->ShouldConsume(keyOption, keyEvent)) {
         MMI_HILOGD("Event consumed, marking as consumed");
-        // 标记事件为已消费，防止传递给其他应用
+        // Mark event as consumed to prevent delivery to other apps
         keyEvent->MarkConsumed();
         return;
     }
 
-    // 生成订阅键，查找对应的回调
+    // Generate subscribe key and find callback
     std::string subscribeKey = GenerateKeyOptionKey(keyOption);
     std::list<sptr<KeyEventMonitorInfo>> info;
     {
@@ -719,7 +719,7 @@ static void OnKeyTriggerCallback(std::shared_ptr<KeyEvent> keyEvent, std::shared
         }
     }
 
-    // 异步调用回调
+    // Invoke callback asynchronously
     while (info.begin() != info.end()) {
         auto it = info.front();
         info.pop_front();
@@ -727,7 +727,7 @@ static void OnKeyTriggerCallback(std::shared_ptr<KeyEvent> keyEvent, std::shared
     }
 }
 
-// SDK 26.0.0 新增：验证异步工作数据
+// SDK 26.0.0: validate async work data
 static bool ValidateAsyncWorkData(KeyCommandWork* cmdWork, sptr<KeyEventMonitorInfo>& event,
     std::shared_ptr<KeyEvent>& keyEvent)
 {
@@ -753,7 +753,7 @@ static bool ValidateAsyncWorkData(KeyCommandWork* cmdWork, sptr<KeyEventMonitorI
     return true;
 }
 
-// SDK 26.0.0 新增：执行JavaScript回调
+// SDK 26.0.0: execute JavaScript callback
 static void ExecuteJavaScriptCallback(napi_env env, sptr<KeyEventMonitorInfo> event,
     std::shared_ptr<KeyEvent> keyEvent)
 {
@@ -785,7 +785,7 @@ static void ExecuteJavaScriptCallback(napi_env env, sptr<KeyEventMonitorInfo> ev
     napi_close_handle_scope(env, scope);
 }
 
-// SDK 26.0.0 新增：异步回调执行函数（在主线程中执行）
+// SDK 26.0.0: async callback execution (main thread)
 static void ExecuteAsyncCallback(uv_work_t* work, int32_t status)
 {
     CALL_DEBUG_ENTER;
@@ -804,17 +804,17 @@ static void ExecuteAsyncCallback(uv_work_t* work, int32_t status)
     delete cmdWork;
 }
 
-// SDK 26.0.0 新增：异步工作执行函数（在工作线程中执行）
-// 注意：此函数是libuv异步机制的必要组成部分，在线程池中执行
-// 虽然当前实现简单，但保留用于未来的数据处理扩展
+// SDK 26.0.0: async work execute function (worker thread)
+// Part of libuv async mechanism, runs in thread pool
+// Kept for future data processing extension
 static void ExecuteAsyncWork(uv_work_t* work)
 {
     CALL_DEBUG_ENTER;
-    // 此函数在工作线程中执行，可以在此进行耗时的数据处理操作
-    // 当前实现不需要额外处理，实际的数据处理在主线程的ExecuteAsyncCallback中进行
+    // Runs in worker thread, can do heavy data processing here
+    // Current implementation needs no extra processing
 }
 
-// SDK 26.0.0 新增：带事件参数的异步回调函数
+// SDK 26.0.0: async callback with event parameter
 void EmitAsyncCallbackWorkWithEvent(sptr<KeyEventMonitorInfo> event, std::shared_ptr<KeyEvent> keyEvent)
 {
     CALL_DEBUG_ENTER;
@@ -859,7 +859,7 @@ void EmitAsyncCallbackWorkWithEvent(sptr<KeyEventMonitorInfo> event, std::shared
     MMI_HILOGD("KeyCommand async work queued successfully");
 }
 
-// SDK 26.0.0 新增：订阅 key command 事件
+// SDK 26.0.0: subscribe key command event
 napi_value SubscribeKeyCommand(napi_env env, napi_callback_info info, sptr<KeyEventMonitorInfo> event,
     std::shared_ptr<KeyOption> keyOption)
 {
@@ -867,7 +867,7 @@ napi_value SubscribeKeyCommand(napi_env env, napi_callback_info info, sptr<KeyEv
     CHKPP(event);
     CHKPP(keyOption);
 
-    // 使用 GetEventInfoAPI26 解析参数
+    // Parse parameters using GetEventInfoAPI26
     if (GetEventInfoAPI26(env, info, event, keyOption) == nullptr) {
         MMI_HILOGE("GetEventInfoAPI26 failed");
         return nullptr;
@@ -902,7 +902,7 @@ napi_value SubscribeKeyCommand(napi_env env, napi_callback_info info, sptr<KeyEv
     return ret;
 }
 
-// SDK 26.0.0 新增：将KeyItems转换为JavaScript数组
+// SDK 26.0.0: convert KeyItems to JavaScript array
 static bool SetKeyItemsToArray(napi_env env, const std::vector<KeyEvent::KeyItem>& keyItems, napi_value& jsArray)
 {
     CALL_DEBUG_ENTER;
@@ -920,7 +920,7 @@ static bool SetKeyItemsToArray(napi_env env, const std::vector<KeyEvent::KeyItem
     return true;
 }
 
-// SDK 26.0.0 新增：将KeyEvent转换为JavaScript对象
+// SDK 26.0.0: convert KeyEvent to JavaScript object
 static bool KeyEvent2JsKeyEvent(napi_env env, std::shared_ptr<KeyEvent> keyEvent, napi_value& jsKeyEvent)
 {
     CALL_DEBUG_ENTER;
@@ -946,7 +946,7 @@ static bool KeyEvent2JsKeyEvent(napi_env env, std::shared_ptr<KeyEvent> keyEvent
     return true;
 }
 
-// SDK 26.0.0 新增：将KeyItem转换为JavaScript对象
+// SDK 26.0.0: convert KeyItem to JavaScript object
 static bool KeyItem2JsKey(napi_env env, const KeyEvent::KeyItem& keyItem, napi_value& jsKey)
 {
     CALL_DEBUG_ENTER;
@@ -1126,7 +1126,7 @@ static napi_value JsOff(napi_env env, napi_callback_info info)
     return nullptr;
 }
 
-// SDK 26.0.0 新增：验证onKey参数
+// SDK 26.0.0: validate onKey parameters
 static bool ValidateOnKeyParameters(napi_env env, size_t argc, napi_value* argv, std::string& keyType)
 {
     CALL_DEBUG_ENTER;
@@ -1168,7 +1168,7 @@ static bool ValidateOnKeyParameters(napi_env env, size_t argc, napi_value* argv,
     return true;
 }
 
-// SDK 26.0.0 新增：保存onKey回调引用
+// SDK 26.0.0: save onKey callback reference
 static bool SaveOnKeyCallback(napi_env env, size_t argc, napi_value* argv, sptr<KeyEventMonitorInfo> event)
 {
     CALL_DEBUG_ENTER;
@@ -1183,7 +1183,7 @@ static bool SaveOnKeyCallback(napi_env env, size_t argc, napi_value* argv, sptr<
     return true;
 }
 
-// SDK 26.0.0 新增：onKey 函数
+// SDK 26.0.0: onKey function
 static napi_value JsOnKey(napi_env env, napi_callback_info info)
 {
     CALL_DEBUG_ENTER;
@@ -1214,7 +1214,7 @@ static napi_value JsOnKey(napi_env env, napi_callback_info info)
     }
     return nullptr;
 }
-// SDK 26.0.0 新增：验证offKey参数
+// SDK 26.0.0: validate offKey parameters
 static bool ValidateOffKeyParameters(napi_env env, size_t argc, napi_value* argv, std::string& keyType)
 {
     CALL_DEBUG_ENTER;
@@ -1244,7 +1244,7 @@ static bool ValidateOffKeyParameters(napi_env env, size_t argc, napi_value* argv
     return true;
 }
 
-// SDK 26.0.0 新增：执行offKey取消订阅
+// SDK 26.0.0: execute offKey unsubscribe
 static bool UnsubscribeKeyCommand(napi_env env, sptr<KeyEventMonitorInfo> event, std::shared_ptr<KeyOption> keyOption)
 {
     CALL_DEBUG_ENTER;
@@ -1260,14 +1260,14 @@ static bool UnsubscribeKeyCommand(napi_env env, sptr<KeyEventMonitorInfo> event,
     MMI_HILOGI("Unsubscribe key command(%{public}d)", subscribeId);
     InputManager::GetInstance()->UnsubscribeKeyEvent(subscribeId);
 
-    // 清理状态
+    // Clear state
     std::string subscribeKey = GenerateKeyOptionKey(keyOption);
     TriggerEventDispatcher::GetInstance()->ClearSubscribeState(subscribeKey);
 
     return true;
 }
 
-// SDK 26.0.0 新增：offKey 函数
+// SDK 26.0.0: offKey function
 static napi_value JsOffKey(napi_env env, napi_callback_info info)
 {
     CALL_DEBUG_ENTER;
@@ -1410,7 +1410,7 @@ static napi_value CreateShieldMode(napi_env env, napi_value exports)
     return exports;
 }
 
-// SDK 26.0.0 新增：创建 KeyCommandTriggerType 枚举
+// SDK 26.0.0: create KeyCommandTriggerType enum
 static napi_value CreateKeyCommandTriggerType(napi_env env, napi_value exports)
 {
     CALL_DEBUG_ENTER;
