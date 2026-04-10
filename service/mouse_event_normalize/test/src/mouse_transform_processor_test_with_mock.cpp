@@ -22,12 +22,12 @@
 #include "preferences_manager_mock.h"
 #include "mouse_transform_processor.h"
 #include "input_device_manager.h"
+#include "input_service_context.h"
 #include "mouse_device_state.h"
 #include "i_input_windows_manager.h"
 
-
 #undef MMI_LOG_TAG
-#define MMI_LOG_TAG "MouseTransformProcessorMockTest"
+#define MMI_LOG_TAG "MouseTransformProcessorTestWithMock"
 
 namespace OHOS {
 namespace MMI {
@@ -37,25 +37,30 @@ using namespace testing::ext;
 constexpr uint32_t TP_CLICK_FINGER_ONE { 1 };
 constexpr uint32_t TP_RIGHT_CLICK_FINGER_CNT { 2 };
 constexpr int32_t BTN_RIGHT_MENUE_CODE { 0x118 };
-}
-class MouseTransformProcessorMockTest : public testing::Test {
+constexpr int32_t TEST_DEVICE_ID_1 { 6 };
+} // namespace
+
+class MouseTransformProcessorTestWithMock : public testing::Test {
 public:
     static void SetUpTestCase(void);
     static void TearDownTestCase(void);
     void SetUp();
     void TearDown();
+
+private:
+    InputServiceContext env_ {};
 };
 
-void MouseTransformProcessorMockTest::SetUpTestCase(void)
+void MouseTransformProcessorTestWithMock::SetUpTestCase(void)
 {}
 
-void MouseTransformProcessorMockTest::TearDownTestCase(void)
+void MouseTransformProcessorTestWithMock::TearDownTestCase(void)
 {}
 
-void MouseTransformProcessorMockTest::SetUp()
+void MouseTransformProcessorTestWithMock::SetUp()
 {}
 
-void MouseTransformProcessorMockTest::TearDown()
+void MouseTransformProcessorTestWithMock::TearDown()
 {}
 
 /**
@@ -64,11 +69,11 @@ void MouseTransformProcessorMockTest::TearDown()
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(MouseTransformProcessorMockTest, MouseTransformProcessorMockTest_Normalize_01, TestSize.Level1)
+HWTEST_F(MouseTransformProcessorTestWithMock, MouseTransformProcessorMockTest_Normalize_01, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     int32_t deviceId = 6;
-    MouseTransformProcessor processor(deviceId);
+    MouseTransformProcessor processor(&env_, deviceId);
 
     libinput_event event {};
     libinput_event_pointer pointerevent {};
@@ -86,11 +91,11 @@ HWTEST_F(MouseTransformProcessorMockTest, MouseTransformProcessorMockTest_Normal
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(MouseTransformProcessorMockTest, MouseTransformProcessorMockTest_Normalize_02, TestSize.Level1)
+HWTEST_F(MouseTransformProcessorTestWithMock, MouseTransformProcessorMockTest_Normalize_02, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     int32_t deviceId = 2;
-    MouseTransformProcessor processor(deviceId);
+    MouseTransformProcessor processor(&env_, deviceId);
 
     libinput_event event {};
     libinput_event_pointer pointerevent {};
@@ -108,11 +113,11 @@ HWTEST_F(MouseTransformProcessorMockTest, MouseTransformProcessorMockTest_Normal
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(MouseTransformProcessorMockTest, MouseTransformProcessorMockTest_Normalize_03, TestSize.Level1)
+HWTEST_F(MouseTransformProcessorTestWithMock, MouseTransformProcessorMockTest_Normalize_03, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     int32_t deviceId = 3;
-    MouseTransformProcessor processor(deviceId);
+    MouseTransformProcessor processor(&env_, deviceId);
 
     libinput_event event {};
     libinput_event_pointer pointerevent {};
@@ -130,11 +135,11 @@ HWTEST_F(MouseTransformProcessorMockTest, MouseTransformProcessorMockTest_Normal
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(MouseTransformProcessorMockTest, MouseTransformProcessorMockTest_HandleAxisBeginEndInner_01, TestSize.Level1)
+HWTEST_F(MouseTransformProcessorTestWithMock, HandleAxisBeginEndInner_01, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     int32_t deviceId = 2;
-    MouseTransformProcessor processor(deviceId);
+    MouseTransformProcessor processor(&env_, deviceId);
     libinput_event event {};
     NiceMock<LibinputInterfaceMock> libinputMock;
     EXPECT_CALL(libinputMock, GetEventType).WillRepeatedly(Return(LIBINPUT_EVENT_TOUCHPAD_DOWN));
@@ -149,11 +154,11 @@ HWTEST_F(MouseTransformProcessorMockTest, MouseTransformProcessorMockTest_Handle
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(MouseTransformProcessorMockTest, MouseTransformProcessorMockTest_HandleAxisBeginEndInner_02, TestSize.Level1)
+HWTEST_F(MouseTransformProcessorTestWithMock, HandleAxisBeginEndInner_02, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     int32_t deviceId = 3;
-    MouseTransformProcessor processor(deviceId);
+    MouseTransformProcessor processor(&env_, deviceId);
     libinput_event event {};
     NiceMock<LibinputInterfaceMock> libinputMock;
     EXPECT_CALL(libinputMock, GetEventType).WillRepeatedly(Return(LIBINPUT_EVENT_TOUCHPAD_UP));
@@ -168,11 +173,11 @@ HWTEST_F(MouseTransformProcessorMockTest, MouseTransformProcessorMockTest_Handle
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(MouseTransformProcessorMockTest, MouseTransformProcessorMockTest_HandleAxisInner_01, TestSize.Level1)
+HWTEST_F(MouseTransformProcessorTestWithMock, MouseTransformProcessorMockTest_HandleAxisInner_01, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     int32_t deviceId = 3;
-    MouseTransformProcessor processor(deviceId);
+    MouseTransformProcessor processor(&env_, deviceId);
     bool tpScrollSwitch;
 
     libinput_event_pointer event {};
@@ -189,11 +194,11 @@ HWTEST_F(MouseTransformProcessorMockTest, MouseTransformProcessorMockTest_Handle
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(MouseTransformProcessorMockTest, MouseTransformProcessorMockTest_HandleAxisInner_02, TestSize.Level1)
+HWTEST_F(MouseTransformProcessorTestWithMock, MouseTransformProcessorMockTest_HandleAxisInner_02, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     int32_t deviceId = 5;
-    MouseTransformProcessor processor(deviceId);
+    MouseTransformProcessor processor(&env_, deviceId);
     bool tpScrollSwitch;
 
     libinput_event_pointer event {};
@@ -210,11 +215,11 @@ HWTEST_F(MouseTransformProcessorMockTest, MouseTransformProcessorMockTest_Handle
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(MouseTransformProcessorMockTest, MouseTransformProcessorMockTest_HandleTwoFingerButton_01, TestSize.Level1)
+HWTEST_F(MouseTransformProcessorTestWithMock, MouseTransformProcessorMockTest_HandleTwoFingerButton_01, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     int32_t deviceId = 3;
-    MouseTransformProcessor processor(deviceId);
+    MouseTransformProcessor processor(&env_, deviceId);
     uint32_t button = MouseDeviceState::LIBINPUT_BUTTON_CODE::LIBINPUT_RIGHT_BUTTON_CODE;
     int32_t eventType = LIBINPUT_EVENT_POINTER_BUTTON_TOUCHPAD;
 
@@ -230,11 +235,11 @@ HWTEST_F(MouseTransformProcessorMockTest, MouseTransformProcessorMockTest_Handle
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(MouseTransformProcessorMockTest, MouseTransformProcessorMockTest_HandleTwoFingerButton_02, TestSize.Level1)
+HWTEST_F(MouseTransformProcessorTestWithMock, MouseTransformProcessorMockTest_HandleTwoFingerButton_02, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     int32_t deviceId = 5;
-    MouseTransformProcessor processor(deviceId);
+    MouseTransformProcessor processor(&env_, deviceId);
     uint32_t button = MouseDeviceState::LIBINPUT_BUTTON_CODE::LIBINPUT_RIGHT_BUTTON_CODE;
     int32_t eventType = LIBINPUT_EVENT_POINTER_BUTTON_TOUCHPAD;
 
@@ -250,11 +255,11 @@ HWTEST_F(MouseTransformProcessorMockTest, MouseTransformProcessorMockTest_Handle
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(MouseTransformProcessorMockTest, MouseTransformProcessorMockTest_HandleTwoFingerButton_03, TestSize.Level1)
+HWTEST_F(MouseTransformProcessorTestWithMock, MouseTransformProcessorMockTest_HandleTwoFingerButton_03, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     int32_t deviceId = 5;
-    MouseTransformProcessor processor(deviceId);
+    MouseTransformProcessor processor(&env_, deviceId);
     uint32_t button = BTN_RIGHT_MENUE_CODE;
     int32_t eventType = LIBINPUT_EVENT_POINTER_BUTTON_TOUCHPAD;
 
@@ -270,11 +275,11 @@ HWTEST_F(MouseTransformProcessorMockTest, MouseTransformProcessorMockTest_Handle
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(MouseTransformProcessorMockTest, MouseTransformProcessorMockTest_HandleMotionInner_01, TestSize.Level1)
+HWTEST_F(MouseTransformProcessorTestWithMock, MouseTransformProcessorMockTest_HandleMotionInner_01, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     int32_t deviceId = 5;
-    MouseTransformProcessor processor(deviceId);
+    MouseTransformProcessor processor(&env_, deviceId);
 
     libinput_event_pointer pointerevent {};
     libinput_event event {};
@@ -292,12 +297,12 @@ HWTEST_F(MouseTransformProcessorMockTest, MouseTransformProcessorMockTest_Handle
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(MouseTransformProcessorMockTest, MouseTransformProcessorMockTest_HandleMotionInner_02, TestSize.Level1)
+HWTEST_F(MouseTransformProcessorTestWithMock, MouseTransformProcessorMockTest_HandleMotionInner_02, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     int32_t deviceId = 7;
     Direction direction;
-    MouseTransformProcessor processor(deviceId);
+    MouseTransformProcessor processor(&env_, deviceId);
     libinput_event_pointer pointerevent {};
     libinput_event event {};
 
@@ -318,12 +323,12 @@ HWTEST_F(MouseTransformProcessorMockTest, MouseTransformProcessorMockTest_Handle
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(MouseTransformProcessorMockTest, MouseTransformProcessorMockTest_HandleMotionInner_03, TestSize.Level1)
+HWTEST_F(MouseTransformProcessorTestWithMock, MouseTransformProcessorMockTest_HandleMotionInner_03, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     int32_t deviceId = 8;
     Direction direction;
-    MouseTransformProcessor processor(deviceId);
+    MouseTransformProcessor processor(&env_, deviceId);
     libinput_event_pointer pointerevent {};
     libinput_event event {};
 
@@ -344,12 +349,12 @@ HWTEST_F(MouseTransformProcessorMockTest, MouseTransformProcessorMockTest_Handle
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(MouseTransformProcessorMockTest, MouseTransformProcessorMockTest_HandleMotionInner_04, TestSize.Level1)
+HWTEST_F(MouseTransformProcessorTestWithMock, MouseTransformProcessorMockTest_HandleMotionInner_04, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     int32_t deviceId = 8;
     Direction direction;
-    MouseTransformProcessor processor(deviceId);
+    MouseTransformProcessor processor(&env_, deviceId);
     libinput_event_pointer pointerevent {};
     libinput_event event {};
 
@@ -363,6 +368,168 @@ HWTEST_F(MouseTransformProcessorMockTest, MouseTransformProcessorMockTest_Handle
 
     int32_t ret = processor.HandleMotionInner(&pointerevent, &event);
     EXPECT_EQ(ret, RET_ERR);
+}
+
+/**
+ * @tc.name: MouseTransformProcessorMockTest_OnDeviceEnabled_001
+ * @tc.desc: Test OnDeviceEnabled function
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MouseTransformProcessorTestWithMock, MouseTransformProcessorMockTest_OnDeviceEnabled_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t deviceId { TEST_DEVICE_ID_1 };
+    MouseTransformProcessor processor(&env_, deviceId);
+    EXPECT_NO_FATAL_FAILURE(processor.OnDeviceEnabled());
+}
+
+/**
+ * @tc.name: MouseTransformProcessorMockTest_OnDeviceDisabled_001
+ * @tc.desc: Test OnDeviceDisabled function
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MouseTransformProcessorTestWithMock, MouseTransformProcessorMockTest_OnDeviceDisabled_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t deviceId { TEST_DEVICE_ID_1 };
+    MouseTransformProcessor processor(&env_, deviceId);
+    EXPECT_NO_FATAL_FAILURE(processor.OnDeviceDisabled());
+}
+
+/**
+ * @tc.name: MouseTransformProcessorMockTest_RecordActiveOperations_001
+ * @tc.desc: Test RecordActiveOperations for non-touchpad device
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MouseTransformProcessorTestWithMock, RecordActiveOperations_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t deviceId { TEST_DEVICE_ID_1 };
+    MouseTransformProcessor processor(&env_, deviceId);
+    EXPECT_NO_FATAL_FAILURE(processor.RecordActiveOperations());
+}
+
+/**
+ * @tc.name: MouseTransformProcessorMockTest_RecordActiveOperations_002
+ * @tc.desc: Test RecordActiveOperations for touchpad device
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MouseTransformProcessorTestWithMock, RecordActiveOperations_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t deviceId { TEST_DEVICE_ID_1 };
+    MouseTransformProcessor processor(&env_, deviceId);
+
+    libinput_event event {};
+    libinput_event_pointer pointerevent {};
+
+    NiceMock<LibinputInterfaceMock> libinputMock;
+    EXPECT_CALL(libinputMock, GetEventType).WillRepeatedly(Return(LIBINPUT_EVENT_POINTER_BUTTON_TOUCHPAD));
+    EXPECT_CALL(libinputMock, LibinputGetPointerEvent).WillOnce(Return(&pointerevent));
+
+    processor.Normalize(&event);
+    EXPECT_NO_FATAL_FAILURE(processor.RecordActiveOperations());
+}
+
+/**
+ * @tc.name: MouseTransformProcessorMockTest_SendButtonUpEvents_001
+ * @tc.desc: Test SendButtonUpEvents when pointerEvent is null
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MouseTransformProcessorTestWithMock, MouseTransformProcessorMockTest_SendButtonUpEvents_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t deviceId { TEST_DEVICE_ID_1 };
+    MouseTransformProcessor processor(&env_, deviceId);
+    EXPECT_NO_FATAL_FAILURE(processor.SendButtonUpEvents());
+}
+
+/**
+ * @tc.name: MouseTransformProcessorMockTest_SendButtonUpEvents_002
+ * @tc.desc: Test SendButtonUpEvents with pressed buttons
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MouseTransformProcessorTestWithMock, MouseTransformProcessorMockTest_SendButtonUpEvents_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t deviceId { TEST_DEVICE_ID_1 };
+    MouseTransformProcessor processor(&env_, deviceId);
+
+    libinput_event event {};
+    libinput_event_pointer pointerevent {};
+
+    NiceMock<LibinputInterfaceMock> libinputMock;
+    EXPECT_CALL(libinputMock, GetEventType).WillRepeatedly(Return(LIBINPUT_EVENT_POINTER_BUTTON_TOUCHPAD));
+    EXPECT_CALL(libinputMock, LibinputGetPointerEvent).WillOnce(Return(&pointerevent));
+
+    processor.Normalize(&event);
+    EXPECT_NO_FATAL_FAILURE(processor.SendButtonUpEvents());
+}
+
+/**
+ * @tc.name: MouseTransformProcessorMockTest_SendAxisEndEvent_001
+ * @tc.desc: Test SendAxisEndEvent when pointerEvent is null
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MouseTransformProcessorTestWithMock, SendAxisEndEvent_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t deviceId { TEST_DEVICE_ID_1 };
+    MouseTransformProcessor processor(&env_, deviceId);
+    EXPECT_NO_FATAL_FAILURE(processor.SendAxisEndEvent());
+}
+
+/**
+ * @tc.name: MouseTransformProcessorMockTest_SendAxisEndEvent_002
+ * @tc.desc: Test SendAxisEndEvent when axisBegin is false
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MouseTransformProcessorTestWithMock, SendAxisEndEvent_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t deviceId { TEST_DEVICE_ID_1 };
+    MouseTransformProcessor processor(&env_, deviceId);
+
+    libinput_event event {};
+    libinput_event_pointer pointerevent {};
+
+    NiceMock<LibinputInterfaceMock> libinputMock;
+    EXPECT_CALL(libinputMock, GetEventType).WillRepeatedly(Return(LIBINPUT_EVENT_POINTER_AXIS));
+    EXPECT_CALL(libinputMock, LibinputGetPointerEvent).WillOnce(Return(&pointerevent));
+
+    processor.Normalize(&event);
+    EXPECT_NO_FATAL_FAILURE(processor.SendAxisEndEvent());
+}
+
+/**
+ * @tc.name: MouseTransformProcessorMockTest_SendAxisEndEvent_003
+ * @tc.desc: Test SendAxisEndEvent when axisBegin is true
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MouseTransformProcessorTestWithMock, MouseTransformProcessorMockTest_SendAxisEndEvent_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t deviceId { TEST_DEVICE_ID_1 };
+    MouseTransformProcessor processor(&env_, deviceId);
+
+    libinput_event event {};
+    libinput_event_pointer pointerevent {};
+
+    NiceMock<LibinputInterfaceMock> libinputMock;
+    EXPECT_CALL(libinputMock, GetEventType).WillRepeatedly(Return(LIBINPUT_EVENT_POINTER_AXIS));
+    EXPECT_CALL(libinputMock, LibinputGetPointerEvent).WillOnce(Return(&pointerevent));
+
+    processor.Normalize(&event);
+    EXPECT_NO_FATAL_FAILURE(processor.SendAxisEndEvent());
 }
 } // namespace MMI
 } // namespace OHOS

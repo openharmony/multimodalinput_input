@@ -29,12 +29,15 @@ public:
 
     void OnDeviceAdded(int32_t deviceId) override;
     void OnDeviceRemoved(int32_t deviceId) override;
+    void OnDeviceEnabled(int32_t deviceId) override;
+    void OnDeviceDisabled(int32_t deviceId) override;
     bool HasJoystick() const override;
     std::shared_ptr<KeyEvent> OnButtonEvent(struct libinput_event *event) override;
     std::shared_ptr<PointerEvent> OnAxisEvent(struct libinput_event *event) override;
     void CheckIntention(std::shared_ptr<PointerEvent> pointerEvent,
         std::function<void(std::shared_ptr<KeyEvent>)> handler) override;
 
+    static std::shared_ptr<IInputEventHandler> GetEventNormalizeHandler(IInputServiceContext *env);
     static std::shared_ptr<ITimerManager> GetTimerManager(IInputServiceContext *env);
     static std::shared_ptr<IInputWindowsManager> GetInputWindowsManager(IInputServiceContext *env);
     static std::shared_ptr<IInputDeviceManager> GetDeviceManager(IInputServiceContext *env);
