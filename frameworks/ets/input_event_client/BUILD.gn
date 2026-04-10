@@ -30,6 +30,7 @@ config("inputEventClient_config") {
     "${mmi_path}/interfaces/native/innerkits/proxy/include",
     "${mmi_path}/frameworks/ets/input_event_client/include",
     "${mmi_path}/frameworks/ets/common/include",
+    
   ]
 }
 subsystem_name = "multimodalinput"

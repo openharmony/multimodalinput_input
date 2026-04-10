@@ -68,13 +68,13 @@ interface MouseController {
     ReleaseButtonSync(button: Button): void;
  
     @promise @rename("beginAxis")
-    BeginAxisSync(button: Button): void;
- 
+    BeginAxisSync(axis: Axis, value: i32): void;
+
     @promise @rename("updateAxis")
-    UpdateAxisSync(button: Button): void;
- 
+    UpdateAxisSync(axis: Axis, value: i32): void;
+
     @promise @rename("endAxis")
-    EndAxisSync(button: Button): void;
+    EndAxisSync(axis: Axis): void;
 }
  
 @promise @rename("createMouseController")
