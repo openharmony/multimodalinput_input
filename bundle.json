@@ -99,6 +99,7 @@
         "ffrt",
         "hdf_core",
         "bounds_checking_function",
+        "icu",
         "call_manager",
         "libinput",
         "screenlock_mgr",
