@@ -4034,7 +4034,7 @@ std::optional<WindowInfo> InputWindowsManager::SelectWindowInfo(int32_t logicalX
         static std::unordered_map<int32_t, int32_t> winId2ZorderMap;
         bool isHotArea = false;
         if (targetWindowId <= 1 && !dispatchEventFlag) {
-            targetMouseWinIds_.clear();
+            ClearMouseTargetWindowId();
         }
         for (const auto &item : windowsInfo) {
             if (transparentWins_.find(item.id) != transparentWins_.end()) {
@@ -7735,6 +7735,12 @@ void InputWindowsManager::ClearTargetWindowId(int32_t pointerId, int32_t deviceI
         return;
     }
     targetTouchWinIds_[deviceId].erase(pointerId);
+}
+
+void InputWindowsManager::ClearMouseTargetWindowId()
+{
+    CALL_DEBUG_ENTER;
+    targetMouseWinIds_.clear();
 }
 
 void InputWindowsManager::SetPrivacyModeFlag(SecureFlag privacyMode, std::shared_ptr<InputEvent> event)

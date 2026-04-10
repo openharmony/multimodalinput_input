@@ -62,6 +62,7 @@ public:
     void ClearTargetDeviceWindowId(int32_t deviceId) override {}
     void ClearFirstTouchWindowInfos(int32_t deviceId) override {}
     void ClearTargetWindowId(int32_t pointerId, int32_t deviceId) override {}
+    void ClearMouseTargetWindowId() override {}
 
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     MOCK_METHOD((std::vector<std::pair<int32_t, TargetInfo>>), UpdateTarget, (std::shared_ptr<KeyEvent>));
