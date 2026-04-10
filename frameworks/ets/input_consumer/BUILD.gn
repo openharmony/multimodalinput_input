@@ -58,6 +58,7 @@ taihe_shared_library("InputConsumer") {
     "access_token:libaccesstoken_sdk",
     "c_utils:utils",
     "hilog:libhilog",
+    "icu:icu",
     "ipc:ipc_single",
   ]
   sources += [
