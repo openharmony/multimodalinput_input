@@ -15,7 +15,8 @@
 
 @!namespace("@ohos.multimodalInput.inputEventClient", "inputEventClient")
 from ohos.multimodalInput.touchEvent use TouchEvent;
-from ohos.multimodalInput.mouseEvent use MouseEvent;
+from ohos.multimodalInput.mouseEvent use MouseEvent, Button, Axis;
+from ohos.multimodalInput.keyCode use KeyCode;
 @!sts_inject("""
 static { loadLibraryWithPermissionCheck("InputEventClient.z", "@ohos.multimodalInput.inputEventClient") }
 """)
@@ -56,4 +57,36 @@ function InjectTouchEventSync(touchEvent: TouchEventData): void;
 @rename("permitInjection")
 function PermitInjectionSync(result: bool): void;
 
-
+interface MouseController {
+    @promise @rename("moveTo")
+    MoveToSync(displayId: i32, displayX: i32, displayY: i32): void;
+ 
+    @promise @rename("pressButton")
+    PressButtonSync(button: Button): void;
+ 
+    @promise @rename("releaseButton")
+    ReleaseButtonSync(button: Button): void;
+ 
+    @promise @rename("beginAxis")
+    BeginAxisSync(button: Button): void;
+ 
+    @promise @rename("updateAxis")
+    UpdateAxisSync(button: Button): void;
+ 
+    @promise @rename("endAxis")
+    EndAxisSync(button: Button): void;
+}
+ 
+@promise @rename("createMouseController")
+function CreateMouseControllerSync():MouseController;
+ 
+interface KeyboardController {
+    @promise @rename("pressKey")
+    PressKeySync(keyCode: KeyCode): void;
+ 
+    @promise @rename("releaseKey")
+    ReleaseKeySync(keyCode: KeyCode): void;
+}
+ 
+@promise @rename("createKeyboardController")
+function CreateKeyboardControllerSync():KeyboardController;
