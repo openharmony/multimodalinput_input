@@ -23,6 +23,7 @@
 #include <sstream>
 #include <sys/stat.h>
 #include <cerrno>
+#include <cstring>
 
 #include "bundle_name_parser.h"
 #include "json_parser.h"
@@ -39,6 +40,15 @@ constexpr int32_t EXCEED_MAX_ARRAY_SIZE = 150;
 constexpr int32_t RET_OK_VALUE = 0;
 constexpr int32_t RET_ERR_VALUE = -1;
 constexpr int32_t FIVE_ITEMS_ARRAY_SIZE = 5;
+
+static std::string GetTestConfigDir()
+{
+    const char* tmpDir = getenv("TEST_TMP_DIR");
+    if (tmpDir != nullptr && strlen(tmpDir) > 0) {
+        return std::string(tmpDir);
+    }
+    return "/data/local/tmp/test_multimodalinput";
+}
 
 static bool CreateDirectoryRecursive(const std::string& path)
 {
@@ -896,23 +906,12 @@ HWTEST_F(BundleNameParserTest, BundleNameParser_InitializeImpl_ValidConfig_001, 
  */
 HWTEST_F(BundleNameParserTest, BundleNameParser_InitializeImpl_NotObject_001, TestSize.Level1)
 {
-    const std::string configDir = "/etc/multimodalinput";
+    const std::string configDir = GetTestConfigDir();
     const std::string configFile = configDir + "/bundle_name_config.json";
     
     CreateDirectoryRecursive(configDir);
     
-    std::string originalContent;
-    bool fileExists = false;
-    std::ifstream inFile(configFile);
-    if (inFile.good()) {
-        fileExists = true;
-        std::stringstream buffer;
-        buffer << inFile.rdbuf();
-        if (!inFile.fail() && !inFile.bad()) {
-            originalContent = buffer.str();
-        }
-    }
-    inFile.close();
+    ScopedFileRestorer restorer(configFile);
     
     const std::string arrayConfig = "[\"item1\", \"item2\"]";
     
@@ -922,21 +921,6 @@ HWTEST_F(BundleNameParserTest, BundleNameParser_InitializeImpl_NotObject_001, Te
     
     JsonParser parser(arrayConfig.c_str());
     EXPECT_FALSE(cJSON_IsObject(parser.Get()));
-    
-    if (fileExists) {
-        std::ofstream restoreFile(configFile);
-        if (restoreFile.good()) {
-            restoreFile << originalContent;
-        }
-        restoreFile.close();
-        if (restoreFile.fail()) {
-            GTEST_LOG_(ERROR) << "Failed to restore config file: " << configFile;
-        }
-    } else {
-        if (remove(configFile.c_str()) != 0) {
-            GTEST_LOG_(ERROR) << "Failed to remove config file: " << configFile;
-        }
-    }
 }
 
 /**
@@ -947,23 +931,12 @@ HWTEST_F(BundleNameParserTest, BundleNameParser_InitializeImpl_NotObject_001, Te
  */
 HWTEST_F(BundleNameParserTest, BundleNameParser_InitializeImpl_EmptyArray_001, TestSize.Level1)
 {
-    const std::string configDir = "/etc/multimodalinput";
+    const std::string configDir = GetTestConfigDir();
     const std::string configFile = configDir + "/bundle_name_config.json";
     
     CreateDirectoryRecursive(configDir);
     
-    std::string originalContent;
-    bool fileExists = false;
-    std::ifstream inFile(configFile);
-    if (inFile.good()) {
-        fileExists = true;
-        std::stringstream buffer;
-        buffer << inFile.rdbuf();
-        if (!inFile.fail() && !inFile.bad()) {
-            originalContent = buffer.str();
-        }
-    }
-    inFile.close();
+    ScopedFileRestorer restorer(configFile);
     
     const std::string emptyArrayConfig = "{\"bundle_name_map\":[]}";
     
@@ -977,21 +950,6 @@ HWTEST_F(BundleNameParserTest, BundleNameParser_InitializeImpl_EmptyArray_001, T
     cJSON* bundleNameMap = cJSON_GetObjectItemCaseSensitive(parser.Get(), "bundle_name_map");
     EXPECT_TRUE(cJSON_IsArray(bundleNameMap));
     EXPECT_EQ(cJSON_GetArraySize(bundleNameMap), 0);
-    
-    if (fileExists) {
-        std::ofstream restoreFile(configFile);
-        if (restoreFile.good()) {
-            restoreFile << originalContent;
-        }
-        restoreFile.close();
-        if (restoreFile.fail()) {
-            GTEST_LOG_(ERROR) << "Failed to restore config file: " << configFile;
-        }
-    } else {
-        if (remove(configFile.c_str()) != 0) {
-            GTEST_LOG_(ERROR) << "Failed to remove config file: " << configFile;
-        }
-    }
 }
 
 /**
@@ -1002,23 +960,12 @@ HWTEST_F(BundleNameParserTest, BundleNameParser_InitializeImpl_EmptyArray_001, T
  */
 HWTEST_F(BundleNameParserTest, BundleNameParser_InitializeImpl_MissingKey_001, TestSize.Level1)
 {
-    const std::string configDir = "/etc/multimodalinput";
+    const std::string configDir = GetTestConfigDir();
     const std::string configFile = configDir + "/bundle_name_config.json";
     
     CreateDirectoryRecursive(configDir);
     
-    std::string originalContent;
-    bool fileExists = false;
-    std::ifstream inFile(configFile);
-    if (inFile.good()) {
-        fileExists = true;
-        std::stringstream buffer;
-        buffer << inFile.rdbuf();
-        if (!inFile.fail() && !inFile.bad()) {
-            originalContent = buffer.str();
-        }
-    }
-    inFile.close();
+    ScopedFileRestorer restorer(configFile);
     
     const std::string noKeyConfig = "{\"other_key\":\"other_value\"}";
     
@@ -1031,21 +978,6 @@ HWTEST_F(BundleNameParserTest, BundleNameParser_InitializeImpl_MissingKey_001, T
     
     cJSON* bundleNameMap = cJSON_GetObjectItemCaseSensitive(parser.Get(), "bundle_name_map");
     EXPECT_FALSE(cJSON_IsArray(bundleNameMap));
-    
-    if (fileExists) {
-        std::ofstream restoreFile(configFile);
-        if (restoreFile.good()) {
-            restoreFile << originalContent;
-        }
-        restoreFile.close();
-        if (restoreFile.fail()) {
-            GTEST_LOG_(ERROR) << "Failed to restore config file: " << configFile;
-        }
-    } else {
-        if (remove(configFile.c_str()) != 0) {
-            GTEST_LOG_(ERROR) << "Failed to remove config file: " << configFile;
-        }
-    }
 }
 
 /**
@@ -1056,23 +988,12 @@ HWTEST_F(BundleNameParserTest, BundleNameParser_InitializeImpl_MissingKey_001, T
  */
 HWTEST_F(BundleNameParserTest, BundleNameParser_InitializeImpl_NotArray_001, TestSize.Level1)
 {
-    const std::string configDir = "/etc/multimodalinput";
+    const std::string configDir = GetTestConfigDir();
     const std::string configFile = configDir + "/bundle_name_config.json";
     
     CreateDirectoryRecursive(configDir);
     
-    std::string originalContent;
-    bool fileExists = false;
-    std::ifstream inFile(configFile);
-    if (inFile.good()) {
-        fileExists = true;
-        std::stringstream buffer;
-        buffer << inFile.rdbuf();
-        if (!inFile.fail() && !inFile.bad()) {
-            originalContent = buffer.str();
-        }
-    }
-    inFile.close();
+    ScopedFileRestorer restorer(configFile);
     
     const std::string notArrayConfig = "{\"bundle_name_map\":\"not_an_array\"}";
     
@@ -1085,21 +1006,6 @@ HWTEST_F(BundleNameParserTest, BundleNameParser_InitializeImpl_NotArray_001, Tes
     
     cJSON* bundleNameMap = cJSON_GetObjectItemCaseSensitive(parser.Get(), "bundle_name_map");
     EXPECT_FALSE(cJSON_IsArray(bundleNameMap));
-    
-    if (fileExists) {
-        std::ofstream restoreFile(configFile);
-        if (restoreFile.good()) {
-            restoreFile << originalContent;
-        }
-        restoreFile.close();
-        if (restoreFile.fail()) {
-            GTEST_LOG_(ERROR) << "Failed to restore config file: " << configFile;
-        }
-    } else {
-        if (remove(configFile.c_str()) != 0) {
-            GTEST_LOG_(ERROR) << "Failed to remove config file: " << configFile;
-        }
-    }
 }
 
 /**
@@ -1110,29 +1016,18 @@ HWTEST_F(BundleNameParserTest, BundleNameParser_InitializeImpl_NotArray_001, Tes
  */
 HWTEST_F(BundleNameParserTest, BundleNameParser_InitializeImpl_MultipleItems_001, TestSize.Level1)
 {
-    const std::string configDir = "/etc/multimodalinput";
+    const std::string configDir = GetTestConfigDir();
     const std::string configFile = configDir + "/bundle_name_config.json";
     
     CreateDirectoryRecursive(configDir);
     
-    std::string originalContent;
-    bool fileExists = false;
-    std::ifstream inFile(configFile);
-    if (inFile.good()) {
-        fileExists = true;
-        std::stringstream buffer;
-        buffer << inFile.rdbuf();
-        if (!inFile.fail() && !inFile.bad()) {
-            originalContent = buffer.str();
-        }
-    }
-    inFile.close();
+    ScopedFileRestorer restorer(configFile);
     
     std::string multiItemConfig =
         "{\n"
         "  \"bundle_name_map\": [\n";
     
-    for (int32_t i = 0; i < FIVE_ITEMS_ARRAY_SIZE; ++i) {
+    for (size_t i = 0; i < FIVE_ITEMS_ARRAY_SIZE; ++i) {
         if (i > 0) {
             multiItemConfig += ",\n";
         }
@@ -1155,7 +1050,7 @@ HWTEST_F(BundleNameParserTest, BundleNameParser_InitializeImpl_MultipleItems_001
     EXPECT_TRUE(cJSON_IsArray(bundleNameMap));
     EXPECT_EQ(cJSON_GetArraySize(bundleNameMap), FIVE_ITEMS_ARRAY_SIZE);
     
-    for (int32_t i = 0; i < FIVE_ITEMS_ARRAY_SIZE; ++i) {
+    for (size_t i = 0; i < FIVE_ITEMS_ARRAY_SIZE; ++i) {
         cJSON* item = cJSON_GetArrayItem(bundleNameMap, i);
         EXPECT_NE(item, nullptr);
         
@@ -1164,21 +1059,6 @@ HWTEST_F(BundleNameParserTest, BundleNameParser_InitializeImpl_MultipleItems_001
         
         EXPECT_NE(placeholder, nullptr);
         EXPECT_NE(bundleName, nullptr);
-    }
-    
-    if (fileExists) {
-        std::ofstream restoreFile(configFile);
-        if (restoreFile.good()) {
-            restoreFile << originalContent;
-        }
-        restoreFile.close();
-        if (restoreFile.fail()) {
-            GTEST_LOG_(ERROR) << "Failed to restore config file: " << configFile;
-        }
-    } else {
-        if (remove(configFile.c_str()) != 0) {
-            GTEST_LOG_(ERROR) << "Failed to remove config file: " << configFile;
-        }
     }
 }
 
@@ -1190,23 +1070,12 @@ HWTEST_F(BundleNameParserTest, BundleNameParser_InitializeImpl_MultipleItems_001
  */
 HWTEST_F(BundleNameParserTest, BundleNameParser_InitializeImpl_InvalidItem_001, TestSize.Level1)
 {
-    const std::string configDir = "/etc/multimodalinput";
+    const std::string configDir = GetTestConfigDir();
     const std::string configFile = configDir + "/bundle_name_config.json";
     
     CreateDirectoryRecursive(configDir);
     
-    std::string originalContent;
-    bool fileExists = false;
-    std::ifstream inFile(configFile);
-    if (inFile.good()) {
-        fileExists = true;
-        std::stringstream buffer;
-        buffer << inFile.rdbuf();
-        if (!inFile.fail() && !inFile.bad()) {
-            originalContent = buffer.str();
-        }
-    }
-    inFile.close();
+    ScopedFileRestorer restorer(configFile);
     
     const std::string invalidItemConfig =
         "{\n"
@@ -1227,21 +1096,6 @@ HWTEST_F(BundleNameParserTest, BundleNameParser_InitializeImpl_InvalidItem_001, 
     
     cJSON* placeholder = cJSON_GetObjectItemCaseSensitive(item, "placeholder");
     EXPECT_EQ(placeholder, nullptr);
-    
-    if (fileExists) {
-        std::ofstream restoreFile(configFile);
-        if (restoreFile.good()) {
-            restoreFile << originalContent;
-        }
-        restoreFile.close();
-        if (restoreFile.fail()) {
-            GTEST_LOG_(ERROR) << "Failed to restore config file: " << configFile;
-        }
-    } else {
-        if (remove(configFile.c_str()) != 0) {
-            GTEST_LOG_(ERROR) << "Failed to remove config file: " << configFile;
-        }
-    }
 }
 
 /**
@@ -1252,23 +1106,12 @@ HWTEST_F(BundleNameParserTest, BundleNameParser_InitializeImpl_InvalidItem_001, 
  */
 HWTEST_F(BundleNameParserTest, BundleNameParser_InitializeImpl_InvalidItem_002, TestSize.Level1)
 {
-    const std::string configDir = "/etc/multimodalinput";
+    const std::string configDir = GetTestConfigDir();
     const std::string configFile = configDir + "/bundle_name_config.json";
     
     CreateDirectoryRecursive(configDir);
     
-    std::string originalContent;
-    bool fileExists = false;
-    std::ifstream inFile(configFile);
-    if (inFile.good()) {
-        fileExists = true;
-        std::stringstream buffer;
-        buffer << inFile.rdbuf();
-        if (!inFile.fail() && !inFile.bad()) {
-            originalContent = buffer.str();
-        }
-    }
-    inFile.close();
+    ScopedFileRestorer restorer(configFile);
     
     const std::string invalidItemConfig =
         "{\n"
@@ -1289,21 +1132,6 @@ HWTEST_F(BundleNameParserTest, BundleNameParser_InitializeImpl_InvalidItem_002, 
     
     cJSON* bundleName = cJSON_GetObjectItemCaseSensitive(item, "bundle_name");
     EXPECT_EQ(bundleName, nullptr);
-    
-    if (fileExists) {
-        std::ofstream restoreFile(configFile);
-        if (restoreFile.good()) {
-            restoreFile << originalContent;
-        }
-        restoreFile.close();
-        if (restoreFile.fail()) {
-            GTEST_LOG_(ERROR) << "Failed to restore config file: " << configFile;
-        }
-    } else {
-        if (remove(configFile.c_str()) != 0) {
-            GTEST_LOG_(ERROR) << "Failed to remove config file: " << configFile;
-        }
-    }
 }
 
 /**
@@ -1314,23 +1142,12 @@ HWTEST_F(BundleNameParserTest, BundleNameParser_InitializeImpl_InvalidItem_002, 
  */
 HWTEST_F(BundleNameParserTest, BundleNameParser_InitializeImpl_NonStringPlaceholder_001, TestSize.Level1)
 {
-    const std::string configDir = "/etc/multimodalinput";
+    const std::string configDir = GetTestConfigDir();
     const std::string configFile = configDir + "/bundle_name_config.json";
     
     CreateDirectoryRecursive(configDir);
     
-    std::string originalContent;
-    bool fileExists = false;
-    std::ifstream inFile(configFile);
-    if (inFile.good()) {
-        fileExists = true;
-        std::stringstream buffer;
-        buffer << inFile.rdbuf();
-        if (!inFile.fail() && !inFile.bad()) {
-            originalContent = buffer.str();
-        }
-    }
-    inFile.close();
+    ScopedFileRestorer restorer(configFile);
     
     const std::string nonStringConfig =
         "{\n"
@@ -1353,21 +1170,6 @@ HWTEST_F(BundleNameParserTest, BundleNameParser_InitializeImpl_NonStringPlacehol
     EXPECT_NE(placeholder, nullptr);
     EXPECT_TRUE(cJSON_IsNumber(placeholder));
     EXPECT_FALSE(cJSON_IsString(placeholder));
-    
-    if (fileExists) {
-        std::ofstream restoreFile(configFile);
-        if (restoreFile.good()) {
-            restoreFile << originalContent;
-        }
-        restoreFile.close();
-        if (restoreFile.fail()) {
-            GTEST_LOG_(ERROR) << "Failed to restore config file: " << configFile;
-        }
-    } else {
-        if (remove(configFile.c_str()) != 0) {
-            GTEST_LOG_(ERROR) << "Failed to remove config file: " << configFile;
-        }
-    }
 }
 
 /**
@@ -1378,23 +1180,12 @@ HWTEST_F(BundleNameParserTest, BundleNameParser_InitializeImpl_NonStringPlacehol
  */
 HWTEST_F(BundleNameParserTest, BundleNameParser_InitializeImpl_NonStringBundleName_001, TestSize.Level1)
 {
-    const std::string configDir = "/etc/multimodalinput";
+    const std::string configDir = GetTestConfigDir();
     const std::string configFile = configDir + "/bundle_name_config.json";
     
     CreateDirectoryRecursive(configDir);
     
-    std::string originalContent;
-    bool fileExists = false;
-    std::ifstream inFile(configFile);
-    if (inFile.good()) {
-        fileExists = true;
-        std::stringstream buffer;
-        buffer << inFile.rdbuf();
-        if (!inFile.fail() && !inFile.bad()) {
-            originalContent = buffer.str();
-        }
-    }
-    inFile.close();
+    ScopedFileRestorer restorer(configFile);
     
     const std::string nonStringConfig =
         "{\n"
@@ -1417,21 +1208,6 @@ HWTEST_F(BundleNameParserTest, BundleNameParser_InitializeImpl_NonStringBundleNa
     EXPECT_NE(bundleName, nullptr);
     EXPECT_TRUE(cJSON_IsBool(bundleName));
     EXPECT_FALSE(cJSON_IsString(bundleName));
-    
-    if (fileExists) {
-        std::ofstream restoreFile(configFile);
-        if (restoreFile.good()) {
-            restoreFile << originalContent;
-        }
-        restoreFile.close();
-        if (restoreFile.fail()) {
-            GTEST_LOG_(ERROR) << "Failed to restore config file: " << configFile;
-        }
-    } else {
-        if (remove(configFile.c_str()) != 0) {
-            GTEST_LOG_(ERROR) << "Failed to remove config file: " << configFile;
-        }
-    }
 }
 
 /**
@@ -1442,23 +1218,12 @@ HWTEST_F(BundleNameParserTest, BundleNameParser_InitializeImpl_NonStringBundleNa
  */
 HWTEST_F(BundleNameParserTest, BundleNameParser_InitializeImpl_MaxSize_001, TestSize.Level1)
 {
-    const std::string configDir = "/etc/multimodalinput";
+    const std::string configDir = GetTestConfigDir();
     const std::string configFile = configDir + "/bundle_name_config.json";
     
     CreateDirectoryRecursive(configDir);
     
-    std::string originalContent;
-    bool fileExists = false;
-    std::ifstream inFile(configFile);
-    if (inFile.good()) {
-        fileExists = true;
-        std::stringstream buffer;
-        buffer << inFile.rdbuf();
-        if (!inFile.fail() && !inFile.bad()) {
-            originalContent = buffer.str();
-        }
-    }
-    inFile.close();
+    ScopedFileRestorer restorer(configFile);
     
     std::string maxSizeConfig = "{\"bundle_name_map\":[";
     for (size_t i = 0; i < MAX_JSON_ARRAY_SIZE; ++i) {
@@ -1480,21 +1245,6 @@ HWTEST_F(BundleNameParserTest, BundleNameParser_InitializeImpl_MaxSize_001, Test
     cJSON* bundleNameMap = cJSON_GetObjectItemCaseSensitive(parser.Get(), "bundle_name_map");
     EXPECT_TRUE(cJSON_IsArray(bundleNameMap));
     EXPECT_EQ(cJSON_GetArraySize(bundleNameMap), MAX_JSON_ARRAY_SIZE);
-    
-    if (fileExists) {
-        std::ofstream restoreFile(configFile);
-        if (restoreFile.good()) {
-            restoreFile << originalContent;
-        }
-        restoreFile.close();
-        if (restoreFile.fail()) {
-            GTEST_LOG_(ERROR) << "Failed to restore config file: " << configFile;
-        }
-    } else {
-        if (remove(configFile.c_str()) != 0) {
-            GTEST_LOG_(ERROR) << "Failed to remove config file: " << configFile;
-        }
-    }
 }
 
 /**
@@ -1505,23 +1255,12 @@ HWTEST_F(BundleNameParserTest, BundleNameParser_InitializeImpl_MaxSize_001, Test
  */
 HWTEST_F(BundleNameParserTest, BundleNameParser_InitializeImpl_ExceedMaxSize_001, TestSize.Level1)
 {
-    const std::string configDir = "/etc/multimodalinput";
+    const std::string configDir = GetTestConfigDir();
     const std::string configFile = configDir + "/bundle_name_config.json";
     
     CreateDirectoryRecursive(configDir);
     
-    std::string originalContent;
-    bool fileExists = false;
-    std::ifstream inFile(configFile);
-    if (inFile.good()) {
-        fileExists = true;
-        std::stringstream buffer;
-        buffer << inFile.rdbuf();
-        if (!inFile.fail() && !inFile.bad()) {
-            originalContent = buffer.str();
-        }
-    }
-    inFile.close();
+    ScopedFileRestorer restorer(configFile);
     
     std::string exceedMaxConfig = "{\"bundle_name_map\":[";
     for (size_t i = 0; i < EXCEED_MAX_ARRAY_SIZE; ++i) {
@@ -1543,21 +1282,6 @@ HWTEST_F(BundleNameParserTest, BundleNameParser_InitializeImpl_ExceedMaxSize_001
     cJSON* bundleNameMap = cJSON_GetObjectItemCaseSensitive(parser.Get(), "bundle_name_map");
     EXPECT_TRUE(cJSON_IsArray(bundleNameMap));
     EXPECT_EQ(cJSON_GetArraySize(bundleNameMap), EXCEED_MAX_ARRAY_SIZE);
-    
-    if (fileExists) {
-        std::ofstream restoreFile(configFile);
-        if (restoreFile.good()) {
-            restoreFile << originalContent;
-        }
-        restoreFile.close();
-        if (restoreFile.fail()) {
-            GTEST_LOG_(ERROR) << "Failed to restore config file: " << configFile;
-        }
-    } else {
-        if (remove(configFile.c_str()) != 0) {
-            GTEST_LOG_(ERROR) << "Failed to remove config file: " << configFile;
-        }
-    }
 }
 
 /**
@@ -1568,23 +1292,12 @@ HWTEST_F(BundleNameParserTest, BundleNameParser_InitializeImpl_ExceedMaxSize_001
  */
 HWTEST_F(BundleNameParserTest, BundleNameParser_InitializeImpl_MixedValidInvalid_001, TestSize.Level1)
 {
-    const std::string configDir = "/etc/multimodalinput";
+    const std::string configDir = GetTestConfigDir();
     const std::string configFile = configDir + "/bundle_name_config.json";
     
     CreateDirectoryRecursive(configDir);
     
-    std::string originalContent;
-    bool fileExists = false;
-    std::ifstream inFile(configFile);
-    if (inFile.good()) {
-        fileExists = true;
-        std::stringstream buffer;
-        buffer << inFile.rdbuf();
-        if (!inFile.fail() && !inFile.bad()) {
-            originalContent = buffer.str();
-        }
-    }
-    inFile.close();
+    ScopedFileRestorer restorer(configFile);
     
     const std::string mixedConfig =
         "{\n"
@@ -1606,21 +1319,6 @@ HWTEST_F(BundleNameParserTest, BundleNameParser_InitializeImpl_MixedValidInvalid
     
     cJSON* bundleNameMap = cJSON_GetObjectItemCaseSensitive(parser.Get(), "bundle_name_map");
     EXPECT_EQ(cJSON_GetArraySize(bundleNameMap), FIVE_ITEMS_ARRAY_SIZE);
-    
-    if (fileExists) {
-        std::ofstream restoreFile(configFile);
-        if (restoreFile.good()) {
-            restoreFile << originalContent;
-        }
-        restoreFile.close();
-        if (restoreFile.fail()) {
-            GTEST_LOG_(ERROR) << "Failed to restore config file: " << configFile;
-        }
-    } else {
-        if (remove(configFile.c_str()) != 0) {
-            GTEST_LOG_(ERROR) << "Failed to remove config file: " << configFile;
-        }
-    }
 }
 
 /**
@@ -1631,23 +1329,12 @@ HWTEST_F(BundleNameParserTest, BundleNameParser_InitializeImpl_MixedValidInvalid
  */
 HWTEST_F(BundleNameParserTest, BundleNameParser_InitializeImpl_DuplicateKeys_001, TestSize.Level1)
 {
-    const std::string configDir = "/etc/multimodalinput";
+    const std::string configDir = GetTestConfigDir();
     const std::string configFile = configDir + "/bundle_name_config.json";
     
     CreateDirectoryRecursive(configDir);
     
-    std::string originalContent;
-    bool fileExists = false;
-    std::ifstream inFile(configFile);
-    if (inFile.good()) {
-        fileExists = true;
-        std::stringstream buffer;
-        buffer << inFile.rdbuf();
-        if (!inFile.fail() && !inFile.bad()) {
-            originalContent = buffer.str();
-        }
-    }
-    inFile.close();
+    ScopedFileRestorer restorer(configFile);
     
     const std::string duplicateConfig =
         "{\n"
@@ -1666,21 +1353,6 @@ HWTEST_F(BundleNameParserTest, BundleNameParser_InitializeImpl_DuplicateKeys_001
     
     cJSON* bundleNameMap = cJSON_GetObjectItemCaseSensitive(parser.Get(), "bundle_name_map");
     EXPECT_EQ(cJSON_GetArraySize(bundleNameMap), 2);
-    
-    if (fileExists) {
-        std::ofstream restoreFile(configFile);
-        if (restoreFile.good()) {
-            restoreFile << originalContent;
-        }
-        restoreFile.close();
-        if (restoreFile.fail()) {
-            GTEST_LOG_(ERROR) << "Failed to restore config file: " << configFile;
-        }
-    } else {
-        if (remove(configFile.c_str()) != 0) {
-            GTEST_LOG_(ERROR) << "Failed to remove config file: " << configFile;
-        }
-    }
 }
 
 /**
@@ -1691,23 +1363,12 @@ HWTEST_F(BundleNameParserTest, BundleNameParser_InitializeImpl_DuplicateKeys_001
  */
 HWTEST_F(BundleNameParserTest, BundleNameParser_InitializeImpl_EmptyStrings_001, TestSize.Level1)
 {
-    const std::string configDir = "/etc/multimodalinput";
+    const std::string configDir = GetTestConfigDir();
     const std::string configFile = configDir + "/bundle_name_config.json";
     
     CreateDirectoryRecursive(configDir);
     
-    std::string originalContent;
-    bool fileExists = false;
-    std::ifstream inFile(configFile);
-    if (inFile.good()) {
-        fileExists = true;
-        std::stringstream buffer;
-        buffer << inFile.rdbuf();
-        if (!inFile.fail() && !inFile.bad()) {
-            originalContent = buffer.str();
-        }
-    }
-    inFile.close();
+    ScopedFileRestorer restorer(configFile);
     
     const std::string emptyStringsConfig =
         "{\n"
@@ -1733,21 +1394,6 @@ HWTEST_F(BundleNameParserTest, BundleNameParser_InitializeImpl_EmptyStrings_001,
     EXPECT_NE(bundleName, nullptr);
     EXPECT_STREQ(cJSON_GetStringValue(placeholder), "");
     EXPECT_STREQ(cJSON_GetStringValue(bundleName), "");
-    
-    if (fileExists) {
-        std::ofstream restoreFile(configFile);
-        if (restoreFile.good()) {
-            restoreFile << originalContent;
-        }
-        restoreFile.close();
-        if (restoreFile.fail()) {
-            GTEST_LOG_(ERROR) << "Failed to restore config file: " << configFile;
-        }
-    } else {
-        if (remove(configFile.c_str()) != 0) {
-            GTEST_LOG_(ERROR) << "Failed to remove config file: " << configFile;
-        }
-    }
 }
 
 /**
@@ -1758,23 +1404,12 @@ HWTEST_F(BundleNameParserTest, BundleNameParser_InitializeImpl_EmptyStrings_001,
  */
 HWTEST_F(BundleNameParserTest, BundleNameParser_InitializeImpl_SpecialChars_001, TestSize.Level1)
 {
-    const std::string configDir = "/etc/multimodalinput";
+    const std::string configDir = GetTestConfigDir();
     const std::string configFile = configDir + "/bundle_name_config.json";
     
     CreateDirectoryRecursive(configDir);
     
-    std::string originalContent;
-    bool fileExists = false;
-    std::ifstream inFile(configFile);
-    if (inFile.good()) {
-        fileExists = true;
-        std::stringstream buffer;
-        buffer << inFile.rdbuf();
-        if (!inFile.fail() && !inFile.bad()) {
-            originalContent = buffer.str();
-        }
-    }
-    inFile.close();
+    ScopedFileRestorer restorer(configFile);
     
     const std::string specialCharsConfig =
         "{\n"
@@ -1798,21 +1433,6 @@ HWTEST_F(BundleNameParserTest, BundleNameParser_InitializeImpl_SpecialChars_001,
     
     EXPECT_STREQ(cJSON_GetStringValue(placeholder), "special.key_123");
     EXPECT_STREQ(cJSON_GetStringValue(bundleName), "com.special.app-name");
-    
-    if (fileExists) {
-        std::ofstream restoreFile(configFile);
-        if (restoreFile.good()) {
-            restoreFile << originalContent;
-        }
-        restoreFile.close();
-        if (restoreFile.fail()) {
-            GTEST_LOG_(ERROR) << "Failed to restore config file: " << configFile;
-        }
-    } else {
-        if (remove(configFile.c_str()) != 0) {
-            GTEST_LOG_(ERROR) << "Failed to remove config file: " << configFile;
-        }
-    }
 }
 
 /**
@@ -1823,23 +1443,12 @@ HWTEST_F(BundleNameParserTest, BundleNameParser_InitializeImpl_SpecialChars_001,
  */
 HWTEST_F(BundleNameParserTest, BundleNameParser_InitializeImpl_NullItem_001, TestSize.Level1)
 {
-    const std::string configDir = "/etc/multimodalinput";
+    const std::string configDir = GetTestConfigDir();
     const std::string configFile = configDir + "/bundle_name_config.json";
     
     CreateDirectoryRecursive(configDir);
     
-    std::string originalContent;
-    bool fileExists = false;
-    std::ifstream inFile(configFile);
-    if (inFile.good()) {
-        fileExists = true;
-        std::stringstream buffer;
-        buffer << inFile.rdbuf();
-        if (!inFile.fail() && !inFile.bad()) {
-            originalContent = buffer.str();
-        }
-    }
-    inFile.close();
+    ScopedFileRestorer restorer(configFile);
     
     const std::string nullItemConfig =
         "{\n"
@@ -1861,21 +1470,6 @@ HWTEST_F(BundleNameParserTest, BundleNameParser_InitializeImpl_NullItem_001, Tes
     
     cJSON* nullItem = cJSON_GetArrayItem(bundleNameMap, 0);
     EXPECT_TRUE(cJSON_IsNull(nullItem));
-    
-    if (fileExists) {
-        std::ofstream restoreFile(configFile);
-        if (restoreFile.good()) {
-            restoreFile << originalContent;
-        }
-        restoreFile.close();
-        if (restoreFile.fail()) {
-            GTEST_LOG_(ERROR) << "Failed to restore config file: " << configFile;
-        }
-    } else {
-        if (remove(configFile.c_str()) != 0) {
-            GTEST_LOG_(ERROR) << "Failed to remove config file: " << configFile;
-        }
-    }
 }
 
 /**
@@ -1904,23 +1498,12 @@ HWTEST_F(BundleNameParserTest, BundleNameParser_Init_MultipleCalls_001, TestSize
  */
 HWTEST_F(BundleNameParserTest, BundleNameParser_GetBundleName_AfterInit_001, TestSize.Level1)
 {
-    const std::string configDir = "/etc/multimodalinput";
+    const std::string configDir = GetTestConfigDir();
     const std::string configFile = configDir + "/bundle_name_config.json";
     
     CreateDirectoryRecursive(configDir);
     
-    std::string originalContent;
-    bool fileExists = false;
-    std::ifstream inFile(configFile);
-    if (inFile.good()) {
-        fileExists = true;
-        std::stringstream buffer;
-        buffer << inFile.rdbuf();
-        if (!inFile.fail() && !inFile.bad()) {
-            originalContent = buffer.str();
-        }
-    }
-    inFile.close();
+    ScopedFileRestorer restorer(configFile);
     
     const std::string testConfig =
         "{\n"
@@ -1943,21 +1526,6 @@ HWTEST_F(BundleNameParserTest, BundleNameParser_GetBundleName_AfterInit_001, Tes
         EXPECT_EQ(result, "com.test.bundle");
     } else {
         EXPECT_EQ(result, "");
-    }
-    
-    if (fileExists) {
-        std::ofstream restoreFile(configFile);
-        if (restoreFile.good()) {
-            restoreFile << originalContent;
-        }
-        restoreFile.close();
-        if (restoreFile.fail()) {
-            GTEST_LOG_(ERROR) << "Failed to restore config file: " << configFile;
-        }
-    } else {
-        if (remove(configFile.c_str()) != 0) {
-            GTEST_LOG_(ERROR) << "Failed to remove config file: " << configFile;
-        }
     }
 }
 
