@@ -44,6 +44,8 @@ public:
     MOCK_METHOD(int32_t, SetCustomCursor, (int32_t windowId, int32_t focusX, int32_t focusY, void *pixelMap),
                 (override));
     MOCK_METHOD(int32_t, SetCustomCursor, (int32_t windowId, CustomCursor cursor, CursorOptions options), (override));
+    MOCK_METHOD(int32_t, SetUIExtensionCustomCursor, (int32_t windowId, CustomCursor cursor, CursorOptions options,
+                const sptr<IRemoteObject> &token), (override));
     MOCK_METHOD(int32_t, SetMouseIcon, (int32_t windowId, void *pixelMap), (override));
     MOCK_METHOD(int32_t, SetPointerSize, (int32_t size), (override));
     MOCK_METHOD(int32_t, SetNapStatus, (int32_t pid, int32_t uid, std::string bundleName, int32_t napStatus),
@@ -64,10 +66,12 @@ public:
     MOCK_METHOD(int32_t, EnableCombineKey, (bool enable), (override));
     MOCK_METHOD(int32_t, SetPointerSpeed, (int32_t speed), (override));
     MOCK_METHOD(int32_t, GetPointerSpeed, (int32_t & speed), (override));
-    MOCK_METHOD(int32_t, SetPointerStyle, (int32_t windowId, PointerStyle pointerStyle, bool isUiExtension),
-                (override));
-    MOCK_METHOD(int32_t, GetPointerStyle, (int32_t windowId, PointerStyle &pointerStyle, bool isUiExtension),
-                (override));
+    MOCK_METHOD(int32_t, SetPointerStyle, (int32_t windowId, PointerStyle pointerStyle), (override));
+    MOCK_METHOD(int32_t, SetUIExtensionPointerStyle, (int32_t windowId, PointerStyle pointerStyle,
+                const sptr<IRemoteObject> &token), (override));
+    MOCK_METHOD(int32_t, GetPointerStyle, (int32_t windowId, PointerStyle &pointerStyle), (override));
+    MOCK_METHOD(int32_t, GetUIExtensionPointerStyle, (int32_t windowId, PointerStyle &pointerStyle,
+                const sptr<IRemoteObject> &token), (override));
     MOCK_METHOD(int32_t, SupportKeys, (int32_t deviceId, std::vector<int32_t> &keys, std::vector<bool> &keystroke),
                 (override));
     MOCK_METHOD(int32_t, GetDeviceIds, (std::vector<int32_t> & ids), (override));

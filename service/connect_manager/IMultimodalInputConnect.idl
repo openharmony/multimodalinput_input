@@ -29,6 +29,7 @@ sequenceable pointer_style..OHOS.MMI.CustomCursorParcel;
 sequenceable pointer_style..OHOS.MMI.CursorOptionsParcel;
 sequenceable pointer_style..OHOS.MMI.CursorPixelMap;
 sequenceable window_info..OHOS.MMI.DisplayBindInfo;
+sequenceable window_info..OHOS.MMI.UIExtensionInfo;
 sequenceable pointer_style..OHOS.MMI.PointerStyle;
 sequenceable key_option..OHOS.MMI.KeyMonitorOption;
 
@@ -47,6 +48,7 @@ interface OHOS.MMI.IMultimodalInputConnect {
     void GetMouseScrollRows([out] int rows);
     void SetCustomCursorPixelMap([in] int windowId, [in] int focusX, [in] int focusY, [in] CursorPixelMap pixelMap);
     void SetCustomCursor([in] int windowId, [in] CustomCursorParcel curParcel, [in] CursorOptionsParcel cOptionParcel);
+    void SetUIExtensionCustomCursor([in] int windowId, [in] CustomCursorParcel curParcel, [in] CursorOptionsParcel cOptionParcel, [in] IRemoteObject token);
     void SetMouseIcon([in] int windowId, [in] CursorPixelMap pixelMap);
     void SetPointerSize([in] int size);
     void SetNapStatus([in] int pid, [in] int uid, [in] String bundleName, [in] int napStatus);
@@ -65,8 +67,10 @@ interface OHOS.MMI.IMultimodalInputConnect {
     void EnableCombineKey([in] boolean enable);
     void SetPointerSpeed([in] int speed);
     void GetPointerSpeed([out] int speed);
-    void SetPointerStyle([in] int windowId, [in] PointerStyle pointerStyle, [in] boolean isUiExtension);
-    void GetPointerStyle([in] int windowId, [out] PointerStyle pointerStyle, [in] boolean isUiExtension);
+    void SetPointerStyle([in] int windowId, [in] PointerStyle pointerStyle);
+    void SetUIExtensionPointerStyle([in] int windowId, [in] PointerStyle pointerStyle, [in] IRemoteObject token);
+    void GetPointerStyle([in] int windowId, [out] PointerStyle pointerStyle);
+    void GetUIExtensionPointerStyle([in] int windowId, [out] PointerStyle pointerStyle, [in] IRemoteObject token);
     void SupportKeys([in] int deviceId, [in] int[] keys, [out] boolean[] keystroke);
     void GetDeviceIds([out] int[] ids);
     void GetDevice([in] int deviceId, [out] InputDevice inputDevice);
@@ -200,4 +204,5 @@ interface OHOS.MMI.IMultimodalInputConnect {
     [macrodef OHOS_BUILD_ENABLE_ANCO_GAME_EVENT_MAPPING] void ControlMouseEventToAnco([in] int windowId, [in] boolean enable);
     void DeliverNonce([in] String nonce);
     void RedispatchInputEvent([in] PointerEvent pointerEvent);
+    void UpdateUIExtensionInfo([in] UIExtensionInfo[] uiExtensionInfos);
 }

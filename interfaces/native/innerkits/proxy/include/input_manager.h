@@ -584,19 +584,23 @@ public:
      * @brief Sets the mouse pointer style.
      * @param windowId Indicates the ID of the window for which the mouse pointer style is set.
      * @param pointerStyle Indicates the ID of the mouse pointer style.
+     * @param token The unique identifier for the UIExtensionAbility process, Set this parameter to modify
+     * the cursor style of the UIExtensionAbility process in the window.
      * @return Returns <b>0</b> if the operation is successful; returns an error code otherwise.
      * @since 9
      */
-    int32_t SetPointerStyle(int32_t windowId, PointerStyle pointerStyle, bool isUiExtension = false);
+    int32_t SetPointerStyle(int32_t windowId, PointerStyle pointerStyle, const sptr<IRemoteObject> &token = nullptr);
 
     /**
      * @brief Obtains the mouse pointer style.
      * @param windowId Indicates the ID of the window for which the mouse pointer style is obtained.
      * @param pointerStyle Indicates the ID of the mouse pointer style.
+     * @param token The unique identifier for the UIExtensionAbility process, Set this parameter to get
+     * the cursor style of the UIExtensionAbility process in the window.
      * @return Returns <b>0</b> if the operation is successful; returns an error code otherwise.
      * @since 9
      */
-    int32_t GetPointerStyle(int32_t windowId, PointerStyle &pointerStyle, bool isUiExtension = false);
+    int32_t GetPointerStyle(int32_t windowId, PointerStyle &pointerStyle, const sptr<IRemoteObject> &token = nullptr);
 
     /**
      * @brief Sets pointer color.
@@ -1161,10 +1165,13 @@ public:
      * @param windowId Indicates the windowId of the window
      * @param cursor Custom cursor, including the custom cursor resource and focus position.
      * @param options Custom cursor option
+     * @param token The unique identifier for the UIExtensionAbility process, Set this parameter to modify
+     * the cursor style of the UIExtensionAbility process in the window.
      * @return Returns <b>0</b> if success; returns a non-0 value otherwise.
      * @since 14
      */
-    int32_t SetCustomCursor(int32_t windowId, CustomCursor cursor, CursorOptions options);
+    int32_t SetCustomCursor(int32_t windowId, CustomCursor cursor, CursorOptions options,
+        const sptr<IRemoteObject> &token = nullptr);
 
     /**
      * @brief Check whether the touch position is a knuckle event.

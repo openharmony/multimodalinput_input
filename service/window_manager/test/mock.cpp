@@ -208,8 +208,7 @@ int32_t PointerDrawingManager::GetPointerColor(int32_t userId)
 {
     return 0;
 }
-int32_t PointerDrawingManager::SetPointerStyle(int32_t pid, int32_t windowId, PointerStyle pointerStyle,
-    bool isUiExtension)
+int32_t PointerDrawingManager::SetPointerStyle(int32_t pid, int32_t windowId, PointerStyle pointerStyle)
 {
     return 0;
 }

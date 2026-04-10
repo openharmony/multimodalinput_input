@@ -364,8 +364,7 @@ HWTEST_F(InputManagerImplTest, SetPointerStyle_InvalidParam_Test, TestSize.Level
     PointerStyle pointerStyle;
     pointerStyle.id = -1;
     int32_t windowId = 1;
-    bool isUiExtension = false;
-    int32_t ret = InputMgrImpl.SetPointerStyle(windowId, pointerStyle, isUiExtension);
+    int32_t ret = InputMgrImpl.SetPointerStyle(windowId, pointerStyle);
     EXPECT_EQ(ret, RET_ERR);
 }
 
@@ -3144,8 +3143,7 @@ HWTEST_F(InputManagerImplTest, InputManagerImplTest_SetPointerStyle_Trace_001, T
     int32_t windowId = 1;
     PointerStyle pointerStyle;
     pointerStyle.id = -1;
-    bool isUiExtension = false;
-    int32_t result = impl->SetPointerStyle(windowId, pointerStyle, isUiExtension);
+    int32_t result = impl->SetPointerStyle(windowId, pointerStyle);
     EXPECT_EQ(result, RET_ERR);
 }
 
@@ -3162,8 +3160,7 @@ HWTEST_F(InputManagerImplTest, InputManagerImplTest_SetPointerStyle_Trace_002, T
     int32_t windowId = 1;
     PointerStyle pointerStyle;
     pointerStyle.id = 0;
-    bool isUiExtension = false;
-    int32_t result = impl->SetPointerStyle(windowId, pointerStyle, isUiExtension);
+    int32_t result = impl->SetPointerStyle(windowId, pointerStyle);
     EXPECT_EQ(result, RET_OK);
 }
 
@@ -3179,8 +3176,7 @@ HWTEST_F(InputManagerImplTest, InputManagerImplTest_GetPointerStyle_Trace_001, T
     auto impl = std::make_shared<InputManagerImpl>();
     int32_t windowId = 1;
     PointerStyle pointerStyle;
-    bool isUiExtension = false;
-    int32_t result = impl->GetPointerStyle(windowId, pointerStyle, isUiExtension);
+    int32_t result = impl->GetPointerStyle(windowId, pointerStyle);
     EXPECT_EQ(result, RET_OK);
 }
 

@@ -17,6 +17,7 @@
 #define DISPLAY_INFO_H
 
 #include "parcel.h"
+#include "iremote_object.h"
 #include <string>
 
 namespace OHOS {
@@ -911,6 +912,69 @@ enum UserState {
 };
 
 /**
+ * UIExtension information
+ *
+ * @since 20
+ */
+struct UIExtensionInfo : public Parcelable {
+public:
+    /**
+     * UIExtension token.
+     *
+     * @since 20
+     */
+    sptr<IRemoteObject> token;
+
+    /**
+     * the pid of UIExtension.
+     *
+     * @since 20
+     */
+    int32_t pid;
+
+    /**
+     * ID of the host window.
+     *
+     * @since 20
+     */
+    int32_t hostWindowId;
+
+public:
+    UIExtensionInfo() = default;
+    UIExtensionInfo(const sptr<IRemoteObject> &token, int32_t uecPid, int32_t uecWindowId)
+        : token(token), pid(uecPid), hostWindowId(uecWindowId) {}
+    ~UIExtensionInfo() = default;
+
+    inline bool Marshalling(Parcel &parcel) const
+    {
+        MessageParcel &messageParcel = static_cast<MessageParcel&>(parcel);
+        return messageParcel.WriteRemoteObject(token) &&
+               messageParcel.WriteInt32(pid) &&
+               messageParcel.WriteInt32(hostWindowId);
+    }
+
+    inline bool ReadFromParcel(Parcel &parcel)
+    {
+        MessageParcel &messageParcel = static_cast<MessageParcel&>(parcel);
+        token = messageParcel.ReadRemoteObject();
+        if (token == nullptr) {
+            return false;
+        }
+        return messageParcel.ReadInt32(pid) && messageParcel.ReadInt32(hostWindowId);
+    }
+
+    static inline UIExtensionInfo *Unmarshalling(Parcel &parcel)
+    {
+        auto obj = new UIExtensionInfo();
+        if (obj && !obj->ReadFromParcel(parcel)) {
+            delete obj;
+            obj = nullptr;
+        }
+        return obj;
+    }
+};
+
+/**
  * user's screen information
  *
  * @since 20
@@ -943,6 +1007,13 @@ struct UserScreenInfo {
      * @since 20
      */
     std::vector<DisplayGroupInfo> displayGroups;
+
+    /**
+     * uiextension information.
+     *
+     * @since 20
+     */
+    std::vector<UIExtensionInfo> uiExtensionInfos;
 };
 
 struct WindowGroupInfo {

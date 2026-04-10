@@ -65,8 +65,10 @@ public:
     ErrCode GetMouseScrollRows(int32_t &rows) override;
     ErrCode SetCustomCursorPixelMap(int32_t windowId, int32_t focusX, int32_t focusY,
         const CursorPixelMap& curPixelMap) override;
-    ErrCode SetCustomCursor(int32_t windowId,
-        const CustomCursorParcel& curParcel, const CursorOptionsParcel& cOptionParcel) override;
+    ErrCode SetCustomCursor(int32_t windowId, const CustomCursorParcel& curParcel,
+        const CursorOptionsParcel& cOptionParcel) override;
+    ErrCode SetUIExtensionCustomCursor(int32_t windowId, const CustomCursorParcel& curParcel,
+        const CursorOptionsParcel& cOptionParcel, const sptr<IRemoteObject> &token) override;
     ErrCode SetMouseIcon(int32_t windowId, const CursorPixelMap& curPixelMap) override;
     ErrCode ClearWindowPointerStyle(int32_t pid, int32_t windowId) override;
     ErrCode SetMouseHotSpot(int32_t pid, int32_t windowId, int32_t hotSpotX, int32_t hotSpotY) override;
@@ -83,10 +85,14 @@ public:
     ErrCode EnableCombineKey(bool enable) override;
     ErrCode SetPointerSpeed(int32_t speed) override;
     ErrCode GetPointerSpeed(int32_t &speed) override;
-    ErrCode SetPointerStyle(int32_t windowId, const PointerStyle& pointerStyle, bool isUiExtension = false) override;
+    ErrCode SetPointerStyle(int32_t windowId, const PointerStyle& pointerStyle) override;
+    ErrCode SetUIExtensionPointerStyle(int32_t windowId, const PointerStyle& pointerStyle,
+        const sptr<IRemoteObject> &token) override;
     ErrCode NotifyNapOnline() override;
     ErrCode RemoveInputEventObserver() override;
-    ErrCode GetPointerStyle(int32_t windowId, PointerStyle& pointerStyle, bool isUiExtension = false) override;
+    ErrCode GetPointerStyle(int32_t windowId, PointerStyle& pointerStyle) override;
+    ErrCode GetUIExtensionPointerStyle(int32_t windowId, PointerStyle& pointerStyle,
+        const sptr<IRemoteObject> &token) override;
     ErrCode SupportKeys(int32_t deviceId, const std::vector<int32_t>& keys, std::vector<bool>& keystroke) override;
     ErrCode GetDeviceIds(std::vector<int32_t> &ids) override;
     ErrCode GetDevice(int32_t deviceId, InputDevice& inputDevice) override;
@@ -244,7 +250,7 @@ public:
 #ifdef OHOS_BUILD_ENABLE_ANCO_GAME_EVENT_MAPPING
     ErrCode ControlMouseEventToAnco(int32_t windowId, bool enable) override;
 #endif // OHOS_BUILD_ENABLE_ANCO_GAME_EVENT_MAPPING
-
+    ErrCode UpdateUIExtensionInfo(const std::vector<UIExtensionInfo> &uiExtensionInfos) override;
 protected:
     void OnConnected(SessionPtr s) override;
     void OnDisconnected(SessionPtr s) override;
@@ -336,11 +342,14 @@ protected:
     int32_t IsPointerInit(bool &status) override;
     int32_t SetCustomCursorPixelMapInner(int32_t windowId, int32_t focusX, int32_t focusY,
         const CursorPixelMap& curPixelMap);
-    int32_t SetCustomCursorInner(int32_t windowId,
-        const CustomCursorParcel& curParcel, const CursorOptionsParcel& cOptionParcel);
+    int32_t SetCustomCursorInner(int32_t windowId, const CustomCursorParcel& curParcel,
+        const CursorOptionsParcel& cOptionParcel, const sptr<IRemoteObject> &token = nullptr);
     int32_t SetMouseIconInner(int32_t windowId, const CursorPixelMap& curPixelMap);
     int32_t SetPixelMapDataInner(int32_t infoId, const CursorPixelMap& curPixelMap);
-
+    int32_t SetPointerStyleInner(int32_t windowId, PointerStyle pointerStyle,
+        const sptr<IRemoteObject> &token = nullptr);
+    int32_t GetPointerStyleInner(int32_t windowId, PointerStyle &pointerStyle,
+        const sptr<IRemoteObject> &token = nullptr);
 private:
     MMIService();
     ~MMIService();

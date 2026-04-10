@@ -1217,7 +1217,7 @@ HWTEST_F(DfxHisysEventTest, DfxHisysEventTest_ReportSetPointerStyleTest_002, Tes
     int32_t pointerStyleId = 2;
     bool isUiExtension = true;
     DfxHisysevent::ReportSetPointerStyle(windowId, pointerStyleId, isUiExtension);
-    EXPECT_EQ(isUiExtension, true);
+    EXPECT_EQ(pointerStyleId, 2);
 }
 
 /**
