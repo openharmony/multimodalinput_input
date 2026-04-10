@@ -291,7 +291,10 @@ static bool ParsePreKeysParameter(napi_env env, napi_value argv, std::shared_ptr
 {
     CALL_DEBUG_ENTER;
     napi_value receiveValue = nullptr;
-    CHKRP(napi_get_named_property(env, argv, "preKeys", &receiveValue), GET_NAMED_PROPERTY);
+    if (napi_get_named_property(env, argv, "preKeys", &receiveValue) != napi_ok) {
+        MMI_HILOGE("Failed to get preKeys property");
+        return false;
+    }
     if (receiveValue == nullptr) {
         return false;
     }
@@ -671,6 +674,12 @@ napi_value SubscribeHotkey(napi_env env, napi_callback_info info, sptr<KeyEventM
     return ret;
 }
 
+// SDK 26.0.0: forward declarations for static helper functions
+static bool KeyEvent2JsKeyEvent(napi_env env, std::shared_ptr<KeyEvent> keyEvent, napi_value& jsKeyEvent);
+static bool KeyItem2JsKey(napi_env env, const KeyEvent::KeyItem& keyItem, napi_value& jsKey);
+static bool SetKeyItemsToArray(napi_env env, const std::vector<KeyEvent::KeyItem>& keyItems, napi_value& jsArray);
+void EmitAsyncCallbackWorkWithEvent(sptr<KeyEventMonitorInfo> event, std::shared_ptr<KeyEvent> keyEvent);
+
 // SDK 26.0.0: Key Command event callback
 static void OnKeyTriggerCallback(std::shared_ptr<KeyEvent> keyEvent, std::shared_ptr<KeyOption> keyOption)
 {
@@ -690,14 +699,6 @@ static void OnKeyTriggerCallback(std::shared_ptr<KeyEvent> keyEvent, std::shared
     }
     if (!dispatcher->ShouldDispatch(keyOption, keyEvent)) {
         MMI_HILOGD("Event should not be dispatched");
-        return;
-    }
-
-    // Check if event should be consumed
-    if (dispatcher->ShouldConsume(keyOption, keyEvent)) {
-        MMI_HILOGD("Event consumed, marking as consumed");
-        // Mark event as consumed to prevent delivery to other apps
-        keyEvent->MarkConsumed();
         return;
     }
 
@@ -933,14 +934,12 @@ static bool KeyEvent2JsKeyEvent(napi_env env, std::shared_ptr<KeyEvent> keyEvent
         MMI_HILOGE("Failed to create JavaScript object");
         return false;
     }
-    UtilNapi::SetNamedProperty(env, jsKeyEvent, std::string("keyCode"), keyEvent->GetKeyCode());
-    UtilNapi::SetNamedProperty(env, jsKeyEvent, std::string("action"), keyEvent->GetKeyAction());
-    std::vector<KeyEvent::KeyItem> keyItems;
-    if (keyEvent->GetKeyItems(keyItems)) {
-        napi_value jsKeyItemsArray = nullptr;
-        if (SetKeyItemsToArray(env, keyItems, jsKeyItemsArray)) {
-            napi_set_named_property(env, jsKeyEvent, "keyItems", jsKeyItemsArray);
-        }
+    SetNamedProperty(env, jsKeyEvent, std::string("keyCode"), keyEvent->GetKeyCode());
+    SetNamedProperty(env, jsKeyEvent, std::string("action"), keyEvent->GetKeyAction());
+    std::vector<KeyEvent::KeyItem> keyItems = keyEvent->GetKeyItems();
+    napi_value jsKeyItemsArray = nullptr;
+    if (SetKeyItemsToArray(env, keyItems, jsKeyItemsArray)) {
+        napi_set_named_property(env, jsKeyEvent, "keyItems", jsKeyItemsArray);
     }
     MMI_HILOGD("KeyEvent converted to JavaScript object successfully");
     return true;
@@ -955,10 +954,10 @@ static bool KeyItem2JsKey(napi_env env, const KeyEvent::KeyItem& keyItem, napi_v
         MMI_HILOGE("Failed to create JavaScript object for KeyItem");
         return false;
     }
-    UtilNapi::SetNamedProperty(env, jsKey, std::string("keyCode"), keyItem.GetKeyCode());
-    UtilNapi::SetNamedProperty(env, jsKey, std::string("action"), keyItem.GetAction());
-    UtilNapi::SetNamedProperty(env, jsKey, std::string("downTime"), keyItem.GetDownTime());
-    UtilNapi::SetNamedProperty(env, jsKey, std::string("deviceId"), keyItem.GetDeviceId());
+    SetNamedProperty(env, jsKey, std::string("keyCode"), keyItem.GetKeyCode());
+    napi_value pressedValue = nullptr;
+    napi_get_boolean(env, keyItem.IsPressed(), &pressedValue);
+    napi_set_named_property(env, jsKey, "pressed", pressedValue);
     return true;
 }
 

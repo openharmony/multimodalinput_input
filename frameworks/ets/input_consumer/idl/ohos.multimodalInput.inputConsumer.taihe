@@ -28,6 +28,7 @@ struct KeyOptions {
     isFinalKeyDown: bool;
     finalKeyDownDuration: i32;
     isRepeat: Optional<bool>;
+    triggerType: Optional<KeyCommandTriggerType>;
 }
 
 struct HotkeyOptions {
@@ -45,6 +46,12 @@ struct KeyPressedConfig {
 struct InfraredFrequency {
     max: i32;
     min: i32;
+}
+
+enum KeyCommandTriggerType: i32 {
+    PRESSED = 1
+    REPEAT_PRESSED = 2
+    ALL_RELEASED = 3
 }
 
 enum ShieldMode: i32 {
@@ -86,6 +93,14 @@ enum ShieldMode: i32 {
     }
 """)
 @!sts_inject("""
+    function onKey(keyOptions: KeyOptions, callback: (keyOptions: KeyOptions, keyEvent?: KeyEvent) => void) {
+        return onKeyCommandImpl(keyOptions, callback, callback);
+    }
+    function offKey(keyOptions: KeyOptions, callback?: (keyOptions: KeyOptions, keyEvent?: KeyEvent) => void) {
+        return offKeyCommandImpl(keyOptions, callback);
+    }
+""")
+@!sts_inject("""
     function onHotkeyChange(hotkeyOptions: HotkeyOptions, callback: (info: HotkeyOptions) => void) {
         return onHotkeyChangeImpl(hotkeyOptions, callback, callback);
     }
@@ -105,6 +120,8 @@ enum ShieldMode: i32 {
 
 function onKeyImpl(keyOptions: KeyOptions, f: (info: KeyOptions) => void, opq: Opaque);
 function offKeyImpl(keyOptions: KeyOptions, opq: Optional<Opaque>);
+function onKeyCommandImpl(keyOptions: KeyOptions, f: (info: KeyOptions, keyEvent: KeyEvent) => void, opq: Opaque);
+function offKeyCommandImpl(keyOptions: KeyOptions, opq: Optional<Opaque>);
 function onHotkeyChangeImpl(hotkeyOptions: HotkeyOptions, f: (info: HotkeyOptions) => void, opq: Opaque);
 function offHotkeyChangeImpl(hotkeyOptions: HotkeyOptions, opq: Optional<Opaque>);
 function onKeyPressedImpl(options: KeyPressedConfig, f: (info: KeyEvent) => void, opq: Opaque);

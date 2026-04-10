@@ -23,6 +23,7 @@
 #include "define_multimodal.h"
 #include "key_event.h"
 #include "key_option.h"
+#include "trigger_event_dispatcher.h"
 
 #define SUCCESS_CODE 0
 #define ERROR_CODE (-1)
@@ -38,13 +39,6 @@ enum JS_CALLBACK_EVENT {
 
 namespace OHOS {
 namespace MMI {
-
-// KeyCommandTriggerType enum (SDK 26.0.0)
-enum KeyCommandTriggerType {
-    PRESSED = 1,
-    REPEAT_PRESSED = 2,
-    ALL_RELEASED = 3
-};
 
 extern std::mutex sCallBacksMutex;
 class JsCommon {
