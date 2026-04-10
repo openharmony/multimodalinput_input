@@ -576,6 +576,7 @@ HWTEST_F(BundleNameParserTest, BundleNameParser_JsonItem_002, TestSize.Level1)
     cJSON* item = cJSON_GetArrayItem(bundleNameMap, 0);
 
     cJSON* placeholder = cJSON_GetObjectItemCaseSensitive(item, "placeholder");
+    ASSERT_NE(placeholder, nullptr);
     EXPECT_STREQ(cJSON_GetStringValue(placeholder), "special.characters_123");
 }
 
@@ -909,13 +910,16 @@ HWTEST_F(BundleNameParserTest, BundleNameParser_InitializeImpl_NotObject_001, Te
     const std::string configDir = GetTestConfigDir();
     const std::string configFile = configDir + "/bundle_name_config.json";
     
-    CreateDirectoryRecursive(configDir);
+    bool dirCreated = CreateDirectoryRecursive(configDir);
+    EXPECT_TRUE(dirCreated);
     
     ScopedFileRestorer restorer(configFile);
     
     const std::string arrayConfig = "[\"item1\", \"item2\"]";
     
     std::ofstream outFile(configFile);
+    EXPECT_TRUE(outFile.is_open());
+    EXPECT_TRUE(outFile.is_open());
     outFile << arrayConfig;
     outFile.close();
     
@@ -934,13 +938,14 @@ HWTEST_F(BundleNameParserTest, BundleNameParser_InitializeImpl_EmptyArray_001, T
     const std::string configDir = GetTestConfigDir();
     const std::string configFile = configDir + "/bundle_name_config.json";
     
-    CreateDirectoryRecursive(configDir);
+    EXPECT_TRUE(CreateDirectoryRecursive(configDir));
     
     ScopedFileRestorer restorer(configFile);
     
     const std::string emptyArrayConfig = "{\"bundle_name_map\":[]}";
     
     std::ofstream outFile(configFile);
+    EXPECT_TRUE(outFile.is_open());
     outFile << emptyArrayConfig;
     outFile.close();
     
@@ -963,13 +968,14 @@ HWTEST_F(BundleNameParserTest, BundleNameParser_InitializeImpl_MissingKey_001, T
     const std::string configDir = GetTestConfigDir();
     const std::string configFile = configDir + "/bundle_name_config.json";
     
-    CreateDirectoryRecursive(configDir);
+    EXPECT_TRUE(CreateDirectoryRecursive(configDir));
     
     ScopedFileRestorer restorer(configFile);
     
     const std::string noKeyConfig = "{\"other_key\":\"other_value\"}";
     
     std::ofstream outFile(configFile);
+    EXPECT_TRUE(outFile.is_open());
     outFile << noKeyConfig;
     outFile.close();
     
@@ -991,13 +997,14 @@ HWTEST_F(BundleNameParserTest, BundleNameParser_InitializeImpl_NotArray_001, Tes
     const std::string configDir = GetTestConfigDir();
     const std::string configFile = configDir + "/bundle_name_config.json";
     
-    CreateDirectoryRecursive(configDir);
+    EXPECT_TRUE(CreateDirectoryRecursive(configDir));
     
     ScopedFileRestorer restorer(configFile);
     
     const std::string notArrayConfig = "{\"bundle_name_map\":\"not_an_array\"}";
     
     std::ofstream outFile(configFile);
+    EXPECT_TRUE(outFile.is_open());
     outFile << notArrayConfig;
     outFile.close();
     
@@ -1019,7 +1026,7 @@ HWTEST_F(BundleNameParserTest, BundleNameParser_InitializeImpl_MultipleItems_001
     const std::string configDir = GetTestConfigDir();
     const std::string configFile = configDir + "/bundle_name_config.json";
     
-    CreateDirectoryRecursive(configDir);
+    EXPECT_TRUE(CreateDirectoryRecursive(configDir));
     
     ScopedFileRestorer restorer(configFile);
     
@@ -1040,6 +1047,7 @@ HWTEST_F(BundleNameParserTest, BundleNameParser_InitializeImpl_MultipleItems_001
         "}";
     
     std::ofstream outFile(configFile);
+    EXPECT_TRUE(outFile.is_open());
     outFile << multiItemConfig;
     outFile.close();
     
@@ -1073,7 +1081,7 @@ HWTEST_F(BundleNameParserTest, BundleNameParser_InitializeImpl_InvalidItem_001, 
     const std::string configDir = GetTestConfigDir();
     const std::string configFile = configDir + "/bundle_name_config.json";
     
-    CreateDirectoryRecursive(configDir);
+    EXPECT_TRUE(CreateDirectoryRecursive(configDir));
     
     ScopedFileRestorer restorer(configFile);
     
@@ -1085,6 +1093,7 @@ HWTEST_F(BundleNameParserTest, BundleNameParser_InitializeImpl_InvalidItem_001, 
         "}";
     
     std::ofstream outFile(configFile);
+    EXPECT_TRUE(outFile.is_open());
     outFile << invalidItemConfig;
     outFile.close();
     
@@ -1109,7 +1118,7 @@ HWTEST_F(BundleNameParserTest, BundleNameParser_InitializeImpl_InvalidItem_002, 
     const std::string configDir = GetTestConfigDir();
     const std::string configFile = configDir + "/bundle_name_config.json";
     
-    CreateDirectoryRecursive(configDir);
+    EXPECT_TRUE(CreateDirectoryRecursive(configDir));
     
     ScopedFileRestorer restorer(configFile);
     
@@ -1121,6 +1130,7 @@ HWTEST_F(BundleNameParserTest, BundleNameParser_InitializeImpl_InvalidItem_002, 
         "}";
     
     std::ofstream outFile(configFile);
+    EXPECT_TRUE(outFile.is_open());
     outFile << invalidItemConfig;
     outFile.close();
     
@@ -1145,7 +1155,7 @@ HWTEST_F(BundleNameParserTest, BundleNameParser_InitializeImpl_NonStringPlacehol
     const std::string configDir = GetTestConfigDir();
     const std::string configFile = configDir + "/bundle_name_config.json";
     
-    CreateDirectoryRecursive(configDir);
+    EXPECT_TRUE(CreateDirectoryRecursive(configDir));
     
     ScopedFileRestorer restorer(configFile);
     
@@ -1157,6 +1167,7 @@ HWTEST_F(BundleNameParserTest, BundleNameParser_InitializeImpl_NonStringPlacehol
         "}";
     
     std::ofstream outFile(configFile);
+    EXPECT_TRUE(outFile.is_open());
     outFile << nonStringConfig;
     outFile.close();
     
@@ -1183,7 +1194,7 @@ HWTEST_F(BundleNameParserTest, BundleNameParser_InitializeImpl_NonStringBundleNa
     const std::string configDir = GetTestConfigDir();
     const std::string configFile = configDir + "/bundle_name_config.json";
     
-    CreateDirectoryRecursive(configDir);
+    EXPECT_TRUE(CreateDirectoryRecursive(configDir));
     
     ScopedFileRestorer restorer(configFile);
     
@@ -1195,6 +1206,7 @@ HWTEST_F(BundleNameParserTest, BundleNameParser_InitializeImpl_NonStringBundleNa
         "}";
     
     std::ofstream outFile(configFile);
+    EXPECT_TRUE(outFile.is_open());
     outFile << nonStringConfig;
     outFile.close();
     
@@ -1221,7 +1233,7 @@ HWTEST_F(BundleNameParserTest, BundleNameParser_InitializeImpl_MaxSize_001, Test
     const std::string configDir = GetTestConfigDir();
     const std::string configFile = configDir + "/bundle_name_config.json";
     
-    CreateDirectoryRecursive(configDir);
+    EXPECT_TRUE(CreateDirectoryRecursive(configDir));
     
     ScopedFileRestorer restorer(configFile);
     
@@ -1236,6 +1248,7 @@ HWTEST_F(BundleNameParserTest, BundleNameParser_InitializeImpl_MaxSize_001, Test
     maxSizeConfig += "]}";
     
     std::ofstream outFile(configFile);
+    EXPECT_TRUE(outFile.is_open());
     outFile << maxSizeConfig;
     outFile.close();
     
@@ -1258,7 +1271,7 @@ HWTEST_F(BundleNameParserTest, BundleNameParser_InitializeImpl_ExceedMaxSize_001
     const std::string configDir = GetTestConfigDir();
     const std::string configFile = configDir + "/bundle_name_config.json";
     
-    CreateDirectoryRecursive(configDir);
+    EXPECT_TRUE(CreateDirectoryRecursive(configDir));
     
     ScopedFileRestorer restorer(configFile);
     
@@ -1273,6 +1286,7 @@ HWTEST_F(BundleNameParserTest, BundleNameParser_InitializeImpl_ExceedMaxSize_001
     exceedMaxConfig += "]}";
     
     std::ofstream outFile(configFile);
+    EXPECT_TRUE(outFile.is_open());
     outFile << exceedMaxConfig;
     outFile.close();
     
@@ -1295,7 +1309,7 @@ HWTEST_F(BundleNameParserTest, BundleNameParser_InitializeImpl_MixedValidInvalid
     const std::string configDir = GetTestConfigDir();
     const std::string configFile = configDir + "/bundle_name_config.json";
     
-    CreateDirectoryRecursive(configDir);
+    EXPECT_TRUE(CreateDirectoryRecursive(configDir));
     
     ScopedFileRestorer restorer(configFile);
     
@@ -1311,6 +1325,7 @@ HWTEST_F(BundleNameParserTest, BundleNameParser_InitializeImpl_MixedValidInvalid
         "}";
     
     std::ofstream outFile(configFile);
+    EXPECT_TRUE(outFile.is_open());
     outFile << mixedConfig;
     outFile.close();
     
@@ -1332,7 +1347,7 @@ HWTEST_F(BundleNameParserTest, BundleNameParser_InitializeImpl_DuplicateKeys_001
     const std::string configDir = GetTestConfigDir();
     const std::string configFile = configDir + "/bundle_name_config.json";
     
-    CreateDirectoryRecursive(configDir);
+    EXPECT_TRUE(CreateDirectoryRecursive(configDir));
     
     ScopedFileRestorer restorer(configFile);
     
@@ -1345,6 +1360,7 @@ HWTEST_F(BundleNameParserTest, BundleNameParser_InitializeImpl_DuplicateKeys_001
         "}";
     
     std::ofstream outFile(configFile);
+    EXPECT_TRUE(outFile.is_open());
     outFile << duplicateConfig;
     outFile.close();
     
@@ -1366,7 +1382,7 @@ HWTEST_F(BundleNameParserTest, BundleNameParser_InitializeImpl_EmptyStrings_001,
     const std::string configDir = GetTestConfigDir();
     const std::string configFile = configDir + "/bundle_name_config.json";
     
-    CreateDirectoryRecursive(configDir);
+    EXPECT_TRUE(CreateDirectoryRecursive(configDir));
     
     ScopedFileRestorer restorer(configFile);
     
@@ -1378,6 +1394,7 @@ HWTEST_F(BundleNameParserTest, BundleNameParser_InitializeImpl_EmptyStrings_001,
         "}";
     
     std::ofstream outFile(configFile);
+    EXPECT_TRUE(outFile.is_open());
     outFile << emptyStringsConfig;
     outFile.close();
     
@@ -1407,7 +1424,7 @@ HWTEST_F(BundleNameParserTest, BundleNameParser_InitializeImpl_SpecialChars_001,
     const std::string configDir = GetTestConfigDir();
     const std::string configFile = configDir + "/bundle_name_config.json";
     
-    CreateDirectoryRecursive(configDir);
+    EXPECT_TRUE(CreateDirectoryRecursive(configDir));
     
     ScopedFileRestorer restorer(configFile);
     
@@ -1419,6 +1436,7 @@ HWTEST_F(BundleNameParserTest, BundleNameParser_InitializeImpl_SpecialChars_001,
         "}";
     
     std::ofstream outFile(configFile);
+    EXPECT_TRUE(outFile.is_open());
     outFile << specialCharsConfig;
     outFile.close();
     
@@ -1446,7 +1464,7 @@ HWTEST_F(BundleNameParserTest, BundleNameParser_InitializeImpl_NullItem_001, Tes
     const std::string configDir = GetTestConfigDir();
     const std::string configFile = configDir + "/bundle_name_config.json";
     
-    CreateDirectoryRecursive(configDir);
+    EXPECT_TRUE(CreateDirectoryRecursive(configDir));
     
     ScopedFileRestorer restorer(configFile);
     
@@ -1459,6 +1477,7 @@ HWTEST_F(BundleNameParserTest, BundleNameParser_InitializeImpl_NullItem_001, Tes
         "}";
     
     std::ofstream outFile(configFile);
+    EXPECT_TRUE(outFile.is_open());
     outFile << nullItemConfig;
     outFile.close();
     
@@ -1501,7 +1520,7 @@ HWTEST_F(BundleNameParserTest, BundleNameParser_GetBundleName_AfterInit_001, Tes
     const std::string configDir = GetTestConfigDir();
     const std::string configFile = configDir + "/bundle_name_config.json";
     
-    CreateDirectoryRecursive(configDir);
+    EXPECT_TRUE(CreateDirectoryRecursive(configDir));
     
     ScopedFileRestorer restorer(configFile);
     
@@ -1513,6 +1532,7 @@ HWTEST_F(BundleNameParserTest, BundleNameParser_GetBundleName_AfterInit_001, Tes
         "}";
     
     std::ofstream outFile(configFile);
+    EXPECT_TRUE(outFile.is_open());
     outFile << testConfig;
     outFile.close();
     
