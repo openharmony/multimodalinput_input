@@ -353,7 +353,7 @@ HWTEST_F(JoystickEventProcessorTest, JoystickEventProcessorTest_CheckIntention_0
     pointerEvent->axes_ = PointerEvent::AXIS_TYPE_ABS_HAT0X;
     double axisValue = 0;
     pointerEvent->axisValues_[PointerEvent::AXIS_TYPE_ABS_HAT0X] = axisValue;
-    JoystickEvent->pressedButtons_ = {KeyEvent::KEYCODE_DPAD_LEFT};
+    JoystickEvent->pressedButtons_.emplace(KeyEvent::KEYCODE_DPAD_LEFT, -1);
     ASSERT_NO_FATAL_FAILURE(
         JoystickEvent->CheckIntention(pointerEvent, [=] (std::shared_ptr<OHOS::MMI::KeyEvent>) { return; }));
 }
@@ -374,7 +374,7 @@ HWTEST_F(JoystickEventProcessorTest, JoystickEventProcessorTest_CheckIntention_0
     pointerEvent->axes_ = PointerEvent::AXIS_TYPE_ABS_HAT0Y;
     double axisValue = 0;
     pointerEvent->axisValues_[PointerEvent::AXIS_TYPE_ABS_HAT0Y] = axisValue;
-    JoystickEvent->pressedButtons_ = {KeyEvent::KEYCODE_DPAD_DOWN};
+    JoystickEvent->pressedButtons_.emplace(KeyEvent::KEYCODE_DPAD_DOWN, -1);
     ASSERT_NO_FATAL_FAILURE(
         JoystickEvent->CheckIntention(pointerEvent, [=] (std::shared_ptr<OHOS::MMI::KeyEvent>) { return; }));
 }
@@ -489,9 +489,9 @@ HWTEST_F(JoystickEventProcessorTest, JoystickEventProcessorTest_CheckHAT0X_004, 
     pointerEvent->axes_ = PointerEvent::AXIS_TYPE_ABS_HAT0X;
     double axisValue = 0;
     pointerEvent->axisValues_[PointerEvent::AXIS_TYPE_ABS_HAT0X] = axisValue;
-    JoystickEvent->pressedButtons_ = {KeyEvent::KEYCODE_DPAD_LEFT};
+    JoystickEvent->pressedButtons_.emplace(KeyEvent::KEYCODE_DPAD_LEFT, -1);
     ASSERT_NO_FATAL_FAILURE(JoystickEvent->CheckHAT0X(pointerEvent, buttonEvents));
-    JoystickEvent->pressedButtons_ = {KeyEvent::KEYCODE_DPAD_RIGHT};
+    JoystickEvent->pressedButtons_.emplace(KeyEvent::KEYCODE_DPAD_RIGHT, -1);
     ASSERT_NO_FATAL_FAILURE(JoystickEvent->CheckHAT0X(pointerEvent, buttonEvents));
 }
 
@@ -619,9 +619,9 @@ HWTEST_F(JoystickEventProcessorTest, JoystickEventProcessorTest_CheckHAT0Y_004, 
     pointerEvent->axes_ = PointerEvent::AXIS_TYPE_ABS_HAT0Y;
     double axisValue = 0;
     pointerEvent->axisValues_[PointerEvent::AXIS_TYPE_ABS_HAT0Y] = axisValue;
-    JoystickEvent->pressedButtons_ = {KeyEvent::KEYCODE_DPAD_DOWN};
+    JoystickEvent->pressedButtons_.emplace(KeyEvent::KEYCODE_DPAD_DOWN, -1);
     ASSERT_NO_FATAL_FAILURE(JoystickEvent->CheckHAT0Y(pointerEvent, buttonEvents));
-    JoystickEvent->pressedButtons_ = {KeyEvent::KEYCODE_DPAD_UP};
+    JoystickEvent->pressedButtons_.emplace(KeyEvent::KEYCODE_DPAD_UP, -1);
     ASSERT_NO_FATAL_FAILURE(JoystickEvent->CheckHAT0Y(pointerEvent, buttonEvents));
 }
 
@@ -691,9 +691,10 @@ HWTEST_F(JoystickEventProcessorTest, JoystickEventProcessorTest_UpdateButtonStat
 {
     CALL_TEST_DEBUG;
     int32_t deviceId { 2 };
+    int32_t rawCode { 1 };
     JoystickEventProcessor joystick(&env_, deviceId);
     KeyEvent::KeyItem keyItem {};
-    ASSERT_NO_FATAL_FAILURE(joystick.UpdateButtonState(keyItem));
+    ASSERT_NO_FATAL_FAILURE(joystick.UpdateButtonState(keyItem, rawCode));
 }
 
 /**

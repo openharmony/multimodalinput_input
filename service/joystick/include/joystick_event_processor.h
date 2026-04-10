@@ -54,16 +54,18 @@ public:
     std::shared_ptr<PointerEvent> OnAxisEvent(struct libinput_event *event);
     void CheckIntention(std::shared_ptr<PointerEvent> pointerEvent,
         std::function<void(std::shared_ptr<KeyEvent>)> handler);
+    void OnDeviceEnabled();
+    void OnDeviceDisabled();
 
 private:
     void Initialize();
     void InitializeFrom(const IInputDeviceManager::IInputDevice &dev);
     void InitializeAxisInfo(struct libinput_device *device, const char *name, AxisInfo &axisInfo) const;
     int32_t MapKey(struct libinput_device *device, int32_t rawCode) const;
-    void PressButton(int32_t button);
+    void PressButton(int32_t button, int32_t rawCode);
     void LiftButton(int32_t button);
     bool IsButtonPressed(int32_t button) const;
-    void UpdateButtonState(const KeyEvent::KeyItem &keyItem);
+    void UpdateButtonState(const KeyEvent::KeyItem &keyItem, int32_t rawCode);
     void CheckHAT0X(std::shared_ptr<PointerEvent> pointerEvent, std::vector<KeyEvent::KeyItem> &buttonEvents) const;
     void CheckHAT0Y(std::shared_ptr<PointerEvent> pointerEvent, std::vector<KeyEvent::KeyItem> &buttonEvents) const;
     std::shared_ptr<KeyEvent> FormatButtonEvent(const KeyEvent::KeyItem &button);
@@ -72,6 +74,8 @@ private:
     void NormalizeAxisValue(const struct libinput_event_joystick_axis_abs_info &absInfo, const AxisInfo &axisInfo);
     void UpdateAxisValue(const AxisInfo &axisInfo, PointerEvent::AxisType axis, double newValue);
     bool HasAxisValueChanged() const;
+    void RecordActiveOperations();
+    void SendButtonUpEvents();
 
 private:
     static const std::unordered_map<PointerEvent::AxisType, std::string> axisNames_;
@@ -79,7 +83,7 @@ private:
 
     IInputServiceContext *env_ { nullptr };
     const int32_t deviceId_ { -1 };
-    std::set<int32_t> pressedButtons_;
+    std::map<int32_t, int32_t> pressedButtons_;
     std::shared_ptr<JoystickLayoutMap> layout_ { nullptr };
     std::shared_ptr<PointerEvent> pointerEvent_ { nullptr };
     std::shared_ptr<KeyEvent> keyEvent_ { nullptr };
@@ -226,9 +230,9 @@ inline int32_t JoystickEventProcessor::GetDeviceId() const
     return deviceId_;
 }
 
-inline void JoystickEventProcessor::PressButton(int32_t button)
+inline void JoystickEventProcessor::PressButton(int32_t button, int32_t rawCode)
 {
-    pressedButtons_.emplace(button);
+    pressedButtons_.emplace(button, rawCode);
 }
 
 inline void JoystickEventProcessor::LiftButton(int32_t button)

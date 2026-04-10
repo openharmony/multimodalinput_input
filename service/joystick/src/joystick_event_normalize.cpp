@@ -100,6 +100,37 @@ void JoystickEventNormalize::OnDeviceRemoved(int32_t deviceId)
     }
 }
 
+void JoystickEventNormalize::OnDeviceEnabled(int32_t deviceId)
+{
+    auto iter = std::find_if(processors_.cbegin(), processors_.cend(),
+        [deviceId](const auto &item) {
+            return ((item.second != nullptr) && (item.second->GetDeviceId() == deviceId));
+        });
+    if ((iter != processors_.end()) && (iter->second != nullptr)) {
+        iter->second->OnDeviceEnabled();
+    }
+}
+
+void JoystickEventNormalize::OnDeviceDisabled(int32_t deviceId)
+{
+    auto iter = std::find_if(processors_.cbegin(), processors_.cend(),
+        [deviceId](const auto &item) {
+            return ((item.second != nullptr) && (item.second->GetDeviceId() == deviceId));
+        });
+    if ((iter != processors_.end()) && (iter->second != nullptr)) {
+        iter->second->OnDeviceDisabled();
+    }
+}
+
+std::shared_ptr<IInputEventHandler> JoystickEventNormalize::GetEventNormalizeHandler(IInputServiceContext *env)
+{
+    if (env == nullptr) {
+        MMI_HILOGE("Env is null");
+        return nullptr;
+    }
+    return env->GetEventNormalizeHandler();
+}
+
 std::shared_ptr<ITimerManager> JoystickEventNormalize::GetTimerManager(IInputServiceContext *env)
 {
     if (env == nullptr) {

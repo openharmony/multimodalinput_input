@@ -17,6 +17,7 @@
 
 #include <iomanip>
 
+#include "device_state_manager.h"
 #include "joystick_event_normalize.h"
 
 #undef MMI_LOG_DOMAIN
@@ -116,13 +117,15 @@ std::shared_ptr<KeyEvent> JoystickEventProcessor::OnButtonEvent(struct libinput_
     CHKPP(inputDev);
     auto rawBtnEvent = libinput_event_get_joystick_button_event(event);
     CHKPP(rawBtnEvent);
-    auto keyCode = MapKey(inputDev, libinput_event_joystick_button_get_key(rawBtnEvent));
+    auto rawCode = libinput_event_joystick_button_get_key(rawBtnEvent);
+    auto keyCode = MapKey(inputDev, rawCode);
     auto rawBtnState = libinput_event_joystick_button_get_key_state(rawBtnEvent);
 
     KeyEvent::KeyItem button {};
     button.SetKeyCode(keyCode);
     button.SetPressed(rawBtnState != LIBINPUT_BUTTON_STATE_RELEASED);
 
+    UpdateButtonState(button, rawCode);
     auto btnEvent = FormatButtonEvent(button);
     if (btnEvent != nullptr) {
         btnEvent->SetRepeatKey(rawBtnState == LIBINPUT_BUTTON_STATE_REPEAT);
@@ -199,7 +202,7 @@ void JoystickEventProcessor::CheckIntention(std::shared_ptr<PointerEvent> pointe
     CheckHAT0Y(pointerEvent, buttonEvents);
 
     for (const auto &button : buttonEvents) {
-        UpdateButtonState(button);
+        UpdateButtonState(button, -1);
         auto btnEvent = FormatButtonEvent(button);
         if (btnEvent != nullptr) {
             MMI_HILOGI("Joystick_intention, No:%{public}d,KC:%{private}d,KA:%{public}d,Intention:%{public}d",
@@ -207,6 +210,23 @@ void JoystickEventProcessor::CheckIntention(std::shared_ptr<PointerEvent> pointe
             handler(btnEvent);
         }
     }
+}
+
+void JoystickEventProcessor::OnDeviceEnabled()
+{
+    MMI_HILOGI("Joystick[%{public}d] received enable notification", deviceId_);
+}
+
+void JoystickEventProcessor::OnDeviceDisabled()
+{
+    MMI_HILOGI("Joystick[%{public}d] received disable notification", deviceId_);
+    RecordActiveOperations();
+    SendButtonUpEvents();
+
+    MMI_HILOGI("Joystick[%{public}d] disabled, reset state data", deviceId_);
+    pressedButtons_.clear();
+    pointerEvent_ = nullptr;
+    keyEvent_ = nullptr;
 }
 
 void JoystickEventProcessor::Initialize()
@@ -379,10 +399,10 @@ void JoystickEventProcessor::CheckHAT0Y(std::shared_ptr<PointerEvent> pointerEve
     }
 }
 
-void JoystickEventProcessor::UpdateButtonState(const KeyEvent::KeyItem &keyItem)
+void JoystickEventProcessor::UpdateButtonState(const KeyEvent::KeyItem &keyItem, int32_t rawCode)
 {
     if (keyItem.IsPressed()) {
-        PressButton(keyItem.GetKeyCode());
+        PressButton(keyItem.GetKeyCode(), rawCode);
     } else {
         LiftButton(keyItem.GetKeyCode());
     }
@@ -550,6 +570,39 @@ bool JoystickEventProcessor::HasAxisValueChanged() const
         }
     }
     return false;
+}
+
+void JoystickEventProcessor::RecordActiveOperations()
+{
+    std::set<int32_t> pressedButtons;
+    std::for_each(pressedButtons_.cbegin(), pressedButtons_.cend(),
+        [&pressedButtons](const auto &item) {
+            if (item.second >= 0) {
+                pressedButtons.emplace(item.second);
+            }
+        });
+    DEVICE_STATE_MGR->AddPressedButtons(deviceId_, pressedButtons);
+}
+
+void JoystickEventProcessor::SendButtonUpEvents()
+{
+    auto inputChannel = JoystickEventNormalize::GetEventNormalizeHandler(env_);
+    if (inputChannel == nullptr) {
+        MMI_HILOGE("EventNormalizeHandler is null");
+        return;
+    }
+    for (const auto &[keyCode, rawCode] : pressedButtons_) {
+        KeyEvent::KeyItem button {};
+        button.SetKeyCode(keyCode);
+        button.SetPressed(false);
+
+        auto btnEvent = FormatButtonEvent(button);
+        if (btnEvent != nullptr) {
+            MMI_HILOGI("Joystick_button_event, No:%{public}d,KC:%{private}d,KA:%{public}d,Intention:%{public}d",
+                btnEvent->GetId(), btnEvent->GetKeyCode(), btnEvent->GetKeyAction(), btnEvent->GetKeyIntention());
+            inputChannel->HandleKeyEvent(btnEvent);
+        }
+    }
 }
 } // namespace MMI
 } // namespace OHOS
