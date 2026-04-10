@@ -49,8 +49,8 @@ struct InfraredFrequency {
 }
 
 enum KeyCommandTriggerType: i32 {
-    PRESSED = 1
-    REPEAT_PRESSED = 2
+    PRESSED = 1,
+    REPEAT_PRESSED = 2,
     ALL_RELEASED = 3
 }
 
