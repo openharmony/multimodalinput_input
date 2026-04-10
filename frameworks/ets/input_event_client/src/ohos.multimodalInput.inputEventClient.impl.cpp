@@ -34,6 +34,8 @@
 #include "accesstoken_kit.h"
 #include "tokenid_kit.h"
 #include "ani_common.h"
+#include "ohos.multimodalInput.mouseEvent.impl.h"
+#include "ohos.multimodalInput.keyCode.impl.h"
 
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "aniInputEventClient"
@@ -102,6 +104,27 @@ bool CheckInputEventClentPermission()
     }
     return  true;
 }
+
+// Axis枚举转换：Taihe → Native
+int32_t ConvertTaiheAxisToNative(::ohos::multimodalInput::mouseEvent::Axis axis) {
+    static const std::map<int32_t, int32_t> AXIS_MAP = {
+        { static_cast<int32_t>(::ohos::multimodalInput::mouseEvent::Axis::key_t::SCROLL_VERTICAL),
+          static_cast<int32_t>(PointerEvent::AXIS_TYPE_SCROLL_VERTICAL) },
+        { static_cast<int32_t>(::ohos::multimodalInput::mouseEvent::Axis::key_t::SCROLL_HORIZONTAL),
+          static_cast<int32_t>(PointerEvent::AXIS_TYPE_SCROLL_HORIZONTAL) },
+        { static_cast<int32_t>(::ohos::multimodalInput::mouseEvent::Axis::key_t::PINCH),
+          static_cast<int32_t>(PointerEvent::AXIS_TYPE_PINCH) }
+    };
+
+    int32_t axisValue = static_cast<int32_t>(axis);
+    auto it = AXIS_MAP.find(axisValue);
+    if (it != AXIS_MAP.end()) {
+        return it->second;
+    }
+    MMI_HILOGW("Unknown Taihe axis: %{public}d, using as-is", axisValue);
+    return axisValue;
+}
+
 
 static std::unordered_map<int32_t, int32_t> THMouseButton2Native = {
     { JS_MOUSE_BUTTON_LEFT, PointerEvent::MOUSE_BUTTON_LEFT },
@@ -536,59 +559,251 @@ void PermitInjectionSync(bool result)
 
 class MouseControllerImpl {
 public:
-    MouseControllerImpl() {}
-    void MoveToSync(int32_t displayId, int32_t displayX, int32_t displayY)
-    {
- 
+    // 构造函数：接收Native实现
+    explicit MouseControllerImpl(std::shared_ptr<OHOS::MMI::MouseControllerImpl> impl)
+        : nativeImpl_(impl) {
+        MMI_HILOGD("MouseControllerImpl created with native impl");
     }
- 
-    void PressButtonSync(::ohos::multimodalInput::mouseEvent::Button button)
-    {
- 
+
+    // 默认构造函数：用于错误情况
+    MouseControllerImpl() : nativeImpl_(nullptr) {
+        MMI_HILOGW("MouseControllerImpl created without native impl (error case)");
     }
- 
-    void ReleaseButtonSync(::ohos::multimodalInput::mouseEvent::Button button)
-    {
- 
+
+    ~MouseControllerImpl() = default;
+
+    void MoveToSync(int32_t displayId, int32_t displayX, int32_t displayY) {
+        CALL_DEBUG_ENTER;
+        if (nativeImpl_ == nullptr) {
+            MMI_HILOGE("Native implementation is null");
+            taihe::set_business_error(INPUT_SERVICE_EXCEPTION, "Controller not initialized");
+            return;
+        }
+
+        int32_t ret = nativeImpl_->MoveTo(displayId, displayX, displayY);
+        if (ret != RET_OK) {
+            MMI_HILOGE("MoveTo failed, ret=%{public}d", ret);
+            TaiheError_t codeMsg;
+            if (TaiheConverter::GetApiError(ret, codeMsg)) {
+                taihe::set_business_error(ret, codeMsg.msg);
+            } else {
+                taihe::set_business_error(ret, "MoveTo failed");
+            }
+        }
     }
- 
-    void BeginAxisSync(::ohos::multimodalInput::mouseEvent::Button button)
-    {
- 
+
+    void PressButtonSync(::ohos::multimodalInput::mouseEvent::Button button) {
+        CALL_DEBUG_ENTER;
+        if (nativeImpl_ == nullptr) {
+            MMI_HILOGE("Native implementation is null");
+            taihe::set_business_error(INPUT_SERVICE_EXCEPTION, "Controller not initialized");
+            return;
+        }
+
+        // 使用现有的Button转换函数
+        int32_t nativeButton = TaiheMouseButonConverter::ConvertEts2Native(button);
+        int32_t ret = nativeImpl_->PressButton(nativeButton);
+        if (ret != RET_OK) {
+            MMI_HILOGE("PressButton failed, ret=%{public}d", ret);
+            TaiheError_t codeMsg;
+            if (TaiheConverter::GetApiError(ret, codeMsg)) {
+                taihe::set_business_error(ret, codeMsg.msg);
+            } else {
+                taihe::set_business_error(ret, "PressButton failed");
+            }
+        }
     }
- 
-    void UpdateAxisSync(::ohos::multimodalInput::mouseEvent::Button button)
-    {
- 
+
+    void ReleaseButtonSync(::ohos::multimodalInput::mouseEvent::Button button) {
+        CALL_DEBUG_ENTER;
+        if (nativeImpl_ == nullptr) {
+            MMI_HILOGE("Native implementation is null");
+            taihe::set_business_error(INPUT_SERVICE_EXCEPTION, "Controller not initialized");
+            return;
+        }
+
+        // 使用现有的Button转换函数
+        int32_t nativeButton = TaiheMouseButonConverter::ConvertEts2Native(button);
+        int32_t ret = nativeImpl_->ReleaseButton(nativeButton);
+        if (ret != RET_OK) {
+            MMI_HILOGE("ReleaseButton failed, ret=%{public}d", ret);
+            TaiheError_t codeMsg;
+            if (TaiheConverter::GetApiError(ret, codeMsg)) {
+                taihe::set_business_error(ret, codeMsg.msg);
+            } else {
+                taihe::set_business_error(ret, "ReleaseButton failed");
+            }
+        }
     }
- 
-    void EndAxisSync(::ohos::multimodalInput::mouseEvent::Button button)
-    {
- 
+
+    void BeginAxisSync(::ohos::multimodalInput::mouseEvent::Axis axis, int32_t value) {
+        CALL_DEBUG_ENTER;
+        if (nativeImpl_ == nullptr) {
+            MMI_HILOGE("Native implementation is null");
+            taihe::set_business_error(INPUT_SERVICE_EXCEPTION, "Controller not initialized");
+            return;
+        }
+
+        int32_t nativeAxis = ConvertTaiheAxisToNative(axis);
+        int32_t ret = nativeImpl_->BeginAxis(nativeAxis, value);
+        if (ret != RET_OK) {
+            MMI_HILOGE("BeginAxis failed, ret=%{public}d", ret);
+            TaiheError_t codeMsg;
+            if (TaiheConverter::GetApiError(ret, codeMsg)) {
+                taihe::set_business_error(ret, codeMsg.msg);
+            } else {
+                taihe::set_business_error(ret, "BeginAxis failed");
+            }
+        }
     }
+
+    void UpdateAxisSync(::ohos::multimodalInput::mouseEvent::Axis axis, int32_t value) {
+        CALL_DEBUG_ENTER;
+        if (nativeImpl_ == nullptr) {
+            MMI_HILOGE("Native implementation is null");
+            taihe::set_business_error(INPUT_SERVICE_EXCEPTION, "Controller not initialized");
+            return;
+        }
+
+        int32_t nativeAxis = ConvertTaiheAxisToNative(axis);
+        int32_t ret = nativeImpl_->UpdateAxis(nativeAxis, value);
+        if (ret != RET_OK) {
+            MMI_HILOGE("UpdateAxis failed, ret=%{public}d", ret);
+            TaiheError_t codeMsg;
+            if (TaiheConverter::GetApiError(ret, codeMsg)) {
+                taihe::set_business_error(ret, codeMsg.msg);
+            } else {
+                taihe::set_business_error(ret, "UpdateAxis failed");
+            }
+        }
+    }
+
+    void EndAxisSync(::ohos::multimodalInput::mouseEvent::Axis axis) {
+        CALL_DEBUG_ENTER;
+        if (nativeImpl_ == nullptr) {
+            MMI_HILOGE("Native implementation is null");
+            taihe::set_business_error(INPUT_SERVICE_EXCEPTION, "Controller not initialized");
+            return;
+        }
+
+        int32_t nativeAxis = ConvertTaiheAxisToNative(axis);
+        int32_t ret = nativeImpl_->EndAxis(nativeAxis);
+        if (ret != RET_OK) {
+            MMI_HILOGE("EndAxis failed, ret=%{public}d", ret);
+            TaiheError_t codeMsg;
+            if (TaiheConverter::GetApiError(ret, codeMsg)) {
+                taihe::set_business_error(ret, codeMsg.msg);
+            } else {
+                taihe::set_business_error(ret, "EndAxis failed");
+            }
+        }
+    }
+
+private:
+    std::shared_ptr<OHOS::MMI::MouseControllerImpl> nativeImpl_;
 };
- 
+
 ::ohos::multimodalInput::inputEventClient::MouseController CreateMouseControllerSync() {
-    return make_holder<MouseControllerImpl, ::ohos::multimodalInput::inputEventClient::MouseController>();
+    CALL_DEBUG_ENTER;
+
+    // 注意：新增接口不需要权限校验（不检查system api和INJECT_INPUT_EVENT权限）
+
+    // 创建Native实现
+    auto nativeImpl = InputManager::GetInstance()->CreateMouseController();
+    if (nativeImpl == nullptr) {
+        MMI_HILOGE("Failed to create native MouseControllerImpl");
+        taihe::set_business_error(INPUT_SERVICE_EXCEPTION, "Input service exception");
+        return make_holder<MouseControllerImpl,
+                          ::ohos::multimodalInput::inputEventClient::MouseController>();
+    }
+
+    MMI_HILOGD("MouseController created successfully");
+    // 包装为Taihe对象
+    return make_holder<MouseControllerImpl,
+                      ::ohos::multimodalInput::inputEventClient::MouseController>(nativeImpl);
 }
  
 class KeyboardControllerImpl {
 public:
-    KeyboardControllerImpl() {}
-    // TaiheKeyCodeConverter 用这个做转换
-    void PressKeySync(::ohos::multimodalInput::keyCode::KeyCode keyCode)
-    {
- 
+    // 构造函数：接收Native实现
+    explicit KeyboardControllerImpl(std::shared_ptr<OHOS::MMI::KeyboardControllerImpl> impl)
+        : nativeImpl_(impl) {
+        MMI_HILOGD("KeyboardControllerImpl created with native impl");
     }
- 
-    void ReleaseKeySync(::ohos::multimodalInput::keyCode::KeyCode keyCode)
-    {
- 
+
+    // 默认构造函数：用于错误情况
+    KeyboardControllerImpl() : nativeImpl_(nullptr) {
+        MMI_HILOGW("KeyboardControllerImpl created without native impl (error case)");
     }
+
+    ~KeyboardControllerImpl() = default;
+
+    void PressKeySync(::ohos::multimodalInput::keyCode::KeyCode keyCode) {
+        CALL_DEBUG_ENTER;
+        if (nativeImpl_ == nullptr) {
+            MMI_HILOGE("Native implementation is null");
+            taihe::set_business_error(INPUT_SERVICE_EXCEPTION, "Controller not initialized");
+            return;
+        }
+
+        // 使用现有的KeyCode转换函数
+        int32_t nativeKeyCode = TaiheKeyCodeConverter::GetKeyCodeByValue(keyCode);
+        int32_t ret = nativeImpl_->PressKey(nativeKeyCode);
+        if (ret != RET_OK) {
+            MMI_HILOGE("PressKey failed, ret=%{public}d", ret);
+            TaiheError_t codeMsg;
+            if (TaiheConverter::GetApiError(ret, codeMsg)) {
+                taihe::set_business_error(ret, codeMsg.msg);
+            } else {
+                taihe::set_business_error(ret, "PressKey failed");
+            }
+        }
+    }
+
+    void ReleaseKeySync(::ohos::multimodalInput::keyCode::KeyCode keyCode) {
+        CALL_DEBUG_ENTER;
+        if (nativeImpl_ == nullptr) {
+            MMI_HILOGE("Native implementation is null");
+            taihe::set_business_error(INPUT_SERVICE_EXCEPTION, "Controller not initialized");
+            return;
+        }
+
+        // 使用现有的KeyCode转换函数
+        int32_t nativeKeyCode = TaiheKeyCodeConverter::GetKeyCodeByValue(keyCode);
+        int32_t ret = nativeImpl_->ReleaseKey(nativeKeyCode);
+        if (ret != RET_OK) {
+            MMI_HILOGE("ReleaseKey failed, ret=%{public}d", ret);
+            TaiheError_t codeMsg;
+            if (TaiheConverter::GetApiError(ret, codeMsg)) {
+                taihe::set_business_error(ret, codeMsg.msg);
+            } else {
+                taihe::set_business_error(ret, "ReleaseKey failed");
+            }
+        }
+    }
+
+private:
+    std::shared_ptr<OHOS::MMI::KeyboardControllerImpl> nativeImpl_;
 };
- 
+
 ::ohos::multimodalInput::inputEventClient::KeyboardController CreateKeyboardControllerSync() {
-    return make_holder<KeyboardControllerImpl, ::ohos::multimodalInput::inputEventClient::KeyboardController>();
+    CALL_DEBUG_ENTER;
+
+    // 注意：新增接口不需要权限校验（不检查system api和INJECT_INPUT_EVENT权限）
+
+    // 创建Native实现
+    auto nativeImpl = InputManager::GetInstance()->CreateKeyboardController();
+    if (nativeImpl == nullptr) {
+        MMI_HILOGE("Failed to create native KeyboardControllerImpl");
+        taihe::set_business_error(INPUT_SERVICE_EXCEPTION, "Input service exception");
+        return make_holder<KeyboardControllerImpl,
+                          ::ohos::multimodalInput::inputEventClient::KeyboardController>();
+    }
+
+    MMI_HILOGD("KeyboardController created successfully");
+    // 包装为Taihe对象
+    return make_holder<KeyboardControllerImpl,
+                      ::ohos::multimodalInput::inputEventClient::KeyboardController>(nativeImpl);
 }
 
 } // namespace
