@@ -43,9 +43,6 @@ constexpr int32_t BOOLEAN_NONE { -1 };
 constexpr uint32_t DEFAULT_REFERENCE_COUNT { 1 };
 // SDK 26.0.0: triggerType constants
 constexpr int32_t TRIGGER_TYPE_NOT_SET { 0 };
-constexpr int32_t TRIGGER_TYPE_PRESSED { 1 };
-constexpr int32_t TRIGGER_TYPE_REPEAT_PRESSED { 2 };
-constexpr int32_t TRIGGER_TYPE_ALL_RELEASED { 3 };
 constexpr int32_t TRIGGER_TYPE_MIN { 0 };
 constexpr int32_t TRIGGER_TYPE_MAX { 3 };
 } // namespace
