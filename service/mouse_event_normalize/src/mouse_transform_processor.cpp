@@ -1038,9 +1038,10 @@ double MouseTransformProcessor::HandleAxisAccelateTouchPad(int32_t userId, doubl
         MMI_HILOGE("winMgr is nullptr");
         return RET_ERR;
     }
-    if (HandleAxisAccelerateTouchpad(winMgr->GetMouseIsCaptureMode(),
-        &axisValue, static_cast<int32_t>(deviceType))
-        != RET_OK) {
+    int32_t ret = PointerMotionAcceleration::DynamicAccelerateTouchpadAxis(
+        axisValue, winMgr->GetMouseIsCaptureMode(),
+        static_cast<DeviceType>(deviceType));
+    if (ret != RET_OK) {
         MMI_HILOGW("Fail accelerate axis");
         if (env_ == nullptr) {
             MMI_HILOGE("Env is nullptr");
