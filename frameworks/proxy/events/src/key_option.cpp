@@ -128,7 +128,7 @@ bool KeyOption::ReadFromParcel(Parcel &in)
         in.ReadInt32(finalKeyUpDelay_) &&
         in.ReadBool(isRepeat_) &&
         in.ReadInt32(priority_) &&
-        in.ReadInt32(triggerType_)  // 新增：读取 triggerType
+        in.ReadInt32(triggerType_)
     );
 }
 
@@ -151,7 +151,7 @@ bool KeyOption::WriteToParcel(Parcel &out) const
         out.WriteInt32(finalKeyUpDelay_) &&
         out.WriteBool(isRepeat_) &&
         out.WriteInt32(priority_) &&
-        out.WriteInt32(triggerType_)  // 新增：写入 triggerType
+        out.WriteInt32(triggerType_)
     );
 }
 
