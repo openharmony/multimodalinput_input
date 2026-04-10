@@ -46,13 +46,21 @@ constexpr size_t DYNAMIC_MOUSE_N_GAIN_PARAMS { 4 };
 constexpr size_t DYNAMIC_TOUCHPAD_N_SPEEDS { 11 };
 constexpr size_t DYNAMIC_TOUCHPAD_N_CURVE_SLOPES { 4 };
 constexpr std::uintmax_t MAX_SIZE_OF_INPUT_PRODUCT_CONFIG { 524288 }; // 512KB
+constexpr int32_t AXIS_CURVE_TABLET_INDEX = 3;
+constexpr int32_t AXIS_CURVE_FOLD_PC_INDEX = 4;
+constexpr int32_t AXIS_CURVE_FOLD_PC_VIRT_INDEX = 5;
+constexpr int32_t AXIS_CURVE_M_PC_INDEX = 6;
+constexpr int32_t AXIS_CURVE_M_TABLET_INDEX = 7;
+constexpr int32_t AXIS_CURVE_Q_TABLET_INDEX = 8;
+constexpr int32_t AXIS_CURVE_G_TABLET_INDEX = 9;
+constexpr int32_t AXIS_CURVE_M_PC_PRO_INDEX = 10;
 } // namespace
 
-std::shared_mutex PointerMotionAcceleration::mutex_ {};
 std::atomic_bool PointerMotionAcceleration::loading_ { false };
 std::optional<PointerMotionAcceleration::DynamicMouseCurve> PointerMotionAcceleration::dynamicMouseCurve_ {};
 std::optional<PointerMotionAcceleration::DynamicTouchpadCurve> PointerMotionAcceleration::dynamicTouchpadCurve_ {};
 std::unordered_map<std::string, PointerMotionAcceleration::CurveCollection> PointerMotionAcceleration::curves_ {};
+std::optional<PointerMotionAcceleration::AxisCurveCollection> PointerMotionAcceleration::axisCurves_ {};
 Offset PointerMotionAcceleration::compensateTouchpad_ {};
 
 bool PointerMotionAcceleration::Curve::IsValid() const
@@ -83,11 +91,8 @@ int32_t PointerMotionAcceleration::DynamicAccelerateMouse(const Offset &offset, 
     MMI_HILOGD("Accelerate mouse motion dynamically, mode:%{public}d, speed:%{public}zu, "
         "deltaTime:%{public}" PRIu64 ", displayPPI:%{public}f, factor:%{public}f",
         mode, speed, deltaTime, displayPPI, factor);
-    std::shared_lock<std::shared_mutex> lock(mutex_);
     if (!dynamicMouseCurve_) {
-        ffrt::submit([]() {
-            PointerMotionAcceleration::LoadAccelerationConfig(&PointerMotionAcceleration::LoadDynamicMouseCurve);
-        });
+        PointerMotionAcceleration::LoadAccelerationConfig(&PointerMotionAcceleration::LoadDynamicMouseCurve);
     }
     const auto vin = std::hypot(offset.dx, offset.dy);
     double gain { 1.0 };
@@ -111,11 +116,8 @@ int32_t PointerMotionAcceleration::DynamicAccelerateTouchpad(const Offset &offse
     MMI_HILOGD("Accelerate touchpad motion, mode:%{public}d, speed:%{public}zu, "
         "displaySize:%{public}f, touchpadSize:%{public}f, touchpadPPI:%{public}f, frequency:%{public}d",
         mode, speed, displaySize, touchpadSize, touchpadPPI, frequency);
-    std::shared_lock<std::shared_mutex> lock(mutex_);
     if (!dynamicTouchpadCurve_) {
-        ffrt::submit([]() {
-            PointerMotionAcceleration::LoadAccelerationConfig(&PointerMotionAcceleration::LoadDynamicTouchpadCurve);
-        });
+        PointerMotionAcceleration::LoadAccelerationConfig(&PointerMotionAcceleration::LoadDynamicTouchpadCurve);
     }
     const auto vin = std::hypot(offset.dx, offset.dy);
     double gain { 1.0 };
@@ -142,14 +144,11 @@ int32_t PointerMotionAcceleration::DynamicAccelerateTouchpad(const Offset &offse
 int32_t PointerMotionAcceleration::AccelerateMouse(
     const Offset &offset, bool mode, size_t speed, DeviceType deviceType, double &absX, double &absY)
 {
-    std::shared_lock<std::shared_mutex> lock(mutex_);
     auto name = PointerMotionAcceleration::GetMouseConfigName(deviceType);
     auto iter = curves_.find(name);
     if (iter == curves_.cend()) {
-        ffrt::submit([name]() {
-            PointerMotionAcceleration::LoadAccelerationConfig([name](const char *cfgPath, cJSON *jsonCfg) {
-                return PointerMotionAcceleration::LoadAccelerationCurve(cfgPath, jsonCfg, name);
-            });
+        PointerMotionAcceleration::LoadAccelerationConfig([name](const char *cfgPath, cJSON *jsonCfg) {
+            return PointerMotionAcceleration::LoadAccelerationCurve(cfgPath, jsonCfg, name);
         });
     }
     const double vin = PointerMotionAcceleration::CalculateVin(offset);
@@ -170,14 +169,11 @@ int32_t PointerMotionAcceleration::AccelerateMouse(
 int32_t PointerMotionAcceleration::AccelerateTouchpad(
     const Offset &offset, bool mode, size_t speed, DeviceType deviceType, double &absX, double &absY)
 {
-    std::shared_lock<std::shared_mutex> lock(mutex_);
     auto name = PointerMotionAcceleration::GetTouchpadConfigName(deviceType);
     auto iter = curves_.find(name);
     if (iter == curves_.cend()) {
-        ffrt::submit([name]() {
-            PointerMotionAcceleration::LoadAccelerationConfig([name](const char *cfgPath, cJSON *jsonCfg) {
-                return PointerMotionAcceleration::LoadAccelerationCurve(cfgPath, jsonCfg, name);
-            });
+        PointerMotionAcceleration::LoadAccelerationConfig([name](const char *cfgPath, cJSON *jsonCfg) {
+            return PointerMotionAcceleration::LoadAccelerationCurve(cfgPath, jsonCfg, name);
         });
     }
     const double vin = CalculateVin(offset);
@@ -201,9 +197,8 @@ int32_t PointerMotionAcceleration::AccelerateTouchpad(
 
 void PointerMotionAcceleration::Dump(int32_t fd, const std::vector<std::string> &args)
 {
-    std::shared_lock<std::shared_mutex> lock(mutex_);
     mprintf(fd, "Pointer acceleration curves:");
-    if (curves_.empty() && !dynamicMouseCurve_ && !dynamicTouchpadCurve_) {
+    if (curves_.empty() && !dynamicMouseCurve_ && !dynamicTouchpadCurve_ && !axisCurves_) {
         mprintf(fd, "\tThere is no acceleration curve.");
         return;
     }
@@ -240,6 +235,24 @@ void PointerMotionAcceleration::Dump(int32_t fd, const std::vector<std::string> 
         mprintf(fd, "\t\t}");
         mprintf(fd, "\t}");
     }
+    if (axisCurves_) {
+        DumpAxisCurves(fd);
+    }
+}
+
+void PointerMotionAcceleration::DumpAxisCurves(int32_t fd)
+{
+    mprintf(fd, "\tAxis accelerate curves (Touchpad) {");
+    size_t index = 0;
+    for (const auto &curve : *axisCurves_) {
+        mprintf(fd, "\t\tAxis acceleration curve [%zu] {", index);
+        mprintf(fd, "\t\t\tspeeds: [%s]", DumpVec(curve.speeds).c_str());
+        mprintf(fd, "\t\t\tslopes: [%s]", DumpVec(curve.slopes).c_str());
+        mprintf(fd, "\t\t\tdiff_nums: [%s]", DumpVec(curve.diffNums).c_str());
+        mprintf(fd, "\t\t}");
+        ++index;
+    }
+    mprintf(fd, "\t}");
 }
 
 void PointerMotionAcceleration::LoadAccelerationConfig(std::function<bool(const char*, cJSON*)> load)
@@ -335,10 +348,7 @@ bool PointerMotionAcceleration::LoadDynamicMouseCurve(const char *cfgPath, cJSON
         MMI_HILOGE("Invalid config(%{private}s): '%{public}s' is invalid", cfgPath, name);
         return false;
     }
-    {
-        std::unique_lock<std::shared_mutex> lock(mutex_);
-        dynamicMouseCurve_ = std::move(curve);
-    }
+    dynamicMouseCurve_ = std::move(curve);
     return true;
 }
 
@@ -382,10 +392,7 @@ bool PointerMotionAcceleration::LoadDynamicTouchpadCurve(const char *cfgPath, cJ
         MMI_HILOGE("Invalid config(%{private}s): '%{public}s' is invalid", cfgPath, name);
         return false;
     }
-    {
-        std::unique_lock<std::shared_mutex> lock(mutex_);
-        dynamicTouchpadCurve_ = std::move(curve);
-    }
+    dynamicTouchpadCurve_ = std::move(curve);
     return true;
 }
 
@@ -567,10 +574,7 @@ bool PointerMotionAcceleration::LoadAccelerationCurve(const char *cfgPath, cJSON
         }
         curves.push_back(std::move(curve));
     }
-    {
-        std::unique_lock<std::shared_mutex> lock(mutex_);
-        curves_.emplace(name, std::move(curves));
-    }
+    curves_.emplace(name, std::move(curves));
     return true;
 }
 
@@ -625,6 +629,157 @@ const PointerMotionAcceleration::Curve* PointerMotionAcceleration::MatchCurve(
     } else {
         return &curves[curves.size() - 1];
     }
+}
+
+bool PointerMotionAcceleration::AxisCurve::IsValid() const
+{
+    return !speeds.empty() && !slopes.empty() && !diffNums.empty();
+}
+
+bool PointerMotionAcceleration::CalcAxisGainTouchpad(const AxisCurve &curve, double axisSpeed, double &gain)
+{
+    MMI_HILOGD("CalcAxisGainTouchpad, axisSpeed:%f", axisSpeed);
+
+    if (curve.speeds.empty() || curve.slopes.empty() || curve.diffNums.empty()) {
+        MMI_HILOGE("Invalid acceleration curve");
+        return false;
+    }
+
+    const auto absAxisSpeed = std::fabs(axisSpeed);
+    const auto len = curve.speeds.size();
+
+    for (size_t index = 0; index < len; ++index) {
+        if (absAxisSpeed <= curve.speeds[index]) {
+            gain = curve.slopes[index] * absAxisSpeed + curve.diffNums[index];
+            MMI_HILOGD("gain is set to %{public}f", gain);
+            return true;
+        }
+    }
+
+    gain = curve.slopes[len - 1] * absAxisSpeed + curve.diffNums[len - 1];
+    MMI_HILOGD("gain is set to %{public}f", gain);
+    return true;
+}
+
+int32_t PointerMotionAcceleration::DynamicAccelerateTouchpadAxis(double &axisSpeed, bool mode, DeviceType deviceType)
+{
+    MMI_HILOGD("Accelerate touchpad axis, mode:%{public}d, deviceType:%{public}d, axisSpeed:%{public}f",
+        mode, static_cast<int32_t>(deviceType), axisSpeed);
+    if (!axisCurves_) {
+        PointerMotionAcceleration::LoadAccelerationConfig(&PointerMotionAcceleration::LoadAxisCurve);
+    }
+    if (axisCurves_) {
+        double gain { 0.0 };
+        const auto curve = MatchAxisCurve(*axisCurves_, deviceType);
+        if (curve == nullptr) {
+            MMI_HILOGE("No match axis curve");
+            return RET_ERR;
+        }
+
+        if (!CalcAxisGainTouchpad(*curve, axisSpeed, gain)) {
+            MMI_HILOGW("CalcAxisGainTouchpad fail");
+            return RET_ERR;
+        }
+        if (!mode) {
+            if (axisSpeed < 0.0) {
+                gain = -gain;
+            }
+        }
+        axisSpeed = gain;
+    }
+    MMI_HILOGD("Accelerated touchpad axis (axisSpeed:%{private}f)", axisSpeed);
+    return RET_OK;
+}
+
+const PointerMotionAcceleration::AxisCurve* PointerMotionAcceleration::MatchAxisCurve(
+    const AxisCurveCollection &curves, DeviceType devType)
+{
+    int32_t validDeviceType;
+    switch (devType) {
+        case DeviceType::DEVICE_PC:
+        case DeviceType::DEVICE_SOFT_PC_PRO:
+            validDeviceType = static_cast<int32_t>(devType);
+            break;
+        case DeviceType::DEVICE_TABLET:
+            validDeviceType = AXIS_CURVE_TABLET_INDEX;
+            break;
+        case DeviceType::DEVICE_FOLD_PC:
+            validDeviceType = AXIS_CURVE_FOLD_PC_INDEX;
+            break;
+        case DeviceType::DEVICE_M_PC:
+            validDeviceType = AXIS_CURVE_M_PC_INDEX;
+            break;
+        case DeviceType::DEVICE_FOLD_PC_VIRT:
+            validDeviceType = AXIS_CURVE_FOLD_PC_VIRT_INDEX;
+            break;
+        case DeviceType::DEVICE_M_TABLET:
+            validDeviceType = AXIS_CURVE_M_TABLET_INDEX;
+            break;
+        case DeviceType::DEVICE_Q_TABLET:
+            validDeviceType = AXIS_CURVE_Q_TABLET_INDEX;
+            break;
+        case DeviceType::DEVICE_G_TABLET:
+            validDeviceType = AXIS_CURVE_G_TABLET_INDEX;
+            break;
+        case DeviceType::DEVICE_M_PC_PRO:
+            validDeviceType = AXIS_CURVE_M_PC_PRO_INDEX;
+            break;
+        default:
+            validDeviceType = 1;
+            break;
+    }
+
+    const auto len = curves.size();
+    if (len == 0) {
+        MMI_HILOGE("Axis curves is empty");
+        return nullptr;
+    }
+    if (validDeviceType > 0 && validDeviceType <= static_cast<int32_t>(len)) {
+        return &curves[validDeviceType - 1];
+    } else {
+        return &curves[len - 1];
+    }
+}
+
+bool PointerMotionAcceleration::LoadAxisCurve(const char *cfgPath, cJSON *jsonCfg)
+{
+    const char name[] { "AxisAccelerateCurvesTouchpad" };
+    auto jsonAxisCurves = cJSON_GetObjectItemCaseSensitive(jsonCfg, name);
+    if (jsonAxisCurves == nullptr) {
+        MMI_HILOGE("Invalid config(%{private}s): no '%{public}s'", cfgPath, name);
+        return false;
+    }
+    if (!cJSON_IsArray(jsonAxisCurves)) {
+        MMI_HILOGE("Invalid config(%{private}s): '%{public}s' is not array", cfgPath, name);
+        return false;
+    }
+    AxisCurveCollection curves;
+    for (int32_t index = 0, nCurves = cJSON_GetArraySize(jsonAxisCurves); index < nCurves; ++index) {
+        auto jsonCurve = cJSON_GetArrayItem(jsonAxisCurves, index);
+        if (jsonCurve == nullptr) {
+            MMI_HILOGE("Invalid config(%{private}s): %{public}s[%{public}d] is null", cfgPath, name, index);
+            return false;
+        }
+        if (!cJSON_IsObject(jsonCurve)) {
+            MMI_HILOGE("Invalid config(%{private}s): %{public}s[%{public}d] is not object",
+                cfgPath, name, index);
+            return false;
+        }
+        AxisCurve curve {};
+        bool valid = (
+            LoadProperty(jsonCurve, std::string("speeds"), curve.speeds) &&
+            LoadProperty(jsonCurve, std::string("slopes"), curve.slopes) &&
+            LoadProperty(jsonCurve, std::string("diff_nums"), curve.diffNums) &&
+            curve.IsValid()
+        );
+        if (!valid) {
+            MMI_HILOGE("Invalid config(%{private}s): %{public}s[%{public}d] is invalid", cfgPath, name, index);
+            return false;
+        }
+        curves.push_back(std::move(curve));
+    }
+    axisCurves_ = std::move(curves);
+    return true;
 }
 } // namespace MMI
 } // namespace OHOS
