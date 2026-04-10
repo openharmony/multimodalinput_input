@@ -71,6 +71,7 @@ private:
     bool HasOtherKeyPressedInWindow(const std::string& subscribeKey);
     void StartDurationWindow(const std::string& subscribeKey, int32_t duration);
     void MarkDurationPassed(const std::string& subscribeKey);
+    std::string GenerateSubscribeKey(std::shared_ptr<KeyOption> keyOption);
 
 private:
     bool CheckDurationWindowPassed(const std::string& subscribeKey);

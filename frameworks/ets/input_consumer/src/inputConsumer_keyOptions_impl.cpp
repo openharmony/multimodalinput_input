@@ -40,6 +40,7 @@ std::string GenerateKeyOptionKey(const std::shared_ptr<KeyOption>& keyOption)
     subKeyNames.append(std::to_string(isFinalKeyDown)).append(",");
     subKeyNames.append(std::to_string(finalKeyDownDuration)).append(",");
     subKeyNames.append(std::to_string(isRepeat));
+    subKeyNames.append(",").append(std::to_string(keyOption->GetTriggerType()));
     return subKeyNames;
 }
 
@@ -59,6 +60,10 @@ inputConsumer::KeyOptions ConvertTaiheKeyOptions(std::shared_ptr<KeyOption> keyO
     result.finalKeyDownDuration = keyOption->GetFinalKeyDownDuration();
     bool isRepeatValue = keyOption->IsRepeat();
     result.isRepeat = taihe::optional<bool>(std::in_place, isRepeatValue);
+    if (keyOption->GetTriggerType() != 0) {
+        result.triggerType = taihe::optional<inputConsumer::KeyCommandTriggerType>(
+            std::in_place, static_cast<inputConsumer::KeyCommandTriggerType>(keyOption->GetTriggerType()));
+    }
     return result;
 }
 } // namespace MMI
