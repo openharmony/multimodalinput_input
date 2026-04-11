@@ -58,7 +58,9 @@ std::string WatchdogTask::GetFirstLine(const std::string& path)
 
 std::string WatchdogTask::GetProcessNameFromProcCmdline(int32_t pid)
 {
-    std::string procCmdlinePath = "/proc/" + std::to_string(pid) + "/cmdline";
+    std::string procCmdlinePath = "/proc/";
+    procCmdlinePath += std::to_string(pid);
+    procCmdlinePath += "/cmdline";
     std::string procCmdlineContent = GetFirstLine(procCmdlinePath);
     if (procCmdlineContent.empty()) {
         return "";
@@ -100,7 +102,9 @@ std::string WatchdogTask::GetBlockDescription(uint64_t interval)
 {
     std::string desc = "Watchdog: thread(";
     desc += THREAD_NAME;
-    desc += ") blocked " + std::to_string(interval) + "s";
+    desc += ") blocked ";
+    desc += std::to_string(interval);
+    desc += "s";
     return desc;
 }
 

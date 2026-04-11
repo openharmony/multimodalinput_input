@@ -1212,7 +1212,10 @@ ErrCode MMIService::MarkProcessed(int32_t eventType, int32_t eventId)
         return MMISERVICE_NOT_RUNNING;
     }
     CHKPR(ANRMgr, RET_ERR);
-    std::string msg = "MarkProcessed,eventType:" + std::to_string(eventType) + ",eventId:" + std::to_string(eventId);
+    std::string msg = "MarkProcessed,eventType:";
+    msg += std::to_string(eventType);
+    msg += ",eventId:";
+    msg += std::to_string(eventId);
     BytraceAdapter::MMIServiceTraceStart(BytraceAdapter::MMI_THREAD_LOOP_DEPTH_THREE, msg);
     int32_t clientPid = GetCallingPid();
     int32_t ret = delegateTasks_.PostSyncTask(
@@ -4935,8 +4938,8 @@ ErrCode MMIService::TransferBinderClientSrv(const sptr<IRemoteObject> &binderCli
 
 void MMIService::CalculateFuntionRunningTime(std::function<void()> func, const std::string &flag)
 {
-
-    std::string msg = "Epoll_event_input, event type is: " + flag;
+    std::string msg = "Epoll_event_input, event type is: ";
+    msg += flag;
     BytraceAdapter::MMIServiceTraceStart(BytraceAdapter::MMI_THREAD_LOOP_DEPTH_THREE, msg);
     std::function<void (void *)> printLog = std::bind(&MMIService::PrintLog, this, flag, THREAD_BLOCK_TIMER_SPAN_S,
         getpid(), gettid());

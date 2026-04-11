@@ -68,7 +68,9 @@ void ANRHandler::MarkProcessed(int32_t eventType, int32_t eventId)
         std::lock_guard<std::mutex> guard(mutex_);
         idList_.push_back(eventId);
         if (idList_.size() >= PRINT_INTERVAL_COUNT) {
-            std::string idList = std::to_string(idList_.front()) + " " + std::to_string(idList_.back());
+            std::string idList = std::to_string(idList_.front());
+            idList += " ";
+            idList += std::to_string(idList_.back());
             MMI_HILOG_FREEZEI("Ffrt PE:%{public}s", idList.c_str());
             idList_.clear();
         }

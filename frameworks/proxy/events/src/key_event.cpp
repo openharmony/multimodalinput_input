@@ -1040,16 +1040,24 @@ void KeyEvent::Reset()
 std::string KeyEvent::ToString()
 {
     std::string eventStr = InputEvent::ToString();
-    eventStr += ",keyCode:" + std::to_string(keyCode_);
-    eventStr += ",keyAction:" + std::to_string(keyAction_);
+    eventStr += ",keyCode:";
+    eventStr += std::to_string(keyCode_);
+    eventStr += ",keyAction:";
+    eventStr += std::to_string(keyAction_);
     eventStr += ",keyItems:[";
     for (size_t i = 0; i < keys_.size(); i++) {
-        int32_t pressed = keys_[i].IsPressed() ? 1 : 0;
-        eventStr += "{pressed:" + std::to_string(pressed);
-        eventStr += ",deviceId:" + std::to_string(keys_[i].GetDeviceId());
-        eventStr += ",keyCode:" + std::to_string(keys_[i].GetKeyCode());
-        eventStr += ",downTime:" + std::to_string(keys_[i].GetDownTime());
-        eventStr += ",unicode:" + std::to_string(keys_[i].GetUnicode()) + "}";
+        int32_t pressed = keys_[i].IsPressed() ?1 : 0;
+        eventStr += "{pressed:";
+        eventStr += std::to_string(pressed);
+        eventStr += ",deviceId:";
+        eventStr += std::to_string(keys_[i].GetDeviceId());
+        eventStr += ",keyCode:";
+        eventStr += std::to_string(keys_[i].GetKeyCode());
+        eventStr += ",downTime:";
+        eventStr += std::to_string(keys_[i].GetDownTime());
+        eventStr += ",unicode:";
+        eventStr += std::to_string(keys_[i].GetUnicode());
+        eventStr += "}";
         if (i != keys_.size() - 1) {
             eventStr += ",";
         }

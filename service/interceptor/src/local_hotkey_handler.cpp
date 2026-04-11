@@ -35,7 +35,7 @@ namespace MMI {
 namespace {
 constexpr uint32_t LOCAL_HOT_KEY_WITH_ALL_MODIFIERS_OPTIONAL { 0x10000000U };
 constexpr std::uintmax_t MAX_SIZE_OF_LOCAL_HOT_KEYS_CONFIG { 8192 };
-const std::string DEFAULT_KEYEVENT_INTERCEPT_WHITELIST { "2722;41;40;0;22;17;16;23;2841;9;2089;2083;" };
+const std::string DEFAULT_KEYEVENT_INTERCEPT_WHITELIST { "2722;41;40;0;22;17;16;23;2841;9;2089;2083;18;" };
 } // namespace
 
 enum class ModifierKeyAction {
