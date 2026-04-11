@@ -2250,6 +2250,10 @@ void InputWindowsManager::DrawPointer(bool isDisplayRemoved)
 void InputWindowsManager::PointerDrawingManagerOnDisplayInfo(const OLD::DisplayGroupInfo &displayGroupInfo,
     bool isDisplayRemoved)
 {
+    if (!INPUT_DEV_MGR->HasPointerDeviceIncludingVirtual()) {
+        MMI_HILOGI("OnDisplayInfo no pointer device");
+        return;
+    }
     auto currentDisplayInfo = CursorDrawingComponent::GetInstance().GetCurrentDisplayInfo();
     CursorDrawingComponent::GetInstance().OnDisplayInfo(displayGroupInfo);
     int32_t groupId = displayGroupInfo.groupId;

@@ -1,0 +1,10 @@
+{
+    "exactly_match":[
+        {
+            "device_name":"fe6e0030.pwm",
+            "is_mouse":false
+        }
+    ],
+    "contain_match":[],
+    "special_input_device":[]
+}
