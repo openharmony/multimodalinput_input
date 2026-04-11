@@ -163,7 +163,7 @@ constexpr int32_t MIN_TIMEOUT_DELAY { 1 };
 constexpr int32_t MSDP_UID { 6699 };
 constexpr int32_t DEFAULT_UNLOAD_DELAY_TIME { 30000 };
 constexpr int32_t REPEAT_ONCE { 1 };
-
+constexpr int32_t CONTROLLER_DISPLAY_NOT_EXIST { 4300002 };
 const size_t QUOTES_BEGIN = 1;
 const size_t QUOTES_END = 2;
 const std::set<int32_t> g_keyCodeValueSet = {
@@ -2315,6 +2315,41 @@ int32_t MMIService::OnGetKeyState(std::vector<int32_t> &pressedKeys,
 }
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 
+int32_t MMIService::ValidateControllerEventCoordinates(const std::shared_ptr<PointerEvent> pointerEvent)
+{
+    CHKPR(pointerEvent, ERROR_NULL_POINTER);
+
+    int32_t targetDisplayId = pointerEvent->GetTargetDisplayId();
+
+    // Get display info from WindowsManager
+    const auto* displayInfo = WIN_MGR->GetPhysicalDisplay(targetDisplayId);
+    if (displayInfo == nullptr) {
+        MMI_HILOGE("Display %{public}d does not exist", targetDisplayId);
+        return CONTROLLER_DISPLAY_NOT_EXIST;  // CONTROLLER_DISPLAY_NOT_EXIST
+    }
+
+    // Validate coordinates are within display bounds
+    PointerEvent::PointerItem item;
+    if (!pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), item)) {
+        MMI_HILOGE("Failed to get pointer item");
+        return RET_OK;  // If no pointer item, skip validation
+    }
+
+    int32_t x = item.GetDisplayX();
+    int32_t y = item.GetDisplayY();
+
+    if (x < 0 || x >= displayInfo->validWidth || y < 0 || y >= displayInfo->validHeight) {
+        MMI_HILOGE("Coordinates out of bounds for display %{public}d "
+            "(width=%{public}d, height=%{public}d)",
+            targetDisplayId, displayInfo->width, displayInfo->height);
+        return CONTROLLER_DISPLAY_NOT_EXIST;  // CONTROLLER_DISPLAY_NOT_EXIST
+    }
+
+    MMI_HILOGD("Validated Controller event: displayId=%{public}d, x=%{public}d, y=%{public}d",
+               targetDisplayId, x, y);
+    return RET_OK;
+}
+
 int32_t MMIService::CheckInjectPointerEvent(int32_t userId, const std::shared_ptr<PointerEvent> pointerEvent,
     int32_t pid, bool isNativeInject, bool isShell, int32_t useCoordinate)
 {
@@ -2361,9 +2396,11 @@ ErrCode MMIService::InjectPointerEvent(const PointerEvent& pointerEvent, bool is
             MMI_HILOGE("Controller permission check failed for PointerEvent, ret:%{public}d", ret);
             return ret;
         }
-        // Remove Controller flag after permission check
+        if (int32_t validateRet = ValidateControllerEventCoordinates(pointerEventPtr); validateRet != RET_OK) {
+            MMI_HILOGE("Controller event validation failed, ret=%{public}d", validateRet);
+            return validateRet;
+        }
         pointerEventPtr->ClearFlag(InputEvent::EVENT_FLAG_CONTROLLER);
-        MMI_HILOGD("Removed EVENT_FLAG_CONTROLLER after permission check");
     } else {
         // Original permission model: system app + INJECT_INPUT_EVENT permission
         if (!isNativeInject && !PER_HELPER->VerifySystemApp()) {

@@ -105,11 +105,6 @@ int32_t MouseControllerImpl::MoveTo(int32_t displayId, int32_t x, int32_t y)
 {
     MMI_HILOGD("MoveTo: displayId=%{public}d, x=%{public}d, y=%{public}d", displayId, x, y);
 
-    if (!ValidateCoordinates(x, y, displayId)) {
-        MMI_HILOGE("Invalid coordinates");
-        return RET_ERR;
-    }
-
     std::shared_ptr<PointerEvent> pointerEvent;
 
     {
@@ -422,25 +417,6 @@ int32_t MouseControllerImpl::InjectPointerEvent(std::shared_ptr<PointerEvent> ev
     InputManager::GetInstance()->SimulateInputEvent(event, false, PointerEvent::DISPLAY_COORDINATE);
 
     return RET_OK;
-}
-
-bool MouseControllerImpl::ValidateCoordinates(int32_t& x, int32_t& y, int32_t displayId)
-{
-    if (x < 0) {
-        MMI_HILOGW("Clamping negative x coordinate: %{public}d -> 0", x);
-        x = 0;
-    }
-    if (y < 0) {
-        MMI_HILOGW("Clamping negative y coordinate: %{public}d -> 0", y);
-        y = 0;
-    }
-
-    // TODO: Get screen size and clamp to screen boundaries
-    // This requires calling DisplayManager API to get display dimensions
-    // For now, we only clamp negative values
-    // The service will validate displayId and return ERROR_CODE_DISPLAY_NOT_EXIST if invalid
-
-    return true;
 }
 
 } // namespace MMI

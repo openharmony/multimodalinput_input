@@ -348,6 +348,7 @@ private:
     ~MMIService();
 
     ErrCode CheckControllerPermission();
+    int32_t ValidateControllerEventCoordinates(const std::shared_ptr<PointerEvent> pointerEvent);
     int32_t CheckPidPermission(int32_t pid);
     void PrintLog(const std::string &flag, int32_t duration, int32_t pid, int32_t tid);
     void OnSessionDelete(SessionPtr session);

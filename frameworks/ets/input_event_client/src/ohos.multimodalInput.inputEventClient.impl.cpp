@@ -575,7 +575,8 @@ public:
 
     ~MouseControllerImpl() = default;
 
-    void MoveToSync(int32_t displayId, int32_t displayX, int32_t displayY) {
+    void MoveToSync(int32_t displayId, int32_t displayX, int32_t displayY)
+    {
         CALL_DEBUG_ENTER;
         if (nativeImpl_ == nullptr) {
             MMI_HILOGE("Native implementation is null");
@@ -595,7 +596,8 @@ public:
         }
     }
 
-    void PressButtonSync(::ohos::multimodalInput::mouseEvent::Button button) {
+    void PressButtonSync(::ohos::multimodalInput::mouseEvent::Button button)
+    {
         CALL_DEBUG_ENTER;
         if (nativeImpl_ == nullptr) {
             MMI_HILOGE("Native implementation is null");
@@ -617,7 +619,8 @@ public:
         }
     }
 
-    void ReleaseButtonSync(::ohos::multimodalInput::mouseEvent::Button button) {
+    void ReleaseButtonSync(::ohos::multimodalInput::mouseEvent::Button button)
+    {
         CALL_DEBUG_ENTER;
         if (nativeImpl_ == nullptr) {
             MMI_HILOGE("Native implementation is null");
@@ -639,7 +642,8 @@ public:
         }
     }
 
-    void BeginAxisSync(::ohos::multimodalInput::mouseEvent::Axis axis, int32_t value) {
+    void BeginAxisSync(::ohos::multimodalInput::mouseEvent::Axis axis, int32_t value)
+    {
         CALL_DEBUG_ENTER;
         if (nativeImpl_ == nullptr) {
             MMI_HILOGE("Native implementation is null");
@@ -660,7 +664,8 @@ public:
         }
     }
 
-    void UpdateAxisSync(::ohos::multimodalInput::mouseEvent::Axis axis, int32_t value) {
+    void UpdateAxisSync(::ohos::multimodalInput::mouseEvent::Axis axis, int32_t value)
+    {
         CALL_DEBUG_ENTER;
         if (nativeImpl_ == nullptr) {
             MMI_HILOGE("Native implementation is null");
@@ -681,7 +686,8 @@ public:
         }
     }
 
-    void EndAxisSync(::ohos::multimodalInput::mouseEvent::Axis axis) {
+    void EndAxisSync(::ohos::multimodalInput::mouseEvent::Axis axis)
+    {
         CALL_DEBUG_ENTER;
         if (nativeImpl_ == nullptr) {
             MMI_HILOGE("Native implementation is null");
@@ -706,7 +712,8 @@ private:
     std::shared_ptr<OHOS::MMI::MouseControllerImpl> nativeImpl_;
 };
 
-::ohos::multimodalInput::inputEventClient::MouseController CreateMouseControllerSync() {
+::ohos::multimodalInput::inputEventClient::MouseController CreateMouseControllerSync()
+{
     CALL_DEBUG_ENTER;
 
     // 注意：新增接口不需要权限校验（不检查system api和INJECT_INPUT_EVENT权限）
@@ -741,7 +748,8 @@ public:
 
     ~KeyboardControllerImpl() = default;
 
-    void PressKeySync(::ohos::multimodalInput::keyCode::KeyCode keyCode) {
+    void PressKeySync(::ohos::multimodalInput::keyCode::KeyCode keyCode)
+    {
         CALL_DEBUG_ENTER;
         if (nativeImpl_ == nullptr) {
             MMI_HILOGE("Native implementation is null");
@@ -763,7 +771,8 @@ public:
         }
     }
 
-    void ReleaseKeySync(::ohos::multimodalInput::keyCode::KeyCode keyCode) {
+    void ReleaseKeySync(::ohos::multimodalInput::keyCode::KeyCode keyCode)
+    {
         CALL_DEBUG_ENTER;
         if (nativeImpl_ == nullptr) {
             MMI_HILOGE("Native implementation is null");
@@ -789,7 +798,8 @@ private:
     std::shared_ptr<OHOS::MMI::KeyboardControllerImpl> nativeImpl_;
 };
 
-::ohos::multimodalInput::inputEventClient::KeyboardController CreateKeyboardControllerSync() {
+::ohos::multimodalInput::inputEventClient::KeyboardController CreateKeyboardControllerSync()
+{
     CALL_DEBUG_ENTER;
 
     // 注意：新增接口不需要权限校验（不检查system api和INJECT_INPUT_EVENT权限）

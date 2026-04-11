@@ -32,13 +32,7 @@ namespace OHOS {
 namespace MMI {
 
 namespace {
-// TODO: Add these error codes to util_napi_error.h
-// Error codes for MouseController
-constexpr int32_t INPUT_SERVICE_EXCEPTION = 3800001;      // Input service exception
 
-/**
- * @brief Create business error
- */
 napi_value CreateBusinessError(napi_env env, int32_t code, const std::string& msg)
 {
     napi_value businessError = nullptr;
@@ -92,8 +86,7 @@ napi_value CreateMouseController(napi_env env, napi_callback_info info)
             MMI_HILOGD("JsMouseController finalizer called");
             delete static_cast<JsMouseController*>(data);
         },
-        nullptr,
-        nullptr);
+        nullptr, nullptr);
 
     if (status != napi_ok) {
         MMI_HILOGE("Failed to wrap JsMouseController");
