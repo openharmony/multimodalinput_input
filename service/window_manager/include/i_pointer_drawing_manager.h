@@ -46,8 +46,7 @@ public:
     {
         return 0;
     }
-    virtual int32_t SetPointerStyle(int32_t pid, int32_t windowId, PointerStyle pointerStyle,
-        bool isUiExtension = false)
+    virtual int32_t SetPointerStyle(int32_t pid, int32_t windowId, PointerStyle pointerStyle)
     {
         return 0;
     }
@@ -67,7 +66,8 @@ public:
     {
         return 0;
     }
-    virtual int32_t SetCustomCursor(int32_t pid, int32_t windowId, CustomCursor cursor, CursorOptions options)
+    virtual int32_t SetCustomCursor(int32_t pid, int32_t windowId, CustomCursor cursor, CursorOptions options,
+        const sptr<IRemoteObject> &token = nullptr)
     {
         return 0;
     }

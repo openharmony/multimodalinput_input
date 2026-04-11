@@ -52,7 +52,8 @@ public:
     int32_t GetPointerSize(int32_t &size);
     int32_t GetCursorSurfaceId(uint64_t &surfaceId);
     int32_t SetCustomCursor(int32_t windowId, int32_t focusX, int32_t focusY, void* pixelMap);
-    int32_t SetCustomCursor(int32_t windowId, CustomCursor cursor, CursorOptions options);
+    int32_t SetCustomCursor(int32_t windowId, CustomCursor cursor, CursorOptions options,
+        const sptr<IRemoteObject> &token = nullptr);
     int32_t SetMouseIcon(int32_t windowId, void* pixelMap);
     int32_t SetMouseHotSpot(int32_t pid, int32_t windowId, int32_t hotSpotX, int32_t hotSpotY);
     int32_t SetMousePrimaryButton(int32_t primaryButton);
@@ -67,8 +68,8 @@ public:
     int32_t EnableCombineKey(bool enable);
     int32_t SetPointerSpeed(int32_t speed);
     int32_t GetPointerSpeed(int32_t &speed);
-    int32_t SetPointerStyle(int32_t windowId, PointerStyle pointerStyle, bool isUiExtension = false);
-    int32_t GetPointerStyle(int32_t windowId, PointerStyle &pointerStyle, bool isUiExtension = false);
+    int32_t SetPointerStyle(int32_t windowId, PointerStyle pointerStyle, const sptr<IRemoteObject> &token = nullptr);
+    int32_t GetPointerStyle(int32_t windowId, PointerStyle &pointerStyle, const sptr<IRemoteObject> &token = nullptr);
     int32_t ClearWindowPointerStyle(int32_t pid, int32_t windowId);
     int32_t SupportKeys(int32_t deviceId, std::vector<int32_t> &keys, std::vector<bool> &keystroke);
     int32_t GetDeviceIds(std::vector<int32_t> &ids);
@@ -211,6 +212,7 @@ public:
     int32_t IsPointerInit(bool &status);
     int32_t DeliverNonce(const std::string &nonce);
     int32_t RedispatchInputEvent(std::shared_ptr<PointerEvent> pointerEvent);
+    int32_t UpdateUIExtensionInfo(const std::vector<UIExtensionInfo> &uiExtensionInfos);
 #ifdef OHOS_BUILD_ENABLE_ANCO_GAME_EVENT_MAPPING
     int32_t ControlMouseEventToAnco(int32_t windowId, bool enable);
 #endif // OHOS_BUILD_ENABLE_ANCO_GAME_EVENT_MAPPING

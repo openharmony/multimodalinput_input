@@ -1322,7 +1322,7 @@ HWTEST_F(InputWindowsManagerTest, UpdateMouseTarget_009, TestSize.Level1)
     UDSServer udsServer;
     inputWindowsManager->udsServer_ = &udsServer;
     inputWindowsManager->mouseDownInfo_.id = 1;
-    inputWindowsManager->isUiExtension_ = true;
+    inputWindowsManager->isUIExtension_ = true;
     it->second.focusWindowId = -1;
     OLD::DisplayInfo displayInfo;
     displayInfo.id = 0;
@@ -1335,7 +1335,7 @@ HWTEST_F(InputWindowsManagerTest, UpdateMouseTarget_009, TestSize.Level1)
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_AXIS_UPDATE);
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager->UpdateMouseTarget(pointerEvent));
     it->second.displaysInfo.clear();
-    inputWindowsManager->isUiExtension_ = false;
+    inputWindowsManager->isUIExtension_ = false;
     inputWindowsManager->mouseDownInfo_.id = -1;
     inputWindowsManager->udsServer_ = nullptr;
     it->second.windowsInfo.clear();
@@ -1367,7 +1367,7 @@ HWTEST_F(InputWindowsManagerTest, UpdateMouseTarget_010, TestSize.Level1)
     inputWindowsManager->mouseDownInfo_.id = 1;
     inputWindowsManager->dragFlag_ = true;
     inputWindowsManager->isDragBorder_ = true;
-    inputWindowsManager->isUiExtension_ = true;
+    inputWindowsManager->isUIExtension_ = true;
     it->second.focusWindowId = -1;
     OLD::DisplayInfo displayInfo;
     displayInfo.id = 0;
@@ -1382,7 +1382,7 @@ HWTEST_F(InputWindowsManagerTest, UpdateMouseTarget_010, TestSize.Level1)
     it->second.displaysInfo.clear();
     inputWindowsManager->dragFlag_ = false;
     inputWindowsManager->isDragBorder_ = false;
-    inputWindowsManager->isUiExtension_ = false;
+    inputWindowsManager->isUIExtension_ = false;
     inputWindowsManager->mouseDownInfo_.id = -1;
     inputWindowsManager->udsServer_ = nullptr;
     it->second.windowsInfo.clear();
@@ -1414,7 +1414,7 @@ HWTEST_F(InputWindowsManagerTest, UpdateMouseTarget_011, TestSize.Level1)
     inputWindowsManager->mouseDownInfo_.id = 1;
     inputWindowsManager->dragFlag_ = true;
     inputWindowsManager->isDragBorder_ = true;
-    inputWindowsManager->isUiExtension_ = false;
+    inputWindowsManager->isUIExtension_ = false;
     it->second.focusWindowId = -1;
     OLD::DisplayInfo displayInfo;
     displayInfo.id = 0;
@@ -1429,7 +1429,7 @@ HWTEST_F(InputWindowsManagerTest, UpdateMouseTarget_011, TestSize.Level1)
     it->second.displaysInfo.clear();
     inputWindowsManager->dragFlag_ = false;
     inputWindowsManager->isDragBorder_ = false;
-    inputWindowsManager->isUiExtension_ = false;
+    inputWindowsManager->isUIExtension_ = false;
     inputWindowsManager->mouseDownInfo_.id = -1;
     inputWindowsManager->udsServer_ = nullptr;
     it->second.windowsInfo.clear();
@@ -1462,7 +1462,7 @@ HWTEST_F(InputWindowsManagerTest, UpdateMouseTarget_012, TestSize.Level1)
     inputWindowsManager->mouseDownInfo_.id = 1;
     inputWindowsManager->dragFlag_ = true;
     inputWindowsManager->isDragBorder_ = true;
-    inputWindowsManager->isUiExtension_ = false;
+    inputWindowsManager->isUIExtension_ = false;
     it->second.focusWindowId = -1;
     inputWindowsManager->captureModeInfo_.isCaptureMode = true;
     inputWindowsManager->captureModeInfo_.windowId = 1;
@@ -1481,7 +1481,7 @@ HWTEST_F(InputWindowsManagerTest, UpdateMouseTarget_012, TestSize.Level1)
     it->second.displaysInfo.clear();
     inputWindowsManager->dragFlag_ = false;
     inputWindowsManager->isDragBorder_ = false;
-    inputWindowsManager->isUiExtension_ = false;
+    inputWindowsManager->isUIExtension_ = false;
     inputWindowsManager->captureModeInfo_.isCaptureMode = false;
     inputWindowsManager->captureModeInfo_.windowId = -1;
     inputWindowsManager->mouseDownInfo_.id = -1;
@@ -1518,7 +1518,7 @@ HWTEST_F(InputWindowsManagerTest, UpdateMouseTarget_013, TestSize.Level1)
     inputWindowsManager->mouseDownInfo_.id = 1;
     inputWindowsManager->dragFlag_ = true;
     inputWindowsManager->isDragBorder_ = true;
-    inputWindowsManager->isUiExtension_ = false;
+    inputWindowsManager->isUIExtension_ = false;
     it->second.focusWindowId = -1;
     inputWindowsManager->captureModeInfo_.isCaptureMode = true;
     inputWindowsManager->captureModeInfo_.windowId = -1;
@@ -1538,7 +1538,7 @@ HWTEST_F(InputWindowsManagerTest, UpdateMouseTarget_013, TestSize.Level1)
     it->second.displaysInfo.clear();
     inputWindowsManager->dragFlag_ = false;
     inputWindowsManager->isDragBorder_ = false;
-    inputWindowsManager->isUiExtension_ = false;
+    inputWindowsManager->isUIExtension_ = false;
     inputWindowsManager->captureModeInfo_.isCaptureMode = false;
     inputWindowsManager->mouseDownInfo_.id = -1;
     inputWindowsManager->udsServer_ = nullptr;
@@ -1574,7 +1574,7 @@ HWTEST_F(InputWindowsManagerTest, UpdateMouseTarget_014, TestSize.Level1)
     inputWindowsManager->mouseDownInfo_.id = 1;
     inputWindowsManager->dragFlag_ = true;
     inputWindowsManager->isDragBorder_ = true;
-    inputWindowsManager->isUiExtension_ = false;
+    inputWindowsManager->isUIExtension_ = false;
     it->second.focusWindowId = -1;
     inputWindowsManager->captureModeInfo_.isCaptureMode = true;
     inputWindowsManager->captureModeInfo_.windowId = -1;
@@ -1593,7 +1593,7 @@ HWTEST_F(InputWindowsManagerTest, UpdateMouseTarget_014, TestSize.Level1)
     it->second.displaysInfo.clear();
     inputWindowsManager->dragFlag_ = false;
     inputWindowsManager->isDragBorder_ = false;
-    inputWindowsManager->isUiExtension_ = false;
+    inputWindowsManager->isUIExtension_ = false;
     inputWindowsManager->captureModeInfo_.isCaptureMode = false;
     inputWindowsManager->mouseDownInfo_.id = -1;
     inputWindowsManager->udsServer_ = nullptr;
@@ -4003,8 +4003,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_SetPointerStyle, TestS
     int32_t pid = 100;
     int32_t windowId = 100;
     PointerStyle pointerStyle;
-    bool isUiExtension = false;
-    EXPECT_NE(inputWindowsManager.SetPointerStyle(pid, windowId, pointerStyle, isUiExtension), RET_OK);
+    EXPECT_NE(inputWindowsManager.SetPointerStyle(pid, windowId, pointerStyle), RET_OK);
 }
 
 /**
@@ -5167,7 +5166,7 @@ HWTEST_F(InputWindowsManagerTest, UpdateMouseTarget_019, TestSize.Level1)
     inputWindowsManager->mouseDownInfo_.id = 1;
     inputWindowsManager->dragFlag_ = true;
     inputWindowsManager->isDragBorder_ = true;
-    inputWindowsManager->isUiExtension_ = false;
+    inputWindowsManager->isUIExtension_ = false;
     it->second.focusWindowId = -1;
     inputWindowsManager->captureModeInfo_.isCaptureMode = true;
     inputWindowsManager->captureModeInfo_.windowId = -1;
@@ -5187,7 +5186,7 @@ HWTEST_F(InputWindowsManagerTest, UpdateMouseTarget_019, TestSize.Level1)
     it->second.displaysInfo.clear();
     inputWindowsManager->dragFlag_ = false;
     inputWindowsManager->isDragBorder_ = false;
-    inputWindowsManager->isUiExtension_ = false;
+    inputWindowsManager->isUIExtension_ = false;
     inputWindowsManager->captureModeInfo_.isCaptureMode = false;
     inputWindowsManager->mouseDownInfo_.id = -1;
     inputWindowsManager->udsServer_ = nullptr;
@@ -6079,7 +6078,7 @@ HWTEST_F(InputWindowsManagerTest, UpdateTouchScreenTarget_PointerStyle_001, Test
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
 
-    inputWindowsManager->isUiExtension_ = true;
+    inputWindowsManager->isUIExtension_ = true;
     inputWindowsManager->uiExtensionWindowId_ = TEST_WINDOW_ID;
     inputWindowsManager->uiExtensionPid_ = TEST_WINDOW_PID;
 
@@ -6088,7 +6087,7 @@ HWTEST_F(InputWindowsManagerTest, UpdateTouchScreenTarget_PointerStyle_001, Test
 
     it->second.displaysInfo.clear();
     it->second.windowsInfo.clear();
-    inputWindowsManager->isUiExtension_ = false;
+    inputWindowsManager->isUIExtension_ = false;
     inputWindowsManager->uiExtensionWindowId_ = TEST_INVALID_WINDOW_ID;
     inputWindowsManager->uiExtensionPid_ = TEST_INVALID_PID;
 }
@@ -6134,7 +6133,7 @@ HWTEST_F(InputWindowsManagerTest, UpdateTouchScreenTarget_PointerStyle_002, Test
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
 
-    inputWindowsManager->isUiExtension_ = false;
+    inputWindowsManager->isUIExtension_ = false;
     inputWindowsManager->isDragBorder_ = false;
 
     auto result = inputWindowsManager->UpdateTouchScreenTarget(pointerEvent);
@@ -6385,7 +6384,7 @@ HWTEST_F(InputWindowsManagerTest, UpdateTouchScreenTarget_PointerStyle_007, Test
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
 
-    inputWindowsManager->isUiExtension_ = true;
+    inputWindowsManager->isUIExtension_ = true;
     inputWindowsManager->uiExtensionWindowId_ = TEST_WINDOW_ID;
     inputWindowsManager->uiExtensionPid_ = TEST_WINDOW_PID;
     inputWindowsManager->dragFlag_ = false;
@@ -6395,7 +6394,7 @@ HWTEST_F(InputWindowsManagerTest, UpdateTouchScreenTarget_PointerStyle_007, Test
 
     it->second.displaysInfo.clear();
     it->second.windowsInfo.clear();
-    inputWindowsManager->isUiExtension_ = false;
+    inputWindowsManager->isUIExtension_ = false;
     inputWindowsManager->uiExtensionWindowId_ = TEST_INVALID_WINDOW_ID;
     inputWindowsManager->uiExtensionPid_ = TEST_INVALID_PID;
     inputWindowsManager->dragFlag_ = false;
@@ -6442,7 +6441,7 @@ HWTEST_F(InputWindowsManagerTest, UpdateTouchScreenTarget_PointerStyle_008, Test
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
 
-    inputWindowsManager->isUiExtension_ = false;
+    inputWindowsManager->isUIExtension_ = false;
     inputWindowsManager->isDragBorder_ = false;
     inputWindowsManager->dragFlag_ = false;
     inputWindowsManager->extraData_.drawCursor = true;

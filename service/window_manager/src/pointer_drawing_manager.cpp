@@ -2787,8 +2787,7 @@ IconStyle PointerDrawingManager::GetIconStyle(const MOUSE_ICON mouseStyle)
     return iter->second;
 }
 
-int32_t PointerDrawingManager::SetPointerStyle(int32_t pid, int32_t windowId, PointerStyle pointerStyle,
-    bool isUiExtension)
+int32_t PointerDrawingManager::SetPointerStyle(int32_t pid, int32_t windowId, PointerStyle pointerStyle)
 {
     CALL_DEBUG_ENTER;
     if (windowId == windowId_ || windowId == GLOBAL_WINDOW_ID) {
@@ -3674,7 +3673,7 @@ void PointerDrawingManager::SetSurfaceNodeBounds()
 }
 
 int32_t PointerDrawingManager::SetCustomCursor(int32_t pid, int32_t windowId, CustomCursor cursor,
-    CursorOptions options)
+    CursorOptions options, const sptr<IRemoteObject> &token)
 {
     CALL_DEBUG_ENTER;
     followSystem_ = options.followSystem;
@@ -3690,7 +3689,7 @@ int32_t PointerDrawingManager::SetCustomCursor(int32_t pid, int32_t windowId, Cu
     PointerStyle style;
     style.id = MOUSE_ICON::DEVELOPER_DEFINED_ICON;
     lastMouseStyle_ = style;
-    ret = CursorDrawingInformation::GetInstance().SetPointerStyle(GetCurrentUser(), pid, windowId, style);
+    ret = CursorDrawingInformation::GetInstance().SetPointerStyle(GetCurrentUser(), pid, windowId, style, token);
     if (ret == RET_ERR) {
         MMI_HILOGE("SetPointerStyle is failed");
     }

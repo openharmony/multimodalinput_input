@@ -267,7 +267,6 @@ HWTEST_F(PointerDrawingManagerExTest, InputWindowsManagerTest_DestroyPointerWind
 HWTEST_F(PointerDrawingManagerExTest, InputWindowsManagerTest_SetPointerStyle_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    bool isUiExtension = true;
     PointerStyle pointerStyle;
     pointerStyle.id = 1;
     pointerStyle.color = 0;
@@ -279,7 +278,7 @@ HWTEST_F(PointerDrawingManagerExTest, InputWindowsManagerTest_SetPointerStyle_00
     EXPECT_TRUE(ret1);
     int32_t ret2 = CursorDrawingInformation::GetInstance().UpdateDefaultPointerStyle(pid, windowId, pointerStyle);
     EXPECT_EQ(ret2, RET_OK);
-    int32_t ret3 = WIN_MGR->SetPointerStyle(pid, windowId, pointerStyle, isUiExtension);
+    int32_t ret3 = WIN_MGR->SetPointerStyle(pid, windowId, pointerStyle);
     EXPECT_EQ(ret3, RET_OK);
 
 #ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
@@ -291,7 +290,7 @@ HWTEST_F(PointerDrawingManagerExTest, InputWindowsManagerTest_SetPointerStyle_00
     EXPECT_FALSE(WIN_MGR->IsNeedRefreshLayer(windowId));
 #endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
 #endif //OHOS_BUILD_ENABLE_POINTER
-    int32_t ret4 = CursorDrawingInformation::GetInstance().SetPointerStyle(0, pid, windowId, pointerStyle, isUiExtension);
+    int32_t ret4 = CursorDrawingInformation::GetInstance().SetPointerStyle(0, pid, windowId, pointerStyle);
     EXPECT_NE(ret4, RET_OK);
 }
 
@@ -348,10 +347,8 @@ HWTEST_F(PointerDrawingManagerExTest, InputWindowsManagerTest_UpdateDefaultPoint
     int32_t windowId = 2;
     EXPECT_TRUE(windowId != GLOBAL_WINDOW_ID);
     PointerStyle pointerStyle;
-    bool isUiExtension = true;
     pointerStyle.id = 1;
-    int32_t ret1 =
-        CursorDrawingInformation::GetInstance().UpdateDefaultPointerStyle(pid, windowId, pointerStyle, isUiExtension);
+    int32_t ret1 = CursorDrawingInformation::GetInstance().UpdateDefaultPointerStyle(pid, windowId, pointerStyle);
     EXPECT_EQ(ret1, RET_OK);
 
     PointerStyle style;
@@ -359,19 +356,16 @@ HWTEST_F(PointerDrawingManagerExTest, InputWindowsManagerTest_UpdateDefaultPoint
     EXPECT_FALSE(windowId != GLOBAL_WINDOW_ID);
     pointerStyle.id = 2;
     style.id = 3;
-    int32_t ret2 =
-        CursorDrawingInformation::GetInstance().UpdateDefaultPointerStyle(pid, windowId, pointerStyle, isUiExtension);
+    int32_t ret2 = CursorDrawingInformation::GetInstance().UpdateDefaultPointerStyle(pid, windowId, pointerStyle);
     EXPECT_EQ(ret2, RET_OK);
 
     pointerStyle.id = MOUSE_ICON::DEFAULT;
-    int32_t ret3 =
-        CursorDrawingInformation::GetInstance().UpdateDefaultPointerStyle(pid, windowId, pointerStyle, isUiExtension);
+    int32_t ret3 = CursorDrawingInformation::GetInstance().UpdateDefaultPointerStyle(pid, windowId, pointerStyle);
     EXPECT_EQ(ret3, RET_OK);
 
     pointerStyle.id = 3;
     EXPECT_TRUE(pointerStyle.id == style.id);
-    int32_t ret4 =
-        CursorDrawingInformation::GetInstance().UpdateDefaultPointerStyle(pid, windowId, pointerStyle, isUiExtension);
+    int32_t ret4 = CursorDrawingInformation::GetInstance().UpdateDefaultPointerStyle(pid, windowId, pointerStyle);
     EXPECT_EQ(ret4, RET_OK);
 }
 
@@ -681,7 +675,6 @@ HWTEST_F(PointerDrawingManagerExTest, InputWindowsManagerTest_DrawPointerStyle_0
 HWTEST_F(PointerDrawingManagerExTest, InputWindowsManagerTest_SetPointerStyle_01, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    bool isUiExtension = false;
 
     PointerStyle pointerStyle;
     pointerStyle.id = 1;
@@ -693,8 +686,7 @@ HWTEST_F(PointerDrawingManagerExTest, InputWindowsManagerTest_SetPointerStyle_01
     bool ret = CursorDrawingInformation::GetInstance().IsPointerStyleParamValid(windowId, pointerStyle);
     EXPECT_FALSE(ret);
     int32_t userId = 0;
-    int32_t ret2 = CursorDrawingInformation::GetInstance().SetPointerStyle(userId, pid, windowId, pointerStyle,
-        isUiExtension);
+    int32_t ret2 = CursorDrawingInformation::GetInstance().SetPointerStyle(userId, pid, windowId, pointerStyle);
     EXPECT_EQ(ret2, RET_ERR);
 }
 
@@ -707,7 +699,6 @@ HWTEST_F(PointerDrawingManagerExTest, InputWindowsManagerTest_SetPointerStyle_01
 HWTEST_F(PointerDrawingManagerExTest, InputWindowsManagerTest_SetPointerStyle_02, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    bool isUiExtension = true;
 
     PointerStyle pointerStyle;
     pointerStyle.id = 1;
@@ -719,8 +710,7 @@ HWTEST_F(PointerDrawingManagerExTest, InputWindowsManagerTest_SetPointerStyle_02
     bool ret = CursorDrawingInformation::GetInstance().IsPointerStyleParamValid(windowId, pointerStyle);
     EXPECT_TRUE(ret);
     int32_t userId = 0;
-    int32_t ret2 = CursorDrawingInformation::GetInstance().SetPointerStyle(userId, pid, windowId, pointerStyle,
-        isUiExtension);
+    int32_t ret2 = CursorDrawingInformation::GetInstance().SetPointerStyle(userId, pid, windowId, pointerStyle);
     EXPECT_EQ(ret2, RET_OK);
 }
 
