@@ -1122,8 +1122,8 @@ static napi_value JsOff(napi_env env, napi_callback_info info)
     return nullptr;
 }
 
-// SDK 26.0.0: validate onKey parameters
-static bool ValidateOnKeyParameters(napi_env env, size_t argc, napi_value* argv, std::string& keyType)
+// SDK 26.0.0: validate onKeyCommand parameters
+static bool ValidateOnKeyCommandParameters(napi_env env, size_t argc, napi_value* argv, std::string& keyType)
 {
     CALL_DEBUG_ENTER;
     if (argc < INPUT_PARAMETER_MAX) {
@@ -1164,8 +1164,8 @@ static bool ValidateOnKeyParameters(napi_env env, size_t argc, napi_value* argv,
     return true;
 }
 
-// SDK 26.0.0: save onKey callback reference
-static bool SaveOnKeyCallback(napi_env env, size_t argc, napi_value* argv, sptr<KeyEventMonitorInfo> event)
+// SDK 26.0.0: save onKeyCommand callback reference
+static bool SaveOnKeyCommandCallback(napi_env env, size_t argc, napi_value* argv, sptr<KeyEventMonitorInfo> event)
 {
     CALL_DEBUG_ENTER;
     CHKPF(event);
@@ -1179,8 +1179,8 @@ static bool SaveOnKeyCallback(napi_env env, size_t argc, napi_value* argv, sptr<
     return true;
 }
 
-// SDK 26.0.0: onKey function
-static napi_value JsOnKey(napi_env env, napi_callback_info info)
+// SDK 26.0.0: onKeyCommand function
+static napi_value JsOnKeyCommand(napi_env env, napi_callback_info info)
 {
     CALL_DEBUG_ENTER;
     sptr<KeyEventMonitorInfo> event = new (std::nothrow) KeyEventMonitorInfo(env);
@@ -1195,13 +1195,13 @@ static napi_value JsOnKey(napi_env env, napi_callback_info info)
         return nullptr;
     }
 
-    if (!ValidateOnKeyParameters(env, argc, argv, keyType)) {
-        MMI_HILOGE("ValidateOnKeyParameters failed");
+    if (!ValidateOnKeyCommandParameters(env, argc, argv, keyType)) {
+        MMI_HILOGE("ValidateOnKeyCommandParameters failed");
         return nullptr;
     }
     event->name = keyType;
-    if (!SaveOnKeyCallback(env, argc, argv, event)) {
-        MMI_HILOGE("SaveOnKeyCallback failed");
+    if (!SaveOnKeyCommandCallback(env, argc, argv, event)) {
+        MMI_HILOGE("SaveOnKeyCommandCallback failed");
         return nullptr;
     }
     if (SubscribeKeyCommand(env, info, event, keyOption) == nullptr) {
@@ -1210,8 +1210,8 @@ static napi_value JsOnKey(napi_env env, napi_callback_info info)
     }
     return nullptr;
 }
-// SDK 26.0.0: validate offKey parameters
-static bool ValidateOffKeyParameters(napi_env env, size_t argc, napi_value* argv, std::string& keyType)
+// SDK 26.0.0: validate offKeyCommand parameters
+static bool ValidateOffKeyCommandParameters(napi_env env, size_t argc, napi_value* argv, std::string& keyType)
 {
     CALL_DEBUG_ENTER;
     if (!UtilNapi::TypeOf(env, argv[0], napi_string)) {
@@ -1240,7 +1240,7 @@ static bool ValidateOffKeyParameters(napi_env env, size_t argc, napi_value* argv
     return true;
 }
 
-// SDK 26.0.0: execute offKey unsubscribe
+// SDK 26.0.0: execute offKeyCommand unsubscribe
 static bool UnsubscribeKeyCommand(napi_env env, sptr<KeyEventMonitorInfo> event, std::shared_ptr<KeyOption> keyOption)
 {
     CALL_DEBUG_ENTER;
@@ -1263,8 +1263,8 @@ static bool UnsubscribeKeyCommand(napi_env env, sptr<KeyEventMonitorInfo> event,
     return true;
 }
 
-// SDK 26.0.0: offKey function
-static napi_value JsOffKey(napi_env env, napi_callback_info info)
+// SDK 26.0.0: offKeyCommand function
+static napi_value JsOffKeyCommand(napi_env env, napi_callback_info info)
 {
     CALL_DEBUG_ENTER;
     sptr<KeyEventMonitorInfo> event = new (std::nothrow) KeyEventMonitorInfo(env);
@@ -1279,8 +1279,8 @@ static napi_value JsOffKey(napi_env env, napi_callback_info info)
         return nullptr;
     }
 
-    if (!ValidateOffKeyParameters(env, argc, argv, keyType)) {
-        MMI_HILOGE("ValidateOffKeyParameters failed");
+    if (!ValidateOffKeyCommandParameters(env, argc, argv, keyType)) {
+        MMI_HILOGE("ValidateOffKeyCommandParameters failed");
         return nullptr;
     }
     event->name = keyType;
@@ -1958,8 +1958,8 @@ static napi_value MmiInit(napi_env env, napi_value exports)
     napi_property_descriptor desc[] = {
         DECLARE_NAPI_FUNCTION("on", JsOn),
         DECLARE_NAPI_FUNCTION("off", JsOff),
-        DECLARE_NAPI_FUNCTION("onKey", JsOnKey),
-        DECLARE_NAPI_FUNCTION("offKey", JsOffKey),
+        DECLARE_NAPI_FUNCTION("onKeyCommand", JsOnKeyCommand),
+        DECLARE_NAPI_FUNCTION("offKeyCommand", JsOffKeyCommand),
         DECLARE_NAPI_FUNCTION("setShieldStatus", SetShieldStatus),
         DECLARE_NAPI_FUNCTION("getShieldStatus", GetShieldStatus),
         DECLARE_NAPI_FUNCTION("getAllSystemHotkeys", GetAllSystemHotkeys)
