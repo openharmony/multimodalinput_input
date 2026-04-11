@@ -144,6 +144,12 @@ ohos_unittest("TriggerEventDispatcherTest") {
     debug = false
   }
 
+  include_dirs = [
+    "${mmi_path}/service/event_handler/include",
+    "${mmi_path}/util/common/include",
+    "${mmi_path}/interfaces/native/innerkits/event/include",
+  ]
+
   sources = [
     "${mmi_path}/service/event_handler/src/trigger_event_dispatcher.cpp",
     "trigger_event_dispatcher_test.cpp",

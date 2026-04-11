@@ -192,7 +192,7 @@ HWTEST_F(TriggerEventDispatcherTest, TriggerEventDispatcher_MatchPreKeys_001, Te
     item3.SetPressed(true);
     keyItems.push_back(item3);
 
-    keyEvent->SetKeyItems(keyItems);
+    keyEvent->SetKeyItem(keyItems);
 
     bool result = dispatcher_->ShouldDispatch(keyOption, keyEvent);
     EXPECT_TRUE(result);
