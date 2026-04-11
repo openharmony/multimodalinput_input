@@ -41,7 +41,6 @@ private:
     PointerEvent::PointerItem CreatePointerItem();
     std::shared_ptr<PointerEvent> CreatePointerEvent(int32_t action);
     int32_t InjectPointerEvent(std::shared_ptr<PointerEvent> event);
-    bool ValidateCoordinates(int32_t& x, int32_t& y, int32_t displayId);
 
     std::map<int32_t, bool> buttonStates_;
     std::map<int32_t, int64_t> buttonDownTimes_;

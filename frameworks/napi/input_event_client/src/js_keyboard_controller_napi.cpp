@@ -32,12 +32,7 @@ namespace OHOS {
 namespace MMI {
 
 namespace {
-// Error codes for KeyboardController
-constexpr int32_t INPUT_SERVICE_EXCEPTION = 3800001;      // Input service exception
 
-/**
- * @brief Create business error
- */
 napi_value CreateBusinessError(napi_env env, int32_t code, const std::string& msg)
 {
     napi_value businessError = nullptr;
