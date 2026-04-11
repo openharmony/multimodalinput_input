@@ -83,7 +83,7 @@ napi_value CreateKeyboardController(napi_env env, napi_callback_info info)
     }
 
     // Wrap C++ instance with JS object
-    napi_status status = napi_wrap(
+    status = napi_wrap(
         env,
         keyboardController,
         controller,

@@ -579,7 +579,7 @@ public:
         CALL_DEBUG_ENTER;
         if (nativeImpl_ == nullptr) {
             MMI_HILOGE("Native implementation is null");
-            taihe::set_business_error(INPUT_SERVICE_EXCEPTION, "Controller not initialized");
+            taihe::set_business_error(OHOS::MMI::TaiheErrorCode::INPUT_SERVICE_EXCEPTION, "Controller not initialized");
             return;
         }
 
@@ -599,7 +599,7 @@ public:
         CALL_DEBUG_ENTER;
         if (nativeImpl_ == nullptr) {
             MMI_HILOGE("Native implementation is null");
-            taihe::set_business_error(INPUT_SERVICE_EXCEPTION, "Controller not initialized");
+            taihe::set_business_error(OHOS::MMI::TaiheErrorCode::INPUT_SERVICE_EXCEPTION, "Controller not initialized");
             return;
         }
 
@@ -621,7 +621,7 @@ public:
         CALL_DEBUG_ENTER;
         if (nativeImpl_ == nullptr) {
             MMI_HILOGE("Native implementation is null");
-            taihe::set_business_error(INPUT_SERVICE_EXCEPTION, "Controller not initialized");
+            taihe::set_business_error(OHOS::MMI::TaiheErrorCode::INPUT_SERVICE_EXCEPTION, "Controller not initialized");
             return;
         }
 
@@ -643,7 +643,7 @@ public:
         CALL_DEBUG_ENTER;
         if (nativeImpl_ == nullptr) {
             MMI_HILOGE("Native implementation is null");
-            taihe::set_business_error(INPUT_SERVICE_EXCEPTION, "Controller not initialized");
+            taihe::set_business_error(OHOS::MMI::TaiheErrorCode::INPUT_SERVICE_EXCEPTION, "Controller not initialized");
             return;
         }
 
@@ -664,7 +664,7 @@ public:
         CALL_DEBUG_ENTER;
         if (nativeImpl_ == nullptr) {
             MMI_HILOGE("Native implementation is null");
-            taihe::set_business_error(INPUT_SERVICE_EXCEPTION, "Controller not initialized");
+            taihe::set_business_error(OHOS::MMI::TaiheErrorCode::INPUT_SERVICE_EXCEPTION, "Controller not initialized");
             return;
         }
 
@@ -685,7 +685,7 @@ public:
         CALL_DEBUG_ENTER;
         if (nativeImpl_ == nullptr) {
             MMI_HILOGE("Native implementation is null");
-            taihe::set_business_error(INPUT_SERVICE_EXCEPTION, "Controller not initialized");
+            taihe::set_business_error(OHOS::MMI::TaiheErrorCode::INPUT_SERVICE_EXCEPTION, "Controller not initialized");
             return;
         }
 
@@ -715,7 +715,7 @@ private:
     auto nativeImpl = InputManager::GetInstance()->CreateMouseController();
     if (nativeImpl == nullptr) {
         MMI_HILOGE("Failed to create native MouseControllerImpl");
-        taihe::set_business_error(INPUT_SERVICE_EXCEPTION, "Input service exception");
+        taihe::set_business_error(OHOS::MMI::TaiheErrorCode::INPUT_SERVICE_EXCEPTION, "Input service exception");
         return make_holder<MouseControllerImpl,
                           ::ohos::multimodalInput::inputEventClient::MouseController>();
     }
@@ -745,7 +745,7 @@ public:
         CALL_DEBUG_ENTER;
         if (nativeImpl_ == nullptr) {
             MMI_HILOGE("Native implementation is null");
-            taihe::set_business_error(INPUT_SERVICE_EXCEPTION, "Controller not initialized");
+            taihe::set_business_error(OHOS::MMI::TaiheErrorCode::INPUT_SERVICE_EXCEPTION, "Controller not initialized");
             return;
         }
 
@@ -767,7 +767,7 @@ public:
         CALL_DEBUG_ENTER;
         if (nativeImpl_ == nullptr) {
             MMI_HILOGE("Native implementation is null");
-            taihe::set_business_error(INPUT_SERVICE_EXCEPTION, "Controller not initialized");
+            taihe::set_business_error(OHOS::MMI::TaiheErrorCode::INPUT_SERVICE_EXCEPTION, "Controller not initialized");
             return;
         }
 
@@ -798,7 +798,7 @@ private:
     auto nativeImpl = InputManager::GetInstance()->CreateKeyboardController();
     if (nativeImpl == nullptr) {
         MMI_HILOGE("Failed to create native KeyboardControllerImpl");
-        taihe::set_business_error(INPUT_SERVICE_EXCEPTION, "Input service exception");
+        taihe::set_business_error(OHOS::MMI::TaiheErrorCode::INPUT_SERVICE_EXCEPTION, "Input service exception");
         return make_holder<KeyboardControllerImpl,
                           ::ohos::multimodalInput::inputEventClient::KeyboardController>();
     }
