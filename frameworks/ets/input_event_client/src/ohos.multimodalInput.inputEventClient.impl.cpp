@@ -34,6 +34,8 @@
 #include "accesstoken_kit.h"
 #include "tokenid_kit.h"
 #include "ani_common.h"
+#include "mouse_controller_impl.h"
+#include "keyboard_controller_impl.h"
 #include "ohos.multimodalInput.mouseEvent.impl.h"
 #include "ohos.multimodalInput.keyCode.impl.h"
 
@@ -43,6 +45,7 @@
 using namespace taihe;
 using namespace ohos::multimodalInput::inputEventClient;
 using namespace OHOS::MMI;
+using TaiheError_t = OHOS::MMI::TaiheError;
 
 namespace {
 
