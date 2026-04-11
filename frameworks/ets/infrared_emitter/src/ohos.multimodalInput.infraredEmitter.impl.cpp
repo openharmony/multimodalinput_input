@@ -84,7 +84,7 @@ void TransmitInfrared(int64_t infraredFrequency, ::taihe::array_view<int64_t> pa
         }
         vecPattern.push_back(*it);
     }
-    if (vecPattern.size() <= 0 || vecPattern.size() > MAX_NUMBER_ARRAY_ELEMENT) {
+    if (vecPattern.size() > MAX_NUMBER_ARRAY_ELEMENT) {
         taihe::set_business_error(COMMON_PARAMETER_ERROR,
             "Parameter error.The number of pattern elements is incorrect.");
         return;
