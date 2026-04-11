@@ -1773,7 +1773,8 @@ int32_t InputManagerImpl::GetPointerSpeed(int32_t &speed)
 #endif // OHOS_BUILD_ENABLE_POINTER
 }
 
-int32_t InputManagerImpl::SetPointerStyle(int32_t windowId, const PointerStyle& pointerStyle, bool isUiExtension)
+int32_t InputManagerImpl::SetPointerStyle(int32_t windowId, const PointerStyle& pointerStyle,
+    const sptr<IRemoteObject> &token)
 {
     CALL_INFO_TRACE;
     std::string msg = "SetPointerStyle, windowId:" + std::to_string(windowId);
@@ -1784,7 +1785,7 @@ int32_t InputManagerImpl::SetPointerStyle(int32_t windowId, const PointerStyle& 
         return RET_ERR;
     }
 
-    int32_t ret = MULTIMODAL_INPUT_CONNECT_MGR->SetPointerStyle(windowId, pointerStyle, isUiExtension);
+    int32_t ret = MULTIMODAL_INPUT_CONNECT_MGR->SetPointerStyle(windowId, pointerStyle, token);
     if (ret != RET_OK) {
         MMI_HILOGE("Set pointer style failed, ret:%{public}d", ret);
         BytraceAdapter::MMIClientTraceStop();
@@ -1794,12 +1795,13 @@ int32_t InputManagerImpl::SetPointerStyle(int32_t windowId, const PointerStyle& 
     return RET_OK;
 }
 
-int32_t InputManagerImpl::GetPointerStyle(int32_t windowId, PointerStyle &pointerStyle, bool isUiExtension)
+int32_t InputManagerImpl::GetPointerStyle(int32_t windowId, PointerStyle &pointerStyle,
+    const sptr<IRemoteObject> &token)
 {
     CALL_DEBUG_ENTER;
     std::string msg = "GetPointerStyle, windowId:" + std::to_string(windowId);
     BytraceAdapter::MMIClientTraceStart(BytraceAdapter::MMI_THREAD_LOOP_DEPTH_THREE, msg);
-    int32_t ret = MULTIMODAL_INPUT_CONNECT_MGR->GetPointerStyle(windowId, pointerStyle, isUiExtension);
+    int32_t ret = MULTIMODAL_INPUT_CONNECT_MGR->GetPointerStyle(windowId, pointerStyle, token);
     if (ret != RET_OK) {
         MMI_HILOGE("Get pointer style failed, ret:%{public}d", ret);
         BytraceAdapter::MMIClientTraceStop();
@@ -1957,6 +1959,12 @@ int32_t InputManagerImpl::SendDisplayInfo(const UserScreenInfo &userScreenInfo)
         MMI_HILOGE("Send message failed, errCode:%{public}d", MSG_SEND_FAIL);
         BytraceAdapter::MMIClientTraceStop();
         return MSG_SEND_FAIL;
+    }
+    ret = MULTIMODAL_INPUT_CONNECT_MGR->UpdateUIExtensionInfo(userScreenInfo.uiExtensionInfos);
+    if (ret != RET_OK) {
+        MMI_HILOGE("UpdateUIExtensionInfo failed, ret=%{public}d", ret);
+        BytraceAdapter::MMIClientTraceStop();
+        return ret;
     }
     BytraceAdapter::MMIClientTraceStop();
     return RET_OK;
@@ -3118,11 +3126,12 @@ int32_t InputManagerImpl::ShiftAppPointerEvent(const ShiftWindowParam &param, bo
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 }
 
-int32_t InputManagerImpl::SetCustomCursor(int32_t windowId, CustomCursor cursor, CursorOptions options)
+int32_t InputManagerImpl::SetCustomCursor(int32_t windowId, CustomCursor cursor, CursorOptions options,
+    const sptr<IRemoteObject> &token)
 {
     CALL_INFO_TRACE;
 #if defined OHOS_BUILD_ENABLE_POINTER
-    int32_t ret = MULTIMODAL_INPUT_CONNECT_MGR->SetCustomCursor(windowId, cursor, options);
+    int32_t ret = MULTIMODAL_INPUT_CONNECT_MGR->SetCustomCursor(windowId, cursor, options, token);
     if (ret != RET_OK) {
         MMI_HILOGE("Set custom cursor failed, ret:%{public}d", ret);
     }

@@ -1372,7 +1372,18 @@ ErrCode MMIService::RemoveInputEventObserver()
     // LCOV_EXCL_STOP
 }
 
-ErrCode MMIService::SetPointerStyle(int32_t windowId, const PointerStyle& pointerStyle, bool isUiExtension)
+ErrCode MMIService::SetPointerStyle(int32_t windowId, const PointerStyle& pointerStyle)
+{
+    return SetPointerStyleInner(windowId, pointerStyle, nullptr);
+}
+
+ErrCode MMIService::SetUIExtensionPointerStyle(int32_t windowId, const PointerStyle& pointerStyle,
+    const sptr<IRemoteObject> &token)
+{
+    return SetPointerStyleInner(windowId, pointerStyle, token);
+}
+
+int32_t MMIService::SetPointerStyleInner(int32_t windowId, PointerStyle pointerStyle, const sptr<IRemoteObject> &token)
 {
     CALL_INFO_TRACE;
     if (!PER_HELPER->VerifySystemApp()) {
@@ -1389,12 +1400,12 @@ ErrCode MMIService::SetPointerStyle(int32_t windowId, const PointerStyle& pointe
     int32_t clientPid = GetCallingPid();
     int32_t userId = GetCallingUser();
     int32_t ret = delegateTasks_.PostSyncTask(
-        [userId, clientPid, windowId, pointerStyle, isUiExtension] {
+        [userId, clientPid, windowId, pointerStyle, token] {
             if (!POINTER_DEV_MGR.isInit) {
                 return RET_ERR;
             }
             return CursorDrawingComponent::GetInstance().SetPointerStyle(
-                userId, clientPid, windowId, pointerStyle, isUiExtension);
+                userId, clientPid, windowId, pointerStyle, token);
         }
         );
     if (ret != RET_OK) {
@@ -1435,19 +1446,31 @@ ErrCode MMIService::ClearWindowPointerStyle(int32_t pid, int32_t windowId)
     return RET_OK;
 }
 
-ErrCode MMIService::GetPointerStyle(int32_t windowId, PointerStyle& pointerStyle, bool isUiExtension)
+ErrCode MMIService::GetPointerStyle(int32_t windowId, PointerStyle& pointerStyle)
+{
+    return GetPointerStyleInner(windowId, pointerStyle, nullptr);
+}
+
+ErrCode MMIService::GetUIExtensionPointerStyle(int32_t windowId, PointerStyle& pointerStyle,
+    const sptr<IRemoteObject> &token)
+{
+    return GetPointerStyleInner(windowId, pointerStyle, token);
+}
+
+ErrCode MMIService::GetPointerStyleInner(int32_t windowId, PointerStyle& pointerStyle,
+    const sptr<IRemoteObject> &token)
 {
     CALL_DEBUG_ENTER;
 #ifdef OHOS_BUILD_ENABLE_POINTER
     int32_t clientPid = GetCallingPid();
     int32_t userId = GetCallingUser();
     int32_t ret = delegateTasks_.PostSyncTask(
-        [userId, clientPid, windowId, &pointerStyle, isUiExtension] {
+        [userId, clientPid, windowId, &pointerStyle, token] {
             if (!POINTER_DEV_MGR.isInit) {
                 return RET_ERR;
             }
             return CursorDrawingComponent::GetInstance().GetPointerStyle(
-                userId, clientPid, windowId, pointerStyle, isUiExtension);
+                userId, clientPid, windowId, pointerStyle, token);
         }
         );
     if (ret != RET_OK) {
@@ -5220,11 +5243,11 @@ ErrCode MMIService::ShiftAppPointerEvent(const ShiftWindowParam &param, bool aut
     return RET_OK;
 }
 
-ErrCode MMIService::SetCustomCursor(int32_t windowId,
-    const CustomCursorParcel& curParcel, const CursorOptionsParcel& cOptionParcel)
+ErrCode MMIService::SetCustomCursor(int32_t windowId, const CustomCursorParcel& curParcel,
+    const CursorOptionsParcel& cOptionParcel)
 {
     CALL_INFO_TRACE;
-    if (auto ret = SetCustomCursorInner(windowId, curParcel, cOptionParcel); ret != RET_OK) {
+    if (auto ret = SetCustomCursorInner(windowId, curParcel, cOptionParcel, nullptr); ret != RET_OK) {
         Media::PixelMap *pixelMap = static_cast<Media::PixelMap*>(curParcel.pixelMap);
         delete pixelMap;
         MMI_HILOGE("SetCustomCursor failed, release resource");
@@ -5233,8 +5256,21 @@ ErrCode MMIService::SetCustomCursor(int32_t windowId,
     return RET_OK;
 }
 
-int32_t MMIService::SetCustomCursorInner(int32_t windowId,
-    const CustomCursorParcel& curParcel, const CursorOptionsParcel& cOptionParcel)
+ErrCode MMIService::SetUIExtensionCustomCursor(int32_t windowId, const CustomCursorParcel& curParcel,
+    const CursorOptionsParcel& cOptionParcel, const sptr<IRemoteObject> &token)
+{
+    CALL_INFO_TRACE;
+    if (auto ret = SetCustomCursorInner(windowId, curParcel, cOptionParcel, token); ret != RET_OK) {
+        Media::PixelMap *pixelMap = static_cast<Media::PixelMap*>(curParcel.pixelMap);
+        delete pixelMap;
+        MMI_HILOGE("SetCustomCursor failed, release resource");
+        return ret;
+    }
+    return RET_OK;
+}
+
+int32_t MMIService::SetCustomCursorInner(int32_t windowId, const CustomCursorParcel& curParcel,
+    const CursorOptionsParcel& cOptionParcel, const sptr<IRemoteObject> &token)
 {
     CALL_INFO_TRACE;
     if (!IsRunning()) {
@@ -5260,11 +5296,11 @@ int32_t MMIService::SetCustomCursorInner(int32_t windowId,
 #if defined OHOS_BUILD_ENABLE_POINTER
     CursorDrawingComponent::GetInstance();
     ret = delegateTasks_.PostSyncTask(std::bind(
-        [pid, windowId, cursor, options] {
+        [pid, windowId, cursor, options, token] {
             if (!POINTER_DEV_MGR.isInit) {
                 return RET_ERR;
             }
-            return CursorDrawingComponent::GetInstance().SetCustomCursor(pid, windowId, cursor, options);
+            return CursorDrawingComponent::GetInstance().SetCustomCursor(pid, windowId, cursor, options, token);
         }
         ));
     if (ret != RET_OK) {
@@ -6087,6 +6123,20 @@ ErrCode MMIService::RedispatchInputEvent(const PointerEvent &pointerEvent)
     });
     if (ret != RET_OK) {
         MMI_HILOGE("PostSyncTask RedispatchInputEvent failed, ret:%{public}d", ret);
+        return ret;
+    }
+    return RET_OK;
+}
+
+ErrCode MMIService::UpdateUIExtensionInfo(const std::vector<UIExtensionInfo> &uiExtensionInfos)
+{
+    CALL_DEBUG_ENTER;
+    int32_t ret = delegateTasks_.PostSyncTask([&uiExtensionInfos] {
+        WIN_MGR->UpdateUIExtensionInfo(uiExtensionInfos);
+        return RET_OK;
+    });
+    if (ret != RET_OK) {
+        MMI_HILOGE("Update UIExtension info fail, ret:%{public}d", ret);
         return ret;
     }
     return RET_OK;

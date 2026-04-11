@@ -27,10 +27,9 @@ void PointerStyleFuzzTest(FuzzedDataProvider &fdp)
     ps.color = fdp.ConsumeIntegral<int32_t>();
     ps.id = fdp.ConsumeIntegral<int32_t>();
     ps.options = fdp.ConsumeIntegral<int32_t>();
-    bool isUiExtension = fdp.ConsumeBool();
 
-    MMIService::GetInstance()->SetPointerStyle(windowId, ps, isUiExtension);
-    MMIService::GetInstance()->GetPointerStyle(windowId, ps, isUiExtension);
+    MMIService::GetInstance()->SetPointerStyle(windowId, ps);
+    MMIService::GetInstance()->GetPointerStyle(windowId, ps);
 
     int32_t pid = fdp.ConsumeIntegral<int32_t>();
     MMIService::GetInstance()->ClearWindowPointerStyle(pid, windowId);

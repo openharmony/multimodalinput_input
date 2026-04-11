@@ -73,6 +73,7 @@ public:
     MOCK_METHOD(int32_t, ClearMouseHideFlag, (int32_t));
     MOCK_METHOD(void, SetFoldState, ());
     MOCK_METHOD(bool, CheckAppFocused, (int32_t));
+    MOCK_METHOD(void, UpdateUIExtensionInfo, (const std::vector<UIExtensionInfo> &));
 
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     MOCK_METHOD(MouseLocation, GetMouseInfo, ());
@@ -93,8 +94,8 @@ public:
 #endif // OHOS_BUILD_ENABLE_POINTER
 
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
-    MOCK_METHOD(int32_t, SetPointerStyle, (int32_t, int32_t, PointerStyle, bool));
-    MOCK_METHOD(int32_t, GetPointerStyle, (int32_t, int32_t, PointerStyle&, bool), (const));
+    MOCK_METHOD(int32_t, SetPointerStyle, (int32_t, int32_t, PointerStyle, const sptr<IRemoteObject>&));
+    MOCK_METHOD(int32_t, GetPointerStyle, (int32_t, int32_t, PointerStyle&, const sptr<IRemoteObject>&), (const));
     void DispatchPointer(int32_t pointerAction, int32_t windowId = -1) override {}
     void SendPointerEvent(int32_t pointerAction) override {}
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH

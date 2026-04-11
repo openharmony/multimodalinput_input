@@ -1341,7 +1341,7 @@ HWTEST_F(MMIServerTest, MMIServerTest_SetPointerStyle_001, TestSize.Level1)
     CALL_TEST_DEBUG;
     MMIService mmiService;
     PointerStyle style;
-    ErrCode ret = mmiService.SetPointerStyle(-1, style, false);
+    ErrCode ret = mmiService.SetPointerStyle(-1, style);
     EXPECT_NE(ret, RET_OK);
 }
 
@@ -1356,7 +1356,7 @@ HWTEST_F(MMIServerTest, MMIServerTest_SetPointerStyle_002, TestSize.Level1)
     CALL_TEST_DEBUG;
     MMIService mmiService;
     PointerStyle style;
-    ErrCode ret = mmiService.SetPointerStyle(-2, style, false);
+    ErrCode ret = mmiService.SetPointerStyle(-2, style);
     EXPECT_NE(ret, RET_OK);
 }
 
@@ -1371,7 +1371,7 @@ HWTEST_F(MMIServerTest, MMIServerTest_SetPointerStyle_003, TestSize.Level1)
     CALL_TEST_DEBUG;
     MMIService mmiService;
     PointerStyle style;
-    ErrCode ret = mmiService.SetPointerStyle(1234, style, false);
+    ErrCode ret = mmiService.SetPointerStyle(1234, style);
     EXPECT_NE(ret, RET_OK);
 }
 
@@ -1387,8 +1387,7 @@ HWTEST_F(MMIServerTest, MMIServerTest_GetPointerStyle_001, TestSize.Level1)
     MMIService mmiService;
     PointerStyle style;
     int32_t windowId = 100;
-    bool isUiExtension = false;
-    ErrCode ret = mmiService.GetPointerStyle(windowId, style, isUiExtension);
+    ErrCode ret = mmiService.GetPointerStyle(windowId, style);
     EXPECT_NE(ret, RET_OK);
 }
 
@@ -4360,6 +4359,111 @@ HWTEST_F(MMIServerTest, MMIService_SetCustomCursor_002, TestSize.Level1)
     CursorOptionsParcel optionParcel;
     int32_t invalidWindowId = -100;
     ErrCode ret = mmiService.SetCustomCursor(invalidWindowId, cursorParcel, optionParcel);
+    EXPECT_NE(ret, RET_OK);
+}
+
+/**
+ * @tc.name: MMIService_SetUIExtensionPointerStyle_001
+ * @tc.desc: SetUIExtensionPointerStyle with valid windowId
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIServerTest, MMIService_SetUIExtensionPointerStyle_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MMIService mmiService;
+    PointerStyle pointerStyle;
+    int32_t windowId = 100;
+    sptr<IRemoteObject> token = nullptr;
+    ErrCode ret = mmiService.SetUIExtensionPointerStyle(windowId, pointerStyle, token);
+    EXPECT_NE(ret, RET_OK);
+}
+
+/**
+ * @tc.name: MMIService_SetUIExtensionPointerStyle_002
+ * @tc.desc: SetUIExtensionPointerStyle with invalid windowId
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIServerTest, MMIService_SetUIExtensionPointerStyle_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MMIService mmiService;
+    PointerStyle pointerStyle;
+    int32_t windowId = -1;
+    sptr<IRemoteObject> token = nullptr;
+    ErrCode ret = mmiService.SetUIExtensionPointerStyle(windowId, pointerStyle, token);
+    EXPECT_NE(ret, RET_OK);
+}
+
+/**
+ * @tc.name: MMIService_GetUIExtensionPointerStyle_001
+ * @tc.desc: GetUIExtensionPointerStyle with valid windowId
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIServerTest, MMIService_GetUIExtensionPointerStyle_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MMIService mmiService;
+    PointerStyle pointerStyle;
+    int32_t windowId = 100;
+    sptr<IRemoteObject> token = nullptr;
+    ErrCode ret = mmiService.GetUIExtensionPointerStyle(windowId, pointerStyle, token);
+    EXPECT_NE(ret, RET_OK);
+}
+
+/**
+ * @tc.name: MMIService_GetUIExtensionPointerStyle_002
+ * @tc.desc: GetUIExtensionPointerStyle with invalid windowId
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIServerTest, MMIService_GetUIExtensionPointerStyle_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MMIService mmiService;
+    PointerStyle pointerStyle;
+    int32_t windowId = -1;
+    sptr<IRemoteObject> token = nullptr;
+    ErrCode ret = mmiService.GetUIExtensionPointerStyle(windowId, pointerStyle, token);
+    EXPECT_NE(ret, RET_OK);
+}
+
+/**
+ * @tc.name: MMIService_SetUIExtensionCustomCursor_001
+ * @tc.desc: SetUIExtensionCustomCursor when service is not running
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIServerTest, MMIService_SetUIExtensionCustomCursor_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MMIService mmiService;
+    mmiService.state_ = ServiceRunningState::STATE_NOT_START;
+    CustomCursorParcel cursorParcel;
+    CursorOptionsParcel optionParcel;
+    sptr<IRemoteObject> token = nullptr;
+    ErrCode ret = mmiService.SetUIExtensionCustomCursor(1, cursorParcel, optionParcel, token);
+    EXPECT_EQ(ret, MMISERVICE_NOT_RUNNING);
+}
+
+/**
+ * @tc.name: MMIService_SetUIExtensionCustomCursor_002
+ * @tc.desc: SetUIExtensionCustomCursor when window permission denied
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIServerTest, MMIService_SetUIExtensionCustomCursor_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MMIService mmiService;
+    mmiService.state_ = ServiceRunningState::STATE_RUNNING;
+    CustomCursorParcel cursorParcel;
+    CursorOptionsParcel optionParcel;
+    sptr<IRemoteObject> token = nullptr;
+    int32_t invalidWindowId = -100;
+    ErrCode ret = mmiService.SetUIExtensionCustomCursor(invalidWindowId, cursorParcel, optionParcel, token);
     EXPECT_NE(ret, RET_OK);
 }
 

@@ -121,8 +121,7 @@ public:
     bool Init() override;
     int32_t SetPointerColor(int32_t userId, int32_t color) override;
     int32_t GetPointerColor(int32_t userId) override;
-    int32_t SetPointerStyle(int32_t pid, int32_t windowId, PointerStyle pointerStyle,
-        bool isUiExtension = false) override;
+    int32_t SetPointerStyle(int32_t pid, int32_t windowId, PointerStyle pointerStyle) override;
     int32_t ClearWindowPointerStyle(int32_t pid, int32_t windowId) override;
     int32_t SetPointerSize(int32_t userId, int32_t size) override;
     int32_t GetPointerSize(int32_t userId) override;
@@ -135,7 +134,8 @@ public:
     bool GetMouseDisplayState() const override;
     int32_t SetCustomCursor(CursorPixelMap curPixelMap,
         int32_t pid, int32_t windowId, int32_t focusX, int32_t focusY) override;
-    int32_t SetCustomCursor(int32_t pid, int32_t windowId, CustomCursor cursor, CursorOptions options) override;
+    int32_t SetCustomCursor(int32_t pid, int32_t windowId, CustomCursor cursor, CursorOptions options,
+        const sptr<IRemoteObject> &token = nullptr) override;
     int32_t SetMouseHotSpot(int32_t pid, int32_t windowId, int32_t hotSpotX, int32_t hotSpotY) override;
     PointerStyle GetLastMouseStyle() override;
     void SetLastMouseStyle(PointerStyle style) override;

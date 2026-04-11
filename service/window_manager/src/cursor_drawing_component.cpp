@@ -295,10 +295,10 @@ int32_t CursorDrawingComponent::GetPointerColor(int32_t userId)
 }
 
 int32_t CursorDrawingComponent::SetPointerStyle(
-    int32_t userId, int32_t pid, int32_t windowId, PointerStyle pointerStyle, bool isUiExtension)
+    int32_t userId, int32_t pid, int32_t windowId, PointerStyle pointerStyle, const sptr<IRemoteObject> &token)
 {
 #ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
-    return CursorDrawingInformation::GetInstance().SetPointerStyle(userId, pid, windowId, pointerStyle, isUiExtension);
+    return CursorDrawingInformation::GetInstance().SetPointerStyle(userId, pid, windowId, pointerStyle, token);
 #else
     return RET_OK;
 #endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
@@ -311,10 +311,10 @@ int32_t CursorDrawingComponent::ClearWindowPointerStyle(int32_t pid, int32_t win
 }
 
 int32_t CursorDrawingComponent::GetPointerStyle(
-    int32_t userId, int32_t pid, int32_t windowId, PointerStyle &pointerStyle, bool isUiExtension)
+    int32_t userId, int32_t pid, int32_t windowId, PointerStyle &pointerStyle, const sptr<IRemoteObject> &token)
 {
 #ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
-    return CursorDrawingInformation::GetInstance().GetPointerStyle(userId, pid, windowId, pointerStyle, isUiExtension);
+    return CursorDrawingInformation::GetInstance().GetPointerStyle(userId, pid, windowId, pointerStyle, token);
 #else
     return RET_OK;
 #endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
@@ -361,10 +361,10 @@ int32_t CursorDrawingComponent::SetCustomCursor(
 }
 
 int32_t CursorDrawingComponent::SetCustomCursor(
-    int32_t pid, int32_t windowId, CustomCursor cursor, CursorOptions options)
+    int32_t pid, int32_t windowId, CustomCursor cursor, CursorOptions options, const sptr<IRemoteObject> &token)
 {
     CHK_IS_LOADR(isLoaded_, pointerInstance_)
-    return pointerInstance_->SetCustomCursor(pid, windowId, cursor, options);
+    return pointerInstance_->SetCustomCursor(pid, windowId, cursor, options, token);
 }
 
 int32_t CursorDrawingComponent::SetMouseIcon(int32_t userId, int32_t pid, int32_t windowId, CursorPixelMap curPixelMap)
@@ -672,15 +672,14 @@ void CursorDrawingInformation::UpdateIconPath(const MOUSE_ICON mouseStyle, const
     iter->second.iconPath = iconPath;
 }
 
-int32_t CursorDrawingInformation::UpdateDefaultPointerStyle(int32_t pid, int32_t windowId, PointerStyle pointerStyle,
-    bool isUiExtension)
+int32_t CursorDrawingInformation::UpdateDefaultPointerStyle(int32_t pid, int32_t windowId, PointerStyle pointerStyle)
 {
     if (windowId != GLOBAL_WINDOW_ID) {
         MMI_HILOGD("No need to change the default icon style");
         return RET_OK;
     }
     PointerStyle style;
-    WIN_MGR->GetPointerStyle(pid, GLOBAL_WINDOW_ID, style, isUiExtension);
+    WIN_MGR->GetPointerStyle(pid, GLOBAL_WINDOW_ID, style);
     if (pointerStyle.id != style.id) {
         auto iconPath = GetMouseIconPath();
         auto it = iconPath.find(MOUSE_ICON(MOUSE_ICON::DEFAULT));
@@ -992,7 +991,7 @@ bool CursorDrawingInformation::IsPointerStyleParamValid(int32_t windowId, Pointe
 }
 
 int32_t CursorDrawingInformation::SetPointerStyle(int32_t userId, int32_t pid, int32_t windowId,
-    PointerStyle pointerStyle, bool isUiExtension)
+    PointerStyle pointerStyle, const sptr<IRemoteObject> &token)
 {
     if (!IsPointerStyleParamValid(windowId, pointerStyle)) {
         MMI_HILOGE("PointerStyle param is invalid");
@@ -1014,7 +1013,7 @@ int32_t CursorDrawingInformation::SetPointerStyle(int32_t userId, int32_t pid, i
         MMI_HILOGE("Update default pointer iconPath failed");
         return RET_ERR;
     }
-    if (WIN_MGR->SetPointerStyle(pid, windowId, pointerStyle, isUiExtension) != RET_OK) {
+    if (WIN_MGR->SetPointerStyle(pid, windowId, pointerStyle, token) != RET_OK) {
         MMI_HILOGE("Set pointer style failed");
         return RET_ERR;
     }
@@ -1035,13 +1034,13 @@ int32_t CursorDrawingInformation::SetPointerStyle(int32_t userId, int32_t pid, i
     }
     auto pointerInstance = CursorDrawingComponent::GetInstance().GetPointerInstance();
     if (pointerInstance != nullptr) {
-        pointerInstance->SetPointerStyle(pid, windowId, pointerStyle, isUiExtension);
+        pointerInstance->SetPointerStyle(pid, windowId, pointerStyle);
     }
     return RET_OK;
 }
 
 int32_t CursorDrawingInformation::GetPointerStyle(int32_t userId, int32_t pid, int32_t windowId,
-    PointerStyle &pointerStyle, bool isUiExtension)
+    PointerStyle &pointerStyle, const sptr<IRemoteObject> &token)
 {
     if (windowId == GLOBAL_WINDOW_ID) {
         pointerStyle.color = DEFAULT_VALUE;
@@ -1056,7 +1055,7 @@ int32_t CursorDrawingInformation::GetPointerStyle(int32_t userId, int32_t pid, i
             return RET_OK;
         }
     }
-    WIN_MGR->GetPointerStyle(pid, windowId, pointerStyle, isUiExtension);
+    WIN_MGR->GetPointerStyle(pid, windowId, pointerStyle, token);
     MMI_HILOGD("Window id:%{public}d get pointer style:%{public}d success", windowId, pointerStyle.id);
     return RET_OK;
 }

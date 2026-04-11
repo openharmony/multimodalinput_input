@@ -119,6 +119,7 @@ public:
     bool GetCancelEventFlag(std::shared_ptr<PointerEvent> pointerEvent);
     void SetFoldState ();
     bool CheckAppFocused(int32_t pid);
+    void UpdateUIExtensionInfo(const std::vector<UIExtensionInfo> &uiExtensionInfos);
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     std::vector<std::pair<int32_t, TargetInfo>> GetPidAndUpdateTarget(std::shared_ptr<KeyEvent> keyEvent);
     void ReissueEvent(std::shared_ptr<KeyEvent> keyEvent, int32_t focusWindowId);
@@ -150,10 +151,17 @@ public:
     bool SelectPointerChangeArea(int32_t windowId, int32_t logicalX, int32_t logicalY);
 #endif // OHOS_BUILD_ENABLE_POINTER
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
-    int32_t SetPointerStyle(int32_t pid, int32_t windowId, PointerStyle pointerStyle, bool isUiExtension = false);
+    int32_t SetPointerStyle(int32_t pid, int32_t windowId, PointerStyle pointerStyle,
+        const sptr<IRemoteObject> &token = nullptr);
+    int32_t UpdateUIExtensionPointerStyle(int32_t pid, const UIExtensionInfo &uecInfo,
+        const PointerStyle &pointerStyle);
+    int32_t UpdateNormalPointerStyle(int32_t pid, int32_t windowId, const PointerStyle &pointerStyle);
+    void ClearUIExtensionPointerStyle(int32_t pid);
+    void SaveLatestPointerStyleInfo(int32_t pid, int32_t windowId, const sptr<IRemoteObject> &token);
     int32_t GetPointerStyle(int32_t pid, int32_t windowId, PointerStyle &pointerStyle,
-        bool isUiExtension = false) const;
-    void SetUiExtensionInfo(bool isUiExtension, int32_t uiExtensionPid, int32_t uiExtensionWindowId);
+        const sptr<IRemoteObject> &token = nullptr) const;
+    int32_t GetUIExtensionPointerStyle(const UIExtensionInfo &uecInfo, PointerStyle &pointerStyle) const;
+    int32_t GetNormalPointerStyle(int32_t pid, int32_t windowId, PointerStyle &pointerStyle) const;
     void DispatchPointer(int32_t pointerAction, int32_t windowId = -1);
     void DispatchPointerRedispatch(int32_t pointerAction, const WindowInfo& windowInfo);
     void SendPointerEvent(int32_t pointerAction);
@@ -372,8 +380,6 @@ private:
 #endif // OHOS_BUILD_ENABLE_POINTER
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     int32_t UpdatePoinerStyle(int32_t pid, int32_t windowId, PointerStyle pointerStyle);
-    int32_t UpdateSceneBoardPointerStyle(int32_t pid, int32_t windowId, PointerStyle pointerStyle,
-        bool isUiExtension = false);
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 #ifdef OHOS_BUILD_ENABLE_POINTER
     int32_t UpdateTouchPadTarget(std::shared_ptr<PointerEvent> pointerEvent);
@@ -567,9 +573,10 @@ private:
 private:
     UDSServer* udsServer_ { nullptr };
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
-    bool isUiExtension_ { false };
+    bool isUIExtension_ { false };
     int32_t uiExtensionPid_ { -1 };
     int32_t uiExtensionWindowId_ { -1 };
+    sptr<IRemoteObject> uiExtensionToken_ { nullptr };
     std::pair<int32_t, int32_t> firstBtnDownWindowInfo_ {-1, -1};
     std::optional<WindowInfo> axisBeginWindowInfo_ { std::nullopt };
     int32_t lastLogicX_ { -1 };
@@ -598,7 +605,7 @@ private:
     DisplayGroupInfo displayGroupInfoTmp_;
     std::mutex tmpInfoMutex_;
     OLD::DisplayGroupInfo displayGroupInfo_;
-    DisplayGroupInfo displayGroupInfoCurr_;
+    std::vector<UIExtensionInfo> uiExtensionInfos_;
     std::map<int32_t, WindowGroupInfo> windowsPerDisplay_;
     std::map<int32_t, std::map<int32_t, WindowGroupInfo>> windowsPerDisplayMap_;
     PointerStyle lastPointerStyle_;

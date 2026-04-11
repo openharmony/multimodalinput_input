@@ -157,7 +157,8 @@ public:
     int32_t GetPointerSize(int32_t &size);
     int32_t GetCursorSurfaceId(uint64_t &surfaceId);
     int32_t SetCustomCursor(int32_t windowId, int32_t focusX, int32_t focusY, void* pixelMap);
-    int32_t SetCustomCursor(int32_t windowId, CustomCursor cursor, CursorOptions options);
+    int32_t SetCustomCursor(int32_t windowId, CustomCursor cursor, CursorOptions options,
+        const sptr<IRemoteObject> &token = nullptr);
     int32_t SetMouseIcon(int32_t windowId, void* pixelMap);
     int32_t SetMouseHotSpot(int32_t windowId, int32_t hotSpotX, int32_t hotSpotY);
     int32_t SetMousePrimaryButton(int32_t primaryButton);
@@ -167,8 +168,9 @@ public:
 
     int32_t SetPointerVisible(bool visible, int32_t priority);
     bool IsPointerVisible();
-    int32_t SetPointerStyle(int32_t windowId, const PointerStyle& pointerStyle, bool isUiExtension = false);
-    int32_t GetPointerStyle(int32_t windowId, PointerStyle &pointerStyle, bool isUiExtension = false);
+    int32_t SetPointerStyle(int32_t windowId, const PointerStyle& pointerStyle,
+        const sptr<IRemoteObject> &token = nullptr);
+    int32_t GetPointerStyle(int32_t windowId, PointerStyle &pointerStyle, const sptr<IRemoteObject> &token = nullptr);
 
     int32_t SetPointerColor(int32_t color);
     int32_t GetPointerColor(int32_t &color);
