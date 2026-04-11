@@ -2400,8 +2400,7 @@ ErrCode MMIService::CreateMouseController()
     // Check CONTROL_DEVICE permission
     if (!PER_HELPER->CheckControlDevicePermission()) {
         MMI_HILOGE("Check CONTROL_DEVICE permission failed");
-        // 调试阶段，先不进行权限校验
-        return RET_OK;
+        return ERROR_NO_PERMISSION;
     }
 
     MMI_HILOGI("CreateMouseController permission check passed");
@@ -2419,8 +2418,7 @@ ErrCode MMIService::CreateKeyboardController()
     // Check CONTROL_DEVICE permission
     if (!PER_HELPER->CheckControlDevicePermission()) {
         MMI_HILOGE("Check CONTROL_DEVICE permission failed");
-        // 调试阶段，先不进行权限校验
-        return RET_OK;
+        return ERROR_NO_PERMISSION;
     }
 
     MMI_HILOGI("CreateKeyboardController permission check passed");

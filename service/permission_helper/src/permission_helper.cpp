@@ -258,5 +258,11 @@ bool PermissionHelper::CheckManageEdmPolicy()
     CALL_DEBUG_ENTER;
     return CheckHapPermission(MANAGE_EDM_POLICY_PERMISSION_CODE);
 }
+
+bool PermissionHelper::CheckControlDevicePermission()
+{
+    CALL_DEBUG_ENTER;
+    return CheckHapPermission(CONTROL_DEVICE_PERMISSION_CODE);
+}
 } // namespace MMI
 } // namespace OHOS

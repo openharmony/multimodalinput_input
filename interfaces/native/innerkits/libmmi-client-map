@@ -38,6 +38,8 @@
             OHOS::MMI::BytraceAdapter::StopDevListener*;
             OHOS::MMI::ClientMsgHandler*;
             OHOS::MMI::MMISceneBoardJudgement*;
+            OHOS::MMI::MouseControllerImpl*;
+            OHOS::MMI::KeyboardControllerImpl*;
             "vtable for OHOS::MMI::MMIClient";
             "virtual thunk to OHOS::MMI::InputDevice::~InputDevice()";
             "virtual thunk to OHOS::MMI::InputEvent::~InputEvent()";

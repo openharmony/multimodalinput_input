@@ -84,7 +84,7 @@ napi_value CreateMouseController(napi_env env, napi_callback_info info)
     }
 
     // Wrap C++ instance with JS object
-    napi_status status = napi_wrap(
+    status = napi_wrap(
         env,
         mouseController,
         controller,
@@ -159,7 +159,9 @@ napi_value MouseControllerMoveTo(napi_env env, napi_callback_info info)
     }
 
     // Extract parameters
-    int32_t displayId, x, y;
+    int32_t displayId = 0;
+    int32_t x = 0;
+    int32_t y = 0;
     status = napi_get_value_int32(env, argv[0], &displayId);
     if (status != napi_ok) {
         MMI_HILOGE("GET_VALUE_INT32 failed");
@@ -369,7 +371,8 @@ napi_value MouseControllerBeginAxis(napi_env env, napi_callback_info info)
         return nullptr;
     }
 
-    int32_t axis, value;
+    int32_t axis = 0;
+    int32_t value = 0;
     status = napi_get_value_int32(env, argv[0], &axis);
     if (status != napi_ok) {
         MMI_HILOGE("GET_VALUE_INT32 failed");
@@ -440,7 +443,8 @@ napi_value MouseControllerUpdateAxis(napi_env env, napi_callback_info info)
         return nullptr;
     }
 
-    int32_t axis, value;
+    int32_t axis = 0;
+    int32_t value = 0;
     status = napi_get_value_int32(env, argv[0], &axis);
     if (status != napi_ok) {
         MMI_HILOGE("GET_VALUE_INT32 failed");
