@@ -611,6 +611,10 @@ void CursorDrawingComponent::UpdatePointerItemCursorInfo(PointerEvent::PointerIt
 
 void CursorDrawingComponent::OnSwitchUser(int32_t userId)
 {
+    if (!INPUT_DEV_MGR->HasPointerDeviceIncludingVirtual()) {
+        MMI_HILOGI("OnSwitchUser no pointer device");
+        return;
+    }
     CHK_IS_LOADV(isLoaded_, pointerInstance_)
     pointerInstance_->OnSwitchUser(userId);
 }
