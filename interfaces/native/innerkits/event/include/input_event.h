@@ -167,6 +167,13 @@ public:
     static constexpr uint32_t EVENT_FLAG_REDISPATCH = 0x00100000;
 
     /**
+     * Flag indicating event is from Controller interface (MouseController/KeyboardController)
+     * Requires CONTROL_DEVICE permission check instead of INJECT_INPUT_EVENT
+     * @since 26
+     */
+    static constexpr uint32_t EVENT_FLAG_CONTROLLER = 0x00200000;
+
+    /**
      * The multimodal input event for the device to enable the intercom mode flag.
      *
      * @since 21

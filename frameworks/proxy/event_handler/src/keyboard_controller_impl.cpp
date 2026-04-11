@@ -248,6 +248,9 @@ int32_t KeyboardControllerImpl::InjectKeyEvent(std::shared_ptr<KeyEvent> event)
         return RET_ERR;
     }
 
+    // Add Controller Flag to mark this event uses CONTROL_DEVICE permission check
+    event->AddFlag(InputEvent::EVENT_FLAG_CONTROLLER);
+
     // Inject event using InputManager
     // Note: SimulateInputEvent returns void, so we assume success
     InputManager::GetInstance()->SimulateInputEvent(event);

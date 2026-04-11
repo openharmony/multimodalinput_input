@@ -416,6 +416,9 @@ int32_t MouseControllerImpl::InjectPointerEvent(std::shared_ptr<PointerEvent> ev
         return RET_ERR;
     }
 
+    // Add Controller Flag to mark this event uses CONTROL_DEVICE permission check
+    event->AddFlag(InputEvent::EVENT_FLAG_CONTROLLER);
+
     InputManager::GetInstance()->SimulateInputEvent(event, false, PointerEvent::DISPLAY_COORDINATE);
 
     return RET_OK;
