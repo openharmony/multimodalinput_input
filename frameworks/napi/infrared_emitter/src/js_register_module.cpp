@@ -190,12 +190,18 @@ static napi_value GetInfraredFrequencies(napi_env env, napi_callback_info info)
         return result;
     }
     size_t size = requencys.size();
-    std::string logPrint = "size:" + std::to_string(size) + ";";
+    std::string logPrint = "size:";
+    logPrint += std::to_string(size);
+    logPrint += ";";
     CHKRP(napi_create_array(env, &result), CREATE_ARRAY);
     for (size_t i = 0; i < size; i++) {
         InfraredFrequency frequencyItem = requencys[i];
-        logPrint = logPrint + std::to_string(i) + "max:" + std::to_string(frequencyItem.max_) + ";min:"
-                    + std::to_string(frequencyItem.min_) + ";";
+        logPrint += std::to_string(i);
+        logPrint += "max:";
+        logPrint += std::to_string(frequencyItem.max_);
+        logPrint += ";min:";
+        logPrint += std::to_string(frequencyItem.min_);
+        logPrint += ";";
         napi_value item = CreateInfraredFrequencyItem(env, requencys[i]);
         if (item == nullptr) {
             MMI_HILOGE("CreateInfraredFrequencyItem error");
@@ -219,9 +225,17 @@ static napi_value TransmitInfrared(napi_env env, napi_callback_info info)
         return nullptr;
     }
     int32_t size = static_cast<int32_t>(pattern.size());
-    std::string context = "number:" + std::to_string(number) + "\n;" + "; size=" + std::to_string(size) + ";";
+    std::string context = "number:";
+    context += std::to_string(number);
+    context += "\n;";
+    context += "; size=";
+    context += std::to_string(size);
+    context += ";";
     for (int32_t i = 0; i < size; i++) {
-        context = context + std::to_string(i) + ": pattern: " + std::to_string(pattern[i]) + ";";
+        context += std::to_string(i);
+        context += ": pattern: ";
+        context += std::to_string(pattern[i]);
+        context += ";";
     }
     MMI_HILOGD("js_register_module.TransmitInfrared para size:%{public}s", context.c_str());
     int32_t ret = InputManager::GetInstance()->TransmitInfrared(number, pattern);

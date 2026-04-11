@@ -93,8 +93,10 @@ void SettingStorage::ReleaseDataShareHelper()
 
 std::string SettingStorage::AssembleUriUser(int32_t userId, const std::string &key) const
 {
-    std::string uri = "datashare:///com.ohos.settingsdata/entry/settingsdata/USER_SETTINGSDATA_" +
-        std::to_string(userId) + "?Proxy=true&key=" + key;
+    std::string uri = "datashare:///com.ohos.settingsdata/entry/settingsdata/USER_SETTINGSDATA_";
+    uri += std::to_string(userId);
+    uri += "?Proxy=true&key=";
+    uri += key;
     return uri;
 }
 

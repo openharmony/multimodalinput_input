@@ -978,7 +978,8 @@ void LibinputAdapter::OnEventHandler()
     hasPendingEvents_ = false;
     while ((event = libinput_get_event(input_))) {
         libinput_event_type eventType = libinput_event_get_type(event);
-        std::string msg = "OnEventHandler, eventType is: " + std::to_string(eventType);
+        std::string msg = "OnEventHandler, eventType is: ";
+        msg += std::to_string(eventType);
         BytraceAdapter::MMIServiceTraceStart(BytraceAdapter::MMI_THREAD_LOOP_DEPTH_THREE, msg);
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
         // confirm boot completed msg in case of mmi restart.

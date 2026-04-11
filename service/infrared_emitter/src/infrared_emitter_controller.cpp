@@ -104,10 +104,16 @@ bool InfraredEmitterController::Transmit(int64_t carrierFreq, const std::vector<
     CHKPF(irInterface_);
     int32_t tempCarrierFreq = carrierFreq;
     std::vector<int32_t> tempPattern;
-    std::string context = "infraredFrequency:" + std::to_string(tempCarrierFreq) + ";";
+    std::string context = "infraredFrequency:";
+    context += std::to_string(tempCarrierFreq);
+    context += ";";
     for (size_t i = 0; i < pattern.size(); i++) {
         int32_t per = pattern[i];
-        context = context + "index:" + std::to_string(i) + ": pattern:" + std::to_string(per) + ";";
+        context += "index:";
+        context += std::to_string(i);
+        context += ": pattern:";
+        context += std::to_string(per);
+        context += ";";
         tempPattern.push_back(per);
     }
     MMI_HILOGI("irInterface_->Transmit params:%{public}s", context.c_str());
@@ -146,11 +152,18 @@ int32_t InfraredEmitterController::GetFrequencies(std::vector<InfraredFrequencyI
         MMI_HILOGE("Infrared emitter GetCarrierFreqs out false");
         return RET_ERR;
     }
-    std::string context = "size:" + std::to_string(outRange.size()) + ";";
+    std::string context = "size:";
+    context += std::to_string(outRange.size());
+    context += ";";
     for (size_t i = 0; i < outRange.size(); i++) {
         InfraredFrequencyInfo item;
-        context = context + "index:" + std::to_string(i) + ": per.max:" + std::to_string(outRange[i].max) +
-                  ": per.min:" + std::to_string(outRange[i].min) + ";;";
+        context += "index:";
+        context += std::to_string(i);
+        context += ": per.max:";
+        context += std::to_string(outRange[i].max);
+        context += ": per.min:";
+        context += std::to_string(outRange[i].min);
+        context += ";;";
         item.max_ = outRange[i].max;
         item.min_ = outRange[i].min;
         frequencyInfo.push_back(item);
