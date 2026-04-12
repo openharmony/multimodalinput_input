@@ -1076,8 +1076,7 @@ void UnsubscribeKeyCommand(KeyOptions const& keyOptions, optional_view<uintptr_t
     }
     MMI_HILOGI("Unsubscribe key command(%{public}d)", subscribeId);
     InputManager::GetInstance()->UnsubscribeKeyEvent(subscribeId);
-    std::string subscribeKey = GenerateKeyOptionKey(keyOption);
-    TriggerEventDispatcher::GetInstance()->ClearSubscribeState(subscribeKey);
+    TriggerEventDispatcher::GetInstance()->ClearSubscribeState(keyOption);
 }
 
 void SubscribeKey(KeyOptions const& keyOptions, callback_view<void(KeyOptions const&)> f, uintptr_t opq)

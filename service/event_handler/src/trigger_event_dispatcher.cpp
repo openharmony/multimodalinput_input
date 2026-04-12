@@ -127,6 +127,16 @@ void TriggerEventDispatcher::ClearSubscribeState(const std::string& subscribeKey
     MMI_HILOGD("Subscribe state cleared for %{public}s", subscribeKey.c_str());
 }
 
+void TriggerEventDispatcher::ClearSubscribeState(std::shared_ptr<KeyOption> keyOption)
+{
+    if (keyOption == nullptr) {
+        MMI_HILOGE("keyOption is nullptr");
+        return;
+    }
+    std::string subscribeKey = GenerateSubscribeKey(keyOption);
+    ClearSubscribeState(subscribeKey);
+}
+
 bool TriggerEventDispatcher::ShouldDispatchPRESSED(std::shared_ptr<KeyOption> keyOption,
     std::shared_ptr<KeyEvent> keyEvent)
 {
