@@ -45,6 +45,7 @@ constexpr uint32_t DEFAULT_REFERENCE_COUNT { 1 };
 constexpr int32_t TRIGGER_TYPE_NOT_SET { 0 };
 constexpr int32_t TRIGGER_TYPE_MIN { 0 };
 constexpr int32_t TRIGGER_TYPE_MAX { 3 };
+constexpr size_t KEY_COMMAND_CALLBACK_ARGC { 2 };
 } // namespace
 
 static Callbacks callbacks = {};
@@ -843,9 +844,9 @@ static void ExecuteJavaScriptCallback(napi_env env, sptr<KeyEventMonitorInfo> ev
         napi_close_handle_scope(env, scope);
         return;
     }
-    napi_value args[2] = { jsKeyOptions, jsKeyEvent };
+    napi_value args[KEY_COMMAND_CALLBACK_ARGC] = { jsKeyOptions, jsKeyEvent };
     napi_value result = nullptr;
-    statusResult = napi_call_function(env, nullptr, callback, 2, args, &result);
+    statusResult = napi_call_function(env, nullptr, callback, KEY_COMMAND_CALLBACK_ARGC, args, &result);
     if (statusResult != napi_ok) {
         MMI_HILOGE("Failed to call JavaScript callback");
     }
