@@ -40,6 +40,8 @@ enum TaiheErrorCode : int32_t {
     PRE_KEY_NOT_SUPPORTED = 4100001,
     INPUT_OCCUPIED_BY_SYSTEM = 4200002,
     INPUT_OCCUPIED_BY_OTHER = 4200003,
+    ERROR_CODE_STATE_ERROR = 4300001,
+    CONTROLLER_DISPLAY_NOT_EXIST = 4300002,
     ERROR_WINDOW_ID_PERMISSION_DENIED = 26500001,
 };
 
@@ -61,6 +63,10 @@ const std::map<int32_t, TaiheError> TAIHE_ERRORS = {
     { INPUT_OCCUPIED_BY_SYSTEM, { INPUT_OCCUPIED_BY_SYSTEM, "The hotkey has been subscribed by system." } },
     { INPUT_OCCUPIED_BY_OTHER, { INPUT_OCCUPIED_BY_OTHER, "The hotkey has been subscribed by other one." } },
     { INPUT_SERVICE_EXCEPTION, { INPUT_SERVICE_EXCEPTION, "Input service exception." } },
+    { ERROR_CODE_STATE_ERROR, { ERROR_CODE_STATE_ERROR,
+        "Controller state error. The operation is invalid in current state." } },
+    { CONTROLLER_DISPLAY_NOT_EXIST, { CONTROLLER_DISPLAY_NOT_EXIST,
+        "The specified display does not exist." } },
 };
 
 class TaiheConverter {

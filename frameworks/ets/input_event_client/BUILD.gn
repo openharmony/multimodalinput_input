@@ -30,6 +30,10 @@ config("inputEventClient_config") {
     "${mmi_path}/interfaces/native/innerkits/proxy/include",
     "${mmi_path}/frameworks/ets/input_event_client/include",
     "${mmi_path}/frameworks/ets/common/include",
+    "${mmi_path}/frameworks/ets/key_code/include",
+    "${mmi_path}/frameworks/ets/mouse_event/include",
+    "${mmi_path}/frameworks/proxy/event_handler/include"
+    
   ]
 }
 subsystem_name = "multimodalinput"
@@ -63,6 +67,8 @@ taihe_shared_library("InputEventClient") {
     "${mmi_path}/frameworks/native/input:oh_input_manager",
     "${mmi_path}/frameworks/proxy:libmmi-client",
     "${mmi_path}/util:libmmi-util",
+    "${mmi_path}/frameworks/ets/mouse_event:MouseEvent",
+    "${mmi_path}/frameworks/ets/key_code:KeyCode",
   ]
   external_deps = [
     "access_token:libaccesstoken_sdk",

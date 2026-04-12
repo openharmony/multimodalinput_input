@@ -32,6 +32,8 @@
 #endif // OHOS_BUILD_ENABLE_KEY_HOOK
 #include "input_event_hook_handler.h"
 #include "long_press_event_subscribe_manager.h"
+#include "mouse_controller_impl.h"
+#include "keyboard_controller_impl.h"
 #include "multimodal_event_handler.h"
 #include "multimodal_input_connect_manager.h"
 #include "net_packet.h"
@@ -3491,6 +3493,56 @@ int32_t InputManagerImpl::RedispatchInputEvent(std::shared_ptr<PointerEvent> poi
     MMI_HILOGW("Pointer and touchscreen device does not support");
     return RET_ERR;
 #endif // OHOS_BUILD_ENABLE_POINTER
+}
+
+int32_t InputManagerImpl::CheckMouseControllerPermission()
+{
+    CALL_DEBUG_ENTER;
+    // Call server-side for permission check and validation
+    int32_t ret = MULTIMODAL_INPUT_CONNECT_MGR->CreateMouseController();
+    if (ret != RET_OK) {
+        MMI_HILOGE("CheckMouseControllerPermission failed, ret=%{public}d", ret);
+    }
+    return ret;
+}
+
+int32_t InputManagerImpl::CheckKeyboardControllerPermission()
+{
+    CALL_DEBUG_ENTER;
+    // Call server-side for permission check and validation
+    int32_t ret = MULTIMODAL_INPUT_CONNECT_MGR->CreateKeyboardController();
+    if (ret != RET_OK) {
+        MMI_HILOGE("CheckKeyboardControllerPermission failed, ret=%{public}d", ret);
+    }
+    return ret;
+}
+
+std::shared_ptr<MouseControllerImpl> InputManagerImpl::CreateMouseController()
+{
+    CALL_DEBUG_ENTER;
+    // Call server-side for permission check and validation
+    int32_t ret = MULTIMODAL_INPUT_CONNECT_MGR->CreateMouseController();
+    if (ret != RET_OK) {
+        MMI_HILOGE("Server-side CreateMouseController failed, ret=%{public}d", ret);
+        return nullptr;
+    }
+
+    // Create and return client-side instance
+    return std::make_shared<MouseControllerImpl>();
+}
+
+std::shared_ptr<KeyboardControllerImpl> InputManagerImpl::CreateKeyboardController()
+{
+    CALL_DEBUG_ENTER;
+    // Call server-side for permission check and validation
+    int32_t ret = MULTIMODAL_INPUT_CONNECT_MGR->CreateKeyboardController();
+    if (ret != RET_OK) {
+        MMI_HILOGE("Server-side CreateKeyboardController failed, ret=%{public}d", ret);
+        return nullptr;
+    }
+
+    // Create and return client-side instance
+    return std::make_shared<KeyboardControllerImpl>();
 }
 } // namespace MMI
 } // namespace OHOS

@@ -132,6 +132,10 @@ public:
     void SimulateTouchPadEvent(std::shared_ptr<PointerEvent> pointerEvent, bool isNativeInject = false);
     void SimulateTouchPadInputEvent(std::shared_ptr<PointerEvent> pointerEvent,
         const TouchpadCDG &touchpadCDG);
+
+    int32_t CheckMouseControllerPermission();
+    int32_t CheckKeyboardControllerPermission();
+
     void OnConnected();
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     template<typename T>
@@ -281,6 +285,10 @@ public:
 #ifdef OHOS_BUILD_ENABLE_ANCO_GAME_EVENT_MAPPING
     int32_t ControlMouseEventToAnco(int32_t windowId, bool enable);
 #endif // OHOS_BUILD_ENABLE_ANCO_GAME_EVENT_MAPPING
+
+    std::shared_ptr<class MouseControllerImpl> CreateMouseController();
+    std::shared_ptr<class KeyboardControllerImpl> CreateKeyboardController();
+
 private:
     int32_t PackScreensInfo(NetPacket &pkt, const std::vector<ScreenInfo>& screens);
     int32_t PackDisplayGroupsInfo(NetPacket &pkt, const std::vector<DisplayGroupInfo> &displayGroups);
