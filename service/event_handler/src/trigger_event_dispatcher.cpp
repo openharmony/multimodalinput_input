@@ -152,7 +152,7 @@ bool TriggerEventDispatcher::ShouldDispatchPRESSED(std::shared_ptr<KeyOption> ke
     }
     firstDownSent_[subscribeKey] = true;
 
-    MMI_HILOGD("PRESSED mode: dispatching first down event");
+    MMI_HILOGI("PRESSED mode: dispatching first down event");
     return true;
 }
 
@@ -187,7 +187,7 @@ bool TriggerEventDispatcher::ShouldDispatchREPEAT_PRESSED(std::shared_ptr<KeyOpt
     if (!CheckDuration(keyOption, keyEvent)) {
         return false;
     }
-    MMI_HILOGD("REPEAT_PRESSED mode: dispatching down event (including auto-repeat)");
+    MMI_HILOGI("REPEAT_PRESSED mode: dispatching down event (including auto-repeat)");
     return true;
 }
 bool TriggerEventDispatcher::ShouldDispatchALL_RELEASED(std::shared_ptr<KeyOption> keyOption,
@@ -204,14 +204,14 @@ bool TriggerEventDispatcher::ShouldDispatchALL_RELEASED(std::shared_ptr<KeyOptio
                 return false;
             }
         }
-        MMI_HILOGD("ALL_RELEASED mode: dispatching finalKey event (action: %{public}d)", action);
+        MMI_HILOGI("ALL_RELEASED mode: dispatching finalKey event (action: %{public}d)", action);
         return true;
     }
 
     const auto& preKeys = keyOption->GetPreKeys();
     if (preKeys.find(keyCode) != preKeys.end()) {
         if (action == KeyEvent::KEY_ACTION_UP) {
-            MMI_HILOGD("ALL_RELEASED mode: dispatching preKey up event (keyCode: %{public}d)", keyCode);
+            MMI_HILOGI("ALL_RELEASED mode: dispatching preKey up event (keyCode: %{public}d)", keyCode);
             return true;
         }
     }
@@ -245,7 +245,7 @@ bool TriggerEventDispatcher::MatchPreKeys(std::shared_ptr<KeyOption> keyOption,
             return false;
         }
     }
-    MMI_HILOGD("All preKeys matched");
+    MMI_HILOGI("All preKeys matched");
     return true;
 }
 
