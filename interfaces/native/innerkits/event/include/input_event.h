@@ -119,6 +119,15 @@ public:
      */
     static constexpr uint32_t EVENT_FLAG_SIMULATE_NAVIGATION = 0x00000200;
 
+    /**
+     * The multimodal input event requires position calibration.
+     * When this flag is set, the server will replace the event's coordinates
+     * with the current system cursor position.
+     *
+     * @since 25
+     */
+    static constexpr uint32_t EVENT_FLAG_CALIBRATE_POSITION = 0x00000800;
+
     static constexpr uint32_t EVENT_FLAG_GENERATE_FROM_REAL = 0x00000400;
     
     static constexpr uint32_t EVENT_FLAG_SHOW_CUSOR_WITH_TOUCH = 0x00000600;
@@ -156,6 +165,13 @@ public:
      * @since 24
      */
     static constexpr uint32_t EVENT_FLAG_REDISPATCH = 0x00100000;
+
+    /**
+     * Flag indicating event is from Controller interface (MouseController/KeyboardController)
+     * Requires CONTROL_DEVICE permission check instead of INJECT_INPUT_EVENT
+     * @since 26
+     */
+    static constexpr uint32_t EVENT_FLAG_CONTROLLER = 0x00200000;
 
     /**
      * The multimodal input event for the device to enable the intercom mode flag.

@@ -126,6 +126,8 @@ ohos_shared_library("libmmi-client") {
 
   sources += [ "event_handler/src/input_device_consumer.cpp" ]
   sources += [ "event_handler/src/tablet_event_input_subscribe_manager.cpp" ]
+  sources += [ "event_handler/src/mouse_controller_impl.cpp" ]
+  sources += [ "event_handler/src/keyboard_controller_impl.cpp" ]
   if (input_feature_interceptor) {
     sources += [ "event_handler/src/input_interceptor_manager.cpp" ]
   }

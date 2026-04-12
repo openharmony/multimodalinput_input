@@ -33,6 +33,10 @@ ohos_shared_library("inputeventclient") {
     "${mmi_path}/util/napi/src/util_napi_error.cpp",
     "src/js_register_module.cpp",
     "src/js_register_util.cpp",
+    "src/js_mouse_controller.cpp",
+    "src/js_mouse_controller_napi.cpp",
+    "src/js_keyboard_controller.cpp",
+    "src/js_keyboard_controller_napi.cpp",
   ]
   branch_protector_ret = "pac_ret"
   sanitize = {

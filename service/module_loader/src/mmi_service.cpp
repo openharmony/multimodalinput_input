@@ -163,7 +163,7 @@ constexpr int32_t MIN_TIMEOUT_DELAY { 1 };
 constexpr int32_t MSDP_UID { 6699 };
 constexpr int32_t DEFAULT_UNLOAD_DELAY_TIME { 30000 };
 constexpr int32_t REPEAT_ONCE { 1 };
-
+constexpr int32_t CONTROLLER_DISPLAY_NOT_EXIST { 4300002 };
 const size_t QUOTES_BEGIN = 1;
 const size_t QUOTES_END = 2;
 const std::set<int32_t> g_keyCodeValueSet = {
@@ -2257,12 +2257,32 @@ ErrCode MMIService::InjectKeyEvent(const KeyEvent& keyEvent, bool isNativeInject
         MMI_HILOGE("Service is not running");
         return MMISERVICE_NOT_RUNNING;
     }
-    if (!isNativeInject && !PER_HELPER->VerifySystemApp()) {
-        MMI_HILOGE("Verify system APP failed");
-        return ERROR_NOT_SYSAPI;
-    }
+
     auto keyEventPtr = std::make_shared<KeyEvent>(keyEvent);
     CHKPR(keyEventPtr, ERROR_NULL_POINTER);
+
+    // Check if event is from Controller interface
+    bool isFromController = keyEventPtr->HasFlag(InputEvent::EVENT_FLAG_CONTROLLER);
+
+    if (isFromController) {
+        // Controller permission model: CONTROL_DEVICE permission + PC device
+        MMI_HILOGD("Event from Controller interface, using CONTROL_DEVICE permission check");
+        ErrCode ret = CheckControllerPermission();
+        if (ret != RET_OK) {
+            MMI_HILOGE("Controller permission check failed for KeyEvent, ret:%{public}d", ret);
+            return ret;
+        }
+        // Remove Controller flag after permission check
+        keyEventPtr->ClearFlag(InputEvent::EVENT_FLAG_CONTROLLER);
+        MMI_HILOGD("Removed EVENT_FLAG_CONTROLLER after permission check");
+    } else {
+        // Original permission model: system app + INJECT_INPUT_EVENT permission
+        if (!isNativeInject && !PER_HELPER->VerifySystemApp()) {
+            MMI_HILOGE("Verify system APP failed");
+            return ERROR_NOT_SYSAPI;
+        }
+    }
+
     bool isShell = PER_HELPER->RequestFromShell();
     if (isShell) {
         keyEventPtr->AddFlag(InputEvent::EVENT_FLAG_SHELL);
@@ -2321,6 +2341,41 @@ int32_t MMIService::OnGetKeyState(std::vector<int32_t> &pressedKeys,
 }
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 
+int32_t MMIService::ValidateControllerEventCoordinates(const std::shared_ptr<PointerEvent> pointerEvent)
+{
+    CHKPR(pointerEvent, ERROR_NULL_POINTER);
+
+    int32_t targetDisplayId = pointerEvent->GetTargetDisplayId();
+
+    // Get display info from WindowsManager
+    const auto* displayInfo = WIN_MGR->GetPhysicalDisplay(targetDisplayId);
+    if (displayInfo == nullptr) {
+        MMI_HILOGE("Display %{public}d does not exist", targetDisplayId);
+        return CONTROLLER_DISPLAY_NOT_EXIST;  // CONTROLLER_DISPLAY_NOT_EXIST
+    }
+
+    // Validate coordinates are within display bounds
+    PointerEvent::PointerItem item;
+    if (!pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), item)) {
+        MMI_HILOGE("Failed to get pointer item");
+        return RET_OK;  // If no pointer item, skip validation
+    }
+
+    int32_t x = item.GetDisplayX();
+    int32_t y = item.GetDisplayY();
+
+    if (x < 0 || x >= displayInfo->validWidth || y < 0 || y >= displayInfo->validHeight) {
+        MMI_HILOGE("Coordinates out of bounds for display %{public}d "
+            "(width=%{public}d, height=%{public}d)",
+            targetDisplayId, displayInfo->width, displayInfo->height);
+        return CONTROLLER_DISPLAY_NOT_EXIST;  // CONTROLLER_DISPLAY_NOT_EXIST
+    }
+
+    MMI_HILOGD("Validated Controller event: displayId=%{public}d, x=%{public}d, y=%{public}d",
+               targetDisplayId, x, y);
+    return RET_OK;
+}
+
 int32_t MMIService::CheckInjectPointerEvent(int32_t userId, const std::shared_ptr<PointerEvent> pointerEvent,
     int32_t pid, bool isNativeInject, bool isShell, int32_t useCoordinate)
 {
@@ -2352,12 +2407,34 @@ ErrCode MMIService::InjectPointerEvent(const PointerEvent& pointerEvent, bool is
         MMI_HILOGE("Service is not running");
         return MMISERVICE_NOT_RUNNING;
     }
-    if (!isNativeInject && !PER_HELPER->VerifySystemApp()) {
-        MMI_HILOGE("Verify system APP failed");
-        return ERROR_NOT_SYSAPI;
-    }
+
     auto pointerEventPtr = std::make_shared<PointerEvent>(pointerEvent);
     CHKPR(pointerEventPtr, ERROR_NULL_POINTER);
+
+    // Check if event is from Controller interface
+    bool isFromController = pointerEventPtr->HasFlag(InputEvent::EVENT_FLAG_CONTROLLER);
+
+    if (isFromController) {
+        // Controller permission model: CONTROL_DEVICE permission + PC device
+        MMI_HILOGD("Event from Controller interface, using CONTROL_DEVICE permission check");
+        ErrCode ret = CheckControllerPermission();
+        if (ret != RET_OK) {
+            MMI_HILOGE("Controller permission check failed for PointerEvent, ret:%{public}d", ret);
+            return ret;
+        }
+        if (int32_t validateRet = ValidateControllerEventCoordinates(pointerEventPtr); validateRet != RET_OK) {
+            MMI_HILOGE("Controller event validation failed, ret=%{public}d", validateRet);
+            return validateRet;
+        }
+        pointerEventPtr->ClearFlag(InputEvent::EVENT_FLAG_CONTROLLER);
+    } else {
+        // Original permission model: system app + INJECT_INPUT_EVENT permission
+        if (!isNativeInject && !PER_HELPER->VerifySystemApp()) {
+            MMI_HILOGE("Verify system APP failed");
+            return ERROR_NOT_SYSAPI;
+        }
+    }
+
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     // Dynamic load mouse module Sync.
     MouseEventHdr->LoadMouseExplicitly();
@@ -2412,6 +2489,37 @@ ErrCode MMIService::InjectTouchPadEvent(const PointerEvent& pointerEvent,
         return ret;
     }
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
+    return RET_OK;
+}
+
+ErrCode MMIService::CreateMouseController()
+{
+    CALL_DEBUG_ENTER;
+    if (!IsRunning()) {
+        MMI_HILOGE("Service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
+    if (ErrCode ret = CheckControllerPermission(); ret != RET_OK) {
+        MMI_HILOGE("CreateMouseController permission check failed, ret:%{public}d", ret);
+        return ret;
+    }
+    MMI_HILOGI("CreateMouseController permission check passed");
+    return RET_OK;
+}
+
+ErrCode MMIService::CreateKeyboardController()
+{
+    CALL_DEBUG_ENTER;
+    if (!IsRunning()) {
+        MMI_HILOGE("Service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
+    if (ErrCode ret = CheckControllerPermission(); ret != RET_OK) {
+        MMI_HILOGE("CreateKeyboardController permission check failed, ret:%{public}d", ret);
+        return ret;
+    }
+
+    MMI_HILOGI("CreateKeyboardController permission check passed");
     return RET_OK;
 }
 
@@ -3474,6 +3582,30 @@ int32_t MMIService::UpdateCombineKeyState(bool enable)
     return ret;
 }
 #endif // OHOS_BUILD_ENABLE_KEYBOARD && OHOS_BUILD_ENABLE_COMBINATION_KEY
+
+ErrCode MMIService::CheckControllerPermission()
+{
+    CALL_DEBUG_ENTER;
+    // Controller permission model: CONTROL_DEVICE permission + PC device
+    int32_t pid = GetCallingPid();
+
+    // 1. Check PC device
+    if (PRODUCT_DEVICE_TYPE != PRODUCT_TYPE_PC) {
+        MMI_HILOGE("Controller not supported on non-PC device, pid:%{public}d, "
+            "deviceType:%{public}s", pid, PRODUCT_DEVICE_TYPE.c_str());
+        return CAPABILITY_NOT_SUPPORTED;
+    }
+
+    // 2. Check CONTROL_DEVICE permission
+    if (!PER_HELPER->CheckControlDevicePermission()) {
+        MMI_HILOGE("Controller permission check failed: CONTROL_DEVICE permission denied, "
+            "pid:%{public}d", pid);
+        return ERROR_NO_PERMISSION;
+    }
+
+    MMI_HILOGD("Controller permission check passed, pid:%{public}d", pid);
+    return RET_OK;
+}
 
 int32_t MMIService::CheckPidPermission(int32_t pid)
 {

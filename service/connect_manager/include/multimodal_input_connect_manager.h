@@ -113,6 +113,8 @@ public:
         int32_t useCoordinate);
     int32_t InjectTouchPadEvent(std::shared_ptr<PointerEvent> pointerEvent, const TouchpadCDG &touchpadCDG,
         bool isNativeInject);
+    int32_t CreateMouseController();
+    int32_t CreateKeyboardController();
     int32_t SetAnrObserver();
     int32_t GetFunctionKeyState(int32_t funcKey, bool &state);
     int32_t SetFunctionKeyState(int32_t funcKey, bool enable);

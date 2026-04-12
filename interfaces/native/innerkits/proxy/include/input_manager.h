@@ -388,6 +388,35 @@ public:
     void SimulateTouchPadEvent(std::shared_ptr<PointerEvent> pointerEvent);
 
     /**
+     * @brief Creates a mouse controller for simulating mouse operations.
+     * Requires system app and INPUT_DEVICE_CONTROLLER permission.
+     * @return Shared pointer to MouseControllerImpl, nullptr on failure
+     * @since 26
+     */
+    std::shared_ptr<class MouseControllerImpl> CreateMouseController();
+
+    /**
+     * @brief Create keyboard controller
+     * @return Shared pointer to KeyboardControllerImpl, nullptr on failure
+     * @since 26
+     */
+    std::shared_ptr<class KeyboardControllerImpl> CreateKeyboardController();
+
+    /**
+     * @brief Check permission for creating mouse controller (for NAPI layer)
+     * @return RET_OK on success, error code otherwise
+     * @since 26
+     */
+    int32_t CheckMouseControllerPermission();
+
+    /**
+     * @brief Check permission for creating keyboard controller (for NAPI layer)
+     * @return RET_OK on success, error code otherwise
+     * @since 26
+     */
+    int32_t CheckKeyboardControllerPermission();
+
+    /**
      * @brief Convert mouse events to touch events.
      * @param pointerEvent PointerEvent object.
      * @return bool

@@ -133,6 +133,8 @@ public:
     ErrCode InjectPointerEvent(const PointerEvent& pointerEvent, bool isNativeInject, int32_t useCoordinate) override;
     ErrCode InjectTouchPadEvent(const PointerEvent& pointerEvent, const TouchpadCDG& touchpadCDG,
         bool isNativeInject) override;
+    ErrCode CreateMouseController() override;
+    ErrCode CreateKeyboardController() override;
     ErrCode SetAnrObserver() override;
     ErrCode GetDisplayBindInfo(std::vector<DisplayBindInfo>& infos) override;
     ErrCode GetAllMmiSubscribedEvents(MmiEventMap& mmiEventMap) override;
@@ -354,6 +356,8 @@ private:
     MMIService();
     ~MMIService();
 
+    ErrCode CheckControllerPermission();
+    int32_t ValidateControllerEventCoordinates(const std::shared_ptr<PointerEvent> pointerEvent);
     int32_t CheckPidPermission(int32_t pid);
     void PrintLog(const std::string &flag, int32_t duration, int32_t pid, int32_t tid);
     void OnSessionDelete(SessionPtr session);

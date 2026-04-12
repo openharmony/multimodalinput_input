@@ -13,18 +13,44 @@
  * limitations under the License.
  */
 
-#include "ohos.multimodalInput.mouseEvent.proj.hpp"
-#include "ohos.multimodalInput.mouseEvent.impl.hpp"
+#include "ohos.multimodalInput.mouseEvent.impl.h"
+ 
+#include "pointer_event.h"
 
 #include <stdexcept>
 
 #include "taihe/runtime.hpp"
 
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "ohos.multimodalInput.mouseEvent.impl"
+
 using namespace taihe;
 using namespace ohos::multimodalInput::mouseEvent;
 
-namespace {
-} // namespace
+using namespace OHOS::MMI;
+namespace OHOS {
+namespace MMI {
+const static std::map<::ohos::multimodalInput::mouseEvent::Button, int32_t> MOUSE_BUTTON_TRANSFORMATION = {
+    { ::ohos::multimodalInput::mouseEvent::Button::key_t::LEFT, PointerEvent::MOUSE_BUTTON_LEFT},
+    { ::ohos::multimodalInput::mouseEvent::Button::key_t::MIDDLE, PointerEvent::MOUSE_BUTTON_RIGHT},
+    { ::ohos::multimodalInput::mouseEvent::Button::key_t::RIGHT, PointerEvent::MOUSE_BUTTON_MIDDLE},
+    { ::ohos::multimodalInput::mouseEvent::Button::key_t::SIDE, PointerEvent::MOUSE_BUTTON_SIDE},
+    { ::ohos::multimodalInput::mouseEvent::Button::key_t::EXTRA, PointerEvent::MOUSE_BUTTON_EXTRA},
+    { ::ohos::multimodalInput::mouseEvent::Button::key_t::FORWARD, PointerEvent::MOUSE_BUTTON_FORWARD},
+    { ::ohos::multimodalInput::mouseEvent::Button::key_t::BACK, PointerEvent::MOUSE_BUTTON_BACK},
+    { ::ohos::multimodalInput::mouseEvent::Button::key_t::TASK, PointerEvent::MOUSE_BUTTON_TASK}
+};
+ 
+int32_t TaiheMouseButonConverter::ConvertEts2Native(::ohos::multimodalInput::mouseEvent::Button button)
+{
+    if (MOUSE_BUTTON_TRANSFORMATION.find(button) !=
+        MOUSE_BUTTON_TRANSFORMATION.end()) {
+        return MOUSE_BUTTON_TRANSFORMATION.at(button);
+    }
+    return PointerEvent::BUTTON_NONE;
+}
+} //MMI
+} // OHOS
 
 // Since these macros are auto-generate, lint will cause false positive.
 // NOLINTBEGIN

@@ -108,6 +108,8 @@ interface OHOS.MMI.IMultimodalInputConnect {
     void UnsubscribeLongPressEvent([in] int subscribeId);
     void InjectPointerEvent([in] PointerEvent pointerEvent, [in] boolean isNativeInject, [in] int useCoordinate);
     void InjectTouchPadEvent([in] PointerEvent pointerEvent, [in] TouchpadCDG touchpadCDG, [in] boolean isNativeInject);
+    void CreateMouseController();
+    void CreateKeyboardController();
     void SetAnrObserver();
     void GetDisplayBindInfo([out] DisplayBindInfo[] infos);
     void SetMoveEventFilters([in] boolean flag);

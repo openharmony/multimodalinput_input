@@ -1100,5 +1100,29 @@ int32_t InputManager::RedispatchInputEvent(std::shared_ptr<PointerEvent> pointer
 {
     return InputMgrImpl.RedispatchInputEvent(pointerEvent);
 }
+
+std::shared_ptr<MouseControllerImpl> InputManager::CreateMouseController()
+{
+    CALL_DEBUG_ENTER;
+    return InputMgrImpl.CreateMouseController();
+}
+
+std::shared_ptr<KeyboardControllerImpl> InputManager::CreateKeyboardController()
+{
+    CALL_DEBUG_ENTER;
+    return InputMgrImpl.CreateKeyboardController();
+}
+
+int32_t InputManager::CheckMouseControllerPermission()
+{
+    CALL_DEBUG_ENTER;
+    return InputMgrImpl.CheckMouseControllerPermission();
+}
+
+int32_t InputManager::CheckKeyboardControllerPermission()
+{
+    CALL_DEBUG_ENTER;
+    return InputMgrImpl.CheckKeyboardControllerPermission();
+}
 } // namespace MMI
 } // namespace OHOS
