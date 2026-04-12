@@ -39,17 +39,17 @@ public:
     void TearDown();
 
 protected:
-    static inline std::shared_ptr<TriggerEventDispatcher> dispatcher_;
+    static inline TriggerEventDispatcher* dispatcher_ { nullptr };
 };
 
 void TriggerEventDispatcherTest::SetUpTestCase(void)
 {
-    dispatcher_ = std::shared_ptr<TriggerEventDispatcher>(TriggerEventDispatcher::GetInstance());
+    dispatcher_ = TriggerEventDispatcher::GetInstance();
 }
 
 void TriggerEventDispatcherTest::TearDownTestCase()
 {
-    dispatcher_.reset();
+    // Do not delete: GetInstance() returns a static local, not heap-allocated
 }
 
 void TriggerEventDispatcherTest::SetUp()
@@ -74,16 +74,22 @@ HWTEST_F(TriggerEventDispatcherTest, TriggerEventDispatcher_ShouldDispatch_PRESS
     keyOption->SetFinalKeyDownDuration(0);
 
     auto keyEvent = KeyEvent::Create();
-    ASSERT_NE(keyEvent, nullptr);
+    EXPECT_NE(keyEvent, nullptr);
     keyEvent->SetKeyCode(KeyEvent::KEYCODE_A);
     keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
 
     bool result = dispatcher_->ShouldDispatch(keyOption, keyEvent);
     EXPECT_TRUE(result);
 
+    // Second dispatch should be blocked (firstDownSent already true)
     keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
     result = dispatcher_->ShouldDispatch(keyOption, keyEvent);
     EXPECT_FALSE(result);
+
+    // Clean up
+    std::string subscribeKey = std::to_string(KeyEvent::KEYCODE_A) + "," +
+        std::to_string(PRESSED) + "," + "0";
+    dispatcher_->ClearSubscribeState(subscribeKey);
 }
 
 /**
@@ -100,7 +106,7 @@ HWTEST_F(TriggerEventDispatcherTest, TriggerEventDispatcher_ShouldDispatch_REPEA
     keyOption->SetFinalKeyDownDuration(0);
 
     auto keyEvent = KeyEvent::Create();
-    ASSERT_NE(keyEvent, nullptr);
+    EXPECT_NE(keyEvent, nullptr);
     keyEvent->SetKeyCode(KeyEvent::KEYCODE_A);
     keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
 
@@ -125,7 +131,7 @@ HWTEST_F(TriggerEventDispatcherTest, TriggerEventDispatcher_ShouldDispatch_ALL_R
     keyOption->SetFinalKeyDownDuration(0);
 
     auto keyEvent = KeyEvent::Create();
-    ASSERT_NE(keyEvent, nullptr);
+    EXPECT_NE(keyEvent, nullptr);
     keyEvent->SetKeyCode(KeyEvent::KEYCODE_A);
     keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
 
@@ -150,7 +156,7 @@ HWTEST_F(TriggerEventDispatcherTest, TriggerEventDispatcher_ShouldConsume_PRESSE
     keyOption->SetTriggerType(PRESSED);
 
     auto keyEvent = KeyEvent::Create();
-    ASSERT_NE(keyEvent, nullptr);
+    EXPECT_NE(keyEvent, nullptr);
     keyEvent->SetKeyCode(KeyEvent::KEYCODE_A);
     keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
 
@@ -170,9 +176,11 @@ HWTEST_F(TriggerEventDispatcherTest, TriggerEventDispatcher_MatchPreKeys_001, Te
     std::set<int32_t> preKeys = { KeyEvent::KEYCODE_CTRL_LEFT, KeyEvent::KEYCODE_SHIFT_LEFT };
     keyOption->SetPreKeys(preKeys);
     keyOption->SetFinalKey(KeyEvent::KEYCODE_A);
+    keyOption->SetTriggerType(PRESSED);
+    keyOption->SetFinalKeyDownDuration(0);
 
     auto keyEvent = KeyEvent::Create();
-    ASSERT_NE(keyEvent, nullptr);
+    EXPECT_NE(keyEvent, nullptr);
     keyEvent->SetKeyCode(KeyEvent::KEYCODE_A);
     keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
 
@@ -207,13 +215,14 @@ HWTEST_F(TriggerEventDispatcherTest, TriggerEventDispatcher_MatchPreKeys_001, Te
 HWTEST_F(TriggerEventDispatcherTest, TriggerEventDispatcher_CheckDuration_001, TestSize.Level1)
 {
     auto keyOption = std::make_shared<KeyOption>();
-    keyOption->SetFinalKey(KeyEvent::KEYCODE_A);
+    // Use KEYCODE_B to avoid subscribeKey collision with PRESSED_001 test
+    keyOption->SetFinalKey(KeyEvent::KEYCODE_B);
     keyOption->SetTriggerType(PRESSED);
     keyOption->SetFinalKeyDownDuration(0);
 
     auto keyEvent = KeyEvent::Create();
-    ASSERT_NE(keyEvent, nullptr);
-    keyEvent->SetKeyCode(KeyEvent::KEYCODE_A);
+    EXPECT_NE(keyEvent, nullptr);
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_B);
     keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
 
     bool result = dispatcher_->ShouldDispatch(keyOption, keyEvent);
@@ -229,19 +238,32 @@ HWTEST_F(TriggerEventDispatcherTest, TriggerEventDispatcher_CheckDuration_001, T
 HWTEST_F(TriggerEventDispatcherTest, TriggerEventDispatcher_ClearSubscribeState_001, TestSize.Level1)
 {
     auto keyOption = std::make_shared<KeyOption>();
-    keyOption->SetFinalKey(KeyEvent::KEYCODE_A);
+    // Use KEYCODE_C to avoid collision with other tests
+    keyOption->SetFinalKey(KeyEvent::KEYCODE_C);
     keyOption->SetTriggerType(PRESSED);
     keyOption->SetFinalKeyDownDuration(0);
 
-    std::string subscribeKey = "TestSubscribeKey";
-    dispatcher_->ClearSubscribeState(subscribeKey);
-
     auto keyEvent = KeyEvent::Create();
-    ASSERT_NE(keyEvent, nullptr);
-    keyEvent->SetKeyCode(KeyEvent::KEYCODE_A);
+    EXPECT_NE(keyEvent, nullptr);
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_C);
     keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
 
+    // First dispatch
     bool result = dispatcher_->ShouldDispatch(keyOption, keyEvent);
+    EXPECT_TRUE(result);
+
+    // Second dispatch should fail (firstDownSent is true)
+    result = dispatcher_->ShouldDispatch(keyOption, keyEvent);
+    EXPECT_FALSE(result);
+
+    // Clear state with the correct subscribeKey matching GenerateSubscribeKey format:
+    // preKeys,finalKey,triggerType,duration
+    std::string subscribeKey = std::to_string(KeyEvent::KEYCODE_C) + "," +
+        std::to_string(PRESSED) + "," + "0";
+    dispatcher_->ClearSubscribeState(subscribeKey);
+
+    // After clear, dispatch should succeed again
+    result = dispatcher_->ShouldDispatch(keyOption, keyEvent);
     EXPECT_TRUE(result);
 }
 } // namespace MMI
