@@ -575,22 +575,24 @@ std::string GenerateKeyOptionKey(const std::shared_ptr<KeyOption>& keyOption)
     CHKPS(keyOption);
     std::string subKeyNames;
     const std::set<int32_t>& preKeys = keyOption->GetPreKeys();
-    int32_t finalKey = keyOption->GetFinalKey();
-    int32_t finalKeyDownDuration = keyOption->GetFinalKeyDownDuration();
     int32_t triggerType = keyOption->GetTriggerType();
     for (const auto& key : preKeys) {
         subKeyNames.append(std::to_string(key)).append(",");
     }
-    subKeyNames.append(std::to_string(finalKey)).append(",");
-    subKeyNames.append(std::to_string(finalKeyDownDuration)).append(",");
     if (triggerType != TRIGGER_TYPE_NOT_SET) {
+        // New API (onKeyCommand) format: preKeys,finalKey,finalKeyDownDuration,triggerType,false,
+        // Must match GetEventInfoAPI26 format
+        subKeyNames.append(std::to_string(keyOption->GetFinalKey())).append(",");
+        subKeyNames.append(std::to_string(keyOption->GetFinalKeyDownDuration())).append(",");
         subKeyNames.append(std::to_string(triggerType));
         subKeyNames.append(",false,");
     } else {
-        bool isFinalKeyDown = keyOption->IsFinalKeyDown();
-        bool isRepeat = keyOption->IsRepeat();
-        subKeyNames.append(std::to_string(isFinalKeyDown)).append(",");
-        subKeyNames.append(std::to_string(isRepeat));
+        // Old API (on('key')) format: preKeys,finalKey,isFinalKeyDown,finalKeyDownDuration,isRepeat
+        // Must match GetEventInfoAPI9 format
+        subKeyNames.append(std::to_string(keyOption->GetFinalKey())).append(",");
+        subKeyNames.append(std::to_string(keyOption->IsFinalKeyDown())).append(",");
+        subKeyNames.append(std::to_string(keyOption->GetFinalKeyDownDuration())).append(",");
+        subKeyNames.append(std::to_string(keyOption->IsRepeat()));
     }
     return subKeyNames;
 }
@@ -1326,9 +1328,8 @@ static bool UnsubscribeKeyCommand(napi_env env, sptr<KeyEventMonitorInfo> event,
     MMI_HILOGI("Unsubscribe key command(%{public}d)", subscribeId);
     InputManager::GetInstance()->UnsubscribeKeyEvent(subscribeId);
 
-    // Clear state
-    std::string subscribeKey = GenerateKeyOptionKey(keyOption);
-    TriggerEventDispatcher::GetInstance()->ClearSubscribeState(subscribeKey);
+    // Clear dispatcher state using the correct internal key format
+    TriggerEventDispatcher::GetInstance()->ClearSubscribeState(keyOption);
 
     return true;
 }

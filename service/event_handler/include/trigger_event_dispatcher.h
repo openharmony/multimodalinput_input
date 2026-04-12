@@ -49,6 +49,8 @@ public:
 
     void ClearSubscribeState(const std::string& subscribeKey);
 
+    void ClearSubscribeState(std::shared_ptr<KeyOption> keyOption);
+
 private:
     TriggerEventDispatcher() = default;
     TriggerEventDispatcher(const TriggerEventDispatcher&) = delete;
