@@ -152,6 +152,7 @@ declare_args() {
     "event_handler/src/key_auto_repeat.cpp",
     "event_handler/src/key_event_value_transformation.cpp",
     "event_handler/src/key_map_manager.cpp",
+    "event_handler/src/trigger_event_dispatcher.cpp",
     "event_hook/src/checker/dispatch_order_checker.cpp",
     "event_hook/src/checker/expiration_checker.cpp",
     "event_hook/src/checker/key_loop_closure_checker.cpp",

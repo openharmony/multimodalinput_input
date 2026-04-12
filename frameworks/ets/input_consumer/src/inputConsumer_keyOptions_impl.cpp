@@ -29,17 +29,25 @@ std::string GenerateKeyOptionKey(const std::shared_ptr<KeyOption>& keyOption)
         return subKeyNames;
     }
     const std::set<int32_t>& preKeys = keyOption->GetPreKeys();
-    int32_t finalKey = keyOption->GetFinalKey();
-    bool isFinalKeyDown = keyOption->IsFinalKeyDown();
-    int32_t finalKeyDownDuration = keyOption->GetFinalKeyDownDuration();
-    bool isRepeat = keyOption->IsRepeat();
+    int32_t triggerType = keyOption->GetTriggerType();
     for (const auto& key : preKeys) {
         subKeyNames.append(std::to_string(key)).append(",");
     }
-    subKeyNames.append(std::to_string(finalKey)).append(",");
-    subKeyNames.append(std::to_string(isFinalKeyDown)).append(",");
-    subKeyNames.append(std::to_string(finalKeyDownDuration)).append(",");
-    subKeyNames.append(std::to_string(isRepeat));
+    if (triggerType != 0) {
+        // New API (onKeyCommand) format: preKeys,finalKey,finalKeyDownDuration,triggerType,false,
+        // Must match ETS GetEventInfoAPI26 format
+        subKeyNames.append(std::to_string(keyOption->GetFinalKey())).append(",");
+        subKeyNames.append(std::to_string(keyOption->GetFinalKeyDownDuration())).append(",");
+        subKeyNames.append(std::to_string(triggerType)).append(",");
+        subKeyNames.append("false,");
+    } else {
+        // Old API (on('key')) format: preKeys,finalKey,isFinalKeyDown,finalKeyDownDuration,isRepeat
+        // Must match ETS GetEventInfoAPI9 format
+        subKeyNames.append(std::to_string(keyOption->GetFinalKey())).append(",");
+        subKeyNames.append(std::to_string(keyOption->IsFinalKeyDown())).append(",");
+        subKeyNames.append(std::to_string(keyOption->GetFinalKeyDownDuration())).append(",");
+        subKeyNames.append(std::to_string(keyOption->IsRepeat()));
+    }
     return subKeyNames;
 }
 
@@ -59,6 +67,10 @@ inputConsumer::KeyOptions ConvertTaiheKeyOptions(std::shared_ptr<KeyOption> keyO
     result.finalKeyDownDuration = keyOption->GetFinalKeyDownDuration();
     bool isRepeatValue = keyOption->IsRepeat();
     result.isRepeat = taihe::optional<bool>(std::in_place, isRepeatValue);
+    if (keyOption->GetTriggerType() != 0) {
+        result.triggerType = taihe::optional<inputConsumer::KeyCommandTriggerType>(
+            std::in_place, static_cast<inputConsumer::KeyCommandTriggerType::key_t>(keyOption->GetTriggerType()));
+    }
     return result;
 }
 } // namespace MMI
