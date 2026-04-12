@@ -27,6 +27,7 @@ config("inputConsumer_config") {
     "${mmi_path}/frameworks/ets/common/include",
     "${mmi_path}/frameworks/ets/key_code/include",
     "${mmi_path}/service/permission_helper/include",
+    "${mmi_path}/service/event_handler/include",
   ]
 }
 subsystem_name = "multimodalinput"
@@ -57,11 +58,13 @@ taihe_shared_library("InputConsumer") {
     "access_token:libaccesstoken_sdk",
     "c_utils:utils",
     "hilog:libhilog",
+    "icu:shared_icuuc",
     "ipc:ipc_single",
   ]
   sources += [
     "${mmi_path}/frameworks/ets/common/src/ani_common.cpp",
     "${mmi_path}/frameworks/ets/key_code/src/ohos.multimodalInput.keyCode.impl.cpp",
+    "${mmi_path}/service/event_handler/src/trigger_event_dispatcher.cpp",
     "src/ani_constructor.cpp",
     "src/inputConsumer_hotkeyOptions_impl.cpp",
     "src/inputConsumer_keyOptions_impl.cpp",

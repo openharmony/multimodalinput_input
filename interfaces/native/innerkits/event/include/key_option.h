@@ -126,6 +126,21 @@ public:
 
     void SetPriority(int32_t priority);
 
+    /**
+     * @brief Obtains the trigger type for key command.
+     * @return Returns the trigger type. 0=not set, 1=PRESSED, 2=REPEAT_PRESSED, 3=ALL_RELEASED
+     * @since 26.0.0
+     */
+    int32_t GetTriggerType() const;
+
+    /**
+     * @brief Sets the trigger type for key command.
+     * @param triggerType Indicates the trigger type. 1=PRESSED, 2=REPEAT_PRESSED, 3=ALL_RELEASED
+     * @return void
+     * @since 26.0.0
+     */
+    void SetTriggerType(int32_t triggerType);
+
 public:
     /**
      * @brief Writes data to a <b>Parcel</b> object.
@@ -166,6 +181,7 @@ private:
     int32_t finalKeyUpDelay_ { 0 };
     bool isRepeat_ { true };
     int32_t priority_ = SubscribePriority::PRIORITY_0;
+    int32_t triggerType_ { 0 };
 };
 
 class KeyMonitorOption final : public Parcelable {

@@ -17,6 +17,7 @@
 #include "inputConsumer_hotkeyOptions_impl.h"
 #include "inputConsumer_keyPressed_impl.h"
 #include "permission_helper.h"
+#include "trigger_event_dispatcher.h"
 
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "AniConsumerImpl"
@@ -34,7 +35,11 @@ static constexpr int32_t OCCUPIED_BY_OTHER = -4;
 constexpr size_t FIRST_INDEX { 0 };
 constexpr size_t SECOND_INDEX { 1 };
 constexpr size_t THIRD_INDEX { 2 };
+constexpr size_t FOURTH_INDEX { 3 };
 const int64_t MILLISECONDS_IN_SECOND = 1000;
+constexpr int32_t TRIGGER_TYPE_NOT_SET { 0 };
+constexpr int32_t TRIGGER_TYPE_MIN { 0 };
+constexpr int32_t TRIGGER_TYPE_MAX { 3 };
 
 enum ETS_CALLBACK_EVENT {
     ETS_CALLBACK_EVENT_FAILED = -1,
@@ -76,7 +81,8 @@ static Callbacks keyCallbacks = {};
 using callbackType = std::variant<
     taihe::callback<void(KeyOptions const&)>,
     taihe::callback<void(HotkeyOptions const&)>,
-    taihe::callback<void(ohos::multimodalInput::keyEvent::KeyEvent const&)>
+    taihe::callback<void(ohos::multimodalInput::keyEvent::KeyEvent const&)>,
+    taihe::callback<void(KeyOptions const&, ohos::multimodalInput::keyEvent::KeyEvent const&)>
 >;
 
 struct CallbackObject {
@@ -482,7 +488,8 @@ bool MatchCombinationKeys(std::shared_ptr<KeyEventMonitorInfo> monitorInfo, std:
 using callbackType = std::variant<
     taihe::callback<void(KeyOptions const&)>,
     taihe::callback<void(HotkeyOptions const&)>,
-    taihe::callback<void(ohos::multimodalInput::keyEvent::KeyEvent const&)>
+    taihe::callback<void(ohos::multimodalInput::keyEvent::KeyEvent const&)>,
+    taihe::callback<void(KeyOptions const&, ohos::multimodalInput::keyEvent::KeyEvent const&)>
 >;
 
 void EmitHotkeyCallbackWork(std::shared_ptr<KeyEventMonitorInfo> reportEvent)
@@ -865,6 +872,209 @@ int32_t GetEventInfoAPI9(KeyOptions const& keyOptions, std::shared_ptr<KeyEventM
     return RET_OK;
 }
 
+int32_t ParseAPI26PreKeys(KeyOptions const& keyOptions, std::shared_ptr<KeyOption> keyOption,
+    std::string& subKeyNames)
+{
+    CALL_DEBUG_ENTER;
+    if (keyOptions.preKeys.empty()) {
+        taihe::set_business_error(COMMON_PARAMETER_ERROR, "preKeys not found");
+        return RET_ERR;
+    }
+    std::set<int32_t> preKeys;
+    std::vector<int32_t> etsPreKeys(keyOptions.preKeys.begin(), keyOptions.preKeys.end());
+    if (GetPreKeys(etsPreKeys, preKeys) != RET_OK) {
+        MMI_HILOGE("Get preKeys failed");
+        return RET_ERR;
+    }
+    if (preKeys.size() > PRE_KEYS_SIZE) {
+        taihe::set_business_error(COMMON_PARAMETER_ERROR, "preKeys size invalid");
+        return RET_ERR;
+    }
+    keyOption->SetPreKeys(preKeys);
+    for (const auto &item : preKeys) {
+        if (item < 0) {
+            taihe::set_business_error(COMMON_PARAMETER_ERROR,
+                "element of preKeys must be greater than or equal to 0");
+            return RET_ERR;
+        }
+        subKeyNames += std::to_string(item) + ",";
+    }
+    return RET_OK;
+}
+
+void ParseAPI26TriggerTypeAndLegacy(KeyOptions const& keyOptions, std::shared_ptr<KeyOption> keyOption,
+    std::string& subKeyNames)
+{
+    CALL_DEBUG_ENTER;
+    if (keyOptions.triggerType.has_value()) {
+        int32_t triggerType = static_cast<int32_t>(keyOptions.triggerType.value().get_value());
+        if (triggerType >= TRIGGER_TYPE_MIN && triggerType <= TRIGGER_TYPE_MAX) {
+            keyOption->SetTriggerType(triggerType);
+            subKeyNames += std::to_string(triggerType) + ",";
+        } else {
+            subKeyNames += "0,";
+        }
+    } else {
+        subKeyNames += "0,";
+    }
+    if (keyOption->GetTriggerType() == TRIGGER_TYPE_NOT_SET) {
+        subKeyNames += std::to_string(keyOptions.isFinalKeyDown) + ",";
+        keyOption->SetFinalKeyDown(keyOptions.isFinalKeyDown);
+        bool isRepeat = keyOptions.isRepeat.has_value() ? keyOptions.isRepeat.value() : true;
+        subKeyNames += std::to_string(isRepeat);
+        keyOption->SetRepeat(isRepeat);
+    } else {
+        subKeyNames += "false,";
+        keyOption->SetFinalKeyDown(false);
+        keyOption->SetRepeat(false);
+    }
+}
+
+int32_t GetEventInfoAPI26(KeyOptions const& keyOptions, std::shared_ptr<KeyEventMonitorInfo> event,
+    std::shared_ptr<KeyOption> keyOption)
+{
+    CALL_DEBUG_ENTER;
+    CHKPR(event, RET_ERR);
+    CHKPR(keyOption, RET_ERR);
+    std::string subKeyNames;
+    if (ParseAPI26PreKeys(keyOptions, keyOption, subKeyNames) != RET_OK) {
+        return RET_ERR;
+    }
+    if (keyOptions.finalKey < 0) {
+        taihe::set_business_error(COMMON_PARAMETER_ERROR, "finalKey must be greater than or equal to 0");
+        return RET_ERR;
+    }
+    subKeyNames += std::to_string(keyOptions.finalKey) + ",";
+    keyOption->SetFinalKey(keyOptions.finalKey);
+    subKeyNames += std::to_string(keyOptions.finalKeyDownDuration) + ",";
+    keyOption->SetFinalKeyDownDuration(keyOptions.finalKeyDownDuration);
+    ParseAPI26TriggerTypeAndLegacy(keyOptions, keyOption, subKeyNames);
+    event->eventType = subKeyNames;
+    return RET_OK;
+}
+
+void SubKeyCommandEventCallback(std::shared_ptr<KeyEvent> keyEvent, const std::string& keyOptionKey,
+    std::shared_ptr<KeyOption> keyOption);
+
+void EmitKeyCommandCallbackWork(std::shared_ptr<KeyEventMonitorInfo> reportEvent,
+    std::shared_ptr<KeyEvent> keyEvent)
+{
+    CALL_DEBUG_ENTER;
+    if (!reportEvent || !reportEvent->keyOption) {
+        MMI_HILOGE("reportEvent or keyOption value is null");
+        return;
+    }
+    std::lock_guard<std::mutex> lock(jsCbMapMutex);
+    auto &cbVec = jsCbMap_[reportEvent->eventType];
+    for (auto &cb : cbVec) {
+        if (cb == nullptr) {
+            continue;
+        }
+        size_t typeIndex = cb->callback.index();
+        if (typeIndex == FOURTH_INDEX) {
+            auto &func = std::get<taihe::callback<void(KeyOptions const&,
+                ohos::multimodalInput::keyEvent::KeyEvent const&)>>(cb->callback);
+            auto keyOptions = ConvertTaiheKeyOptions(reportEvent->keyOption);
+            auto keyEventEts = ConvertTaiheKeyPressed(keyEvent);
+            func(keyOptions, keyEventEts);
+        }
+    }
+}
+
+void SubKeyCommandEventCallback(std::shared_ptr<KeyEvent> keyEvent, const std::string& keyOptionKey,
+    std::shared_ptr<KeyOption> keyOption)
+{
+    CALL_DEBUG_ENTER;
+    CHKPV(keyEvent);
+    std::lock_guard guard(sCallBacksMutex);
+    auto iter = keyCallbacks.find(keyOptionKey);
+    if (iter == keyCallbacks.end()) {
+        MMI_HILOGE("No matches found for SubKeyCommandEventCallback");
+        return;
+    }
+    auto &list = iter->second;
+    for (auto monitorInfo : list) {
+        EmitKeyCommandCallbackWork(monitorInfo, keyEvent);
+    }
+}
+
+void SubscribeKeyCommand(KeyOptions const& keyOptions,
+    callback_view<void(KeyOptions const&, ohos::multimodalInput::keyEvent::KeyEvent const&)> f,
+    uintptr_t opq)
+{
+    CALL_DEBUG_ENTER;
+    std::shared_ptr<KeyEventMonitorInfo> event = std::make_shared<KeyEventMonitorInfo>();
+    CHKPV(event);
+    auto keyOption = std::make_shared<KeyOption>();
+    CHKPV(keyOption);
+    if (!PER_HELPER->VerifySystemApp()) {
+        HandleCommonErrors(COMMON_USE_SYSAPI_ERROR);
+        return;
+    }
+    if (GetEventInfoAPI26(keyOptions, event, keyOption) != RET_OK) {
+        MMI_HILOGE("GetEventInfoAPI26 failed");
+        return;
+    }
+    event->keyOption = keyOption;
+    int32_t preSubscribeId = GetPreSubscribeId(keyCallbacks, event);
+    if (preSubscribeId < 0) {
+        MMI_HILOGD("EventType:%{private}s", event->eventType.c_str());
+        int32_t subscribeId = InputManager::GetInstance()->SubscribeKeyEvent(keyOption,
+            [keyOption](std::shared_ptr<KeyEvent> keyEvent) {
+                auto* dispatcher = TriggerEventDispatcher::GetInstance();
+                if (dispatcher != nullptr && dispatcher->ShouldDispatch(keyOption, keyEvent)) {
+                    std::string keyOptionKey = GenerateKeyOptionKey(keyOption);
+                    SubKeyCommandEventCallback(keyEvent, keyOptionKey, keyOption);
+                }
+            });
+        if (subscribeId < 0) {
+            MMI_HILOGE("SubscribeId invalid:%{public}d", subscribeId);
+            return;
+        }
+        MMI_HILOGD("SubscribeId:%{public}d", subscribeId);
+        event->subscribeId = subscribeId;
+    } else {
+        event->subscribeId = preSubscribeId;
+    }
+    auto result = RegisterListener(event->eventType, f, opq);
+    if (result == ETS_CALLBACK_EVENT_FAILED) {
+        MMI_HILOGE("Register listener failed");
+        return;
+    }
+    if (result == ETS_CALLBACK_EVENT_EXIST) {
+        MMI_HILOGE("Callback already exist");
+        return;
+    }
+    if (result == ETS_CALLBACK_EVENT_SUCCESS) {
+        keyCallbacks[event->eventType].push_back(event);
+    }
+}
+
+void UnsubscribeKeyCommand(KeyOptions const& keyOptions, optional_view<uintptr_t> opq)
+{
+    CALL_DEBUG_ENTER;
+    std::shared_ptr<KeyEventMonitorInfo> event = std::make_shared<KeyEventMonitorInfo>();
+    CHKPV(event);
+    auto keyOption = std::make_shared<KeyOption>();
+    CHKPV(keyOption);
+    int32_t subscribeId = -1;
+    if (!PER_HELPER->VerifySystemApp()) {
+        HandleCommonErrors(COMMON_USE_SYSAPI_ERROR);
+        return;
+    }
+    if (GetEventInfoAPI26(keyOptions, event, keyOption) != RET_OK) {
+        MMI_HILOGE("GetEventInfoAPI26 failed");
+        return;
+    }
+    if (DelEventCallback(keyCallbacks, event, opq, subscribeId) < 0) {
+        MMI_HILOGE("DelEventCallback failed");
+        return;
+    }
+    MMI_HILOGI("Unsubscribe key command(%{public}d)", subscribeId);
+    InputManager::GetInstance()->UnsubscribeKeyEvent(subscribeId);
+    TriggerEventDispatcher::GetInstance()->ClearSubscribeState(keyOption);
+}
+
 void SubscribeKey(KeyOptions const& keyOptions, callback_view<void(KeyOptions const&)> f, uintptr_t opq)
 {
     CALL_DEBUG_ENTER;
@@ -939,6 +1149,18 @@ void onKeyImpl(KeyOptions const& keyOptions, callback_view<void(KeyOptions const
 void offKeyImpl(KeyOptions const& keyOptions, optional_view<uintptr_t> opq)
 {
     UnsubscribeKey(keyOptions, opq);
+}
+
+void onKeyCommandImpl(KeyOptions const& keyOptions,
+    callback_view<void(KeyOptions const&, ohos::multimodalInput::keyEvent::KeyEvent const&)> f,
+    uintptr_t opq)
+{
+    SubscribeKeyCommand(keyOptions, f, opq);
+}
+
+void offKeyCommandImpl(KeyOptions const& keyOptions, optional_view<uintptr_t> opq)
+{
+    UnsubscribeKeyCommand(keyOptions, opq);
 }
 
 void onHotkeyChangeImpl(HotkeyOptions const& hotkeyOptions, callback_view<void(HotkeyOptions const&)> f, uintptr_t opq)
@@ -1029,6 +1251,8 @@ bool GetShieldStatus(::ohos::multimodalInput::inputConsumer::ShieldMode shieldMo
 // NOLINTBEGIN
 TH_EXPORT_CPP_API_onKeyImpl(onKeyImpl);
 TH_EXPORT_CPP_API_offKeyImpl(offKeyImpl);
+TH_EXPORT_CPP_API_onKeyCommandImpl(onKeyCommandImpl);
+TH_EXPORT_CPP_API_offKeyCommandImpl(offKeyCommandImpl);
 TH_EXPORT_CPP_API_onHotkeyChangeImpl(onHotkeyChangeImpl);
 TH_EXPORT_CPP_API_offHotkeyChangeImpl(offHotkeyChangeImpl);
 TH_EXPORT_CPP_API_onKeyPressedImpl(onKeyPressedImpl);
