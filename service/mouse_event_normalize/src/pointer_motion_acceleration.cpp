@@ -633,14 +633,16 @@ const PointerMotionAcceleration::Curve* PointerMotionAcceleration::MatchCurve(
 
 bool PointerMotionAcceleration::AxisCurve::IsValid() const
 {
-    return !speeds.empty() && !slopes.empty() && !diffNums.empty();
+    return (!speeds.empty() &&
+            (speeds.size() == slopes.size()) &&
+            (speeds.size() == diffNums.size()));
 }
 
 bool PointerMotionAcceleration::CalcAxisGainTouchpad(const AxisCurve &curve, double axisSpeed, double &gain)
 {
     MMI_HILOGD("CalcAxisGainTouchpad, axisSpeed:%f", axisSpeed);
 
-    if (curve.speeds.empty() || curve.slopes.empty() || curve.diffNums.empty()) {
+    if (!curve.IsValid()) {
         MMI_HILOGE("Invalid acceleration curve");
         return false;
     }

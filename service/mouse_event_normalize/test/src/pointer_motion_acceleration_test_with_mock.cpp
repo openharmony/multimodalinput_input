@@ -413,6 +413,51 @@ HWTEST_F(PointerMotionAccelerationTestWithMock, AxisCurve_IsValid_004, TestSize.
 }
 
 /**
+ * @tc.name: AxisCurve_IsValid_005
+ * @tc.desc: Test AxisCurve::IsValid with mismatched sizes (speeds vs slopes)
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerMotionAccelerationTestWithMock, AxisCurve_IsValid_005, TestSize.Level1)
+{
+    PointerMotionAcceleration::AxisCurve curve;
+    curve.speeds = {1.0, 2.0, 3.0};
+    curve.slopes = {1.0, 2.0};
+    curve.diffNums = {0.0, 0.1, 0.2};
+    EXPECT_FALSE(curve.IsValid());
+}
+
+/**
+ * @tc.name: AxisCurve_IsValid_006
+ * @tc.desc: Test AxisCurve::IsValid with mismatched sizes (speeds vs diffNums)
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerMotionAccelerationTestWithMock, AxisCurve_IsValid_006, TestSize.Level1)
+{
+    PointerMotionAcceleration::AxisCurve curve;
+    curve.speeds = {1.0, 2.0, 3.0};
+    curve.slopes = {1.0, 2.0, 3.0};
+    curve.diffNums = {0.0, 0.1};
+    EXPECT_FALSE(curve.IsValid());
+}
+
+/**
+ * @tc.name: AxisCurve_IsValid_007
+ * @tc.desc: Test AxisCurve::IsValid with all same sizes (valid)
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerMotionAccelerationTestWithMock, AxisCurve_IsValid_007, TestSize.Level1)
+{
+    PointerMotionAcceleration::AxisCurve curve;
+    curve.speeds = {1.0, 2.0, 3.0};
+    curve.slopes = {1.0, 2.0, 3.0};
+    curve.diffNums = {0.0, 0.1, 0.2};
+    EXPECT_TRUE(curve.IsValid());
+}
+
+/**
  * @tc.name: DynamicAccelerateTouchpadAxis_001
  * @tc.desc: Test DynamicAccelerateTouchpadAxis with empty axisCurves_
  * @tc.type: FUNC
@@ -909,6 +954,46 @@ HWTEST_F(PointerMotionAccelerationTestWithMock, CalcAxisGainTouchpad_006, TestSi
     auto ret = PointerMotionAcceleration::CalcAxisGainTouchpad(curve, axisSpeed, gain);
     EXPECT_TRUE(ret);
     EXPECT_GT(gain, 0.0);
+}
+
+/**
+ * @tc.name: CalcAxisGainTouchpad_007
+ * @tc.desc: Test CalcAxisGainTouchpad with mismatched array sizes (speeds vs slopes)
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerMotionAccelerationTestWithMock, CalcAxisGainTouchpad_007, TestSize.Level1)
+{
+    PointerMotionAcceleration::AxisCurve curve;
+    curve.speeds = {1.0, 2.0, 3.0};
+    curve.slopes = {1.0, 2.0};
+    curve.diffNums = {0.0, 0.1, 0.2};
+
+    double axisSpeed = 5.0;
+    double gain = 0.0;
+
+    auto ret = PointerMotionAcceleration::CalcAxisGainTouchpad(curve, axisSpeed, gain);
+    EXPECT_FALSE(ret);
+}
+
+/**
+ * @tc.name: CalcAxisGainTouchpad_008
+ * @tc.desc: Test CalcAxisGainTouchpad with mismatched array sizes (speeds vs diffNums)
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerMotionAccelerationTestWithMock, CalcAxisGainTouchpad_008, TestSize.Level1)
+{
+    PointerMotionAcceleration::AxisCurve curve;
+    curve.speeds = {1.0, 2.0, 3.0};
+    curve.slopes = {1.0, 2.0, 3.0};
+    curve.diffNums = {0.0, 0.1};
+
+    double axisSpeed = 5.0;
+    double gain = 0.0;
+
+    auto ret = PointerMotionAcceleration::CalcAxisGainTouchpad(curve, axisSpeed, gain);
+    EXPECT_FALSE(ret);
 }
 
 /**
