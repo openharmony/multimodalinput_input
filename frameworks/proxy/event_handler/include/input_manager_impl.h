@@ -359,6 +359,8 @@ private:
 #ifdef OHOS_BUILD_ENABLE_ANCO
     std::map<std::shared_ptr<IAncoConsumer>, sptr<IAncoChannel>> ancoChannels_;
 #endif // OHOS_BUILD_ENABLE_ANCO
+    uint32_t permissionType_ = 0;
+    bool permissionEnable_ = false;
 };
 
 #define InputMgrImpl ::OHOS::Singleton<InputManagerImpl>::GetInstance()
