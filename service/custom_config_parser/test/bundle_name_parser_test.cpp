@@ -40,6 +40,7 @@ constexpr int32_t EXCEED_MAX_ARRAY_SIZE = 150;
 constexpr int32_t RET_OK_VALUE = 0;
 constexpr int32_t RET_ERR_VALUE = -1;
 constexpr int32_t FIVE_ITEMS_ARRAY_SIZE = 5;
+constexpr mode_t kDirectoryPermissions = 0755;
 
 static std::string GetTestConfigDir()
 {
@@ -64,7 +65,7 @@ static bool CreateDirectoryRecursive(const std::string& path)
         }
         struct stat st;
         if (stat(parent.c_str(), &st) != 0) {
-            if (mkdir(parent.c_str(), 0755) != 0 && errno != EEXIST) {
+            if (mkdir(parent.c_str(), kDirectoryPermissions) != 0 && errno != EEXIST) {
                 return false;
             }
         }
@@ -1038,7 +1039,7 @@ HWTEST_F(BundleNameParserTest, BundleNameParser_InitializeImpl_MultipleItems_001
         if (i > 0) {
             multiItemConfig += ",\n";
         }
-        multiItemConfig += "    {\"placeholder\":\"app" + std::to_string(i) + 
+        multiItemConfig += "    {\"placeholder\":\"app" + std::to_string(i) +
                           "\",\"bundle_name\":\"com.example.app" + std::to_string(i) + "\"}";
     }
     
@@ -1242,7 +1243,7 @@ HWTEST_F(BundleNameParserTest, BundleNameParser_InitializeImpl_MaxSize_001, Test
         if (i > 0) {
             maxSizeConfig += ",";
         }
-        maxSizeConfig += "{\"placeholder\":\"key" + std::to_string(i) + 
+        maxSizeConfig += "{\"placeholder\":\"key" + std::to_string(i) +
                         "\",\"bundle_name\":\"bundle" + std::to_string(i) + "\"}";
     }
     maxSizeConfig += "]}";
@@ -1280,7 +1281,7 @@ HWTEST_F(BundleNameParserTest, BundleNameParser_InitializeImpl_ExceedMaxSize_001
         if (i > 0) {
             exceedMaxConfig += ",";
         }
-        exceedMaxConfig += "{\"placeholder\":\"key" + std::to_string(i) + 
+        exceedMaxConfig += "{\"placeholder\":\"key" + std::to_string(i) +
                           "\",\"bundle_name\":\"bundle" + std::to_string(i) + "\"}";
     }
     exceedMaxConfig += "]}";
