@@ -36,6 +36,9 @@
 #ifdef OHOS_BUILD_ENABLE_TOUCH_DRAWING
 #include "touch_drawing_manager.h"
 #endif // #ifdef OHOS_BUILD_ENABLE_TOUCH_DRAWING
+#ifdef OHOS_BUILD_ENABLE_TRIPLE_FINGER_SNAPSHOT
+#include "triple_finger_snapshot_manager.h"
+#endif // OHOS_BUILD_ENABLE_TRIPLE_FINGER_SNAPSHOT
 #include "cursor_drawing_component.h"
 #include "util_ex.h"
 
@@ -104,6 +107,7 @@ void EventDump::ParseCommand(int32_t fd, const std::vector<std::string> &args)
         { "event", no_argument, 0, 'e' },
         { "lidstate", no_argument, 0, 't' },
         { "tabletStandState", no_argument, 0, 'b' },
+        { "tripleFingerSnapshot", no_argument, 0, 'n' },
         { nullptr, 0, 0, 0 }
     };
     if (args.empty()) {
@@ -131,7 +135,7 @@ void EventDump::ParseCommand(int32_t fd, const std::vector<std::string> &args)
     }
     optind = 1;
     int32_t c;
-    while ((c = getopt_long (args.size(), argv, "hdlwusoifmckKetb", dumpOptions, &optionIndex)) != -1) {
+    while ((c = getopt_long (args.size(), argv, "hdlwusoifmckKetbn", dumpOptions, &optionIndex)) != -1) {
         switch (c) {
             case 'h': {
                 DumpEventHelp(fd, args);
@@ -285,6 +289,14 @@ void EventDump::ParseCommand(int32_t fd, const std::vector<std::string> &args)
 #else
                 mprintf(fd, "Switch Subscriber function does not support");
 #endif // OHOS_BUILD_ENABLE_SWITCH
+                break;
+            }
+            case 'n': {
+#ifdef OHOS_BUILD_ENABLE_TRIPLE_FINGER_SNAPSHOT
+                TripleFingerSnapshotManager::GetInstance().Dump(fd);
+#else
+                mprintf(fd, "triple finger snapshot does not support");
+#endif // OHOS_BUILD_ENABLE_TRIPLE_FINGER_SNAPSHOT
                 break;
             }
             default: {

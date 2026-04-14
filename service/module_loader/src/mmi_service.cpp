@@ -110,6 +110,10 @@
 #include "mouse_event_interface.h"
 #endif // OHOS_BUILD_ENABLE_POINTER
 
+#ifdef OHOS_BUILD_ENABLE_TRIPLE_FINGER_SNAPSHOT
+#include "triple_finger_snapshot_manager.h"
+#endif // OHOS_BUILD_ENABLE_TRIPLE_FINGER_SNAPSHOT
+
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "MMIService"
 #undef MMI_LOG_DOMAIN
@@ -159,6 +163,7 @@ constexpr int32_t GAME_UID { 7011 };
 constexpr int32_t USS_UID { 6699 };
 constexpr int32_t STYLUS_UID { 7555 };
 constexpr int32_t SYNERGY_UID { 5521 };
+constexpr int32_t ACCESSIBILITY_UID { 1103 };
 constexpr int32_t MIN_TIMEOUT_DELAY { 1 };
 constexpr int32_t MSDP_UID { 6699 };
 constexpr int32_t DEFAULT_UNLOAD_DELAY_TIME { 30000 };
@@ -2584,6 +2589,10 @@ void MMIService::OnAddSystemAbility(int32_t systemAbilityId, const std::string &
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
         RegisterForCommonEventService();
 #endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
+#ifdef OHOS_BUILD_ENABLE_TRIPLE_FINGER_SNAPSHOT
+        TripleFingerSnapshotManager::GetInstance().RegisterSwitchObserver(
+            ACCOUNT_MGR->GetCurrentAccountSetting().GetAccountId());
+#endif // OHOS_BUILD_ENABLE_TRIPLE_FINGER_SNAPSHOT
     }
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
     RegisterForRenderService(systemAbilityId);
@@ -5808,7 +5817,8 @@ ErrCode MMIService::SwitchScreenCapturePermission(uint32_t permissionType, bool 
         MMI_HILOGE("Verify system APP failed");
         return ERROR_NOT_SYSAPI;
     }
-    if (callingUid != PENGLAI_UID && callingUid != GAME_UID) {
+    if (callingUid != PENGLAI_UID && callingUid != GAME_UID &&
+            callingUid != ACCESSIBILITY_UID) {
         MMI_HILOGE("Verify specified system APP failed");
         return ERROR_NO_PERMISSION;
     }
@@ -5817,8 +5827,8 @@ ErrCode MMIService::SwitchScreenCapturePermission(uint32_t permissionType, bool 
     auto eventKeyCommandHandler = InputHandler->GetKeyCommandHandler();
     CHKPR(eventKeyCommandHandler, RET_ERR);
     int32_t ret = delegateTasks_.PostSyncTask(
-        [permissionType, enable, eventKeyCommandHandler] {
-            return eventKeyCommandHandler->SwitchScreenCapturePermission(permissionType, enable);
+        [permissionType, enable, eventKeyCommandHandler, callingUid] {
+            return eventKeyCommandHandler->SwitchScreenCapturePermission(permissionType, enable, callingUid);
         }
         );
     if (ret != RET_OK) {

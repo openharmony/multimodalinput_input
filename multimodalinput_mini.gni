@@ -71,6 +71,7 @@ declare_args() {
   input_feature_pen = true
   input_feature_touch_gesture = true
   input_feature_universal_drag_enable = false
+  input_feature_triple_finger_snapshot = false
 
   if (defined(global_parts_info) &&
       defined(global_parts_info.msdp_device_status)) {
