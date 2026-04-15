@@ -1405,7 +1405,12 @@ typedef enum {
      * XKEY
      * @since 26.0.0
      */
-    KEYCODE_XKEY = 3232
+    KEYCODE_XKEY = 3232,
+    /**
+     * Wrist Turn key
+     * @since 26.0.0
+     */
+    KEYCODE_WRIST_TURN = 16777216
 } Input_KeyCode;
 
 #ifdef __cplusplus
