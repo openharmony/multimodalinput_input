@@ -958,6 +958,7 @@ MapFun JsInputMonitor::GetFuns(const std::shared_ptr<PointerEvent> pointerEvent,
     mapFun["globalY"] = [item] { return static_cast<int32_t>(item.GetGlobalY()); };
     mapFun["rawDeltaX"] = [item] { return item.GetRawDx(); };
     mapFun["rawDeltaY"] = [item] { return item.GetRawDy(); };
+    mapFun["toolType"] = [item] { return item.GetToolType(); };
     return mapFun;
 }
 
