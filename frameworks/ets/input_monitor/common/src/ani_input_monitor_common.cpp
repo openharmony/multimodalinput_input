@@ -172,7 +172,7 @@ int32_t TaiheMonitorConverter::TouchToTaihe(const PointerEvent::PointerItem &ite
     out.toolHeight = item.GetToolHeight();
     out.rawX = item.GetRawDx();
     out.rawY = item.GetRawDy();
-    out.toolType.from_value(item.GetToolType());
+    out.toolType = TaiheToolType::from_value(item.GetToolType());
     out.fixedDisplayX = taihe::optional<int32_t>(std::in_place_t{}, item.GetFixedDisplayX());
     out.fixedDisplayY = taihe::optional<int32_t>(std::in_place_t{}, item.GetFixedDisplayY());
     out.blobId = taihe::optional<int32_t>(std::in_place_t{}, item.GetBlobId());
@@ -641,6 +641,7 @@ int32_t TaiheMonitorConverter::SetMouseProperty(std::shared_ptr<PointerEvent> po
     mouseEvent.rawDeltaY = item.GetRawDy();
     mouseEvent.globalX = taihe::optional<int32_t>(std::in_place, static_cast<int32_t>(item.GetGlobalX()));
     mouseEvent.globalY = taihe::optional<int32_t>(std::in_place, static_cast<int32_t>(item.GetGlobalY()));
+    mouseEvent.toolType = TaiheMouseToolType::from_value(item.GetToolType());
     return ret;
 }
 
