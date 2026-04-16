@@ -1083,12 +1083,12 @@ typedef enum {
     KEYCODE_KBDINPUTASSIST_CANCEL = 2731,
     /**
      * Mouse Assistant key
-     * @since 24
+     * @since 26.0.0
      */
     KEYCODE_MOUSE_ASSISTANT = 2732,
     /**
      * Mouse Intelligence Selection key
-     * @since 24
+     * @since 26.0.0
      */
     KEYCODE_MOUSE_INTELLIGENCE_SELECTION = 2733,
     /**

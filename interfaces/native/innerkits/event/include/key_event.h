@@ -3187,14 +3187,14 @@ public:
     /**
      * Assistant By Mouse
      *
-     * @since 24
+     * @since 26.0.0
      */
     static const int32_t KEYCODE_MOUSE_ASSISTANT;
 
     /**
      * Intelligence Selection By Mouse
      *
-     * @since 24
+     * @since 26.0.0
      */
     static const int32_t KEYCODE_MOUSE_INTELLIGENCE_SELECTION;
 
