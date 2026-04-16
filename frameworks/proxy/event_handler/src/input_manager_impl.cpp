@@ -3137,6 +3137,12 @@ int32_t InputManagerImpl::DisableInputEventDispatch(bool disabled)
     return MULTIMODAL_INPUT_CONNECT_MGR->DisableInputEventDispatch(disabled);
 }
 
+int32_t InputManagerImpl::EnableInputExtension(const std::string &uuid, bool enabled)
+{
+    CALL_INFO_TRACE;
+    return MULTIMODAL_INPUT_CONNECT_MGR->EnableInputExtension(uuid, enabled);
+}
+
 int32_t InputManagerImpl::ShiftAppPointerEvent(const ShiftWindowParam &param, bool autoGenDown)
 {
     CALL_INFO_TRACE;

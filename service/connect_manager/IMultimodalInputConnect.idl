@@ -178,6 +178,7 @@ interface OHOS.MMI.IMultimodalInputConnect {
     void GetAllSystemHotkeys([out] KeyOption[] keyOptions);
     void SetInputDeviceEnabled([in] int deviceId, [in] boolean enable, [in] int index);
     void DisableInputEventDispatch([in] boolean disabled);
+    void EnableInputExtension([in] String uuid, [in] boolean enabled);
     void ShiftAppPointerEvent([in] ShiftWindowParam param, [in] boolean autoGenDown);
     void SetMultiWindowScreenId([in] unsigned long screenId, [in] unsigned long displayNodeScreenId);
     void QuerySwitchStatus([in] int switchType, [out] int status);

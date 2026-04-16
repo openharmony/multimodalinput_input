@@ -918,6 +918,7 @@ public:
      * @since 12
      */
     int32_t EnableHardwareCursorStats(bool enable);
+
     /**
      * @brief Get the mouse hard cursor information.
      * @param frameCount Counting the frame rate of continuous mouse movement.
@@ -1432,6 +1433,15 @@ public:
      * @since 24
      */
     int32_t GetMouseScrollDirection(bool &state);
+
+    /**
+     * @brief Enable or disable input extension by uuid.
+     * @param uuid The unique identifier of the extension plugin.
+     * @param enabled True to enable, false to disable.
+     * @return Returns 0 if success; returns a non-0 value otherwise.
+     * @since 26
+     */
+    int32_t EnableInputExtension(const std::string &uuid, bool enabled);
 
 private:
     InputManager() = default;
