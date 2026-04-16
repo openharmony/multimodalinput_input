@@ -342,10 +342,10 @@ public:
      * @brief Simulates a key input event. This event will be distributed and
      * processed in the same way as the event reported by the input device.
      * @param keyEvent Indicates the key input event to simulate.
-     * @return void
+     * @return Returns RET_OK on success, error code otherwise
      * @since 9
      */
-    void SimulateInputEvent(std::shared_ptr<KeyEvent> keyEvent);
+    int32_t SimulateInputEvent(std::shared_ptr<KeyEvent> keyEvent);
 
     /**
      * @brief Simulates a touchpad input event, touchscreen input event, or mouse device input event.
@@ -355,10 +355,10 @@ public:
      * @param isAutoToVirtualScreen In one-handed mode, true indicates that the data is automatically injected to
      * the virtual screen, and false indicates that the data is not automatically injected to the virtual screen.
      * @param useCoordinate Which coordinates to use for injecting events.
-     * @return void
+     * @return Returns RET_OK on success, error code otherwise
      * @since 9
      */
-    void SimulateInputEvent(std::shared_ptr<PointerEvent> pointerEvent, bool isAutoToVirtualScreen = true,
+    int32_t SimulateInputEvent(std::shared_ptr<PointerEvent> pointerEvent, bool isAutoToVirtualScreen = true,
         int32_t useCoordinate = PointerEvent::DISPLAY_COORDINATE);
 
     /**
@@ -370,10 +370,10 @@ public:
      * @param isAutoToVirtualScreen In one-handed mode, true indicates that the data is automatically injected to
      * the virtual screen, and false indicates that the data is not automatically injected to the virtual screen.
      * @param useCoordinate Which coordinates to use for injecting events.
-     * @return void
+     * @return Returns RET_OK on success, error code otherwise
      * @since 9
      */
-    void SimulateInputEvent(std::shared_ptr<PointerEvent> pointerEvent, float zOrder,
+    int32_t SimulateInputEvent(std::shared_ptr<PointerEvent> pointerEvent, float zOrder,
         bool isAutoToVirtualScreen = true, int32_t useCoordinate = PointerEvent::DISPLAY_COORDINATE);
     void SimulateTouchPadInputEvent(std::shared_ptr<PointerEvent> pointerEvent, const TouchpadCDG &touchpadCDG);
 

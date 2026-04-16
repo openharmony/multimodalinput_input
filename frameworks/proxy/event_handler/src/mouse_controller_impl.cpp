@@ -17,6 +17,7 @@
 
 #include "define_multimodal.h"
 #include "input_manager.h"
+#include "input_manager_impl.h"
 #include "mmi_log.h"
 #include "util.h"
 
@@ -414,7 +415,11 @@ int32_t MouseControllerImpl::InjectPointerEvent(std::shared_ptr<PointerEvent> ev
     // Add Controller Flag to mark this event uses CONTROL_DEVICE permission check
     event->AddFlag(InputEvent::EVENT_FLAG_CONTROLLER);
 
-    InputManager::GetInstance()->SimulateInputEvent(event, false, PointerEvent::DISPLAY_COORDINATE);
+    int32_t ret = InputMgrImpl.SimulateInputEvent(event, false, PointerEvent::DISPLAY_COORDINATE);
+    if (ret != RET_OK) {
+        MMI_HILOGE("SimulateInputEvent failed, ret=%{public}d", ret);
+        return ret;
+    }
 
     return RET_OK;
 }
