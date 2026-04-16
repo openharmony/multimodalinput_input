@@ -32,8 +32,8 @@ namespace OHOS {
 namespace MMI {
 const static std::map<::ohos::multimodalInput::mouseEvent::Button, int32_t> MOUSE_BUTTON_TRANSFORMATION = {
     { ::ohos::multimodalInput::mouseEvent::Button::key_t::LEFT, PointerEvent::MOUSE_BUTTON_LEFT},
-    { ::ohos::multimodalInput::mouseEvent::Button::key_t::MIDDLE, PointerEvent::MOUSE_BUTTON_RIGHT},
-    { ::ohos::multimodalInput::mouseEvent::Button::key_t::RIGHT, PointerEvent::MOUSE_BUTTON_MIDDLE},
+    { ::ohos::multimodalInput::mouseEvent::Button::key_t::MIDDLE, PointerEvent::MOUSE_BUTTON_MIDDLE},
+    { ::ohos::multimodalInput::mouseEvent::Button::key_t::RIGHT, PointerEvent::MOUSE_BUTTON_RIGHT},
     { ::ohos::multimodalInput::mouseEvent::Button::key_t::SIDE, PointerEvent::MOUSE_BUTTON_SIDE},
     { ::ohos::multimodalInput::mouseEvent::Button::key_t::EXTRA, PointerEvent::MOUSE_BUTTON_EXTRA},
     { ::ohos::multimodalInput::mouseEvent::Button::key_t::FORWARD, PointerEvent::MOUSE_BUTTON_FORWARD},
