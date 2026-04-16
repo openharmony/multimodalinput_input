@@ -1530,6 +1530,8 @@ const std::set<int32_t> JsInputConsumer::allowedKeys_ {
     KeyEvent::KEYCODE_MEDIA_PLAY_PAUSE,
     KeyEvent::KEYCODE_MEDIA_NEXT,
     KeyEvent::KEYCODE_MEDIA_PREVIOUS,
+    KeyEvent::KEYCODE_FINGERPRINT_SLIDE_UP,
+    KeyEvent::KEYCODE_FINGERPRINT_SLIDE_DOWN,
 };
 
 std::shared_ptr<JsInputConsumer> JsInputConsumer::GetInstance()

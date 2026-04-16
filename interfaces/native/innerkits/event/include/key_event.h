@@ -3213,6 +3213,17 @@ public:
     static const int32_t KEYCODE_XKEY;
 
     /**
+     * FINGERPRINT_SLIDE_UP
+     * @since 26.0.0
+     */
+    static const int32_t KEYCODE_FINGERPRINT_SLIDE_UP;
+    /**
+     * FINGERPRINT_SLIDE_DOWN
+     * @since 26.0.0
+     */
+    static const int32_t KEYCODE_FINGERPRINT_SLIDE_DOWN;
+
+    /**
      * Extended function key mask (fourth byte)
      * Used to identify extended function keys by checking bits 24-31
      * @internal
