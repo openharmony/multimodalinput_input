@@ -1402,6 +1402,11 @@ typedef enum {
      */
     KEYCODE_DIV = 3220,
     /**
+     * XKEY
+     * @since 26.0.0
+     */
+    KEYCODE_XKEY = 3232,
+    /**
      * FINGERPRINT_SLIDE_UP
      * @since 26.0.0
      */
@@ -1411,11 +1416,6 @@ typedef enum {
      * @since 26.0.0
      */
     KEYCODE_FINGERPRINT_SLIDE_DOWN = 3234
-    /**
-     * XKEY
-     * @since 26.0.0
-     */
-    KEYCODE_XKEY = 3232
 } Input_KeyCode;
 
 #ifdef __cplusplus
