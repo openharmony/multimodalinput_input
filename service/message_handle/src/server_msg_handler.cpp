@@ -1844,5 +1844,13 @@ int32_t ServerMsgHandler::NativeInjectCheck(int32_t pid)
     MMI_HILOGI("Native inject permitted by dialog authorization, pid:%{public}d", pid);
     return RET_OK;
 }
+
+int32_t ServerMsgHandler::EnableInputExtension(int32_t uid, const std::string &uuid, bool enabled)
+{
+    CALL_DEBUG_ENTER;
+    MMI_HILOGI("EnableInputExtension (uid:%{public}d, uuid:%{public}s, enabled:%{public}d)",
+        uid, uuid.c_str(), enabled);
+    return RET_OK;
+}
 } // namespace MMI
 } // namespace OHOS

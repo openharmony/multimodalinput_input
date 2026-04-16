@@ -5211,8 +5211,7 @@ ErrCode MMIService::GetAllSystemHotkeys(std::vector<KeyOption>& keyOptions)
     int32_t ret = delegateTasks_.PostSyncTask(
         [this, &options] {
             return this->OnGetAllSystemHotkey(options);
-        }
-        );
+        });
     if (ret != RET_OK) {
         MMI_HILOGD("Get all system hot key, ret:%{public}d", ret);
         return ret;
@@ -5353,6 +5352,25 @@ ErrCode MMIService::DisableInputEventDispatch(bool disabled)
     return RET_OK;
 }
 
+ErrCode MMIService::EnableInputExtension(const std::string &uuid, bool enabled)
+{
+    CALL_INFO_TRACE;
+    if (!IsRunning()) {
+        MMI_HILOGE("Service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
+    auto uid = GetCallingUid();
+    int32_t ret = delegateTasks_.PostSyncTask(
+        [this, uid, uuid, enabled] {
+            return sMsgHandler_.EnableInputExtension(uid, uuid, enabled);
+        });
+    if (ret != RET_OK) {
+        MMI_HILOGE("EnableInputExtension failed, return:%{public}d", ret);
+        return ret;
+    }
+    return RET_OK;
+}
+
 ErrCode MMIService::ShiftAppPointerEvent(const ShiftWindowParam &param, bool autoGenDown)
 {
     CALL_DEBUG_ENTER;
@@ -5368,8 +5386,7 @@ ErrCode MMIService::ShiftAppPointerEvent(const ShiftWindowParam &param, bool aut
     int32_t ret = delegateTasks_.PostSyncTask(
         [param, autoGenDown]() {
             return WIN_MGR->ShiftAppPointerEvent(param, autoGenDown);
-        }
-        );
+        });
     if (ret != RET_OK) {
         MMI_HILOGE("Shift AppPointerEvent failed, return:%{public}d", ret);
         return ret;

@@ -1124,5 +1124,10 @@ int32_t InputManager::CheckKeyboardControllerPermission()
     CALL_DEBUG_ENTER;
     return InputMgrImpl.CheckKeyboardControllerPermission();
 }
+
+int32_t InputManager::EnableInputExtension(const std::string &uuid, bool enabled)
+{
+    return InputMgrImpl.EnableInputExtension(uuid, enabled);
+}
 } // namespace MMI
 } // namespace OHOS

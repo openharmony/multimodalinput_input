@@ -260,6 +260,7 @@ public:
     int32_t ConvertToCapiKeyAction(int32_t keyAction);
     int32_t SetInputDeviceEnabled(int32_t deviceId, bool enable, std::function<void(int32_t)> callback);
     int32_t DisableInputEventDispatch(bool disabled);
+    int32_t EnableInputExtension(const std::string &uuid, bool enabled);
     int32_t ShiftAppPointerEvent(const ShiftWindowParam &param, bool autoGenDown);
     int32_t CheckKnuckleEvent(float pointX, float pointY, bool &touchType);
     int32_t LaunchAiScreenAbility();
