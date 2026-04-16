@@ -17,6 +17,7 @@
 
 #include "app_state_observer.h"
 #include "bytrace_adapter.h"
+#include "trigger_event_dispatcher.h"
 #ifdef OHOS_BUILD_ENABLE_CALL_MANAGER
 #include "call_manager_client.h"
 #endif // OHOS_BUILD_ENABLE_CALL_MANAGER
@@ -195,6 +196,7 @@ int32_t KeySubscriberHandler::RemoveSubscriber(SessionPtr sess, int32_t subscrib
                     "finalKeyDownDuration:%{public}d, pid:%{public}d", subscribeId, option->GetFinalKey(),
                     option->IsFinalKeyDown() ? "true" : "false", option->GetFinalKeyDownDuration(), sess->GetPid());
                 subscribers.erase(it);
+                ResetAllReleasedState(subscribeId);
                 DfxHisysevent::ReportUnSubscribeKeyEvent(subscribeId, option->GetFinalKey(),
                     sess->GetProgramName(), sess->GetPid());
                 return RET_OK;
@@ -675,9 +677,14 @@ bool KeySubscriberHandler::OnSubscribeKeyEvent(std::shared_ptr<KeyEvent> keyEven
     }
 #endif // #ifdef OHOS_BUILD_ENABLE_KEY_PRESSED_HANDLER
     if (IsRepeatedKeyEvent(keyEvent)) {
-        MMI_HILOGD("Repeat KeyEvent, skip");
-        powerKeyLogger("IsRepeatedKeyEvent");
-        return true;
+        if (ShouldProcessRepeatEvent(keyEvent)) {
+            MMI_HILOGI("Repeat KeyEvent but new triggerType needs processing, continue, (KC:%{public}d, KA:%{public}d)",
+                keyEvent->GetKeyCode(), keyEvent->GetKeyAction());
+        } else {
+            MMI_HILOGD("Repeat KeyEvent, skip");
+            powerKeyLogger("IsRepeatedKeyEvent");
+            return true;
+        }
     }
     return ProcessKeyEvent(keyEvent);
 }
@@ -1100,6 +1107,31 @@ bool KeySubscriberHandler::InitSessionDeleteCallback()
     return true;
 }
 
+void KeySubscriberHandler::HandleKeyDownForPressedType(const std::shared_ptr<KeyEvent> &keyEvent,
+    int32_t keyCode, const std::vector<int32_t> &pressedKeys,
+    const std::shared_ptr<KeyOption> &keyOption,
+    std::list<std::shared_ptr<Subscriber>> &subscribers, bool &handled)
+{
+    if (keyCode != keyOption->GetFinalKey()) {
+        MMI_HILOGD("PRESSED/REPEAT_PRESSED: code != finalKey");
+        return;
+    }
+    if (!IsPreKeysMatch(keyOption->GetPreKeys(), pressedKeys)) {
+        MMI_HILOGD("PRESSED/REPEAT_PRESSED: preKeysMatch failed");
+        return;
+    }
+    for (auto &subscriber : subscribers) {
+        CHKPC(subscriber);
+        auto sess = subscriber->sess_;
+        CHKPC(sess);
+        if (isForegroundExits_ || keyCode == KeyEvent::KEYCODE_POWER ||
+            foregroundPids_.find(sess->GetPid()) != foregroundPids_.end()) {
+            NotifySubscriber(keyEvent, subscriber);
+            handled = true;
+        }
+    }
+}
+
 bool KeySubscriberHandler::HandleKeyDown(const std::shared_ptr<KeyEvent> &keyEvent)
 {
     CALL_DEBUG_ENTER;
@@ -1121,6 +1153,15 @@ bool KeySubscriberHandler::HandleKeyDown(const std::shared_ptr<KeyEvent> &keyEve
         PrintKeyOption(keyOption);
         IsMatchForegroundPid(subscribers, pids);
         CHKPC(keyOption);
+        if (keyOption->GetTriggerType() == KeyCommandTriggerType::ALL_RELEASED) {
+            HandleKeyForAllReleased(keyEvent, keyOption, subscribers, handled);
+            continue;
+        }
+        if (keyOption->GetTriggerType() == KeyCommandTriggerType::PRESSED ||
+            keyOption->GetTriggerType() == KeyCommandTriggerType::REPEAT_PRESSED) {
+            HandleKeyDownForPressedType(keyEvent, keyCode, pressedKeys, keyOption, subscribers, handled);
+            continue;
+        }
         if (!keyOption->IsFinalKeyDown()) {
             MMI_HILOGD("!keyOption->IsFinalKeyDown()");
             continue;
@@ -1164,6 +1205,36 @@ void KeySubscriberHandler::SubscriberNotifyNap(const std::shared_ptr<Subscriber>
     }
 }
 
+void KeySubscriberHandler::HandleKeyUpForPressedType(const std::shared_ptr<KeyEvent> &keyEvent,
+    int32_t keyCode, const std::shared_ptr<KeyOption> &keyOption, bool &handled)
+{
+    int32_t finalKey = keyOption->GetFinalKey();
+    const auto &preKeys = keyOption->GetPreKeys();
+    if (keyCode == finalKey || preKeys.find(keyCode) != preKeys.end()) {
+        MMI_HILOGI("PRESSED/REPEAT_PRESSED: consuming UP event KC:%{public}d", keyCode);
+        handled = true;
+    }
+}
+
+bool KeySubscriberHandler::HandleKeyUpWithDurationCheck(const std::shared_ptr<KeyEvent> &keyEvent,
+    const std::shared_ptr<KeyOption> &keyOption,
+    std::list<std::shared_ptr<Subscriber>> &subscribers, bool &handled)
+{
+    auto duration = keyOption->GetFinalKeyDownDuration();
+    if (duration <= 0) {
+        NotifyKeyUpSubscriber(keyEvent, subscribers, handled);
+        return true;
+    }
+    std::optional<KeyEvent::KeyItem> keyItem = keyEvent->GetKeyItem();
+    CHK_KEY_ITEM(keyItem);
+    if (keyEvent->GetActionTime() - keyItem->GetDownTime() >= MS2US(duration)) {
+        MMI_HILOGE("upTime - downTime >= duration");
+        return true;
+    }
+    NotifyKeyUpSubscriber(keyEvent, subscribers, handled);
+    return true;
+}
+
 bool KeySubscriberHandler::HandleKeyUp(const std::shared_ptr<KeyEvent> &keyEvent)
 {
 #ifdef SHORTCUT_KEY_RULES_ENABLED
@@ -1184,6 +1255,15 @@ bool KeySubscriberHandler::HandleKeyUp(const std::shared_ptr<KeyEvent> &keyEvent
         auto subscribers = iter.second;
         PrintKeyOption(keyOption);
         IsMatchForegroundPid(subscribers, pids);
+        if (keyOption->GetTriggerType() == KeyCommandTriggerType::ALL_RELEASED) {
+            HandleKeyForAllReleased(keyEvent, keyOption, subscribers, handled);
+            continue;
+        }
+        if (keyOption->GetTriggerType() == KeyCommandTriggerType::PRESSED ||
+            keyOption->GetTriggerType() == KeyCommandTriggerType::REPEAT_PRESSED) {
+            HandleKeyUpForPressedType(keyEvent, keyCode, keyOption, handled);
+            continue;
+        }
         if (keyOption->IsFinalKeyDown()) {
             MMI_HILOGD("keyOption->IsFinalKeyDown()");
             ClearSubscriberTimer(subscribers);
@@ -1197,21 +1277,170 @@ bool KeySubscriberHandler::HandleKeyUp(const std::shared_ptr<KeyEvent> &keyEvent
             MMI_HILOGD("PreKeysMatch failed");
             continue;
         }
-        auto duration = keyOption->GetFinalKeyDownDuration();
-        if (duration <= 0) {
-            NotifyKeyUpSubscriber(keyEvent, subscribers, handled);
-            continue;
+        if (!HandleKeyUpWithDurationCheck(keyEvent, keyOption, subscribers, handled)) {
+            return false;
         }
-        std::optional<KeyEvent::KeyItem> keyItem = keyEvent->GetKeyItem();
-        CHK_KEY_ITEM(keyItem);
-        if (keyEvent->GetActionTime() - keyItem->GetDownTime() >= MS2US(duration)) {
-            MMI_HILOGE("upTime - downTime >= duration");
-            continue;
-        }
-        NotifyKeyUpSubscriber(keyEvent, subscribers, handled);
     }
     MMI_HILOGI("Handle key up:%{public}s", handled ? "true" : "false");
     return handled;
+}
+
+void KeySubscriberHandler::ProcessAllReleasedComboActivated(
+    const std::shared_ptr<KeyEvent> &keyEvent,
+    const std::shared_ptr<KeyOption> &keyOption,
+    std::shared_ptr<Subscriber> &subscriber, bool &handled)
+{
+    auto keyCode = keyEvent->GetKeyCode();
+    int32_t keyAction = keyEvent->GetKeyAction();
+    MMI_HILOGI("ALL_RELEASED: combo activated, dispatch KC:%{public}d action:%{public}d",
+               keyCode, keyAction);
+    auto sess = subscriber->sess_;
+    CHKPV(sess);
+    if (isForegroundExits_ || keyCode == KeyEvent::KEYCODE_POWER ||
+        foregroundPids_.find(sess->GetPid()) != foregroundPids_.end()) {
+        NotifySubscriber(keyEvent, subscriber);
+        handled = true;
+    }
+    if (keyAction == KeyEvent::KEY_ACTION_UP) {
+        auto &state = allReleasedStates_[subscriber->id_];
+        state.pressedComboKeys.erase(keyCode);
+        if (state.pressedComboKeys.empty()) {
+            MMI_HILOGI("ALL_RELEASED: all keys released, reset state for sub:%{public}d",
+                       subscriber->id_);
+            state.comboActivated = false;
+        }
+    }
+}
+
+bool KeySubscriberHandler::ProcessAllReleasedComboActivate(
+    const std::shared_ptr<KeyEvent> &keyEvent,
+    const std::shared_ptr<KeyOption> &keyOption,
+    std::shared_ptr<Subscriber> &subscriber, bool &handled)
+{
+    auto keyCode = keyEvent->GetKeyCode();
+    std::vector<int32_t> pressedKeys = keyEvent->GetPressedKeys();
+    RemoveKeyCode(keyCode, pressedKeys);
+    const auto &preKeys = keyOption->GetPreKeys();
+    if (!IsPreKeysMatch(preKeys, pressedKeys)) {
+        MMI_HILOGD("ALL_RELEASED: preKeys not matched on finalKey DOWN");
+        return true;
+    }
+    auto duration = keyOption->GetFinalKeyDownDuration();
+    if (duration > 0) {
+        std::optional<KeyEvent::KeyItem> keyItem = keyEvent->GetKeyItem();
+        CHK_KEY_ITEM(keyItem);
+        if (keyEvent->GetActionTime() - keyItem->GetDownTime() >= MS2US(duration)) {
+            MMI_HILOGD("ALL_RELEASED: duration check failed");
+            return true;
+        }
+    }
+    auto &state = allReleasedStates_[subscriber->id_];
+    state.comboActivated = true;
+    state.pressedComboKeys.clear();
+    state.pressedComboKeys.insert(keyOption->GetFinalKey());
+    for (const auto &preKey : preKeys) {
+        state.pressedComboKeys.insert(preKey);
+    }
+    MMI_HILOGI("ALL_RELEASED: combo activated, dispatch finalKey DOWN KC:%{public}d", keyCode);
+    auto sess = subscriber->sess_;
+    CHKPV(sess);
+    if (isForegroundExits_ || keyCode == KeyEvent::KEYCODE_POWER ||
+        foregroundPids_.find(sess->GetPid()) != foregroundPids_.end()) {
+        NotifySubscriber(keyEvent, subscriber);
+        handled = true;
+    }
+    return true;
+}
+
+bool KeySubscriberHandler::HandleKeyForAllReleased(const std::shared_ptr<KeyEvent> &keyEvent,
+    const std::shared_ptr<KeyOption> &keyOption, std::list<std::shared_ptr<Subscriber>> &subscribers,
+    bool &handled)
+{
+    CALL_DEBUG_ENTER;
+    CHKPF(keyEvent);
+    CHKPF(keyOption);
+    auto keyCode = keyEvent->GetKeyCode();
+    int32_t keyAction = keyEvent->GetKeyAction();
+    int32_t finalKey = keyOption->GetFinalKey();
+    const auto &preKeys = keyOption->GetPreKeys();
+    bool isComboKey = (keyCode == finalKey) || (preKeys.find(keyCode) != preKeys.end());
+    if (!isComboKey) {
+        MMI_HILOGD("ALL_RELEASED: keyCode not in combo, skip");
+        return false;
+    }
+
+    for (auto &subscriber : subscribers) {
+        CHKPC(subscriber);
+        auto &state = allReleasedStates_[subscriber->id_];
+        if (state.comboActivated) {
+            ProcessAllReleasedComboActivated(keyEvent, keyOption, subscriber, handled);
+            continue;
+        }
+        if (keyCode == finalKey && keyAction == KeyEvent::KEY_ACTION_DOWN) {
+            if (!ProcessAllReleasedComboActivate(keyEvent, keyOption, subscriber, handled)) {
+                return false;
+            }
+        }
+    }
+    return handled;
+}
+
+void KeySubscriberHandler::ResetAllReleasedState(int32_t subscriberId)
+{
+    CALL_DEBUG_ENTER;
+    auto iter = allReleasedStates_.find(subscriberId);
+    if (iter != allReleasedStates_.end()) {
+        allReleasedStates_.erase(iter);
+    }
+    MMI_HILOGD("ALL_RELEASED state reset for subscriber:%{public}d", subscriberId);
+}
+
+bool KeySubscriberHandler::ShouldProcessAllReleasedRepeat(int32_t keyCode,
+    const std::shared_ptr<KeyOption> &keyOption,
+    const std::list<std::shared_ptr<Subscriber>> &subscribers)
+{
+    int32_t finalKey = keyOption->GetFinalKey();
+    const auto &preKeys = keyOption->GetPreKeys();
+    bool isComboKey = (keyCode == finalKey) || (preKeys.find(keyCode) != preKeys.end());
+    if (!isComboKey) {
+        return false;
+    }
+    for (const auto &subscriber : subscribers) {
+        CHKPC(subscriber);
+        auto stateIter = allReleasedStates_.find(subscriber->id_);
+        if (stateIter != allReleasedStates_.end() && stateIter->second.comboActivated) {
+            MMI_HILOGD("ALL_RELEASED combo active, process repeat event");
+            return true;
+        }
+    }
+    return false;
+}
+
+bool KeySubscriberHandler::ShouldProcessRepeatEvent(const std::shared_ptr<KeyEvent> &keyEvent)
+{
+    CALL_DEBUG_ENTER;
+    CHKPF(keyEvent);
+    auto keyCode = keyEvent->GetKeyCode();
+    std::lock_guard<std::mutex> lock(subscriberMapMutex_);
+    for (const auto &iter : subscriberMap_) {
+        auto keyOption = iter.first;
+        CHKPC(keyOption);
+        int32_t triggerType = keyOption->GetTriggerType();
+        if (triggerType == KeyCommandTriggerType::ALL_RELEASED) {
+            if (ShouldProcessAllReleasedRepeat(keyCode, keyOption, iter.second)) {
+                return true;
+            }
+            continue;
+        }
+        if ((triggerType == KeyCommandTriggerType::PRESSED ||
+             triggerType == KeyCommandTriggerType::REPEAT_PRESSED) &&
+            keyCode == keyOption->GetFinalKey() &&
+            keyEvent->GetKeyAction() == KeyEvent::KEY_ACTION_DOWN) {
+            MMI_HILOGD("PRESSED/REPEAT_PRESSED: process repeat DOWN event");
+            return true;
+        }
+    }
+    return false;
 }
 
 bool KeySubscriberHandler::HandleKeyCancel(const std::shared_ptr<KeyEvent> &keyEvent)
@@ -1225,6 +1454,9 @@ bool KeySubscriberHandler::HandleKeyCancel(const std::shared_ptr<KeyEvent> &keyE
         for (auto &subscriber : subscribers) {
             PrintKeyUpLog(subscriber);
             ClearTimer(subscriber);
+            if (keyOption != nullptr && keyOption->GetTriggerType() == KeyCommandTriggerType::ALL_RELEASED) {
+                ResetAllReleasedState(subscriber->id_);
+            }
         }
     }
     return false;

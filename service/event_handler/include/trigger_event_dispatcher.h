@@ -78,6 +78,10 @@ private:
 private:
     bool CheckDurationWindowPassed(const std::string& subscribeKey);
     bool CheckDurationWindowWithOtherKey(const std::string& subscribeKey);
+    struct AllReleasedDispatchState {
+        bool comboActivated { false };
+        std::set<int32_t> pressedComboKeys;
+    };
 
 private:
     std::mutex mutex_;
@@ -85,6 +89,7 @@ private:
     std::map<std::string, int64_t> downStartTime_;
     std::map<std::string, bool> durationPassed_;
     std::map<std::string, bool> hasOtherKey_;
+    std::map<std::string, AllReleasedDispatchState> allReleasedDispatchStates_;
 };
 } // namespace MMI
 } // namespace OHOS

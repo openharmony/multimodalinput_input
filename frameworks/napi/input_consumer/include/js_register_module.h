@@ -94,6 +94,10 @@ public:
     void UnsubscribeKeyMonitor(napi_env env, napi_callback_info info);
 
     static std::shared_ptr<JsInputConsumer> GetInstance();
+    static napi_value KeyEvent2JsKeyEvent(napi_env env, std::shared_ptr<KeyEvent> keyEvent);
+    static napi_value KeyItem2JsKey(napi_env env, const KeyEvent::KeyItem &keyItem);
+    static int32_t JsKeyAction2KeyAction(int32_t action);
+    static int32_t KeyAction2JsKeyAction(int32_t action);
 
 private:
     size_t GenerateId();
@@ -108,11 +112,7 @@ private:
     void NotifyKeyMonitor(const KeyMonitor &keyMonitor, std::shared_ptr<KeyEvent> keyEvent);
     void NotifyKeyMonitorScoped(const KeyMonitor &keyMonitor, std::shared_ptr<KeyEvent> keyEvent);
     static bool CheckKeyMonitorOption(const KeyMonitorOption &keyOption);
-    static napi_value KeyEvent2JsKeyEvent(napi_env env, std::shared_ptr<KeyEvent> keyEvent);
-    static napi_value KeyItem2JsKey(napi_env env, const KeyEvent::KeyItem &keyItem);
     static void HandleKeyMonitor(uv_work_t *work, int32_t status);
-    static int32_t JsKeyAction2KeyAction(int32_t action);
-    static int32_t KeyAction2JsKeyAction(int32_t action);
 
     std::mutex mutex_;
     size_t baseId_ { 0 };
