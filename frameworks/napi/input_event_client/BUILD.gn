@@ -35,6 +35,8 @@ ohos_shared_library("inputeventclient") {
     "src/js_register_util.cpp",
     "src/js_mouse_controller.cpp",
     "src/js_mouse_controller_napi.cpp",
+    "src/js_touch_controller.cpp",
+    "src/js_touch_controller_napi.cpp",
     "src/js_keyboard_controller.cpp",
     "src/js_keyboard_controller_napi.cpp",
   ]

@@ -135,6 +135,7 @@ public:
 
     int32_t CheckMouseControllerPermission();
     int32_t CheckKeyboardControllerPermission();
+    int32_t CheckTouchControllerPermission();
 
     void OnConnected();
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
@@ -289,6 +290,7 @@ public:
 
     std::shared_ptr<class MouseControllerImpl> CreateMouseController();
     std::shared_ptr<class KeyboardControllerImpl> CreateKeyboardController();
+    std::shared_ptr<class TouchControllerImpl> CreateTouchController();
 
 private:
     int32_t PackScreensInfo(NetPacket &pkt, const std::vector<ScreenInfo>& screens);
