@@ -21,6 +21,8 @@
 #include "hardware_cursor_pointer_manager.h"
 #include "pointer_renderer.h"
 #include "old_display_info.h"
+#include "ui/rs_ui_context.h"
+#include "ui/rs_ui_director.h"
 
 namespace OHOS::MMI {
 using hwcmgr_ptr_t = std::shared_ptr<HardwareCursorPointerManager>;
@@ -199,6 +201,16 @@ public:
         isVirtualExtend_ = isVirtualExtend;
     }
 
+    std::shared_ptr<Rosen::RSUIDirector> GetRSUIDirector() const
+    {
+        return rsUIDirector_;
+    }
+
+    std::shared_ptr<Rosen::RSUIContext> GetRSUIContext() const
+    {
+        return rsUIContext_;
+    }
+
 private:
     bool InitSurfaceNode();
     bool FlushSerfaceBuffer();
@@ -211,6 +223,8 @@ private:
     bool InitCommonBuffer(const OHOS::BufferRequestConfig &bufferCfg);
     buffer_ptr_t CreateSurfaceBuffer(const OHOS::BufferRequestConfig &bufferCfg);
     bool IsDefaultCfg(const RenderConfig &cfg);
+    void InitRSUIContext(uint64_t screenId);
+    void RsFlushImplicitTransaction();
 
 private:
     std::mutex mtx_;
@@ -237,6 +251,8 @@ private:
     // RS Layer
     std::shared_ptr<OHOS::Rosen::RSSurfaceNode> surfaceNode_{nullptr};
     std::shared_ptr<OHOS::Rosen::RSCanvasNode> canvasNode_{nullptr};
+    std::shared_ptr<OHOS::Rosen::RSUIDirector> rsUIDirector_{nullptr};
+    std::shared_ptr<OHOS::Rosen::RSUIContext> rsUIContext_{nullptr};
 
     RenderConfig defaultCursorCfg_;
     buffer_ptr_t transparentBuffer_{nullptr};
