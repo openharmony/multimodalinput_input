@@ -81,6 +81,21 @@ public:
         const std::function<void(const EventFwk::CommonEventData &)> &callback) override;
     bool UnRegisterCommonEventCallback(int32_t callbackId) override;
 
+    // Configuration management implementations
+    bool GetSettingValue(const std::string& uri,
+                        const std::string& key,
+                        std::string& value) override;
+
+    sptr<SettingObserver> RegisterSettingObserver(
+        const std::string& uri,
+        const std::string& key,
+        SettingObserver::UpdateFunc callback) override;
+
+    bool UnregisterSettingObserver(const std::string& uri,
+                                   sptr<SettingObserver> observer) override;
+
+    bool IsDataShareReady() override;
+
     int32_t prio_ = 200;
     std::function<void(PluginEventType, int64_t)> callback_;
     UnintPlugin unintPlugin_ = nullptr;
@@ -92,6 +107,9 @@ private:
     InputPluginStage stage_;
     std::vector<InputPluginStage> stages_;
     int32_t timerCnt_ = 0;
+    // Observer lifecycle management
+    std::vector<sptr<SettingObserver>> observers_;
+    std::mutex observersMutex_;
 };
 
 struct InputPluginManager {

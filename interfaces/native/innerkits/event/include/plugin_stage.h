@@ -25,6 +25,7 @@
 #include "iremote_broker.h"
 #include "i_input_device_consumer.h"
 #include "device_observer.h"
+#include "setting_observer.h"
 
 namespace OHOS {
 namespace EventFwk {
@@ -168,6 +169,25 @@ struct IPluginContext {
     virtual int32_t RegisterCommonEventCallback(
         const std::function<void(const EventFwk::CommonEventData &)> &callback) = 0;
     virtual bool UnRegisterCommonEventCallback(int32_t callbackId) = 0;
+
+    // Configuration management APIs for plugins
+    // Read configuration value as string (plugin parses the value)
+    virtual bool GetSettingValue(const std::string& uri,
+                                 const std::string& key,
+                                 std::string& value) = 0;
+
+    // Register observer for configuration changes
+    virtual sptr<SettingObserver> RegisterSettingObserver(
+        const std::string& uri,
+        const std::string& key,
+        SettingObserver::UpdateFunc callback) = 0;
+
+    // Unregister observer
+    virtual bool UnregisterSettingObserver(const std::string& uri,
+                                           sptr<SettingObserver> observer) = 0;
+
+    // Check if DataShare is ready (avoid blocking when not ready)
+    virtual bool IsDataShareReady() = 0;
 };
 
 inline bool checkPluginEventNull(PluginEventType &event)

@@ -29,6 +29,9 @@
 #include "account_manager.h"
 #include "common_event_data.h"
 #include "bytrace_adapter.h"
+#include "i_setting_manager.h"
+#include "setting_datashare.h"
+#include "system_ability_definition.h"
 
 #undef MMI_LOG_DOMAIN
 #define MMI_LOG_DOMAIN MMI_LOG_SERVER
@@ -627,7 +630,6 @@ std::shared_ptr<IInputPlugin> InputPlugin::GetPlugin()
 
 InputPlugin::~InputPlugin()
 {
-    // LCOV_EXCL_START
     if (handle_) {
         dlclose(handle_);
         handle_ = nullptr;
@@ -757,6 +759,104 @@ bool InputPlugin::UnRegisterCommonEventCallback(int32_t callbackId)
         return false;
     }
     return ACCOUNT_MGR->UnRegisterCommonEventCallback(callbackId);
+}
+
+bool InputPlugin::GetSettingValue(const std::string& uri,
+                                  const std::string& key,
+                                  std::string& value)
+{
+    // Validate parameters
+    if (uri.empty() || key.empty()) {
+        MMI_HILOGE("Invalid parameters: uri or key is empty");
+        return false;
+    }
+
+    // Directly use SettingDataShare to get string value
+    auto& settingHelper = SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID);
+    ErrCode ret = settingHelper.GetStringValue(key, value, uri);
+    if (ret != ERR_OK) {
+        MMI_HILOGW("Failed to get setting value for key: %{public}s, ret=%{public}d", key.c_str(), ret);
+        return false;
+    }
+
+    return true;
+}
+
+sptr<SettingObserver> InputPlugin::RegisterSettingObserver(
+    const std::string& uri,
+    const std::string& key,
+    SettingObserver::UpdateFunc callback)
+{
+    // Validate parameters
+    if (uri.empty() || key.empty() || !callback) {
+        MMI_HILOGE("Invalid parameters");
+        return nullptr;
+    }
+
+    MMI_HILOGI("Plugin '%{public}s' registering observer: uri=%{public}s, key=%{public}s",
+               name_.c_str(), uri.c_str(), key.c_str());
+
+    // Create and register observer
+    auto& settingHelper = SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID);
+    sptr<SettingObserver> observer = settingHelper.CreateObserver(key, callback);
+    if (observer == nullptr) {
+        MMI_HILOGE("Failed to create observer");
+        return nullptr;
+    }
+
+    ErrCode ret = settingHelper.RegisterObserver(observer, uri);
+    if (ret != ERR_OK) {
+        MMI_HILOGE("Failed to register observer, error=%{public}d", ret);
+        return nullptr;
+    }
+
+    // Track observer for lifecycle management
+    {
+        std::lock_guard<std::mutex> lock(observersMutex_);
+        observers_.push_back(observer);
+    }
+
+    return observer;
+}
+
+bool InputPlugin::UnregisterSettingObserver(const std::string& uri,
+                                            sptr<SettingObserver> observer)
+{
+    if (uri.empty() || observer == nullptr) {
+        MMI_HILOGE("Invalid parameters");
+        return false;
+    }
+
+    auto& settingHelper = SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID);
+    ErrCode ret = settingHelper.UnregisterObserver(observer, uri);
+
+    if (ret != ERR_OK) {
+        MMI_HILOGW("Failed to unregister observer, error=%{public}d", ret);
+        return false;
+    }
+
+    // Remove from tracking list
+    {
+        std::lock_guard<std::mutex> lock(observersMutex_);
+        auto it = std::find(observers_.begin(), observers_.end(), observer);
+        if (it != observers_.end()) {
+            observers_.erase(it);
+        }
+    }
+
+    MMI_HILOGI("Plugin '%{public}s' unregistered observer successfully", name_.c_str());
+    return true;
+}
+
+bool InputPlugin::IsDataShareReady()
+{
+    auto settingMgr = INPUT_SETTING_MANAGER;
+    if (settingMgr == nullptr) {
+        MMI_HILOGE("Setting manager is null");
+        return false;
+    }
+
+    return settingMgr->IsDatabaseReady();
 }
 } // namespace MMI
 } // namespace OHOS
