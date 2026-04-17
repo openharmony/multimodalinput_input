@@ -133,6 +133,9 @@ public:
     ErrCode InjectPointerEvent(const PointerEvent& pointerEvent, bool isNativeInject, int32_t useCoordinate) override;
     ErrCode InjectTouchPadEvent(const PointerEvent& pointerEvent, const TouchpadCDG& touchpadCDG,
         bool isNativeInject) override;
+#ifdef OHOS_BUILD_ENABLE_CONTROLLER_INJECT
+    ErrCode CreateTouchController() override;
+#endif // OHOS_BUILD_ENABLE_CONTROLLER_INJECT
     ErrCode CreateMouseController() override;
     ErrCode CreateKeyboardController() override;
     ErrCode SetAnrObserver() override;

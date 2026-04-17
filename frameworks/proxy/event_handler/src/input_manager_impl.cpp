@@ -36,6 +36,7 @@
 #include "keyboard_controller_impl.h"
 #include "multimodal_event_handler.h"
 #include "multimodal_input_connect_manager.h"
+#include "touch_controller_impl.h"
 #include "net_packet.h"
 #include "oh_input_manager.h"
 #include "tablet_event_input_subscribe_manager.h"
@@ -66,6 +67,7 @@ const std::map<int32_t, int32_t> g_keyActionMap = {
 };
 static const std::string g_foldScreenType = system::GetParameter("const.window.foldscreen.type", "0,0,0,0");
 const std::string PRODUCT_TYPE = system::GetParameter("const.product.devicetype", "unknown");
+constexpr char PRODUCT_TYPE_PC[] { "2in1" };
 } // namespace
 
 struct MonitorEventConsumer : public IInputEventConsumer {
@@ -3531,6 +3533,21 @@ int32_t InputManagerImpl::CheckKeyboardControllerPermission()
     return ret;
 }
 
+int32_t InputManagerImpl::CheckTouchControllerPermission()
+{
+    CALL_DEBUG_ENTER;
+    CHKPR(MULTIMODAL_INPUT_CONNECT_MGR, RET_ERR);
+    if (PRODUCT_TYPE != PRODUCT_TYPE_PC) {
+        MMI_HILOGE("TouchController not supported on non-PC device, productType:%{public}s", PRODUCT_TYPE.c_str());
+        return CAPABILITY_NOT_SUPPORTED;
+    }
+    int32_t ret = MULTIMODAL_INPUT_CONNECT_MGR->CreateMouseController();
+    if (ret != RET_OK) {
+        MMI_HILOGE("CheckTouchControllerPermission failed, ret=%{public}d", ret);
+    }
+    return ret;
+}
+
 std::shared_ptr<MouseControllerImpl> InputManagerImpl::CreateMouseController()
 {
     CALL_DEBUG_ENTER;
@@ -3557,6 +3574,17 @@ std::shared_ptr<KeyboardControllerImpl> InputManagerImpl::CreateKeyboardControll
 
     // Create and return client-side instance
     return std::make_shared<KeyboardControllerImpl>();
+}
+
+std::shared_ptr<TouchControllerImpl> InputManagerImpl::CreateTouchController()
+{
+    CALL_DEBUG_ENTER;
+    if (CheckTouchControllerPermission() != RET_OK) {
+        MMI_HILOGE("Server-side CreateTouchController permission check failed");
+        return nullptr;
+    }
+
+    return std::make_shared<TouchControllerImpl>();
 }
 } // namespace MMI
 } // namespace OHOS

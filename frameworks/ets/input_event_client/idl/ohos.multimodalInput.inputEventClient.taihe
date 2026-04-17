@@ -79,6 +79,27 @@ interface MouseController {
  
 @promise @rename("createMouseController")
 function CreateMouseControllerSync():MouseController;
+
+struct TouchPoint {
+    id: i32;
+    displayId: i32;
+    displayX: i32;
+    displayY: i32;
+}
+
+interface TouchController {
+    @promise @rename("touchDown")
+    TouchDownSync(touch: TouchPoint): void;
+
+    @promise @rename("touchMove")
+    TouchMoveSync(touch: TouchPoint): void;
+
+    @promise @rename("touchUp")
+    TouchUpSync(touch: TouchPoint): void;
+}
+
+@promise @rename("createTouchController")
+function CreateTouchControllerSync():TouchController;
  
 interface KeyboardController {
     @promise @rename("pressKey")

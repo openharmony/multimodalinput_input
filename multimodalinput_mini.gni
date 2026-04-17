@@ -72,6 +72,7 @@ declare_args() {
   input_feature_touch_gesture = true
   input_feature_universal_drag_enable = false
   input_feature_triple_finger_snapshot = false
+  input_controller_inject_enable = false
 
   if (defined(global_parts_info) &&
       defined(global_parts_info.msdp_device_status)) {
@@ -356,6 +357,7 @@ print("input_feature_external_screen = ${input_feature_external_screen}")
 print("input_feature_touchpad = ${input_feature_touchpad}")
 print("input_feature_pen = ${input_feature_pen}")
 print("input_feature_touch_gesture = ${input_feature_touch_gesture}")
+print("input_controller_inject_enable = ${input_controller_inject_enable}")
 
 input_default_defines = []
 
@@ -582,4 +584,8 @@ if (input_feature_pen) {
 
 if (input_feature_touch_gesture) {
   input_default_defines += [ "OHOS_BUILD_ENABLE_TOUCH_GESTURE" ]
+}
+
+if (input_controller_inject_enable) {
+  input_default_defines += [ "OHOS_BUILD_ENABLE_CONTROLLER_INJECT" ]
 }

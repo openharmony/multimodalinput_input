@@ -24,6 +24,8 @@
 #include <unordered_map>
 #endif // OHOS_RSS_CLIENT
 
+#include <algorithm>
+
 #include "bundle_name_parser.h"
 #include "misc_product_type_parser.h"
 #include "product_type_parser.h"
@@ -2266,6 +2268,7 @@ ErrCode MMIService::InjectKeyEvent(const KeyEvent& keyEvent, bool isNativeInject
     auto keyEventPtr = std::make_shared<KeyEvent>(keyEvent);
     CHKPR(keyEventPtr, ERROR_NULL_POINTER);
 
+#ifdef OHOS_BUILD_ENABLE_CONTROLLER_INJECT
     // Check if event is from Controller interface
     bool isFromController = keyEventPtr->HasFlag(InputEvent::EVENT_FLAG_CONTROLLER);
 
@@ -2277,9 +2280,6 @@ ErrCode MMIService::InjectKeyEvent(const KeyEvent& keyEvent, bool isNativeInject
             MMI_HILOGE("Controller permission check failed for KeyEvent, ret:%{public}d", ret);
             return ret;
         }
-        // Remove Controller flag after permission check
-        keyEventPtr->ClearFlag(InputEvent::EVENT_FLAG_CONTROLLER);
-        MMI_HILOGD("Removed EVENT_FLAG_CONTROLLER after permission check");
     } else {
         // Original permission model: system app + INJECT_INPUT_EVENT permission
         if (!isNativeInject && !PER_HELPER->VerifySystemApp()) {
@@ -2287,6 +2287,12 @@ ErrCode MMIService::InjectKeyEvent(const KeyEvent& keyEvent, bool isNativeInject
             return ERROR_NOT_SYSAPI;
         }
     }
+#else
+    if (!isNativeInject && !PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
+#endif // OHOS_BUILD_ENABLE_CONTROLLER_INJECT
 
     bool isShell = PER_HELPER->RequestFromShell();
     if (isShell) {
@@ -2359,25 +2365,30 @@ int32_t MMIService::ValidateControllerEventCoordinates(const std::shared_ptr<Poi
         return CONTROLLER_DISPLAY_NOT_EXIST;  // CONTROLLER_DISPLAY_NOT_EXIST
     }
 
-    // Validate coordinates are within display bounds
-    PointerEvent::PointerItem item;
-    if (!pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), item)) {
-        MMI_HILOGE("Failed to get pointer item");
-        return RET_OK;  // If no pointer item, skip validation
+    int32_t maxX = displayInfo->validWidth > 0 ? displayInfo->validWidth - 1 : 0;
+    int32_t maxY = displayInfo->validHeight > 0 ? displayInfo->validHeight - 1 : 0;
+    bool isClamped = false;
+    for (auto item : pointerEvent->GetAllPointerItems()) {
+        int32_t x = item.GetDisplayX();
+        int32_t y = item.GetDisplayY();
+        int32_t clampedX = std::min(std::max(x, 0), maxX);
+        int32_t clampedY = std::min(std::max(y, 0), maxY);
+        if (clampedX != x || clampedY != y) {
+            isClamped = true;
+            item.SetDisplayX(clampedX);
+            item.SetDisplayY(clampedY);
+            pointerEvent->UpdatePointerItem(item.GetPointerId(), item);
+            MMI_HILOGW("Controller coordinates clamped for display %{public}d, "
+                "origin=(%{public}d, %{public}d), clamped=(%{public}d, %{public}d), "
+                "validWidth=%{public}d, validHeight=%{public}d",
+                targetDisplayId, x, y, clampedX, clampedY, displayInfo->validWidth, displayInfo->validHeight);
+        }
     }
 
-    int32_t x = item.GetDisplayX();
-    int32_t y = item.GetDisplayY();
-
-    if (x < 0 || x >= displayInfo->validWidth || y < 0 || y >= displayInfo->validHeight) {
-        MMI_HILOGE("Coordinates out of bounds for display %{public}d "
-            "(width=%{public}d, height=%{public}d)",
-            targetDisplayId, displayInfo->width, displayInfo->height);
-        return CONTROLLER_DISPLAY_NOT_EXIST;  // CONTROLLER_DISPLAY_NOT_EXIST
+    if (!isClamped) {
+        MMI_HILOGD("Validated Controller event: displayId=%{public}d, validWidth=%{public}d, validHeight=%{public}d",
+            targetDisplayId, displayInfo->validWidth, displayInfo->validHeight);
     }
-
-    MMI_HILOGD("Validated Controller event: displayId=%{public}d, x=%{public}d, y=%{public}d",
-               targetDisplayId, x, y);
     return RET_OK;
 }
 
@@ -2416,6 +2427,7 @@ ErrCode MMIService::InjectPointerEvent(const PointerEvent& pointerEvent, bool is
     auto pointerEventPtr = std::make_shared<PointerEvent>(pointerEvent);
     CHKPR(pointerEventPtr, ERROR_NULL_POINTER);
 
+#ifdef OHOS_BUILD_ENABLE_CONTROLLER_INJECT
     // Check if event is from Controller interface
     bool isFromController = pointerEventPtr->HasFlag(InputEvent::EVENT_FLAG_CONTROLLER);
 
@@ -2431,7 +2443,6 @@ ErrCode MMIService::InjectPointerEvent(const PointerEvent& pointerEvent, bool is
             MMI_HILOGE("Controller event validation failed, ret=%{public}d", validateRet);
             return validateRet;
         }
-        pointerEventPtr->ClearFlag(InputEvent::EVENT_FLAG_CONTROLLER);
     } else {
         // Original permission model: system app + INJECT_INPUT_EVENT permission
         if (!isNativeInject && !PER_HELPER->VerifySystemApp()) {
@@ -2439,6 +2450,12 @@ ErrCode MMIService::InjectPointerEvent(const PointerEvent& pointerEvent, bool is
             return ERROR_NOT_SYSAPI;
         }
     }
+#else
+    if (!isNativeInject && !PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
+#endif // OHOS_BUILD_ENABLE_CONTROLLER_INJECT
 
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     // Dynamic load mouse module Sync.
@@ -2527,6 +2544,23 @@ ErrCode MMIService::CreateKeyboardController()
     MMI_HILOGI("CreateKeyboardController permission check passed");
     return RET_OK;
 }
+
+#ifdef OHOS_BUILD_ENABLE_CONTROLLER_INJECT
+ErrCode MMIService::CreateTouchController()
+{
+    CALL_DEBUG_ENTER;
+    if (!IsRunning()) {
+        MMI_HILOGE("Service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
+    if (ErrCode ret = CheckControllerPermission(); ret != RET_OK) {
+        MMI_HILOGE("CreateTouchController permission check failed, ret:%{public}d", ret);
+        return ret;
+    }
+    MMI_HILOGI("CreateTouchController permission check passed");
+    return RET_OK;
+}
+#endif // OHOS_BUILD_ENABLE_CONTROLLER_INJECT
 
 #ifdef OHOS_RSS_CLIENT
 void MMIService::OnAddResSchedSystemAbility(int32_t systemAbilityId, const std::string &deviceId)

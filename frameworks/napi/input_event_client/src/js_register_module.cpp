@@ -23,6 +23,7 @@
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
 #include "util_napi_error.h"
 #include "js_mouse_controller_napi.h"
+#include "js_touch_controller_napi.h"
 #include "js_keyboard_controller_napi.h"
 
 #undef MMI_LOG_TAG
@@ -883,6 +884,7 @@ static napi_value MmiInit(napi_env env, napi_value exports)
         DECLARE_NAPI_FUNCTION("injectJoystickEvent", InjectJoystickEvent),
         DECLARE_NAPI_FUNCTION("permitInjection", PermitInjection),
         DECLARE_NAPI_FUNCTION("createMouseController", CreateMouseController),
+        DECLARE_NAPI_FUNCTION("createTouchController", CreateTouchController),
         DECLARE_NAPI_FUNCTION("createKeyboardController", CreateKeyboardController),
     };
     if ((napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc)) != napi_ok) {
