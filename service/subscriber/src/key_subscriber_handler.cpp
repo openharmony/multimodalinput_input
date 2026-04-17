@@ -1343,7 +1343,7 @@ bool KeySubscriberHandler::ProcessAllReleasedComboActivate(
     }
     MMI_HILOGI("ALL_RELEASED: combo activated, dispatch finalKey DOWN KC:%{public}d", keyCode);
     auto sess = subscriber->sess_;
-    CHKPV(sess);
+    CHKPF(sess);
     if (isForegroundExits_ || keyCode == KeyEvent::KEYCODE_POWER ||
         foregroundPids_.find(sess->GetPid()) != foregroundPids_.end()) {
         NotifySubscriber(keyEvent, subscriber);
