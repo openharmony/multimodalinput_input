@@ -21,6 +21,9 @@
 #include "input_event_data_transformation.h"
 #include "input_event_handler.h"
 #include "timer_manager.h"
+#ifdef OHOS_BUILD_ENABLE_TRIPLE_FINGER_SNAPSHOT
+#include "triple_finger_snapshot_manager.h"
+#endif // OHOS_BUILD_ENABLE_TRIPLE_FINGER_SNAPSHOT
 #include "util_ex.h"
 
 #undef MMI_LOG_DOMAIN
@@ -56,7 +59,14 @@ void InputActiveSubscriberHandler::HandleTouchEvent(const std::shared_ptr<Pointe
     CHKPV(pointerEvent);
     CHKPV(nextHandler_);
     OnSubscribeInputActive(pointerEvent);
-    nextHandler_->HandleTouchEvent(pointerEvent);
+    bool isFiltered = false;
+#ifdef OHOS_BUILD_ENABLE_TRIPLE_FINGER_SNAPSHOT
+    // 处理三指截屏手势
+    isFiltered = TripleFingerSnapshotManager::GetInstance().HandleTouchEvent(pointerEvent);
+#endif // OHOS_BUILD_ENABLE_TRIPLE_FINGER_SNAPSHOT
+    if (!isFiltered) {
+        nextHandler_->HandleTouchEvent(pointerEvent);
+    }
 }
 #endif // OHOS_BUILD_ENABLE_TOUCH
 

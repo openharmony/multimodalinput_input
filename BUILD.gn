@@ -315,6 +315,10 @@ group("mmi_tests") {
   if (input_feature_knuckle) {
     deps += [ "service:KnuckleHandlerComponentTest" ]
   }
+
+  if (input_feature_triple_finger_snapshot) {
+    deps += [ "service:TripleFingerSnapshotManagerTest" ]
+  }
 }
 
 group("examples_group") {

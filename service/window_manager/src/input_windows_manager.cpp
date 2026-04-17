@@ -33,6 +33,9 @@
 #ifdef OHOS_BUILD_ENABLE_TOUCH_DRAWING
 #include "touch_drawing_manager.h"
 #endif // #ifdef OHOS_BUILD_ENABLE_TOUCH_DRAWING
+#ifdef OHOS_BUILD_ENABLE_TRIPLE_FINGER_SNAPSHOT
+#include "triple_finger_snapshot_manager.h"
+#endif // OHOS_BUILD_ENABLE_TRIPLE_FINGER_SNAPSHOT
 #ifdef OHOS_BUILD_ENABLE_ANCO
 #endif // OHOS_BUILD_ENABLE_ANCO
 #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
@@ -1164,6 +1167,11 @@ void InputWindowsManager::UpdateDisplayInfoExtIfNeed(OLD::DisplayGroupInfo &disp
     }
     auto physicDisplayInfo = GetPhysicalDisplay(displayGroupInfo.displaysInfo[0].id);
     CHKPV(physicDisplayInfo);
+#ifdef OHOS_BUILD_ENABLE_TRIPLE_FINGER_SNAPSHOT
+    // 更新三指截屏的显示信息
+    TripleFingerSnapshotManager::GetInstance().UpdateDisplayInfo(physicDisplayInfo->validWidth,
+        physicDisplayInfo->validHeight, GetDisplayDirection(physicDisplayInfo));
+#endif // OHOS_BUILD_ENABLE_TRIPLE_FINGER_SNAPSHOT
 #ifdef OHOS_BUILD_ENABLE_TOUCH_DRAWING
     TOUCH_DRAWING_MGR->UpdateDisplayInfo(*physicDisplayInfo);
     TOUCH_DRAWING_MGR->RotationScreen();
