@@ -38,7 +38,9 @@
 #ifdef OHOS_BUILD_ENABLE_TOUCHPAD
 #include "touchpad_settings_handler.h"
 #endif // OHOS_BUILD_ENABLE_TOUCHPAD
-
+#ifdef OHOS_BUILD_ENABLE_TRIPLE_FINGER_SNAPSHOT
+#include "triple_finger_snapshot_manager.h"
+#endif // OHOS_BUILD_ENABLE_TRIPLE_FINGER_SNAPSHOT
 #undef MMI_LOG_DOMAIN
 #define MMI_LOG_DOMAIN MMI_LOG_SERVER
 #undef MMI_LOG_TAG
@@ -540,6 +542,9 @@ void AccountManager::OnSwitchUser(const EventFwk::CommonEventData &data)
         MMI_HILOGI("Switched to account(%d)", currentAccountId_);
     }
     INPUT_SETTING_MANAGER->OnSwitchUser(currentAccountId_);
+#ifdef OHOS_BUILD_ENABLE_TRIPLE_FINGER_SNAPSHOT
+    TripleFingerSnapshotManager::GetInstance().RegisterSwitchObserver(currentAccountId_);
+#endif // OHOS_BUILD_ENABLE_TRIPLE_FINGER_SNAPSHOT
 }
 
 int32_t AccountManager::GetCurrentAccountId()
@@ -550,6 +555,9 @@ int32_t AccountManager::GetCurrentAccountId()
 
 void AccountManager::OnDataShareReady(const EventFwk::CommonEventData &data)
 {
+    #ifdef OHOS_BUILD_ENABLE_TRIPLE_FINGER_SNAPSHOT
+        TripleFingerSnapshotManager::GetInstance().SetDatashareReady(currentAccountId_);
+    #endif // OHOS_BUILD_ENABLE_TRIPLE_FINGER_SNAPSHOT
     INPUT_SETTING_MANAGER->OnDataShareReady();
 }
 
