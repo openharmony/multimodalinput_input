@@ -81,6 +81,7 @@ ScreenPointer::ScreenPointer(hwcmgr_ptr_t hwcMgr, handler_ptr_t handler, const O
         std::swap(width_, height_);
     }
     dpi_ = float(di.dpi) / BASELINE_DENSITY;
+    InitRSUIContext(screenId_);
     MMI_HILOGI("Construct with DisplayInfo, id=%{public}" PRIu64 ", shape=(%{public}u, %{public}u), mode=%{public}u, "
         "rotation=%{public}u, dpi=%{public}f", screenId_, width_, height_, mode_, rotation_, dpi_);
 }
@@ -98,6 +99,7 @@ ScreenPointer::ScreenPointer(hwcmgr_ptr_t hwcMgr, handler_ptr_t handler, screen_
     mirrorWidth_ = si->GetMirrorWidth();
     mirrorHeight_ = si->GetMirrorHeight();
 #endif // OHOS_BUILD_EXTERNAL_SCREEN
+    InitRSUIContext(screenId_);
     MMI_HILOGI("Construct with ScreenInfo, id=%{public}" PRIu64 ", shape=(%{public}u, %{public}u), mode=%{public}u, "
         "rotation=%{public}u, dpi=%{public}f", screenId_, width_, height_, mode_, rotation_, dpi_);
 }
@@ -108,7 +110,7 @@ ScreenPointer::~ScreenPointer()
         surfaceNode_->DetachToDisplay(screenId_);
         surfaceNode_ = nullptr;
         MMI_HILOGI("Detach screenId:%{public}" PRIu64, screenId_);
-        Rosen::RSTransaction::FlushImplicitTransaction();
+        RsFlushImplicitTransaction();
     }
 }
 
@@ -272,8 +274,10 @@ bool ScreenPointer::InitSurface(bool needDrawPointer)
     // create SurfaceNode
     Rosen::RSSurfaceNodeConfig surfaceNodeConfig;
     surfaceNodeConfig.SurfaceNodeName = RS_SURFACE_NODE_NAME;
-    surfaceNode_ = Rosen::RSSurfaceNode::Create(surfaceNodeConfig, Rosen::RSSurfaceNodeType::CURSOR_NODE);
+    surfaceNode_ = Rosen::RSSurfaceNode::Create(surfaceNodeConfig, Rosen::RSSurfaceNodeType::CURSOR_NODE,
+        true, false, rsUIContext_);
     CHKPF(surfaceNode_);
+    surfaceNode_->SetSkipCheckInMultiInstance(true);
     MMI_HILOGI("SurfaceNode::Create success");
 
     // set soft cursor buffer size
@@ -291,7 +295,7 @@ bool ScreenPointer::InitSurface(bool needDrawPointer)
     MMI_HILOGI("AttachToDisplay %{public}" PRIu64 " completed, needDrawPointer=%{public}d", screenId_, needDrawPointer);
 
     // create canvas node
-    canvasNode_ = Rosen::RSCanvasNode::Create();
+    canvasNode_ = Rosen::RSCanvasNode::Create(false, false, rsUIContext_);
     CHKPF(canvasNode_);
     canvasNode_->SetBounds(0, 0, DEFAULT_CURSOR_SIZE, DEFAULT_CURSOR_SIZE);
     canvasNode_->SetFrame(0, 0, DEFAULT_CURSOR_SIZE, DEFAULT_CURSOR_SIZE);
@@ -328,7 +332,7 @@ void ScreenPointer::UpdateScreenInfo(const sptr<OHOS::Rosen::ScreenInfo> si, boo
         surfaceNode_->RemoveFromTree();
         surfaceNode_->AttachToDisplay(screenId_);
     }
-    Rosen::RSTransaction::FlushImplicitTransaction();
+    RsFlushImplicitTransaction();
     MMI_HILOGI("Update with ScreenInfo, id=%{public}" PRIu64 ", shape=(%{public}u, %{public}u), mode=%{public}u, "
         "rotation=%{public}u, dpi=%{public}f, needDrawPointer=%{public}d", screenId_, width_, height_, mode_,
         rotation_, dpi_, needDrawPointer);
@@ -522,7 +526,8 @@ bool ScreenPointer::MoveSoft(int32_t x, int32_t y)
 
     if (!IsMirror()) {
         int64_t nodeId = surfaceNode_->GetId();
-        Rosen::RSInterfaces::GetInstance().SetHwcNodeBounds(nodeId, px, py, DEFAULT_CURSOR_SIZE, DEFAULT_CURSOR_SIZE);
+        rsUIContext_->GetRSRenderInterface()->SetHwcNodeBounds(nodeId, px, py, DEFAULT_CURSOR_SIZE,
+            DEFAULT_CURSOR_SIZE);
     } else {
         surfaceNode_->SetBounds(px, py, DEFAULT_CURSOR_SIZE, DEFAULT_CURSOR_SIZE);
     }
@@ -586,4 +591,32 @@ bool ScreenPointer::IsPositionOutScreen(int32_t x, int32_t y)
     return false;
 }
 
+void ScreenPointer::InitRSUIContext(uint64_t screenId)
+{
+    sptr<IRemoteObject> renderToken = Rosen::RSInterfaces::GetInstance().GetConnectToRenderToken(screenId);
+    if (renderToken == nullptr) {
+        MMI_HILOGE("Get connect to render token fail, screenId=%{public}" PRIu64, screenId);
+        return;
+    }
+
+    rsUIDirector_ = Rosen::RSUIDirector::Create(renderToken);
+    if (rsUIDirector_ == nullptr) {
+        MMI_HILOGE("Create RSUIDirector fail, screenId=%{public}" PRIu64, screenId);
+        return;
+    }
+
+    rsUIContext_ = rsUIDirector_->GetRSUIContext();
+    if (rsUIContext_ == nullptr) {
+        rsUIDirector_ = nullptr;
+        MMI_HILOGE("Create RSUIContext fail, screenId=%{public}" PRIu64, screenId);
+        return;
+    }
+}
+
+void ScreenPointer::RsFlushImplicitTransaction()
+{
+    if (rsUIDirector_ != nullptr) {
+        rsUIDirector_->SendMessages();
+    }
+}
 } // namespace OHOS::MMI

@@ -26,6 +26,7 @@
 #include "i_input_service_context.h"
 #include "mmi_matrix3.h"
 #include "table_dump.h"
+#include "transaction/rs_interfaces.h"
 
 #undef MMI_LOG_DOMAIN
 #define MMI_LOG_DOMAIN MMI_LOG_CURSOR
@@ -199,7 +200,7 @@ void TouchDrawingHandler::UpdateDisplayInfo(const OLD::DisplayInfo& displayInfo)
         if (labelsCanvasNode_ != nullptr) {
             labelsCanvasNode_.reset();
         }
-        Rosen::RSTransaction::FlushImplicitTransaction();
+        RsFlushImplicitTransaction();
     }
 }
 
@@ -223,7 +224,7 @@ void TouchDrawingHandler::UpdateLabels(bool isOn)
         RemovePointerPosition();
         DestoryTouchWindow();
     }
-    Rosen::RSTransaction::FlushImplicitTransaction();
+    RsFlushImplicitTransaction();
 }
 
 void TouchDrawingHandler::UpdateBubbleData(bool isOn)
@@ -235,7 +236,7 @@ void TouchDrawingHandler::UpdateBubbleData(bool isOn)
         surfaceNode_->RemoveChild(bubbleCanvasNode_);
         bubbleCanvasNode_.reset();
         DestoryTouchWindow();
-        Rosen::RSTransaction::FlushImplicitTransaction();
+        RsFlushImplicitTransaction();
     }
 }
 
@@ -260,7 +261,7 @@ void TouchDrawingHandler::RotationScreen()
             UpdateLabels(pointerMode_.isShow);
         }
     }
-    Rosen::RSTransaction::FlushImplicitTransaction();
+    RsFlushImplicitTransaction();
 }
 
 template <class T>
@@ -285,7 +286,8 @@ void TouchDrawingHandler::AddCanvasNode(std::shared_ptr<Rosen::RSCanvasNode>& ca
     }
     MMI_HILOGI("Screen from:%{public}" PRIu64 " to :%{public}" PRIu64, screenId_, displayInfo_.rsId);
     screenId_ = displayInfo_.rsId;
-    canvasNode = isTrackerNode ? Rosen::RSCanvasDrawingNode::Create() : Rosen::RSCanvasNode::Create();
+    canvasNode = isTrackerNode ? Rosen::RSCanvasDrawingNode::Create(false, false, rsUIContext_) :
+        Rosen::RSCanvasNode::Create(false, false, rsUIContext_);
     canvasNode->SetBounds(0, 0, scaleW_, scaleH_);
     canvasNode->SetFrame(0, 0, scaleW_, scaleH_);
     surfaceNode_->SetBounds(0, 0, scaleW_, scaleH_);
@@ -369,10 +371,14 @@ void TouchDrawingHandler::CreateTouchWindow()
     if (surfaceNode_ != nullptr || scaleW_ == 0 || scaleH_ == 0) {
         return;
     }
+    if (!InitRSUIContext(displayInfo_.rsId)) {
+        MMI_HILOGE("Init RSUIContext fail");
+        return;
+    }
     Rosen::RSSurfaceNodeConfig surfaceNodeConfig;
     surfaceNodeConfig.SurfaceNodeName = "touch window";
     Rosen::RSSurfaceNodeType surfaceNodeType = Rosen::RSSurfaceNodeType::SELF_DRAWING_WINDOW_NODE;
-    surfaceNode_ = Rosen::RSSurfaceNode::Create(surfaceNodeConfig, surfaceNodeType);
+    surfaceNode_ = Rosen::RSSurfaceNode::Create(surfaceNodeConfig, surfaceNodeType, true, false, rsUIContext_);
     CHKPV(surfaceNode_);
     surfaceNode_->SetFrameGravity(Rosen::Gravity::RESIZE_ASPECT_FILL);
     surfaceNode_->SetPositionZ(Rosen::RSSurfaceNode::POINTER_WINDOW_POSITION_Z);
@@ -400,7 +406,7 @@ void TouchDrawingHandler::DrawBubbleHandler()
     if (IsValidAction(pointerAction)) {
         DrawBubble();
     }
-    Rosen::RSTransaction::FlushImplicitTransaction();
+    RsFlushImplicitTransaction();
 }
 
 void TouchDrawingHandler::DrawBubble()
@@ -485,7 +491,7 @@ void TouchDrawingHandler::DrawPointerPositionHandler()
     }
     DrawLabels();
     crosshairCanvasNode_->FinishRecording();
-    Rosen::RSTransaction::FlushImplicitTransaction();
+    RsFlushImplicitTransaction();
 }
 
 void TouchDrawingHandler::Snapshot()
@@ -736,7 +742,7 @@ void TouchDrawingHandler::RemovePointerPosition()
     labelsCanvasNode_.reset();
     
     pointerEvent_.reset();
-    Rosen::RSTransaction::FlushImplicitTransaction();
+    RsFlushImplicitTransaction();
     isFirstDraw_ = true;
     pressure_ = 0.0;
 }
@@ -886,6 +892,36 @@ void TouchDrawingHandler::StopTrace()
 #ifdef HITRACE_ENABLED
     ::FinishTraceEx(HITRACE_LEVEL_INFO, HITRACE_TAG_MULTIMODALINPUT);
 #endif // HITRACE_ENABLED
+}
+
+bool TouchDrawingHandler::InitRSUIContext(uint64_t screenId)
+{
+    sptr<IRemoteObject> renderToken = Rosen::RSInterfaces::GetInstance().GetConnectToRenderToken(screenId);
+    if (renderToken == nullptr) {
+        MMI_HILOGE("Get connect to render token fail, screenId=%{public}" PRIu64, screenId);
+        return false;
+    }
+
+    rsUIDirector_ = Rosen::RSUIDirector::Create(renderToken);
+    if (rsUIDirector_ == nullptr) {
+        MMI_HILOGE("Create RSUIDirector fail, screenId=%{public}" PRIu64, screenId);
+        return false;
+    }
+
+    rsUIContext_ = rsUIDirector_->GetRSUIContext();
+    if (rsUIContext_ == nullptr) {
+        rsUIDirector_ = nullptr;
+        MMI_HILOGE("Create RSUIContext fail, screenId=%{public}" PRIu64, screenId);
+        return false;
+    }
+    return true;
+}
+
+void TouchDrawingHandler::RsFlushImplicitTransaction()
+{
+    if (rsUIDirector_ != nullptr) {
+        rsUIDirector_->SendMessages();
+    }
 }
 
 extern "C" ITouchDrawingHandler* CreateInstance(IInputServiceContext *env)

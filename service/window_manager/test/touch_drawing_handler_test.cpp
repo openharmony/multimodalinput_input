@@ -24,6 +24,9 @@
 #endif
 #include "touch_drawing_handler.h"
 #include "window_info.h"
+#include "ui/rs_ui_context.h"
+#include "ui/rs_ui_director.h"
+#include "transaction/rs_interfaces.h"
 
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "TouchDrawingHandlerTest"
@@ -42,10 +45,31 @@ using RosenRecordingCanvas = Rosen::RSRecordingCanvas;
 
 class TouchDrawingHandlerTest : public testing::Test {
 public:
-    static void SetUpTestCase(void) {};
-    static void TearDownTestCase(void) {};
+    static std::shared_ptr<OHOS::Rosen::RSUIContext> rsUIContext_;
+    static std::shared_ptr<OHOS::Rosen::RSUIContext> GetRSUIContext(uint64_t screenId = 0)
+    {
+        sptr<IRemoteObject> renderToken = Rosen::RSInterfaces::GetInstance().GetConnectToRenderToken(screenId);
+        if (renderToken == nullptr) {
+            return nullptr;
+        }
+        auto rsUIDirector = Rosen::RSUIDirector::Create(renderToken);
+        if (rsUIDirector == nullptr) {
+            return nullptr;
+        }
+        return rsUIDirector->GetRSUIContext();
+    }
+    static void SetUpTestCase(void)
+    {
+        rsUIContext_ = GetRSUIContext(0);
+    }
+    static void TearDownTestCase(void)
+    {
+        rsUIContext_ = nullptr;
+    }
     void SetUp(void) {};
 };
+
+std::shared_ptr<OHOS::Rosen::RSUIContext> TouchDrawingHandlerTest::rsUIContext_ = nullptr;
 
 /**
  * @tc.name: TouchDrawingHandlerTest_RecordLabelsInfo
@@ -170,14 +194,15 @@ HWTEST_F(TouchDrawingHandlerTest, TouchDrawingHandlerTest_UpdateDisplayInfo_002,
     Rosen::RSSurfaceNodeConfig surfaceNodeConfig;
     surfaceNodeConfig.SurfaceNodeName = "touch window";
     Rosen::RSSurfaceNodeType surfaceNodeType = Rosen::RSSurfaceNodeType::SELF_DRAWING_WINDOW_NODE;
-    touchDrawingHandler.surfaceNode_ = Rosen::RSSurfaceNode::Create(surfaceNodeConfig, surfaceNodeType);
+    touchDrawingHandler.surfaceNode_ = Rosen::RSSurfaceNode::Create(surfaceNodeConfig, surfaceNodeType, true, false,
+        rsUIContext_);
     EXPECT_NO_FATAL_FAILURE(touchDrawingHandler.UpdateDisplayInfo(displayInfo));
     touchDrawingHandler.isChangedMode_ = true;
     EXPECT_NO_FATAL_FAILURE(touchDrawingHandler.UpdateDisplayInfo(displayInfo));
-    touchDrawingHandler.trackerCanvasNode_ = Rosen::RSCanvasDrawingNode::Create();
-    touchDrawingHandler.bubbleCanvasNode_ = Rosen::RSCanvasNode::Create();
-    touchDrawingHandler.crosshairCanvasNode_ = Rosen::RSCanvasNode::Create();
-    touchDrawingHandler.labelsCanvasNode_ = Rosen::RSCanvasDrawingNode::Create();
+    touchDrawingHandler.trackerCanvasNode_ = Rosen::RSCanvasDrawingNode::Create(false, false, rsUIContext_);
+    touchDrawingHandler.bubbleCanvasNode_ = Rosen::RSCanvasNode::Create(false, false, rsUIContext_);
+    touchDrawingHandler.crosshairCanvasNode_ = Rosen::RSCanvasNode::Create(false, false, rsUIContext_);
+    touchDrawingHandler.labelsCanvasNode_ = Rosen::RSCanvasDrawingNode::Create(false, false, rsUIContext_);
     EXPECT_NO_FATAL_FAILURE(touchDrawingHandler.UpdateDisplayInfo(displayInfo));
 }
 
@@ -216,237 +241,12 @@ HWTEST_F(TouchDrawingHandlerTest, TouchDrawingManagerTest_UpdateBubbleData_002, 
 HWTEST_F(TouchDrawingHandlerTest, TouchDrawingManagerTest_UpdateBubbleData_003, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    TouchDrawingHandler touchDrawingHandler;
+TouchDrawingHandler touchDrawingHandler;
     Rosen::RSSurfaceNodeConfig surfaceNodeConfig;
     surfaceNodeConfig.SurfaceNodeName = "touch window";
     Rosen::RSSurfaceNodeType surfaceNodeType = Rosen::RSSurfaceNodeType::SELF_DRAWING_WINDOW_NODE;
-    touchDrawingHandler.surfaceNode_ = Rosen::RSSurfaceNode::Create(surfaceNodeConfig, surfaceNodeType);
-    ASSERT_NE(touchDrawingHandler.surfaceNode_, nullptr);
-    touchDrawingHandler.bubbleCanvasNode_ = Rosen::RSCanvasNode::Create();
-    ASSERT_NE(touchDrawingHandler.bubbleCanvasNode_, nullptr);
-    EXPECT_NO_FATAL_FAILURE(touchDrawingHandler.UpdateBubbleData(false));
-    EXPECT_NO_FATAL_FAILURE(touchDrawingHandler.UpdateBubbleData(true));
-}
-
-/**
- * @tc.name: TouchDrawingManagerTest_RotationScreen_001
- * @tc.desc: Test RotationScreen
- * @tc.type: Function
- * @tc.require:
- */
-HWTEST_F(TouchDrawingHandlerTest, TouchDrawingManagerTest_RotationScreen_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    TouchDrawingHandler touchDrawingHandler;
-    touchDrawingHandler.isChangedRotation_ = true;
-    touchDrawingHandler.displayInfo_.displayDirection = DIRECTION0;
-    touchDrawingHandler.pointerMode_.isShow = true;
-    touchDrawingHandler.bubbleMode_.isShow = true;
-    EXPECT_NO_FATAL_FAILURE(touchDrawingHandler.RotationScreen());
-}
-
-/**
- * @tc.name: TouchDrawingManagerTest_RotationScreen_002
- * @tc.desc: Test RotationScreen
- * @tc.type: Function
- * @tc.require:
- */
-HWTEST_F(TouchDrawingHandlerTest, TouchDrawingManagerTest_RotationScreen_002, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    TouchDrawingHandler touchDrawingHandler;
-    touchDrawingHandler.isChangedRotation_ = false;
-    touchDrawingHandler.displayInfo_.displayDirection = DIRECTION0;
-    touchDrawingHandler.pointerMode_.isShow = true;
-    touchDrawingHandler.bubbleMode_.isShow = true;
-    EXPECT_NO_FATAL_FAILURE(touchDrawingHandler.RotationScreen());
-}
-
-/**
- * @tc.name: TouchDrawingManagerTest_RotationScreen_003
- * @tc.desc: Test RotationScreen
- * @tc.type: Function
- * @tc.require:
- */
-HWTEST_F(TouchDrawingHandlerTest, TouchDrawingManagerTest_RotationScreen_003, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    TouchDrawingHandler touchDrawingHandler;
-    touchDrawingHandler.isChangedRotation_ = true;
-    touchDrawingHandler.displayInfo_.displayDirection = DIRECTION90;
-    touchDrawingHandler.pointerMode_.isShow = true;
-    touchDrawingHandler.bubbleMode_.isShow = true;
-    EXPECT_NO_FATAL_FAILURE(touchDrawingHandler.RotationScreen());
-}
-
-/**
- * @tc.name: TouchDrawingManagerTest_RotationScreen_004
- * @tc.desc: Test RotationScreen
- * @tc.type: Function
- * @tc.require:
- */
-HWTEST_F(TouchDrawingHandlerTest, TouchDrawingManagerTest_RotationScreen_004, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    TouchDrawingHandler touchDrawingHandler;
-    touchDrawingHandler.isChangedRotation_ = true;
-    touchDrawingHandler.displayInfo_.displayDirection = DIRECTION0;
-    touchDrawingHandler.pointerMode_.isShow = false;
-    touchDrawingHandler.bubbleMode_.isShow = true;
-    EXPECT_NO_FATAL_FAILURE(touchDrawingHandler.RotationScreen());
-}
-
-/**
- * @tc.name: TouchDrawingManagerTest_RotationScreen_005
- * @tc.desc: Test RotationScreen
- * @tc.type: Function
- * @tc.require:
- */
-HWTEST_F(TouchDrawingHandlerTest, TouchDrawingManagerTest_RotationScreen_005, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    TouchDrawingHandler touchDrawingHandler;
-    touchDrawingHandler.isChangedRotation_ = true;
-    touchDrawingHandler.displayInfo_.displayDirection = DIRECTION0;
-    touchDrawingHandler.pointerMode_.isShow = true;
-    touchDrawingHandler.bubbleMode_.isShow = false;
-    EXPECT_NO_FATAL_FAILURE(touchDrawingHandler.RotationScreen());
-}
-
-/**
- * @tc.name: TouchDrawingManagerTest_RotationScreen_006
- * @tc.desc: Test RotationScreen
- * @tc.type: Function
- * @tc.require:
- */
-HWTEST_F(TouchDrawingHandlerTest, TouchDrawingManagerTest_RotationScreen_006, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    TouchDrawingHandler touchDrawingHandler;
-    touchDrawingHandler.isChangedRotation_ = false;
-    touchDrawingHandler.isChangedMode_ = true;
-    touchDrawingHandler.pointerMode_.isShow = true;
-    touchDrawingHandler.bubbleMode_.isShow = true;
-    EXPECT_NO_FATAL_FAILURE(touchDrawingHandler.RotationScreen());
-}
-
-/**
- * @tc.name: TouchDrawingManagerTest_RotationScreen_007
- * @tc.desc: Test RotationScreen
- * @tc.type: Function
- * @tc.require:
- */
-HWTEST_F(TouchDrawingHandlerTest, TouchDrawingManagerTest_RotationScreen_007, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    TouchDrawingHandler touchDrawingHandler;
-    touchDrawingHandler.isChangedRotation_ = false;
-    touchDrawingHandler.isChangedMode_ = true;
-    touchDrawingHandler.pointerMode_.isShow = false;
-    touchDrawingHandler.bubbleMode_.isShow = false;
-    EXPECT_NO_FATAL_FAILURE(touchDrawingHandler.RotationScreen());
-}
-
-/**
- * @tc.name: TouchDrawingManagerTest_RotationScreen_008
- * @tc.desc: Test RotationScreen
- * @tc.type: Function
- * @tc.require:
- */
-HWTEST_F(TouchDrawingHandlerTest, TouchDrawingManagerTest_RotationScreen_008, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    TouchDrawingHandler touchDrawingHandler;
-    touchDrawingHandler.isChangedRotation_ = false;
-    touchDrawingHandler.isChangedMode_ = false;
-    EXPECT_NO_FATAL_FAILURE(touchDrawingHandler.RotationScreen());
-}
-
-/**
- * @tc.name: TouchDrawingManagerTest_RotationScreen_009
- * @tc.desc: Test RotationScreen
- * @tc.type: Function
- * @tc.require:
- */
-HWTEST_F(TouchDrawingHandlerTest, TouchDrawingManagerTest_RotationScreen_009, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    TouchDrawingHandler touchDrawingHandler;
-    touchDrawingHandler.isChangedRotation_ = false;
-    touchDrawingHandler.isChangedMode_ = false;
-    EXPECT_NO_FATAL_FAILURE(touchDrawingHandler.RotationScreen());
-
-    touchDrawingHandler.trackerCanvasNode_ = Rosen::RSCanvasNode::Create();
-    ASSERT_NE(touchDrawingHandler.trackerCanvasNode_, nullptr);
-    touchDrawingHandler.crosshairCanvasNode_ = Rosen::RSCanvasNode::Create();
-    ASSERT_NE(touchDrawingHandler.crosshairCanvasNode_, nullptr);
-    touchDrawingHandler.bubbleCanvasNode_ = Rosen::RSCanvasNode::Create();
-    ASSERT_NE(touchDrawingHandler.bubbleCanvasNode_, nullptr);
-    touchDrawingHandler.labelsCanvasNode_ = Rosen::RSCanvasNode::Create();
-    ASSERT_NE(touchDrawingHandler.labelsCanvasNode_, nullptr);
-    touchDrawingHandler.isChangedRotation_ = true;
-    touchDrawingHandler.isChangedMode_ = true;
-    touchDrawingHandler.pointerMode_.isShow = true;
-    touchDrawingHandler.bubbleMode_.isShow = true;
-    PointerEvent::PointerItem item;
-    touchDrawingHandler.lastPointerItem_.push_back(item);
-    EXPECT_NO_FATAL_FAILURE(touchDrawingHandler.RotationScreen());
-
-    touchDrawingHandler.lastPointerItem_.clear();
-    touchDrawingHandler.stopRecord_ = true;
-    EXPECT_NO_FATAL_FAILURE(touchDrawingHandler.RotationScreen());
-
-    touchDrawingHandler.bubbleMode_.isShow = false;
-    touchDrawingHandler.stopRecord_ = false;
-    EXPECT_NO_FATAL_FAILURE(touchDrawingHandler.RotationScreen());
-
-    touchDrawingHandler.pointerMode_.isShow = false;
-    EXPECT_NO_FATAL_FAILURE(touchDrawingHandler.RotationScreen());
-}
-
-/**
- * @tc.name: TouchDrawingManagerTest_RotationScreen_010
- * @tc.desc: Test RotationScreen
- * @tc.type: Function
- * @tc.require:
- */
-HWTEST_F(TouchDrawingHandlerTest, TouchDrawingManagerTest_RotationScreen_010, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    TouchDrawingHandler touchDrawingHandler;
-    touchDrawingHandler.isChangedRotation_ = true;
-    touchDrawingHandler.isChangedMode_ = false;
-    touchDrawingHandler.pointerMode_.isShow = true;
-    touchDrawingHandler.bubbleMode_.isShow = true;
-    touchDrawingHandler.stopRecord_ = true;
-    EXPECT_NO_FATAL_FAILURE(touchDrawingHandler.RotationScreen());
-    touchDrawingHandler.stopRecord_ = false;
-    EXPECT_NO_FATAL_FAILURE(touchDrawingHandler.RotationScreen());
-    PointerEvent::PointerItem item;
-    item.SetPointerId(1);
-    item.SetPressed(true);
-    touchDrawingHandler.lastPointerItem_.emplace_back(item);
-    EXPECT_NO_FATAL_FAILURE(touchDrawingHandler.RotationScreen());
-    touchDrawingHandler.stopRecord_ = true;
-    EXPECT_NO_FATAL_FAILURE(touchDrawingHandler.RotationScreen());
-    touchDrawingHandler.stopRecord_ = false;
-    EXPECT_NO_FATAL_FAILURE(touchDrawingHandler.RotationScreen());
-}
-
-/**
- * @tc.name: TouchDrawingManagerTest_AddCanvasNode_001
- * @tc.desc: Test AddCanvasNode
- * @tc.type: Function
- * @tc.require:
- */
-HWTEST_F(TouchDrawingHandlerTest, TouchDrawingManagerTest_AddCanvasNode_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    TouchDrawingHandler touchDrawingHandler;
-    Rosen::RSSurfaceNodeConfig surfaceNodeConfig;
-    surfaceNodeConfig.SurfaceNodeName = "touch window";
-    Rosen::RSSurfaceNodeType surfaceNodeType = Rosen::RSSurfaceNodeType::SELF_DRAWING_WINDOW_NODE;
-    touchDrawingHandler.surfaceNode_ = Rosen::RSSurfaceNode::Create(surfaceNodeConfig, surfaceNodeType);
+    touchDrawingHandler.surfaceNode_ = Rosen::RSSurfaceNode::Create(surfaceNodeConfig, surfaceNodeType, true, false,
+        rsUIContext_);
 
     std::shared_ptr<Rosen::RSCanvasNode> canvasNode = nullptr;
     bool isTrackerNode = true;
@@ -466,7 +266,8 @@ HWTEST_F(TouchDrawingHandlerTest, TouchDrawingManagerTest_AddCanvasNode_002, Tes
     Rosen::RSSurfaceNodeConfig surfaceNodeConfig;
     surfaceNodeConfig.SurfaceNodeName = "touch window";
     Rosen::RSSurfaceNodeType surfaceNodeType = Rosen::RSSurfaceNodeType::SELF_DRAWING_WINDOW_NODE;
-    touchDrawingHandler.surfaceNode_ = Rosen::RSSurfaceNode::Create(surfaceNodeConfig, surfaceNodeType);
+    touchDrawingHandler.surfaceNode_ = Rosen::RSSurfaceNode::Create(surfaceNodeConfig, surfaceNodeType, true, false,
+        rsUIContext_);
 
     std::shared_ptr<Rosen::RSCanvasNode> canvasNode = nullptr;
     bool isTrackerNode = false;
@@ -486,8 +287,9 @@ HWTEST_F(TouchDrawingHandlerTest, TouchDrawingManagerTest_AddCanvasNode_003, Tes
     Rosen::RSSurfaceNodeConfig surfaceNodeConfig;
     surfaceNodeConfig.SurfaceNodeName = "touch window";
     Rosen::RSSurfaceNodeType surfaceNodeType = Rosen::RSSurfaceNodeType::SELF_DRAWING_WINDOW_NODE;
-    touchDrawingHandler.surfaceNode_ = Rosen::RSSurfaceNode::Create(surfaceNodeConfig, surfaceNodeType);
-    std::shared_ptr<Rosen::RSCanvasNode> canvasNode = Rosen::RSCanvasNode::Create();
+    touchDrawingHandler.surfaceNode_ = Rosen::RSSurfaceNode::Create(surfaceNodeConfig, surfaceNodeType, true, false,
+        rsUIContext_);
+    std::shared_ptr<Rosen::RSCanvasNode> canvasNode = Rosen::RSCanvasNode::Create(false, false, rsUIContext_);
     ASSERT_NE(canvasNode, nullptr);
     bool isTrackerNode = true;
     EXPECT_NO_FATAL_FAILURE(touchDrawingHandler.AddCanvasNode(canvasNode, isTrackerNode));
@@ -506,7 +308,7 @@ HWTEST_F(TouchDrawingHandlerTest, TouchDrawingManagerTest_RotationCanvasNode_001
 {
     CALL_TEST_DEBUG;
     TouchDrawingHandler touchDrawingHandler;
-    std::shared_ptr<Rosen::RSCanvasNode> canvasNode = Rosen::RSCanvasNode::Create();
+    std::shared_ptr<Rosen::RSCanvasNode> canvasNode = Rosen::RSCanvasNode::Create(false, false, rsUIContext_);
     ASSERT_NE(canvasNode, nullptr);
     touchDrawingHandler.displayInfo_.direction = Direction::DIRECTION90;
     EXPECT_NO_FATAL_FAILURE(touchDrawingHandler.RotationCanvasNode(canvasNode));
@@ -522,7 +324,7 @@ HWTEST_F(TouchDrawingHandlerTest, TouchDrawingManagerTest_RotationCanvasNode_002
 {
     CALL_TEST_DEBUG;
     TouchDrawingHandler touchDrawingHandler;
-    std::shared_ptr<Rosen::RSCanvasNode> canvasNode = Rosen::RSCanvasNode::Create();
+    std::shared_ptr<Rosen::RSCanvasNode> canvasNode = Rosen::RSCanvasNode::Create(false, false, rsUIContext_);
     ASSERT_NE(canvasNode, nullptr);
     touchDrawingHandler.displayInfo_.direction = Direction::DIRECTION270;
     EXPECT_NO_FATAL_FAILURE(touchDrawingHandler.RotationCanvasNode(canvasNode));
@@ -538,7 +340,7 @@ HWTEST_F(TouchDrawingHandlerTest, TouchDrawingManagerTest_RotationCanvasNode_003
 {
     CALL_TEST_DEBUG;
     TouchDrawingHandler touchDrawingHandler;
-    std::shared_ptr<Rosen::RSCanvasNode> canvasNode = Rosen::RSCanvasNode::Create();
+    std::shared_ptr<Rosen::RSCanvasNode> canvasNode = Rosen::RSCanvasNode::Create(false, false, rsUIContext_);
     ASSERT_NE(canvasNode, nullptr);
     touchDrawingHandler.displayInfo_.direction = Direction::DIRECTION180;
     EXPECT_NO_FATAL_FAILURE(touchDrawingHandler.RotationCanvasNode(canvasNode));
@@ -554,7 +356,7 @@ HWTEST_F(TouchDrawingHandlerTest, TouchDrawingManagerTest_RotationCanvasNode_004
 {
     CALL_TEST_DEBUG;
     TouchDrawingHandler touchDrawingHandler;
-    std::shared_ptr<Rosen::RSCanvasNode> canvasNode = Rosen::RSCanvasNode::Create();
+    std::shared_ptr<Rosen::RSCanvasNode> canvasNode = Rosen::RSCanvasNode::Create(false, false, rsUIContext_);
     ASSERT_NE(canvasNode, nullptr);
     touchDrawingHandler.displayInfo_.direction = Direction::DIRECTION0;
     EXPECT_NO_FATAL_FAILURE(touchDrawingHandler.RotationCanvasNode(canvasNode));
@@ -570,7 +372,7 @@ HWTEST_F(TouchDrawingHandlerTest, TouchDrawingManagerTest_RotationCanvasNode_005
 {
     CALL_TEST_DEBUG;
     TouchDrawingHandler touchDrawingHandler;
-    std::shared_ptr<Rosen::RSCanvasNode> canvasNode = Rosen::RSCanvasNode::Create();
+    std::shared_ptr<Rosen::RSCanvasNode> canvasNode = Rosen::RSCanvasNode::Create(false, false, rsUIContext_);
     ASSERT_NE(canvasNode, nullptr);
     touchDrawingHandler.displayInfo_.width = 720;
     touchDrawingHandler.displayInfo_.height = 1800;
@@ -594,7 +396,7 @@ HWTEST_F(TouchDrawingHandlerTest, TouchDrawingManagerTest_RotationCanvasNode_006
 {
     CALL_TEST_DEBUG;
     TouchDrawingHandler touchDrawingHandler;
-    std::shared_ptr<Rosen::RSCanvasNode> canvasNode = Rosen::RSCanvasNode::Create();
+    std::shared_ptr<Rosen::RSCanvasNode> canvasNode = Rosen::RSCanvasNode::Create(false, false, rsUIContext_);
     ASSERT_NE(canvasNode, nullptr);
     touchDrawingHandler.displayInfo_.validWidth = 720;
     touchDrawingHandler.displayInfo_.validHeight = 1800;
@@ -625,7 +427,7 @@ HWTEST_F(TouchDrawingHandlerTest, TouchDrawingManagerTest_RotationCanvasNode_007
 {
     CALL_TEST_DEBUG;
     TouchDrawingHandler touchDrawingHandler;
-    std::shared_ptr<Rosen::RSCanvasNode> canvasNode = Rosen::RSCanvasNode::Create();
+    std::shared_ptr<Rosen::RSCanvasNode> canvasNode = Rosen::RSCanvasNode::Create(false, false, rsUIContext_);
     ASSERT_NE(canvasNode, nullptr);
     touchDrawingHandler.displayInfo_.validWidth = 1800;
     touchDrawingHandler.displayInfo_.validHeight = 720;
@@ -661,7 +463,7 @@ HWTEST_F(TouchDrawingHandlerTest, TouchDrawingHandlerTest_RotationCanvas_001, Te
     touchDrawingHandler.displayInfo_.width = 300;
     touchDrawingHandler.displayInfo_.height = 100;
     Direction direction = Direction::DIRECTION90;
-    touchDrawingHandler.labelsCanvasNode_ = Rosen::RSCanvasDrawingNode::Create();
+    touchDrawingHandler.labelsCanvasNode_ = Rosen::RSCanvasDrawingNode::Create(false, false, rsUIContext_);
     auto canvas = static_cast<RosenRecordingCanvas *>(
         touchDrawingHandler.labelsCanvasNode_->BeginRecording(width, height));
     EXPECT_NO_FATAL_FAILURE(touchDrawingHandler.RotationCanvas(canvas, direction));
@@ -686,7 +488,7 @@ HWTEST_F(TouchDrawingHandlerTest, TouchDrawingHandlerTest_RotationCanvas_002, Te
     int32_t width = 300;
     int32_t height = 100;
     Direction direction = Direction::DIRECTION90;
-    touchDrawingHandler.labelsCanvasNode_ = Rosen::RSCanvasDrawingNode::Create();
+    touchDrawingHandler.labelsCanvasNode_ = Rosen::RSCanvasDrawingNode::Create(false, false, rsUIContext_);
     auto canvas = static_cast<RosenRecordingCanvas *>(
         touchDrawingHandler.labelsCanvasNode_->BeginRecording(width, height));
     EXPECT_NO_FATAL_FAILURE(touchDrawingHandler.RotationCanvas(canvas, direction));
@@ -711,7 +513,8 @@ HWTEST_F(TouchDrawingHandlerTest, TouchDrawingManagerTest_CreateTouchWindow_001,
     Rosen::RSSurfaceNodeConfig surfaceNodeConfig;
     surfaceNodeConfig.SurfaceNodeName = "touch window";
     Rosen::RSSurfaceNodeType surfaceNodeType = Rosen::RSSurfaceNodeType::SELF_DRAWING_WINDOW_NODE;
-    touchDrawingHandler.surfaceNode_ = Rosen::RSSurfaceNode::Create(surfaceNodeConfig, surfaceNodeType);
+    touchDrawingHandler.surfaceNode_ = Rosen::RSSurfaceNode::Create(surfaceNodeConfig, surfaceNodeType, true, false,
+        rsUIContext_);
     EXPECT_NO_FATAL_FAILURE(touchDrawingHandler.CreateTouchWindow());
 }
 
@@ -764,7 +567,8 @@ HWTEST_F(TouchDrawingHandlerTest, TouchDrawingHandlerTest_CreateTouchWindow_004,
     Rosen::RSSurfaceNodeConfig surfaceNodeConfig;
     surfaceNodeConfig.SurfaceNodeName = "touch window";
     Rosen::RSSurfaceNodeType surfaceNodeType = Rosen::RSSurfaceNodeType::SELF_DRAWING_WINDOW_NODE;
-    touchDrawingHandler.surfaceNode_ = Rosen::RSSurfaceNode::Create(surfaceNodeConfig, surfaceNodeType);
+    touchDrawingHandler.surfaceNode_ = Rosen::RSSurfaceNode::Create(surfaceNodeConfig, surfaceNodeType, true, false,
+        rsUIContext_);
     ASSERT_NE(touchDrawingHandler.surfaceNode_, nullptr);
     EXPECT_NO_FATAL_FAILURE(touchDrawingHandler.CreateTouchWindow());
     touchDrawingHandler.surfaceNode_ = nullptr;
@@ -824,7 +628,8 @@ HWTEST_F(TouchDrawingHandlerTest, TouchDrawingManagerTest_DestoryTouchWindow_003
     Rosen::RSSurfaceNodeConfig surfaceNodeConfig;
     surfaceNodeConfig.SurfaceNodeName = "touch window";
     Rosen::RSSurfaceNodeType surfaceNodeType = Rosen::RSSurfaceNodeType::SELF_DRAWING_WINDOW_NODE;
-    touchDrawingHandler.surfaceNode_ = Rosen::RSSurfaceNode::Create(surfaceNodeConfig, surfaceNodeType);
+    touchDrawingHandler.surfaceNode_ = Rosen::RSSurfaceNode::Create(surfaceNodeConfig, surfaceNodeType, true, false,
+        rsUIContext_);
     EXPECT_NO_FATAL_FAILURE(touchDrawingHandler.DestoryTouchWindow());
 }
 
@@ -840,7 +645,7 @@ HWTEST_F(TouchDrawingHandlerTest, TouchDrawingHandlerTest_DrawBubbleHandler, Tes
     TouchDrawingHandler touchDrawingHandler;
     touchDrawingHandler.pointerEvent_ = PointerEvent::Create();
     ASSERT_NE(touchDrawingHandler.pointerEvent_, nullptr);
-    touchDrawingHandler.bubbleCanvasNode_ = Rosen::RSCanvasNode::Create();
+    touchDrawingHandler.bubbleCanvasNode_ = Rosen::RSCanvasNode::Create(false, false, rsUIContext_);
     ASSERT_NE(touchDrawingHandler.bubbleCanvasNode_, nullptr);
     touchDrawingHandler.pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
     EXPECT_NO_FATAL_FAILURE(touchDrawingHandler.DrawBubbleHandler());
@@ -941,7 +746,7 @@ HWTEST_F(TouchDrawingHandlerTest, TouchDrawingHandlerTest_DrawBubble_001, TestSi
 {
     CALL_TEST_DEBUG;
     TouchDrawingHandler touchDrawingHandler;
-    touchDrawingHandler.bubbleCanvasNode_ = Rosen::RSCanvasNode::Create();
+    touchDrawingHandler.bubbleCanvasNode_ = Rosen::RSCanvasNode::Create(false, false, rsUIContext_);
     touchDrawingHandler.pointerEvent_ = PointerEvent::Create();
     ASSERT_NE(touchDrawingHandler.pointerEvent_, nullptr);
 
@@ -968,7 +773,7 @@ HWTEST_F(TouchDrawingHandlerTest, TouchDrawingHandlerTest_DrawBubble_002, TestSi
 {
     CALL_TEST_DEBUG;
     TouchDrawingHandler touchDrawingHandler;
-    touchDrawingHandler.bubbleCanvasNode_ = Rosen::RSCanvasNode::Create();
+    touchDrawingHandler.bubbleCanvasNode_ = Rosen::RSCanvasNode::Create(false, false, rsUIContext_);
     touchDrawingHandler.pointerEvent_ = PointerEvent::Create();
     ASSERT_NE(touchDrawingHandler.pointerEvent_, nullptr);
 
@@ -992,7 +797,7 @@ HWTEST_F(TouchDrawingHandlerTest, TouchDrawingManagerTest_DrawBubble_003, TestSi
 {
     CALL_TEST_DEBUG;
     TouchDrawingHandler touchDrawingHandler;
-    touchDrawingHandler.bubbleCanvasNode_ = Rosen::RSCanvasNode::Create();
+    touchDrawingHandler.bubbleCanvasNode_ = Rosen::RSCanvasNode::Create(false, false, rsUIContext_);
     touchDrawingHandler.pointerEvent_ = PointerEvent::Create();
     ASSERT_NE(touchDrawingHandler.pointerEvent_, nullptr);
     PointerEvent::PointerItem item;
@@ -1089,7 +894,7 @@ HWTEST_F(TouchDrawingHandlerTest, TouchDrawingManagerTest_DrawTracker_003, TestS
     touchDrawingHandler.xVelocity_ = 200;
     touchDrawingHandler.yVelocity_ = 400;
     touchDrawingHandler.lastPointerItem_.push_back(item);
-    touchDrawingHandler.trackerCanvasNode_ = Rosen::RSCanvasNode::Create();
+    touchDrawingHandler.trackerCanvasNode_ = Rosen::RSCanvasNode::Create(false, false, rsUIContext_);
     ASSERT_NE(touchDrawingHandler.trackerCanvasNode_, nullptr);
     EXPECT_NO_FATAL_FAILURE(touchDrawingHandler.DrawTracker(x, y, pointerId));
 
@@ -1112,7 +917,7 @@ HWTEST_F(TouchDrawingHandlerTest, TouchDrawingManagerTest_DrawCrosshairs_001, Te
     int32_t y = 11;
     TouchDrawingHandler touchDrawingHandler;
     if (touchDrawingHandler.crosshairCanvasNode_ == nullptr) {
-        touchDrawingHandler.crosshairCanvasNode_ = Rosen::RSCanvasNode::Create();
+        touchDrawingHandler.crosshairCanvasNode_ = Rosen::RSCanvasNode::Create(false, false, rsUIContext_);
     }
     ASSERT_NE(touchDrawingHandler.crosshairCanvasNode_, nullptr);
     auto canvas = static_cast<RosenRecordingCanvas *>(
@@ -1135,7 +940,7 @@ HWTEST_F(TouchDrawingHandlerTest, TouchDrawingManagerTest_DrawCrosshairs_002, Te
     int32_t y = 11;
     TouchDrawingHandler touchDrawingHandler;
     if (touchDrawingHandler.crosshairCanvasNode_ == nullptr) {
-        touchDrawingHandler.crosshairCanvasNode_ = Rosen::RSCanvasNode::Create();
+        touchDrawingHandler.crosshairCanvasNode_ = Rosen::RSCanvasNode::Create(false, false, rsUIContext_);
     }
     auto canvas = static_cast<RosenRecordingCanvas *>(
         touchDrawingHandler.crosshairCanvasNode_->BeginRecording(touchDrawingHandler.displayInfo_.width,
@@ -1158,7 +963,7 @@ HWTEST_F(TouchDrawingHandlerTest, TouchDrawingManagerTest_DrawCrosshairs_003, Te
     int32_t y = 11;
     TouchDrawingHandler touchDrawingHandler;
     if (touchDrawingHandler.crosshairCanvasNode_ == nullptr) {
-        touchDrawingHandler.crosshairCanvasNode_ = Rosen::RSCanvasNode::Create();
+        touchDrawingHandler.crosshairCanvasNode_ = Rosen::RSCanvasNode::Create(false, false, rsUIContext_);
     }
     auto canvas = static_cast<RosenRecordingCanvas *>(
         touchDrawingHandler.crosshairCanvasNode_->BeginRecording(touchDrawingHandler.displayInfo_.width,
@@ -1194,7 +999,7 @@ HWTEST_F(TouchDrawingHandlerTest, TouchDrawingManagerTest_DrawLabels_002, TestSi
     CALL_TEST_DEBUG;
     TouchDrawingHandler touchDrawingHandler;
     if (touchDrawingHandler.labelsCanvasNode_ == nullptr) {
-        touchDrawingHandler.labelsCanvasNode_ = Rosen::RSCanvasDrawingNode::Create();
+        touchDrawingHandler.labelsCanvasNode_ = Rosen::RSCanvasDrawingNode::Create(false, false, rsUIContext_);
     }
     touchDrawingHandler.isDownAction_ = true;
     touchDrawingHandler.displayInfo_.direction = DIRECTION180;
@@ -1213,7 +1018,7 @@ HWTEST_F(TouchDrawingHandlerTest, TouchDrawingManagerTest_DrawLabels_003, TestSi
     CALL_TEST_DEBUG;
     TouchDrawingHandler touchDrawingHandler;
     if (touchDrawingHandler.labelsCanvasNode_ == nullptr) {
-        touchDrawingHandler.labelsCanvasNode_ = Rosen::RSCanvasDrawingNode::Create();
+        touchDrawingHandler.labelsCanvasNode_ = Rosen::RSCanvasDrawingNode::Create(false, false, rsUIContext_);
     }
     touchDrawingHandler.isDownAction_ = true;
     touchDrawingHandler.displayInfo_.direction = DIRECTION270;
@@ -1232,7 +1037,7 @@ HWTEST_F(TouchDrawingHandlerTest, TouchDrawingManagerTest_DrawLabels_004, TestSi
     CALL_TEST_DEBUG;
     TouchDrawingHandler touchDrawingHandler;
     if (touchDrawingHandler.labelsCanvasNode_ == nullptr) {
-        touchDrawingHandler.labelsCanvasNode_ = Rosen::RSCanvasDrawingNode::Create();
+        touchDrawingHandler.labelsCanvasNode_ = Rosen::RSCanvasDrawingNode::Create(false, false, rsUIContext_);
     }
     touchDrawingHandler.isDownAction_ = true;
     touchDrawingHandler.displayInfo_.direction = DIRECTION270;
@@ -1250,7 +1055,7 @@ HWTEST_F(TouchDrawingHandlerTest, TouchDrawingManagerTest_DrawLabels_005, TestSi
 {
     CALL_TEST_DEBUG;
     TouchDrawingHandler touchDrawingHandler;
-    touchDrawingHandler.labelsCanvasNode_ = Rosen::RSCanvasNode::Create();
+    touchDrawingHandler.labelsCanvasNode_ = Rosen::RSCanvasNode::Create(false, false, rsUIContext_);
     ASSERT_NE(touchDrawingHandler.labelsCanvasNode_, nullptr);
     PointerEvent::PointerItem item;
     touchDrawingHandler.currentPointerCount_ = 10;
@@ -1465,7 +1270,8 @@ HWTEST_F(TouchDrawingHandlerTest, TouchDrawingManagerTest_RemovePointerPosition_
     Rosen::RSSurfaceNodeConfig surfaceNodeConfig;
     surfaceNodeConfig.SurfaceNodeName = "touch window";
     Rosen::RSSurfaceNodeType surfaceNodeType = Rosen::RSSurfaceNodeType::SELF_DRAWING_WINDOW_NODE;
-    touchDrawingHandler.surfaceNode_ = Rosen::RSSurfaceNode::Create(surfaceNodeConfig, surfaceNodeType);
+    touchDrawingHandler.surfaceNode_ = Rosen::RSSurfaceNode::Create(surfaceNodeConfig, surfaceNodeType, true, false,
+        rsUIContext_);
     EXPECT_NO_FATAL_FAILURE(touchDrawingHandler.RemovePointerPosition());
 }
 
@@ -1480,7 +1286,7 @@ HWTEST_F(TouchDrawingHandlerTest, TouchDrawingManagerTest_ClearTracker_001, Test
     CALL_TEST_DEBUG;
     TouchDrawingHandler touchDrawingHandler;
     if (touchDrawingHandler.trackerCanvasNode_ == nullptr) {
-        touchDrawingHandler.trackerCanvasNode_ = Rosen::RSCanvasDrawingNode::Create();
+        touchDrawingHandler.trackerCanvasNode_ = Rosen::RSCanvasDrawingNode::Create(false, false, rsUIContext_);
     }
     EXPECT_NO_FATAL_FAILURE(touchDrawingHandler.ClearTracker());
 }
@@ -1496,7 +1302,7 @@ HWTEST_F(TouchDrawingHandlerTest, TouchDrawingManagerTest_ClearTracker_002, Test
     CALL_TEST_DEBUG;
     TouchDrawingHandler touchDrawingHandler;
     if (touchDrawingHandler.trackerCanvasNode_ == nullptr) {
-        touchDrawingHandler.trackerCanvasNode_ = Rosen::RSCanvasDrawingNode::Create();
+        touchDrawingHandler.trackerCanvasNode_ = Rosen::RSCanvasDrawingNode::Create(false, false, rsUIContext_);
     }
     touchDrawingHandler.lastPointerItem_.clear();
     touchDrawingHandler.isDownAction_ = false;
@@ -1514,7 +1320,7 @@ HWTEST_F(TouchDrawingHandlerTest, TouchDrawingManagerTest_ClearTracker_003, Test
     CALL_TEST_DEBUG;
     TouchDrawingHandler touchDrawingHandler;
     if (touchDrawingHandler.trackerCanvasNode_ == nullptr) {
-        touchDrawingHandler.trackerCanvasNode_ = Rosen::RSCanvasDrawingNode::Create();
+        touchDrawingHandler.trackerCanvasNode_ = Rosen::RSCanvasDrawingNode::Create(false, false, rsUIContext_);
     }
     PointerEvent::PointerItem item;
     item.SetPointerId(0);
@@ -1535,7 +1341,7 @@ HWTEST_F(TouchDrawingHandlerTest, TouchDrawingManagerTest_UpdateLabels_001, Test
     CALL_TEST_DEBUG;
     TouchDrawingHandler touchDrawingHandler;
     if (touchDrawingHandler.labelsCanvasNode_ == nullptr) {
-        touchDrawingHandler.labelsCanvasNode_ = Rosen::RSCanvasDrawingNode::Create();
+        touchDrawingHandler.labelsCanvasNode_ = Rosen::RSCanvasDrawingNode::Create(false, false, rsUIContext_);
     }
     EXPECT_NO_FATAL_FAILURE(touchDrawingHandler.UpdateLabels(true));
 }
@@ -1598,7 +1404,7 @@ HWTEST_F(TouchDrawingHandlerTest, TouchDrawingManagerTest_DrawRectItem_002, Test
     CALL_TEST_DEBUG;
     TouchDrawingHandler touchDrawingHandler;
     if (touchDrawingHandler.labelsCanvasNode_ == nullptr) {
-        touchDrawingHandler.labelsCanvasNode_ = Rosen::RSCanvasNode::Create();
+        touchDrawingHandler.labelsCanvasNode_ = Rosen::RSCanvasNode::Create(false, false, rsUIContext_);
     }
     auto canvas = static_cast<RosenRecordingCanvas *>(
         touchDrawingHandler.labelsCanvasNode_->BeginRecording(touchDrawingHandler.displayInfo_.width,
@@ -1623,7 +1429,7 @@ HWTEST_F(TouchDrawingHandlerTest, TouchDrawingManagerTest_Snapshot_001, TestSize
     CALL_TEST_DEBUG;
     TouchDrawingHandler touchDrawingHandler;
     if (touchDrawingHandler.labelsCanvasNode_ == nullptr) {
-        touchDrawingHandler.labelsCanvasNode_ = Rosen::RSCanvasDrawingNode::Create();
+        touchDrawingHandler.labelsCanvasNode_ = Rosen::RSCanvasDrawingNode::Create(false, false, rsUIContext_);
     }
     touchDrawingHandler.isChangedRotation_ = true;
     touchDrawingHandler.displayInfo_.direction = DIRECTION90;
@@ -1642,7 +1448,7 @@ HWTEST_F(TouchDrawingHandlerTest, TouchDrawingManagerTest_Snapshot_002, TestSize
     CALL_TEST_DEBUG;
     TouchDrawingHandler touchDrawingHandler;
     if (touchDrawingHandler.labelsCanvasNode_ == nullptr) {
-        touchDrawingHandler.labelsCanvasNode_ = Rosen::RSCanvasDrawingNode::Create();
+        touchDrawingHandler.labelsCanvasNode_ = Rosen::RSCanvasDrawingNode::Create(false, false, rsUIContext_);
     }
     touchDrawingHandler.isChangedRotation_ = true;
     touchDrawingHandler.displayInfo_.direction = DIRECTION180;
@@ -1661,7 +1467,7 @@ HWTEST_F(TouchDrawingHandlerTest, TouchDrawingManagerTest_Snapshot_003, TestSize
     CALL_TEST_DEBUG;
     TouchDrawingHandler touchDrawingHandler;
     if (touchDrawingHandler.labelsCanvasNode_ == nullptr) {
-        touchDrawingHandler.labelsCanvasNode_ = Rosen::RSCanvasDrawingNode::Create();
+        touchDrawingHandler.labelsCanvasNode_ = Rosen::RSCanvasDrawingNode::Create(false, false, rsUIContext_);
     }
     touchDrawingHandler.isChangedRotation_ = true;
     touchDrawingHandler.displayInfo_.direction = DIRECTION270;
@@ -1681,7 +1487,7 @@ HWTEST_F(TouchDrawingHandlerTest, TouchDrawingManagerTest_ResetCanvasNode_001, T
     TouchDrawingHandler touchDrawingHandler;
     EXPECT_NO_FATAL_FAILURE(touchDrawingHandler.ResetCanvasNode(nullptr));
 
-    auto canvasNode = Rosen::RSCanvasDrawingNode::Create();
+    auto canvasNode = Rosen::RSCanvasDrawingNode::Create(false, false, rsUIContext_);
     ASSERT_NE(canvasNode, nullptr);
     EXPECT_NO_FATAL_FAILURE(touchDrawingHandler.ResetCanvasNode(canvasNode));
 }
@@ -1696,7 +1502,7 @@ HWTEST_F(TouchDrawingHandlerTest, TouchDrawingManagerTest_SetMultiWindowScreenId
 {
     CALL_TEST_DEBUG;
     TouchDrawingHandler touchDrawingHandler;
-    touchDrawingHandler.bubbleCanvasNode_ = Rosen::RSCanvasNode::Create();
+    touchDrawingHandler.bubbleCanvasNode_ = Rosen::RSCanvasNode::Create(false, false, rsUIContext_);
     touchDrawingHandler.pointerEvent_ = PointerEvent::Create();
     ASSERT_NE(touchDrawingHandler.pointerEvent_, nullptr);
     PointerEvent::PointerItem item;
@@ -1718,7 +1524,7 @@ HWTEST_F(TouchDrawingHandlerTest, TouchDrawingManagerTest_Dump, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     TouchDrawingHandler touchDrawingHandler;
-    touchDrawingHandler.bubbleCanvasNode_ = Rosen::RSCanvasNode::Create();
+    touchDrawingHandler.bubbleCanvasNode_ = Rosen::RSCanvasNode::Create(false, false, rsUIContext_);
     touchDrawingHandler.pointerEvent_ = PointerEvent::Create();
     ASSERT_NE(touchDrawingHandler.pointerEvent_, nullptr);
     PointerEvent::PointerItem item;
@@ -1740,7 +1546,7 @@ HWTEST_F(TouchDrawingHandlerTest, TouchDrawingManagerTest_CalcDrawCoordinate, Te
 {
     CALL_TEST_DEBUG;
     TouchDrawingHandler touchDrawingHandler;
-    touchDrawingHandler.bubbleCanvasNode_ = Rosen::RSCanvasNode::Create();
+    touchDrawingHandler.bubbleCanvasNode_ = Rosen::RSCanvasNode::Create(false, false, rsUIContext_);
     touchDrawingHandler.pointerEvent_ = PointerEvent::Create();
     ASSERT_NE(touchDrawingHandler.pointerEvent_, nullptr);
     OLD::DisplayInfo displayInfo;
@@ -1773,7 +1579,7 @@ HWTEST_F(TouchDrawingHandlerTest, TouchDrawingManagerTest_TransformDisplayXY, Te
 {
     CALL_TEST_DEBUG;
     TouchDrawingHandler touchDrawingHandler;
-    touchDrawingHandler.bubbleCanvasNode_ = Rosen::RSCanvasNode::Create();
+    touchDrawingHandler.bubbleCanvasNode_ = Rosen::RSCanvasNode::Create(false, false, rsUIContext_);
     touchDrawingHandler.pointerEvent_ = PointerEvent::Create();
     ASSERT_NE(touchDrawingHandler.pointerEvent_, nullptr);
     OLD::DisplayInfo displayInfo;
@@ -1802,7 +1608,7 @@ HWTEST_F(TouchDrawingHandlerTest, TouchDrawingManagerTest_TransformDisplayXY_001
 {
     CALL_TEST_DEBUG;
     TouchDrawingHandler touchDrawingHandler;
-    touchDrawingHandler.bubbleCanvasNode_ = Rosen::RSCanvasNode::Create();
+    touchDrawingHandler.bubbleCanvasNode_ = Rosen::RSCanvasNode::Create(false, false, rsUIContext_);
     touchDrawingHandler.pointerEvent_ = PointerEvent::Create();
     ASSERT_NE(touchDrawingHandler.pointerEvent_, nullptr);
     OLD::DisplayInfo displayInfo;
@@ -1833,7 +1639,7 @@ HWTEST_F(TouchDrawingHandlerTest, TouchDrawingManagerTest_StartTrace, TestSize.L
 {
     CALL_TEST_DEBUG;
     TouchDrawingHandler touchDrawingHandler;
-    touchDrawingHandler.bubbleCanvasNode_ = Rosen::RSCanvasNode::Create();
+    touchDrawingHandler.bubbleCanvasNode_ = Rosen::RSCanvasNode::Create(false, false, rsUIContext_);
     touchDrawingHandler.pointerEvent_ = PointerEvent::Create();
     ASSERT_NE(touchDrawingHandler.pointerEvent_, nullptr);
     PointerEvent::PointerItem item;
@@ -1906,6 +1712,48 @@ HWTEST_F(TouchDrawingHandlerTest, TouchDrawingHandlerTest_IsValidScaleInfo_004, 
     handler.scaleH_ = 0;
     bool result = handler.IsValidScaleInfo();
     EXPECT_FALSE(result);
+}
+
+/**
+ * @tc.name: TouchDrawingHandlerTest_RsFlushImplicitTransaction_001
+ * @tc.desc: Test RsFlushImplicitTransaction with null rsUIDirector_
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(TouchDrawingHandlerTest, TouchDrawingHandlerTest_RsFlushImplicitTransaction_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    TouchDrawingHandler touchDrawingHandler;
+    touchDrawingHandler.rsUIDirector_ = nullptr;
+    ASSERT_NO_FATAL_FAILURE(touchDrawingHandler.RsFlushImplicitTransaction());
+}
+
+/**
+ * @tc.name: TouchDrawingHandlerTest_RsFlushImplicitTransaction_002
+ * @tc.desc: Test RsFlushImplicitTransaction with valid rsUIDirector_
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(TouchDrawingHandlerTest, TouchDrawingHandlerTest_RsFlushImplicitTransaction_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    TouchDrawingHandler touchDrawingHandler;
+    ASSERT_NO_FATAL_FAILURE(touchDrawingHandler.RsFlushImplicitTransaction());
+}
+
+/**
+ * @tc.name: TouchDrawingHandlerTest_InitRSUIContext_001
+ * @tc.desc: Test InitRSUIContext with screenId
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(TouchDrawingHandlerTest, TouchDrawingHandlerTest_InitRSUIContext_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    TouchDrawingHandler touchDrawingHandler;
+    uint64_t screenId = 0;
+    bool ret = touchDrawingHandler.InitRSUIContext(screenId);
+    EXPECT_TRUE(ret);
 }
 } // namespace MMI
 } // namespace OHOS

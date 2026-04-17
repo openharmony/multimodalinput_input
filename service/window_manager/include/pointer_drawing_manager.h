@@ -28,6 +28,8 @@
 #include "i_pointer_drawing_manager.h"
 #include "mouse_event_interface.h"
 #include "screen_pointer.h"
+#include "ui/rs_ui_context.h"
+#include "ui/rs_ui_director.h"
 
 namespace OHOS {
 namespace MMI {
@@ -196,7 +198,7 @@ private:
     void DrawRunningPointerAnimate(const MOUSE_ICON mouseStyle);
     void CreatePointerWindow(uint64_t rsId, int32_t physicalX, int32_t physicalY, Direction direction);
     int32_t CreatePointerWindowForScreenPointer(uint64_t rsId, int32_t physicalX, int32_t physicalY);
-    int32_t CreatePointerWindowForNoScreenPointer(int32_t physicalX, int32_t physicalY);
+    int32_t CreatePointerWindowForNoScreenPointer(uint64_t rsId, int32_t physicalX, int32_t physicalY);
     sptr<OHOS::Surface> GetLayer();
     sptr<OHOS::SurfaceBuffer> GetSurfaceBuffer(sptr<OHOS::Surface> layer);
     sptr<OHOS::SurfaceBuffer> RetryGetSurfaceBuffer(sptr<OHOS::Surface> layer);
@@ -308,6 +310,10 @@ private:
     void UpdateCursorBlurEnabled();
     uint64_t GetResampleTimestamp(uint64_t timestamp);
     void GetValidWidthAndHeight(const OLD::DisplayInfo *displayInfo, int32_t &validWidth, int32_t &validHeight);
+    bool InitRSUIContext(uint64_t screenId);
+    void RsFlushImplicitTransaction();
+    std::shared_ptr<Rosen::RSUIDirector> GetRSUIDirector();
+    std::shared_ptr<Rosen::RSUIContext> GetRSUIContext();
 private:
     bool hasDisplay_ { false };
     bool hasPointerDevice_ { false };
@@ -334,6 +340,8 @@ private:
     int32_t cursorHeight_ { 0 };
     uint64_t screenId_ { 0 };
     std::mutex surfaceNodeMutex_;
+    std::shared_ptr<Rosen::RSUIDirector> rsUIDirector_;
+    std::shared_ptr<Rosen::RSUIContext> rsUIContext_;
     std::shared_ptr<Rosen::RSSurfaceNode> surfaceNode_;
     std::shared_ptr<Rosen::RSCanvasNode> canvasNode_;
     int32_t userIconHotSpotX_ { 0 };
