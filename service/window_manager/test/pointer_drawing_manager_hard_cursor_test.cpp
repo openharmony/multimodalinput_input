@@ -191,7 +191,7 @@ HWTEST_F(PointerDrawingManagerHardCursorTest, PointerDrawingManagerHardCursorTes
     pointerDrawingManager.screenPointers_.insert({1, mirrorSp});
     pointerDrawingManager.screenPointers_.insert({2, extendSp});
     pointerDrawingManager.displayId_ = 0;
-    int32_t ret = pointerDrawingManager.HardwareCursorMove(10, 20);
+    int32_t ret = pointerDrawingManager.HardwareCursorMove(0, 10, 20);
     EXPECT_EQ(ret, RET_OK);
 }
 
@@ -225,7 +225,7 @@ HWTEST_F(PointerDrawingManagerHardCursorTest, PointerDrawingManagerHardCursorTes
     pointerDrawingManager.screenPointers_.insert({1, mirrorSp});
     pointerDrawingManager.screenPointers_.insert({2, extendSp});
     pointerDrawingManager.displayId_ = 0;
-    int32_t ret = pointerDrawingManager.HardwareCursorMove(10, 20);
+    int32_t ret = pointerDrawingManager.HardwareCursorMove(0, 10, 20);
     EXPECT_EQ(ret, RET_ERR);
 }
 
@@ -266,15 +266,125 @@ HWTEST_F(PointerDrawingManagerHardCursorTest, PointerDrawingManagerHardCursorTes
 {
     PointerDrawingManager pointerDrawingManager;
     ASSERT_NE(pointerDrawingManager.hardwareCursorPointerManager_, nullptr);
-    sptr<Rosen::ScreenInfo> ScreenInfo = CreateScreenInfo(0, 0, Rosen::ScreenSourceMode::SCREEN_MAIN);
-    auto sp = CreateScreenPointer(pointerDrawingManager.pointerRenderer_,
-        pointerDrawingManager.hardwareCursorPointerManager_, pointerDrawingManager.handler_, ScreenInfo);
-    ASSERT_NE(sp, nullptr);
-    pointerDrawingManager.screenPointers_.insert({0, sp});
+    sptr<Rosen::ScreenInfo> mainScreenInfo = CreateScreenInfo(0, 0, Rosen::ScreenSourceMode::SCREEN_MAIN);
+    sptr<Rosen::ScreenInfo> mirrorScreenInfo = CreateScreenInfo(1, 1, Rosen::ScreenSourceMode::SCREEN_MIRROR);
+    sptr<Rosen::ScreenInfo> extendScreenInfo = CreateScreenInfo(2, 2, Rosen::ScreenSourceMode::SCREEN_EXTEND);
+    auto mainSp = CreateScreenPointer(pointerDrawingManager.pointerRenderer_,
+        pointerDrawingManager.hardwareCursorPointerManager_, pointerDrawingManager.handler_, mainScreenInfo);
+    auto mirrorSp = CreateScreenPointer(pointerDrawingManager.pointerRenderer_,
+        pointerDrawingManager.hardwareCursorPointerManager_, pointerDrawingManager.handler_, mirrorScreenInfo);
+    auto extendSp = CreateScreenPointer(pointerDrawingManager.pointerRenderer_,
+        pointerDrawingManager.hardwareCursorPointerManager_, pointerDrawingManager.handler_, extendScreenInfo);
+    ASSERT_NE(mainSp, nullptr);
+    ASSERT_NE(mirrorSp, nullptr);
+    ASSERT_NE(extendSp, nullptr);
+    pointerDrawingManager.screenPointers_.insert({0, mainSp});
+    pointerDrawingManager.screenPointers_.insert({1, mirrorSp});
+    pointerDrawingManager.screenPointers_.insert({2, extendSp});
     pointerDrawingManager.lastPhysicalX_ = 10;
     pointerDrawingManager.lastPhysicalY_ = 20;
     pointerDrawingManager.displayId_ = 0;
-    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.HardwareCursorRender(MOUSE_ICON::DEFAULT, 10, 20));
+    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.HardwareCursorRender(MOUSE_ICON::DEFAULT, 10, 20, 0));
+    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.HardwareCursorRender(MOUSE_ICON::DEFAULT, 10, 20, 2));
+}
+
+/**
+ * @tc.name: PointerDrawingManagerHardCursorTest_SoftwareCursorRender_001
+ * @tc.desc: Test SoftwareCursorRender
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerHardCursorTest, PointerDrawingManagerHardCursorTest_SoftwareCursorRender_001,
+    TestSize.Level1)
+{
+    PointerDrawingManager pointerDrawingManager;
+    ASSERT_NE(pointerDrawingManager.hardwareCursorPointerManager_, nullptr);
+    sptr<Rosen::ScreenInfo> mainScreenInfo = CreateScreenInfo(0, 0, Rosen::ScreenSourceMode::SCREEN_MAIN);
+    sptr<Rosen::ScreenInfo> mirrorScreenInfo = CreateScreenInfo(1, 1, Rosen::ScreenSourceMode::SCREEN_MIRROR);
+    sptr<Rosen::ScreenInfo> extendScreenInfo = CreateScreenInfo(2, 2, Rosen::ScreenSourceMode::SCREEN_EXTEND);
+    auto mainSp = CreateScreenPointer(pointerDrawingManager.pointerRenderer_,
+        pointerDrawingManager.hardwareCursorPointerManager_, pointerDrawingManager.handler_, mainScreenInfo);
+    auto mirrorSp = CreateScreenPointer(pointerDrawingManager.pointerRenderer_,
+        pointerDrawingManager.hardwareCursorPointerManager_, pointerDrawingManager.handler_, mirrorScreenInfo);
+    auto extendSp = CreateScreenPointer(pointerDrawingManager.pointerRenderer_,
+        pointerDrawingManager.hardwareCursorPointerManager_, pointerDrawingManager.handler_, extendScreenInfo);
+    ASSERT_NE(mainSp, nullptr);
+    ASSERT_NE(mirrorSp, nullptr);
+    ASSERT_NE(extendSp, nullptr);
+    pointerDrawingManager.screenPointers_.insert({0, mainSp});
+    pointerDrawingManager.screenPointers_.insert({1, mirrorSp});
+    pointerDrawingManager.screenPointers_.insert({2, extendSp});
+    pointerDrawingManager.lastPhysicalX_ = 10;
+    pointerDrawingManager.lastPhysicalY_ = 20;
+    pointerDrawingManager.displayId_ = 0;
+    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.SoftwareCursorRender(MOUSE_ICON::DEFAULT, 10, 20, 0));
+    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.SoftwareCursorRender(MOUSE_ICON::DEFAULT, 10, 20, 2));
+}
+
+/**
+ * @tc.name: PointerDrawingManagerHardCursorTest_SoftwareCursorDynamicRender_001
+ * @tc.desc: Test SoftwareCursorDynamicRender
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerHardCursorTest, PointerDrawingManagerHardCursorTest_SoftwareCursorDynamicRender_001,
+    TestSize.Level1)
+{
+    PointerDrawingManager pointerDrawingManager;
+    ASSERT_NE(pointerDrawingManager.hardwareCursorPointerManager_, nullptr);
+    sptr<Rosen::ScreenInfo> mainScreenInfo = CreateScreenInfo(0, 0, Rosen::ScreenSourceMode::SCREEN_MAIN);
+    sptr<Rosen::ScreenInfo> mirrorScreenInfo = CreateScreenInfo(1, 1, Rosen::ScreenSourceMode::SCREEN_MIRROR);
+    sptr<Rosen::ScreenInfo> extendScreenInfo = CreateScreenInfo(2, 2, Rosen::ScreenSourceMode::SCREEN_EXTEND);
+    auto mainSp = CreateScreenPointer(pointerDrawingManager.pointerRenderer_,
+        pointerDrawingManager.hardwareCursorPointerManager_, pointerDrawingManager.handler_, mainScreenInfo);
+    auto mirrorSp = CreateScreenPointer(pointerDrawingManager.pointerRenderer_,
+        pointerDrawingManager.hardwareCursorPointerManager_, pointerDrawingManager.handler_, mirrorScreenInfo);
+    auto extendSp = CreateScreenPointer(pointerDrawingManager.pointerRenderer_,
+        pointerDrawingManager.hardwareCursorPointerManager_, pointerDrawingManager.handler_, extendScreenInfo);
+    ASSERT_NE(mainSp, nullptr);
+    ASSERT_NE(mirrorSp, nullptr);
+    ASSERT_NE(extendSp, nullptr);
+    pointerDrawingManager.screenPointers_.insert({0, mainSp});
+    pointerDrawingManager.screenPointers_.insert({1, mirrorSp});
+    pointerDrawingManager.screenPointers_.insert({2, extendSp});
+    pointerDrawingManager.lastPhysicalX_ = 10;
+    pointerDrawingManager.lastPhysicalY_ = 20;
+    pointerDrawingManager.displayId_ = 0;
+    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.SoftwareCursorDynamicRender(MOUSE_ICON::LOADING, 0));
+    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.SoftwareCursorDynamicRender(MOUSE_ICON::LOADING, 2));
+}
+
+/**
+ * @tc.name: PointerDrawingManagerHardCursorTest_HardwareCursorDynamicRender_001
+ * @tc.desc: Test HardwareCursorDynamicRender
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerHardCursorTest, PointerDrawingManagerHardCursorTest_HardwareCursorDynamicRender_001,
+    TestSize.Level1)
+{
+    PointerDrawingManager pointerDrawingManager;
+    ASSERT_NE(pointerDrawingManager.hardwareCursorPointerManager_, nullptr);
+    sptr<Rosen::ScreenInfo> mainScreenInfo = CreateScreenInfo(0, 0, Rosen::ScreenSourceMode::SCREEN_MAIN);
+    sptr<Rosen::ScreenInfo> mirrorScreenInfo = CreateScreenInfo(1, 1, Rosen::ScreenSourceMode::SCREEN_MIRROR);
+    sptr<Rosen::ScreenInfo> extendScreenInfo = CreateScreenInfo(2, 2, Rosen::ScreenSourceMode::SCREEN_EXTEND);
+    auto mainSp = CreateScreenPointer(pointerDrawingManager.pointerRenderer_,
+        pointerDrawingManager.hardwareCursorPointerManager_, pointerDrawingManager.handler_, mainScreenInfo);
+    auto mirrorSp = CreateScreenPointer(pointerDrawingManager.pointerRenderer_,
+        pointerDrawingManager.hardwareCursorPointerManager_, pointerDrawingManager.handler_, mirrorScreenInfo);
+    auto extendSp = CreateScreenPointer(pointerDrawingManager.pointerRenderer_,
+        pointerDrawingManager.hardwareCursorPointerManager_, pointerDrawingManager.handler_, extendScreenInfo);
+    ASSERT_NE(mainSp, nullptr);
+    ASSERT_NE(mirrorSp, nullptr);
+    ASSERT_NE(extendSp, nullptr);
+    pointerDrawingManager.screenPointers_.insert({0, mainSp});
+    pointerDrawingManager.screenPointers_.insert({1, mirrorSp});
+    pointerDrawingManager.screenPointers_.insert({2, extendSp});
+    pointerDrawingManager.lastPhysicalX_ = 10;
+    pointerDrawingManager.lastPhysicalY_ = 20;
+    pointerDrawingManager.displayId_ = 0;
+    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.HardwareCursorDynamicRender(MOUSE_ICON::LOADING, 0));
+    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.HardwareCursorDynamicRender(MOUSE_ICON::LOADING, 2));
 }
 
 /**
@@ -296,6 +406,63 @@ HWTEST_F(PointerDrawingManagerHardCursorTest, PointerDrawingManagerHardCursorTes
     ASSERT_NE(sp, nullptr);
     pointerDrawingManager.screenPointers_.insert({0, sp});
     ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.CreateRenderConfig(config, sp, MOUSE_ICON::DEFAULT, true, 0, 0, 0));
+}
+
+/**
+ * @tc.name: PointerDrawingManagerHardCursorTest_SetCursorLocation_001
+ * @tc.desc: Test SetCursorLocation
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerHardCursorTest, PointerDrawingManagerHardCursorTest_SetCursorLocation_001,
+    TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerDrawingManager pointerDrawingManager;
+    ASSERT_NE(pointerDrawingManager.hardwareCursorPointerManager_, nullptr);
+    EXPECT_CALL(*pointerDrawingManager.hardwareCursorPointerManager_, IsSupported).WillRepeatedly(Return(true));
+    int32_t x = 50;
+    int32_t y = 60;
+    uint64_t displayId = 0;
+    Rosen::RSSurfaceNodeConfig surfaceNodeConfig;
+    surfaceNodeConfig.SurfaceNodeName = "pointer window";
+    Rosen::RSSurfaceNodeType surfaceNodeType = Rosen::RSSurfaceNodeType::SELF_DRAWING_WINDOW_NODE;
+    pointerDrawingManager.surfaceNode_ = Rosen::RSSurfaceNode::Create(surfaceNodeConfig, surfaceNodeType);
+    ASSERT_TRUE(pointerDrawingManager.surfaceNode_ != nullptr);
+    pointerDrawingManager.SetCursorLocation(x, y);
+    EXPECT_EQ(pointerDrawingManager.moveFinished_.load(), true);
+    pointerDrawingManager.currentCursorBlurEnabled_ = false;
+    pointerDrawingManager.lastCursorBlurEnabled_ = true;
+    pointerDrawingManager.SetCursorLocation(x, y);
+    EXPECT_EQ(pointerDrawingManager.moveFinished_.load(), true);
+}
+
+/**
+ * @tc.name: PointerDrawingManagerHardCursorTest_UpdateBindDisplayId_001
+ * @tc.desc: Test UpdateBindDisplayId
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerHardCursorTest, PointerDrawingManagerHardCursorTest_UpdateBindDisplayId_001,
+    TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerDrawingManager pointerDrawingManager;
+    pointerDrawingManager.lastDisplayId_ = 1;
+    ASSERT_NE(pointerDrawingManager.hardwareCursorPointerManager_, nullptr);
+    EXPECT_CALL(*pointerDrawingManager.hardwareCursorPointerManager_, IsSupported).WillRepeatedly(Return(true));
+    uint64_t displayId = 0;
+    pointerDrawingManager.currentCursorBlurEnabled_ = false;
+    pointerDrawingManager.mouseStylePending_.store(0);
+    pointerDrawingManager.UpdateBindDisplayId(displayId);
+    EXPECT_EQ(pointerDrawingManager.screenId_, 0);
+    EXPECT_EQ(pointerDrawingManager.mouseStylePending_.load(), 0);
+    displayId = 1;
+    pointerDrawingManager.currentCursorBlurEnabled_ = true;
+    pointerDrawingManager.mouseStylePending_.store(0);
+    pointerDrawingManager.UpdateBindDisplayId(displayId);
+    EXPECT_EQ(pointerDrawingManager.screenId_, 1);
+    EXPECT_EQ(pointerDrawingManager.mouseStylePending_.load(), 1);
 }
 } // namespace MMI
 } // namespace OHOS

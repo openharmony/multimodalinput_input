@@ -148,6 +148,7 @@ int32_t PointerRenderer::Render(uint8_t *addr, uint32_t width, uint32_t height, 
     uint32_t addrSize = width * height * RENDER_STRIDE;
     if (cfg.style_ == MOUSE_ICON::TRANSPARENT_ICON) {
         (void)memset_s(addr, addrSize, 0, addrSize);
+        SetPointerCfg(cfg);
         return RET_OK;
     }
     if (cfg.isHard && cfg.isBlur) {
@@ -317,7 +318,7 @@ bool PointerRenderer::HasPointerCfg(const RenderConfig &cfg)
     if (it == screenConfigs_.end()) {
         return false;
     }
-    if (it->second != cfg) {
+    if (it->second != cfg || it->second.isHard != cfg.isHard || it->second.isBlur != cfg.isBlur) {
         return false;
     }
     return true;
