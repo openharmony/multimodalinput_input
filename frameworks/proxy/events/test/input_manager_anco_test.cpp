@@ -44,6 +44,8 @@ public:
     int32_t UpdateOneHandData(const AncoOneHandData &oneHandData) override;
     int32_t UpdateExcludedKeyEventWindow(
         const AncoExcludedKeyEventWindow &excludedKeyEventWindow) override;
+    int32_t UpdateTripleFingerSnapshotState(
+        const AncoTripleFingerSnapshotState &snapshotState) override;
 };
 
 int32_t AncoMonitor::SyncInputEvent(std::shared_ptr<PointerEvent> pointerEvent)
@@ -77,6 +79,12 @@ int32_t AncoMonitor::UpdateOneHandData(const AncoOneHandData &oneHandData)
 
 int32_t AncoMonitor::UpdateExcludedKeyEventWindow(
     const AncoExcludedKeyEventWindow &excludedKeyEventWindow)
+{
+    return RET_OK;
+}
+
+int32_t AncoMonitor::UpdateTripleFingerSnapshotState(
+    const AncoTripleFingerSnapshotState &snapshotState)
 {
     return RET_OK;
 }

@@ -29,6 +29,15 @@ ohos_prebuilt_etc("special_input_device_config") {
   subsystem_name = "${mmi_subsystem_name}"
 }
 
+ohos_prebuilt_etc("triple_finger_snapshot") {
+  source = "triple_finger_snapshot.json"
+
+  relative_install_dir = "multimodalinput"
+
+  part_name = "${mmi_part_name}"
+  subsystem_name = "${mmi_subsystem_name}"
+}
+
 group("input_system_etc") {
   deps = []
 
@@ -38,5 +47,11 @@ group("input_system_etc") {
 
   if (input_feature_product == "default") {
     deps += [ ":special_input_device_config" ]
+  }
+
+  if (input_feature_triple_finger_snapshot) {
+    deps += [
+      ":triple_finger_snapshot",
+    ]
   }
 }

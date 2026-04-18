@@ -1777,6 +1777,7 @@ ohos_unittest("InputWindowsManagerEXTest") {
     "${mmi_path}/common/anco/comm/include",
     "${mmi_path}/service/hardware_cursor_pointer_manager/include",
     "${mmi_path}/service/drag_security/include",
+    "${mmi_path}/service/triple_finger_snapshot/include",
   ]
 
   configs = [

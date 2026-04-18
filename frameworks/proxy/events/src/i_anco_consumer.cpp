@@ -193,5 +193,25 @@ AncoExcludedKeyEventWindow *AncoExcludedKeyEventWindow::Unmarshalling(Parcel &pa
     }
     return data;
 }
+
+bool AncoTripleFingerSnapshotState::Marshalling(Parcel &parcel) const
+{
+    return parcel.WriteBool(enabled);
+}
+ 
+bool AncoTripleFingerSnapshotState::ReadFromParcel(Parcel &parcel)
+{
+    return parcel.ReadBool(enabled);
+}
+ 
+AncoTripleFingerSnapshotState *AncoTripleFingerSnapshotState::Unmarshalling(Parcel &parcel)
+{
+    AncoTripleFingerSnapshotState *data = new (std::nothrow) AncoTripleFingerSnapshotState();
+    if (data && !data->ReadFromParcel(parcel)) {
+        delete data;
+        data = nullptr;
+    }
+    return data;
+}
 } // namespace MMI
 } // namespace OHOS
