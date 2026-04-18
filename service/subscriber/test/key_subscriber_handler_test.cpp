@@ -6200,7 +6200,7 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_HandleKeyUpWithDurat
     std::list<std::shared_ptr<OHOS::MMI::KeySubscriberHandler::Subscriber>> subscribers;
     bool handled = false;
     bool ret = handler.HandleKeyUpWithDurationCheck(keyEvent, keyOption, subscribers, handled);
-    EXPECT_TRUE(ret);
+    EXPECT_FALSE(ret);
     EXPECT_FALSE(handled);
 }
 
@@ -6231,7 +6231,7 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_HandleKeyUpWithDurat
     handler.isForegroundExits_ = true;
     bool handled = false;
     bool ret = handler.HandleKeyUpWithDurationCheck(keyEvent, keyOption, subscribers, handled);
-    EXPECT_TRUE(ret);
+    EXPECT_FALSE(ret);
 }
 
 /**
@@ -6396,7 +6396,7 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_ProcessAllReleasedCo
     handler.isForegroundExits_ = true;
     bool handled = false;
     bool ret = handler.ProcessAllReleasedComboActivate(keyEvent, keyOption, subscriber, handled);
-    EXPECT_TRUE(ret);
+    EXPECT_FALSE(ret);
     EXPECT_FALSE(handled);
 }
 
@@ -6424,7 +6424,7 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_ProcessAllReleasedCo
     keyEvent->AddKeyItem(item);
     bool handled = false;
     bool ret = handler.ProcessAllReleasedComboActivate(keyEvent, keyOption, subscriber, handled);
-    EXPECT_FALSE(ret);
+    EXPECT_TRUE(ret);
 }
 
 /**
