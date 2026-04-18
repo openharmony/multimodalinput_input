@@ -1137,7 +1137,7 @@ int32_t PointerDrawingManager::DrawDynamicSoftCursor(std::shared_ptr<Rosen::RSSu
     return RET_OK;
 }
 
-void PointerDrawingManager::SoftwareCursorDynamicRender(MOUSE_ICON mouseStyle)
+void PointerDrawingManager::SoftwareCursorDynamicRender(MOUSE_ICON mouseStyle, uint64_t displayId)
 {
     auto screenPointers = CopyScreenPointers();
     auto mouseIcons = CursorDrawingInformation::GetInstance().GetMouseIconsMap();
@@ -1157,7 +1157,7 @@ void PointerDrawingManager::SoftwareCursorDynamicRender(MOUSE_ICON mouseStyle)
         auto sn = it.second->GetSurfaceNode();
         cfg.dpi = it.second->GetDPI();
         MMI_HILOGD("SoftwareCursorDynamicRender, screen = %{public}" PRIu64 ", dpi = %{public}f", it.first, cfg.dpi);
-        if (it.second->IsMirror() || it.first == screenId_) {
+        if (it.second->IsMirror() || it.first == displayId) {
             if (mouseStyle == MOUSE_ICON::LOADING) {
                 cfg.rotationFocusX = GetFocusCoordinates();
                 cfg.rotationFocusY = GetFocusCoordinates();
