@@ -3882,6 +3882,12 @@ bool PointerDrawingManager::GetCursorBlurEnabled()
     return currentCursorBlurEnabled_;
 }
 
+bool PointerDrawingManager::IsCursorBlurEnabledUpdate()
+{
+    std::lock_guard<std::mutex> lock(cursorBlurEnableMutex_);
+    return currentCursorBlurEnabled_ != lastCursorBlurEnabled_;
+}
+
 void PointerDrawingManager::UpdateCursorBlurEnabled()
 {
     std::lock_guard<std::mutex> lock(cursorBlurEnableMutex_);
