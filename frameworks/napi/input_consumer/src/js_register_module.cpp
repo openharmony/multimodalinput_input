@@ -685,24 +685,24 @@ static void OnKeyTriggerCallback(std::shared_ptr<KeyEvent> keyEvent, std::shared
 {
     CALL_DEBUG_ENTER;
     if (keyEvent == nullptr) {
-        MMI_HILOGE("HGC 011 keyEvent is nullptr");
+        MMI_HILOGE("keyEvent is nullptr");
         return;
     }
     if (keyOption == nullptr) {
-        MMI_HILOGE("HGC 012 keyOption is nullptr");
+        MMI_HILOGE("keyOption is nullptr");
         return;
     }
     auto* dispatcher = TriggerEventDispatcher::GetInstance();
     if (dispatcher == nullptr) {
-        MMI_HILOGE("HGC 013 dispatcher is nullptr");
+        MMI_HILOGE("dispatcher is nullptr");
         return;
     }
     if (!dispatcher->ShouldDispatch(keyOption, keyEvent)) {
-        MMI_HILOGI("HGC 014 Event should not be dispatched");
+        MMI_HILOGI("Event should not be dispatched");
         return;
     }
 
-    MMI_HILOGI("HGC 015 KC:%{public}d", keyEvent->GetKeyCode());
+    MMI_HILOGI("KC:%{public}d", keyEvent->GetKeyCode());
 
     // Generate subscribe key and find callback
     std::string subscribeKey = GenerateKeyOptionKey(keyOption);
@@ -830,7 +830,7 @@ static void ExecuteJavaScriptCallback(napi_env env, sptr<KeyEventMonitorInfo> ev
     }
     napi_value jsKeyEvent = JsInputConsumer::KeyEvent2JsKeyEvent(env, keyEvent);
     if (jsKeyEvent == nullptr) {
-        MMI_HILOGE("HGC 023 Failed to convert KeyEvent to JavaScript object");
+        MMI_HILOGE("Failed to convert KeyEvent to JavaScript object");
         napi_close_handle_scope(env, scope);
         return;
     }
@@ -928,7 +928,7 @@ napi_value SubscribeKeyCommand(napi_env env, napi_callback_info info, sptr<KeyEv
     event->keyOption = keyOption;
     int32_t preSubscribeId = GetPreSubscribeId(keyCommandCallbacks, event);
     if (preSubscribeId < 0) {
-        MMI_HILOGI("HGC 07 EventType:%{private}s, eventName:%{public}s", event->eventType.c_str(), event->name.c_str());
+        MMI_HILOGI("EventType:%{private}s, eventName:%{public}s", event->eventType.c_str(), event->name.c_str());
         int32_t subscribeId = -1;
         subscribeId = InputManager::GetInstance()->SubscribeKeyEvent(keyOption,
             [keyOption](std::shared_ptr<KeyEvent> keyEvent) {
@@ -938,7 +938,7 @@ napi_value SubscribeKeyCommand(napi_env env, napi_callback_info info, sptr<KeyEv
             MMI_HILOGE("SubscribeId invalid:%{public}d", subscribeId);
             return nullptr;
         }
-        MMI_HILOGI("HGC 008 SubscribeId:%{public}d", subscribeId);
+        MMI_HILOGI("SubscribeId:%{public}d", subscribeId);
         event->subscribeId = subscribeId;
     } else {
         event->subscribeId = preSubscribeId;
@@ -1122,19 +1122,19 @@ static bool ValidateOnKeyCommandParameters(napi_env env, size_t argc, napi_value
 {
     CALL_DEBUG_ENTER;
     if (argc < ON_KEY_COMMAND_MIN_PARAMS) {
-        MMI_HILOGE("HGC 004 Parameter number error argc:%{public}zu", argc);
+        MMI_HILOGE("Parameter number error argc:%{public}zu", argc);
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "parameter number error");
         return false;
     }
 
     if (!UtilNapi::TypeOf(env, argv[KEY_COMMAND_OPTIONS_INDEX], napi_object)) {
-        MMI_HILOGE("HGC 005 The first parameter is not napi_object");
+        MMI_HILOGE("The first parameter is not napi_object");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "keyOptions", "object");
         return false;
     }
 
     if (!UtilNapi::TypeOf(env, argv[KEY_COMMAND_CALLBACK_INDEX], napi_function)) {
-        MMI_HILOGE("HGC 006 The second parameter is not napi_function");
+        MMI_HILOGE("The second parameter is not napi_function");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "callback", "function");
         return false;
     }
@@ -1923,8 +1923,8 @@ static napi_value MmiInit(napi_env env, napi_value exports)
     napi_property_descriptor desc[] = {
         DECLARE_NAPI_FUNCTION("on", JsOn),
         DECLARE_NAPI_FUNCTION("off", JsOff),
-        DECLARE_NAPI_FUNCTION("onKeyCommand", JsOnKeyCommand),
-        DECLARE_NAPI_FUNCTION("offKeyCommand", JsOffKeyCommand),
+        DECLARE_NAPI_FUNCTION("onKey", JsOnKeyCommand),
+        DECLARE_NAPI_FUNCTION("offKey", JsOffKeyCommand),
         DECLARE_NAPI_FUNCTION("setShieldStatus", SetShieldStatus),
         DECLARE_NAPI_FUNCTION("getShieldStatus", GetShieldStatus),
         DECLARE_NAPI_FUNCTION("getAllSystemHotkeys", GetAllSystemHotkeys)

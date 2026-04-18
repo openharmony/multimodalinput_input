@@ -96,7 +96,7 @@ bool TriggerEventDispatcher::ShouldConsume(std::shared_ptr<KeyOption> keyOption,
         if (it != allReleasedDispatchStates_.end() && it->second.comboActivated) {
             if (keyCode == keyOption->GetFinalKey() ||
                 keyOption->GetPreKeys().count(keyCode) > 0) {
-                MMI_HILOGI("HGC 102 ALL_RELEASED mode: consuming combo key event KC:%{public}d", keyCode);
+                MMI_HILOGI("ALL_RELEASED mode: consuming combo key event KC:%{public}d", keyCode);
                 return true;
             }
         }
@@ -128,7 +128,7 @@ void TriggerEventDispatcher::ClearSubscribeState(const std::string& subscribeKey
     if (iter5 != allReleasedDispatchStates_.end()) {
         allReleasedDispatchStates_.erase(iter5);
     }
-    MMI_HILOGI("HGC 103 Subscribe state cleared for %{public}s", subscribeKey.c_str());
+    MMI_HILOGI("Subscribe state cleared for %{public}s", subscribeKey.c_str());
 }
 
 void TriggerEventDispatcher::ClearSubscribeState(std::shared_ptr<KeyOption> keyOption)
@@ -223,14 +223,14 @@ bool TriggerEventDispatcher::ShouldDispatchALL_RELEASED(std::shared_ptr<KeyOptio
             MMI_HILOGD("ALL_RELEASED: non-combo key event KC:%{public}d, skip", keyCode);
             return false;
         }
-        MMI_HILOGI("HGC 105 ALL_RELEASED: combo activated, dispatch KC:%{public}d action:%{public}d",
+        MMI_HILOGI("ALL_RELEASED: combo activated, dispatch KC:%{public}d action:%{public}d",
                    keyCode, action);
         if (action == KeyEvent::KEY_ACTION_DOWN) {
             state.pressedComboKeys.insert(keyCode);
         } else if (action == KeyEvent::KEY_ACTION_UP) {
             state.pressedComboKeys.erase(keyCode);
             if (state.pressedComboKeys.empty()) {
-                MMI_HILOGI("HGC 106 ALL_RELEASED: all keys released, resetting dispatch state");
+                MMI_HILOGI("ALL_RELEASED: all keys released, resetting dispatch state");
                 state.comboActivated = false;
             }
         }
@@ -252,7 +252,7 @@ bool TriggerEventDispatcher::ShouldDispatchALL_RELEASED(std::shared_ptr<KeyOptio
         for (const auto& preKey : preKeys) {
             state.pressedComboKeys.insert(preKey);
         }
-        MMI_HILOGI("HGC 106 ALL_RELEASED: combo activated, dispatching finalKey DOWN KC:%{public}d", keyCode);
+        MMI_HILOGI("ALL_RELEASED: combo activated, dispatching finalKey DOWN KC:%{public}d", keyCode);
         return true;
     }
     MMI_HILOGD("ALL_RELEASED: not activated, skip KC:%{public}d action:%{public}d", keyCode, action);
