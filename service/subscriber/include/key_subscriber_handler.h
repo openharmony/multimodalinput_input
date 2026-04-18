@@ -131,6 +131,38 @@ private:
 #endif // OHOS_BUILD_ENABLE_CALL_MANAGER
 
 private:
+    bool HandleKeyForAllReleased(
+        const std::shared_ptr<KeyEvent> &keyEvent,
+        const std::shared_ptr<KeyOption> &keyOption,
+        std::list<std::shared_ptr<Subscriber>> &subscribers,
+        bool &handled);
+    void ResetAllReleasedState(int32_t subscriberId);
+    bool ShouldProcessRepeatEvent(const std::shared_ptr<KeyEvent> &keyEvent);
+    void HandleKeyDownForPressedType(const std::shared_ptr<KeyEvent> &keyEvent,
+        int32_t keyCode, const std::vector<int32_t> &pressedKeys,
+        const std::shared_ptr<KeyOption> &keyOption,
+        std::list<std::shared_ptr<Subscriber>> &subscribers, bool &handled);
+    void HandleKeyUpForPressedType(const std::shared_ptr<KeyEvent> &keyEvent,
+        int32_t keyCode, const std::shared_ptr<KeyOption> &keyOption, bool &handled);
+    bool HandleKeyUpWithDurationCheck(const std::shared_ptr<KeyEvent> &keyEvent,
+        const std::shared_ptr<KeyOption> &keyOption,
+        std::list<std::shared_ptr<Subscriber>> &subscribers, bool &handled);
+    void ProcessAllReleasedComboActivated(const std::shared_ptr<KeyEvent> &keyEvent,
+        const std::shared_ptr<KeyOption> &keyOption,
+        std::shared_ptr<Subscriber> &subscriber, bool &handled);
+    bool ProcessAllReleasedComboActivate(const std::shared_ptr<KeyEvent> &keyEvent,
+        const std::shared_ptr<KeyOption> &keyOption,
+        std::shared_ptr<Subscriber> &subscriber, bool &handled);
+    bool ShouldProcessAllReleasedRepeat(int32_t keyCode,
+        const std::shared_ptr<KeyOption> &keyOption,
+        const std::list<std::shared_ptr<Subscriber>> &subscribers);
+
+    struct AllReleasedState {
+        bool comboActivated { false };
+        std::set<int32_t> pressedComboKeys;
+    };
+private:
+    std::map<int32_t, AllReleasedState> allReleasedStates_;
     SubscriberCollection subscriberMap_;
     std::mutex subscriberMapMutex_;
     SubscriberCollection keyGestures_;

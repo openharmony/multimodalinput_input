@@ -41,11 +41,13 @@ constexpr int32_t BOOLEAN_TRUE { 1 };
 constexpr int32_t BOOLEAN_FALSE { 0 };
 constexpr int32_t BOOLEAN_NONE { -1 };
 constexpr uint32_t DEFAULT_REFERENCE_COUNT { 1 };
-// SDK 26.0.0: triggerType constants
 constexpr int32_t TRIGGER_TYPE_NOT_SET { 0 };
 constexpr int32_t TRIGGER_TYPE_MIN { 0 };
 constexpr int32_t TRIGGER_TYPE_MAX { 3 };
 constexpr size_t KEY_COMMAND_CALLBACK_ARGC { 2 };
+constexpr size_t ON_KEY_COMMAND_MIN_PARAMS { 2 };
+constexpr size_t KEY_COMMAND_OPTIONS_INDEX { 0 };
+constexpr size_t KEY_COMMAND_CALLBACK_INDEX { 1 };
 } // namespace
 
 static Callbacks callbacks = {};
@@ -53,7 +55,6 @@ static Callbacks hotkeyCallbacks = {};
 static Callbacks keyCommandCallbacks = {};
 std::mutex sCallBacksMutex;
 
-// SDK 26.0.0: Key Command async work struct
 struct KeyCommandWork {
     sptr<KeyEventMonitorInfo> eventInfo;
     std::shared_ptr<KeyEvent> keyEvent;
@@ -284,7 +285,6 @@ napi_value GetEventInfoAPI9(napi_env env, napi_callback_info info, sptr<KeyEvent
     return ret;
 }
 
-// SDK 26.0.0: parse preKeys parameter
 static bool ParsePreKeysParameter(napi_env env, napi_value argv, std::shared_ptr<KeyOption> keyOption,
     std::string& subKeyNames)
 {
@@ -316,7 +316,6 @@ static bool ParsePreKeysParameter(napi_env env, napi_value argv, std::shared_ptr
     return true;
 }
 
-// SDK 26.0.0: parse finalKey parameter
 static bool ParseFinalKeyParameter(napi_env env, napi_value argv, std::shared_ptr<KeyOption> keyOption,
     std::string& subKeyNames)
 {
@@ -338,7 +337,6 @@ static bool ParseFinalKeyParameter(napi_env env, napi_value argv, std::shared_pt
     return true;
 }
 
-// SDK 26.0.0: parse triggerType parameter (optional)
 static bool ParseTriggerTypeParameter(napi_env env, napi_value argv, std::shared_ptr<KeyOption> keyOption)
 {
     CALL_DEBUG_ENTER;
@@ -358,7 +356,6 @@ static bool ParseTriggerTypeParameter(napi_env env, napi_value argv, std::shared
     return true;
 }
 
-// SDK 26.0.0: parse finalKeyDownDuration parameter
 static bool ParseFinalKeyDownDurationParameter(napi_env env, napi_value argv, std::shared_ptr<KeyOption> keyOption,
     std::string& subKeyNames)
 {
@@ -380,7 +377,6 @@ static bool ParseFinalKeyDownDurationParameter(napi_env env, napi_value argv, st
     return true;
 }
 
-// SDK 26.0.0: parse legacy isFinalKeyDown and isRepeat parameters
 static bool ParseLegacyParameters(napi_env env, napi_value argv, std::shared_ptr<KeyOption> keyOption,
     std::string& subKeyNames)
 {
@@ -412,29 +408,29 @@ napi_value GetEventInfoAPI26(napi_env env, napi_callback_info info, sptr<KeyEven
         MMI_HILOGE("event or keyOption is nullptr");
         return nullptr;
     }
-    size_t argc = INPUT_PARAMETER_MAX;
-    napi_value argv[INPUT_PARAMETER_MAX] = { 0 };
+    size_t argc = ON_KEY_COMMAND_MIN_PARAMS;
+    napi_value argv[ON_KEY_COMMAND_MIN_PARAMS] = { 0 };
     CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
     std::string subKeyNames = "";
-    if (!ParsePreKeysParameter(env, argv[1], keyOption, subKeyNames)) {
+    if (!ParsePreKeysParameter(env, argv[KEY_COMMAND_OPTIONS_INDEX], keyOption, subKeyNames)) {
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "preKeys parameter error");
         return nullptr;
     }
-    if (!ParseFinalKeyParameter(env, argv[1], keyOption, subKeyNames)) {
+    if (!ParseFinalKeyParameter(env, argv[KEY_COMMAND_OPTIONS_INDEX], keyOption, subKeyNames)) {
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "finalKey parameter error");
         return nullptr;
     }
-    if (!ParseTriggerTypeParameter(env, argv[1], keyOption)) {
+    if (!ParseTriggerTypeParameter(env, argv[KEY_COMMAND_OPTIONS_INDEX], keyOption)) {
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "triggerType parameter error");
         return nullptr;
     }
-    if (!ParseFinalKeyDownDurationParameter(env, argv[1], keyOption, subKeyNames)) {
+    if (!ParseFinalKeyDownDurationParameter(env, argv[KEY_COMMAND_OPTIONS_INDEX], keyOption, subKeyNames)) {
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "finalKeyDownDuration parameter error");
         return nullptr;
     }
     int32_t triggerType = keyOption->GetTriggerType();
     if (triggerType == TRIGGER_TYPE_NOT_SET) {
-        if (!ParseLegacyParameters(env, argv[1], keyOption, subKeyNames)) {
+        if (!ParseLegacyParameters(env, argv[KEY_COMMAND_OPTIONS_INDEX], keyOption, subKeyNames)) {
             THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "legacy parameters error");
             return nullptr;
         }
@@ -682,14 +678,9 @@ napi_value SubscribeHotkey(napi_env env, napi_callback_info info, sptr<KeyEventM
     return ret;
 }
 
-// SDK 26.0.0: forward declarations for static helper functions
-static bool KeyEvent2JsKeyEvent(napi_env env, std::shared_ptr<KeyEvent> keyEvent, napi_value& jsKeyEvent);
-static bool KeyItem2JsKey(napi_env env, const KeyEvent::KeyItem& keyItem, napi_value& jsKey);
-static bool SetKeyItemsToArray(napi_env env, const std::vector<KeyEvent::KeyItem>& keyItems, napi_value& jsArray);
 void EmitAsyncCallbackWorkWithEvent(sptr<KeyEventMonitorInfo> event, std::shared_ptr<KeyEvent> keyEvent,
     std::shared_ptr<KeyOption> keyOption);
 
-// SDK 26.0.0: Key Command event callback
 static void OnKeyTriggerCallback(std::shared_ptr<KeyEvent> keyEvent, std::shared_ptr<KeyOption> keyOption)
 {
     CALL_DEBUG_ENTER;
@@ -707,9 +698,11 @@ static void OnKeyTriggerCallback(std::shared_ptr<KeyEvent> keyEvent, std::shared
         return;
     }
     if (!dispatcher->ShouldDispatch(keyOption, keyEvent)) {
-        MMI_HILOGD("Event should not be dispatched");
+        MMI_HILOGI("Event should not be dispatched");
         return;
     }
+
+    MMI_HILOGI("KC:%{public}d", keyEvent->GetKeyCode());
 
     // Generate subscribe key and find callback
     std::string subscribeKey = GenerateKeyOptionKey(keyOption);
@@ -737,7 +730,6 @@ static void OnKeyTriggerCallback(std::shared_ptr<KeyEvent> keyEvent, std::shared
     }
 }
 
-// SDK 26.0.0: validate async work data
 static bool ValidateAsyncWorkData(KeyCommandWork* cmdWork, sptr<KeyEventMonitorInfo>& event,
     std::shared_ptr<KeyEvent>& keyEvent, std::shared_ptr<KeyOption>& keyOption)
 {
@@ -764,7 +756,6 @@ static bool ValidateAsyncWorkData(KeyCommandWork* cmdWork, sptr<KeyEventMonitorI
     return true;
 }
 
-// SDK 26.0.0: convert KeyOption to JavaScript object
 static bool KeyOption2JsKeyOption(napi_env env, std::shared_ptr<KeyOption> keyOption, napi_value& jsKeyOption)
 {
     CALL_DEBUG_ENTER;
@@ -814,7 +805,6 @@ static bool KeyOption2JsKeyOption(napi_env env, std::shared_ptr<KeyOption> keyOp
     return true;
 }
 
-// SDK 26.0.0: execute JavaScript callback
 static void ExecuteJavaScriptCallback(napi_env env, sptr<KeyEventMonitorInfo> event,
     std::shared_ptr<KeyEvent> keyEvent, std::shared_ptr<KeyOption> keyOption)
 {
@@ -838,12 +828,13 @@ static void ExecuteJavaScriptCallback(napi_env env, sptr<KeyEventMonitorInfo> ev
         napi_close_handle_scope(env, scope);
         return;
     }
-    napi_value jsKeyEvent = nullptr;
-    if (!KeyEvent2JsKeyEvent(env, keyEvent, jsKeyEvent)) {
+    napi_value jsKeyEvent = JsInputConsumer::KeyEvent2JsKeyEvent(env, keyEvent);
+    if (jsKeyEvent == nullptr) {
         MMI_HILOGE("Failed to convert KeyEvent to JavaScript object");
         napi_close_handle_scope(env, scope);
         return;
     }
+    SetNamedProperty(env, jsKeyEvent, std::string("keyCode"), keyEvent->GetKeyCode());
     napi_value args[KEY_COMMAND_CALLBACK_ARGC] = { jsKeyOptions, jsKeyEvent };
     napi_value result = nullptr;
     statusResult = napi_call_function(env, nullptr, callback, KEY_COMMAND_CALLBACK_ARGC, args, &result);
@@ -853,7 +844,6 @@ static void ExecuteJavaScriptCallback(napi_env env, sptr<KeyEventMonitorInfo> ev
     napi_close_handle_scope(env, scope);
 }
 
-// SDK 26.0.0: async callback execution (main thread)
 static void ExecuteAsyncCallback(uv_work_t* work, int32_t status)
 {
     CALL_DEBUG_ENTER;
@@ -873,17 +863,11 @@ static void ExecuteAsyncCallback(uv_work_t* work, int32_t status)
     delete cmdWork;
 }
 
-// SDK 26.0.0: async work execute function (worker thread)
-// Part of libuv async mechanism, runs in thread pool
-// Kept for future data processing extension
 static void ExecuteAsyncWork(uv_work_t* work)
 {
     CALL_DEBUG_ENTER;
-    // Runs in worker thread, can do heavy data processing here
-    // Current implementation needs no extra processing
 }
 
-// SDK 26.0.0: async callback with event parameter
 void EmitAsyncCallbackWorkWithEvent(sptr<KeyEventMonitorInfo> event, std::shared_ptr<KeyEvent> keyEvent,
     std::shared_ptr<KeyOption> keyOption)
 {
@@ -930,15 +914,12 @@ void EmitAsyncCallbackWorkWithEvent(sptr<KeyEventMonitorInfo> event, std::shared
     MMI_HILOGI("KeyCommand async work queued successfully");
 }
 
-// SDK 26.0.0: subscribe key command event
 napi_value SubscribeKeyCommand(napi_env env, napi_callback_info info, sptr<KeyEventMonitorInfo> event,
     std::shared_ptr<KeyOption> keyOption)
 {
     CALL_DEBUG_ENTER;
     CHKPP(event);
     CHKPP(keyOption);
-
-    // Parse parameters using GetEventInfoAPI26
     if (GetEventInfoAPI26(env, info, event, keyOption) == nullptr) {
         MMI_HILOGE("GetEventInfoAPI26 failed");
         return nullptr;
@@ -947,7 +928,7 @@ napi_value SubscribeKeyCommand(napi_env env, napi_callback_info info, sptr<KeyEv
     event->keyOption = keyOption;
     int32_t preSubscribeId = GetPreSubscribeId(keyCommandCallbacks, event);
     if (preSubscribeId < 0) {
-        MMI_HILOGD("EventType:%{private}s, eventName:%{public}s", event->eventType.c_str(), event->name.c_str());
+        MMI_HILOGI("EventType:%{private}s, eventName:%{public}s", event->eventType.c_str(), event->name.c_str());
         int32_t subscribeId = -1;
         subscribeId = InputManager::GetInstance()->SubscribeKeyEvent(keyOption,
             [keyOption](std::shared_ptr<KeyEvent> keyEvent) {
@@ -971,64 +952,6 @@ napi_value SubscribeKeyCommand(napi_env env, napi_callback_info info, sptr<KeyEv
     napi_value ret;
     CHKRP(napi_create_int32(env, RET_OK, &ret), CREATE_INT32);
     return ret;
-}
-
-// SDK 26.0.0: convert KeyItems to JavaScript array
-static bool SetKeyItemsToArray(napi_env env, const std::vector<KeyEvent::KeyItem>& keyItems, napi_value& jsArray)
-{
-    CALL_DEBUG_ENTER;
-    napi_status status = napi_create_array(env, &jsArray);
-    if (status != napi_ok) {
-        MMI_HILOGE("Failed to create JavaScript array");
-        return false;
-    }
-    for (size_t i = 0; i < keyItems.size(); i++) {
-        napi_value jsKeyItem = nullptr;
-        if (KeyItem2JsKey(env, keyItems[i], jsKeyItem)) {
-            napi_set_element(env, jsArray, i, jsKeyItem);
-        }
-    }
-    return true;
-}
-
-// SDK 26.0.0: convert KeyEvent to JavaScript object
-static bool KeyEvent2JsKeyEvent(napi_env env, std::shared_ptr<KeyEvent> keyEvent, napi_value& jsKeyEvent)
-{
-    CALL_DEBUG_ENTER;
-    if (keyEvent == nullptr) {
-        MMI_HILOGE("keyEvent is nullptr");
-        return false;
-    }
-    napi_status status = napi_create_object(env, &jsKeyEvent);
-    if (status != napi_ok) {
-        MMI_HILOGE("Failed to create JavaScript object");
-        return false;
-    }
-    SetNamedProperty(env, jsKeyEvent, std::string("keyCode"), keyEvent->GetKeyCode());
-    SetNamedProperty(env, jsKeyEvent, std::string("action"), keyEvent->GetKeyAction());
-    std::vector<KeyEvent::KeyItem> keyItems = keyEvent->GetKeyItems();
-    napi_value jsKeyItemsArray = nullptr;
-    if (SetKeyItemsToArray(env, keyItems, jsKeyItemsArray)) {
-        napi_set_named_property(env, jsKeyEvent, "keyItems", jsKeyItemsArray);
-    }
-    MMI_HILOGD("KeyEvent converted to JavaScript object successfully");
-    return true;
-}
-
-// SDK 26.0.0: convert KeyItem to JavaScript object
-static bool KeyItem2JsKey(napi_env env, const KeyEvent::KeyItem& keyItem, napi_value& jsKey)
-{
-    CALL_DEBUG_ENTER;
-    napi_status status = napi_create_object(env, &jsKey);
-    if (status != napi_ok) {
-        MMI_HILOGE("Failed to create JavaScript object for KeyItem");
-        return false;
-    }
-    SetNamedProperty(env, jsKey, std::string("keyCode"), keyItem.GetKeyCode());
-    napi_value pressedValue = nullptr;
-    napi_get_boolean(env, keyItem.IsPressed(), &pressedValue);
-    napi_set_named_property(env, jsKey, "pressed", pressedValue);
-    return true;
 }
 
 bool GetEventType(napi_env env, napi_callback_info info, sptr<KeyEventMonitorInfo> event, std::string &keyType)
@@ -1195,56 +1118,38 @@ static napi_value JsOff(napi_env env, napi_callback_info info)
     return nullptr;
 }
 
-// SDK 26.0.0: validate onKeyCommand parameters
 static bool ValidateOnKeyCommandParameters(napi_env env, size_t argc, napi_value* argv, std::string& keyType)
 {
     CALL_DEBUG_ENTER;
-    if (argc < INPUT_PARAMETER_MAX) {
+    if (argc < ON_KEY_COMMAND_MIN_PARAMS) {
         MMI_HILOGE("Parameter number error argc:%{public}zu", argc);
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "parameter number error");
         return false;
     }
 
-    if (!UtilNapi::TypeOf(env, argv[0], napi_string)) {
-        MMI_HILOGE("The first parameter is not string");
-        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "type", "string");
-        return false;
-    }
-
-    if (!UtilNapi::TypeOf(env, argv[1], napi_object)) {
-        MMI_HILOGE("The second parameter is not napi_object");
+    if (!UtilNapi::TypeOf(env, argv[KEY_COMMAND_OPTIONS_INDEX], napi_object)) {
+        MMI_HILOGE("The first parameter is not napi_object");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "keyOptions", "object");
         return false;
     }
 
-    if (argc >= INPUT_PARAMETER_MAX && !UtilNapi::TypeOf(env, argv[INPUT_PARAMETER_MIDDLE], napi_function)) {
-        MMI_HILOGE("The third parameter is not napi_function");
+    if (!UtilNapi::TypeOf(env, argv[KEY_COMMAND_CALLBACK_INDEX], napi_function)) {
+        MMI_HILOGE("The second parameter is not napi_function");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "callback", "function");
         return false;
     }
 
-    char eventType[EVENT_NAME_LEN] = { 0 };
-    size_t typeLen = 0;
-    CHKRF(napi_get_value_string_utf8(env, argv[0], eventType, EVENT_NAME_LEN - 1, &typeLen), GET_VALUE_STRING_UTF8);
-    keyType = eventType;
-
-    if (keyType != "key") {
-        MMI_HILOGE("Type must be 'key'");
-        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Type must be 'key'");
-        return false;
-    }
-
+    keyType = "key";
     return true;
 }
 
-// SDK 26.0.0: save onKeyCommand callback reference
 static bool SaveOnKeyCommandCallback(napi_env env, size_t argc, napi_value* argv, sptr<KeyEventMonitorInfo> event)
 {
     CALL_DEBUG_ENTER;
     CHKPF(event);
 
-    if (argc == INPUT_PARAMETER_MAX) {
-        CHKRF(napi_create_reference(env, argv[INPUT_PARAMETER_MIDDLE], 1, &event->callback), REFERENCE_REF);
+    if (argc >= ON_KEY_COMMAND_MIN_PARAMS) {
+        CHKRF(napi_create_reference(env, argv[KEY_COMMAND_CALLBACK_INDEX], 1, &event->callback), REFERENCE_REF);
     } else {
         event->callback = nullptr;
     }
@@ -1252,7 +1157,6 @@ static bool SaveOnKeyCommandCallback(napi_env env, size_t argc, napi_value* argv
     return true;
 }
 
-// SDK 26.0.0: onKeyCommand function
 static napi_value JsOnKeyCommand(napi_env env, napi_callback_info info)
 {
     CALL_DEBUG_ENTER;
@@ -1261,8 +1165,8 @@ static napi_value JsOnKeyCommand(napi_env env, napi_callback_info info)
     auto keyOption = std::make_shared<KeyOption>();
     std::string keyType;
 
-    size_t argc = INPUT_PARAMETER_MAX;
-    napi_value argv[INPUT_PARAMETER_MAX] = { 0 };
+    size_t argc = ON_KEY_COMMAND_MIN_PARAMS;
+    napi_value argv[ON_KEY_COMMAND_MIN_PARAMS] = { 0 };
     if (napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr) != napi_ok) {
         MMI_HILOGE("GET_CB_INFO failed");
         return nullptr;
@@ -1283,37 +1187,25 @@ static napi_value JsOnKeyCommand(napi_env env, napi_callback_info info)
     }
     return nullptr;
 }
-// SDK 26.0.0: validate offKeyCommand parameters
+
 static bool ValidateOffKeyCommandParameters(napi_env env, size_t argc, napi_value* argv, std::string& keyType)
 {
     CALL_DEBUG_ENTER;
-    if (!UtilNapi::TypeOf(env, argv[0], napi_string)) {
-        MMI_HILOGE("The first parameter is not string");
-        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "type", "string");
+    if (argc < 1) {
+        MMI_HILOGE("Parameter number error argc:%{public}zu", argc);
+        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "parameter number error");
         return false;
     }
-
-    if (!UtilNapi::TypeOf(env, argv[1], napi_object)) {
-        MMI_HILOGE("The second parameter is not napi_object");
+    if (!UtilNapi::TypeOf(env, argv[0], napi_object)) {
+        MMI_HILOGE("The first parameter is not napi_object");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "keyOptions", "object");
         return false;
     }
 
-    char eventType[EVENT_NAME_LEN] = { 0 };
-    size_t typeLen = 0;
-    CHKRF(napi_get_value_string_utf8(env, argv[0], eventType, EVENT_NAME_LEN - 1, &typeLen), GET_VALUE_STRING_UTF8);
-    keyType = eventType;
-
-    if (keyType != "key") {
-        MMI_HILOGE("Type must be 'key'");
-        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Type must be 'key'");
-        return false;
-    }
-
+    keyType = "key";
     return true;
 }
 
-// SDK 26.0.0: execute offKeyCommand unsubscribe
 static bool UnsubscribeKeyCommand(napi_env env, sptr<KeyEventMonitorInfo> event, std::shared_ptr<KeyOption> keyOption)
 {
     CALL_DEBUG_ENTER;
@@ -1335,7 +1227,6 @@ static bool UnsubscribeKeyCommand(napi_env env, sptr<KeyEventMonitorInfo> event,
     return true;
 }
 
-// SDK 26.0.0: offKeyCommand function
 static napi_value JsOffKeyCommand(napi_env env, napi_callback_info info)
 {
     CALL_DEBUG_ENTER;
@@ -1344,8 +1235,8 @@ static napi_value JsOffKeyCommand(napi_env env, napi_callback_info info)
     auto keyOption = std::make_shared<KeyOption>();
     std::string keyType;
 
-    size_t argc = INPUT_PARAMETER_MAX;
-    napi_value argv[INPUT_PARAMETER_MAX] = { 0 };
+    size_t argc = ON_KEY_COMMAND_MIN_PARAMS;
+    napi_value argv[ON_KEY_COMMAND_MIN_PARAMS] = { 0 };
     if (napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr) != napi_ok) {
         MMI_HILOGE("GET_CB_INFO failed");
         return nullptr;
@@ -1478,7 +1369,6 @@ static napi_value CreateShieldMode(napi_env env, napi_value exports)
     return exports;
 }
 
-// SDK 26.0.0: create KeyCommandTriggerType enum
 static napi_value CreateKeyCommandTriggerType(napi_env env, napi_value exports)
 {
     CALL_DEBUG_ENTER;
@@ -1987,6 +1877,9 @@ napi_value JsInputConsumer::KeyItem2JsKey(napi_env env, const KeyEvent::KeyItem 
     SetNamedProperty(env, jsKey, std::string("code"), keyItem.GetKeyCode());
     SetNamedProperty(env, jsKey, std::string("pressedTime"), keyItem.GetDownTime());
     SetNamedProperty(env, jsKey, std::string("deviceId"), keyItem.GetDeviceId());
+    napi_value pressedValue = nullptr;
+    CHKRP(napi_get_boolean(env, keyItem.IsPressed(), &pressedValue), GET_BOOLEAN);
+    CHKRP(napi_set_named_property(env, jsKey, "pressed", pressedValue), SET_NAMED_PROPERTY);
     return jsKey;
 }
 
@@ -2030,8 +1923,8 @@ static napi_value MmiInit(napi_env env, napi_value exports)
     napi_property_descriptor desc[] = {
         DECLARE_NAPI_FUNCTION("on", JsOn),
         DECLARE_NAPI_FUNCTION("off", JsOff),
-        DECLARE_NAPI_FUNCTION("onKeyCommand", JsOnKeyCommand),
-        DECLARE_NAPI_FUNCTION("offKeyCommand", JsOffKeyCommand),
+        DECLARE_NAPI_FUNCTION("onKey", JsOnKeyCommand),
+        DECLARE_NAPI_FUNCTION("offKey", JsOffKeyCommand),
         DECLARE_NAPI_FUNCTION("setShieldStatus", SetShieldStatus),
         DECLARE_NAPI_FUNCTION("getShieldStatus", GetShieldStatus),
         DECLARE_NAPI_FUNCTION("getAllSystemHotkeys", GetAllSystemHotkeys)
