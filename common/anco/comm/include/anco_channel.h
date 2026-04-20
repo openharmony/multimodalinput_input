@@ -36,6 +36,8 @@ public:
     ErrCode UpdateOneHandData(const AncoOneHandData &oneHandData) override;
     ErrCode UpdateExcludedKeyEventWindow(
         const AncoExcludedKeyEventWindow &excludedKeyEventWindow) override;
+    ErrCode UpdateTripleFingerSnapshotState(
+        const AncoTripleFingerSnapshotState &snapshotState) override;
 
 private:
     std::shared_ptr<IAncoConsumer> consumer_;

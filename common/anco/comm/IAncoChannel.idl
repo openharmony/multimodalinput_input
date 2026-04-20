@@ -18,6 +18,7 @@ sequenceable key_event..OHOS.MMI.KeyEvent;
 sequenceable i_anco_consumer..OHOS.MMI.AncoWindows;
 sequenceable i_anco_consumer..OHOS.MMI.AncoOneHandData;
 sequenceable i_anco_consumer..OHOS.MMI.AncoExcludedKeyEventWindow;
+sequenceable i_anco_consumer..OHOS.MMI.AncoTripleFingerSnapshotState;
 interface OHOS.MMI.IAncoChannel {
     void SyncInputPointEvent([in] PointerEvent pointerEvent);
     void SyncInputKeyEvent([in] KeyEvent keyEvent);
@@ -25,4 +26,5 @@ interface OHOS.MMI.IAncoChannel {
     void SyncKnuckleStatus([in] boolean isKnuckleEnable);
     [oneway] void UpdateOneHandData([in] AncoOneHandData oneHandData);
     [oneway] void UpdateExcludedKeyEventWindow([in] AncoExcludedKeyEventWindow excludedKeyEventWindow);
+    [oneway] void UpdateTripleFingerSnapshotState([in] AncoTripleFingerSnapshotState snapshotState);
 }
