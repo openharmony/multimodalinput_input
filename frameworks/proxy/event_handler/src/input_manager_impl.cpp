@@ -3536,16 +3536,21 @@ int32_t InputManagerImpl::CheckKeyboardControllerPermission()
 int32_t InputManagerImpl::CheckTouchControllerPermission()
 {
     CALL_DEBUG_ENTER;
+#ifndef OHOS_BUILD_ENABLE_CONTROLLER_INJECT
+    MMI_HILOGE("TouchController is not supported");
+    return CAPABILITY_NOT_SUPPORTED;
+#else
     CHKPR(MULTIMODAL_INPUT_CONNECT_MGR, RET_ERR);
     if (PRODUCT_TYPE != PRODUCT_TYPE_PC) {
         MMI_HILOGE("TouchController not supported on non-PC device, productType:%{public}s", PRODUCT_TYPE.c_str());
         return CAPABILITY_NOT_SUPPORTED;
     }
-    int32_t ret = MULTIMODAL_INPUT_CONNECT_MGR->CreateMouseController();
+    int32_t ret = MULTIMODAL_INPUT_CONNECT_MGR->CreateTouchController();
     if (ret != RET_OK) {
         MMI_HILOGE("CheckTouchControllerPermission failed, ret=%{public}d", ret);
     }
     return ret;
+#endif // OHOS_BUILD_ENABLE_CONTROLLER_INJECT
 }
 
 std::shared_ptr<MouseControllerImpl> InputManagerImpl::CreateMouseController()

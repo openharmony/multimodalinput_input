@@ -40,8 +40,20 @@ constexpr int32_t TOUCH_STATE_ERROR = 4300001;
 constexpr const char* TOUCH_DOWN_STATE_ERROR_MSG = "The touch point is touching the display.";
 constexpr const char* TOUCH_NOT_DOWN_STATE_ERROR_MSG = "The touch point is not touching the display.";
 
+int32_t NormalizeTouchControllerErrorCode(int32_t code)
+{
+    if (code == ERROR_NO_PERMISSION) {
+        return COMMON_PERMISSION_CHECK_ERROR;
+    }
+    if (code == CAPABILITY_NOT_SUPPORTED) {
+        return INPUT_DEVICE_NOT_SUPPORTED;
+    }
+    return code;
+}
+
 std::string GetTouchControllerErrorMsg(int32_t code, const char* stateErrorMsg = nullptr)
 {
+    code = NormalizeTouchControllerErrorCode(code);
     if (code == TOUCH_STATE_ERROR && stateErrorMsg != nullptr) {
         return stateErrorMsg;
     }
@@ -61,6 +73,7 @@ napi_value CreateBusinessError(napi_env env, int32_t code, const char* stateErro
     napi_value errorCode = nullptr;
     napi_value errorMsg = nullptr;
 
+    code = NormalizeTouchControllerErrorCode(code);
     std::string msg = GetTouchControllerErrorMsg(code, stateErrorMsg);
     napi_create_int32(env, code, &errorCode);
     napi_create_string_utf8(env, msg.c_str(), NAPI_AUTO_LENGTH, &errorMsg);
