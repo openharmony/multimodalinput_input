@@ -88,9 +88,14 @@ bool TripleFingerSnapshotManager::Enable()
         MMI_HILOGE("delegateProxy is nullptr");
         return false;
     }
-    delegateProxy->OnPostSyncTask([this, impl] {
+    bool isAllAppsEnabled = true;
+    {
+        std::lock_guard<std::mutex> lock(mutex_);
+        isAllAppsEnabled = CheckAllAppsEnabled();
+    }
+    delegateProxy->OnPostSyncTask([this, impl, isAllAppsEnabled] {
         impl->Enable();
-        impl->UpdateAppsEnable(CheckAllAppsEnabled());
+        impl->UpdateAppsEnable(isAllAppsEnabled);
         // 获取并初始化显示信息
         auto displayInfo = WIN_MGR->GetDefaultDisplayInfo();
         if (displayInfo != nullptr) {
@@ -152,10 +157,6 @@ void TripleFingerSnapshotManager::Dump(int32_t fd)
         return;
     }
     auto delegateProxy = GetDelegateProxy();
-    if (delegateProxy == nullptr) {
-        MMI_HILOGE("delegateProxy is nullptr");
-        return;
-    }
     if (delegateProxy == nullptr) {
         MMI_HILOGE("delegateProxy is nullptr");
         return;
@@ -266,6 +267,7 @@ bool TripleFingerSnapshotManager::CreateAndRegisterObserver(int32_t userId)
         auto ret = SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID)
             .GetStringValue(key, value, uri);
         if (ret != RET_OK) {
+            this->OnSwitchChanged(false);
             MMI_HILOGE("Get value from setting data fail:%{public}d", ret);
             return;
         }
@@ -459,6 +461,13 @@ void TripleFingerSnapshotContext::TriggerScreenshot()
 
     MMI_HILOGI("Launching screenshot ability, bundleName:%{public}s, abilityName:%{public}s",
                bundleName.c_str(), abilityName.c_str());
+}
+
+void TripleFingerSnapshotContext::TriggerAncoTripleFingerSnapshot()
+{
+#ifdef OHOS_BUILD_ENABLE_ANCO
+    TriggerAncoTripleFingerSnapshotExt();
+#endif // OHOS_BUILD_ENABLE_ANCO
 }
 } // namespace MMI
 } // namespace OHOS

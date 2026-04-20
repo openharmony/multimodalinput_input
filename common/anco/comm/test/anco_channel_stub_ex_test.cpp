@@ -59,6 +59,11 @@ public:
     {
         return 0;
     }
+    int32_t UpdateTripleFingerSnapshotState(
+        const AncoTripleFingerSnapshotState &snapshotState)
+    {
+        return 0;
+    }
 };
 } // namespace
 

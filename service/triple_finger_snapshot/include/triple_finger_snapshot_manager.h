@@ -57,6 +57,7 @@ public:
     virtual ~ITripleFingerSnapshotContext() = default;
 
     virtual void TriggerScreenshot() = 0;
+    virtual void TriggerAncoTripleFingerSnapshot() = 0;
 };
 
 /**
@@ -169,6 +170,8 @@ public:
     ~TripleFingerSnapshotContext() override = default;
 
     void TriggerScreenshot() override;
+    void TriggerAncoTripleFingerSnapshot() override;
+    void TriggerAncoTripleFingerSnapshotExt();
 };
 
 } // namespace MMI
