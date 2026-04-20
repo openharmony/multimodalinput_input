@@ -737,6 +737,20 @@ private:
                       ::ohos::multimodalInput::inputEventClient::MouseController>(nativeImpl);
 }
 
+void SetTouchControllerBusinessError(int32_t errorCode)
+{
+    TaiheError_t codeMsg;
+    if (TaiheConverter::GetApiError(errorCode, codeMsg)) {
+        taihe::set_business_error(errorCode, codeMsg.msg);
+        return;
+    }
+    if (TaiheConverter::GetApiError(OHOS::MMI::TaiheErrorCode::INPUT_SERVICE_EXCEPTION, codeMsg)) {
+        taihe::set_business_error(OHOS::MMI::TaiheErrorCode::INPUT_SERVICE_EXCEPTION, codeMsg.msg);
+        return;
+    }
+    taihe::set_business_error(OHOS::MMI::TaiheErrorCode::INPUT_SERVICE_EXCEPTION, "Input service exception.");
+}
+
 class TaiheTouchControllerImpl {
 public:
     explicit TaiheTouchControllerImpl(std::shared_ptr<OHOS::MMI::TouchControllerImpl> impl) : nativeImpl_(impl)
@@ -755,14 +769,14 @@ public:
     {
         if (nativeImpl_ == nullptr) {
             MMI_HILOGE("Native implementation is null");
-            taihe::set_business_error(OHOS::MMI::TaiheErrorCode::INPUT_SERVICE_EXCEPTION, "Controller not initialized");
+            SetTouchControllerBusinessError(OHOS::MMI::TaiheErrorCode::INPUT_SERVICE_EXCEPTION);
             return;
         }
 
         int32_t ret = nativeImpl_->TouchDown(touch.id, touch.displayId, touch.displayX, touch.displayY);
         if (ret != RET_OK) {
             MMI_HILOGE("TouchDown failed, ret=%{public}d", ret);
-            taihe::set_business_error(ret, "TouchDown failed");
+            SetTouchControllerBusinessError(ret);
         }
     }
 
@@ -770,14 +784,14 @@ public:
     {
         if (nativeImpl_ == nullptr) {
             MMI_HILOGE("Native implementation is null");
-            taihe::set_business_error(OHOS::MMI::TaiheErrorCode::INPUT_SERVICE_EXCEPTION, "Controller not initialized");
+            SetTouchControllerBusinessError(OHOS::MMI::TaiheErrorCode::INPUT_SERVICE_EXCEPTION);
             return;
         }
 
         int32_t ret = nativeImpl_->TouchMove(touch.id, touch.displayId, touch.displayX, touch.displayY);
         if (ret != RET_OK) {
             MMI_HILOGE("TouchMove failed, ret=%{public}d", ret);
-            taihe::set_business_error(ret, "TouchMove failed");
+            SetTouchControllerBusinessError(ret);
         }
     }
 
@@ -785,14 +799,14 @@ public:
     {
         if (nativeImpl_ == nullptr) {
             MMI_HILOGE("Native implementation is null");
-            taihe::set_business_error(OHOS::MMI::TaiheErrorCode::INPUT_SERVICE_EXCEPTION, "Controller not initialized");
+            SetTouchControllerBusinessError(OHOS::MMI::TaiheErrorCode::INPUT_SERVICE_EXCEPTION);
             return;
         }
 
         int32_t ret = nativeImpl_->TouchUp(touch.id, touch.displayId, touch.displayX, touch.displayY);
         if (ret != RET_OK) {
             MMI_HILOGE("TouchUp failed, ret=%{public}d", ret);
-            taihe::set_business_error(ret, "TouchUp failed");
+            SetTouchControllerBusinessError(ret);
         }
     }
 
@@ -808,9 +822,9 @@ private:
     if (ret != RET_OK) {
         MMI_HILOGE("CheckTouchControllerPermission failed for touch controller, ret=%{public}d", ret);
         if (ret == CAPABILITY_NOT_SUPPORTED || ret == ERROR_NO_PERMISSION) {
-            taihe::set_business_error(ret, "Permission check failed");
+            SetTouchControllerBusinessError(ret);
         } else {
-            taihe::set_business_error(OHOS::MMI::TaiheErrorCode::INPUT_SERVICE_EXCEPTION, "Input service exception");
+            SetTouchControllerBusinessError(OHOS::MMI::TaiheErrorCode::INPUT_SERVICE_EXCEPTION);
         }
         return make_holder<TaiheTouchControllerImpl,
             ::ohos::multimodalInput::inputEventClient::TouchController>();
@@ -819,7 +833,7 @@ private:
     auto nativeImpl = InputManager::GetInstance()->CreateTouchController();
     if (nativeImpl == nullptr) {
         MMI_HILOGE("Failed to create native TouchControllerImpl");
-        taihe::set_business_error(OHOS::MMI::TaiheErrorCode::INPUT_SERVICE_EXCEPTION, "Input service exception");
+        SetTouchControllerBusinessError(OHOS::MMI::TaiheErrorCode::INPUT_SERVICE_EXCEPTION);
         return make_holder<TaiheTouchControllerImpl,
             ::ohos::multimodalInput::inputEventClient::TouchController>();
     }
