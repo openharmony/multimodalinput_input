@@ -163,13 +163,7 @@ static void GetInjectionEventData(napi_env env, std::shared_ptr<KeyEvent> keyEve
     item.SetPressed(isPressed);
     item.SetDownTime(static_cast<int64_t>(keyDownDuration));
     keyEvent->AddKeyItem(item);
-    if (int32_t ret = InputManager::GetInstance()->SimulateInputEvent(keyEvent); ret != RET_OK) {
-        NapiError codeMsg;
-        UtilNapiError::GetErrorCodeOrDefault(ret, codeMsg);
-        MMI_HILOGE("SimulateInputEvent failed, ret=%{public}d, errorCode=%{public}d", ret, codeMsg.errorCode);
-        THROWERR_CUSTOM(env, codeMsg.errorCode, codeMsg.msg.c_str());
-        return;
-    }
+    InputManager::GetInstance()->SimulateInputEvent(keyEvent);
     std::this_thread::sleep_for(std::chrono::milliseconds(keyDownDuration));
 }
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
@@ -459,14 +453,7 @@ static napi_value InjectMouseEvent(napi_env env, napi_callback_info info)
         }
         useCoordinate = PointerEvent::GLOBAL_COORDINATE;
     }
-    if (int32_t ret = InputManager::GetInstance()->SimulateInputEvent(pointerEvent, true, useCoordinate);
-        ret != RET_OK) {
-        NapiError codeMsg;
-        UtilNapiError::GetErrorCodeOrDefault(ret, codeMsg);
-        MMI_HILOGE("SimulateInputEvent failed, ret=%{public}d, errorCode=%{public}d", ret, codeMsg.errorCode);
-        THROWERR_CUSTOM(env, codeMsg.errorCode, codeMsg.msg.c_str());
-        return nullptr;
-    }
+    InputManager::GetInstance()->SimulateInputEvent(pointerEvent, true, useCoordinate);
     CHKRP(napi_create_int32(env, 0, &result), CREATE_INT32);
     return result;
 }
@@ -706,14 +693,8 @@ static napi_value InjectTouchEvent(napi_env env, napi_callback_info info)
         }
         useCoordinate = PointerEvent::GLOBAL_COORDINATE;
     }
-    if (int32_t ret = InputManager::GetInstance()->SimulateInputEvent(pointerEvent,
-        pointerEvent->GetAutoToVirtualScreen(), useCoordinate); ret != RET_OK) {
-        NapiError codeMsg;
-        UtilNapiError::GetErrorCodeOrDefault(ret, codeMsg);
-        MMI_HILOGE("SimulateInputEvent failed, ret=%{public}d, errorCode=%{public}d", ret, codeMsg.errorCode);
-        THROWERR_CUSTOM(env, codeMsg.errorCode, codeMsg.msg.c_str());
-        return nullptr;
-    }
+    InputManager::GetInstance()->SimulateInputEvent(pointerEvent,
+        pointerEvent->GetAutoToVirtualScreen(), useCoordinate);
     CHKRP(napi_create_int32(env, 0, &result), CREATE_INT32);
     return result;
 }
@@ -858,13 +839,7 @@ static napi_value InjectJoystickEvent(napi_env env, napi_callback_info info)
     HandleJoystickButton(env, joystickHandle, pointerEvent);
     HandleJoystickAction(env, joystickHandle, pointerEvent);
     HandleJoystickAxes(env, joystickHandle, pointerEvent);
-    if (int32_t ret = InputManager::GetInstance()->SimulateInputEvent(pointerEvent); ret != RET_OK) {
-        NapiError codeMsg;
-        UtilNapiError::GetErrorCodeOrDefault(ret, codeMsg);
-        MMI_HILOGE("SimulateInputEvent failed, ret=%{public}d, errorCode=%{public}d", ret, codeMsg.errorCode);
-        THROWERR_CUSTOM(env, codeMsg.errorCode, codeMsg.msg.c_str());
-        return nullptr;
-    }
+    InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
     CHKRP(napi_create_int32(env, 0, &result), CREATE_INT32);
     return result;
 }

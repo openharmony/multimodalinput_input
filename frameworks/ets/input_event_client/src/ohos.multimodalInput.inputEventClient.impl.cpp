@@ -191,13 +191,7 @@ void GetInjectionEventData(std::shared_ptr<OHOS::MMI::KeyEvent> keyEventNative,
     item.SetPressed(thKeyEvent.isPressed);
     item.SetDownTime(static_cast<int64_t>(thKeyEvent.keyDownDuration));
     keyEventNative->AddKeyItem(item);
-    if (int32_t ret = InputManager::GetInstance()->SimulateInputEvent(keyEventNative); ret != RET_OK) {
-        TaiheError codeMsg;
-        TaiheConverter::GetErrorCodeOrDefault(ret, codeMsg);
-        MMI_HILOGE("SimulateInputEvent failed, ret=%{public}d, errorCode=%{public}d", ret, codeMsg.errorCode);
-        set_business_error(codeMsg.errorCode, codeMsg.msg);
-        return;
-    }
+    InputManager::GetInstance()->SimulateInputEvent(keyEventNative);
     std::this_thread::sleep_for(std::chrono::milliseconds(thKeyEvent.keyDownDuration));
 }
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
@@ -391,13 +385,7 @@ void InjectMouseEventSync(::ohos::multimodalInput::inputEventClient::MouseEventD
         }
         useCoordinate = PointerEvent::GLOBAL_COORDINATE;
     }
-    if (int32_t ret = InputManager::GetInstance()->SimulateInputEvent(pointerEvent, true, useCoordinate);
-        ret != RET_OK) {
-        TaiheError codeMsg;
-        TaiheConverter::GetErrorCodeOrDefault(ret, codeMsg);
-        MMI_HILOGE("SimulateInputEvent failed, ret=%{public}d, errorCode=%{public}d", ret, codeMsg.errorCode);
-        ::taihe::set_business_error(codeMsg.errorCode, codeMsg.msg);
-    }
+    InputManager::GetInstance()->SimulateInputEvent(pointerEvent, true, useCoordinate);
 }
 
 int32_t HandleTouchAction(::ohos::multimodalInput::touchEvent::TouchEvent touchEvent,
@@ -560,13 +548,8 @@ void InjectTouchEventSync(::ohos::multimodalInput::inputEventClient::TouchEventD
         }
         useCoordinate = PointerEvent::GLOBAL_COORDINATE;
     }
-    if (int32_t ret = InputManager::GetInstance()->SimulateInputEvent(pointerEvent,
-        pointerEvent->GetAutoToVirtualScreen(), useCoordinate); ret != RET_OK) {
-        TaiheError codeMsg;
-        TaiheConverter::GetErrorCodeOrDefault(ret, codeMsg);
-        MMI_HILOGE("SimulateInputEvent failed, ret=%{public}d, errorCode=%{public}d", ret, codeMsg.errorCode);
-        ::taihe::set_business_error(codeMsg.errorCode, codeMsg.msg);
-    }
+    InputManager::GetInstance()->SimulateInputEvent(pointerEvent,
+        pointerEvent->GetAutoToVirtualScreen(), useCoordinate);
 }
 
 void PermitInjectionSync(bool result)
