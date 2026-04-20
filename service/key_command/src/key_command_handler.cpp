@@ -43,6 +43,9 @@
 #ifdef OHOS_BUILD_KNUCKLE
 #include "knuckle_handler_component.h"
 #endif // OHOS_BUILD_KNUCKLE
+#ifdef OHOS_BUILD_ENABLE_TRIPLE_FINGER_SNAPSHOT
+#include "triple_finger_snapshot_manager.h"
+#endif // OHOS_BUILD_ENABLE_TRIPLE_FINGER_SNAPSHOT
 
 #undef MMI_LOG_DOMAIN
 #define MMI_LOG_DOMAIN MMI_LOG_HANDLER
@@ -1045,7 +1048,7 @@ void KeyCommandHandler::UnregisterProximitySensor()
     }
 }
 
-int32_t KeyCommandHandler::SwitchScreenCapturePermission(uint32_t permissionType, bool enable)
+int32_t KeyCommandHandler::SwitchScreenCapturePermission(uint32_t permissionType, bool enable, int32_t uid)
 {
     uint32_t knucklePermissions = permissionType & KNUCKLE_ALL_PERMISSIONS;
     uint32_t otherPermissions = permissionType & (~KNUCKLE_ALL_PERMISSIONS);
@@ -1062,6 +1065,13 @@ int32_t KeyCommandHandler::SwitchScreenCapturePermission(uint32_t permissionType
             screenCapturePermission_ &= ~otherPermissions;
         }
     }
+
+#ifdef OHOS_BUILD_ENABLE_TRIPLE_FINGER_SNAPSHOT
+    // 处理三指截屏权限
+    if ((permissionType & TRIPLE_FINGER_SNAPSHOT) != 0) {
+        TripleFingerSnapshotManager::GetInstance().UpdateAppPermission(uid, enable);
+    }
+#endif // OHOS_BUILD_ENABLE_TRIPLE_FINGER_SNAPSHOT
 
     MMI_HILOGW("SwitchScreenCapturePermission is successful in keyCommand handler, "
                "screenCapturePermission_:%{public}d, permissionType:%{public}d, "

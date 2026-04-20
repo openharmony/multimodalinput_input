@@ -503,7 +503,7 @@ void EventDispatchHandler::DispatchPointerEventInner(std::shared_ptr<PointerEven
     if (pointerAc != PointerEvent::POINTER_ACTION_MOVE && pointerAc != PointerEvent::POINTER_ACTION_AXIS_UPDATE &&
         pointerAc != PointerEvent::POINTER_ACTION_ROTATE_UPDATE &&
         pointerAc != PointerEvent::POINTER_ACTION_PULL_MOVE) {
-        MMI_HILOG_FREEZEI("SendMsg:%{public}d", sess->GetPid());
+        MMI_HILOG_FREEZEI("SendMsg:%{public}d, pointerAc:%{public}d", sess->GetPid(), pointerAc);
     }
     WIN_MGR->PrintEnterEventInfo(pointerEvent);
     if (!udsServer->SendMsg(fd, pkt)) {
