@@ -39,6 +39,7 @@
 #include "ani_common.h"
 #include "mouse_controller_impl.h"
 #include "keyboard_controller_impl.h"
+#include "touch_controller_impl.h"
 #include "ohos.multimodalInput.mouseEvent.impl.h"
 #include "ohos.multimodalInput.keyCode.impl.h"
 
@@ -736,14 +737,29 @@ private:
                       ::ohos::multimodalInput::inputEventClient::MouseController>(nativeImpl);
 }
 
-class TouchControllerImpl {
+class TaiheTouchControllerImpl {
 public:
-    TouchControllerImpl() = default;
-    ~TouchControllerImpl() = default;
+    explicit TaiheTouchControllerImpl(std::shared_ptr<OHOS::MMI::TouchControllerImpl> impl) : nativeImpl_(impl)
+    {
+        MMI_HILOGD("TaiheTouchControllerImpl created with native impl");
+    }
+
+    TaiheTouchControllerImpl() : nativeImpl_(nullptr)
+    {
+        MMI_HILOGW("TaiheTouchControllerImpl created without native impl");
+    }
+
+    ~TaiheTouchControllerImpl() = default;
 
     void TouchDownSync(::ohos::multimodalInput::inputEventClient::TouchPoint touch)
     {
-        auto ret = TouchDown(touch);
+        if (nativeImpl_ == nullptr) {
+            MMI_HILOGE("Native implementation is null");
+            taihe::set_business_error(OHOS::MMI::TaiheErrorCode::INPUT_SERVICE_EXCEPTION, "Controller not initialized");
+            return;
+        }
+
+        int32_t ret = nativeImpl_->TouchDown(touch.id, touch.displayId, touch.displayX, touch.displayY);
         if (ret != RET_OK) {
             MMI_HILOGE("TouchDown failed, ret=%{public}d", ret);
             taihe::set_business_error(ret, "TouchDown failed");
@@ -752,7 +768,13 @@ public:
 
     void TouchMoveSync(::ohos::multimodalInput::inputEventClient::TouchPoint touch)
     {
-        auto ret = TouchMove(touch);
+        if (nativeImpl_ == nullptr) {
+            MMI_HILOGE("Native implementation is null");
+            taihe::set_business_error(OHOS::MMI::TaiheErrorCode::INPUT_SERVICE_EXCEPTION, "Controller not initialized");
+            return;
+        }
+
+        int32_t ret = nativeImpl_->TouchMove(touch.id, touch.displayId, touch.displayX, touch.displayY);
         if (ret != RET_OK) {
             MMI_HILOGE("TouchMove failed, ret=%{public}d", ret);
             taihe::set_business_error(ret, "TouchMove failed");
@@ -761,7 +783,13 @@ public:
 
     void TouchUpSync(::ohos::multimodalInput::inputEventClient::TouchPoint touch)
     {
-        auto ret = TouchUp(touch);
+        if (nativeImpl_ == nullptr) {
+            MMI_HILOGE("Native implementation is null");
+            taihe::set_business_error(OHOS::MMI::TaiheErrorCode::INPUT_SERVICE_EXCEPTION, "Controller not initialized");
+            return;
+        }
+
+        int32_t ret = nativeImpl_->TouchUp(touch.id, touch.displayId, touch.displayX, touch.displayY);
         if (ret != RET_OK) {
             MMI_HILOGE("TouchUp failed, ret=%{public}d", ret);
             taihe::set_business_error(ret, "TouchUp failed");
@@ -769,228 +797,36 @@ public:
     }
 
 private:
-    struct TouchContact {
-        int32_t displayId { -1 };
-        int32_t displayX { 0 };
-        int32_t displayY { 0 };
-        int64_t downTime { 0 };
-    };
-
-    static constexpr int32_t TOUCH_ID_MIN = 0;
-    static constexpr int32_t TOUCH_ID_MAX = 9;
-    static constexpr int32_t ERROR_CODE_TOUCH_SEQUENCE = 4300001;
-
-    static bool IsValidTouchId(int32_t touchId)
-    {
-        return touchId >= TOUCH_ID_MIN && touchId <= TOUCH_ID_MAX;
-    }
-
-    PointerEvent::PointerItem BuildPointerItem(int32_t pointerId, const TouchContact& contact, bool pressed) const
-    {
-        PointerEvent::PointerItem item;
-        item.SetPointerId(pointerId);
-        item.SetDisplayX(contact.displayX);
-        item.SetDisplayY(contact.displayY);
-        item.SetDisplayXPos(contact.displayX);
-        item.SetDisplayYPos(contact.displayY);
-        item.SetToolType(PointerEvent::TOOL_TYPE_FINGER);
-        item.SetDeviceId(-1);
-        item.SetDownTime(contact.downTime);
-        item.SetPressed(pressed);
-        return item;
-    }
-
-    std::shared_ptr<PointerEvent> BuildPointerEvent(int32_t action, int32_t pointerId, int32_t displayId,
-        const std::map<int32_t, TouchContact>& contacts, bool currentPressed) const
-    {
-        auto pointerEvent = PointerEvent::Create();
-        if (pointerEvent == nullptr) {
-            MMI_HILOGE("Failed to create PointerEvent");
-            return nullptr;
-        }
-
-        pointerEvent->SetPointerAction(action);
-        pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
-        pointerEvent->SetPointerId(pointerId);
-        pointerEvent->SetTargetDisplayId(displayId);
-        pointerEvent->SetDeviceId(-1);
-        pointerEvent->SetActionTime(GetSysClockTime());
-        pointerEvent->AddFlag(InputEvent::EVENT_FLAG_SIMULATE);
-        pointerEvent->AddFlag(InputEvent::EVENT_FLAG_CONTROLLER);
-
-        for (const auto& [id, contact] : contacts) {
-            bool pressed = (id == pointerId) ? currentPressed : true;
-            PointerEvent::PointerItem item = BuildPointerItem(id, contact, pressed);
-            pointerEvent->AddPointerItem(item);
-        }
-
-        return pointerEvent;
-    }
-
-    int32_t InjectPointerEvent(const std::shared_ptr<PointerEvent>& pointerEvent) const
-    {
-        if (pointerEvent == nullptr) {
-            MMI_HILOGE("pointerEvent is null");
-            return OHOS::MMI::INPUT_SERVICE_EXCEPTION;
-        }
-        InputManager::GetInstance()->SimulateInputEvent(pointerEvent, false, PointerEvent::DISPLAY_COORDINATE);
-        return RET_OK;
-    }
-
-    int32_t TouchDown(const ::ohos::multimodalInput::inputEventClient::TouchPoint& touch)
-    {
-        if (!IsValidTouchId(touch.id)) {
-            MMI_HILOGE("Touch id invalid: %{public}d", touch.id);
-            return INPUT_PARAMETER_ERROR;
-        }
-
-        std::shared_ptr<PointerEvent> pointerEvent;
-        TouchContact currentContact;
-        currentContact.displayId = touch.displayId;
-        currentContact.displayX = touch.displayX;
-        currentContact.displayY = touch.displayY;
-        currentContact.downTime = GetSysClockTime();
-
-        {
-            std::lock_guard<std::mutex> lock(mutex_);
-            if (activeContacts_.find(touch.id) != activeContacts_.end()) {
-                MMI_HILOGE("Touch id %{public}d already active", touch.id);
-                return ERROR_CODE_TOUCH_SEQUENCE;
-            }
-            if (!activeContacts_.empty() && activeDisplayId_ != touch.displayId) {
-                MMI_HILOGE("Touch display mismatch, expected %{public}d, got %{public}d",
-                    activeDisplayId_, touch.displayId);
-                return ERROR_CODE_TOUCH_SEQUENCE;
-            }
-
-            std::map<int32_t, TouchContact> contacts = activeContacts_;
-            contacts[touch.id] = currentContact;
-            int32_t displayId = activeContacts_.empty() ? touch.displayId : activeDisplayId_;
-            pointerEvent = BuildPointerEvent(PointerEvent::POINTER_ACTION_DOWN, touch.id, displayId, contacts, true);
-        }
-
-        int32_t ret = InjectPointerEvent(pointerEvent);
-        if (ret == RET_OK) {
-            std::lock_guard<std::mutex> lock(mutex_);
-            if (activeContacts_.empty()) {
-                activeDisplayId_ = touch.displayId;
-            }
-            activeContacts_[touch.id] = currentContact;
-        }
-        return ret;
-    }
-
-    int32_t TouchMove(const ::ohos::multimodalInput::inputEventClient::TouchPoint& touch)
-    {
-        if (!IsValidTouchId(touch.id)) {
-            MMI_HILOGE("Touch id invalid: %{public}d", touch.id);
-            return INPUT_PARAMETER_ERROR;
-        }
-
-        std::shared_ptr<PointerEvent> pointerEvent;
-        TouchContact currentContact;
-
-        {
-            std::lock_guard<std::mutex> lock(mutex_);
-            auto iter = activeContacts_.find(touch.id);
-            if (iter == activeContacts_.end()) {
-                MMI_HILOGE("Touch id %{public}d not active", touch.id);
-                return ERROR_CODE_TOUCH_SEQUENCE;
-            }
-            if (activeDisplayId_ != touch.displayId) {
-                MMI_HILOGE("Touch display mismatch, expected %{public}d, got %{public}d",
-                    activeDisplayId_, touch.displayId);
-                return ERROR_CODE_TOUCH_SEQUENCE;
-            }
-
-            currentContact = iter->second;
-            currentContact.displayId = touch.displayId;
-            currentContact.displayX = touch.displayX;
-            currentContact.displayY = touch.displayY;
-
-            std::map<int32_t, TouchContact> contacts = activeContacts_;
-            contacts[touch.id] = currentContact;
-            pointerEvent = BuildPointerEvent(PointerEvent::POINTER_ACTION_MOVE, touch.id, activeDisplayId_,
-                contacts, true);
-        }
-
-        int32_t ret = InjectPointerEvent(pointerEvent);
-        if (ret == RET_OK) {
-            std::lock_guard<std::mutex> lock(mutex_);
-            activeContacts_[touch.id] = currentContact;
-        }
-        return ret;
-    }
-
-    int32_t TouchUp(const ::ohos::multimodalInput::inputEventClient::TouchPoint& touch)
-    {
-        if (!IsValidTouchId(touch.id)) {
-            MMI_HILOGE("Touch id invalid: %{public}d", touch.id);
-            return INPUT_PARAMETER_ERROR;
-        }
-
-        std::shared_ptr<PointerEvent> pointerEvent;
-        TouchContact currentContact;
-
-        {
-            std::lock_guard<std::mutex> lock(mutex_);
-            auto iter = activeContacts_.find(touch.id);
-            if (iter == activeContacts_.end()) {
-                MMI_HILOGE("Touch id %{public}d not active", touch.id);
-                return ERROR_CODE_TOUCH_SEQUENCE;
-            }
-            if (activeDisplayId_ != touch.displayId) {
-                MMI_HILOGE("Touch display mismatch, expected %{public}d, got %{public}d",
-                    activeDisplayId_, touch.displayId);
-                return ERROR_CODE_TOUCH_SEQUENCE;
-            }
-
-            currentContact = iter->second;
-            currentContact.displayId = touch.displayId;
-            currentContact.displayX = touch.displayX;
-            currentContact.displayY = touch.displayY;
-
-            std::map<int32_t, TouchContact> contacts = activeContacts_;
-            contacts[touch.id] = currentContact;
-            pointerEvent = BuildPointerEvent(PointerEvent::POINTER_ACTION_UP, touch.id, activeDisplayId_,
-                contacts, false);
-        }
-
-        int32_t ret = InjectPointerEvent(pointerEvent);
-        {
-            std::lock_guard<std::mutex> lock(mutex_);
-            activeContacts_.erase(touch.id);
-            if (activeContacts_.empty()) {
-                activeDisplayId_ = -1;
-            }
-        }
-        return ret;
-    }
-
-    int32_t activeDisplayId_ { -1 };
-    std::map<int32_t, TouchContact> activeContacts_;
-    mutable std::mutex mutex_;
+    std::shared_ptr<OHOS::MMI::TouchControllerImpl> nativeImpl_;
 };
 
 ::ohos::multimodalInput::inputEventClient::TouchController CreateTouchControllerSync()
 {
     CALL_DEBUG_ENTER;
 
-    int32_t ret = InputManager::GetInstance()->CheckMouseControllerPermission();
+    int32_t ret = InputManager::GetInstance()->CheckTouchControllerPermission();
     if (ret != RET_OK) {
-        MMI_HILOGE("CheckMouseControllerPermission failed for touch controller, ret=%{public}d", ret);
+        MMI_HILOGE("CheckTouchControllerPermission failed for touch controller, ret=%{public}d", ret);
         if (ret == CAPABILITY_NOT_SUPPORTED || ret == ERROR_NO_PERMISSION) {
             taihe::set_business_error(ret, "Permission check failed");
         } else {
             taihe::set_business_error(OHOS::MMI::TaiheErrorCode::INPUT_SERVICE_EXCEPTION, "Input service exception");
         }
-        return make_holder<TouchControllerImpl,
+        return make_holder<TaiheTouchControllerImpl,
+            ::ohos::multimodalInput::inputEventClient::TouchController>();
+    }
+
+    auto nativeImpl = InputManager::GetInstance()->CreateTouchController();
+    if (nativeImpl == nullptr) {
+        MMI_HILOGE("Failed to create native TouchControllerImpl");
+        taihe::set_business_error(OHOS::MMI::TaiheErrorCode::INPUT_SERVICE_EXCEPTION, "Input service exception");
+        return make_holder<TaiheTouchControllerImpl,
             ::ohos::multimodalInput::inputEventClient::TouchController>();
     }
 
     MMI_HILOGD("TouchController created successfully");
-    return make_holder<TouchControllerImpl,
-        ::ohos::multimodalInput::inputEventClient::TouchController>();
+    return make_holder<TaiheTouchControllerImpl,
+        ::ohos::multimodalInput::inputEventClient::TouchController>(nativeImpl);
 }
 
 class KeyboardControllerImpl {

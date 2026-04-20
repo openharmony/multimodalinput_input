@@ -403,6 +403,13 @@ public:
     std::shared_ptr<class KeyboardControllerImpl> CreateKeyboardController();
 
     /**
+     * @brief Create touch controller
+     * @return Shared pointer to TouchControllerImpl, nullptr on failure
+     * @since 26
+     */
+    std::shared_ptr<class TouchControllerImpl> CreateTouchController();
+
+    /**
      * @brief Check permission for creating mouse controller (for NAPI layer)
      * @return RET_OK on success, error code otherwise
      * @since 26
@@ -415,6 +422,13 @@ public:
      * @since 26
      */
     int32_t CheckKeyboardControllerPermission();
+
+    /**
+     * @brief Check permission for creating touch controller
+     * @return RET_OK on success, error code otherwise
+     * @since 26
+     */
+    int32_t CheckTouchControllerPermission();
 
     /**
      * @brief Convert mouse events to touch events.
