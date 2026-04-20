@@ -741,8 +741,20 @@ constexpr int32_t TOUCH_STATE_ERROR = 4300001;
 constexpr const char* TOUCH_DOWN_STATE_ERROR_MSG = "The touch point is touching the display.";
 constexpr const char* TOUCH_NOT_DOWN_STATE_ERROR_MSG = "The touch point is not touching the display.";
 
+int32_t NormalizeTouchControllerErrorCode(int32_t errorCode)
+{
+    if (errorCode == ERROR_NO_PERMISSION) {
+        return OHOS::MMI::TaiheErrorCode::COMMON_PERMISSION_CHECK_ERROR;
+    }
+    if (errorCode == CAPABILITY_NOT_SUPPORTED) {
+        return OHOS::MMI::TaiheErrorCode::INPUT_DEVICE_NOT_SUPPORTED;
+    }
+    return errorCode;
+}
+
 void SetTouchControllerBusinessError(int32_t errorCode, const char* stateErrorMsg = nullptr)
 {
+    errorCode = NormalizeTouchControllerErrorCode(errorCode);
     if (errorCode == TOUCH_STATE_ERROR && stateErrorMsg != nullptr) {
         taihe::set_business_error(errorCode, stateErrorMsg);
         return;
