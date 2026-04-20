@@ -737,8 +737,16 @@ private:
                       ::ohos::multimodalInput::inputEventClient::MouseController>(nativeImpl);
 }
 
-void SetTouchControllerBusinessError(int32_t errorCode)
+constexpr int32_t TOUCH_STATE_ERROR = 4300001;
+constexpr const char* TOUCH_DOWN_STATE_ERROR_MSG = "The touch point is touching the display.";
+constexpr const char* TOUCH_NOT_DOWN_STATE_ERROR_MSG = "The touch point is not touching the display.";
+
+void SetTouchControllerBusinessError(int32_t errorCode, const char* stateErrorMsg = nullptr)
 {
+    if (errorCode == TOUCH_STATE_ERROR && stateErrorMsg != nullptr) {
+        taihe::set_business_error(errorCode, stateErrorMsg);
+        return;
+    }
     TaiheError_t codeMsg;
     if (TaiheConverter::GetApiError(errorCode, codeMsg)) {
         taihe::set_business_error(errorCode, codeMsg.msg);
@@ -776,7 +784,7 @@ public:
         int32_t ret = nativeImpl_->TouchDown(touch.id, touch.displayId, touch.displayX, touch.displayY);
         if (ret != RET_OK) {
             MMI_HILOGE("TouchDown failed, ret=%{public}d", ret);
-            SetTouchControllerBusinessError(ret);
+            SetTouchControllerBusinessError(ret, TOUCH_DOWN_STATE_ERROR_MSG);
         }
     }
 
@@ -791,7 +799,7 @@ public:
         int32_t ret = nativeImpl_->TouchMove(touch.id, touch.displayId, touch.displayX, touch.displayY);
         if (ret != RET_OK) {
             MMI_HILOGE("TouchMove failed, ret=%{public}d", ret);
-            SetTouchControllerBusinessError(ret);
+            SetTouchControllerBusinessError(ret, TOUCH_NOT_DOWN_STATE_ERROR_MSG);
         }
     }
 
@@ -806,7 +814,7 @@ public:
         int32_t ret = nativeImpl_->TouchUp(touch.id, touch.displayId, touch.displayX, touch.displayY);
         if (ret != RET_OK) {
             MMI_HILOGE("TouchUp failed, ret=%{public}d", ret);
-            SetTouchControllerBusinessError(ret);
+            SetTouchControllerBusinessError(ret, TOUCH_NOT_DOWN_STATE_ERROR_MSG);
         }
     }
 
