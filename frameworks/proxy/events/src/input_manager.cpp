@@ -1113,6 +1113,12 @@ std::shared_ptr<KeyboardControllerImpl> InputManager::CreateKeyboardController()
     return InputMgrImpl.CreateKeyboardController();
 }
 
+std::shared_ptr<TouchControllerImpl> InputManager::CreateTouchController()
+{
+    CALL_DEBUG_ENTER;
+    return InputMgrImpl.CreateTouchController();
+}
+
 int32_t InputManager::CheckMouseControllerPermission()
 {
     CALL_DEBUG_ENTER;
@@ -1123,6 +1129,12 @@ int32_t InputManager::CheckKeyboardControllerPermission()
 {
     CALL_DEBUG_ENTER;
     return InputMgrImpl.CheckKeyboardControllerPermission();
+}
+
+int32_t InputManager::CheckTouchControllerPermission()
+{
+    CALL_DEBUG_ENTER;
+    return InputMgrImpl.CheckTouchControllerPermission();
 }
 
 int32_t InputManager::EnableInputExtension(const std::string &uuid, bool enabled)
