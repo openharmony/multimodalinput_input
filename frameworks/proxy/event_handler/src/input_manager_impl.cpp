@@ -1283,7 +1283,7 @@ int32_t InputManagerImpl::RemoveInterceptor(int32_t interceptorId)
 #endif // OHOS_BUILD_ENABLE_INTERCEPTOR
 }
 
-void InputManagerImpl::SimulateInputEvent(std::shared_ptr<KeyEvent> keyEvent, bool isNativeInject)
+int32_t InputManagerImpl::SimulateInputEvent(std::shared_ptr<KeyEvent> keyEvent, bool isNativeInject)
 {
     CALL_DEBUG_ENTER;
     std::string msg = "SimulateKeyEvent";
@@ -1292,20 +1292,26 @@ void InputManagerImpl::SimulateInputEvent(std::shared_ptr<KeyEvent> keyEvent, bo
     if (keyEvent == nullptr) {
         MMI_HILOGE("keyEvent is nullptr");
         BytraceAdapter::MMIClientTraceStop();
-        return;
+        return RET_ERR;
     }
     if (!EventLogHelper::IsBetaVersion()) {
         MMI_HILOGI("Key action:%{public}d", keyEvent->GetKeyAction());
     } else {
         MMI_HILOGI("KeyCode:%{private}d, action:%{public}d", keyEvent->GetKeyCode(), keyEvent->GetKeyAction());
     }
-    if (MMIEventHdl.InjectEvent(keyEvent, isNativeInject) != RET_OK) {
-        MMI_HILOGE("Failed to inject keyEvent");
+    int32_t ret = MMIEventHdl.InjectEvent(keyEvent, isNativeInject);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Failed to inject keyEvent, ret=%{public}d", ret);
+        BytraceAdapter::MMIClientTraceStop();
+        return ret;
     }
+    BytraceAdapter::MMIClientTraceStop();
+    return RET_OK;
 #else
     MMI_HILOGW("Keyboard device does not support");
-#endif // OHOS_BUILD_ENABLE_KEYBOARD
     BytraceAdapter::MMIClientTraceStop();
+    return RET_UNSUPPORT;
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
 }
 
 void InputManagerImpl::HandleSimulateInputEvent(std::shared_ptr<PointerEvent> pointerEvent)
@@ -1384,9 +1390,9 @@ int32_t InputManagerImpl::SimulateInputEvent(std::shared_ptr<PointerEvent> point
         MMI_HILOGE("ButtonPressed state is err");
         pointerEvent->DeleteReleaseButton(pointerEvent->GetButtonId());
     }
-    if (MMIEventHdl.InjectPointerEvent(pointerEvent, isNativeInject, useCoordinate) != RET_OK) {
+    if (int32_t ret = MMIEventHdl.InjectPointerEvent(pointerEvent, isNativeInject, useCoordinate); ret != RET_OK) {
         MMI_HILOGE("Failed to inject pointer event");
-        return INPUT_PERMISSION_DENIED;
+        return ret;
     }
     return INPUT_SUCCESS;
 #else

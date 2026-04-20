@@ -72,6 +72,7 @@ const std::map<int32_t, TaiheError> TAIHE_ERRORS = {
 class TaiheConverter {
 public:
     static bool GetApiError(int32_t code, TaiheError &codeMsg);
+    static void GetErrorCodeOrDefault(int32_t ret, TaiheError &codeMsg);
 };
 } // namespace MMI
 } // namespace OHOS

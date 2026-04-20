@@ -19,6 +19,7 @@
 
 #include "define_multimodal.h"
 #include "input_manager.h"
+#include "input_manager_impl.h"
 #include "mmi_log.h"
 #include "util.h"
 
@@ -251,9 +252,12 @@ int32_t KeyboardControllerImpl::InjectKeyEvent(std::shared_ptr<KeyEvent> event)
     // Add Controller Flag to mark this event uses CONTROL_DEVICE permission check
     event->AddFlag(InputEvent::EVENT_FLAG_CONTROLLER);
 
-    // Inject event using InputManager
-    // Note: SimulateInputEvent returns void, so we assume success
-    InputManager::GetInstance()->SimulateInputEvent(event);
+    // Inject event using InputManagerImpl
+    int32_t ret = InputMgrImpl.SimulateInputEvent(event);
+    if (ret != RET_OK) {
+        MMI_HILOGE("SimulateInputEvent failed, ret=%{public}d", ret);
+        return ret;
+    }
 
     return RET_OK;
 }

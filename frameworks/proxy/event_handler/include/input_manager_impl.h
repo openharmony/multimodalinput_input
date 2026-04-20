@@ -125,7 +125,7 @@ public:
         uint32_t deviceTags = CapabilityToTags(InputDeviceCapability::INPUT_DEV_CAP_MAX));
     int32_t RemoveInterceptor(int32_t interceptorId);
 
-    void SimulateInputEvent(std::shared_ptr<KeyEvent> keyEvent, bool isNativeInject = false);
+    int32_t SimulateInputEvent(std::shared_ptr<KeyEvent> keyEvent, bool isNativeInject = false);
     int32_t SimulateInputEvent(std::shared_ptr<PointerEvent> pointerEvent, bool isNativeInject = false,
         int32_t useCoordinate = PointerEvent::DISPLAY_COORDINATE);
     void HandleSimulateInputEvent(std::shared_ptr<PointerEvent> pointerEvent);

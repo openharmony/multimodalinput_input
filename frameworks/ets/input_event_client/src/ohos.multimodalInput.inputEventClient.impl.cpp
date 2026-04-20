@@ -191,7 +191,7 @@ void GetInjectionEventData(std::shared_ptr<OHOS::MMI::KeyEvent> keyEventNative,
     item.SetPressed(thKeyEvent.isPressed);
     item.SetDownTime(static_cast<int64_t>(thKeyEvent.keyDownDuration));
     keyEventNative->AddKeyItem(item);
-    OHOS::MMI::InputManager::GetInstance()->SimulateInputEvent(keyEventNative);
+    InputManager::GetInstance()->SimulateInputEvent(keyEventNative);
     std::this_thread::sleep_for(std::chrono::milliseconds(thKeyEvent.keyDownDuration));
 }
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
@@ -548,8 +548,8 @@ void InjectTouchEventSync(::ohos::multimodalInput::inputEventClient::TouchEventD
         }
         useCoordinate = PointerEvent::GLOBAL_COORDINATE;
     }
-    InputManager::GetInstance()->SimulateInputEvent(pointerEvent, pointerEvent->GetAutoToVirtualScreen(),
-        useCoordinate);
+    InputManager::GetInstance()->SimulateInputEvent(pointerEvent,
+        pointerEvent->GetAutoToVirtualScreen(), useCoordinate);
 }
 
 void PermitInjectionSync(bool result)
