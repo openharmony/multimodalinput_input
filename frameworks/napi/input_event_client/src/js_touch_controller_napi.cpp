@@ -135,9 +135,9 @@ napi_value CreateTouchController(napi_env env, napi_callback_info info)
     (void)info;
     MMI_HILOGD("CreateTouchController called");
 
-    int32_t ret = InputManager::GetInstance()->CheckMouseControllerPermission();
+    int32_t ret = InputManager::GetInstance()->CheckTouchControllerPermission();
     if (ret != RET_OK) {
-        MMI_HILOGE("CheckMouseControllerPermission failed, ret=%{public}d", ret);
+        MMI_HILOGE("CheckTouchControllerPermission failed, ret=%{public}d", ret);
         if (ret == CAPABILITY_NOT_SUPPORTED || ret == ERROR_NO_PERMISSION) {
             THROWERR_CUSTOM(env, ret, "Permission check failed");
         } else {
@@ -208,7 +208,6 @@ napi_value CreateTouchController(napi_env env, napi_callback_info info)
 
 napi_value TouchControllerTouchDown(napi_env env, napi_callback_info info)
 {
-    MMI_HILOGD("TouchControllerTouchDown called");
     return HandleTouchControllerPromise(env, info, 1, "TouchDown failed",
         [](JsTouchController* controller, napi_env env, napi_value argv0) -> int32_t {
             napi_valuetype type = napi_undefined;
@@ -229,7 +228,6 @@ napi_value TouchControllerTouchDown(napi_env env, napi_callback_info info)
 
 napi_value TouchControllerTouchMove(napi_env env, napi_callback_info info)
 {
-    MMI_HILOGD("TouchControllerTouchMove called");
     return HandleTouchControllerPromise(env, info, 1, "TouchMove failed",
         [](JsTouchController* controller, napi_env env, napi_value argv0) -> int32_t {
             napi_valuetype type = napi_undefined;
@@ -250,7 +248,6 @@ napi_value TouchControllerTouchMove(napi_env env, napi_callback_info info)
 
 napi_value TouchControllerTouchUp(napi_env env, napi_callback_info info)
 {
-    MMI_HILOGD("TouchControllerTouchUp called");
     return HandleTouchControllerPromise(env, info, 1, "TouchUp failed",
         [](JsTouchController* controller, napi_env env, napi_value argv0) -> int32_t {
             napi_valuetype type = napi_undefined;

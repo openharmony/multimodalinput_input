@@ -18,7 +18,7 @@
 
 #include <memory>
 
-#include "pointer_event.h"
+#include "touch_controller_impl.h"
 
 namespace OHOS {
 namespace MMI {
@@ -26,15 +26,14 @@ namespace MMI {
 class JsTouchController {
 public:
     JsTouchController();
-    ~JsTouchController();
+    ~JsTouchController() = default;
 
     int32_t TouchDown(int32_t id, int32_t displayId, int32_t displayX, int32_t displayY);
     int32_t TouchMove(int32_t id, int32_t displayId, int32_t displayX, int32_t displayY);
     int32_t TouchUp(int32_t id, int32_t displayId, int32_t displayX, int32_t displayY);
 
 private:
-    class Impl;
-    std::unique_ptr<Impl> impl_;
+    std::shared_ptr<TouchControllerImpl> impl_;
 };
 
 } // namespace MMI
