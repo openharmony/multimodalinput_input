@@ -141,6 +141,10 @@ config("libmmi_server_config") {
   if (input_feature_knuckle) {
     defines += [ "OHOS_BUILD_KNUCKLE" ]
   }
+
+  if (input_feature_triple_finger_snapshot) {
+    defines += [ "OHOS_BUILD_ENABLE_TRIPLE_FINGER_SNAPSHOT" ]
+  }
 }
 
 ohos_rust_shared_ffi("mmi_rust") {
@@ -348,6 +352,7 @@ ohos_shared_library("libmmi-server") {
     "${mmi_path}/util/json_parser/include",
     "${mmi_service_path}/product_property_config/include",
     "${mmi_path}/service/drag_security/include",
+    "triple_finger_snapshot/include",
   ]
 
   sources += [
@@ -453,6 +458,12 @@ ohos_shared_library("libmmi-server") {
       "event_hook/src/event_loop_closure_checker.cpp",
       "event_hook/src/event_dispatch_order_checker.cpp",
       "event_hook/src/event_expiration_checker.cpp"
+    ]
+  }
+
+  if (input_feature_triple_finger_snapshot) {
+    sources += [
+      "triple_finger_snapshot/src/triple_finger_snapshot_manager.cpp",
     ]
   }
 
@@ -5067,5 +5078,45 @@ ohos_unittest("PropertyNameMapperTest") {
     "googletest:gmock_main",
     "googletest:gtest_main",
     "preferences:native_preferences",
+  ]
+}
+
+ohos_unittest("TripleFingerSnapshotManagerTest") {
+  module_out_path = module_output_path
+
+  include_dirs = [
+    "${mmi_path}/interfaces/native/innerkits/proxy/include",
+    "${mmi_path}/interfaces/native/innerkits/event/include",
+    "${mmi_path}/service/touch_event_normalize/include",
+    "${mmi_path}/service/delegate_task/include",
+    "${mmi_path}/service/event_handler/include",
+    "${mmi_path}/service/module_loader/include",
+    "${mmi_path}/util/common/include",
+    "${mmi_path}/service/connect_manager/include",
+    "${mmi_path}/service/common/include",
+    "${mmi_path}/service/triple_finger_snapshot/include",
+  ]
+
+  configs = [ "${mmi_path}:coverage_flags" ]
+
+  cflags = [
+    "-Dprivate=public",
+    "-Dprotected=public",
+  ]
+
+  sources = [ "triple_finger_snapshot/test/triple_finger_snapshot_manager_test.cpp" ]
+
+  deps = [
+    "${mmi_path}/service:libmmi-server",
+    "${mmi_path}/service:libmmi-server-common",
+    "${mmi_path}/util:libmmi-util",
+  ]
+
+  external_deps = [
+    "c_utils:utils",
+    "googletest:gmock_main",
+    "googletest:gtest_main",
+    "hilog:libhilog",
+    "data_share:datashare_consumer",
   ]
 }

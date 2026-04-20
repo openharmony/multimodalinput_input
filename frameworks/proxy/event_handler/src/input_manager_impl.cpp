@@ -1864,6 +1864,9 @@ void InputManagerImpl::OnConnected()
             MMI_HILOGE("Set anr observer failed, ret:%{public}d", ret);
         }
     }
+    if (permissionType_ != 0) {
+        MULTIMODAL_INPUT_CONNECT_MGR->SwitchScreenCapturePermission(permissionType_, permissionEnable_);
+    }
     if (currentUserId_.load() == -1) {
         MMI_HILOGW("Current userId is not initialized");
         return;
@@ -3277,6 +3280,11 @@ int32_t InputManagerImpl::SetMouseAccelerateMotionSwitch(int32_t deviceId, bool 
 
 int32_t InputManagerImpl::SwitchScreenCapturePermission(uint32_t permissionType, bool enable)
 {
+    {
+        std::lock_guard<std::mutex> guard(mtx_);
+        permissionType_ = permissionType;
+        permissionEnable_ = enable;
+    }
     return MULTIMODAL_INPUT_CONNECT_MGR->SwitchScreenCapturePermission(permissionType, enable);
 }
 

@@ -3213,6 +3213,12 @@ public:
     static const int32_t KEYCODE_XKEY;
 
     /**
+     * Wrist Turn key
+     *
+     * @since 26.0.0
+     */
+    static const int32_t KEYCODE_WRIST_TURN;
+    /**
      * FINGERPRINT_SLIDE_UP
      * @since 26.0.0
      */

@@ -1476,11 +1476,11 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_SwitchScreenCapturePermiss
     KeyCommandHandler handler;
     std::uint32_t permissions = DEFAULT_PERMISSIONS & ~(KNUCKLE_ALL_PERMISSIONS);
     bool enable = false;
-    ASSERT_NO_FATAL_FAILURE(handler.SwitchScreenCapturePermission(permissions, enable));
+    ASSERT_NO_FATAL_FAILURE(handler.SwitchScreenCapturePermission(permissions, enable, 10));
     EXPECT_EQ(handler.screenCapturePermission_, 0);
  
     enable = true;
-    ASSERT_NO_FATAL_FAILURE(handler.SwitchScreenCapturePermission(permissions, enable));
+    ASSERT_NO_FATAL_FAILURE(handler.SwitchScreenCapturePermission(permissions, enable, 10));
     EXPECT_EQ(handler.screenCapturePermission_, permissions);
 }
  
