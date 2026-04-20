@@ -28,7 +28,6 @@ namespace MMI {
 
 namespace {
 constexpr int32_t ERROR_CODE_TOUCH_SEQUENCE_ERROR = 4300001;
-constexpr char PRODUCT_TYPE_PC[] = "2in1";
 constexpr int32_t TOUCH_TOOL_TYPE_FINGER = PointerEvent::TOOL_TYPE_FINGER;
 constexpr int32_t INVALID_DEVICE_ID = -1;
 constexpr int32_t MIN_TOUCH_ID = 0;
@@ -107,9 +106,6 @@ int32_t TouchControllerImpl::InjectPointerEvent(const std::shared_ptr<PointerEve
 
 int32_t TouchControllerImpl::TouchDown(int32_t touchId, int32_t displayId, int32_t displayX, int32_t displayY)
 {
-    MMI_HILOGD("TouchDown: touchId=%{public}d, displayId=%{public}d, x=%{public}d, y=%{public}d",
-        touchId, displayId, displayX, displayY);
-
     if (!IsTouchIdValid(touchId)) {
         MMI_HILOGE("Invalid touch id %{public}d", touchId);
         return ERROR_CODE_TOUCH_SEQUENCE_ERROR;
@@ -154,9 +150,6 @@ int32_t TouchControllerImpl::TouchDown(int32_t touchId, int32_t displayId, int32
 
 int32_t TouchControllerImpl::TouchMove(int32_t touchId, int32_t displayId, int32_t displayX, int32_t displayY)
 {
-    MMI_HILOGD("TouchMove: touchId=%{public}d, displayId=%{public}d, x=%{public}d, y=%{public}d",
-        touchId, displayId, displayX, displayY);
-
     if (!IsTouchIdValid(touchId)) {
         MMI_HILOGE("Invalid touch id %{public}d", touchId);
         return ERROR_CODE_TOUCH_SEQUENCE_ERROR;
@@ -210,9 +203,6 @@ int32_t TouchControllerImpl::TouchMove(int32_t touchId, int32_t displayId, int32
 
 int32_t TouchControllerImpl::TouchUp(int32_t touchId, int32_t displayId, int32_t displayX, int32_t displayY)
 {
-    MMI_HILOGD("TouchUp: touchId=%{public}d, displayId=%{public}d, x=%{public}d, y=%{public}d",
-        touchId, displayId, displayX, displayY);
-
     if (!IsTouchIdValid(touchId)) {
         MMI_HILOGE("Invalid touch id %{public}d", touchId);
         return ERROR_CODE_TOUCH_SEQUENCE_ERROR;
