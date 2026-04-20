@@ -42,6 +42,9 @@ enum NapiErrorCode : int32_t {
     COMMON_DEVICE_NOT_EXIST = 3900001,
     COMMON_KEYBOARD_DEVICE_NOT_EXIST = 3900002,
     COMMON_NON_INPUT_APPLICATION = 3900003,
+    CONTROLLER_INPUT_SERVICE_EXCEPTION = 3800001,
+    ERROR_CODE_STATE_ERROR = 4300001,
+    CONTROLLER_DISPLAY_NOT_EXIST = 4300002,
     ERROR_WINDOW_ID_PERMISSION_DENIED = 26500001,
     INPUT_SERVICE_EXCEPTION = 38000001,
 };
@@ -62,6 +65,11 @@ const std::map<int32_t, NapiError> NAPI_ERRORS = {
     { PRE_KEY_NOT_SUPPORTED, { PRE_KEY_NOT_SUPPORTED, "Invalid combination of keys." } },
     { INPUT_OCCUPIED_BY_SYSTEM, { INPUT_OCCUPIED_BY_SYSTEM, "The hotkey has been subscribed by system." } },
     { INPUT_OCCUPIED_BY_OTHER, { INPUT_OCCUPIED_BY_OTHER, "The hotkey has been subscribed by other one." } },
+    { CONTROLLER_INPUT_SERVICE_EXCEPTION, { CONTROLLER_INPUT_SERVICE_EXCEPTION, "Input service exception." } },
+    { ERROR_CODE_STATE_ERROR, { ERROR_CODE_STATE_ERROR,
+        "Controller state error. The operation is invalid in current state." } },
+    { CONTROLLER_DISPLAY_NOT_EXIST, { CONTROLLER_DISPLAY_NOT_EXIST,
+        "The specified display does not exist." } },
     { INPUT_SERVICE_EXCEPTION, { INPUT_SERVICE_EXCEPTION, "Input service exception." } },
 };
 
