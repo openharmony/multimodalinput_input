@@ -3071,7 +3071,7 @@ void PointerDrawingManager::UpdateBindDisplayId(uint64_t rsId)
         AttachToDisplay();
         if (GetCursorBlurEnabled()) {
             MMI_HILOGI("display change, pending style ++");
-            mouseStylePending_.fetch_add(1);    
+            mouseStylePending_.fetch_add(1);
         }
         // 新屏幕上重新绘制软硬光标
         UpdatePointerVisible();
@@ -3897,7 +3897,7 @@ void PointerDrawingManager::UpdateCursorBlurEnabled()
     MMI_HILOGD("UpdateCursorBlurEnabled, now:%{public}d, current:%{public}d, last:%{public}d",
         cursorBlurEnabled, currentCursorBlurEnabled_, lastCursorBlurEnabled_);
     if (cursorBlurEnabled == lastCursorBlurEnabled_) {
-       return;
+        return;
     }
     currentCursorBlurEnabled_ = cursorBlurEnabled;
     MMI_HILOGI("Cursor blur enabled updated, currentCursorBlurEnabled_:%{public}d", currentCursorBlurEnabled_);
