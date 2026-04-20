@@ -693,8 +693,8 @@ static napi_value InjectTouchEvent(napi_env env, napi_callback_info info)
         }
         useCoordinate = PointerEvent::GLOBAL_COORDINATE;
     }
-    InputManager::GetInstance()->SimulateInputEvent(pointerEvent, pointerEvent->GetAutoToVirtualScreen(),
-        useCoordinate);
+    InputManager::GetInstance()->SimulateInputEvent(pointerEvent,
+        pointerEvent->GetAutoToVirtualScreen(), useCoordinate);
     CHKRP(napi_create_int32(env, 0, &result), CREATE_INT32);
     return result;
 }

@@ -276,16 +276,16 @@ void InputManager::RemoveInterceptor(int32_t interceptorId)
     InputMgrImpl.RemoveInterceptor(interceptorId);
 }
 
-void InputManager::SimulateInputEvent(std::shared_ptr<KeyEvent> keyEvent)
+int32_t InputManager::SimulateInputEvent(std::shared_ptr<KeyEvent> keyEvent)
 {
     // LCOV_EXCL_START
     LogTracer lt(keyEvent->GetId(), keyEvent->GetEventType(), keyEvent->GetKeyAction());
     keyEvent->AddFlag(InputEvent::EVENT_FLAG_SIMULATE);
-    InputMgrImpl.SimulateInputEvent(keyEvent);
+    return InputMgrImpl.SimulateInputEvent(keyEvent);
     // LCOV_EXCL_STOP
 }
 
-void InputManager::SimulateInputEvent(std::shared_ptr<PointerEvent> pointerEvent, bool isAutoToVirtualScreen,
+int32_t InputManager::SimulateInputEvent(std::shared_ptr<PointerEvent> pointerEvent, bool isAutoToVirtualScreen,
     int32_t useCoordinate)
 {
     // LCOV_EXCL_START
@@ -303,15 +303,15 @@ void InputManager::SimulateInputEvent(std::shared_ptr<PointerEvent> pointerEvent
     } else {
         MMI_HILOGD("isAutoToVirtualScreen=%{public}s", isAutoToVirtualScreen ? "true" : "false");
     }
-    InputMgrImpl.SimulateInputEvent(pointerEvent, useCoordinate);
+    return InputMgrImpl.SimulateInputEvent(pointerEvent, useCoordinate);
     // LCOV_EXCL_STOP
 }
 
-void InputManager::SimulateInputEvent(std::shared_ptr<PointerEvent> pointerEvent, float zOrder,
+int32_t InputManager::SimulateInputEvent(std::shared_ptr<PointerEvent> pointerEvent, float zOrder,
     bool isAutoToVirtualScreen, int32_t useCoordinate)
 {
     // LCOV_EXCL_START
-    CHKPV(pointerEvent);
+    CHKPR(pointerEvent, RET_ERR);
     LogTracer lt(pointerEvent->GetId(), pointerEvent->GetEventType(), pointerEvent->GetPointerAction());
     pointerEvent->AddFlag(InputEvent::EVENT_FLAG_SIMULATE);
     pointerEvent->SetZOrder(zOrder);
@@ -328,7 +328,7 @@ void InputManager::SimulateInputEvent(std::shared_ptr<PointerEvent> pointerEvent
         MMI_HILOGD("zOrder=%{public}f, isAutoToVirtualScreen=%{public}s", zOrder,
             isAutoToVirtualScreen ? "true" : "false");
     }
-    InputMgrImpl.SimulateInputEvent(pointerEvent, useCoordinate);
+    return InputMgrImpl.SimulateInputEvent(pointerEvent, useCoordinate);
     // LCOV_EXCL_STOP
 }
 

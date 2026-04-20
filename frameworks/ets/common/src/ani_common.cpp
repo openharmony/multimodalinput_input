@@ -31,5 +31,14 @@ bool TaiheConverter::GetApiError(int32_t code, TaiheError &codeMsg)
     codeMsg = iter->second;
     return true;
 }
+
+void TaiheConverter::GetErrorCodeOrDefault(int32_t ret, TaiheError &codeMsg)
+{
+    if (!GetApiError(ret, codeMsg)) {
+        codeMsg.errorCode = INPUT_SERVICE_EXCEPTION;
+        codeMsg.msg = "Input service exception";
+        MMI_HILOGE("Error code %{public}d not found, use default", ret);
+    }
+}
 } // namespace MMI
 } // namespace OHOS
