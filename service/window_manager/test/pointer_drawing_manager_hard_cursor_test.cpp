@@ -429,8 +429,10 @@ HWTEST_F(PointerDrawingManagerHardCursorTest, PointerDrawingManagerHardCursorTes
     Rosen::RSSurfaceNodeType surfaceNodeType = Rosen::RSSurfaceNodeType::SELF_DRAWING_WINDOW_NODE;
     pointerDrawingManager.surfaceNode_ = Rosen::RSSurfaceNode::Create(surfaceNodeConfig, surfaceNodeType);
     ASSERT_TRUE(pointerDrawingManager.surfaceNode_ != nullptr);
+    pointerDrawingManager.currentCursorBlurEnabled_ = true;
+    pointerDrawingManager.lastCursorBlurEnabled_ = true;
     pointerDrawingManager.SetCursorLocation(x, y);
-    EXPECT_EQ(pointerDrawingManager.moveFinished_.load(), true);
+    EXPECT_EQ(pointerDrawingManager.moveFinished_.load(), false);
     pointerDrawingManager.currentCursorBlurEnabled_ = false;
     pointerDrawingManager.lastCursorBlurEnabled_ = true;
     pointerDrawingManager.SetCursorLocation(x, y);
