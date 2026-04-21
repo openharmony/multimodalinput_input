@@ -838,22 +838,11 @@ private:
 {
     CALL_DEBUG_ENTER;
 
-    int32_t ret = InputManager::GetInstance()->CheckTouchControllerPermission();
-    if (ret != RET_OK) {
-        MMI_HILOGE("CheckTouchControllerPermission failed for touch controller, ret=%{public}d", ret);
-        if (ret == CAPABILITY_NOT_SUPPORTED || ret == ERROR_NO_PERMISSION) {
-            SetTouchControllerBusinessError(ret);
-        } else {
-            SetTouchControllerBusinessError(OHOS::MMI::TaiheErrorCode::INPUT_SERVICE_EXCEPTION);
-        }
-        return make_holder<TaiheTouchControllerImpl,
-            ::ohos::multimodalInput::inputEventClient::TouchController>();
-    }
-
-    auto nativeImpl = InputManager::GetInstance()->CreateTouchController();
-    if (nativeImpl == nullptr) {
-        MMI_HILOGE("Failed to create native TouchControllerImpl");
-        SetTouchControllerBusinessError(OHOS::MMI::TaiheErrorCode::INPUT_SERVICE_EXCEPTION);
+    std::shared_ptr<OHOS::MMI::TouchControllerImpl> nativeImpl = nullptr;
+    int32_t ret = InputManager::GetInstance()->CreateTouchController(nativeImpl);
+    if (ret != RET_OK || nativeImpl == nullptr) {
+        MMI_HILOGE("Failed to create native TouchControllerImpl, ret=%{public}d", ret);
+        SetTouchControllerBusinessError(ret);
         return make_holder<TaiheTouchControllerImpl,
             ::ohos::multimodalInput::inputEventClient::TouchController>();
     }

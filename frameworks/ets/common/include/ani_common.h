@@ -66,7 +66,7 @@ const std::map<int32_t, TaiheError> TAIHE_ERRORS = {
     { ERROR_CODE_STATE_ERROR, { ERROR_CODE_STATE_ERROR,
         "Controller state error. The operation is invalid in current state." } },
     { CONTROLLER_DISPLAY_NOT_EXIST, { CONTROLLER_DISPLAY_NOT_EXIST,
-        "The specified display does not exist." } },
+        "The display does not exist." } },
 };
 
 class TaiheConverter {

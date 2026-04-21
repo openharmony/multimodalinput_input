@@ -290,7 +290,7 @@ public:
 
     std::shared_ptr<class MouseControllerImpl> CreateMouseController();
     std::shared_ptr<class KeyboardControllerImpl> CreateKeyboardController();
-    std::shared_ptr<class TouchControllerImpl> CreateTouchController();
+    int32_t CreateTouchController(std::shared_ptr<class TouchControllerImpl> &controller);
 
 private:
     int32_t PackScreensInfo(NetPacket &pkt, const std::vector<ScreenInfo>& screens);

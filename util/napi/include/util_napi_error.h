@@ -49,6 +49,9 @@ enum NapiErrorCode : int32_t {
     INPUT_SERVICE_EXCEPTION = 38000001,
 };
 
+constexpr const char* TOUCH_DOWN_STATE_ERROR_MSG = "The touch point is touching the display.";
+constexpr const char* TOUCH_NOT_DOWN_STATE_ERROR_MSG = "The touch point is not touching the display.";
+
 const std::map<int32_t, NapiError> NAPI_ERRORS = {
     { COMMON_PERMISSION_CHECK_ERROR,
         { COMMON_PERMISSION_CHECK_ERROR, "Permission denied. An attempt was made to %s forbidden by permission:%s." } },
@@ -69,7 +72,7 @@ const std::map<int32_t, NapiError> NAPI_ERRORS = {
     { ERROR_CODE_STATE_ERROR, { ERROR_CODE_STATE_ERROR,
         "Controller state error. The operation is invalid in current state." } },
     { CONTROLLER_DISPLAY_NOT_EXIST, { CONTROLLER_DISPLAY_NOT_EXIST,
-        "The specified display does not exist." } },
+        "The display does not exist." } },
     { INPUT_SERVICE_EXCEPTION, { INPUT_SERVICE_EXCEPTION, "Input service exception." } },
 };
 

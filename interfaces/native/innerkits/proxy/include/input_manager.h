@@ -404,10 +404,11 @@ public:
 
     /**
      * @brief Create touch controller
-     * @return Shared pointer to TouchControllerImpl, nullptr on failure
+     * @param controller Shared pointer to TouchControllerImpl on success, nullptr on failure.
+     * @return RET_OK on success, error code otherwise.
      * @since 26
      */
-    std::shared_ptr<class TouchControllerImpl> CreateTouchController();
+    int32_t CreateTouchController(std::shared_ptr<class TouchControllerImpl> &controller);
 
     /**
      * @brief Check permission for creating mouse controller (for NAPI layer)

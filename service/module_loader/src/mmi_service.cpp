@@ -2257,6 +2257,27 @@ ErrCode MMIService::MoveMouseEvent(int32_t offsetX, int32_t offsetY)
     return RET_OK;
 }
 
+ErrCode MMIService::CheckControllerKeyEventPermission(const std::shared_ptr<KeyEvent> keyEvent,
+    bool isNativeInject)
+{
+    CHKPR(keyEvent, ERROR_NULL_POINTER);
+#ifdef OHOS_BUILD_ENABLE_CONTROLLER_INJECT
+    if (keyEvent->HasFlag(InputEvent::EVENT_FLAG_CONTROLLER)) {
+        MMI_HILOGD("Event from Controller interface, using CONTROL_DEVICE permission check");
+        ErrCode ret = CheckControllerPermission();
+        if (ret != RET_OK) {
+            MMI_HILOGE("Controller permission check failed for KeyEvent, ret:%{public}d", ret);
+        }
+        return ret;
+    }
+#endif // OHOS_BUILD_ENABLE_CONTROLLER_INJECT
+    if (!isNativeInject && !PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
+    return RET_OK;
+}
+
 ErrCode MMIService::InjectKeyEvent(const KeyEvent& keyEvent, bool isNativeInject)
 {
     CALL_DEBUG_ENTER;
@@ -2267,32 +2288,10 @@ ErrCode MMIService::InjectKeyEvent(const KeyEvent& keyEvent, bool isNativeInject
 
     auto keyEventPtr = std::make_shared<KeyEvent>(keyEvent);
     CHKPR(keyEventPtr, ERROR_NULL_POINTER);
-
-#ifdef OHOS_BUILD_ENABLE_CONTROLLER_INJECT
-    // Check if event is from Controller interface
-    bool isFromController = keyEventPtr->HasFlag(InputEvent::EVENT_FLAG_CONTROLLER);
-
-    if (isFromController) {
-        // Controller permission model: CONTROL_DEVICE permission + PC device
-        MMI_HILOGD("Event from Controller interface, using CONTROL_DEVICE permission check");
-        ErrCode ret = CheckControllerPermission();
-        if (ret != RET_OK) {
-            MMI_HILOGE("Controller permission check failed for KeyEvent, ret:%{public}d", ret);
-            return ret;
-        }
-    } else {
-        // Original permission model: system app + INJECT_INPUT_EVENT permission
-        if (!isNativeInject && !PER_HELPER->VerifySystemApp()) {
-            MMI_HILOGE("Verify system APP failed");
-            return ERROR_NOT_SYSAPI;
-        }
+    ErrCode permissionRet = CheckControllerKeyEventPermission(keyEventPtr, isNativeInject);
+    if (permissionRet != RET_OK) {
+        return permissionRet;
     }
-#else
-    if (!isNativeInject && !PER_HELPER->VerifySystemApp()) {
-        MMI_HILOGE("Verify system APP failed");
-        return ERROR_NOT_SYSAPI;
-    }
-#endif // OHOS_BUILD_ENABLE_CONTROLLER_INJECT
 
     bool isShell = PER_HELPER->RequestFromShell();
     if (isShell) {
@@ -2416,6 +2415,32 @@ int32_t MMIService::CheckTouchPadEvent(int32_t userId, const std::shared_ptr<Poi
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 }
 
+ErrCode MMIService::CheckControllerPointerEventPermission(const std::shared_ptr<PointerEvent> pointerEvent,
+    bool isNativeInject)
+{
+    CHKPR(pointerEvent, ERROR_NULL_POINTER);
+#ifdef OHOS_BUILD_ENABLE_CONTROLLER_INJECT
+    if (pointerEvent->HasFlag(InputEvent::EVENT_FLAG_CONTROLLER)) {
+        MMI_HILOGD("Event from Controller interface, using CONTROL_DEVICE permission check");
+        ErrCode ret = CheckControllerPermission();
+        if (ret != RET_OK) {
+            MMI_HILOGE("Controller permission check failed for PointerEvent, ret:%{public}d", ret);
+            return ret;
+        }
+        ret = ValidateControllerEventCoordinates(pointerEvent);
+        if (ret != RET_OK) {
+            MMI_HILOGE("Controller event validation failed, ret=%{public}d", ret);
+        }
+        return ret;
+    }
+#endif // OHOS_BUILD_ENABLE_CONTROLLER_INJECT
+    if (!isNativeInject && !PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
+    return RET_OK;
+}
+
 ErrCode MMIService::InjectPointerEvent(const PointerEvent& pointerEvent, bool isNativeInject, int32_t useCoordinate)
 {
     CALL_DEBUG_ENTER;
@@ -2426,36 +2451,10 @@ ErrCode MMIService::InjectPointerEvent(const PointerEvent& pointerEvent, bool is
 
     auto pointerEventPtr = std::make_shared<PointerEvent>(pointerEvent);
     CHKPR(pointerEventPtr, ERROR_NULL_POINTER);
-
-#ifdef OHOS_BUILD_ENABLE_CONTROLLER_INJECT
-    // Check if event is from Controller interface
-    bool isFromController = pointerEventPtr->HasFlag(InputEvent::EVENT_FLAG_CONTROLLER);
-
-    if (isFromController) {
-        // Controller permission model: CONTROL_DEVICE permission + PC device
-        MMI_HILOGD("Event from Controller interface, using CONTROL_DEVICE permission check");
-        ErrCode ret = CheckControllerPermission();
-        if (ret != RET_OK) {
-            MMI_HILOGE("Controller permission check failed for PointerEvent, ret:%{public}d", ret);
-            return ret;
-        }
-        if (int32_t validateRet = ValidateControllerEventCoordinates(pointerEventPtr); validateRet != RET_OK) {
-            MMI_HILOGE("Controller event validation failed, ret=%{public}d", validateRet);
-            return validateRet;
-        }
-    } else {
-        // Original permission model: system app + INJECT_INPUT_EVENT permission
-        if (!isNativeInject && !PER_HELPER->VerifySystemApp()) {
-            MMI_HILOGE("Verify system APP failed");
-            return ERROR_NOT_SYSAPI;
-        }
+    ErrCode permissionRet = CheckControllerPointerEventPermission(pointerEventPtr, isNativeInject);
+    if (permissionRet != RET_OK) {
+        return permissionRet;
     }
-#else
-    if (!isNativeInject && !PER_HELPER->VerifySystemApp()) {
-        MMI_HILOGE("Verify system APP failed");
-        return ERROR_NOT_SYSAPI;
-    }
-#endif // OHOS_BUILD_ENABLE_CONTROLLER_INJECT
 
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     // Dynamic load mouse module Sync.

@@ -42,15 +42,35 @@ private:
         int64_t downTime = 0;
     };
 
+    struct PointerEventContext {
+        int32_t action = PointerEvent::POINTER_ACTION_UNKNOWN;
+        int32_t touchId = -1;
+        int32_t displayId = -1;
+        int64_t actionTime = 0;
+        bool currentPressed = false;
+    };
+
     bool IsTouchIdValid(int32_t touchId) const;
-    std::shared_ptr<PointerEvent> CreatePointerEvent(int32_t action, int32_t touchId, int32_t displayId,
-        int64_t actionTime, const std::map<int32_t, TouchContactState> &contacts, bool currentPressed);
+    std::shared_ptr<PointerEvent> CreatePointerEvent(const PointerEventContext &context,
+        const std::map<int32_t, TouchContactState> &contacts);
+    void AddPointerItems(const std::shared_ptr<PointerEvent> &pointerEvent, const PointerEventContext &context,
+        const std::map<int32_t, TouchContactState> &contacts) const;
     int32_t InjectPointerEvent(const std::shared_ptr<PointerEvent> &event);
+    std::shared_ptr<PointerEvent> BuildTouchDownEvent(int32_t touchId, int32_t displayId, int32_t displayX,
+        int32_t displayY, int64_t actionTime);
+    std::shared_ptr<PointerEvent> BuildTouchMoveEvent(int32_t touchId, int32_t displayId, int32_t displayX,
+        int32_t displayY, int64_t actionTime);
+    std::shared_ptr<PointerEvent> BuildTouchUpEvent(int32_t touchId, int32_t displayId, int32_t displayX,
+        int32_t displayY, int64_t actionTime);
+    void CommitTouchDownState(int32_t touchId, int32_t displayId, int32_t displayX, int32_t displayY,
+        int64_t downTime);
+    void CommitTouchMoveState(int32_t touchId, int32_t displayId, int32_t displayX, int32_t displayY);
+    void ClearTouchState(int32_t touchId);
 
     std::map<int32_t, TouchContactState> activePoints_;
     int32_t activeDisplayId_ { -1 };
-    mutable std::mutex sendMutex_;
-    mutable std::mutex mutex_;
+    mutable std::mutex injectMutex_;
+    mutable std::mutex activePointsMutex_;
 };
 
 } // namespace MMI

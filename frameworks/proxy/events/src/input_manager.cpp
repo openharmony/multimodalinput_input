@@ -1113,10 +1113,10 @@ std::shared_ptr<KeyboardControllerImpl> InputManager::CreateKeyboardController()
     return InputMgrImpl.CreateKeyboardController();
 }
 
-std::shared_ptr<TouchControllerImpl> InputManager::CreateTouchController()
+int32_t InputManager::CreateTouchController(std::shared_ptr<TouchControllerImpl> &controller)
 {
     CALL_DEBUG_ENTER;
-    return InputMgrImpl.CreateTouchController();
+    return InputMgrImpl.CreateTouchController(controller);
 }
 
 int32_t InputManager::CheckMouseControllerPermission()

@@ -17,6 +17,7 @@
 
 #include "input_manager.h"
 #include "mmi_log.h"
+#include "util_napi_error.h"
 
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "JsTouchController"
@@ -24,15 +25,10 @@
 namespace OHOS {
 namespace MMI {
 
-namespace {
-constexpr int32_t TOUCH_INPUT_SERVICE_EXCEPTION = 3800001;
-} // namespace
-
-JsTouchController::JsTouchController()
+JsTouchController::JsTouchController(std::shared_ptr<TouchControllerImpl> impl) : impl_(impl)
 {
-    impl_ = InputManager::GetInstance()->CreateTouchController();
     if (impl_ == nullptr) {
-        MMI_HILOGE("Create TouchControllerImpl failed");
+        MMI_HILOGE("TouchControllerImpl is null");
     }
 }
 
@@ -40,7 +36,7 @@ int32_t JsTouchController::TouchDown(int32_t id, int32_t displayId, int32_t disp
 {
     if (impl_ == nullptr) {
         MMI_HILOGE("TouchControllerImpl is null");
-        return TOUCH_INPUT_SERVICE_EXCEPTION;
+        return CONTROLLER_INPUT_SERVICE_EXCEPTION;
     }
     return impl_->TouchDown(id, displayId, displayX, displayY);
 }
@@ -49,7 +45,7 @@ int32_t JsTouchController::TouchMove(int32_t id, int32_t displayId, int32_t disp
 {
     if (impl_ == nullptr) {
         MMI_HILOGE("TouchControllerImpl is null");
-        return TOUCH_INPUT_SERVICE_EXCEPTION;
+        return CONTROLLER_INPUT_SERVICE_EXCEPTION;
     }
     return impl_->TouchMove(id, displayId, displayX, displayY);
 }
@@ -58,7 +54,7 @@ int32_t JsTouchController::TouchUp(int32_t id, int32_t displayId, int32_t displa
 {
     if (impl_ == nullptr) {
         MMI_HILOGE("TouchControllerImpl is null");
-        return TOUCH_INPUT_SERVICE_EXCEPTION;
+        return CONTROLLER_INPUT_SERVICE_EXCEPTION;
     }
     return impl_->TouchUp(id, displayId, displayX, displayY);
 }
