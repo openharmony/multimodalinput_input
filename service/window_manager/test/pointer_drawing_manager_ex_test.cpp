@@ -1927,6 +1927,10 @@ HWTEST_F(PointerDrawingManagerExTest, PointerDrawingManagerExTest_UpdateCursorBl
     pointerDrawMgr.lastCursorBlurEnabled_ = true;
     pointerDrawMgr.UpdateCursorBlurEnabled();
     EXPECT_EQ(pointerDrawMgr.lastCursorBlurEnabled_, true);
+    pointerDrawMgr.lastCursorBlurEnabled_ = false;
+    pointerDrawMgr.currentCursorBlurEnabled_ = false;
+    pointerDrawMgr.UpdateCursorBlurEnabled();
+    EXPECT_EQ(pointerDrawMgr.lastCursorBlurEnabled_, false);
 }
 
 /**
