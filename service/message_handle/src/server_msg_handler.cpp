@@ -88,6 +88,13 @@ constexpr float FACTOR_MAX { 2.4f };
 constexpr int64_t QUERY_AUTHORIZE_MAX_INTERVAL_TIME { 3000 };
 constexpr uint32_t MAX_ENHANCE_CONFIG_SIZE { 1000 };
 constexpr int32_t BASE_USER_RANGE { 200000 };
+
+bool IsControllerTouchEvent(const std::shared_ptr<PointerEvent> &pointerEvent)
+{
+    CHKPF(pointerEvent);
+    return pointerEvent->HasFlag(InputEvent::EVENT_FLAG_CONTROLLER) &&
+        pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHSCREEN;
+}
 } // namespace
 
 void ServerMsgHandler::Init(UDSServer &udsServer)
@@ -727,7 +734,8 @@ int32_t ServerMsgHandler::FixTargetWindowId(std::shared_ptr<PointerEvent> pointe
 {
     CHKPR(pointerEvent, RET_ERR);
     std::list<PointerEvent::PointerItem> pointerItems = pointerEvent->GetAllPointerItems();
-    if (bNeedResetPointerId) {
+    bool needResetPointerId = bNeedResetPointerId && !IsControllerTouchEvent(pointerEvent);
+    if (needResetPointerId) {
         if (diffPointerId <= 0) {
             MMI_HILOGE("Parameter diffPointerId error, diffPointerId:%{public}d", diffPointerId);
             return RET_ERR;

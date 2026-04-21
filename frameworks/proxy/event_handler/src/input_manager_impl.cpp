@@ -1310,11 +1310,19 @@ void InputManagerImpl::SimulateInputEvent(std::shared_ptr<KeyEvent> keyEvent, bo
     BytraceAdapter::MMIClientTraceStop();
 }
 
+static bool IsControllerTouchEvent(const std::shared_ptr<PointerEvent> &pointerEvent)
+{
+    CHKPF(pointerEvent);
+    return pointerEvent->HasFlag(InputEvent::EVENT_FLAG_CONTROLLER) &&
+        pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHSCREEN;
+}
+
 void InputManagerImpl::HandleSimulateInputEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
     CALL_DEBUG_ENTER;
     int maxPointerId = SIMULATE_EVENT_START_ID;
     CHKPV(pointerEvent);
+    bool isControllerTouchEvent = IsControllerTouchEvent(pointerEvent);
     std::list<PointerEvent::PointerItem> pointerItems = pointerEvent->GetAllPointerItems();
     for (auto &pointerItem : pointerItems) {
         int32_t pointerId = pointerItem.GetPointerId();
@@ -1325,11 +1333,13 @@ void InputManagerImpl::HandleSimulateInputEvent(std::shared_ptr<PointerEvent> po
         maxPointerId += 1;
         pointerItem.SetPointerId(maxPointerId);
     }
-    for (auto &pointerItem : pointerItems) {
-        int32_t pointerId = pointerItem.GetPointerId();
-        if (pointerId < SIMULATE_EVENT_START_ID) {
-            pointerItem.SetOriginPointerId(pointerId);
-            pointerItem.SetPointerId(pointerId + SIMULATE_EVENT_START_ID);
+    if (!isControllerTouchEvent) {
+        for (auto &pointerItem : pointerItems) {
+            int32_t pointerId = pointerItem.GetPointerId();
+            if (pointerId < SIMULATE_EVENT_START_ID) {
+                pointerItem.SetOriginPointerId(pointerId);
+                pointerItem.SetPointerId(pointerId + SIMULATE_EVENT_START_ID);
+            }
         }
     }
     pointerEvent->RemoveAllPointerItems();
@@ -1340,7 +1350,7 @@ void InputManagerImpl::HandleSimulateInputEvent(std::shared_ptr<PointerEvent> po
         pointerEvent->SetPointerId(pointerItems.front().GetPointerId());
         MMI_HILOGD("Simulate pointer event id:%{public}d", pointerEvent->GetPointerId());
     }
-    if (pointerEvent->GetPointerId() < SIMULATE_EVENT_START_ID) {
+    if (!isControllerTouchEvent && pointerEvent->GetPointerId() < SIMULATE_EVENT_START_ID) {
         pointerEvent->SetPointerId(pointerEvent->GetPointerId() + SIMULATE_EVENT_START_ID);
     }
 }
@@ -3581,15 +3591,22 @@ std::shared_ptr<KeyboardControllerImpl> InputManagerImpl::CreateKeyboardControll
     return std::make_shared<KeyboardControllerImpl>();
 }
 
-std::shared_ptr<TouchControllerImpl> InputManagerImpl::CreateTouchController()
+int32_t InputManagerImpl::CreateTouchController(std::shared_ptr<TouchControllerImpl> &controller)
 {
     CALL_DEBUG_ENTER;
-    if (CheckTouchControllerPermission() != RET_OK) {
-        MMI_HILOGE("Server-side CreateTouchController permission check failed");
-        return nullptr;
+    controller = nullptr;
+    int32_t ret = CheckTouchControllerPermission();
+    if (ret != RET_OK) {
+        MMI_HILOGE("Server-side CreateTouchController permission check failed, ret=%{public}d", ret);
+        return ret;
     }
 
-    return std::make_shared<TouchControllerImpl>();
+    controller = std::make_shared<TouchControllerImpl>();
+    if (controller == nullptr) {
+        MMI_HILOGE("Create TouchControllerImpl failed");
+        return ::INPUT_SERVICE_EXCEPTION;
+    }
+    return RET_OK;
 }
 } // namespace MMI
 } // namespace OHOS

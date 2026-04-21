@@ -25,7 +25,7 @@ namespace MMI {
 
 class JsTouchController {
 public:
-    JsTouchController();
+    explicit JsTouchController(std::shared_ptr<TouchControllerImpl> impl);
     ~JsTouchController() = default;
 
     int32_t TouchDown(int32_t id, int32_t displayId, int32_t displayX, int32_t displayY);

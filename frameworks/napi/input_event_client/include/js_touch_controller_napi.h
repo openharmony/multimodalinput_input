@@ -20,6 +20,12 @@
 
 namespace OHOS {
 namespace MMI {
+struct TouchPointParams {
+    int32_t id = 0;
+    int32_t displayId = 0;
+    int32_t displayX = 0;
+    int32_t displayY = 0;
+};
 
 napi_value CreateTouchController(napi_env env, napi_callback_info info);
 napi_value TouchControllerTouchDown(napi_env env, napi_callback_info info);

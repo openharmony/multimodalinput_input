@@ -49,9 +49,8 @@ bool TouchControllerImpl::IsTouchIdValid(int32_t touchId) const
     return touchId >= MIN_TOUCH_ID && touchId <= MAX_TOUCH_ID;
 }
 
-std::shared_ptr<PointerEvent> TouchControllerImpl::CreatePointerEvent(int32_t action, int32_t touchId,
-    int32_t displayId, int64_t actionTime, const std::map<int32_t, TouchContactState> &contacts,
-    bool currentPressed)
+std::shared_ptr<PointerEvent> TouchControllerImpl::CreatePointerEvent(const PointerEventContext &context,
+    const std::map<int32_t, TouchContactState> &contacts)
 {
     auto pointerEvent = PointerEvent::Create();
     if (pointerEvent == nullptr) {
@@ -59,16 +58,23 @@ std::shared_ptr<PointerEvent> TouchControllerImpl::CreatePointerEvent(int32_t ac
         return nullptr;
     }
 
-    pointerEvent->SetPointerAction(action);
+    pointerEvent->SetPointerAction(context.action);
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
-    pointerEvent->SetPointerId(touchId);
+    pointerEvent->SetPointerId(context.touchId);
     pointerEvent->SetDeviceId(INVALID_DEVICE_ID);
-    pointerEvent->SetTargetDisplayId(displayId);
-    pointerEvent->SetActionTime(actionTime);
+    pointerEvent->SetTargetDisplayId(context.displayId);
+    pointerEvent->SetActionTime(context.actionTime);
     pointerEvent->AddFlag(InputEvent::EVENT_FLAG_SIMULATE);
     pointerEvent->AddFlag(InputEvent::EVENT_FLAG_CONTROLLER);
-
     pointerEvent->RemoveAllPointerItems();
+    AddPointerItems(pointerEvent, context, contacts);
+    pointerEvent->UpdateId();
+    return pointerEvent;
+}
+
+void TouchControllerImpl::AddPointerItems(const std::shared_ptr<PointerEvent> &pointerEvent,
+    const PointerEventContext &context, const std::map<int32_t, TouchContactState> &contacts) const
+{
     for (const auto &itemPair : contacts) {
         const auto &contact = itemPair.second;
         PointerEvent::PointerItem item;
@@ -81,12 +87,9 @@ std::shared_ptr<PointerEvent> TouchControllerImpl::CreatePointerEvent(int32_t ac
         item.SetToolType(TOUCH_TOOL_TYPE_FINGER);
         item.SetDeviceId(INVALID_DEVICE_ID);
         item.SetDownTime(contact.downTime);
-        item.SetPressed(itemPair.first == touchId ? currentPressed : true);
+        item.SetPressed(itemPair.first == context.touchId ? context.currentPressed : true);
         pointerEvent->AddPointerItem(item);
     }
-
-    pointerEvent->UpdateId();
-    return pointerEvent;
 }
 
 int32_t TouchControllerImpl::InjectPointerEvent(const std::shared_ptr<PointerEvent> &event)
@@ -104,6 +107,96 @@ int32_t TouchControllerImpl::InjectPointerEvent(const std::shared_ptr<PointerEve
     return ret;
 }
 
+std::shared_ptr<PointerEvent> TouchControllerImpl::BuildTouchDownEvent(int32_t touchId, int32_t displayId,
+    int32_t displayX, int32_t displayY, int64_t actionTime)
+{
+    std::lock_guard<std::mutex> lock(activePointsMutex_);
+    if (activePoints_.count(touchId) != 0) {
+        MMI_HILOGE("Touch id %{public}d already pressed", touchId);
+        return nullptr;
+    }
+    if (!activePoints_.empty() && activeDisplayId_ != displayId) {
+        MMI_HILOGE("Touch display mismatch, activeDisplayId=%{public}d, input=%{public}d",
+            activeDisplayId_, displayId);
+        return nullptr;
+    }
+
+    std::map<int32_t, TouchContactState> contacts { activePoints_ };
+    contacts[touchId] = { displayId, displayX, displayY, actionTime };
+    PointerEventContext context { PointerEvent::POINTER_ACTION_DOWN, touchId, displayId, actionTime, true };
+    return CreatePointerEvent(context, contacts);
+}
+
+std::shared_ptr<PointerEvent> TouchControllerImpl::BuildTouchMoveEvent(int32_t touchId, int32_t displayId,
+    int32_t displayX, int32_t displayY, int64_t actionTime)
+{
+    std::lock_guard<std::mutex> lock(activePointsMutex_);
+    auto it = activePoints_.find(touchId);
+    if (it == activePoints_.end()) {
+        MMI_HILOGE("Touch id %{public}d is not active", touchId);
+        return nullptr;
+    }
+    if (activeDisplayId_ != displayId) {
+        MMI_HILOGE("Touch display mismatch, activeDisplayId=%{public}d, input=%{public}d",
+            activeDisplayId_, displayId);
+        return nullptr;
+    }
+
+    std::map<int32_t, TouchContactState> contacts { activePoints_ };
+    contacts[touchId] = { displayId, displayX, displayY, it->second.downTime };
+    PointerEventContext context { PointerEvent::POINTER_ACTION_MOVE, touchId, displayId, actionTime, true };
+    return CreatePointerEvent(context, contacts);
+}
+
+std::shared_ptr<PointerEvent> TouchControllerImpl::BuildTouchUpEvent(int32_t touchId, int32_t displayId,
+    int32_t displayX, int32_t displayY, int64_t actionTime)
+{
+    std::lock_guard<std::mutex> lock(activePointsMutex_);
+    auto it = activePoints_.find(touchId);
+    if (it == activePoints_.end()) {
+        MMI_HILOGE("Touch id %{public}d is not active", touchId);
+        return nullptr;
+    }
+    if (activeDisplayId_ != displayId) {
+        MMI_HILOGE("Touch display mismatch, activeDisplayId=%{public}d, input=%{public}d",
+            activeDisplayId_, displayId);
+        return nullptr;
+    }
+
+    std::map<int32_t, TouchContactState> contacts { activePoints_ };
+    contacts[touchId] = { displayId, displayX, displayY, it->second.downTime };
+    PointerEventContext context { PointerEvent::POINTER_ACTION_UP, touchId, displayId, actionTime, false };
+    return CreatePointerEvent(context, contacts);
+}
+
+void TouchControllerImpl::CommitTouchDownState(int32_t touchId, int32_t displayId, int32_t displayX,
+    int32_t displayY, int64_t downTime)
+{
+    std::lock_guard<std::mutex> lock(activePointsMutex_);
+    activePoints_[touchId] = { displayId, displayX, displayY, downTime };
+    activeDisplayId_ = displayId;
+}
+
+void TouchControllerImpl::CommitTouchMoveState(int32_t touchId, int32_t displayId, int32_t displayX, int32_t displayY)
+{
+    std::lock_guard<std::mutex> lock(activePointsMutex_);
+    auto it = activePoints_.find(touchId);
+    if (it != activePoints_.end()) {
+        it->second.displayId = displayId;
+        it->second.displayX = displayX;
+        it->second.displayY = displayY;
+    }
+}
+
+void TouchControllerImpl::ClearTouchState(int32_t touchId)
+{
+    std::lock_guard<std::mutex> lock(activePointsMutex_);
+    activePoints_.erase(touchId);
+    if (activePoints_.empty()) {
+        activeDisplayId_ = -1;
+    }
+}
+
 int32_t TouchControllerImpl::TouchDown(int32_t touchId, int32_t displayId, int32_t displayX, int32_t displayY)
 {
     if (!IsTouchIdValid(touchId)) {
@@ -111,39 +204,19 @@ int32_t TouchControllerImpl::TouchDown(int32_t touchId, int32_t displayId, int32
         return ERROR_CODE_TOUCH_SEQUENCE_ERROR;
     }
 
-    std::shared_ptr<PointerEvent> pointerEvent;
     int64_t now = GetSysClockTime();
-
-    {
-        std::lock_guard<std::mutex> lock(mutex_);
-        if (activePoints_.count(touchId) != 0) {
-            MMI_HILOGE("Touch id %{public}d already pressed", touchId);
-            return ERROR_CODE_TOUCH_SEQUENCE_ERROR;
-        }
-        if (!activePoints_.empty() && activeDisplayId_ != displayId) {
-            MMI_HILOGE("Touch display mismatch, activeDisplayId=%{public}d, input=%{public}d",
-                activeDisplayId_, displayId);
-            return ERROR_CODE_TOUCH_SEQUENCE_ERROR;
-        }
-
-        std::map<int32_t, TouchContactState> contacts { activePoints_ };
-        contacts[touchId] = { displayId, displayX, displayY, now };
-        pointerEvent = CreatePointerEvent(PointerEvent::POINTER_ACTION_DOWN, touchId, displayId,
-            now, contacts, true);
-        if (pointerEvent == nullptr) {
-            return RET_ERR;
-        }
+    auto pointerEvent = BuildTouchDownEvent(touchId, displayId, displayX, displayY, now);
+    if (pointerEvent == nullptr) {
+        return ERROR_CODE_TOUCH_SEQUENCE_ERROR;
     }
 
-    int32_t ret;
+    int32_t ret = RET_OK;
     {
-        std::lock_guard<std::mutex> sendLock(sendMutex_);
+        std::lock_guard<std::mutex> lock(injectMutex_);
         ret = InjectPointerEvent(pointerEvent);
     }
     if (ret == RET_OK) {
-        std::lock_guard<std::mutex> lock(mutex_);
-        activePoints_[touchId] = { displayId, displayX, displayY, now };
-        activeDisplayId_ = displayId;
+        CommitTouchDownState(touchId, displayId, displayX, displayY, now);
     }
     return ret;
 }
@@ -155,48 +228,18 @@ int32_t TouchControllerImpl::TouchMove(int32_t touchId, int32_t displayId, int32
         return ERROR_CODE_TOUCH_SEQUENCE_ERROR;
     }
 
-    std::shared_ptr<PointerEvent> pointerEvent;
-    int64_t now = GetSysClockTime();
-
-    {
-        std::lock_guard<std::mutex> lock(mutex_);
-        auto it = activePoints_.find(touchId);
-        if (it == activePoints_.end()) {
-            MMI_HILOGE("Touch id %{public}d is not active", touchId);
-            return ERROR_CODE_TOUCH_SEQUENCE_ERROR;
-        }
-        if (activeDisplayId_ != displayId) {
-            MMI_HILOGE("Touch display mismatch, activeDisplayId=%{public}d, input=%{public}d",
-                activeDisplayId_, displayId);
-            return ERROR_CODE_TOUCH_SEQUENCE_ERROR;
-        }
-
-        std::map<int32_t, TouchContactState> contacts { activePoints_ };
-        contacts[touchId].displayId = displayId;
-        contacts[touchId].displayX = displayX;
-        contacts[touchId].displayY = displayY;
-        contacts[touchId].downTime = it->second.downTime;
-
-        pointerEvent = CreatePointerEvent(PointerEvent::POINTER_ACTION_MOVE, touchId, displayId,
-            now, contacts, true);
-        if (pointerEvent == nullptr) {
-            return RET_ERR;
-        }
+    auto pointerEvent = BuildTouchMoveEvent(touchId, displayId, displayX, displayY, GetSysClockTime());
+    if (pointerEvent == nullptr) {
+        return ERROR_CODE_TOUCH_SEQUENCE_ERROR;
     }
 
-    int32_t ret;
+    int32_t ret = RET_OK;
     {
-        std::lock_guard<std::mutex> sendLock(sendMutex_);
+        std::lock_guard<std::mutex> lock(injectMutex_);
         ret = InjectPointerEvent(pointerEvent);
     }
     if (ret == RET_OK) {
-        std::lock_guard<std::mutex> lock(mutex_);
-        auto it = activePoints_.find(touchId);
-        if (it != activePoints_.end()) {
-            it->second.displayId = displayId;
-            it->second.displayX = displayX;
-            it->second.displayY = displayY;
-        }
+        CommitTouchMoveState(touchId, displayId, displayX, displayY);
     }
     return ret;
 }
@@ -208,51 +251,18 @@ int32_t TouchControllerImpl::TouchUp(int32_t touchId, int32_t displayId, int32_t
         return ERROR_CODE_TOUCH_SEQUENCE_ERROR;
     }
 
-    std::shared_ptr<PointerEvent> pointerEvent;
-    int64_t now = GetSysClockTime();
-
-    {
-        std::lock_guard<std::mutex> lock(mutex_);
-        auto it = activePoints_.find(touchId);
-        if (it == activePoints_.end()) {
-            MMI_HILOGE("Touch id %{public}d is not active", touchId);
-            return ERROR_CODE_TOUCH_SEQUENCE_ERROR;
-        }
-        if (activeDisplayId_ != displayId) {
-            MMI_HILOGE("Touch display mismatch, activeDisplayId=%{public}d, input=%{public}d",
-                activeDisplayId_, displayId);
-            return ERROR_CODE_TOUCH_SEQUENCE_ERROR;
-        }
-
-        std::map<int32_t, TouchContactState> contacts { activePoints_ };
-        contacts[touchId].displayId = displayId;
-        contacts[touchId].displayX = displayX;
-        contacts[touchId].displayY = displayY;
-        contacts[touchId].downTime = it->second.downTime;
-
-        pointerEvent = CreatePointerEvent(PointerEvent::POINTER_ACTION_UP, touchId, displayId,
-            now, contacts, false);
-        if (pointerEvent == nullptr) {
-            activePoints_.erase(it);
-            if (activePoints_.empty()) {
-                activeDisplayId_ = -1;
-            }
-            return RET_ERR;
-        }
+    auto pointerEvent = BuildTouchUpEvent(touchId, displayId, displayX, displayY, GetSysClockTime());
+    if (pointerEvent == nullptr) {
+        ClearTouchState(touchId);
+        return ERROR_CODE_TOUCH_SEQUENCE_ERROR;
     }
 
-    int32_t ret;
+    int32_t ret = RET_OK;
     {
-        std::lock_guard<std::mutex> sendLock(sendMutex_);
+        std::lock_guard<std::mutex> lock(injectMutex_);
         ret = InjectPointerEvent(pointerEvent);
     }
-    {
-        std::lock_guard<std::mutex> lock(mutex_);
-        activePoints_.erase(touchId);
-        if (activePoints_.empty()) {
-            activeDisplayId_ = -1;
-        }
-    }
+    ClearTouchState(touchId);
     return ret;
 }
 
