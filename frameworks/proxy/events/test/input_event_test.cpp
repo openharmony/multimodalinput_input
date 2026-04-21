@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -15,6 +15,7 @@
 
 #include <gtest/gtest.h>
 
+#include <ipc_object_proxy.h>
 #include "input_event.h"
 #include "window_info.h"
 #include "mmi_log.h"
@@ -454,5 +455,122 @@ HWTEST_F(InputEventTest, InputEventTest_Hash_001, TestSize.Level1)
     EXPECT_NE(inputEvent->Hash(), inputEvent2->Hash());
 }
 
+/**
+ * @tc.name: UIExtensionInfo_Marshalling_Success
+ * @tc.desc: Test UIExtensionInfo Marshalling success
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputEventTest, UIExtensionInfo_Marshalling_Success, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    sptr<IRemoteObject> token = new (std::nothrow) IPCObjectProxy(0);
+    ASSERT_NE(token, nullptr);
+    int32_t uecPid = 1;
+    int32_t uecWindowId = 1;
+    UIExtensionInfo info(token, uecPid, uecWindowId);
+
+    MessageParcel parcel;
+    EXPECT_TRUE(info.Marshalling(parcel));
+}
+
+/**
+ * @tc.name: UIExtensionInfo_Marshalling_Fail
+ * @tc.desc: Test UIExtensionInfo marshalling fail
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputEventTest, UIExtensionInfo_Marshalling_Fail, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t uecPid = 1;
+    int32_t uecWindowId = 1;
+    UIExtensionInfo info(nullptr, uecPid, uecWindowId);
+
+    MessageParcel parcel;
+    EXPECT_FALSE(info.Marshalling(parcel));
+}
+
+/**
+ * @tc.name: UIExtensionInfo_Unmarshalling_Success
+ * @tc.desc: Test UIExtensionInfo Unmarshalling success
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputEventTest, UIExtensionInfo_Unmarshalling_Success, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MessageParcel parcel;
+
+    sptr<IRemoteObject> token = new (std::nothrow) IPCObjectProxy(0);
+    ASSERT_NE(token, nullptr);
+    int32_t uecPid = 1;
+    int32_t uecWindowId = 1;
+    UIExtensionInfo info(token, uecPid, uecWindowId);
+    EXPECT_TRUE(info.Marshalling(parcel));
+
+    UIExtensionInfo *unmarshalledInfo = UIExtensionInfo::Unmarshalling(parcel);
+    EXPECT_NE(unmarshalledInfo, nullptr);
+    delete unmarshalledInfo;
+}
+
+/**
+ * @tc.name: UIExtensionInfo_Unmarshalling_Fail
+ * @tc.desc: Test UIExtensionInfo Unmarshalling fail
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputEventTest, UIExtensionInfo_Unmarshalling_Fail, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MessageParcel parcel;
+    UIExtensionInfo *info = UIExtensionInfo::Unmarshalling(parcel);
+    EXPECT_EQ(info, nullptr);
+}
+
+/**
+ * @tc.name: UIExtensionInfo_ReadFromParcel_Success
+ * @tc.desc: Test UIExtensionInfo ReadFromParcel success
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputEventTest, UIExtensionInfo_ReadFromParcel_Success, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MessageParcel parcel;
+
+    sptr<IRemoteObject> token = new (std::nothrow) IPCObjectProxy(0);
+    ASSERT_NE(token, nullptr);
+    int32_t uecPid = 1;
+    int32_t uecWindowId = 1;
+    UIExtensionInfo info(token, uecPid, uecWindowId);
+    EXPECT_TRUE(info.Marshalling(parcel));
+
+    UIExtensionInfo info2;
+    EXPECT_TRUE(info2.ReadFromParcel(parcel));
+
+    EXPECT_NE(info2.token, nullptr);
+    EXPECT_EQ(info2.pid, uecPid);
+    EXPECT_EQ(info2.hostWindowId, uecWindowId);
+}
+
+/**
+ * @tc.name: UIExtensionInfo_ReadFromParcel_Fail
+ * @tc.desc: Test UIExtensionInfo ReadFromParcel fail
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputEventTest, UIExtensionInfo_ReadFromParcel_Fail, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MessageParcel parcel;
+
+    UIExtensionInfo info;
+    EXPECT_FALSE(info.ReadFromParcel(parcel));
+
+    EXPECT_EQ(info.token, nullptr);
+    EXPECT_EQ(info.pid, 0);
+    EXPECT_EQ(info.hostWindowId, 0);
+}
 } // namespace MMI
 } // namespace OHOS
