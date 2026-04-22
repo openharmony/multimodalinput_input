@@ -2349,6 +2349,7 @@ int32_t MMIService::OnGetKeyState(std::vector<int32_t> &pressedKeys,
 }
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 
+#ifdef OHOS_BUILD_ENABLE_CONTROLLER_INJECT
 int32_t MMIService::ValidateControllerEventCoordinates(const std::shared_ptr<PointerEvent> pointerEvent)
 {
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
@@ -2388,6 +2389,7 @@ int32_t MMIService::ValidateControllerEventCoordinates(const std::shared_ptr<Poi
     }
     return RET_OK;
 }
+#endif // OHOS_BUILD_ENABLE_CONTROLLER_INJECT
 
 int32_t MMIService::CheckInjectPointerEvent(int32_t userId, const std::shared_ptr<PointerEvent> pointerEvent,
     int32_t pid, bool isNativeInject, bool isShell, int32_t useCoordinate)
