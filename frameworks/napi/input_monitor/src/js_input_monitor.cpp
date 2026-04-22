@@ -656,7 +656,12 @@ int32_t JsInputMonitor::TransformPointerEvent(
         MMI_HILOGE("Set inputEvent property failed");
         return RET_ERR;
     }
-    if (SetNameProperty(env, result, "action", GetAction(pointerEvent->GetPointerAction())) != napi_ok) {
+    int32_t action = GetAction(pointerEvent->GetPointerAction());
+    if (action == RET_ERR) {
+        MMI_HILOGD("Unexpected event action");
+        return RET_ERR;
+    }
+    if (SetNameProperty(env, result, "action", action) != napi_ok) {
         MMI_HILOGE("Set action property failed");
         return RET_ERR;
     }
