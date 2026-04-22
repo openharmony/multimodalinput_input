@@ -848,6 +848,7 @@ const int32_t KeyEvent::KEYCODE_MMX_TOUCH = 3222;
 const int32_t KeyEvent::KEYCODE_XKEY = 3232;
 const int32_t KeyEvent::KEYCODE_FINGERPRINT_SLIDE_UP = 3233;
 const int32_t KeyEvent::KEYCODE_FINGERPRINT_SLIDE_DOWN = 3234;
+const int32_t KeyEvent::KEYCODE_PEN_WRITING_MOUSE = 3251;
 const int32_t KeyEvent::KEYCODE_WRIST_TURN = 16777216;  // 0x01000000
 const int32_t KeyEvent::KEYCODE_REMOTE_POWER = 4000;
 const int32_t KeyEvent::KEYCODE_LEFT_KNOB_ROLL_UP = 10001;
