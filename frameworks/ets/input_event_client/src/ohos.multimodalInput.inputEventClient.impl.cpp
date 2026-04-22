@@ -742,6 +742,37 @@ constexpr int32_t TOUCH_ID_INVALID_ERROR = 4300003;
 constexpr const char* TOUCH_DOWN_STATE_ERROR_MSG = "The touch point is touching the display.";
 constexpr const char* TOUCH_NOT_DOWN_STATE_ERROR_MSG = "The touch point is not touching the display.";
 constexpr const char* TOUCH_ID_INVALID_ERROR_MSG = "The touch point ID is not within the valid range [0,9].";
+constexpr const char* CONTROL_DEVICE_PERMISSION = "ohos.permission.CONTROL_DEVICE";
+
+enum class TouchControllerOperation {
+    CREATE,
+    DOWN,
+    MOVE,
+    UP,
+};
+
+std::string GetTouchControllerActionName(TouchControllerOperation operation)
+{
+    switch (operation) {
+        case TouchControllerOperation::DOWN:
+            return "touch down";
+        case TouchControllerOperation::MOVE:
+            return "touch move";
+        case TouchControllerOperation::UP:
+            return "touch up";
+        case TouchControllerOperation::CREATE:
+        default:
+            return "create TouchController";
+    }
+}
+
+const char* GetTouchControllerStateErrorMsg(TouchControllerOperation operation)
+{
+    if (operation == TouchControllerOperation::DOWN) {
+        return TOUCH_DOWN_STATE_ERROR_MSG;
+    }
+    return TOUCH_NOT_DOWN_STATE_ERROR_MSG;
+}
 
 int32_t NormalizeTouchControllerErrorCode(int32_t errorCode)
 {
@@ -754,11 +785,11 @@ int32_t NormalizeTouchControllerErrorCode(int32_t errorCode)
     return errorCode;
 }
 
-void SetTouchControllerBusinessError(int32_t errorCode, const char* stateErrorMsg = nullptr)
+void SetTouchControllerBusinessError(int32_t errorCode, TouchControllerOperation operation)
 {
     errorCode = NormalizeTouchControllerErrorCode(errorCode);
     if (errorCode == OHOS::MMI::TaiheErrorCode::COMMON_PERMISSION_CHECK_ERROR) {
-        std::string msg = MakePermissionCheckErrMsg("create TouchController", "ohos.permission.CONTROL_DEVICE");
+        std::string msg = MakePermissionCheckErrMsg(GetTouchControllerActionName(operation), CONTROL_DEVICE_PERMISSION);
         taihe::set_business_error(errorCode, msg);
         return;
     }
@@ -766,8 +797,8 @@ void SetTouchControllerBusinessError(int32_t errorCode, const char* stateErrorMs
         taihe::set_business_error(TOUCH_STATE_ERROR, TOUCH_ID_INVALID_ERROR_MSG);
         return;
     }
-    if (errorCode == TOUCH_STATE_ERROR && stateErrorMsg != nullptr) {
-        taihe::set_business_error(errorCode, stateErrorMsg);
+    if (errorCode == TOUCH_STATE_ERROR) {
+        taihe::set_business_error(errorCode, GetTouchControllerStateErrorMsg(operation));
         return;
     }
     TaiheError_t codeMsg;
@@ -800,14 +831,15 @@ public:
     {
         if (nativeImpl_ == nullptr) {
             MMI_HILOGE("Native implementation is null");
-            SetTouchControllerBusinessError(OHOS::MMI::TaiheErrorCode::INPUT_SERVICE_EXCEPTION);
+            SetTouchControllerBusinessError(OHOS::MMI::TaiheErrorCode::INPUT_SERVICE_EXCEPTION,
+                TouchControllerOperation::DOWN);
             return;
         }
 
         int32_t ret = nativeImpl_->TouchDown(touch.id, touch.displayId, touch.displayX, touch.displayY);
         if (ret != RET_OK) {
             MMI_HILOGE("TouchDown failed, ret=%{public}d", ret);
-            SetTouchControllerBusinessError(ret, TOUCH_DOWN_STATE_ERROR_MSG);
+            SetTouchControllerBusinessError(ret, TouchControllerOperation::DOWN);
         }
     }
 
@@ -815,14 +847,15 @@ public:
     {
         if (nativeImpl_ == nullptr) {
             MMI_HILOGE("Native implementation is null");
-            SetTouchControllerBusinessError(OHOS::MMI::TaiheErrorCode::INPUT_SERVICE_EXCEPTION);
+            SetTouchControllerBusinessError(OHOS::MMI::TaiheErrorCode::INPUT_SERVICE_EXCEPTION,
+                TouchControllerOperation::MOVE);
             return;
         }
 
         int32_t ret = nativeImpl_->TouchMove(touch.id, touch.displayId, touch.displayX, touch.displayY);
         if (ret != RET_OK) {
             MMI_HILOGE("TouchMove failed, ret=%{public}d", ret);
-            SetTouchControllerBusinessError(ret, TOUCH_NOT_DOWN_STATE_ERROR_MSG);
+            SetTouchControllerBusinessError(ret, TouchControllerOperation::MOVE);
         }
     }
 
@@ -830,14 +863,15 @@ public:
     {
         if (nativeImpl_ == nullptr) {
             MMI_HILOGE("Native implementation is null");
-            SetTouchControllerBusinessError(OHOS::MMI::TaiheErrorCode::INPUT_SERVICE_EXCEPTION);
+            SetTouchControllerBusinessError(OHOS::MMI::TaiheErrorCode::INPUT_SERVICE_EXCEPTION,
+                TouchControllerOperation::UP);
             return;
         }
 
         int32_t ret = nativeImpl_->TouchUp(touch.id, touch.displayId, touch.displayX, touch.displayY);
         if (ret != RET_OK) {
             MMI_HILOGE("TouchUp failed, ret=%{public}d", ret);
-            SetTouchControllerBusinessError(ret, TOUCH_NOT_DOWN_STATE_ERROR_MSG);
+            SetTouchControllerBusinessError(ret, TouchControllerOperation::UP);
         }
     }
 
@@ -853,7 +887,7 @@ private:
     int32_t ret = InputManager::GetInstance()->CreateTouchController(nativeImpl);
     if (ret != RET_OK || nativeImpl == nullptr) {
         MMI_HILOGE("Failed to create native TouchControllerImpl, ret=%{public}d", ret);
-        SetTouchControllerBusinessError(ret);
+        SetTouchControllerBusinessError(ret, TouchControllerOperation::CREATE);
         return make_holder<TaiheTouchControllerImpl,
             ::ohos::multimodalInput::inputEventClient::TouchController>();
     }
