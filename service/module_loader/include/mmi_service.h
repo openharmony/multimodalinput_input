@@ -364,7 +364,9 @@ private:
     ErrCode CheckControllerKeyEventPermission(const std::shared_ptr<KeyEvent> keyEvent, bool isNativeInject);
     ErrCode CheckControllerPointerEventPermission(const std::shared_ptr<PointerEvent> pointerEvent,
         bool isNativeInject);
+#ifdef OHOS_BUILD_ENABLE_CONTROLLER_INJECT
     int32_t ValidateControllerEventCoordinates(const std::shared_ptr<PointerEvent> pointerEvent);
+#endif // OHOS_BUILD_ENABLE_CONTROLLER_INJECT
     int32_t CheckPidPermission(int32_t pid);
     void PrintLog(const std::string &flag, int32_t duration, int32_t pid, int32_t tid);
     void OnSessionDelete(SessionPtr session);

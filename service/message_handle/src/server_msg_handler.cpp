@@ -91,9 +91,14 @@ constexpr int32_t BASE_USER_RANGE { 200000 };
 
 bool IsControllerTouchEvent(const std::shared_ptr<PointerEvent> &pointerEvent)
 {
+#ifdef OHOS_BUILD_ENABLE_CONTROLLER_INJECT
     CHKPF(pointerEvent);
     return pointerEvent->HasFlag(InputEvent::EVENT_FLAG_CONTROLLER) &&
         pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHSCREEN;
+#else
+    (void)pointerEvent;
+    return false;
+#endif // OHOS_BUILD_ENABLE_CONTROLLER_INJECT
 }
 } // namespace
 

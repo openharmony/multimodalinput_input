@@ -1312,9 +1312,14 @@ void InputManagerImpl::SimulateInputEvent(std::shared_ptr<KeyEvent> keyEvent, bo
 
 static bool IsControllerTouchEvent(const std::shared_ptr<PointerEvent> &pointerEvent)
 {
+#ifdef OHOS_BUILD_ENABLE_CONTROLLER_INJECT
     CHKPF(pointerEvent);
     return pointerEvent->HasFlag(InputEvent::EVENT_FLAG_CONTROLLER) &&
         pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHSCREEN;
+#else
+    (void)pointerEvent;
+    return false;
+#endif // OHOS_BUILD_ENABLE_CONTROLLER_INJECT
 }
 
 void InputManagerImpl::HandleSimulateInputEvent(std::shared_ptr<PointerEvent> pointerEvent)
