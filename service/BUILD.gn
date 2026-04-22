@@ -2290,6 +2290,7 @@ ohos_unittest("ModuleLoaderTest") {
     "graphic_2d:librender_service_base",
     "graphic_2d:librender_service_client",
     "hilog:libhilog",
+    "hisysevent:libhisysevent",
     "image_framework:image_native",
     "init:libbegetutil",
     "ipc:ipc_core",

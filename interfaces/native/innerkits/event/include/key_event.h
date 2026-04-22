@@ -3225,6 +3225,12 @@ public:
     static const int32_t KEYCODE_FINGERPRINT_SLIDE_DOWN;
 
     /**
+     * Long press the writing button of pen in mouse mode
+     * @since 26.0.0
+     */
+    static const int32_t KEYCODE_PEN_WRITING_MOUSE;
+
+    /**
      * Wrist Turn key
      *
      * @since 26.0.0

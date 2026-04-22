@@ -91,7 +91,7 @@ public:
 
 private:
     void* handle_ { nullptr };
-    InputPluginStage stage_;
+    InputPluginStage stage_ { InputPluginStage::INPUT_GLOBAL_INIT };
     std::vector<InputPluginStage> stages_;
     int32_t timerCnt_ = 0;
 };

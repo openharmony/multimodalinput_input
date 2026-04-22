@@ -225,6 +225,7 @@ ohos_unittest("GestureTransformTest") {
     "${mmi_path}/service/subscriber/include",
     "${mmi_path}/service/common/timer_manager/include",
     "${mmi_path}/service/touch_event_normalize/include",
+    "${mmi_path}/service/triple_finger_snapshot/include",
     "${mmi_path}/service/window_manager/include",
     "${mmi_path}/util/common/include",
     "${mmi_path}/util/network/include",
