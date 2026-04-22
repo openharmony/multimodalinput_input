@@ -29,7 +29,6 @@ namespace SettingConstants {
 
     // Default values
     constexpr int32_t DEFAULT_USER_ID = 100;
-    constexpr int32_t MAX_USER_ID = 10000;
 
     // File paths (internal use only)
     extern const std::string GLOBAL_CONFIG_PATH;
