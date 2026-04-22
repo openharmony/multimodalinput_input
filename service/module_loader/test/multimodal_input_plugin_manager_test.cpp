@@ -197,8 +197,8 @@ HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_Load
 
     // Call LoadPlugin
     InputPluginManager* manager = InputPluginManager::GetInstance("/tmp");
-    bool result = manager->LoadPlugin(validPath);
-    EXPECT_FALSE(result);
+    auto plugin = manager->LoadPlugin(validPath);
+    EXPECT_EQ(plugin, nullptr);
 
     // Verify plugin is inserted into plugins_
     auto& plugins = manager->plugins_;
@@ -218,8 +218,8 @@ HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_Load
     EXPECT_CALL(libinputMock, Dlerror()).WillRepeatedly(Return("dlopen error"));
 
     InputPluginManager* manager = InputPluginManager::GetInstance("/tmp");
-    bool result = manager->LoadPlugin(invalidPath);
-    EXPECT_FALSE(result);
+    auto plugin = manager->LoadPlugin(invalidPath);
+    EXPECT_EQ(plugin, nullptr);
 }
 
 /**
@@ -236,8 +236,8 @@ HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_Load
     EXPECT_CALL(libinputMock, Dlerror()).WillRepeatedly(Return("symbol not found"));
 
     InputPluginManager* manager = InputPluginManager::GetInstance("/tmp");
-    bool result = manager->LoadPlugin(validPath);
-    EXPECT_FALSE(result);
+    auto plugin = manager->LoadPlugin(validPath);
+    EXPECT_EQ(plugin, nullptr);
 }
 
 /**
@@ -253,8 +253,8 @@ HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_Load
     EXPECT_CALL(libinputMock, Dlerror()).WillRepeatedly(Return(nullptr));
 
     InputPluginManager* manager = InputPluginManager::GetInstance("/tmp");
-    bool result = manager->LoadPlugin(validPath);
-    EXPECT_FALSE(result);
+    auto plugin = manager->LoadPlugin(validPath);
+    EXPECT_EQ(plugin, nullptr);
 }
 
 /**
@@ -1086,7 +1086,7 @@ HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_Inpu
     TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    std::shared_ptr<InputPlugin> inputPluginContext = std::make_shared<InputPlugin>();
+    std::shared_ptr<InputPlugin> inputPluginContext = std::make_shared<InputPlugin>(nullptr);
     libinput_event* event = nullptr;
     int64_t frameTime = 100;
     inputPluginContext->DispatchEvent(event, frameTime);
@@ -1102,7 +1102,7 @@ HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_Inpu
     TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    std::shared_ptr<InputPlugin> inputPluginContext = std::make_shared<InputPlugin>();
+    std::shared_ptr<InputPlugin> inputPluginContext = std::make_shared<InputPlugin>(nullptr);
     int32_t pid = 1;
     UDSServer udsServer;
     InputPluginManager::GetInstance()->udsServer_ = &udsServer;
@@ -1120,7 +1120,7 @@ HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_Inpu
     TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    std::shared_ptr<InputPlugin> inputPluginContext = std::make_shared<InputPlugin>();
+    std::shared_ptr<InputPlugin> inputPluginContext = std::make_shared<InputPlugin>(nullptr);
     std::shared_ptr<UDSServer> udsServer = std::make_shared<UDSServer>();
     std::string programName = "program";
     int32_t moduleType = 1;
@@ -1160,7 +1160,7 @@ HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_Inpu
     InputHandler->eventKeyCommandHandler_ = std::make_shared<KeyCommandHandler>();
     InputHandler->eventMonitorHandler_ = std::make_shared<EventMonitorHandler>();
 
-    std::shared_ptr<InputPlugin> inputPluginContext = std::make_shared<InputPlugin>();
+    std::shared_ptr<InputPlugin> inputPluginContext = std::make_shared<InputPlugin>(nullptr);
     EXPECT_NO_FATAL_FAILURE(inputPluginContext->DispatchEvent(event, filterStage));
     EXPECT_NO_FATAL_FAILURE(inputPluginContext->DispatchEvent(event, interceptStage));
     EXPECT_NO_FATAL_FAILURE(inputPluginContext->DispatchEvent(event, keyCommandStage));
@@ -1179,7 +1179,7 @@ HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_Inpu
     TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    std::shared_ptr<InputPlugin> inputPluginContext = std::make_shared<InputPlugin>();
+    std::shared_ptr<InputPlugin> inputPluginContext = std::make_shared<InputPlugin>(nullptr);
     libinput_event* event = nullptr;
     std::shared_ptr<IPluginData> data = std::make_shared<IPluginData>();
     PluginResult result = inputPluginContext->HandleEvent(event, data);
@@ -1223,7 +1223,7 @@ HWTEST_F(
     MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_InputPlugin_GetName_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    std::shared_ptr<InputPlugin> inputPluginContext = std::make_shared<InputPlugin>();
+    std::shared_ptr<InputPlugin> inputPluginContext = std::make_shared<InputPlugin>(nullptr);
     inputPluginContext->name_ = "yunshuiqiao";
     std::string pluginName = inputPluginContext->GetName();
     EXPECT_EQ(pluginName, "yunshuiqiao");
@@ -1238,7 +1238,7 @@ HWTEST_F(
     MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_InputPlugin_GetPriority_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    std::shared_ptr<InputPlugin> inputPluginContext = std::make_shared<InputPlugin>();
+    std::shared_ptr<InputPlugin> inputPluginContext = std::make_shared<InputPlugin>(nullptr);
     inputPluginContext->prio_ = 300;
     int32_t priority = inputPluginContext->GetPriority();
     EXPECT_EQ(priority, 300);
@@ -1253,7 +1253,7 @@ HWTEST_F(
     MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_InputPlugin_SetCallback_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    std::shared_ptr<InputPlugin> inputPluginContext = std::make_shared<InputPlugin>();
+    std::shared_ptr<InputPlugin> inputPluginContext = std::make_shared<InputPlugin>(nullptr);
     std::function<void(PluginEventType, int64_t)> callback = [](PluginEventType, int64_t) {};
     inputPluginContext->SetCallback(callback);
     EXPECT_NE(inputPluginContext->callback_, nullptr);
@@ -1268,7 +1268,7 @@ HWTEST_F(
     MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_InputPlugin_GetPlugin_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    std::shared_ptr<InputPlugin> inputPluginContext = std::make_shared<InputPlugin>();
+    std::shared_ptr<InputPlugin> inputPluginContext = std::make_shared<InputPlugin>(nullptr);
     std::shared_ptr<MockInputPlugin> mockInputPlugin = std::make_shared<MockInputPlugin>();
     EXPECT_CALL(*mockInputPlugin, GetName()).WillRepeatedly(Return("yunshuiqiao"));
     EXPECT_CALL(*mockInputPlugin, GetPriority()).WillRepeatedly(Return(201));
@@ -1286,7 +1286,7 @@ HWTEST_F(
 HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_IsFingerPressed_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    std::shared_ptr<InputPlugin> inputPluginContext = std::make_shared<InputPlugin>();
+    std::shared_ptr<InputPlugin> inputPluginContext = std::make_shared<InputPlugin>(nullptr);
     EXPECT_EQ(inputPluginContext->IsFingerPressed(), false);
 }
 
@@ -1298,7 +1298,7 @@ HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_IsFi
 HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_GetFocusedPid_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    std::shared_ptr<InputPlugin> inputPluginContext = std::make_shared<InputPlugin>();
+    std::shared_ptr<InputPlugin> inputPluginContext = std::make_shared<InputPlugin>(nullptr);
     EXPECT_EQ(inputPluginContext->GetFocusedPid(), -1);
 }
 
@@ -1310,7 +1310,7 @@ HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_GetF
 HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_HasLocalMouseDevice_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    std::shared_ptr<InputPlugin> inputPluginContext = std::make_shared<InputPlugin>();
+    std::shared_ptr<InputPlugin> inputPluginContext = std::make_shared<InputPlugin>(nullptr);
     EXPECT_EQ(inputPluginContext->HasLocalMouseDevice(), false);
 }
 
@@ -1322,7 +1322,7 @@ HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_HasL
 HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_AttachDeviceObserver_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    std::shared_ptr<InputPlugin> inputPluginContext = std::make_shared<InputPlugin>();
+    std::shared_ptr<InputPlugin> inputPluginContext = std::make_shared<InputPlugin>(nullptr);
     std::shared_ptr<MockIDeviceObserver> mockDeviceObserver = std::make_shared<MockIDeviceObserver>();
     EXPECT_TRUE(inputPluginContext->AttachDeviceObserver(mockDeviceObserver));
 }
@@ -1335,7 +1335,7 @@ HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_Atta
 HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_DetachDeviceObserver_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    std::shared_ptr<InputPlugin> inputPluginContext = std::make_shared<InputPlugin>();
+    std::shared_ptr<InputPlugin> inputPluginContext = std::make_shared<InputPlugin>(nullptr);
     std::shared_ptr<MockIDeviceObserver> mockDeviceObserver = std::make_shared<MockIDeviceObserver>();
     EXPECT_TRUE(inputPluginContext->DetachDeviceObserver(mockDeviceObserver));
 }
@@ -1348,7 +1348,7 @@ HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_Deta
 HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_GetCurrentAccountId_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    std::shared_ptr<InputPlugin> inputPluginContext = std::make_shared<InputPlugin>();
+    std::shared_ptr<InputPlugin> inputPluginContext = std::make_shared<InputPlugin>(nullptr);
     int32_t defaultAccountId = 100;
     EXPECT_EQ(inputPluginContext->GetCurrentAccountId(), defaultAccountId);
 }
@@ -1362,7 +1362,7 @@ HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_Regi
          TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    std::shared_ptr<InputPlugin> inputPluginContext = std::make_shared<InputPlugin>();
+    std::shared_ptr<InputPlugin> inputPluginContext = std::make_shared<InputPlugin>(nullptr);
     std::function<void(const EventFwk::CommonEventData &)> callback = [](const EventFwk::CommonEventData &) {};
     int32_t callbackId = inputPluginContext->RegisterCommonEventCallback(callback);
     EXPECT_NE(callbackId, -1);
@@ -1377,7 +1377,7 @@ HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_UnRe
          TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    std::shared_ptr<InputPlugin> inputPluginContext = std::make_shared<InputPlugin>();
+    std::shared_ptr<InputPlugin> inputPluginContext = std::make_shared<InputPlugin>(nullptr);
     int32_t callbackId = 1;
     EXPECT_FALSE(inputPluginContext->UnRegisterCommonEventCallback(callbackId));
 }
@@ -1390,7 +1390,7 @@ HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_UnRe
 HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_InputPlugin_Init_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    std::shared_ptr<InputPlugin> inputPluginContext = std::make_shared<InputPlugin>();
+    std::shared_ptr<InputPlugin> inputPluginContext = std::make_shared<InputPlugin>(nullptr);
     std::shared_ptr<MockInputPlugin> mockInputPlugin = std::make_shared<MockInputPlugin>();
     
     EXPECT_CALL(*mockInputPlugin, GetName()).WillRepeatedly(Return("test plugin"));
@@ -1409,7 +1409,7 @@ HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_Inpu
 HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_InputPlugin_Init_002, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    std::shared_ptr<InputPlugin> inputPluginContext = std::make_shared<InputPlugin>();
+    std::shared_ptr<InputPlugin> inputPluginContext = std::make_shared<InputPlugin>(nullptr);
     std::shared_ptr<MockInputPlugin> mockInputPlugin = std::make_shared<MockInputPlugin>();
     
     EXPECT_CALL(*mockInputPlugin, GetName()).WillRepeatedly(Return("test plugin"));
@@ -1431,7 +1431,7 @@ HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_Inpu
 HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_InputPlugin_Init_003, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    std::shared_ptr<InputPlugin> inputPluginContext = std::make_shared<InputPlugin>();
+    std::shared_ptr<InputPlugin> inputPluginContext = std::make_shared<InputPlugin>(nullptr);
     std::shared_ptr<MockInputPlugin> mockInputPlugin = std::make_shared<MockInputPlugin>();
     
     EXPECT_CALL(*mockInputPlugin, GetName()).WillRepeatedly(Return("test plugin"));
