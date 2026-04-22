@@ -1159,7 +1159,7 @@ HWTEST_F(SettingDataMigratorTest, SettingDataMigrator_FieldTypes_001, TestSize.L
  */
 HWTEST_F(SettingDataMigratorTest, SettingDataMigrator_MaxUserId_001, TestSize.Level1)
 {
-    constexpr int32_t maxUserId = SettingConstants::MAX_USER_ID;
+    constexpr int32_t maxUserId = 10000;
     SettingDataMigrator& migrator = SettingDataMigrator::GetInstance();
     bool result = migrator.MigratorUserData(maxUserId);
 
