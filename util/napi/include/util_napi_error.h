@@ -51,6 +51,7 @@ enum NapiErrorCode : int32_t {
 
 constexpr const char* TOUCH_DOWN_STATE_ERROR_MSG = "The touch point is touching the display.";
 constexpr const char* TOUCH_NOT_DOWN_STATE_ERROR_MSG = "The touch point is not touching the display.";
+constexpr const char* TOUCH_ID_INVALID_ERROR_MSG = "The touch point ID is not within the valid range [0,9].";
 
 const std::map<int32_t, NapiError> NAPI_ERRORS = {
     { COMMON_PERMISSION_CHECK_ERROR,

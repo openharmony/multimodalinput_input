@@ -61,7 +61,7 @@ std::string MakePermissionCheckErrMsg(const std::string &moduleName,
 {
     std::stringstream ss;
     ss << "Permission denied. An attempt was made to " <<
-        moduleName << "forbidden by permission " <<
+        moduleName << " forbidden by permission:" <<
         permissionName << ".";
     return ss.str();
 }
@@ -738,8 +738,10 @@ private:
 }
 
 constexpr int32_t TOUCH_STATE_ERROR = 4300001;
+constexpr int32_t TOUCH_ID_INVALID_ERROR = 4300003;
 constexpr const char* TOUCH_DOWN_STATE_ERROR_MSG = "The touch point is touching the display.";
 constexpr const char* TOUCH_NOT_DOWN_STATE_ERROR_MSG = "The touch point is not touching the display.";
+constexpr const char* TOUCH_ID_INVALID_ERROR_MSG = "The touch point ID is not within the valid range [0,9].";
 
 int32_t NormalizeTouchControllerErrorCode(int32_t errorCode)
 {
@@ -755,6 +757,15 @@ int32_t NormalizeTouchControllerErrorCode(int32_t errorCode)
 void SetTouchControllerBusinessError(int32_t errorCode, const char* stateErrorMsg = nullptr)
 {
     errorCode = NormalizeTouchControllerErrorCode(errorCode);
+    if (errorCode == OHOS::MMI::TaiheErrorCode::COMMON_PERMISSION_CHECK_ERROR) {
+        std::string msg = MakePermissionCheckErrMsg("create TouchController", "ohos.permission.CONTROL_DEVICE");
+        taihe::set_business_error(errorCode, msg);
+        return;
+    }
+    if (errorCode == TOUCH_ID_INVALID_ERROR) {
+        taihe::set_business_error(TOUCH_STATE_ERROR, TOUCH_ID_INVALID_ERROR_MSG);
+        return;
+    }
     if (errorCode == TOUCH_STATE_ERROR && stateErrorMsg != nullptr) {
         taihe::set_business_error(errorCode, stateErrorMsg);
         return;

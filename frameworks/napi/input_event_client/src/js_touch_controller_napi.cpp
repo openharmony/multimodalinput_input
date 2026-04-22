@@ -35,6 +35,8 @@ namespace MMI {
 
 namespace {
 
+constexpr int32_t TOUCH_ID_INVALID_ERROR = 4300003;
+
 int32_t NormalizeTouchControllerErrorCode(int32_t code)
 {
     if (code == ERROR_NO_PERMISSION) {
@@ -49,6 +51,20 @@ int32_t NormalizeTouchControllerErrorCode(int32_t code)
 std::string GetTouchControllerErrorMsg(int32_t code, const char* stateErrorMsg = nullptr)
 {
     code = NormalizeTouchControllerErrorCode(code);
+    if (code == COMMON_PERMISSION_CHECK_ERROR) {
+        NapiError codeMsg;
+        if (UtilNapiError::GetApiError(code, codeMsg)) {
+            char msg[300] = {};
+            int32_t ret = sprintf_s(msg, sizeof(msg), codeMsg.msg.c_str(),
+                "create TouchController", "ohos.permission.CONTROL_DEVICE");
+            if (ret > 0) {
+                return msg;
+            }
+        }
+    }
+    if (code == TOUCH_ID_INVALID_ERROR) {
+        return TOUCH_ID_INVALID_ERROR_MSG;
+    }
     if (code == ERROR_CODE_STATE_ERROR && stateErrorMsg != nullptr) {
         return stateErrorMsg;
     }
@@ -70,6 +86,7 @@ napi_value CreateBusinessError(napi_env env, int32_t code, const char* stateErro
 
     code = NormalizeTouchControllerErrorCode(code);
     std::string msg = GetTouchControllerErrorMsg(code, stateErrorMsg);
+    code = code == TOUCH_ID_INVALID_ERROR ? ERROR_CODE_STATE_ERROR : code;
     napi_create_int32(env, code, &errorCode);
     napi_create_string_utf8(env, msg.c_str(), NAPI_AUTO_LENGTH, &errorMsg);
     napi_create_error(env, nullptr, errorMsg, &businessError);
@@ -129,7 +146,9 @@ napi_value GetTouchControllerCallbackInfo(napi_env env, napi_callback_info info,
 
 napi_value ResolveTouchControllerPromise(napi_env env, napi_deferred deferred, napi_value promise)
 {
-    napi_status status = napi_resolve_deferred(env, deferred, nullptr);
+    napi_value result = nullptr;
+    napi_get_undefined(env, &result);
+    napi_status status = napi_resolve_deferred(env, deferred, result);
     if (status != napi_ok) {
         MMI_HILOGE("RESOLVE_DEFERRED failed");
         return nullptr;
