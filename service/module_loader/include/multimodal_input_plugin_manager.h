@@ -18,11 +18,13 @@
 
 #include <dirent.h>
 #include <dlfcn.h>
+#include <atomic>
 #include <map>
 #include "plugin_stage.h"
 #include "timer_manager.h"
 #include "uds_server.h"
 #include "net_packet.h"
+#include "i_delegate_interface.h"
 #include "input_event_data_transformation.h"
 #include "key_command_handler.h"
 #include "key_option.h"
@@ -43,14 +45,14 @@ typedef int32_t (*InitPlugin)(std::shared_ptr<IPluginContext> ctx, std::shared_p
   * return：= 0: success
   *        !=0: error
  */
-typedef int32_t (*UnintPlugin)(std::shared_ptr<IInputPlugin> plugin);
+typedef int32_t (*UnintPlugin)(std::shared_ptr<IInputPlugin> &plugin);
 
 const int32_t RET_NOTDO = 0;
 const int32_t RET_DO = 1;
 
 struct InputPlugin : public IPluginContext {
 public:
-    InputPlugin() {};
+    InputPlugin(void *handle);
     virtual ~InputPlugin();
     int32_t Init(std::shared_ptr<IInputPlugin> pin);
     void UnInit();
@@ -86,19 +88,30 @@ public:
     UnintPlugin unintPlugin_ = nullptr;
     std::shared_ptr<IInputPlugin> plugin_;
     std::string name_;
-    void* handle_;
 
 private:
+    void* handle_ { nullptr };
     InputPluginStage stage_;
     std::vector<InputPluginStage> stages_;
     int32_t timerCnt_ = 0;
 };
 
-struct InputPluginManager {
+class InputPluginManager final {
+private:
+    struct PluginConfig {
+        std::string uuid_;
+        int32_t uid_ { -1 };
+        std::string name_;
+        std::string mode_;
+
+        bool IsValid() const;
+    };
+
 public:
     InputPluginManager(const InputPluginManager &) = delete;
     InputPluginManager &operator=(const InputPluginManager &) = delete;
     static InputPluginManager *GetInstance(const std::string &directory = "");
+    void AttachDelegateInterface(std::shared_ptr<IDelegateInterface> delegate);
     int32_t Init(UDSServer &udsServer);
     void Dump(int fd);
     void PluginAssignmentCallBack(std::function<void(PluginEventType, int64_t)> callback, InputPluginStage stage);
@@ -115,17 +128,35 @@ public:
     bool HandleShortcutKey(const KeyOption &option);
     bool HandleSequenceKeys(const Sequence &sequence);
 
+    int32_t LoadDynamicPlugin(int32_t uid, const std::string &uuid);
+    int32_t UnloadDynamicPlugin(int32_t uid, const std::string &uuid);
+
 private:
     explicit InputPluginManager(const std::string& directory) : directory_(directory) {};
     ~InputPluginManager();
     bool IntermediateEndEvent(PluginEventType pluginEvent);
-    bool LoadPlugin(const std::string &path);
+    std::shared_ptr<InputPlugin> LoadPlugin(const std::string &path);
     bool ProcessShortcutKey(const IShortcutKey &shortcutKey);
     bool ProcessSequenceKeys(const std::vector<ISequenceKey> &sequenceKeys);
+    void AddPluginToStages(const std::shared_ptr<IPluginContext> &cPin);
+    void RemovePluginFromStages(const std::shared_ptr<IPluginContext> &plugin);
+    void LoadPluginConfig();
+    bool ParsePluginConfig(const char *cfgPath, cJSON *jsonCfg);
+    bool ParsePluginItem(cJSON *item);
+    bool ReadStringField(cJSON *obj, const char *field, std::string &out);
+    bool ReadNumberField(cJSON *obj, const char *field, int32_t &out);
+    PluginConfig* FindPluginConfig(const std::string &uuid);
+    void LoadPluginAsync(std::shared_ptr<IDelegateInterface> delegate,
+        const std::string &uuid, const std::string &pluginPath);
+    void OnPluginLoaded(const std::string &uuid, std::shared_ptr<InputPlugin> plugin);
 
+    std::weak_ptr<IDelegateInterface> delegate_;
     UDSServer* udsServer_ {nullptr};
     std::string directory_;
     std::map<InputPluginStage, std::list<std::shared_ptr<IPluginContext>>> plugins_;
+    std::map<std::string, std::shared_ptr<InputPlugin>> dynamicPlugins_;
+    std::map<std::string, PluginConfig> pluginConfigs_;
+    std::atomic_bool loading_ { false };
     inline static InputPluginManager* instance_ { nullptr };
     inline static std::once_flag init_flag_;
 };

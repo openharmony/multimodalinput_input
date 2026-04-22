@@ -37,6 +37,7 @@
 #include "long_press_subscriber_handler.h"
 #include "libinput_adapter.h"
 #include "mouse_event_interface.h"
+#include "multimodal_input_plugin_manager.h"
 #include "permission_helper.h"
 #include "pointer_device_manager.h"
 #include "pointer_motion_acceleration.h"
@@ -1836,8 +1837,29 @@ int32_t ServerMsgHandler::NativeInjectCheck(int32_t pid)
 int32_t ServerMsgHandler::EnableInputExtension(int32_t uid, const std::string &uuid, bool enabled)
 {
     CALL_DEBUG_ENTER;
-    MMI_HILOGI("EnableInputExtension (uid:%{public}d, uuid:%{public}s, enabled:%{public}d)",
+    auto pluginMgr = InputPluginManager::GetInstance();
+    if (pluginMgr == nullptr) {
+        MMI_HILOGE("No input plugin manager");
+        return RET_ERR;
+    }
+
+    MMI_HILOGI("EnableInputExtension (uid:%{private}d, uuid:%{private}s, enabled:%{public}d)",
         uid, uuid.c_str(), enabled);
+
+    if (enabled) {
+        auto ret = pluginMgr->LoadDynamicPlugin(uid, uuid);
+        if (ret != RET_OK) {
+            MMI_HILOGE("Failed to load plugin uuid=%{private}s, error:%{public}d", uuid.c_str(), ret);
+            return ret;
+        }
+    } else {
+        auto ret = pluginMgr->UnloadDynamicPlugin(uid, uuid);
+        if (ret != RET_OK) {
+            MMI_HILOGE("Failed to unload plugin uuid=%{private}s, error:%{public}d", uuid.c_str(), ret);
+            return ret;
+        }
+    }
+
     return RET_OK;
 }
 } // namespace MMI

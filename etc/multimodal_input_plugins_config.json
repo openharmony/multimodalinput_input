@@ -1,0 +1,10 @@
+{
+  "input_plugins": [
+    {
+      "uuid": "8B2F8FC1-40B2-4204-B964-9D1524D9D426",
+      "uid": 7555,
+      "name": "libstylus_mouse_mode_plugin.z.so",
+      "mode": "dynamic"
+    }
+  ]
+}
