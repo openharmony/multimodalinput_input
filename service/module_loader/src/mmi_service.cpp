@@ -2261,16 +2261,14 @@ ErrCode MMIService::CheckControllerKeyEventPermission(const std::shared_ptr<KeyE
     bool isNativeInject)
 {
     CHKPR(keyEvent, ERROR_NULL_POINTER);
-#ifdef OHOS_BUILD_ENABLE_CONTROLLER_INJECT
     if (keyEvent->HasFlag(InputEvent::EVENT_FLAG_CONTROLLER)) {
-        MMI_HILOGD("Event from Controller interface, using CONTROL_DEVICE permission check");
+        MMI_HILOGD("Key event from Controller interface, using CONTROL_DEVICE permission check");
         ErrCode ret = CheckControllerPermission();
         if (ret != RET_OK) {
-            MMI_HILOGE("Controller permission check failed for KeyEvent, ret:%{public}d", ret);
+            MMI_HILOGE("Controller permission check failed for key event, ret:%{public}d", ret);
         }
         return ret;
     }
-#endif // OHOS_BUILD_ENABLE_CONTROLLER_INJECT
     if (!isNativeInject && !PER_HELPER->VerifySystemApp()) {
         MMI_HILOGE("Verify system APP failed");
         return ERROR_NOT_SYSAPI;
@@ -2419,17 +2417,27 @@ ErrCode MMIService::CheckControllerPointerEventPermission(const std::shared_ptr<
     bool isNativeInject)
 {
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
-#ifdef OHOS_BUILD_ENABLE_CONTROLLER_INJECT
-    if (pointerEvent->HasFlag(InputEvent::EVENT_FLAG_CONTROLLER)) {
-        MMI_HILOGD("Event from Controller interface, using CONTROL_DEVICE permission check");
+    if (pointerEvent->HasFlag(InputEvent::EVENT_FLAG_CONTROLLER) &&
+        pointerEvent->GetSourceType() != PointerEvent::SOURCE_TYPE_TOUCHSCREEN) {
+        MMI_HILOGD("Pointer event from Controller interface, using CONTROL_DEVICE permission check");
         ErrCode ret = CheckControllerPermission();
         if (ret != RET_OK) {
-            MMI_HILOGE("Controller permission check failed for PointerEvent, ret:%{public}d", ret);
+            MMI_HILOGE("Controller permission check failed for pointer event, ret:%{public}d", ret);
+        }
+        return ret;
+    }
+#ifdef OHOS_BUILD_ENABLE_CONTROLLER_INJECT
+    if (pointerEvent->HasFlag(InputEvent::EVENT_FLAG_CONTROLLER) &&
+        pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHSCREEN) {
+        MMI_HILOGD("Touch event from Controller interface, using CONTROL_DEVICE permission check");
+        ErrCode ret = CheckControllerPermission();
+        if (ret != RET_OK) {
+            MMI_HILOGE("Controller permission check failed for touch event, ret:%{public}d", ret);
             return ret;
         }
         ret = ValidateControllerEventCoordinates(pointerEvent);
         if (ret != RET_OK) {
-            MMI_HILOGE("Controller event validation failed, ret=%{public}d", ret);
+            MMI_HILOGE("Controller touch event validation failed, ret=%{public}d", ret);
         }
         return ret;
     }
