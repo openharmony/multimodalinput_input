@@ -35,7 +35,10 @@ namespace MMI {
 
 namespace {
 
+// Internal code used only to select the public 4300001 error message.
 constexpr int32_t TOUCH_ID_INVALID_ERROR = 4300003;
+constexpr size_t TOUCH_CONTROLLER_ARG_COUNT = 1;
+constexpr size_t CREATE_CONTROLLER_ARG_COUNT = 0;
 constexpr const char* CONTROL_DEVICE_PERMISSION = "ohos.permission.CONTROL_DEVICE";
 
 enum class TouchControllerOperation {
@@ -62,10 +65,16 @@ const char* GetTouchControllerActionName(TouchControllerOperation operation)
 
 const char* GetTouchControllerStateErrorMsg(TouchControllerOperation operation)
 {
-    if (operation == TouchControllerOperation::DOWN) {
-        return TOUCH_DOWN_STATE_ERROR_MSG;
+    switch (operation) {
+        case TouchControllerOperation::DOWN:
+            return TOUCH_DOWN_STATE_ERROR_MSG;
+        case TouchControllerOperation::MOVE:
+        case TouchControllerOperation::UP:
+            return TOUCH_NOT_DOWN_STATE_ERROR_MSG;
+        case TouchControllerOperation::CREATE:
+        default:
+            return "Input service exception.";
     }
-    return TOUCH_NOT_DOWN_STATE_ERROR_MSG;
 }
 
 int32_t NormalizeTouchControllerErrorCode(int32_t code)
@@ -79,19 +88,30 @@ int32_t NormalizeTouchControllerErrorCode(int32_t code)
     return code;
 }
 
+int32_t GetExposedTouchControllerErrorCode(int32_t code)
+{
+    return code == TOUCH_ID_INVALID_ERROR ? ERROR_CODE_STATE_ERROR : code;
+}
+
+std::string MakePermissionErrorMsg(int32_t code, TouchControllerOperation operation)
+{
+    NapiError codeMsg;
+    if (!UtilNapiError::GetApiError(code, codeMsg)) {
+        return "Permission denied.";
+    }
+    char msg[300] = {};
+    int32_t ret = sprintf_s(msg, sizeof(msg), codeMsg.msg.c_str(),
+        GetTouchControllerActionName(operation), CONTROL_DEVICE_PERMISSION);
+    if (ret <= 0) {
+        return codeMsg.msg;
+    }
+    return msg;
+}
+
 std::string GetTouchControllerErrorMsg(int32_t code, TouchControllerOperation operation)
 {
-    code = NormalizeTouchControllerErrorCode(code);
     if (code == COMMON_PERMISSION_CHECK_ERROR) {
-        NapiError codeMsg;
-        if (UtilNapiError::GetApiError(code, codeMsg)) {
-            char msg[300] = {};
-            int32_t ret = sprintf_s(msg, sizeof(msg), codeMsg.msg.c_str(),
-                GetTouchControllerActionName(operation), CONTROL_DEVICE_PERMISSION);
-            if (ret > 0) {
-                return msg;
-            }
-        }
+        return MakePermissionErrorMsg(code, operation);
     }
     if (code == TOUCH_ID_INVALID_ERROR) {
         return TOUCH_ID_INVALID_ERROR_MSG;
@@ -115,10 +135,10 @@ napi_value CreateBusinessError(napi_env env, int32_t code, TouchControllerOperat
     napi_value errorCode = nullptr;
     napi_value errorMsg = nullptr;
 
-    code = NormalizeTouchControllerErrorCode(code);
-    std::string msg = GetTouchControllerErrorMsg(code, operation);
-    code = code == TOUCH_ID_INVALID_ERROR ? ERROR_CODE_STATE_ERROR : code;
-    napi_create_int32(env, code, &errorCode);
+    int32_t normalizedCode = NormalizeTouchControllerErrorCode(code);
+    std::string msg = GetTouchControllerErrorMsg(normalizedCode, operation);
+    int32_t exposedCode = GetExposedTouchControllerErrorCode(normalizedCode);
+    napi_create_int32(env, exposedCode, &errorCode);
     napi_create_string_utf8(env, msg.c_str(), NAPI_AUTO_LENGTH, &errorMsg);
     napi_create_error(env, nullptr, errorMsg, &businessError);
     napi_set_named_property(env, businessError, "code", errorCode);
@@ -176,6 +196,48 @@ napi_value GetTouchControllerCallbackInfo(napi_env env, napi_callback_info info,
     return thisVar;
 }
 
+bool CheckCreateTouchControllerArgs(napi_env env, napi_callback_info info)
+{
+    size_t argc = TOUCH_CONTROLLER_ARG_COUNT;
+    napi_value argv[TOUCH_CONTROLLER_ARG_COUNT] = { nullptr };
+    napi_status status = napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr);
+    if (status != napi_ok) {
+        MMI_HILOGE("GET_CB_INFO failed");
+        return false;
+    }
+    if (argc != CREATE_CONTROLLER_ARG_COUNT) {
+        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Invalid parameter count");
+        return false;
+    }
+    return true;
+}
+
+int32_t HandleTouchControllerOperation(JsTouchController* controller, napi_env env, napi_value argv,
+    TouchControllerOperation operation)
+{
+    napi_valuetype type = napi_undefined;
+    if (napi_typeof(env, argv, &type) != napi_ok || type != napi_object) {
+        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "touch", "object");
+        return INT32_MIN;
+    }
+    TouchPointParams touchPoint;
+    if (!ParseTouchPoint(env, argv, touchPoint)) {
+        return INT32_MIN;
+    }
+    switch (operation) {
+        case TouchControllerOperation::DOWN:
+            return controller->TouchDown(touchPoint.id, touchPoint.displayId, touchPoint.displayX, touchPoint.displayY);
+        case TouchControllerOperation::MOVE:
+            return controller->TouchMove(touchPoint.id, touchPoint.displayId, touchPoint.displayX, touchPoint.displayY);
+        case TouchControllerOperation::UP:
+            return controller->TouchUp(touchPoint.id, touchPoint.displayId, touchPoint.displayX, touchPoint.displayY);
+        case TouchControllerOperation::CREATE:
+        default:
+            MMI_HILOGE("Invalid touch controller operation");
+            return CONTROLLER_INPUT_SERVICE_EXCEPTION;
+    }
+}
+
 napi_value ResolveTouchControllerPromise(napi_env env, napi_deferred deferred, napi_value promise)
 {
     napi_value result = nullptr;
@@ -200,17 +262,15 @@ napi_value RejectTouchControllerPromise(napi_env env, napi_deferred deferred, na
     return promise;
 }
 
-template<typename Handler>
-napi_value HandleTouchControllerPromise(napi_env env, napi_callback_info info, TouchControllerOperation operation,
-    Handler handler)
+napi_value HandleTouchControllerPromise(napi_env env, napi_callback_info info, TouchControllerOperation operation)
 {
     napi_value argv = nullptr;
     JsTouchController* controller = nullptr;
-    if (GetTouchControllerCallbackInfo(env, info, 1, argv, &controller) == nullptr) {
+    if (GetTouchControllerCallbackInfo(env, info, TOUCH_CONTROLLER_ARG_COUNT, argv, &controller) == nullptr) {
         return nullptr;
     }
 
-    int32_t result = handler(controller, env, argv);
+    int32_t result = HandleTouchControllerOperation(controller, env, argv, operation);
     if (result == INT32_MIN) {
         MMI_HILOGE("TouchController handler failed");
         return nullptr;
@@ -279,8 +339,10 @@ napi_value ResolveCreateTouchControllerPromise(napi_env env, napi_value touchCon
 
 napi_value CreateTouchController(napi_env env, napi_callback_info info)
 {
-    (void)info;
     MMI_HILOGD("CreateTouchController called");
+    if (!CheckCreateTouchControllerArgs(env, info)) {
+        return nullptr;
+    }
     std::shared_ptr<TouchControllerImpl> nativeImpl = nullptr;
     int32_t ret = InputManager::GetInstance()->CreateTouchController(nativeImpl);
     if (ret != RET_OK || nativeImpl == nullptr) {
@@ -315,56 +377,17 @@ napi_value CreateTouchController(napi_env env, napi_callback_info info)
 
 napi_value TouchControllerTouchDown(napi_env env, napi_callback_info info)
 {
-    return HandleTouchControllerPromise(env, info, TouchControllerOperation::DOWN,
-        [](JsTouchController* controller, napi_env env, napi_value argv0) -> int32_t {
-            napi_valuetype type = napi_undefined;
-            if (napi_typeof(env, argv0, &type) != napi_ok || type != napi_object) {
-                THROWERR_API9(env, COMMON_PARAMETER_ERROR, "touch", "object");
-                return INT32_MIN;
-            }
-            TouchPointParams touchPoint;
-            if (!ParseTouchPoint(env, argv0, touchPoint)) {
-                return INT32_MIN;
-            }
-            return controller->TouchDown(touchPoint.id, touchPoint.displayId, touchPoint.displayX,
-                touchPoint.displayY);
-        });
+    return HandleTouchControllerPromise(env, info, TouchControllerOperation::DOWN);
 }
 
 napi_value TouchControllerTouchMove(napi_env env, napi_callback_info info)
 {
-    return HandleTouchControllerPromise(env, info, TouchControllerOperation::MOVE,
-        [](JsTouchController* controller, napi_env env, napi_value argv0) -> int32_t {
-            napi_valuetype type = napi_undefined;
-            if (napi_typeof(env, argv0, &type) != napi_ok || type != napi_object) {
-                THROWERR_API9(env, COMMON_PARAMETER_ERROR, "touch", "object");
-                return INT32_MIN;
-            }
-            TouchPointParams touchPoint;
-            if (!ParseTouchPoint(env, argv0, touchPoint)) {
-                return INT32_MIN;
-            }
-            return controller->TouchMove(touchPoint.id, touchPoint.displayId, touchPoint.displayX,
-                touchPoint.displayY);
-        });
+    return HandleTouchControllerPromise(env, info, TouchControllerOperation::MOVE);
 }
 
 napi_value TouchControllerTouchUp(napi_env env, napi_callback_info info)
 {
-    return HandleTouchControllerPromise(env, info, TouchControllerOperation::UP,
-        [](JsTouchController* controller, napi_env env, napi_value argv0) -> int32_t {
-            napi_valuetype type = napi_undefined;
-            if (napi_typeof(env, argv0, &type) != napi_ok || type != napi_object) {
-                THROWERR_API9(env, COMMON_PARAMETER_ERROR, "touch", "object");
-                return INT32_MIN;
-            }
-            TouchPointParams touchPoint;
-            if (!ParseTouchPoint(env, argv0, touchPoint)) {
-                return INT32_MIN;
-            }
-            return controller->TouchUp(touchPoint.id, touchPoint.displayId, touchPoint.displayX,
-                touchPoint.displayY);
-        });
+    return HandleTouchControllerPromise(env, info, TouchControllerOperation::UP);
 }
 
 } // namespace MMI
