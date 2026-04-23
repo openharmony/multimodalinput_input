@@ -82,6 +82,11 @@ public:
     MOCK_METHOD(int32_t, RegisterCommonEventCallback,
                 (const std::function<void(const EventFwk::CommonEventData &)> &callback), (override));
     MOCK_METHOD(bool, UnRegisterCommonEventCallback, (int32_t callbackId), (override));
+    MOCK_METHOD(void, HideMouseCursorTemporary, (), (override));
+    MOCK_METHOD(int32_t, CalculateTipPoint,
+                (libinput_event *event, int32_t &displayId, PhysicalCoordinate &coord), (override));
+    MOCK_METHOD(void, SetMouseAccelerateMotionSwitch, (libinput_event *event, bool enable), (override));
+    MOCK_METHOD(int32_t, GetCurrentMouseLocation, (double &mouseX, double &mouseY), (override));
 };
 
 class MockInputPlugin : public IInputPlugin {
