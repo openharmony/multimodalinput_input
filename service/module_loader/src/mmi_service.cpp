@@ -859,10 +859,16 @@ int32_t MMIService::SetCustomCursorPixelMapInner(int32_t windowId, int32_t focus
 ErrCode MMIService::SetCustomCursorPixelMap(int32_t windowId, int32_t focusX, int32_t focusY,
     const CursorPixelMap& curPixelMap)
 {
-    if (int32_t ret = SetCustomCursorPixelMapInner(windowId, focusX, focusY, curPixelMap); ret != RET_OK) {
-        Media::PixelMap* pixelMap = static_cast<Media::PixelMap*>(curPixelMap.pixelMap);
-        delete pixelMap;
-        MMI_HILOGE("SetCustomCursorPixelMap failed, release resource");
+    int32_t ret = SetCustomCursorPixelMapInner(windowId, focusX, focusY, curPixelMap);
+    if (ret != RET_OK) {
+        if (ret != ERROR_PIXELMAP_MANAGED) {
+            Media::PixelMap* pixelMap = static_cast<Media::PixelMap*>(curPixelMap.pixelMap);
+            delete pixelMap;
+            MMI_HILOGE("SetCustomCursorPixelMap failed, release resource");
+        } else {
+            MMI_HILOGE("SetCustomCursorPixelMap failed after pixelMap managed, no need to release");
+            ret = RET_ERR;  // Convert back to RET_ERR for client compatibility
+        }
         return ret;
     }
     return RET_OK;
@@ -904,10 +910,16 @@ int32_t MMIService::SetMouseIconInner(int32_t windowId, const CursorPixelMap& cu
 ErrCode MMIService::SetMouseIcon(int32_t windowId, const CursorPixelMap& curPixelMap)
 {
     CALL_INFO_TRACE;
-    if (int32_t ret = SetMouseIconInner(windowId, curPixelMap); ret != RET_OK) {
-        Media::PixelMap* pixelMap = static_cast<Media::PixelMap*>(curPixelMap.pixelMap);
-        delete pixelMap;
-        MMI_HILOGE("SetMouseIcon failed, release resource");
+    int32_t ret = SetMouseIconInner(windowId, curPixelMap);
+    if (ret != RET_OK) {
+        if (ret != ERROR_PIXELMAP_MANAGED) {
+            Media::PixelMap* pixelMap = static_cast<Media::PixelMap*>(curPixelMap.pixelMap);
+            delete pixelMap;
+            MMI_HILOGE("SetMouseIcon failed, release resource");
+        } else {
+            MMI_HILOGE("SetMouseIcon failed after pixelMap managed, no need to release");
+            ret = RET_ERR;  // Convert back to RET_ERR for client compatibility
+        }
         return ret;
     }
     return RET_OK;
@@ -4659,10 +4671,16 @@ int32_t MMIService::SetPixelMapDataInner(int32_t infoId, const CursorPixelMap& c
 
 ErrCode MMIService::SetPixelMapData(int32_t infoId, const CursorPixelMap& curPixelMap)
 {
-    if (int32_t ret = SetPixelMapDataInner(infoId, curPixelMap); ret != RET_OK) {
-        Media::PixelMap* pixelMap = static_cast<Media::PixelMap*>(curPixelMap.pixelMap);
-        delete pixelMap;
-        MMI_HILOGE("SetPixelMapData failed, release resource");
+    int32_t ret = SetPixelMapDataInner(infoId, curPixelMap);
+    if (ret != RET_OK) {
+        if (ret != ERROR_PIXELMAP_MANAGED) {
+            Media::PixelMap* pixelMap = static_cast<Media::PixelMap*>(curPixelMap.pixelMap);
+            delete pixelMap;
+            MMI_HILOGE("SetPixelMapData failed, release resource");
+        } else {
+            MMI_HILOGE("SetPixelMapData failed after pixelMap managed, no need to release");
+            ret = RET_ERR;  // Convert back to RET_ERR for client compatibility
+        }
         return ret;
     }
     return RET_OK;
