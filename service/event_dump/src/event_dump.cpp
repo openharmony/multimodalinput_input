@@ -339,6 +339,7 @@ void EventDump::DumpHelp(int32_t fd)
     mprintf(fd, "      -e, --event: dump the libinput event information\t");
     mprintf(fd, "      -t, --lidstate: dump the status of the laptop cover\t");
     mprintf(fd, "      -b, --tabletStandState: dump the status of the tablet stand\t");
+    mprintf(fd, "      -n, --triple finger snapshot: dump the triple finger snapshot information\t");
 }
 
 void EventDump::AttachTouchGestureMgr(std::shared_ptr<ITouchGestureManager> touchGestureMgr)
