@@ -33,6 +33,7 @@
 #include "common_event_data.h"
 #include "bytrace_adapter.h"
 #include "util.h"
+#include "cursor_drawing_component.h"
 
 #undef MMI_LOG_DOMAIN
 #define MMI_LOG_DOMAIN MMI_LOG_SERVER
@@ -1018,6 +1019,81 @@ bool InputPlugin::UnRegisterCommonEventCallback(int32_t callbackId)
         return false;
     }
     return ACCOUNT_MGR->UnRegisterCommonEventCallback(callbackId);
+}
+
+void InputPlugin::HideMouseCursorTemporary()
+{
+    MMI_HILOGD("hide mouse in stylus mouse mode");
+    auto& instance = CursorDrawingComponent::GetInstance();
+    if (instance.GetMouseDisplayState()) {
+        instance.SetMouseDisplayState(false);
+    }
+}
+
+int32_t InputPlugin::CalculateTipPoint(libinput_event *event, int32_t &displayId, PhysicalCoordinate &coord)
+{
+    if (event == nullptr) {
+        MMI_HILOGE("event is invalid");
+        return RET_ERR;
+    }
+    libinput_event_tablet_tool *toolEvent = nullptr;
+    toolEvent = libinput_event_get_tablet_tool_event(event);
+    if (toolEvent == nullptr) {
+        MMI_HILOGE("event is invalid");
+        return RET_ERR;
+    }
+    auto inputDevice = libinput_event_get_device(event);
+    if (inputDevice == nullptr || INPUT_DEV_MGR == nullptr) {
+        MMI_HILOGE("inputDevice or INPUT_DEV_MGR is null");
+        return RET_ERR;
+    }
+    auto deviceId = INPUT_DEV_MGR->FindInputDeviceId(inputDevice);
+    if (deviceId < 0) {
+        return RET_ERR;
+    }
+    PointerEvent::PointerItem item;
+    item.SetPointerId(0);
+    item.SetDeviceId(deviceId);
+    item.SetToolType(PointerEvent::TOOL_TYPE_PEN);
+    if (WIN_MGR == nullptr) {
+        MMI_HILOGE("get WIN_MGR failed");
+        return RET_ERR;
+    }
+    return WIN_MGR->CalculateTipPoint(toolEvent, displayId, coord, item);
+}
+
+void InputPlugin::SetMouseAccelerateMotionSwitch(libinput_event *event, bool enable)
+{
+    if (event == nullptr) {
+        MMI_HILOGE("event is invalid");
+        return;
+    }
+    if (MouseEventHdr == nullptr) {
+        MMI_HILOGE("get MouseEventHdr failed");
+        return;
+    }
+    auto inputDevice = libinput_event_get_device(event);
+    if (inputDevice == nullptr || INPUT_DEV_MGR == nullptr) {
+        MMI_HILOGE("inputDevice or INPUT_DEV_MGR is null");
+        return;
+    }
+    auto deviceId = INPUT_DEV_MGR->FindInputDeviceId(inputDevice);
+    if (deviceId < 0) {
+        return;
+    }
+    MouseEventHdr->SetMouseAccelerateMotionSwitch(deviceId, enable);
+}
+
+int32_t InputPlugin::GetCurrentMouseLocation(double &mouseX, double &mouseY)
+{
+    if (WIN_MGR == nullptr) {
+        MMI_HILOGE("get WIN_MGR failed");
+        return RET_ERR;
+    }
+    auto mouseLocation = WIN_MGR->GetMouseInfo();
+    mouseX = mouseLocation.physicalX;
+    mouseY = mouseLocation.physicalY;
+    return RET_OK;
 }
 } // namespace MMI
 } // namespace OHOS
