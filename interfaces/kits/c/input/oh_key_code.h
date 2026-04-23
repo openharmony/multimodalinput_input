@@ -1407,6 +1407,16 @@ typedef enum {
      */
     KEYCODE_XKEY = 3232,
     /**
+     * FINGERPRINT_SLIDE_UP
+     * @since 26.0.0
+     */
+    KEYCODE_FINGERPRINT_SLIDE_UP = 3233,
+    /**
+     * FINGERPRINT_SLIDE_DOWN
+     * @since 26.0.0
+     */
+    KEYCODE_FINGERPRINT_SLIDE_DOWN = 3234,
+    /**
      * Wrist Turn key
      * @since 26.0.0
      */
