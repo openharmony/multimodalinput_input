@@ -271,6 +271,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                 auto simulateMouseEvent = [&ppx, &ppy](std::shared_ptr<PointerEvent> pointerEvent) {
                     PointerEvent::PointerItem item;
                     pointerEvent->GetPointerItem(0, item);
+                    item.SetToolType(PointerEvent::TOOL_TYPE_MOUSE);
                     int32_t x = item.GetDisplayX();
                     int32_t y = item.GetDisplayY();
                     item.SetRawDx(x - ppx);
@@ -322,6 +323,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                 item.SetPointerId(0);
                                 item.SetDisplayX(px);
                                 item.SetDisplayY(py);
+                                item.SetToolType(PointerEvent::TOOL_TYPE_MOUSE);
                                 pointerEvent->AddPointerItem(item);
                                 pointerEvent->SetPointerId(0);
                                 pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
@@ -399,6 +401,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                 item.SetPointerId(0);
                                 item.SetDisplayX(px);
                                 item.SetDisplayY(py);
+                                item.SetToolType(PointerEvent::TOOL_TYPE_MOUSE);
                                 pointerEvent->SetPointerId(0);
                                 pointerEvent->AddPointerItem(item);
                                 pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
@@ -451,6 +454,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                             item.SetDisplayX(px);
                             item.SetDisplayY(py);
                             item.SetPressed(true);
+                            item.SetToolType(PointerEvent::TOOL_TYPE_MOUSE);
                             pointerEvent->SetPointerId(0);
                             pointerEvent->AddPointerItem(item);
                             pointerEvent->SetButtonId(buttonId);
@@ -477,6 +481,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                             item.SetDisplayX(px);
                             item.SetDisplayY(py);
                             item.SetPressed(false);
+                            item.SetToolType(PointerEvent::TOOL_TYPE_MOUSE);
                             pointerEvent->SetPointerId(0);
                             pointerEvent->AddPointerItem(item);
                             pointerEvent->DeleteReleaseButton(buttonId);
@@ -503,6 +508,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                             item.SetDisplayX(px);
                             item.SetDisplayY(py);
                             item.SetPressed(false);
+                            item.SetToolType(PointerEvent::TOOL_TYPE_MOUSE);
                             int64_t time = pointerEvent->GetActionStartTime();
                             pointerEvent->SetActionTime(time + ACTION_TIME);
                             pointerEvent->SetPointerId(0);
@@ -551,6 +557,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                             item.SetPressed(true);
                             item.SetPointerId(0);
                             item.SetDisplayX(px);
+                            item.SetToolType(PointerEvent::TOOL_TYPE_MOUSE);
                             pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
                             pointerEvent->AddPointerItem(item);
                             pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_DOWN);
@@ -638,6 +645,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                             item.SetPointerId(0);
                             item.SetDisplayX(px);
                             item.SetDisplayY(py);
+                            item.SetToolType(PointerEvent::TOOL_TYPE_MOUSE);
                             pointerEvent->SetPointerId(0);
                             pointerEvent->SetButtonId(buttonId);
                             pointerEvent->SetButtonPressed(buttonId);
@@ -714,6 +722,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                             item.SetDisplayX(px1);
                             item.SetPressed(true);
                             item.SetPointerId(0);
+                            item.SetToolType(PointerEvent::TOOL_TYPE_MOUSE);
                             pointerEvent->SetButtonPressed(0);
                             pointerEvent->AddPointerItem(item);
                             pointerEvent->SetButtonId(buttonsId);
