@@ -18,6 +18,7 @@
 #include "account_manager.h"
 #include "mmi_log.h"
 #include "ability_launcher.h"
+#include "parameters.h"
 #include "setting_datashare.h"
 #include "setting_observer.h"
 #include "bundle_name_parser.h"
@@ -64,7 +65,12 @@ bool TripleFingerSnapshotManager::HandleTouchEvent(std::shared_ptr<PointerEvent>
     if (event->GetFixedMode() == PointerEvent::FixedMode::AUTO) {
         return false;
     }
-
+    PointerEvent::PointerItem item;
+    if (event->GetPointerItem(event->GetPointerId(), item)) {
+        if (item.GetToolType() != PointerEvent::TOOL_TYPE_FINGER) {
+            return false;
+        }
+    }
     if (event->GetDeviceId() == CAST_INPUT_DEVICEID ||
         event->GetDeviceId() == CAST_SCREEN_DEVICEID) {
         return false;
@@ -216,7 +222,8 @@ bool TripleFingerSnapshotManager::RegisterSwitchObserver(int32_t userId)
         MMI_HILOGW("userId is -1");
         return false;
     }
-    if (!isDataShareReady_.load()) {
+    if (!isDataShareReady_.load() ||
+        !SettingDataShare::GetInstance(DISTRIBUTED_KV_DATA_SERVICE_ABILITY_ID).CheckIfSettingsDataReady()) {
         MMI_HILOGW("datashare is not ready");
         return false;
     }
@@ -267,9 +274,8 @@ bool TripleFingerSnapshotManager::CreateAndRegisterObserver(int32_t userId)
         auto ret = SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID)
             .GetStringValue(key, value, uri);
         if (ret != RET_OK) {
-            this->OnSwitchChanged(false);
-            MMI_HILOGE("Get value from setting data fail:%{public}d", ret);
-            return;
+            value = system::GetParameter("const.sceneboard.triple_finger_type", DISABLE_TRIPLE_FINGER_SNAPSHOT);
+            MMI_HILOGW("Get value from setting data fail:%{public}d, value:%{public}s", ret, value.c_str());
         }
         if (value == ENABLE_TRIPLE_FINGER_SNAPSHOT) {
             this->OnSwitchChanged(true);
