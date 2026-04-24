@@ -22,6 +22,7 @@
 #include "app_mgr_client.h"
 #include "cJSON.h"
 #include "ffrt.h"
+#include "dfx_hisysevent.h"
 #include "i_input_event_handler.h"
 #include "input_event_handler.h"
 #include "input_windows_manager.h"
@@ -104,6 +105,8 @@ int32_t InputPluginManager::Init(UDSServer& udsServer)
 {
     CALL_DEBUG_ENTER;
     udsServer_ = &udsServer;
+    LoadPluginConfig();
+
     DIR *dir = opendir(directory_.c_str());
     if (!dir) {
         MMI_HILOGE("Failed to open error:%{private}s", strerror(errno));
@@ -127,7 +130,6 @@ int32_t InputPluginManager::Init(UDSServer& udsServer)
         }
     }
     closedir(dir);
-    LoadPluginConfig();
     PrintPlugins();
     return RET_OK;
 }
@@ -241,6 +243,8 @@ PluginResult InputPluginManager::ProcessEvent(
     if (lostTime >= timeout) {
         MMI_HILOGW("iplugin timeout name:%{public}s ,endTime:%{public}" PRId64 ",lostTime:%{public}" PRId64,
             iplugin->GetName().c_str(), endTime, lostTime);
+        auto session = std::make_shared<UDSSession>(iplugin->GetName(), -1, -1, -1, ::getpid());
+        DfxHisysevent::ApplicationBlockInput(session);
     }
     return result;
 }

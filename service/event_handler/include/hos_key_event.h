@@ -1339,6 +1339,7 @@ enum HosKeyEventEnum {
     HOS_KEY_XKEY = 3232,
     HOS_KEY_FINGERPRINT_SLIDE_UP = 3233,
     HOS_KEY_FINGERPRINT_SLIDE_DOWN = 3234,
+    HOS_KEY_PEN_WRITING_MOUSE = 3251,
 
     /**
      * Left Knob roll-up
