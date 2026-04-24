@@ -114,14 +114,14 @@ HWTEST_F(PointerDrawingManagerSupTest, PointerDrawingManagerSupTest_HardwareCurs
     auto screenpointer = std::make_shared<ScreenPointer>(hwcmgr, handler, screenInfo);
     ASSERT_NE(screenpointer, nullptr);
     PointerDrawingManager pointerDrawingManager;
-
+    uint64_t displayId = 0;
     pointerDrawingManager.screenPointers_[0] = screenpointer;
 
     MOUSE_ICON mouseStyle = MOUSE_ICON::LOADING;
-    EXPECT_NO_FATAL_FAILURE(pointerDrawingManager.HardwareCursorDynamicRender(mouseStyle));
+    EXPECT_NO_FATAL_FAILURE(pointerDrawingManager.HardwareCursorDynamicRender(mouseStyle, displayId));
 
     mouseStyle = MOUSE_ICON::RUNNING_RIGHT;
-    EXPECT_NO_FATAL_FAILURE(pointerDrawingManager.HardwareCursorDynamicRender(mouseStyle));
+    EXPECT_NO_FATAL_FAILURE(pointerDrawingManager.HardwareCursorDynamicRender(mouseStyle, displayId));
 }
 
 /**
@@ -161,14 +161,14 @@ HWTEST_F(PointerDrawingManagerSupTest, PointerDrawingManagerSupTest_SoftwareCurs
     auto screenpointer = std::make_shared<ScreenPointer>(hwcmgr, handler, screenInfo);
     ASSERT_NE(screenpointer, nullptr);
     PointerDrawingManager pointerDrawingManager;
-
+    uint64_t displayId = 0;
     pointerDrawingManager.screenPointers_[0] = screenpointer;
 
     MOUSE_ICON mouseStyle = MOUSE_ICON::LOADING;
-    EXPECT_NO_FATAL_FAILURE(pointerDrawingManager.SoftwareCursorDynamicRender(mouseStyle));
+    EXPECT_NO_FATAL_FAILURE(pointerDrawingManager.SoftwareCursorDynamicRender(mouseStyle, displayId));
 
     mouseStyle = MOUSE_ICON::RUNNING_RIGHT;
-    EXPECT_NO_FATAL_FAILURE(pointerDrawingManager.SoftwareCursorDynamicRender(mouseStyle));
+    EXPECT_NO_FATAL_FAILURE(pointerDrawingManager.SoftwareCursorDynamicRender(mouseStyle, displayId));
 }
 
 /**
@@ -1205,9 +1205,11 @@ HWTEST_F(PointerDrawingManagerSupTest, PointerDrawingManagerSupTest_SoftwareCurs
     MOUSE_ICON mouseStyle = MOUSE_ICON::DEVELOPER_DEFINED_ICON;
     int32_t x = 0;
     int32_t y = 0;
-    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.SoftwareCursorRender(mouseStyle, x, y));
+    uint64_t displayId = 100;
+    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.SoftwareCursorRender(mouseStyle, x, y, displayId));
     pointerDrawingManager.screenId_ = 102;
-    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.SoftwareCursorRender(mouseStyle, x, y));
+    displayId = 102;
+    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.SoftwareCursorRender(mouseStyle, x, y, displayId));
 }
 
 /**
@@ -1320,12 +1322,14 @@ HWTEST_F(PointerDrawingManagerSupTest, PointerDrawingManagerSupTest_HardwareCurs
     spMirror->displayDirection_ = DIRECTION0;
     pointerDrawingManager.screenPointers_[displaysInfo.rsId] = spMirror;
     pointerDrawingManager.displayId_ = 100;
-    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.HardwareCursorMove(x, y));
+    uint64_t displayId = 100;
+    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.HardwareCursorMove(displayId, x, y));
     ASSERT_NO_FATAL_FAILURE(
         pointerDrawingManager.SoftwareCursorMove(pointerDrawingManager.displayId_, x, y));
     spMirror->mode_ = mode_t::SCREEN_EXTEND;
     pointerDrawingManager.displayId_ = 200;
-    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.HardwareCursorMove(x, y));
+    displayId = 200;
+    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.HardwareCursorMove(displayId, x, y));
     ASSERT_NO_FATAL_FAILURE(
         pointerDrawingManager.SoftwareCursorMoveAsync(pointerDrawingManager.displayId_, x, y));
 }

@@ -1829,10 +1829,18 @@ HWTEST_F(PointerDrawingManagerExTest, PointerDrawingManagerExTest_RenderAndMoveO
 {
     CALL_TEST_DEBUG;
     PointerDrawingManager pointerDrawMgr;
+    PointerStyle style;
     pointerDrawMgr.mouseDisplayState_ = false;
-    ASSERT_NO_FATAL_FAILURE(pointerDrawMgr.RenderAndMoveOnVsync(0, 0));
+    ASSERT_NO_FATAL_FAILURE(pointerDrawMgr.RenderAndMoveOnVsync(0, 0, 0));
     pointerDrawMgr.mouseDisplayState_ = true;
-    ASSERT_NO_FATAL_FAILURE(pointerDrawMgr.RenderAndMoveOnVsync(0, 0));
+    pointerDrawMgr.currentMouseStyle_ = style;
+    pointerDrawMgr.currentMouseStyle_.id = MOUSE_ICON::LOADING;
+    ASSERT_NO_FATAL_FAILURE(pointerDrawMgr.RenderAndMoveOnVsync(0, 0, 0));
+    pointerDrawMgr.currentMouseStyle_.id = MOUSE_ICON::DEFAULT;
+    pointerDrawMgr.mouseStylePending_.store(1);
+    ASSERT_NO_FATAL_FAILURE(pointerDrawMgr.RenderAndMoveOnVsync(0, 0, 0));
+    pointerDrawMgr.mouseStylePending_.store(0);
+    ASSERT_NO_FATAL_FAILURE(pointerDrawMgr.RenderAndMoveOnVsync(0, 0, 0));
 }
 
 /**
@@ -1850,6 +1858,13 @@ HWTEST_F(PointerDrawingManagerExTest, PointerDrawingManagerExTest_OnVsync_001,
     uint64_t time = 1000 * 1000 * 100;
     ASSERT_NO_FATAL_FAILURE(pointerDrawMgr.OnVsync(time));
     pointerDrawMgr.mouseDisplayState_ = true;
+    ASSERT_NO_FATAL_FAILURE(pointerDrawMgr.OnVsync(time));
+    pointerDrawMgr.resample_.currentBuffer_ = {
+        ResampleAlgorithm::Point(0, 0, 0, time + 2000)
+    };
+    pointerDrawMgr.resample_.historyBuffer_ = {
+        ResampleAlgorithm::Point(0, 0, 0, time - 2000)
+    };
     ASSERT_NO_FATAL_FAILURE(pointerDrawMgr.OnVsync(time));
 }
 
@@ -1912,6 +1927,10 @@ HWTEST_F(PointerDrawingManagerExTest, PointerDrawingManagerExTest_UpdateCursorBl
     pointerDrawMgr.lastCursorBlurEnabled_ = true;
     pointerDrawMgr.UpdateCursorBlurEnabled();
     EXPECT_EQ(pointerDrawMgr.lastCursorBlurEnabled_, true);
+    pointerDrawMgr.lastCursorBlurEnabled_ = false;
+    pointerDrawMgr.currentCursorBlurEnabled_ = false;
+    pointerDrawMgr.UpdateCursorBlurEnabled();
+    EXPECT_EQ(pointerDrawMgr.lastCursorBlurEnabled_, false);
 }
 
 /**
@@ -1963,17 +1982,18 @@ HWTEST_F(PointerDrawingManagerExTest, PointerDrawingManagerExTest_RA_GetResample
     uint64_t preTime = 1000 * 1000 * 99;
     uint64_t curId = 0;
     uint64_t preId = 1;
-    bool ret = pointerDrawMgr.resample_.GetResampledPoint(curX, curY, curTime);
+    uint64_t displayId = 0;
+    bool ret = pointerDrawMgr.resample_.GetResampledPoint(curX, curY, displayId, curTime);
     EXPECT_EQ(ret, false);
     pointerDrawMgr.resample_.currentBuffer_ = {
         ResampleAlgorithm::Point(curX, curY, curId, curTime)
     };
-    ret = pointerDrawMgr.resample_.GetResampledPoint(curX, curY, curTime);
+    ret = pointerDrawMgr.resample_.GetResampledPoint(curX, curY, displayId, curTime);
     EXPECT_EQ(ret, false);
     pointerDrawMgr.resample_.historyBuffer_ = {
         ResampleAlgorithm::Point(preX, preY, preId, preTime)
     };
-    ret = pointerDrawMgr.resample_.GetResampledPoint(curX, curY, curTime);
+    ret = pointerDrawMgr.resample_.GetResampledPoint(curX, curY, displayId, curTime);
     EXPECT_EQ(ret, false);
     pointerDrawMgr.resample_.currentBuffer_ = {
         ResampleAlgorithm::Point(curX, curY, curId, curTime)
@@ -1981,7 +2001,7 @@ HWTEST_F(PointerDrawingManagerExTest, PointerDrawingManagerExTest_RA_GetResample
     pointerDrawMgr.resample_.historyBuffer_ = {
         ResampleAlgorithm::Point(preX, preY, curId, preTime)
     };
-    ret = pointerDrawMgr.resample_.GetResampledPoint(curX, curY, curTime + 1);
+    ret = pointerDrawMgr.resample_.GetResampledPoint(curX, curY, displayId, curTime + 1);
     EXPECT_EQ(ret, true);
 }
 
