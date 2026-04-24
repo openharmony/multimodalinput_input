@@ -361,6 +361,8 @@ void EventDispatchHandler::HandlePointerEventInner(const std::shared_ptr<Pointer
         if (point->GetTargetWindowId() == windowStateErrorInfo_.windowId && agentPid == windowStateErrorInfo_.pid) {
             if (GetSysClockTime() - windowStateErrorInfo_.startTime >= ERROR_TIME) {
                 auto userId = WIN_MGR->FindDisplayUserId(point->GetTargetDisplayId());
+                MMI_HILOGW("Exception occurred in the window:%{private}d|%{public}d|%{public}d|%{public}" PRId64,
+                    userId, point->GetTargetWindowId(), agentPid, windowStateErrorInfo_.startTime);
                 SendWindowStateError(userId, agentPid, point->GetTargetWindowId());
             }
         } else {
