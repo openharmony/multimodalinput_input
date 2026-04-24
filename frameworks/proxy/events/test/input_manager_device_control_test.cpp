@@ -183,5 +183,151 @@ HWTEST_F(InputManagerDeviceControlTest, PriorityRule_002, TestSize.Level1)
         });
     EXPECT_EQ(ret2, RET_OK);
 }
+
+/**
+ * @tc.name: EnableInputExtension_001
+ * @tc.desc: Test EnableInputExtension with enabled=true
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerDeviceControlTest, EnableInputExtension_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    const std::string uuid = "test_extension_uuid_001";
+    int32_t ret = InputManager::GetInstance()->EnableInputExtension(uuid, true);
+    MMI_HILOGI("EnableInputExtension(true) ret:%{public}d", ret);
+    EXPECT_EQ(ret, PARAM_INPUT_INVALID);
+    InputManager::GetInstance()->EnableInputExtension(uuid, false);
+}
+
+/**
+ * @tc.name: EnableInputExtension_002
+ * @tc.desc: Test EnableInputExtension with enabled=false
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerDeviceControlTest, EnableInputExtension_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    const std::string uuid = "test_extension_uuid_002";
+    int32_t ret = InputManager::GetInstance()->EnableInputExtension(uuid, false);
+    MMI_HILOGI("EnableInputExtension(false) ret:%{public}d", ret);
+    EXPECT_EQ(ret, PARAM_INPUT_INVALID);
+}
+
+/**
+ * @tc.name: EnableInputExtension_003
+ * @tc.desc: Test EnableInputExtension with empty uuid
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerDeviceControlTest, EnableInputExtension_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    const std::string uuid = "";
+    int32_t ret = InputManager::GetInstance()->EnableInputExtension(uuid, true);
+    MMI_HILOGI("EnableInputExtension with empty uuid ret:%{public}d", ret);
+    EXPECT_EQ(ret, PARAM_INPUT_INVALID);
+    InputManager::GetInstance()->EnableInputExtension(uuid, false);
+}
+
+/**
+ * @tc.name: EnableInputExtension_004
+ * @tc.desc: Test EnableInputExtension enable then disable
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerDeviceControlTest, EnableInputExtension_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    const std::string uuid = "test_extension_uuid_004";
+    int32_t ret1 = InputManager::GetInstance()->EnableInputExtension(uuid, true);
+    EXPECT_EQ(ret1, PARAM_INPUT_INVALID);
+
+    int32_t ret2 = InputManager::GetInstance()->EnableInputExtension(uuid, false);
+    EXPECT_EQ(ret2, PARAM_INPUT_INVALID);
+}
+
+/**
+ * @tc.name: EnableInputExtension_005
+ * @tc.desc: Test EnableInputExtension idempotency - enable twice
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerDeviceControlTest, EnableInputExtension_005, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    const std::string uuid = "test_extension_uuid_005";
+    int32_t ret1 = InputManager::GetInstance()->EnableInputExtension(uuid, true);
+    EXPECT_EQ(ret1, PARAM_INPUT_INVALID);
+
+    int32_t ret2 = InputManager::GetInstance()->EnableInputExtension(uuid, true);
+    EXPECT_EQ(ret2, PARAM_INPUT_INVALID);
+
+    InputManager::GetInstance()->EnableInputExtension(uuid, false);
+}
+
+/**
+ * @tc.name: EnableInputExtension_006
+ * @tc.desc: Test EnableInputExtension idempotency - disable twice
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerDeviceControlTest, EnableInputExtension_006, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    const std::string uuid = "test_extension_uuid_006";
+    int32_t ret1 = InputManager::GetInstance()->EnableInputExtension(uuid, false);
+    EXPECT_EQ(ret1, PARAM_INPUT_INVALID);
+
+    int32_t ret2 = InputManager::GetInstance()->EnableInputExtension(uuid, false);
+    EXPECT_EQ(ret2, PARAM_INPUT_INVALID);
+}
+
+/**
+ * @tc.name: EnableInputExtension_007
+ * @tc.desc: Test EnableInputExtension with multiple different uuids
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerDeviceControlTest, EnableInputExtension_007, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    const std::string uuid1 = "extension_uuid_A";
+    const std::string uuid2 = "extension_uuid_B";
+    const std::string uuid3 = "extension_uuid_C";
+
+    int32_t ret1 = InputManager::GetInstance()->EnableInputExtension(uuid1, true);
+    EXPECT_EQ(ret1, PARAM_INPUT_INVALID);
+
+    int32_t ret2 = InputManager::GetInstance()->EnableInputExtension(uuid2, true);
+    EXPECT_EQ(ret2, PARAM_INPUT_INVALID);
+
+    int32_t ret3 = InputManager::GetInstance()->EnableInputExtension(uuid3, true);
+    EXPECT_EQ(ret3, PARAM_INPUT_INVALID);
+
+    InputManager::GetInstance()->EnableInputExtension(uuid1, false);
+    InputManager::GetInstance()->EnableInputExtension(uuid2, false);
+    InputManager::GetInstance()->EnableInputExtension(uuid3, false);
+}
+
+/**
+ * @tc.name: EnableInputExtension_008
+ * @tc.desc: Test EnableInputExtension disable then enable (reverse toggle)
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerDeviceControlTest, EnableInputExtension_008, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    const std::string uuid = "test_extension_uuid_008";
+    int32_t ret1 = InputManager::GetInstance()->EnableInputExtension(uuid, false);
+    EXPECT_EQ(ret1, PARAM_INPUT_INVALID);
+
+    int32_t ret2 = InputManager::GetInstance()->EnableInputExtension(uuid, true);
+    EXPECT_EQ(ret2, PARAM_INPUT_INVALID);
+
+    InputManager::GetInstance()->EnableInputExtension(uuid, false);
+}
 } // namespace MMI
 } // namespace OHOS
