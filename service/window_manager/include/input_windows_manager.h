@@ -99,7 +99,8 @@ public:
     int32_t ClearWindowPointerStyle(int32_t pid, int32_t windowId);
     void Dump(int32_t fd, const std::vector<std::string> &args);
     void DumpDisplayInfo(int32_t fd, const std::vector<OLD::DisplayInfo>& displaysInfo);
-    void DumpWindowInfo(int32_t fd, const std::vector<WindowInfo> windowsInfo);
+    void DumpWindowsInfo(int32_t fd, const std::vector<WindowInfo> windowsInfo);
+    void DumpWindowInfo(int32_t fd, const WindowInfo &item);
     int32_t GetWindowPid(int32_t windowId, const std::vector<WindowInfo> &windowsInfo) const;
     int32_t GetWindowPid(int32_t windowId) const;
     int32_t GetWindowAgentPid(int32_t windowId) const;
