@@ -499,7 +499,7 @@ bool SettingManager::UpdateSettingData(
 
 bool SettingManager::IsParamsValid(int32_t userId, const std::string &settingKey, const std::string &field)
 {
-    if (userId < 0 || userId > MAX_USER_ID || settingKey.empty() || field.empty()) {
+    if (userId < 0 || settingKey.empty() || field.empty()) {
         MMI_HILOGE("Invalid param, settingKey:%{public}s, field:%{public}s, id:%{private}d",
             settingKey.c_str(), field.c_str(), userId);
         return false;
