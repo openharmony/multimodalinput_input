@@ -85,10 +85,17 @@ HWTEST_F(PointerDrawingManagerHardCursorTest, PointerDrawingManagerHardCursorTes
     int32_t x = 50;
     int32_t y = 60;
     uint64_t displayId = 0;
+    sptr<IRemoteObject> renderToken = Rosen::RSInterfaces::GetInstance().GetConnectToRenderToken(displayId);
+    ASSERT_NE(renderToken, nullptr);
+    auto rsUIDirector = Rosen::RSUIDirector::Create(renderToken);
+    ASSERT_NE(rsUIDirector, nullptr);
+    auto rsUIContext = rsUIDirector->GetRSUIContext();
+    ASSERT_NE(rsUIContext, nullptr);
     Rosen::RSSurfaceNodeConfig surfaceNodeConfig;
     surfaceNodeConfig.SurfaceNodeName = "pointer window";
     Rosen::RSSurfaceNodeType surfaceNodeType = Rosen::RSSurfaceNodeType::SELF_DRAWING_WINDOW_NODE;
-    pointerDrawingManager.surfaceNode_ = Rosen::RSSurfaceNode::Create(surfaceNodeConfig, surfaceNodeType);
+    pointerDrawingManager.surfaceNode_ = Rosen::RSSurfaceNode::Create(surfaceNodeConfig, surfaceNodeType, true, false,
+        rsUIContext);
     ASSERT_TRUE(pointerDrawingManager.surfaceNode_ != nullptr);
     pointerDrawingManager.SetPointerLocation(x, y, displayId);
     EXPECT_EQ(pointerDrawingManager.lastPhysicalX_, x);

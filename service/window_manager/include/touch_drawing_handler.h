@@ -21,6 +21,8 @@
 #include <transaction/rs_transaction.h>
 #include <ui/rs_canvas_node.h>
 #include <ui/rs_surface_node.h>
+#include <ui/rs_ui_context.h>
+#include <ui/rs_ui_director.h>
 #include <utils/rect.h>
 
 #ifndef USE_ROSEN_DRAWING
@@ -100,8 +102,12 @@ private:
     std::pair<double, double> TransformDisplayXY(const OLD::DisplayInfo &info, double logicX, double logicY) const;
     void StartTrace(int32_t pointerId);
     void StopTrace();
+    bool InitRSUIContext(uint64_t screenId);
+    void RsFlushImplicitTransaction();
 
 private:
+    std::shared_ptr<OHOS::Rosen::RSUIDirector> rsUIDirector_ { nullptr };
+    std::shared_ptr<OHOS::Rosen::RSUIContext> rsUIContext_ { nullptr };
     std::shared_ptr<Rosen::RSSurfaceNode> surfaceNode_ { nullptr };
     std::shared_ptr<Rosen::RSCanvasNode> bubbleCanvasNode_ { nullptr };
     std::shared_ptr<Rosen::RSCanvasNode> trackerCanvasNode_ { nullptr };
