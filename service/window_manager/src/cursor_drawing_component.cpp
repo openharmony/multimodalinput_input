@@ -1093,6 +1093,7 @@ int32_t CursorDrawingInformation::SetMouseIcon(int32_t userId, int32_t pid, int3
     int32_t ret = SetPointerStyle(userId, pid, windowId, style);
     if (ret == RET_ERR) {
         MMI_HILOGE("SetPointerStyle return RET_ERR here");
+        return ERROR_PIXELMAP_MANAGED;
     }
     return ret;
 }
