@@ -453,6 +453,8 @@ HWTEST_F(PointerRendererTest, PointerRendererTest_HasPointerCfg_001, TestSize.Le
     RenderConfig config;
     RenderConfig config1;
     PointerRenderer renderer;
+    config.style_ = MOUSE_ICON::DEFAULT;
+    config1.style_ = MOUSE_ICON::DEFAULT;
     config.screenId = 0;
     config1.screenId = 1;
     bool ret = renderer.HasPointerCfg(config);
@@ -462,8 +464,23 @@ HWTEST_F(PointerRendererTest, PointerRendererTest_HasPointerCfg_001, TestSize.Le
     };
     ret = renderer.HasPointerCfg(config);
     EXPECT_EQ(ret, true);
+    config1.style_ = MOUSE_ICON::EAST;
     renderer.screenConfigs_ = {
-        {1, config1}
+        {0, config1}
+    };
+    ret = renderer.HasPointerCfg(config);
+    EXPECT_EQ(ret, false);
+    config1.style_ = MOUSE_ICON::DEFAULT;
+    config1.isBlur = true;
+    renderer.screenConfigs_ = {
+        {0, config1}
+    };
+    ret = renderer.HasPointerCfg(config);
+    EXPECT_EQ(ret, false);
+    config1.isHard = true;
+    config1.isBlur = false;
+    renderer.screenConfigs_ = {
+        {0, config1}
     };
     ret = renderer.HasPointerCfg(config);
     EXPECT_EQ(ret, false);
