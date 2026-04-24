@@ -31,6 +31,9 @@
 #include "pointer_drawing_manager.h"
 #include "pointer_event.h"
 #include "pointer_style.h"
+#include "ui/rs_ui_context.h"
+#include "ui/rs_ui_director.h"
+#include "transaction/rs_interfaces.h"
 
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "PointerDrawingManagerSupTest"
@@ -47,11 +50,32 @@ constexpr int32_t AECH_DEVELOPER_DEFINED { 4 };
 
 class PointerDrawingManagerSupTest : public testing::Test {
 public:
-    static void SetUpTestCase(void) {};
-    static void TearDownTestCase(void) {};
+    static std::shared_ptr<OHOS::Rosen::RSUIContext> rsUIContext_;
+    static std::shared_ptr<OHOS::Rosen::RSUIContext> GetRSUIContext(uint64_t screenId = 0)
+    {
+        sptr<IRemoteObject> renderToken = Rosen::RSInterfaces::GetInstance().GetConnectToRenderToken(screenId);
+        if (renderToken == nullptr) {
+            return nullptr;
+        }
+        auto rsUIDirector = Rosen::RSUIDirector::Create(renderToken);
+        if (rsUIDirector == nullptr) {
+            return nullptr;
+        }
+        return rsUIDirector->GetRSUIContext();
+    }
+    static void SetUpTestCase(void)
+    {
+        rsUIContext_ = GetRSUIContext(0);
+    }
+    static void TearDownTestCase(void)
+    {
+        rsUIContext_ = nullptr;
+    }
     void SetUp(void) {}
     void TearDown(void) {}
 };
+
+std::shared_ptr<OHOS::Rosen::RSUIContext> PointerDrawingManagerSupTest::rsUIContext_ = nullptr;
 
 /**
  * @tc.name: PointerDrawingManagerSupTest_PostMoveRetryTask_001
@@ -136,7 +160,7 @@ HWTEST_F(PointerDrawingManagerSupTest, PointerDrawingManagerSupTest_DrawDynamicS
     Rosen::RSSurfaceNodeConfig surfaceNodeConfig;
     surfaceNodeConfig.SurfaceNodeName = "touch window";
     Rosen::RSSurfaceNodeType surfaceNodeType = Rosen::RSSurfaceNodeType::SELF_DRAWING_WINDOW_NODE;
-    auto sn = Rosen::RSSurfaceNode::Create(surfaceNodeConfig, surfaceNodeType);
+    auto sn = Rosen::RSSurfaceNode::Create(surfaceNodeConfig, surfaceNodeType, true, false, rsUIContext_);
     ASSERT_NE(sn, nullptr);
 
     RenderConfig cfg;
@@ -203,7 +227,8 @@ HWTEST_F(PointerDrawingManagerSupTest, PointerDrawingManagerSupTest_SetCursorLoc
     Rosen::RSSurfaceNodeConfig surfaceNodeConfig;
     surfaceNodeConfig.SurfaceNodeName = "pointer window";
     Rosen::RSSurfaceNodeType surfaceNodeType = Rosen::RSSurfaceNodeType::SELF_DRAWING_WINDOW_NODE;
-    pointerDrawingManager.surfaceNode_ = Rosen::RSSurfaceNode::Create(surfaceNodeConfig, surfaceNodeType);
+    pointerDrawingManager.surfaceNode_ = Rosen::RSSurfaceNode::Create(surfaceNodeConfig, surfaceNodeType, true, false,
+        rsUIContext_);
     ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.SetCursorLocation(physicalX, physicalY));
 }
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
@@ -223,7 +248,8 @@ HWTEST_F(PointerDrawingManagerSupTest, PointerDrawingManagerSupTest_SetCursorLoc
     Rosen::RSSurfaceNodeConfig surfaceNodeConfig;
     surfaceNodeConfig.SurfaceNodeName = "pointer window";
     Rosen::RSSurfaceNodeType surfaceNodeType = Rosen::RSSurfaceNodeType::SELF_DRAWING_WINDOW_NODE;
-    pointerDrawingManager.surfaceNode_ = Rosen::RSSurfaceNode::Create(surfaceNodeConfig, surfaceNodeType);
+    pointerDrawingManager.surfaceNode_ = Rosen::RSSurfaceNode::Create(surfaceNodeConfig, surfaceNodeType, true, false,
+        rsUIContext_);
     ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.SetCursorLocation(physicalX, physicalY));
     pointerDrawingManager.hardwareCursorPointerManager_->SetHdiServiceState(true);
     pointerDrawingManager.hardwareCursorPointerManager_->isEnableState_ = true;
@@ -289,7 +315,8 @@ HWTEST_F(PointerDrawingManagerSupTest, PointerDrawingManagerSupTest_InitVsync_00
     Rosen::RSSurfaceNodeConfig surfaceNodeConfig;
     surfaceNodeConfig.SurfaceNodeName = "pointer window";
     Rosen::RSSurfaceNodeType surfaceNodeType = Rosen::RSSurfaceNodeType::SELF_DRAWING_WINDOW_NODE;
-    pointerDrawingManager.surfaceNode_ = Rosen::RSSurfaceNode::Create(surfaceNodeConfig, surfaceNodeType);
+    pointerDrawingManager.surfaceNode_ = Rosen::RSSurfaceNode::Create(surfaceNodeConfig, surfaceNodeType, true, false,
+        rsUIContext_);
     pointerDrawingManager.currentMouseStyle_.id = MOUSE_ICON::DEVELOPER_DEFINED_ICON;
     ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.InitVsync(MOUSE_ICON(MOUSE_ICON::DEVELOPER_DEFINED_ICON)));
 }
@@ -307,7 +334,8 @@ HWTEST_F(PointerDrawingManagerSupTest, PointerDrawingManagerSupTest_RetryGetSurf
     Rosen::RSSurfaceNodeConfig surfaceNodeConfig;
     surfaceNodeConfig.SurfaceNodeName = "pointer window";
     Rosen::RSSurfaceNodeType surfaceNodeType = Rosen::RSSurfaceNodeType::SELF_DRAWING_WINDOW_NODE;
-    pointerDrawingManager.surfaceNode_ = Rosen::RSSurfaceNode::Create(surfaceNodeConfig, surfaceNodeType);
+    pointerDrawingManager.surfaceNode_ = Rosen::RSSurfaceNode::Create(surfaceNodeConfig, surfaceNodeType, true, false,
+        rsUIContext_);
     pointerDrawingManager.hardwareCursorPointerManager_->SetHdiServiceState(true);
     pointerDrawingManager.hardwareCursorPointerManager_->isEnableState_ = true;
     auto layer = pointerDrawingManager.surfaceNode_->GetSurface();
@@ -344,7 +372,8 @@ HWTEST_F(PointerDrawingManagerSupTest, PointerDrawingManagerSupTest_PostTask_002
     Rosen::RSSurfaceNodeConfig surfaceNodeConfig;
     surfaceNodeConfig.SurfaceNodeName = "pointer window";
     Rosen::RSSurfaceNodeType surfaceNodeType = Rosen::RSSurfaceNodeType::SELF_DRAWING_WINDOW_NODE;
-    pointerDrawingManager.surfaceNode_ = Rosen::RSSurfaceNode::Create(surfaceNodeConfig, surfaceNodeType);
+    pointerDrawingManager.surfaceNode_ = Rosen::RSSurfaceNode::Create(surfaceNodeConfig, surfaceNodeType, true, false,
+        rsUIContext_);
     pointerDrawingManager.hardwareCursorPointerManager_->SetHdiServiceState(true);
     pointerDrawingManager.hardwareCursorPointerManager_->isEnableState_ = true;
     int32_t rsId = 10;
@@ -385,7 +414,8 @@ HWTEST_F(PointerDrawingManagerSupTest, PointerDrawingManagerSupTest_PostSoftCurs
     Rosen::RSSurfaceNodeConfig surfaceNodeConfig;
     surfaceNodeConfig.SurfaceNodeName = "pointer window";
     Rosen::RSSurfaceNodeType surfaceNodeType = Rosen::RSSurfaceNodeType::SELF_DRAWING_WINDOW_NODE;
-    pointerDrawingManager.surfaceNode_ = Rosen::RSSurfaceNode::Create(surfaceNodeConfig, surfaceNodeType);
+    pointerDrawingManager.surfaceNode_ = Rosen::RSSurfaceNode::Create(surfaceNodeConfig, surfaceNodeType, true, false,
+        rsUIContext_);
     pointerDrawingManager.hardwareCursorPointerManager_->SetHdiServiceState(true);
     pointerDrawingManager.hardwareCursorPointerManager_->isEnableState_ = true;
     int32_t rsId = 10;
@@ -520,7 +550,8 @@ HWTEST_F(PointerDrawingManagerSupTest, PointerDrawingManagerSupTest_CreatePointe
     Rosen::RSSurfaceNodeConfig surfaceNodeConfig;
     surfaceNodeConfig.SurfaceNodeName = "pointer window";
     Rosen::RSSurfaceNodeType surfaceNodeType = Rosen::RSSurfaceNodeType::SELF_DRAWING_WINDOW_NODE;
-    pointerDrawingManager.surfaceNode_ = Rosen::RSSurfaceNode::Create(surfaceNodeConfig, surfaceNodeType);
+    pointerDrawingManager.surfaceNode_ = Rosen::RSSurfaceNode::Create(surfaceNodeConfig, surfaceNodeType, true, false,
+        rsUIContext_);
     ASSERT_NO_FATAL_FAILURE(
         pointerDrawingManager.CreatePointerWindow(rsId, physicalX, physicalY, Direction::DIRECTION90));
     ASSERT_NO_FATAL_FAILURE(
@@ -545,7 +576,8 @@ HWTEST_F(PointerDrawingManagerSupTest, PointerDrawingManagerSupTest_CreatePointe
     Rosen::RSSurfaceNodeConfig surfaceNodeConfig;
     surfaceNodeConfig.SurfaceNodeName = "pointer window";
     Rosen::RSSurfaceNodeType surfaceNodeType = Rosen::RSSurfaceNodeType::SELF_DRAWING_WINDOW_NODE;
-    pointerDrawingManager.surfaceNode_ = Rosen::RSSurfaceNode::Create(surfaceNodeConfig, surfaceNodeType);
+    pointerDrawingManager.surfaceNode_ = Rosen::RSSurfaceNode::Create(surfaceNodeConfig, surfaceNodeType, true, false,
+        rsUIContext_);
     pointerDrawingManager.hardwareCursorPointerManager_->SetHdiServiceState(true);
     pointerDrawingManager.hardwareCursorPointerManager_->isEnableState_ = true;
     OLD::DisplayInfo displaysInfo;
@@ -801,7 +833,8 @@ HWTEST_F(PointerDrawingManagerSupTest, PointerDrawingManagerSupTest_UpdateDispla
     Rosen::RSSurfaceNodeConfig surfaceNodeConfig;
     surfaceNodeConfig.SurfaceNodeName = "pointer window";
     Rosen::RSSurfaceNodeType surfaceNodeType = Rosen::RSSurfaceNodeType::SELF_DRAWING_WINDOW_NODE;
-    pointerDrawingManager.surfaceNode_ = Rosen::RSSurfaceNode::Create(surfaceNodeConfig, surfaceNodeType);
+    pointerDrawingManager.surfaceNode_ = Rosen::RSSurfaceNode::Create(surfaceNodeConfig, surfaceNodeType, true, false,
+        rsUIContext_);
     pointerDrawingManager.hardwareCursorPointerManager_->SetHdiServiceState(true);
     pointerDrawingManager.hardwareCursorPointerManager_->isEnableState_ = true;
 
@@ -871,7 +904,8 @@ HWTEST_F(PointerDrawingManagerSupTest, PointerDrawingManagerSupTest_AttachAllSur
     Rosen::RSSurfaceNodeConfig surfaceNodeConfig;
     surfaceNodeConfig.SurfaceNodeName = "pointer window";
     Rosen::RSSurfaceNodeType surfaceNodeType = Rosen::RSSurfaceNodeType::SELF_DRAWING_WINDOW_NODE;
-    pointerDrawingManager.surfaceNode_ = Rosen::RSSurfaceNode::Create(surfaceNodeConfig, surfaceNodeType);
+    pointerDrawingManager.surfaceNode_ = Rosen::RSSurfaceNode::Create(surfaceNodeConfig, surfaceNodeType, true, false,
+        rsUIContext_);
     pointerDrawingManager.hardwareCursorPointerManager_->SetHdiServiceState(true);
     pointerDrawingManager.hardwareCursorPointerManager_->isEnableState_ = true;
 
@@ -912,7 +946,8 @@ HWTEST_F(PointerDrawingManagerSupTest, PointerDrawingManagerSupTest_AttachAllSur
     Rosen::RSSurfaceNodeConfig surfaceNodeConfig;
     surfaceNodeConfig.SurfaceNodeName = "pointer window";
     Rosen::RSSurfaceNodeType surfaceNodeType = Rosen::RSSurfaceNodeType::SELF_DRAWING_WINDOW_NODE;
-    pointerDrawingManager.surfaceNode_ = Rosen::RSSurfaceNode::Create(surfaceNodeConfig, surfaceNodeType);
+    pointerDrawingManager.surfaceNode_ = Rosen::RSSurfaceNode::Create(surfaceNodeConfig, surfaceNodeType, true, false,
+        rsUIContext_);
     ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.AttachAllSurfaceNode());
 }
 
@@ -930,7 +965,8 @@ HWTEST_F(PointerDrawingManagerSupTest, PointerDrawingManagerSupTest_DetachAllSur
     Rosen::RSSurfaceNodeConfig surfaceNodeConfig;
     surfaceNodeConfig.SurfaceNodeName = "pointer window";
     Rosen::RSSurfaceNodeType surfaceNodeType = Rosen::RSSurfaceNodeType::SELF_DRAWING_WINDOW_NODE;
-    pointerDrawingManager.surfaceNode_ = Rosen::RSSurfaceNode::Create(surfaceNodeConfig, surfaceNodeType);
+    pointerDrawingManager.surfaceNode_ = Rosen::RSSurfaceNode::Create(surfaceNodeConfig, surfaceNodeType, true, false,
+        rsUIContext_);
     pointerDrawingManager.hardwareCursorPointerManager_->SetHdiServiceState(true);
     pointerDrawingManager.hardwareCursorPointerManager_->isEnableState_ = true;
 
@@ -1094,7 +1130,8 @@ HWTEST_F(PointerDrawingManagerSupTest, PointerDrawingManagerSupTest_UpdateBindDi
     Rosen::RSSurfaceNodeConfig surfaceNodeConfig;
     surfaceNodeConfig.SurfaceNodeName = "pointer window";
     Rosen::RSSurfaceNodeType surfaceNodeType = Rosen::RSSurfaceNodeType::SELF_DRAWING_WINDOW_NODE;
-    pointerDrawingManager.surfaceNode_ = Rosen::RSSurfaceNode::Create(surfaceNodeConfig, surfaceNodeType);
+    pointerDrawingManager.surfaceNode_ = Rosen::RSSurfaceNode::Create(surfaceNodeConfig, surfaceNodeType, true, false,
+        rsUIContext_);
     pointerDrawingManager.hardwareCursorPointerManager_ = std::make_shared<HardwareCursorPointerManager>();
     pointerDrawingManager.hardwareCursorPointerManager_->SetHdiServiceState(true);
     pointerDrawingManager.hardwareCursorPointerManager_->isEnableState_ = true;
@@ -1226,7 +1263,7 @@ HWTEST_F(PointerDrawingManagerSupTest, PointerDrawingManagerSupTest_DrawSoftCurs
     Rosen::RSSurfaceNodeConfig surfaceNodeConfig;
     surfaceNodeConfig.SurfaceNodeName = "pointer window";
     Rosen::RSSurfaceNodeType surfaceNodeType = Rosen::RSSurfaceNodeType::SELF_DRAWING_WINDOW_NODE;
-    auto surfaceNode = Rosen::RSSurfaceNode::Create(surfaceNodeConfig, surfaceNodeType);
+    auto surfaceNode = Rosen::RSSurfaceNode::Create(surfaceNodeConfig, surfaceNodeType, true, false, rsUIContext_);
     ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.DrawSoftCursor(surfaceNode, cfg));
 }
 

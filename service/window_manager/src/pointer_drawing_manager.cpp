@@ -254,7 +254,7 @@ void PointerDrawingManager::DestroyPointerWindow()
             SetSurfaceNode(nullptr);
             MMI_HILOGI("Detach screenId:%{public}" PRIu64, screenId_);
         }
-        Rosen::RSTransaction::FlushImplicitTransaction();
+        RsFlushImplicitTransaction();
         MMI_HILOGI("Pointer window destroy success");
         return RET_OK;
     });
@@ -326,7 +326,7 @@ void PointerDrawingManager::ClearResources()
             surfaceNodePtr->DetachToDisplay(screenId_);
             SetSurfaceNode(nullptr);
             MMI_HILOGI("Detach screenId:%{public}" PRIu64, screenId_);
-            Rosen::RSTransaction::FlushImplicitTransaction();
+            RsFlushImplicitTransaction();
         }
     }
     INPUT_DEV_MGR->Detach(self_);
@@ -379,7 +379,7 @@ bool PointerDrawingManager::SetCursorLocation(int32_t physicalX, int32_t physica
     bool magicCursorSetBounds = false;
     if (UpdateSurfaceNodeBounds(physicalX, physicalY) == RET_OK) {
         magicCursorSetBounds = true;
-        Rosen::RSTransaction::FlushImplicitTransaction();
+        RsFlushImplicitTransaction();
     }
     auto surfaceNodePtr = GetSurfaceNode();
     CHKPF(surfaceNodePtr);
@@ -414,7 +414,7 @@ bool PointerDrawingManager::SetCursorLocation(int32_t physicalX, int32_t physica
         if (!magicCursorSetBounds) {
             surfaceNodePtr->SetBounds(physicalX, physicalY, surfaceNodePtr->GetStagingProperties().GetBounds().z_,
                 surfaceNodePtr->GetStagingProperties().GetBounds().w_);
-            Rosen::RSTransaction::FlushImplicitTransaction();
+            RsFlushImplicitTransaction();
         }
     }
     return true;
@@ -719,7 +719,7 @@ int32_t PointerDrawingManager::CreatePointerSwitchObserver(isMagicCursor& item)
                 MMI_HILOGI("DetachToDisplay start screenId_:%{public}" PRIu64, screenId_);
                 surfaceNodePtr->DetachToDisplay(screenId_);
                 SetSurfaceNode(nullptr);
-                Rosen::RSTransaction::FlushImplicitTransaction();
+                RsFlushImplicitTransaction();
             }
             MAGIC_CURSOR->DetachDisplayNode();
             this->SwitchPointerStyle();
@@ -845,7 +845,7 @@ int32_t PointerDrawingManager::DrawCursor(const MOUSE_ICON mouseStyle)
         surfaceNodePtr->DetachToDisplay(screenId_);
         SetSurfaceNode(nullptr);
         MMI_HILOGI("Detach screenId:%{public}" PRIu64, screenId_);
-        Rosen::RSTransaction::FlushImplicitTransaction();
+        RsFlushImplicitTransaction();
         MMI_HILOGE("Pointer window destroy success");
         return RET_ERR;
     }
@@ -855,7 +855,7 @@ int32_t PointerDrawingManager::DrawCursor(const MOUSE_ICON mouseStyle)
         surfaceNodePtr->DetachToDisplay(screenId_);
         SetSurfaceNode(nullptr);
         MMI_HILOGI("Detach screenId:%{public}" PRIu64, screenId_);
-        Rosen::RSTransaction::FlushImplicitTransaction();
+        RsFlushImplicitTransaction();
         MMI_HILOGE("Pointer window destroy success");
         return RET_ERR;
     }
@@ -891,7 +891,7 @@ void PointerDrawingManager::DrawLoadingPointer(const MOUSE_ICON mouseStyle)
         (mouseStyle != MOUSE_ICON::DEFAULT ||
             mouseIcons[mouseStyle].iconPath != (IMAGE_POINTER_DEFAULT_PATH + "Loading.svg"))) {
         protocol.SetDuration(0);
-        Rosen::RSNode::Animate(
+        Rosen::RSNode::Animate(GetRSUIContext(),
             protocol,
             Rosen::RSAnimationTimingCurve::LINEAR,
             [this]() {
@@ -902,7 +902,7 @@ void PointerDrawingManager::DrawLoadingPointer(const MOUSE_ICON mouseStyle)
                 RotateDegree(currentDirection_);
             });
         MMI_HILOGE("Current pointer is not loading");
-        Rosen::RSTransaction::FlushImplicitTransaction();
+        RsFlushImplicitTransaction();
         return;
     }
     if (canvasWidth_ == 0) {
@@ -915,7 +915,7 @@ void PointerDrawingManager::DrawLoadingPointer(const MOUSE_ICON mouseStyle)
     protocol.SetRepeatCount(DEFAULT_VALUE);
 
     // create property animation
-    Rosen::RSNode::Animate(
+    Rosen::RSNode::Animate(GetRSUIContext(),
         protocol,
         Rosen::RSAnimationTimingCurve::LINEAR,
         [this]() {
@@ -923,6 +923,7 @@ void PointerDrawingManager::DrawLoadingPointer(const MOUSE_ICON mouseStyle)
             CHKPV(ptr);
             ptr->SetRotation(ROTATION_ANGLE);
         });
+    RsFlushImplicitTransaction();
 }
 
 std::shared_ptr<Rosen::Drawing::ColorSpace> PointerDrawingManager::ConvertToColorSpace(
@@ -1335,10 +1336,11 @@ void PointerDrawingManager::DrawRunningPointerAnimate(const MOUSE_ICON mouseStyl
         if (canvasNode_ != nullptr) {
             Rosen::RSAnimationTimingProtocol protocol;
             protocol.SetDuration(0);
-            Rosen::RSNode::Animate(
+            Rosen::RSNode::Animate(GetRSUIContext(),
                 protocol,
                 Rosen::RSAnimationTimingCurve::LINEAR,
                 [this]() { canvasNode_->SetRotation(0); });
+            RsFlushImplicitTransaction();
             canvasNode_->SetVisible(false);
         }
         MMI_HILOGE("current pointer is not running");
@@ -1377,12 +1379,12 @@ void PointerDrawingManager::DrawRunningPointerAnimate(const MOUSE_ICON mouseStyl
     protocol.SetRepeatCount(DEFAULT_VALUE);
 
     // create property animation
-    Rosen::RSNode::Animate(
+    Rosen::RSNode::Animate(GetRSUIContext(),
         protocol,
         Rosen::RSAnimationTimingCurve::LINEAR,
         [this]() { canvasNode_->SetRotation(ROTATION_ANGLE); });
 
-    Rosen::RSTransaction::FlushImplicitTransaction();
+    RsFlushImplicitTransaction();
 }
 
 void PointerDrawingManager::AdjustMouseFocus(Direction direction, ICON_TYPE iconType,
@@ -1719,7 +1721,7 @@ void PointerDrawingManager::CreateCanvasNode()
     }
     auto surfaceNodePtr = GetSurfaceNode();
     CHKPV(surfaceNodePtr);
-    canvasNode_ = Rosen::RSCanvasNode::Create();
+    canvasNode_ = Rosen::RSCanvasNode::Create(false, false, GetRSUIContext());
     CHKPV(canvasNode_);
     canvasNode_->SetBounds(0, 0, canvasWidth_, canvasHeight_);
     canvasNode_->SetFrame(0, 0, canvasWidth_, canvasHeight_);
@@ -1752,7 +1754,7 @@ int32_t PointerDrawingManager::CreatePointerWindowForScreenPointer(uint64_t rsId
         if (rsId == displayInfo_.rsId) {
             SetSurfaceNode(sp->GetSurfaceNode());
         }
-        Rosen::RSTransaction::FlushImplicitTransaction();
+        RsFlushImplicitTransaction();
         g_isRsRestart = true;
     } else if (sp == nullptr) {
         g_isRsRestart = true;
@@ -1768,7 +1770,7 @@ int32_t PointerDrawingManager::CreatePointerWindowForScreenPointer(uint64_t rsId
         }
         MMI_HILOGI("ScreenPointer rsId %{public}" PRIu64 " displayInfo_.rsId %{public}" PRIu64,
             rsId, displayInfo_.rsId);
-        Rosen::RSTransaction::FlushImplicitTransaction();
+        RsFlushImplicitTransaction();
     }
     CHKPR(sp, RET_ERR);
     SetSurfaceNode(sp->GetSurfaceNode()); // use SurfaceNode from current display
@@ -1777,13 +1779,18 @@ int32_t PointerDrawingManager::CreatePointerWindowForScreenPointer(uint64_t rsId
     return RET_OK;
 }
 
-int32_t PointerDrawingManager::CreatePointerWindowForNoScreenPointer(int32_t physicalX, int32_t physicalY)
+int32_t PointerDrawingManager::CreatePointerWindowForNoScreenPointer(uint64_t rsId, int32_t physicalX,
+    int32_t physicalY)
 {
     CALL_DEBUG_ENTER;
     Rosen::RSSurfaceNodeConfig surfaceNodeConfig;
     surfaceNodeConfig.SurfaceNodeName = "pointer window";
     Rosen::RSSurfaceNodeType surfaceNodeType = Rosen::RSSurfaceNodeType::CURSOR_NODE;
-    SetSurfaceNode(Rosen::RSSurfaceNode::Create(surfaceNodeConfig, surfaceNodeType));
+    if (!InitRSUIContext(rsId)) {
+        MMI_HILOGE("Init RSUIContext fail, rsId=%{public}" PRIu64, rsId);
+        return RET_ERR;
+    }
+    SetSurfaceNode(Rosen::RSSurfaceNode::Create(surfaceNodeConfig, surfaceNodeType, true, false, GetRSUIContext()));
     auto surfaceNodePtr = GetSurfaceNode();
     CHKPR(surfaceNodePtr, RET_ERR);
     surfaceNodePtr->SetPositionZ(Rosen::RSSurfaceNode::POINTER_WINDOW_POSITION_Z);
@@ -1810,7 +1817,7 @@ void PointerDrawingManager::CreatePointerWindow(uint64_t rsId, int32_t physicalX
             return;
         }
     } else {
-        if (CreatePointerWindowForNoScreenPointer(physicalX, physicalY) != RET_OK) {
+        if (CreatePointerWindowForNoScreenPointer(rsId, physicalX, physicalY) != RET_OK) {
             return;
         }
     }
@@ -1825,7 +1832,7 @@ void PointerDrawingManager::CreatePointerWindow(uint64_t rsId, int32_t physicalX
     RotateDegree(direction);
     lastDirection_ = direction;
     CreateCanvasNode();
-    Rosen::RSTransaction::FlushImplicitTransaction();
+    RsFlushImplicitTransaction();
     BytraceAdapter::StopRsSurfaceNode();
 }
 
@@ -2511,7 +2518,7 @@ void PointerDrawingManager::OnDisplayInfo(const OLD::DisplayGroupInfo &displayGr
             surfaceNodePtr->DetachToDisplay(screenId_);
             SetSurfaceNode(nullptr);
         }
-        Rosen::RSTransaction::FlushImplicitTransaction();
+        RsFlushImplicitTransaction();
         MMI_HILOGD("Pointer window destroy success");
     }
     MMI_HILOGD("rsId:%{public}" PRIu64 ", displayWidth_:%{public}d, displayHeight_:%{public}d",
@@ -2567,7 +2574,7 @@ void PointerDrawingManager::UpdatePointerDevice(bool hasPointerDevice, bool isPo
         // record pointer visible status for unload libcursor_drawing_adapter.z.so when pointer device has all removed
         RecordCursorVisibleStatus(false);
     }
-    Rosen::RSTransaction::FlushImplicitTransaction();
+    RsFlushImplicitTransaction();
     MMI_HILOGD("Pointer window destroy success");
 }
 
@@ -2600,7 +2607,7 @@ void PointerDrawingManager::AttachAllSurfaceNode()
             }
         }
     }
-    Rosen::RSTransaction::FlushImplicitTransaction();
+    RsFlushImplicitTransaction();
 }
 
 void PointerDrawingManager::DetachAllSurfaceNode()
@@ -2616,7 +2623,7 @@ void PointerDrawingManager::DetachAllSurfaceNode()
             }
         }
     }
-    Rosen::RSTransaction::FlushImplicitTransaction();
+    RsFlushImplicitTransaction();
 }
 
 void PointerDrawingManager::DrawManager()
@@ -2631,7 +2638,7 @@ void PointerDrawingManager::DrawManager()
             MMI_HILOGI("Pointer window DetachToDisplay start screenId_:%{public}" PRIu64, screenId_);
             surfaceNodePtr->DetachToDisplay(screenId_);
             SetSurfaceNode(nullptr);
-            Rosen::RSTransaction::FlushImplicitTransaction();
+            RsFlushImplicitTransaction();
         }
     }
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
@@ -2711,7 +2718,7 @@ void PointerDrawingManager::UpdatePointerVisible()
         MMI_HILOGI("Pointer window hide success, mouseDisplayState_:%{public}s displayId_:%{public}" PRIu64,
             mouseDisplayState_ ? "true" : "false", displayId_);
     }
-    Rosen::RSTransaction::FlushImplicitTransaction();
+    RsFlushImplicitTransaction();
 }
 
 void PointerDrawingManager::ShowCursorWhenHardwareCursorEnabled()
@@ -2752,7 +2759,7 @@ void PointerDrawingManager::DeleteSurfaceNode()
         MMI_HILOGI("Pointer window DetachToDisplay start screenId_:%{public}" PRIu64, screenId_);
         surfaceNodePtr->DetachToDisplay(screenId_);
         SetSurfaceNode(nullptr);
-        Rosen::RSTransaction::FlushImplicitTransaction();
+        RsFlushImplicitTransaction();
     }
 }
 
@@ -2780,7 +2787,7 @@ void PointerDrawingManager::SetPointerLocation(int32_t x, int32_t y, uint64_t rs
             y,
             surfaceNodePtr->GetStagingProperties().GetBounds().z_,
             surfaceNodePtr->GetStagingProperties().GetBounds().w_);
-        Rosen::RSTransaction::FlushImplicitTransaction();
+        RsFlushImplicitTransaction();
     }
     MMI_HILOGD("Pointer window move success");
 }
@@ -2830,11 +2837,11 @@ void PointerDrawingManager::DrawPointerStyle(const PointerStyle& pointerStyle)
         if (GetSurfaceNode() != nullptr) {
             AttachToDisplay();
             if (GetHardCursorEnabled()) {
-                PostTask([]() {
-                    Rosen::RSTransaction::FlushImplicitTransaction();
+                PostTask([this]() {
+                    RsFlushImplicitTransaction();
                 });
             } else {
-                Rosen::RSTransaction::FlushImplicitTransaction();
+                RsFlushImplicitTransaction();
             }
         }
         Direction direction = GetDisplayDirection(&displayInfo_);
@@ -3063,7 +3070,7 @@ void PointerDrawingManager::UpdateBindDisplayId(uint64_t rsId)
             SoftwareCursorRender(MOUSE_ICON::TRANSPARENT_ICON, lastPhysicalX_, lastPhysicalY_, displayId_);
         });
         HideHardwareCursors();
-        Rosen::RSTransaction::FlushImplicitTransaction();
+        RsFlushImplicitTransaction();
 
         // 绑定新屏幕 SurfaceNode 到全局 surfaceNode_
         screenId_ = rsId;
@@ -3536,7 +3543,7 @@ void PointerDrawingManager::SoftwareCursorMove(uint64_t displayId, int32_t x, in
         CHKPC(msp);
         msp->MoveSoft(x, y);
     }
-    Rosen::RSTransaction::FlushImplicitTransaction();
+    RsFlushImplicitTransaction();
 }
 
 void PointerDrawingManager::SoftwareCursorMoveAsync(uint64_t displayId, int32_t x, int32_t y)
@@ -3608,7 +3615,7 @@ void PointerDrawingManager::DrawScreenCenterPointer(const PointerStyle& pointerS
     if (hasDisplay_ && hasPointerDevice_) {
         if (GetSurfaceNode() != nullptr) {
             AttachToDisplay();
-            Rosen::RSTransaction::FlushImplicitTransaction();
+            RsFlushImplicitTransaction();
         }
         int32_t validWidth = 0;
         int32_t validHeight = 0;
@@ -4082,6 +4089,68 @@ ResampleAlgorithm::Point ResampleAlgorithm::LinearInterpolation(const Point& his
         return Point{static_cast<int32_t>(x), static_cast<int32_t>(y), current.displayId, timestamp};
     }
     return Point{0, 0, 0, 0};
+}
+
+bool PointerDrawingManager::InitRSUIContext(uint64_t screenId)
+{
+    sptr<IRemoteObject> renderToken = Rosen::RSInterfaces::GetInstance().GetConnectToRenderToken(screenId);
+    if (renderToken == nullptr) {
+        MMI_HILOGE("Get connect to render token fail, screenId=%{public}" PRIu64, screenId);
+        return false;
+    }
+
+    rsUIDirector_ = Rosen::RSUIDirector::Create(renderToken);
+    if (rsUIDirector_ == nullptr) {
+        MMI_HILOGE("Create RSUIDirector fail, screenId=%{public}" PRIu64, screenId);
+        return false;
+    }
+
+    rsUIContext_ = rsUIDirector_->GetRSUIContext();
+    if (rsUIContext_ == nullptr) {
+        rsUIDirector_ = nullptr;
+        MMI_HILOGE("Create RSUIContext fail, screenId=%{public}" PRIu64, screenId);
+        return false;
+    }
+    MMI_HILOGI("Init RSUIContext success, screenId=%{public}" PRIu64, screenId);
+    return true;
+}
+
+void PointerDrawingManager::RsFlushImplicitTransaction()
+{
+    std::shared_ptr<Rosen::RSUIDirector> rsUIDirector = GetRSUIDirector();
+    if (rsUIDirector == nullptr) {
+        MMI_HILOGE("rsUIDirector is null");
+        return;
+    }
+    rsUIDirector->SendMessages();
+}
+
+std::shared_ptr<Rosen::RSUIContext> PointerDrawingManager::GetRSUIContext()
+{
+    if (GetHardCursorEnabled()) {
+        auto sp = GetScreenPointer(displayId_);
+        if (sp == nullptr) {
+            MMI_HILOGE("Get ScreenPointer fail, displayId=%{public}" PRIu64, displayId_);
+            return nullptr;
+        }
+        return sp->GetRSUIContext();
+    } else {
+        return rsUIContext_;
+    }
+}
+
+std::shared_ptr<Rosen::RSUIDirector> PointerDrawingManager::GetRSUIDirector()
+{
+    if (GetHardCursorEnabled()) {
+        auto sp = GetScreenPointer(displayId_);
+        if (sp == nullptr) {
+            MMI_HILOGE("Get ScreenPointer fail, displayId=%{public}" PRIu64, displayId_);
+            return nullptr;
+        }
+        return sp->GetRSUIDirector();
+    } else {
+        return rsUIDirector_;
+    }
 }
 } // namespace MMI
 } // namespace OHOS
