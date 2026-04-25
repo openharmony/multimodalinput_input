@@ -1405,7 +1405,22 @@ typedef enum {
      * XKEY
      * @since 26.0.0
      */
-    KEYCODE_XKEY = 3232
+    KEYCODE_XKEY = 3232,
+    /**
+     * FINGERPRINT_SLIDE_UP
+     * @since 26.0.0
+     */
+    KEYCODE_FINGERPRINT_SLIDE_UP = 3233,
+    /**
+     * FINGERPRINT_SLIDE_DOWN
+     * @since 26.0.0
+     */
+    KEYCODE_FINGERPRINT_SLIDE_DOWN = 3234,
+    /**
+     * Wrist Turn key
+     * @since 26.0.0
+     */
+    KEYCODE_WRIST_TURN = 16777216
 } Input_KeyCode;
 
 #ifdef __cplusplus

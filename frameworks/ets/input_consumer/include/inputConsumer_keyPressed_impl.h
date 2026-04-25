@@ -44,6 +44,8 @@ static const std::set<int32_t> allowedKeys_ {
     KeyEvent::KEYCODE_MEDIA_PLAY_PAUSE,
     KeyEvent::KEYCODE_MEDIA_NEXT,
     KeyEvent::KEYCODE_MEDIA_PREVIOUS,
+    KeyEvent::KEYCODE_FINGERPRINT_SLIDE_UP,
+    KeyEvent::KEYCODE_FINGERPRINT_SLIDE_DOWN,
 };
 
 int32_t EtsKeyActionToKeyAction(int32_t action);

@@ -28,6 +28,8 @@
 #include "i_pointer_drawing_manager.h"
 #include "mouse_event_interface.h"
 #include "screen_pointer.h"
+#include "ui/rs_ui_context.h"
+#include "ui/rs_ui_director.h"
 
 namespace OHOS {
 namespace MMI {
@@ -94,7 +96,7 @@ public:
     ~ResampleAlgorithm() = default;
     void AddPoint(int32_t physicalX, int32_t physicalY, uint64_t displayId);
     bool HasCoords();
-    bool GetResampledPoint(int32_t &outX, int32_t &outY, uint64_t timestamp);
+    bool GetResampledPoint(int32_t &outX, int32_t &outY, uint64_t &displayId, uint64_t timestamp);
 private:
     bool CheckDifferentDisplayId();
     Point GetResampledCoords(uint64_t timestamp);
@@ -104,6 +106,7 @@ private:
     std::deque<Point> currentBuffer_;
     std::deque<Point> historyBuffer_;
     int32_t keepResample_ { 2 };
+    std::mutex bufferMutex_;
 };
 
 class DelegateInterface;
@@ -196,7 +199,7 @@ private:
     void DrawRunningPointerAnimate(const MOUSE_ICON mouseStyle);
     void CreatePointerWindow(uint64_t rsId, int32_t physicalX, int32_t physicalY, Direction direction);
     int32_t CreatePointerWindowForScreenPointer(uint64_t rsId, int32_t physicalX, int32_t physicalY);
-    int32_t CreatePointerWindowForNoScreenPointer(int32_t physicalX, int32_t physicalY);
+    int32_t CreatePointerWindowForNoScreenPointer(uint64_t rsId, int32_t physicalX, int32_t physicalY);
     sptr<OHOS::Surface> GetLayer();
     sptr<OHOS::SurfaceBuffer> GetSurfaceBuffer(sptr<OHOS::Surface> layer);
     sptr<OHOS::SurfaceBuffer> RetryGetSurfaceBuffer(sptr<OHOS::Surface> layer);
@@ -247,7 +250,7 @@ private:
     void SoftCursorRenderThreadLoop();
     void MoveRetryThreadLoop();
     int32_t RequestNextVSync();
-    void RenderAndMoveOnVsync(int32_t x, int32_t y);
+    void RenderAndMoveOnVsync(int32_t x, int32_t y, uint64_t displayId);
     void OnVsync(uint64_t timestamp);
     void PostTask(std::function<void()> task);
     void PostSoftCursorTask(std::function<void()> task);
@@ -277,20 +280,20 @@ private:
     void CreateRenderConfig(RenderConfig& cfg, std::shared_ptr<ScreenPointer> sp, MOUSE_ICON mouseStyle, bool isHard,
         int32_t x, int32_t y, uint64_t screenId);
     Direction CalculateRenderDirection(bool isHard);
-    void SoftwareCursorRender(MOUSE_ICON mouseStyle, int32_t x, int32_t y);
-    void HardwareCursorRender(MOUSE_ICON mouseStyle, int32_t x, int32_t y);
+    void SoftwareCursorRender(MOUSE_ICON mouseStyle, int32_t x, int32_t y, uint64_t displayId);
+    void HardwareCursorRender(MOUSE_ICON mouseStyle, int32_t x, int32_t y, uint64_t displayId);
     void SoftwareCursorMove(uint64_t displayId, int32_t x, int32_t y);
     void SoftwareCursorMoveAsync(uint64_t displayId, int32_t x, int32_t y);
-    void MoveRetryAsync(int32_t x, int32_t y);
+    void MoveRetryAsync(uint64_t displayId, int32_t x, int32_t y);
     void ResetMoveRetryTimer();
-    int32_t HardwareCursorMove(int32_t x, int32_t y);
+    int32_t HardwareCursorMove(uint64_t displayId, int32_t x, int32_t y);
     void HideHardwareCursors();
     int32_t GetMainScreenDisplayInfo(const OLD::DisplayGroupInfo &displayGroupInfo,
         OLD::DisplayInfo &mainScreenDisplayInfo) const;
     int32_t DrawDynamicHardwareCursor(std::shared_ptr<ScreenPointer> sp, const RenderConfig &cfg);
     int32_t DrawDynamicSoftCursor(std::shared_ptr<Rosen::RSSurfaceNode> sn, const RenderConfig &cfg);
-    void HardwareCursorDynamicRender(MOUSE_ICON mouseStyle);
-    void SoftwareCursorDynamicRender(MOUSE_ICON mouseStyle);
+    void HardwareCursorDynamicRender(MOUSE_ICON mouseStyle, uint64_t displayId);
+    void SoftwareCursorDynamicRender(MOUSE_ICON mouseStyle, uint64_t displayId);
     void UpdateMirrorScreens(std::shared_ptr<ScreenPointer> sp, OLD::DisplayInfo displayInfo);
     void AttachAllSurfaceNode() override;
     void DetachAllSurfaceNode() override;
@@ -305,9 +308,14 @@ private:
     void ClearResources() override;
     void ClearRunnerAndHandler();
     bool GetCursorBlurEnabled();
+    bool IsCursorBlurEnabledUpdate();
     void UpdateCursorBlurEnabled();
     uint64_t GetResampleTimestamp(uint64_t timestamp);
     void GetValidWidthAndHeight(const OLD::DisplayInfo *displayInfo, int32_t &validWidth, int32_t &validHeight);
+    bool InitRSUIContext(uint64_t screenId);
+    void RsFlushImplicitTransaction();
+    std::shared_ptr<Rosen::RSUIDirector> GetRSUIDirector();
+    std::shared_ptr<Rosen::RSUIContext> GetRSUIContext();
 private:
     bool hasDisplay_ { false };
     bool hasPointerDevice_ { false };
@@ -334,6 +342,8 @@ private:
     int32_t cursorHeight_ { 0 };
     uint64_t screenId_ { 0 };
     std::mutex surfaceNodeMutex_;
+    std::shared_ptr<Rosen::RSUIDirector> rsUIDirector_;
+    std::shared_ptr<Rosen::RSUIContext> rsUIContext_;
     std::shared_ptr<Rosen::RSSurfaceNode> surfaceNode_;
     std::shared_ptr<Rosen::RSCanvasNode> canvasNode_;
     int32_t userIconHotSpotX_ { 0 };

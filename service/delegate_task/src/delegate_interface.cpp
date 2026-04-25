@@ -26,7 +26,9 @@
 #ifdef OHOS_BUILD_KNUCKLE
 #include "knuckle_handler_component.h"
 #endif // OHOS_BUILD_KNUCKLE
-
+#ifdef OHOS_BUILD_ENABLE_TRIPLE_FINGER_SNAPSHOT
+#include "triple_finger_snapshot_manager.h"
+#endif // OHOS_BUILD_ENABLE_TRIPLE_FINGER_SNAPSHOT
 #undef MMI_LOG_DOMAIN
 #define MMI_LOG_DOMAIN MMI_LOG_SERVER
 #undef MMI_LOG_TAG
@@ -49,6 +51,9 @@ void DelegateInterface::Init()
 #ifdef OHOS_BUILD_KNUCKLE
     KnuckleHandlerComponent::GetInstance().SetDelegateProxy(shared_from_this());
 #endif // OHOS_BUILD_KNUCKLE
+#ifdef OHOS_BUILD_ENABLE_TRIPLE_FINGER_SNAPSHOT
+    TripleFingerSnapshotManager::GetInstance().SetDelegateProxy(shared_from_this());
+#endif // OHOS_BUILD_ENABLE_TRIPLE_FINGER_SNAPSHOT
 }
 
 int32_t DelegateInterface::OnPostSyncTask(DTaskCallback cb) const

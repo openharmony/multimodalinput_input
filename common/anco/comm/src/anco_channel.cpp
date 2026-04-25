@@ -73,5 +73,14 @@ ErrCode AncoChannel::UpdateExcludedKeyEventWindow(
     }
     return consumer_->UpdateExcludedKeyEventWindow(excludedKeyEventWindow);
 }
+
+ErrCode AncoChannel::UpdateTripleFingerSnapshotState(
+    const AncoTripleFingerSnapshotState &snapshotState)
+{
+    if (consumer_ == nullptr) {
+        return RET_ERR;
+    }
+    return consumer_->UpdateTripleFingerSnapshotState(snapshotState);
+}
 } // namespace MMI
 } // namespace OHOS

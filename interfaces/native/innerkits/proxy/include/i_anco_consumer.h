@@ -100,6 +100,14 @@ struct AncoExcludedKeyEventWindow : public Parcelable {
     static AncoExcludedKeyEventWindow* Unmarshalling(Parcel &parcel);
 };
 
+struct AncoTripleFingerSnapshotState : public Parcelable {
+    bool enabled;
+ 
+    bool Marshalling(Parcel &parcel) const;
+    bool ReadFromParcel(Parcel &parcel);
+    static AncoTripleFingerSnapshotState* Unmarshalling(Parcel &parcel);
+};
+
 class IAncoConsumer {
 public:
     IAncoConsumer() = default;
@@ -112,6 +120,8 @@ public:
     virtual int32_t UpdateOneHandData(const AncoOneHandData &oneHandData) = 0;
     virtual int32_t UpdateExcludedKeyEventWindow(
         const AncoExcludedKeyEventWindow &excludedKeyEventWindow) = 0;
+    virtual int32_t UpdateTripleFingerSnapshotState(
+        const AncoTripleFingerSnapshotState &snapshotState) = 0;
 };
 } // namespace MMI
 } // namespace OHOS

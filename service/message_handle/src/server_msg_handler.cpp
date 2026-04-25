@@ -37,6 +37,7 @@
 #include "long_press_subscriber_handler.h"
 #include "libinput_adapter.h"
 #include "mouse_event_interface.h"
+#include "multimodal_input_plugin_manager.h"
 #include "permission_helper.h"
 #include "pointer_device_manager.h"
 #include "pointer_motion_acceleration.h"
@@ -137,10 +138,6 @@ void ServerMsgHandler::OnMsgHandler(SessionPtr sess, NetPacket& pkt)
 int32_t ServerMsgHandler::OnInjectKeyEvent(const std::shared_ptr<KeyEvent> keyEvent, int32_t pid, bool isNativeInject)
 {
     CALL_DEBUG_ENTER;
-    if (INPUT_DEV_MGR->IsEduInputDisabled()) {
-        MMI_HILOGW("Edu input is disabled, rejecting event injection for pid=%{public}d", getpid());
-        return ERROR_EDU_INPUT_DISABLED;
-    }
     CHKPR(keyEvent, ERROR_NULL_POINTER);
     keyEvent->UpdateId();
     LogTracer lt(keyEvent->GetId(), keyEvent->GetEventType(), keyEvent->GetKeyAction());
@@ -249,10 +246,6 @@ int32_t ServerMsgHandler::OnInjectPointerEvent(int32_t userId, const std::shared
     int32_t pid, bool isNativeInject, bool isShell, int32_t useCoordinate)
 {
     CALL_DEBUG_ENTER;
-    if (INPUT_DEV_MGR->IsEduInputDisabled()) {
-        MMI_HILOGW("Edu input is disabled, rejecting event injection for pid=%{public}d", getpid());
-        return ERROR_EDU_INPUT_DISABLED;
-    }
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
     LogTracer lt(pointerEvent->GetId(), pointerEvent->GetEventType(), pointerEvent->GetPointerAction());
     if (isNativeInject) {
@@ -268,10 +261,6 @@ int32_t ServerMsgHandler::OnInjectTouchPadEvent(int32_t userId, const std::share
     int32_t pid, const TouchpadCDG& touchpadCDG, bool isNativeInject, bool isShell)
 {
     CALL_DEBUG_ENTER;
-    if (INPUT_DEV_MGR->IsEduInputDisabled()) {
-        MMI_HILOGW("Edu input is disabled, rejecting touchpad event injection for pid=%{public}d", getpid());
-        return ERROR_EDU_INPUT_DISABLED;
-    }
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
     LogTracer lt(pointerEvent->GetId(), pointerEvent->GetEventType(), pointerEvent->GetPointerAction());
     if (isNativeInject) {
@@ -1848,8 +1837,29 @@ int32_t ServerMsgHandler::NativeInjectCheck(int32_t pid)
 int32_t ServerMsgHandler::EnableInputExtension(int32_t uid, const std::string &uuid, bool enabled)
 {
     CALL_DEBUG_ENTER;
-    MMI_HILOGI("EnableInputExtension (uid:%{public}d, uuid:%{public}s, enabled:%{public}d)",
+    auto pluginMgr = InputPluginManager::GetInstance();
+    if (pluginMgr == nullptr) {
+        MMI_HILOGE("No input plugin manager");
+        return RET_ERR;
+    }
+
+    MMI_HILOGI("EnableInputExtension (uid:%{private}d, uuid:%{private}s, enabled:%{public}d)",
         uid, uuid.c_str(), enabled);
+
+    if (enabled) {
+        auto ret = pluginMgr->LoadDynamicPlugin(uid, uuid);
+        if (ret != RET_OK) {
+            MMI_HILOGE("Failed to load plugin uuid=%{private}s, error:%{public}d", uuid.c_str(), ret);
+            return ret;
+        }
+    } else {
+        auto ret = pluginMgr->UnloadDynamicPlugin(uid, uuid);
+        if (ret != RET_OK) {
+            MMI_HILOGE("Failed to unload plugin uuid=%{private}s, error:%{public}d", uuid.c_str(), ret);
+            return ret;
+        }
+    }
+
     return RET_OK;
 }
 } // namespace MMI

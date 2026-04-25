@@ -110,6 +110,10 @@
 #include "mouse_event_interface.h"
 #endif // OHOS_BUILD_ENABLE_POINTER
 
+#ifdef OHOS_BUILD_ENABLE_TRIPLE_FINGER_SNAPSHOT
+#include "triple_finger_snapshot_manager.h"
+#endif // OHOS_BUILD_ENABLE_TRIPLE_FINGER_SNAPSHOT
+
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "MMIService"
 #undef MMI_LOG_DOMAIN
@@ -159,6 +163,7 @@ constexpr int32_t GAME_UID { 7011 };
 constexpr int32_t USS_UID { 6699 };
 constexpr int32_t STYLUS_UID { 7555 };
 constexpr int32_t SYNERGY_UID { 5521 };
+constexpr int32_t ACCESSIBILITY_UID { 1103 };
 constexpr int32_t MIN_TIMEOUT_DELAY { 1 };
 constexpr int32_t MSDP_UID { 6699 };
 constexpr int32_t DEFAULT_UNLOAD_DELAY_TIME { 30000 };
@@ -430,6 +435,10 @@ bool MMIService::InitDelegateTasks()
     delegateInterface_->Init();
     if (serviceContext_ != nullptr) {
         serviceContext_->AttachDelegateInterface(delegateInterface_);
+    }
+    auto pluginMgr = InputPluginManager::GetInstance();
+    if (pluginMgr != nullptr) {
+        pluginMgr->AttachDelegateInterface(delegateInterface_);
     }
     MMI_HILOGI("AddEpoll, epollfd:%{public}d, fd:%{public}d", mmiFd_, delegateTasks_.GetReadFd());
     return true;
@@ -850,10 +859,16 @@ int32_t MMIService::SetCustomCursorPixelMapInner(int32_t windowId, int32_t focus
 ErrCode MMIService::SetCustomCursorPixelMap(int32_t windowId, int32_t focusX, int32_t focusY,
     const CursorPixelMap& curPixelMap)
 {
-    if (int32_t ret = SetCustomCursorPixelMapInner(windowId, focusX, focusY, curPixelMap); ret != RET_OK) {
-        Media::PixelMap* pixelMap = static_cast<Media::PixelMap*>(curPixelMap.pixelMap);
-        delete pixelMap;
-        MMI_HILOGE("SetCustomCursorPixelMap failed, release resource");
+    int32_t ret = SetCustomCursorPixelMapInner(windowId, focusX, focusY, curPixelMap);
+    if (ret != RET_OK) {
+        if (ret != ERROR_PIXELMAP_MANAGED) {
+            Media::PixelMap* pixelMap = static_cast<Media::PixelMap*>(curPixelMap.pixelMap);
+            delete pixelMap;
+            MMI_HILOGE("SetCustomCursorPixelMap failed, release resource");
+        } else {
+            MMI_HILOGE("SetCustomCursorPixelMap failed after pixelMap managed, no need to release");
+            ret = RET_ERR;  // Convert back to RET_ERR for client compatibility
+        }
         return ret;
     }
     return RET_OK;
@@ -895,10 +910,16 @@ int32_t MMIService::SetMouseIconInner(int32_t windowId, const CursorPixelMap& cu
 ErrCode MMIService::SetMouseIcon(int32_t windowId, const CursorPixelMap& curPixelMap)
 {
     CALL_INFO_TRACE;
-    if (int32_t ret = SetMouseIconInner(windowId, curPixelMap); ret != RET_OK) {
-        Media::PixelMap* pixelMap = static_cast<Media::PixelMap*>(curPixelMap.pixelMap);
-        delete pixelMap;
-        MMI_HILOGE("SetMouseIcon failed, release resource");
+    int32_t ret = SetMouseIconInner(windowId, curPixelMap);
+    if (ret != RET_OK) {
+        if (ret != ERROR_PIXELMAP_MANAGED) {
+            Media::PixelMap* pixelMap = static_cast<Media::PixelMap*>(curPixelMap.pixelMap);
+            delete pixelMap;
+            MMI_HILOGE("SetMouseIcon failed, release resource");
+        } else {
+            MMI_HILOGE("SetMouseIcon failed after pixelMap managed, no need to release");
+            ret = RET_ERR;  // Convert back to RET_ERR for client compatibility
+        }
         return ret;
     }
     return RET_OK;
@@ -2584,6 +2605,10 @@ void MMIService::OnAddSystemAbility(int32_t systemAbilityId, const std::string &
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
         RegisterForCommonEventService();
 #endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
+#ifdef OHOS_BUILD_ENABLE_TRIPLE_FINGER_SNAPSHOT
+        TripleFingerSnapshotManager::GetInstance().RegisterSwitchObserver(
+            ACCOUNT_MGR->GetCurrentAccountSetting().GetAccountId());
+#endif // OHOS_BUILD_ENABLE_TRIPLE_FINGER_SNAPSHOT
     }
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
     RegisterForRenderService(systemAbilityId);
@@ -4646,10 +4671,16 @@ int32_t MMIService::SetPixelMapDataInner(int32_t infoId, const CursorPixelMap& c
 
 ErrCode MMIService::SetPixelMapData(int32_t infoId, const CursorPixelMap& curPixelMap)
 {
-    if (int32_t ret = SetPixelMapDataInner(infoId, curPixelMap); ret != RET_OK) {
-        Media::PixelMap* pixelMap = static_cast<Media::PixelMap*>(curPixelMap.pixelMap);
-        delete pixelMap;
-        MMI_HILOGE("SetPixelMapData failed, release resource");
+    int32_t ret = SetPixelMapDataInner(infoId, curPixelMap);
+    if (ret != RET_OK) {
+        if (ret != ERROR_PIXELMAP_MANAGED) {
+            Media::PixelMap* pixelMap = static_cast<Media::PixelMap*>(curPixelMap.pixelMap);
+            delete pixelMap;
+            MMI_HILOGE("SetPixelMapData failed, release resource");
+        } else {
+            MMI_HILOGE("SetPixelMapData failed after pixelMap managed, no need to release");
+            ret = RET_ERR;  // Convert back to RET_ERR for client compatibility
+        }
         return ret;
     }
     return RET_OK;
@@ -5359,6 +5390,10 @@ ErrCode MMIService::EnableInputExtension(const std::string &uuid, bool enabled)
         MMI_HILOGE("Service is not running");
         return MMISERVICE_NOT_RUNNING;
     }
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
     auto uid = GetCallingUid();
     int32_t ret = delegateTasks_.PostSyncTask(
         [this, uid, uuid, enabled] {
@@ -5825,7 +5860,8 @@ ErrCode MMIService::SwitchScreenCapturePermission(uint32_t permissionType, bool 
         MMI_HILOGE("Verify system APP failed");
         return ERROR_NOT_SYSAPI;
     }
-    if (callingUid != PENGLAI_UID && callingUid != GAME_UID) {
+    if (callingUid != PENGLAI_UID && callingUid != GAME_UID &&
+            callingUid != ACCESSIBILITY_UID) {
         MMI_HILOGE("Verify specified system APP failed");
         return ERROR_NO_PERMISSION;
     }
@@ -5834,8 +5870,8 @@ ErrCode MMIService::SwitchScreenCapturePermission(uint32_t permissionType, bool 
     auto eventKeyCommandHandler = InputHandler->GetKeyCommandHandler();
     CHKPR(eventKeyCommandHandler, RET_ERR);
     int32_t ret = delegateTasks_.PostSyncTask(
-        [permissionType, enable, eventKeyCommandHandler] {
-            return eventKeyCommandHandler->SwitchScreenCapturePermission(permissionType, enable);
+        [permissionType, enable, eventKeyCommandHandler, callingUid] {
+            return eventKeyCommandHandler->SwitchScreenCapturePermission(permissionType, enable, callingUid);
         }
         );
     if (ret != RET_OK) {

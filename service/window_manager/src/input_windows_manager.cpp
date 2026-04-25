@@ -33,6 +33,9 @@
 #ifdef OHOS_BUILD_ENABLE_TOUCH_DRAWING
 #include "touch_drawing_manager.h"
 #endif // #ifdef OHOS_BUILD_ENABLE_TOUCH_DRAWING
+#ifdef OHOS_BUILD_ENABLE_TRIPLE_FINGER_SNAPSHOT
+#include "triple_finger_snapshot_manager.h"
+#endif // OHOS_BUILD_ENABLE_TRIPLE_FINGER_SNAPSHOT
 #ifdef OHOS_BUILD_ENABLE_ANCO
 #endif // OHOS_BUILD_ENABLE_ANCO
 #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
@@ -1164,6 +1167,11 @@ void InputWindowsManager::UpdateDisplayInfoExtIfNeed(OLD::DisplayGroupInfo &disp
     }
     auto physicDisplayInfo = GetPhysicalDisplay(displayGroupInfo.displaysInfo[0].id);
     CHKPV(physicDisplayInfo);
+#ifdef OHOS_BUILD_ENABLE_TRIPLE_FINGER_SNAPSHOT
+    // 更新三指截屏的显示信息
+    TripleFingerSnapshotManager::GetInstance().UpdateDisplayInfo(physicDisplayInfo->validWidth,
+        physicDisplayInfo->validHeight, GetDisplayDirection(physicDisplayInfo));
+#endif // OHOS_BUILD_ENABLE_TRIPLE_FINGER_SNAPSHOT
 #ifdef OHOS_BUILD_ENABLE_TOUCH_DRAWING
     TOUCH_DRAWING_MGR->UpdateDisplayInfo(*physicDisplayInfo);
     TOUCH_DRAWING_MGR->RotationScreen();
@@ -7406,6 +7414,9 @@ int32_t InputWindowsManager::AppendExtraData(const ExtraData& extraData)
     extraData_.pullId = extraData.pullId;
     extraData_.eventId = extraData.eventId;
     extraData_.drawCursor = extraData.drawCursor;
+    if (!extraData_.appended) {
+        activeDragToolType_ = -1;
+    }
     if ((extraData_.eventId > 0) && (extraData.sourceType == PointerEvent::SOURCE_TYPE_MOUSE) &&
         (mouseDownEventId_ < 0 || extraData.eventId < mouseDownEventId_)) {
         MMI_HILOGE("Mouse drag failed, PI:%{public}d, EI:%{public}d, DEI:%{public}d",
@@ -8100,7 +8111,10 @@ int32_t InputWindowsManager::SetPixelMapData(int32_t infoId, void *pixelMap)
         static_cast<OHOS::Media::PixelMap*>(pixelMap));
     Media::InitializationOptions opts;
     auto pixelMapPtr = OHOS::Media::PixelMap::Create(*pixelMapSource, opts);
-    CHKPR(pixelMapPtr, RET_ERR);
+    if (pixelMapPtr == nullptr) {
+        MMI_HILOGE("PixelMap::Create failed");
+        return ERROR_PIXELMAP_MANAGED;
+    }
     MMI_HILOGD("The byteCount:%{public}d, width:%{public}d, height:%{public}d",
         pixelMapPtr->GetByteCount(), pixelMapPtr->GetWidth(), pixelMapPtr->GetHeight());
     transparentWins_.insert_or_assign(infoId, std::move(pixelMapPtr));

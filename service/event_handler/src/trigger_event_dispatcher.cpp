@@ -91,14 +91,14 @@ bool TriggerEventDispatcher::ShouldConsume(std::shared_ptr<KeyOption> keyOption,
         }
     }
     if (triggerType == ALL_RELEASED) {
-        if (keyCode == keyOption->GetFinalKey()) {
-            MMI_HILOGD("ALL_RELEASED mode: consuming finalKey event");
-            return true;
-        }
-        const auto& preKeys = keyOption->GetPreKeys();
-        if (preKeys.find(keyCode) != preKeys.end()) {
-            MMI_HILOGD("ALL_RELEASED mode: consuming preKey event");
-            return true;
+        std::string subscribeKey = GenerateSubscribeKey(keyOption);
+        auto it = allReleasedDispatchStates_.find(subscribeKey);
+        if (it != allReleasedDispatchStates_.end() && it->second.comboActivated) {
+            if (keyCode == keyOption->GetFinalKey() ||
+                keyOption->GetPreKeys().count(keyCode) > 0) {
+                MMI_HILOGI("ALL_RELEASED mode: consuming combo key event KC:%{public}d", keyCode);
+                return true;
+            }
         }
     }
     MMI_HILOGD("Event not consumed");
@@ -124,7 +124,11 @@ void TriggerEventDispatcher::ClearSubscribeState(const std::string& subscribeKey
     if (iter4 != hasOtherKey_.end()) {
         hasOtherKey_.erase(iter4);
     }
-    MMI_HILOGD("Subscribe state cleared for %{public}s", subscribeKey.c_str());
+    auto iter5 = allReleasedDispatchStates_.find(subscribeKey);
+    if (iter5 != allReleasedDispatchStates_.end()) {
+        allReleasedDispatchStates_.erase(iter5);
+    }
+    MMI_HILOGI("Subscribe state cleared for %{public}s", subscribeKey.c_str());
 }
 
 void TriggerEventDispatcher::ClearSubscribeState(std::shared_ptr<KeyOption> keyOption)
@@ -200,31 +204,58 @@ bool TriggerEventDispatcher::ShouldDispatchREPEAT_PRESSED(std::shared_ptr<KeyOpt
     MMI_HILOGI("REPEAT_PRESSED mode: dispatching down event (including auto-repeat)");
     return true;
 }
+
 bool TriggerEventDispatcher::ShouldDispatchALL_RELEASED(std::shared_ptr<KeyOption> keyOption,
     std::shared_ptr<KeyEvent> keyEvent)
 {
     int32_t keyCode = keyEvent->GetKeyCode();
     int32_t action = keyEvent->GetKeyAction();
-    if (keyCode == keyOption->GetFinalKey()) {
+    int32_t finalKey = keyOption->GetFinalKey();
+    const auto& preKeys = keyOption->GetPreKeys();
+    std::string subscribeKey = GenerateSubscribeKey(keyOption);
+
+    auto& state = allReleasedDispatchStates_[subscribeKey];
+
+    // If combo already activated: dispatch all combo key events
+    if (state.comboActivated) {
+        bool isComboKey = (keyCode == finalKey) || (preKeys.count(keyCode) > 0);
+        if (!isComboKey) {
+            MMI_HILOGD("ALL_RELEASED: non-combo key event KC:%{public}d, skip", keyCode);
+            return false;
+        }
+        MMI_HILOGI("ALL_RELEASED: combo activated, dispatch KC:%{public}d action:%{public}d",
+                   keyCode, action);
         if (action == KeyEvent::KEY_ACTION_DOWN) {
-            if (!MatchPreKeys(keyOption, keyEvent)) {
-                return false;
-            }
-            if (!CheckDuration(keyOption, keyEvent)) {
-                return false;
+            state.pressedComboKeys.insert(keyCode);
+        } else if (action == KeyEvent::KEY_ACTION_UP) {
+            state.pressedComboKeys.erase(keyCode);
+            if (state.pressedComboKeys.empty()) {
+                MMI_HILOGI("ALL_RELEASED: all keys released, resetting dispatch state");
+                state.comboActivated = false;
             }
         }
-        MMI_HILOGI("ALL_RELEASED mode: dispatching finalKey event (action: %{public}d)", action);
         return true;
     }
 
-    const auto& preKeys = keyOption->GetPreKeys();
-    if (preKeys.find(keyCode) != preKeys.end()) {
-        if (action == KeyEvent::KEY_ACTION_UP) {
-            MMI_HILOGI("ALL_RELEASED mode: dispatching preKey up event (keyCode: %{public}d)", keyCode);
-            return true;
+    // Not yet activated: check if this is the finalKey DOWN with preKeys matching
+    if (keyCode == finalKey && action == KeyEvent::KEY_ACTION_DOWN) {
+        if (!MatchPreKeys(keyOption, keyEvent)) {
+            MMI_HILOGD("ALL_RELEASED: preKeys not matched on finalKey DOWN");
+            return false;
         }
+        if (!CheckDuration(keyOption, keyEvent)) {
+            return false;
+        }
+        state.comboActivated = true;
+        state.pressedComboKeys.clear();
+        state.pressedComboKeys.insert(finalKey);
+        for (const auto& preKey : preKeys) {
+            state.pressedComboKeys.insert(preKey);
+        }
+        MMI_HILOGI("ALL_RELEASED: combo activated, dispatching finalKey DOWN KC:%{public}d", keyCode);
+        return true;
     }
+    MMI_HILOGD("ALL_RELEASED: not activated, skip KC:%{public}d action:%{public}d", keyCode, action);
     return false;
 }
 
