@@ -190,7 +190,8 @@ public:
 static bool IsSingleDisplayFoldDevice()
 {
     return (!FOLD_SCREEN_FLAG.empty() &&
-        (FOLD_SCREEN_FLAG[0] == '1' || FOLD_SCREEN_FLAG[0] == '4' || FOLD_SCREEN_FLAG[0] == '7'));
+        (FOLD_SCREEN_FLAG[0] == '1' || FOLD_SCREEN_FLAG[0] == '4' || FOLD_SCREEN_FLAG[0] == '7' ||
+         FOLD_SCREEN_FLAG[0] == '8'));
 }
 
 void PointerDrawingManager::RsRemoteDiedCallback()
@@ -1664,7 +1665,9 @@ void PointerDrawingManager::AttachToDisplay()
         auto displayMode = WIN_MGR->GetDisplayMode();
         if (displayMode == DisplayMode::MAIN && screenId_ == FOLD_SCREEN_ID_FULL) {
             screenId_ = FOLD_SCREEN_ID_MAIN;
-        } else if (displayMode == DisplayMode::FULL && screenId_ == FOLD_SCREEN_ID_MAIN) {
+        } else if ((displayMode == DisplayMode::FULL || displayMode == DisplayMode::GLOBAL_FULL ||
+                    displayMode == DisplayMode::V_MAIN || displayMode == DisplayMode::N_MAIN ||
+                    displayMode == DisplayMode::L_FULL) && screenId_ == FOLD_SCREEN_ID_MAIN) {
             screenId_ = FOLD_SCREEN_ID_FULL;
         }
     }
