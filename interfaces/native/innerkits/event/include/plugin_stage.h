@@ -168,6 +168,10 @@ struct IPluginContext {
     virtual int32_t RegisterCommonEventCallback(
         const std::function<void(const EventFwk::CommonEventData &)> &callback) = 0;
     virtual bool UnRegisterCommonEventCallback(int32_t callbackId) = 0;
+    virtual void HideMouseCursorTemporary() = 0;
+    virtual int32_t CalculateTipPoint(libinput_event *event, int32_t &displayId, PhysicalCoordinate &coord) = 0;
+    virtual void SetMouseAccelerateMotionSwitch(libinput_event *event, bool enable) = 0;
+    virtual int32_t GetCurrentMouseLocation(double &mouseX, double &mouseY) = 0;
 };
 
 inline bool checkPluginEventNull(PluginEventType &event)
