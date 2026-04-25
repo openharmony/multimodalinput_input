@@ -34,6 +34,7 @@
 #include "common_event_data.h"
 #include "bytrace_adapter.h"
 #include "i_setting_manager.h"
+#include "util.h"
 #include "setting_datashare.h"
 #include "system_ability_definition.h"
 
