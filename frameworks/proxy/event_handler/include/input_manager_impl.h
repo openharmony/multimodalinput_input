@@ -349,10 +349,6 @@ private:
     std::shared_ptr<AppExecFwk::EventHandler> eventHandler_ { nullptr };
     std::shared_ptr<PointerEvent> lastPointerEvent_ { nullptr };
     std::function<void(int32_t, int32_t)> windowStatecallback_;
-    bool knuckleSwitch_ { true };
-    uint64_t windowScreenId_ { 0 };
-    uint64_t displayNodeScreenId_ { 0 };
-    bool isMultiWindowScreenIdSet_ { false };
     UserScreenInfo userScreenInfo_ = {0};
     std::atomic_int32_t currentUserId_ { -1 };
 #ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
