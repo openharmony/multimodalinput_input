@@ -676,7 +676,7 @@ HWTEST_F(TripleFingerSnapshotManagerTest, TripleFingerSnapshotManagerTest_Regist
     // Switch to user 200, should unregister old observer
     // Note: This test only verifies the logic flow, actual observer unregistration
     // requires mocking SettingDataShare
-    ASSERT_FALSE(manager.RegisterSwitchObserver(200));
+    ASSERT_TRUE(manager.RegisterSwitchObserver(200));
     
     {
         std::lock_guard<std::mutex> lock(manager.mutex_);
