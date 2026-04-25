@@ -82,6 +82,10 @@ public:
     int32_t RegisterCommonEventCallback(
         const std::function<void(const EventFwk::CommonEventData &)> &callback) override;
     bool UnRegisterCommonEventCallback(int32_t callbackId) override;
+    void HideMouseCursorTemporary() override;
+    int32_t CalculateTipPoint(libinput_event *event, int32_t &displayId, PhysicalCoordinate &coord) override;
+    void SetMouseAccelerateMotionSwitch(libinput_event *event, bool enable) override;
+    int32_t GetCurrentMouseLocation(double &mouseX, double &mouseY) override;
 
     int32_t prio_ = 200;
     std::function<void(PluginEventType, int64_t)> callback_;
