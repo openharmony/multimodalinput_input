@@ -76,6 +76,34 @@ enum class DisplayMode: uint32_t {
      * @since 9
      */
     COORDINATION = 4,
+
+    /**
+     * The global full display mode
+     *
+     * @since 26
+     */
+    GLOBAL_FULL = 5,
+
+    /**
+     * The v main display mode
+     *
+     * @since 26.0.0
+     */
+    V_MAIN = 6,
+
+    /**
+     * The n main display mode
+     *
+     * @since 26.0.0
+     */
+    N_MAIN = 7,
+
+    /**
+     * The l full display mode
+     *
+     * @since 26.0.0
+     */
+    L_FULL = 8,
 };
 
 enum class WINDOW_UPDATE_ACTION: uint32_t {
