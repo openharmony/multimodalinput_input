@@ -1864,7 +1864,6 @@ void InputManagerImpl::OnConnected()
             MMI_HILOGE("Get client failed");
         }
     }
-    MULTIMODAL_INPUT_CONNECT_MGR->SetKnuckleSwitch(knuckleSwitch_);
     if (!anrObservers_.empty()) {
         if (int32_t ret = MULTIMODAL_INPUT_CONNECT_MGR->SetAnrObserver(); ret != RET_OK) {
             MMI_HILOGE("Set anr observer failed, ret:%{public}d", ret);
@@ -3205,7 +3204,6 @@ void InputManagerImpl::SetMultiWindowScreenId(uint64_t screenId, uint64_t displa
 
 int32_t InputManagerImpl::SetKnuckleSwitch(bool knuckleSwitch)
 {
-    knuckleSwitch_ = knuckleSwitch;
     return MULTIMODAL_INPUT_CONNECT_MGR->SetKnuckleSwitch(knuckleSwitch);
 }
 
