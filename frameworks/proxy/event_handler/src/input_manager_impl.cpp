@@ -3189,7 +3189,6 @@ void InputManagerImpl::SetMultiWindowScreenId(uint64_t screenId, uint64_t displa
 
 int32_t InputManagerImpl::SetKnuckleSwitch(bool knuckleSwitch)
 {
-    knuckleSwitch_ = knuckleSwitch;
     return MULTIMODAL_INPUT_CONNECT_MGR->SetKnuckleSwitch(knuckleSwitch);
 }
 
