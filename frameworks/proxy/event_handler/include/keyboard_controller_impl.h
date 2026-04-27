@@ -43,7 +43,7 @@ private:
 
     mutable std::mutex mutex_;
 
-    static constexpr size_t MAX_PRESSED_KEYS = 10;
+    static constexpr size_t MAX_PRESSED_KEYS = 5;
 };
 
 } // namespace MMI
