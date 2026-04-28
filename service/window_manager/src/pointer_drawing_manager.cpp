@@ -223,6 +223,8 @@ void PointerDrawingManager::InitPointerCallback()
 #endif // OHOS_BUILD_ENABLE_DFX_RADAR
     if (GetSurfaceNode() != nullptr) {
         SetSurfaceNode(nullptr);
+        // Flush commands to remove surfaceNode from render tree
+        RsFlushImplicitTransaction();
     }
 #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
     if (HasMagicCursor()) {
