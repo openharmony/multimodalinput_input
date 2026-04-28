@@ -161,6 +161,7 @@ void TabletToolTransformProcessor::SendTipUpEvent()
     if (inputChannel != nullptr) {
         LogTracer lt(pointerEvent_->GetId(), pointerEvent_->GetEventType(), pointerEvent_->GetPointerAction());
         inputChannel->HandlePointerEvent(pointerEvent_);
+        DrawTouchGraphic();
     }
 
     isPressed_ = false;
@@ -191,6 +192,7 @@ void TabletToolTransformProcessor::SendProximityOutEvent()
     if (inputChannel != nullptr) {
         LogTracer lt(pointerEvent_->GetId(), pointerEvent_->GetEventType(), pointerEvent_->GetPointerAction());
         inputChannel->HandlePointerEvent(pointerEvent_);
+        DrawTouchGraphic();
     }
 
     isProximity_ = false;
