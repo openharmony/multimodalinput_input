@@ -6565,6 +6565,91 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateTouchScreenTarge
 }
 
 /**
+ * @tc.name: InputWindowsManagerTest_UpdateTouchScreenTarget_020
+ * @tc.desc: Test UpdateTouchScreenTarget
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateTouchScreenTarget_020, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsMgr;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    OLD::DisplayInfo displayInfo;
+    WindowGroupInfo winGroupInfo;
+    WindowInfo winInfo;
+    Rect rect;
+    PointerEvent::PointerItem item;
+    constexpr int32_t pointerId = 0;
+    constexpr int32_t displayId = 1;
+    constexpr int32_t windowId = 1;
+    displayInfo.id = displayId;
+    displayInfo.x = 300;
+    displayInfo.y = 500;
+    displayInfo.width = 100;
+    displayInfo.height = 100;
+    pointerEvent->SetTargetDisplayId(displayId);
+    pointerEvent->SetPointerId(pointerId);
+    pointerEvent->SetDeviceId(1);
+    item.SetPointerId(pointerId);
+    item.SetDisplayXPos(500);
+    item.SetDisplayYPos(500);
+    item.SetTargetWindowId(windowId);
+    item.SetToolType(PointerEvent::TOOL_TYPE_FINGER);
+    item.SetPressure(1.0);
+    pointerEvent->AddPointerItem(item);
+    pointerEvent->SetZOrder(15.5f);
+    pointerEvent->ClearFlag();
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+    rect.x = 0;
+    rect.width = 0;
+    rect.y = 0;
+    rect.height = 0;
+    winInfo.defaultHotAreas.push_back(rect);
+    winInfo.id = windowId;
+    winInfo.flags = 0;
+    winInfo.pixelMap = nullptr;
+    winInfo.transform = {1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f};
+    winInfo.windowInputType = WindowInputType::NORMAL;
+    OLD::DisplayGroupInfo displayGroupInfo;
+    displayGroupInfo.focusWindowId = windowId;
+    displayGroupInfo.windowsInfo.push_back(winInfo);
+    WindowInfoEX winEx;
+    winEx.flag = true;
+    winEx.window = winInfo;
+    inputWindowsMgr.extraData_.appended = true;
+    inputWindowsMgr.extraData_.pointerId = pointerId;
+    inputWindowsMgr.extraData_.sourceType = PointerEvent::SOURCE_TYPE_TOUCHSCREEN;
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
+    auto displayGroupIter = inputWindowsMgr.displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
+    if (displayGroupIter != inputWindowsMgr.displayGroupInfoMap_.end()) {
+        displayGroupIter->second.displaysInfo.push_back(displayInfo);
+    }
+    winGroupInfo.windowsInfo.push_back(winInfo);
+    auto windowsPerDisplayIter = inputWindowsMgr.windowsPerDisplayMap_.find(DEFAULT_GROUP_ID);
+    if (windowsPerDisplayIter != inputWindowsMgr.windowsPerDisplayMap_.end()) {
+        windowsPerDisplayIter->second.insert(std::make_pair(windowId, winGroupInfo));
+    }
+    inputWindowsMgr.touchItemDownInfos_[1].insert(std::make_pair(8, winEx));
+    inputWindowsMgr.ancoTouchDownInfos_[1].insert(std::make_pair(8, winEx));
+    EXPECT_EQ(inputWindowsMgr.UpdateTouchScreenTarget(pointerEvent), RET_ERR);
+
+
+    inputWindowsMgr.touchItemDownInfos_.clear();
+    inputWindowsMgr.ancoTouchDownInfos_.clear();
+    inputWindowsMgr.touchItemDownInfos_[1].insert(std::make_pair(pointerId, winEx));
+    inputWindowsMgr.ancoTouchDownInfos_[1].insert(std::make_pair(pointerId, winEx));
+    auto pair = inputWindowsMgr.touchItemDownInfos_[pointerEvent->GetDeviceId()].find(pointerId);
+    if (pair != inputWindowsMgr.touchItemDownInfos_[pointerEvent->GetDeviceId()].end()) {
+        pair->second.window.transform.clear();
+        pair->second.window.transform = winInfo.transform;
+    }
+    EXPECT_EQ(inputWindowsMgr.UpdateTouchScreenTarget(pointerEvent), RET_OK);
+}
+
+
+/**
  * @tc.name: InputWindowsManagerTest_SendCancelEventWhenLock_001
  * @tc.desc: Test the function SendCancelEventWhenLock
  * @tc.type: FUNC
@@ -14158,11 +14243,11 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_DispatchPointerRedispa
 }
 
 /**
- * @tc.name: InputWindowsManagerTest_ClearPointerDeviceId_001
- * @tc.desc: Test branch
- * @tc.type: FUNC
- * @tc.require:
- */
+* @tc.name: InputWindowsManagerTest_ClearPointerDeviceId_001
+* @tc.desc: Test ClearPointerDeviceId
+* @tc.type: FUNC
+* @tc.require:
+*/
 HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_ClearPointerDeviceId_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
@@ -14186,6 +14271,21 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_ClearPointerDeviceId_0
     winEx.window = winInfo;
     inputWindowsMgr.touchItemDownInfos_[pointerEvent->GetDeviceId()].insert(std::make_pair(pointerId, winEx));
     EXPECT_NO_FATAL_FAILURE(inputWindowsMgr.ClearPointerDeviceId(pointerEvent));
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
+    inputWindowsMgr.touchItemDownInfos_[1].insert(std::make_pair(pointerId, winEx));
+    inputWindowsMgr.ClearPointerDeviceId(pointerEvent);
+    EXPECT_TRUE(inputWindowsMgr.touchItemDownInfos_.find(1) != inputWindowsMgr.touchItemDownInfos_.end());
+    pointerEvent->ClearFlag(InputEvent::EVENT_FLAG_SHELL);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_HOVER_EXIT);
+    inputWindowsMgr.ClearPointerDeviceId(pointerEvent);
+    EXPECT_TRUE(inputWindowsMgr.touchItemDownInfos_[1].find(150) == inputWindowsMgr.touchItemDownInfos_[1].end());
+#ifdef OHOS_BUILD_ENABLE_ANCO
+    pointerEvent->SetAncoDeal(true);
+    inputWindowsMgr.touchItemDownInfos_[pointerEvent->GetDeviceId()].insert(std::make_pair(pointerId, winEx));
+    inputWindowsMgr.ClearPointerDeviceId(pointerEvent);
+    EXPECT_TRUE(inputWindowsMgr.touchItemDownInfos_[1].find(150) != inputWindowsMgr.touchItemDownInfos_[1].end());
+    pointerEvent->SetAncoDeal(false);
+#endif  // OHOS_BUILD_ENABLE_ANCO
     item.SetToolType(PointerEvent::TOOL_TYPE_THP_FEATURE);
     pointerEvent->AddPointerItem(item);
     EXPECT_NO_FATAL_FAILURE(inputWindowsMgr.ClearPointerDeviceId(pointerEvent));
