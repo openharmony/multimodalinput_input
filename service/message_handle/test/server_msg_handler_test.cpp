@@ -32,6 +32,7 @@
 #include "input_manager_impl.h"
 #include "input_windows_manager.h"
 #include "mmi_log.h"
+#include "pointer_device_manager.h"
 #include "pointer_event.h"
 #include "running_process_info.h"
 #include "server_msg_handler.h"
@@ -7589,6 +7590,131 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_UpdateMouseLocation_011, Tes
     pointerEvent->AddPointerItem(item);
     pointerEvent->SetPointerId(0);
     ASSERT_NO_FATAL_FAILURE(handler.UpdateMouseLocation(pointerEvent));
+}
+
+/**
+ * @tc.name: UpdateCursorVisibility_001
+ * @tc.desc: Test ServerMsgHandler::UpdateCursorVisibility
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ServerMsgHandlerTest, UpdateCursorVisibility_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    POINTER_DEV_MGR.isPointerVisible = true;
+
+    int32_t pid { -1 };
+    ExtraData extraData {};
+    extraData.appended = true;
+    WIN_MGR->AppendExtraData(extraData);
+
+    ServerMsgHandler msgHandler {};
+    bool visible { true };
+    int32_t priority { 0 };
+    bool isHap { false };
+
+    auto result = msgHandler.UpdateCursorVisibility(pid, visible, priority, isHap);
+    EXPECT_EQ(result, RET_ERR);
+}
+
+/**
+ * @tc.name: UpdateCursorVisibility_002
+ * @tc.desc: Test ServerMsgHandler::UpdateCursorVisibility
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ServerMsgHandlerTest, UpdateCursorVisibility_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    POINTER_DEV_MGR.isPointerVisible = true;
+
+    int32_t pid { -1 };
+    ExtraData extraData {};
+    extraData.appended = false;
+    WIN_MGR->AppendExtraData(extraData);
+
+    ServerMsgHandler msgHandler {};
+    bool visible { true };
+    int32_t priority { 0 };
+    bool isHap { false };
+
+    auto result = msgHandler.UpdateCursorVisibility(pid, visible, priority, isHap);
+    EXPECT_EQ(result, RET_OK);
+}
+
+/**
+ * @tc.name: UpdateCursorVisibility_003
+ * @tc.desc: Test ServerMsgHandler::UpdateCursorVisibility
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ServerMsgHandlerTest, UpdateCursorVisibility_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    POINTER_DEV_MGR.isPointerVisible = true;
+
+    int32_t pid { -1 };
+    ExtraData extraData {};
+    extraData.appended = false;
+    WIN_MGR->AppendExtraData(extraData);
+
+    ServerMsgHandler msgHandler {};
+    bool visible { false };
+    int32_t priority { 0 };
+    bool isHap { false };
+
+    auto result = msgHandler.UpdateCursorVisibility(pid, visible, priority, isHap);
+    EXPECT_EQ(result, RET_OK);
+}
+
+/**
+ * @tc.name: UpdateCursorVisibility_004
+ * @tc.desc: Test ServerMsgHandler::UpdateCursorVisibility
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ServerMsgHandlerTest, UpdateCursorVisibility_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    POINTER_DEV_MGR.isPointerVisible = false;
+
+    int32_t pid { -1 };
+    ExtraData extraData {};
+    extraData.appended = false;
+    WIN_MGR->AppendExtraData(extraData);
+
+    ServerMsgHandler msgHandler {};
+    bool visible { true };
+    int32_t priority { 0 };
+    bool isHap { false };
+
+    auto result = msgHandler.UpdateCursorVisibility(pid, visible, priority, isHap);
+    EXPECT_EQ(result, RET_OK);
+}
+
+/**
+ * @tc.name: UpdateCursorVisibility_005
+ * @tc.desc: Test ServerMsgHandler::UpdateCursorVisibility
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ServerMsgHandlerTest, UpdateCursorVisibility_005, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    POINTER_DEV_MGR.isPointerVisible = false;
+
+    int32_t pid { -1 };
+    ExtraData extraData {};
+    extraData.appended = true;
+    WIN_MGR->AppendExtraData(extraData);
+
+    ServerMsgHandler msgHandler {};
+    bool visible { false };
+    int32_t priority { 0 };
+    bool isHap { false };
+
+    auto result = msgHandler.UpdateCursorVisibility(pid, visible, priority, isHap);
+    EXPECT_EQ(result, RET_OK);
 }
 } // namespace MMI
 } // namespace OHOS

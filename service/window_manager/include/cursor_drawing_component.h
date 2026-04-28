@@ -45,6 +45,7 @@ public:
     void SetPointerLocation(int32_t x, int32_t y, uint64_t displayId);
     void Load();
     bool ResetUnloadTimer(int32_t unloadTime = -1, int32_t checkInterval = -1);
+    bool IsCursorShowing() const;
     void DrawPointer(uint64_t displayId, int32_t physicalX, int32_t physicalY,
         const PointerStyle pointerStyle, Direction direction);
     void UpdateDisplayInfo(const OLD::DisplayInfo &displayInfo);
