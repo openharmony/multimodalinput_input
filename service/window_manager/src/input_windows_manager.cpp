@@ -5572,10 +5572,10 @@ void InputWindowsManager::ClearPointerDeviceId(const std::shared_ptr<PointerEven
         }
         if (pointerItem.GetToolType() == PointerEvent::TOOL_TYPE_THP_FEATURE) {
             ErasePointerDeviceId(pointerEvent, thpFeatureTouchDownInfos_);
-        #ifdef OHOS_BUILD_ENABLE_ANCO
+#ifdef OHOS_BUILD_ENABLE_ANCO
         } else if (pointerEvent->GetAncoDeal()) {
             ErasePointerDeviceId(pointerEvent, ancoTouchDownInfos_);
-        #endif // OHOS_BUILD_ENABLE_ANCO
+#endif // OHOS_BUILD_ENABLE_ANCO
         } else {
             ErasePointerDeviceId(pointerEvent, touchItemDownInfos_);
         }
