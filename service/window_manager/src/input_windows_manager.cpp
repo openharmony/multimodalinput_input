@@ -7550,7 +7550,7 @@ void InputWindowsManager::DumpDisplayInfo(int32_t fd, const std::vector<OLD::Dis
     }
 }
 
-void InputWindowsManager::DumpWindowsInfo(int32_t fd, const std::vector<WindowInfo> windowsInfo)
+void InputWindowsManager::DumpWindowsInfo(int32_t fd, const std::vector<WindowInfo>& windowsInfo)
 {
     mprintf(fd, "  windowsInfos: num:%zu\n", windowsInfo.size());
     for (const auto &item : windowsInfo) {
