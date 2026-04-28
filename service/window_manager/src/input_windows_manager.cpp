@@ -5811,10 +5811,12 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
             return RET_ERR;
         }
         auto it = tmpWindowInfo[pointerEvent->GetDeviceId()].find(pointerId);
+
         auto outerIter = ancoTouchDownInfos_.find(pointerEvent->GetDeviceId());
-        auto iter = (outerIter != ancoTouchDownInfos_.end()) ? outerIter->second.find(pointerId) :
-            ancoTouchDownInfos_[pointerEvent->GetDeviceId()].end();
-        bool foundInAnco = (outerIter == ancoTouchDownInfos_.end() || iter == outerIter->second.end());
+        bool foundInAnco = true;
+        if (outerIter != ancoTouchDownInfos_.end()) {
+            foundInAnco = (outerIter->second.find(pointerId) == outerIter->second.end());
+        }
         if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHSCREEN) {
             if ((it == tmpWindowInfo[pointerEvent->GetDeviceId()].end() && foundInAnco) ||
                 pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_DOWN) {
