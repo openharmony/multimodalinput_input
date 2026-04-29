@@ -52,7 +52,7 @@ bool TriggerEventDispatcher::ShouldDispatch(std::shared_ptr<KeyOption> keyOption
         case ALL_RELEASED:
             return ShouldDispatchALL_RELEASED(keyOption, keyEvent);
         default:
-            MMI_HILOGE("Unknown triggerType: %{public}d", triggerType);
+            MMI_HILOGE("Invalid triggerType:%{public}d", triggerType);
             return false;
     }
 }
@@ -96,7 +96,7 @@ bool TriggerEventDispatcher::ShouldConsume(std::shared_ptr<KeyOption> keyOption,
         if (it != allReleasedDispatchStates_.end() && it->second.comboActivated) {
             if (keyCode == keyOption->GetFinalKey() ||
                 keyOption->GetPreKeys().count(keyCode) > 0) {
-                MMI_HILOGI("ALL_RELEASED mode: consuming combo key event KC:%{public}d", keyCode);
+                MMI_HILOGI("ALL_RELEASED mode: consuming combo key event KC:%{private}d", keyCode);
                 return true;
             }
         }
@@ -220,10 +220,10 @@ bool TriggerEventDispatcher::ShouldDispatchALL_RELEASED(std::shared_ptr<KeyOptio
     if (state.comboActivated) {
         bool isComboKey = (keyCode == finalKey) || (preKeys.count(keyCode) > 0);
         if (!isComboKey) {
-            MMI_HILOGD("ALL_RELEASED: non-combo key event KC:%{public}d, skip", keyCode);
+            MMI_HILOGD("ALL_RELEASED: non-combo key event KC:%{private}d, skip", keyCode);
             return false;
         }
-        MMI_HILOGI("ALL_RELEASED: combo activated, dispatch KC:%{public}d action:%{public}d",
+        MMI_HILOGI("ALL_RELEASED: combo activated, dispatch KC:%{private}d action:%{public}d",
                    keyCode, action);
         if (action == KeyEvent::KEY_ACTION_DOWN) {
             state.pressedComboKeys.insert(keyCode);
@@ -252,10 +252,10 @@ bool TriggerEventDispatcher::ShouldDispatchALL_RELEASED(std::shared_ptr<KeyOptio
         for (const auto& preKey : preKeys) {
             state.pressedComboKeys.insert(preKey);
         }
-        MMI_HILOGI("ALL_RELEASED: combo activated, dispatching finalKey DOWN KC:%{public}d", keyCode);
+        MMI_HILOGI("ALL_RELEASED: combo activated, dispatching finalKey DOWN KC:%{private}d", keyCode);
         return true;
     }
-    MMI_HILOGD("ALL_RELEASED: not activated, skip KC:%{public}d action:%{public}d", keyCode, action);
+    MMI_HILOGD("ALL_RELEASED: not activated, skip KC:%{private}d action:%{public}d", keyCode, action);
     return false;
 }
 
@@ -326,16 +326,17 @@ bool TriggerEventDispatcher::CheckDuration(std::shared_ptr<KeyOption> keyOption,
         MMI_HILOGD("Duration is 0, immediate trigger");
         return true;
     }
+
     std::string subscribeKey = GenerateSubscribeKey(keyOption);
-    if (!CheckDurationWindowPassed(subscribeKey)) {
-        return false;
-    }
     if (downStartTime_.find(subscribeKey) == downStartTime_.end()) {
         StartDurationWindow(subscribeKey, duration);
         MMI_HILOGD("Duration window started, will wait %{public}d microseconds", duration);
         return false;
     }
-    return CheckDurationWindowWithOtherKey(subscribeKey);
+    if (CheckDurationWindowPassed(subscribeKey)) {
+        return CheckDurationWindowWithOtherKey(subscribeKey);
+    }
+    return false;
 }
 
 bool TriggerEventDispatcher::HasOtherKeyPressedInWindow(const std::string& subscribeKey)
