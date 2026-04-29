@@ -549,18 +549,7 @@ int32_t InputWindowsManager::GetClientFd(std::shared_ptr<PointerEvent> pointerEv
     }
     int32_t agentPid = -1;
     if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHSCREEN) {
-        if (pointerEvent->HasFlag(InputEvent::EVENT_FLAG_REDISPATCH)) {
-            auto fingerEvent = touchRedispatchStore_.GetFingerEvent(
-                pointerEvent->GetZOrder(), pointerEvent->GetDeviceId(), pointerEvent->GetPointerId());
-            if (fingerEvent != nullptr) {
-                int32_t targetWindowId = fingerEvent->GetTargetWindowId();
-                agentPid = GetWindowAgentPid(targetWindowId);
-                MMI_HILOGD("Touchscreen redispatch cancel, agentPid:%{public}d, windowId:%{public}d",
-                    agentPid, targetWindowId);
-                touchRedispatchStore_.DeactivateFinger(
-                    pointerEvent->GetZOrder(), pointerEvent->GetDeviceId(), pointerEvent->GetPointerId());
-            }
-        } else if (iter != devIter->second.end()) {
+        if (iter != devIter->second.end()) {
             MMI_HILOG_DISPATCHI("Cant not find agentPid");
             agentPid = iter->second.window.agentPid;
             iter->second.flag = false;
@@ -585,7 +574,7 @@ int32_t InputWindowsManager::GetClientFd(std::shared_ptr<PointerEvent> pointerEv
                     agentPid = axisWindow->agentPid;
                 }
                 MMI_HILOGD("The axisBeginWindowInfoReDispatch occurs, update the agentPid:%{public}d", agentPid);
-            mouseRedispatchStore_.EraseAxisBeginWindow(mouseRedispatchStore_.GetZOrder());
+                mouseRedispatchStore_.EraseAxisBeginWindow(mouseRedispatchStore_.GetZOrder());
             }
         } else {
             if (axisBeginWindowInfo_ && axisBeginWindowInfo_->agentPid != -1) {
@@ -6733,7 +6722,7 @@ void InputWindowsManager::UpdateStashTouchEventInfo(int32_t logicalX, int32_t lo
     }
     LastTouch touch{
         .deviceId_ = pointerEvent->GetDeviceId(), .pointerId_ = pointerEvent->GetPointerId()};
-    if (pointerEvent->HasFlag(InputEvent::EVENT_FLAG_REDISPATCH)) {
+    if (touchRedispatchStore_.IsActive()) {
         touchRedispatchStore_.SetFingerActive(pointerEvent->GetZOrder(),
             pointerEvent->GetDeviceId(),
             pointerEvent->GetPointerId(), pointerEvent);
