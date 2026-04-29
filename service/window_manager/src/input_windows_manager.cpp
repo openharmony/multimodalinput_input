@@ -184,14 +184,14 @@ InputWindowsManager::InputWindowsManager() : bindInfo_(BIND_CFG_FILE_NAME)
     displayGroupInfo_.groupId = MAIN_GROUPID;
     displayGroupInfo_.type = GroupType::GROUP_DEFAULT;
     displayGroupInfo_.focusWindowId = -1;
-    InitWindowInfo(TouchLockWindowInfo());
+    InitWindowInfo(lockWindowInfo_);
     displayGroupInfoMap_[MAIN_GROUPID] = displayGroupInfo_;
     displayGroupInfoMapTmp_[MAIN_GROUPID] = displayGroupInfo_;
     captureModeInfoMap_[MAIN_GROUPID] = captureModeInfo_;
     pointerDrawFlagMap_[MAIN_GROUPID] = pointerDrawFlag_;
     mouseLocationMap_[MAIN_GROUPID] = mouseLocation_;
     windowsPerDisplayMap_[MAIN_GROUPID] = windowsPerDisplay_;
-    TouchLastPointerEventForWindowChangeMap()[MAIN_GROUPID] = lastPointerEventForWindowChange_;
+    lastPointerEventForWindowChangeMap_[MAIN_GROUPID] = lastPointerEventForWindowChange_;
     displayModeMap_[MAIN_GROUPID] = displayMode_;
     lastDpiMap_[MAIN_GROUPID] = lastDpi_;
     CursorPosition cursorPos = {};
@@ -6013,7 +6013,8 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
     ProcessTouchTracking(pointerEvent, *touchWindow);
     if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_DOWN) {
         TouchLockWindowInfo() = *touchWindow;
-        MMI_HILOG_DISPATCHD("lockWid:%{public}d, lockPid:%{public}d", TouchLockWindowInfo().id, TouchLockWindowInfo().pid);
+        MMI_HILOG_DISPATCHD(
+            "lockWid:%{public}d, lockPid:%{public}d", TouchLockWindowInfo().id, TouchLockWindowInfo().pid);
     }
     pointerEvent->SetTargetWindowId(touchWindow->id);
     pointerItem.SetTargetWindowId(touchWindow->id);
@@ -8095,27 +8096,28 @@ void InputWindowsManager::ReverseXY(int32_t &x, int32_t &y)
 void InputWindowsManager::SendCancelEventWhenLock()
 {
     CALL_INFO_TRACE;
-    CHKPV(TouchLastTouchEventOnBackGesture());
-    int32_t deviceId = TouchLastTouchEventOnBackGesture()->GetDeviceId();
-    if (TouchLastTouchEventOnBackGesture()->GetPointerAction() != PointerEvent::POINTER_ACTION_MOVE &&
-        TouchLastTouchEventOnBackGesture()->GetPointerAction() != PointerEvent::POINTER_ACTION_DOWN) {
+    auto& lastTouchEventOnBackGesture = TouchLastTouchEventOnBackGesture();
+    CHKPV(lastTouchEventOnBackGesture);
+    int32_t deviceId = lastTouchEventOnBackGesture->GetDeviceId();
+    if (lastTouchEventOnBackGesture->GetPointerAction() != PointerEvent::POINTER_ACTION_MOVE &&
+        lastTouchEventOnBackGesture->GetPointerAction() != PointerEvent::POINTER_ACTION_DOWN) {
             return;
     }
-    TouchLastTouchEventOnBackGesture()->SetPointerAction(PointerEvent::POINTER_ACTION_CANCEL);
-    TouchLastTouchEventOnBackGesture()->SetActionTime(GetSysClockTime());
-    TouchLastTouchEventOnBackGesture()->UpdateId();
-    TouchLastTouchEventOnBackGesture()->AddFlag(InputEvent::EVENT_FLAG_NO_INTERCEPT | InputEvent::EVENT_FLAG_NO_MONITOR);
+    lastTouchEventOnBackGesture->SetPointerAction(PointerEvent::POINTER_ACTION_CANCEL);
+    lastTouchEventOnBackGesture->SetActionTime(GetSysClockTime());
+    lastTouchEventOnBackGesture->UpdateId();
+    lastTouchEventOnBackGesture->AddFlag(InputEvent::EVENT_FLAG_NO_INTERCEPT | InputEvent::EVENT_FLAG_NO_MONITOR);
     auto inputEventNormalizeHandler = InputHandler->GetEventNormalizeHandler();
     CHKPV(inputEventNormalizeHandler);
     MMI_HILOGI("Screen locked, Send cancel event");
-    inputEventNormalizeHandler->HandleTouchEvent(TouchLastTouchEventOnBackGesture());
+    inputEventNormalizeHandler->HandleTouchEvent(lastTouchEventOnBackGesture);
     auto& infos = TouchItemDownInfos();
     auto devIter = infos.find(deviceId);
     if (devIter == infos.end()) {
         MMI_HILOGI("get deviceId failed:%{public}d", deviceId);
         return;
     }
-    auto iter = devIter->second.find(TouchLastTouchEventOnBackGesture()->GetPointerId());
+    auto iter = devIter->second.find(lastTouchEventOnBackGesture->GetPointerId());
     if (iter != devIter->second.end()) {
         iter->second.flag = false;
     }

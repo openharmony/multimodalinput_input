@@ -902,8 +902,9 @@ int32_t InputManagerImpl::PackWindowInfo(NetPacket &pkt,
         pkt << item.id << item.pid << item.uid << item.area << item.defaultHotAreas
             << item.pointerHotAreas << item.agentWindowId << resultFlags << item.action
             << item.displayId << item.groupId << item.zOrder << item.pointerChangeAreas << item.transform
-            << item.windowInputType << item.privacyMode << item.windowType << item.isSkipSelfWhenShowOnVirtualScreen
-            << item.windowNameType << item.agentPid << item.dragDisabledAreas;
+            << item.windowInputType << item.privacyMode << item.windowType
+            << item.isSkipSelfWhenShowOnVirtualScreen << item.windowNameType
+            << item.agentPid << item.dragDisabledAreas;
 
         if (item.pixelMap == nullptr) {
             pkt << byteCount;

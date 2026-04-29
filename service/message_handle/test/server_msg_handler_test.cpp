@@ -3614,7 +3614,8 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_ReadWindowsInfo_002, TestSiz
     pkt << num << info.id << info.pid << info.uid << info.area << info.defaultHotAreas << info.pointerHotAreas
         << info.agentWindowId << info.flags << info.action << info.displayId << info.groupId << info.zOrder
         << info.pointerChangeAreas << info.transform << info.windowInputType << info.privacyMode << info.windowType
-        << info.isSkipSelfWhenShowOnVirtualScreen << info.windowNameType << info.agentPid << info.dragDisabledAreas << byteCount;
+        << info.isSkipSelfWhenShowOnVirtualScreen << info.windowNameType << info.agentPid
+        << info.dragDisabledAreas << byteCount;
     EXPECT_EQ(handler.ReadWindowsInfo(pkt, displayGroupInfo, oldDisplayGroupInfo), RET_ERR);
 }
 
@@ -3642,7 +3643,8 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_ReadWindowsInfo_003, TestSiz
     pkt << num << info.id << info.pid << info.uid << info.area << info.defaultHotAreas << info.pointerHotAreas
         << info.agentWindowId << info.flags << info.action << info.displayId << info.groupId << info.zOrder
         << info.pointerChangeAreas << info.transform << info.windowInputType << info.privacyMode << info.windowType
-        << info.isSkipSelfWhenShowOnVirtualScreen << info.windowNameType << info.agentPid << info.dragDisabledAreas << byteCount
+        << info.isSkipSelfWhenShowOnVirtualScreen << info.windowNameType << info.agentPid
+        << info.dragDisabledAreas << byteCount
         << windowsNum << info.rectChangeBySystem;
     EXPECT_EQ(handler.ReadWindowsInfo(pkt, displayGroupInfo, oldDisplayGroupInfo), RET_OK);
 }
@@ -4532,7 +4534,8 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnDisplayInfo_08, TestSize.L
         << windowInfo.pointerHotAreas << windowInfo.agentWindowId << windowInfo.flags << windowInfo.action
         << windowInfo.displayId << windowInfo.groupId << windowInfo.zOrder << windowInfo.pointerChangeAreas
         << windowInfo.transform << windowInfo.windowInputType << windowInfo.privacyMode << windowInfo.windowType
-        << windowInfo.isSkipSelfWhenShowOnVirtualScreen << windowInfo.windowNameType << windowInfo.dragDisabledAreas << byteCount;
+        << windowInfo.isSkipSelfWhenShowOnVirtualScreen << windowInfo.windowNameType
+        << windowInfo.dragDisabledAreas << byteCount;
     int32_t result = handler.OnDisplayInfo(sess, pkt);
     EXPECT_EQ(result, RET_ERR);
 }

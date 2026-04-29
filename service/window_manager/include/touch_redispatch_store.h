@@ -85,7 +85,8 @@ public:
     std::shared_ptr<PointerEvent> GetFingerEvent(float zOrder, int32_t deviceId, int32_t pointerId) const;
     int32_t GetFingerWindowId(float zOrder, int32_t deviceId, int32_t pointerId) const;
 
-    const std::map<float, std::map<std::pair<int32_t, int32_t>, RedispatchFingerInfo>>& GetFingerMap() const;
+    using FingerMap = std::map<float, std::map<std::pair<int32_t, int32_t>, RedispatchFingerInfo>>;
+    const FingerMap& GetFingerMap() const;
 
     std::map<int32_t, std::map<int32_t, std::set<int32_t>>>& GetTargetTouchWinIds();
     std::map<int32_t, WindowPartInfo>& GetFirstTouchInfos();

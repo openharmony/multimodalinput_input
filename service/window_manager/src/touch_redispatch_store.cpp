@@ -103,8 +103,7 @@ int32_t TouchRedispatchStore::GetFingerWindowId(float zOrder, int32_t deviceId, 
     return -1;
 }
 
-const std::map<float, std::map<std::pair<int32_t, int32_t>, RedispatchFingerInfo>>&
-    TouchRedispatchStore::GetFingerMap() const
+const TouchRedispatchStore::FingerMap& TouchRedispatchStore::GetFingerMap() const
 {
     return redispatchFingers_;
 }
