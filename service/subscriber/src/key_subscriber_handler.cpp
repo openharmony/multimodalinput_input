@@ -678,7 +678,7 @@ bool KeySubscriberHandler::OnSubscribeKeyEvent(std::shared_ptr<KeyEvent> keyEven
 #endif // #ifdef OHOS_BUILD_ENABLE_KEY_PRESSED_HANDLER
     if (IsRepeatedKeyEvent(keyEvent)) {
         if (ShouldProcessRepeatEvent(keyEvent)) {
-            MMI_HILOGI("Repeat KeyEvent but new triggerType needs processing, continue, (KC:%{public}d, KA:%{public}d)",
+            MMI_HILOGI("Repeat KeyEvent but new triggerType needs processing, continue, (KC:%{private}d, KA:%{public}d)",
                 keyEvent->GetKeyCode(), keyEvent->GetKeyAction());
         } else {
             MMI_HILOGD("Repeat KeyEvent, skip");
@@ -1211,7 +1211,7 @@ void KeySubscriberHandler::HandleKeyUpForPressedType(const std::shared_ptr<KeyEv
     int32_t finalKey = keyOption->GetFinalKey();
     const auto &preKeys = keyOption->GetPreKeys();
     if (keyCode == finalKey || preKeys.find(keyCode) != preKeys.end()) {
-        MMI_HILOGI("PRESSED/REPEAT_PRESSED: consuming UP event KC:%{public}d", keyCode);
+        MMI_HILOGI("PRESSED/REPEAT_PRESSED: consuming UP event KC:%{private}d", keyCode);
         handled = true;
     }
 }
@@ -1292,7 +1292,7 @@ void KeySubscriberHandler::ProcessAllReleasedComboActivated(
 {
     auto keyCode = keyEvent->GetKeyCode();
     int32_t keyAction = keyEvent->GetKeyAction();
-    MMI_HILOGI("ALL_RELEASED: combo activated, dispatch KC:%{public}d action:%{public}d",
+    MMI_HILOGI("ALL_RELEASED: combo activated, dispatch KC:%{private}d action:%{public}d",
                keyCode, keyAction);
     auto sess = subscriber->sess_;
     CHKPV(sess);
@@ -1341,7 +1341,7 @@ bool KeySubscriberHandler::ProcessAllReleasedComboActivate(
     for (const auto &preKey : preKeys) {
         state.pressedComboKeys.insert(preKey);
     }
-    MMI_HILOGI("ALL_RELEASED: combo activated, dispatch finalKey DOWN KC:%{public}d", keyCode);
+    MMI_HILOGI("ALL_RELEASED: combo activated, dispatch finalKey DOWN KC:%{private}d", keyCode);
     auto sess = subscriber->sess_;
     CHKPF(sess);
     if (isForegroundExits_ || keyCode == KeyEvent::KEYCODE_POWER ||
