@@ -534,8 +534,35 @@ void InputPluginManager::OnPluginLoaded(const std::string &uuid, std::shared_ptr
 {
     MMI_HILOGI("Dynamic plugin %{private}s loaded successfully", uuid.c_str());
     AddPluginToStages(plugin);
+    AddCallbackToPlugin(plugin);
     dynamicPlugins_[uuid] = plugin;
     PrintPlugins();
+}
+
+void InputPluginManager::AddCallbackToPlugin(const std::shared_ptr<IPluginContext> &cPin)
+{
+    if (cPin == nullptr) {
+        MMI_HILOGE("cPin is null");
+        return;
+    }
+    auto iPin = cPin->GetPlugin();
+    if (iPin == nullptr) {
+        MMI_HILOGE("iPin is null");
+        return;
+    }
+    for (const auto& stage : iPin->GetStages()) {
+        if (stage != InputPluginStage::INPUT_BEFORE_LIBINPUT_ADAPTER_ON_EVENT) {
+            continue;
+        }
+        auto funInputEvent = [](void *event, int64_t frameTime) { InputHandler->OnEvent(event, frameTime); };
+        auto callback = [funInputEvent](PluginEventType pluginEvent, int64_t frameTime) {
+            auto event = std::get_if<libinput_event*>(&pluginEvent);
+            if (!event) return;
+            funInputEvent(static_cast<void *>(*event), frameTime);
+        };
+        cPin->SetCallback(callback);
+        return;
+    }
 }
 
 int32_t InputPluginManager::UnloadDynamicPlugin(int32_t uid, const std::string &uuid)
