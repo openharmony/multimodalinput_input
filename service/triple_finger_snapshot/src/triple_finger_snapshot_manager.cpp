@@ -71,6 +71,9 @@ bool TripleFingerSnapshotManager::HandleTouchEvent(std::shared_ptr<PointerEvent>
             return false;
         }
     }
+    if (event->HasFlag(InputEvent::EVENT_FLAG_ACCESSIBILITY))
+        return false;
+    }
     if (event->GetDeviceId() == CAST_INPUT_DEVICEID ||
         event->GetDeviceId() == CAST_SCREEN_DEVICEID) {
         return false;
