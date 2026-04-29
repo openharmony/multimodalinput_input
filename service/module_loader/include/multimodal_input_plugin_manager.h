@@ -153,6 +153,7 @@ private:
     void LoadPluginAsync(std::shared_ptr<IDelegateInterface> delegate,
         const std::string &uuid, const std::string &pluginPath);
     void OnPluginLoaded(const std::string &uuid, std::shared_ptr<InputPlugin> plugin);
+    void AddCallbackToPlugin(const std::shared_ptr<IPluginContext> &cPin);
 
     std::weak_ptr<IDelegateInterface> delegate_;
     UDSServer* udsServer_ {nullptr};
