@@ -584,6 +584,16 @@ int32_t MultimodalInputConnectManager::InjectTouchPadEvent(std::shared_ptr<Point
     return multimodalInputConnectService_->InjectTouchPadEvent(*pointerEvent.get(), touchpadCDG, isNativeInject);
 }
 
+#ifdef OHOS_BUILD_ENABLE_CONTROLLER_INJECT
+int32_t MultimodalInputConnectManager::CreateTouchController()
+{
+    CALL_DEBUG_ENTER;
+    std::lock_guard<std::mutex> guard(lock_);
+    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    return multimodalInputConnectService_->CreateTouchController();
+}
+#endif // OHOS_BUILD_ENABLE_CONTROLLER_INJECT
+
 int32_t MultimodalInputConnectManager::CreateMouseController()
 {
     CALL_DEBUG_ENTER;

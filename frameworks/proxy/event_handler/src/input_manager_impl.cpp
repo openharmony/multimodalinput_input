@@ -36,6 +36,7 @@
 #include "keyboard_controller_impl.h"
 #include "multimodal_event_handler.h"
 #include "multimodal_input_connect_manager.h"
+#include "touch_controller_impl.h"
 #include "net_packet.h"
 #include "oh_input_manager.h"
 #include "tablet_event_input_subscribe_manager.h"
@@ -66,6 +67,7 @@ const std::map<int32_t, int32_t> g_keyActionMap = {
 };
 static const std::string g_foldScreenType = system::GetParameter("const.window.foldscreen.type", "0,0,0,0");
 const std::string PRODUCT_TYPE = system::GetParameter("const.product.devicetype", "unknown");
+constexpr char PRODUCT_TYPE_PC[] { "2in1" };
 } // namespace
 
 struct MonitorEventConsumer : public IInputEventConsumer {
@@ -1314,11 +1316,24 @@ int32_t InputManagerImpl::SimulateInputEvent(std::shared_ptr<KeyEvent> keyEvent,
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 }
 
+static bool IsControllerTouchEvent(const std::shared_ptr<PointerEvent> &pointerEvent)
+{
+#ifdef OHOS_BUILD_ENABLE_CONTROLLER_INJECT
+    CHKPF(pointerEvent);
+    return pointerEvent->HasFlag(InputEvent::EVENT_FLAG_CONTROLLER) &&
+        pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHSCREEN;
+#else
+    (void)pointerEvent;
+    return false;
+#endif // OHOS_BUILD_ENABLE_CONTROLLER_INJECT
+}
+
 void InputManagerImpl::HandleSimulateInputEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
     CALL_DEBUG_ENTER;
     int maxPointerId = SIMULATE_EVENT_START_ID;
     CHKPV(pointerEvent);
+    bool isControllerTouchEvent = IsControllerTouchEvent(pointerEvent);
     std::list<PointerEvent::PointerItem> pointerItems = pointerEvent->GetAllPointerItems();
     for (auto &pointerItem : pointerItems) {
         int32_t pointerId = pointerItem.GetPointerId();
@@ -1329,11 +1344,13 @@ void InputManagerImpl::HandleSimulateInputEvent(std::shared_ptr<PointerEvent> po
         maxPointerId += 1;
         pointerItem.SetPointerId(maxPointerId);
     }
-    for (auto &pointerItem : pointerItems) {
-        int32_t pointerId = pointerItem.GetPointerId();
-        if (pointerId < SIMULATE_EVENT_START_ID) {
-            pointerItem.SetOriginPointerId(pointerId);
-            pointerItem.SetPointerId(pointerId + SIMULATE_EVENT_START_ID);
+    if (!isControllerTouchEvent) {
+        for (auto &pointerItem : pointerItems) {
+            int32_t pointerId = pointerItem.GetPointerId();
+            if (pointerId < SIMULATE_EVENT_START_ID) {
+                pointerItem.SetOriginPointerId(pointerId);
+                pointerItem.SetPointerId(pointerId + SIMULATE_EVENT_START_ID);
+            }
         }
     }
     pointerEvent->RemoveAllPointerItems();
@@ -1344,7 +1361,7 @@ void InputManagerImpl::HandleSimulateInputEvent(std::shared_ptr<PointerEvent> po
         pointerEvent->SetPointerId(pointerItems.front().GetPointerId());
         MMI_HILOGD("Simulate pointer event id:%{public}d", pointerEvent->GetPointerId());
     }
-    if (pointerEvent->GetPointerId() < SIMULATE_EVENT_START_ID) {
+    if (!isControllerTouchEvent && pointerEvent->GetPointerId() < SIMULATE_EVENT_START_ID) {
         pointerEvent->SetPointerId(pointerEvent->GetPointerId() + SIMULATE_EVENT_START_ID);
     }
 }
@@ -3535,6 +3552,26 @@ int32_t InputManagerImpl::CheckKeyboardControllerPermission()
     return ret;
 }
 
+int32_t InputManagerImpl::CheckTouchControllerPermission()
+{
+    CALL_DEBUG_ENTER;
+#ifndef OHOS_BUILD_ENABLE_CONTROLLER_INJECT
+    MMI_HILOGE("TouchController is not supported");
+    return CAPABILITY_NOT_SUPPORTED;
+#else
+    CHKPR(MULTIMODAL_INPUT_CONNECT_MGR, RET_ERR);
+    if (PRODUCT_TYPE != PRODUCT_TYPE_PC) {
+        MMI_HILOGE("TouchController not supported on non-PC device, productType:%{public}s", PRODUCT_TYPE.c_str());
+        return CAPABILITY_NOT_SUPPORTED;
+    }
+    int32_t ret = MULTIMODAL_INPUT_CONNECT_MGR->CreateTouchController();
+    if (ret != RET_OK) {
+        MMI_HILOGE("CheckTouchControllerPermission failed, ret=%{public}d", ret);
+    }
+    return ret;
+#endif // OHOS_BUILD_ENABLE_CONTROLLER_INJECT
+}
+
 std::shared_ptr<MouseControllerImpl> InputManagerImpl::CreateMouseController()
 {
     CALL_DEBUG_ENTER;
@@ -3561,6 +3598,24 @@ std::shared_ptr<KeyboardControllerImpl> InputManagerImpl::CreateKeyboardControll
 
     // Create and return client-side instance
     return std::make_shared<KeyboardControllerImpl>();
+}
+
+int32_t InputManagerImpl::CreateTouchController(std::shared_ptr<TouchControllerImpl> &controller)
+{
+    CALL_DEBUG_ENTER;
+    controller = nullptr;
+    int32_t ret = CheckTouchControllerPermission();
+    if (ret != RET_OK) {
+        MMI_HILOGE("Server-side CreateTouchController permission check failed, ret=%{public}d", ret);
+        return ret;
+    }
+
+    controller = std::make_shared<TouchControllerImpl>();
+    if (controller == nullptr) {
+        MMI_HILOGE("Create TouchControllerImpl failed");
+        return ::INPUT_SERVICE_EXCEPTION;
+    }
+    return RET_OK;
 }
 } // namespace MMI
 } // namespace OHOS

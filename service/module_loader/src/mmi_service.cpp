@@ -24,6 +24,8 @@
 #include <unordered_map>
 #endif // OHOS_RSS_CLIENT
 
+#include <algorithm>
+
 #include "bundle_name_parser.h"
 #include "misc_product_type_parser.h"
 #include "product_type_parser.h"
@@ -2271,6 +2273,25 @@ ErrCode MMIService::MoveMouseEvent(int32_t offsetX, int32_t offsetY)
     return RET_OK;
 }
 
+ErrCode MMIService::CheckControllerKeyEventPermission(const std::shared_ptr<KeyEvent> keyEvent,
+    bool isNativeInject)
+{
+    CHKPR(keyEvent, ERROR_NULL_POINTER);
+    if (keyEvent->HasFlag(InputEvent::EVENT_FLAG_CONTROLLER)) {
+        MMI_HILOGD("Key event from Controller interface, using CONTROL_DEVICE permission check");
+        ErrCode ret = CheckControllerPermission();
+        if (ret != RET_OK) {
+            MMI_HILOGE("Controller permission check failed for key event, ret:%{public}d", ret);
+        }
+        return ret;
+    }
+    if (!isNativeInject && !PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
+    return RET_OK;
+}
+
 ErrCode MMIService::InjectKeyEvent(const KeyEvent& keyEvent, bool isNativeInject)
 {
     CALL_DEBUG_ENTER;
@@ -2281,27 +2302,9 @@ ErrCode MMIService::InjectKeyEvent(const KeyEvent& keyEvent, bool isNativeInject
 
     auto keyEventPtr = std::make_shared<KeyEvent>(keyEvent);
     CHKPR(keyEventPtr, ERROR_NULL_POINTER);
-
-    // Check if event is from Controller interface
-    bool isFromController = keyEventPtr->HasFlag(InputEvent::EVENT_FLAG_CONTROLLER);
-
-    if (isFromController) {
-        // Controller permission model: CONTROL_DEVICE permission + PC device
-        MMI_HILOGD("Event from Controller interface, using CONTROL_DEVICE permission check");
-        ErrCode ret = CheckControllerPermission();
-        if (ret != RET_OK) {
-            MMI_HILOGE("Controller permission check failed for KeyEvent, ret:%{public}d", ret);
-            return ret;
-        }
-        // Remove Controller flag after permission check
-        keyEventPtr->ClearFlag(InputEvent::EVENT_FLAG_CONTROLLER);
-        MMI_HILOGD("Removed EVENT_FLAG_CONTROLLER after permission check");
-    } else {
-        // Original permission model: system app + INJECT_INPUT_EVENT permission
-        if (!isNativeInject && !PER_HELPER->VerifySystemApp()) {
-            MMI_HILOGE("Verify system APP failed");
-            return ERROR_NOT_SYSAPI;
-        }
+    ErrCode permissionRet = CheckControllerKeyEventPermission(keyEventPtr, isNativeInject);
+    if (permissionRet != RET_OK) {
+        return permissionRet;
     }
 
     bool isShell = PER_HELPER->RequestFromShell();
@@ -2362,6 +2365,7 @@ int32_t MMIService::OnGetKeyState(std::vector<int32_t> &pressedKeys,
 }
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 
+#ifdef OHOS_BUILD_ENABLE_CONTROLLER_INJECT
 int32_t MMIService::ValidateControllerEventCoordinates(const std::shared_ptr<PointerEvent> pointerEvent)
 {
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
@@ -2375,27 +2379,33 @@ int32_t MMIService::ValidateControllerEventCoordinates(const std::shared_ptr<Poi
         return CONTROLLER_DISPLAY_NOT_EXIST;  // CONTROLLER_DISPLAY_NOT_EXIST
     }
 
-    // Validate coordinates are within display bounds
-    PointerEvent::PointerItem item;
-    if (!pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), item)) {
-        MMI_HILOGE("Failed to get pointer item");
-        return RET_OK;  // If no pointer item, skip validation
+    int32_t maxX = displayInfo->validWidth > 0 ? displayInfo->validWidth - 1 : 0;
+    int32_t maxY = displayInfo->validHeight > 0 ? displayInfo->validHeight - 1 : 0;
+    bool isClamped = false;
+    for (auto item : pointerEvent->GetAllPointerItems()) {
+        int32_t x = item.GetDisplayX();
+        int32_t y = item.GetDisplayY();
+        int32_t clampedX = std::min(std::max(x, 0), maxX);
+        int32_t clampedY = std::min(std::max(y, 0), maxY);
+        if (clampedX != x || clampedY != y) {
+            isClamped = true;
+            item.SetDisplayX(clampedX);
+            item.SetDisplayY(clampedY);
+            pointerEvent->UpdatePointerItem(item.GetPointerId(), item);
+            MMI_HILOGW("Controller coordinates clamped for display %{public}d, "
+                "origin=(%{public}d, %{public}d), clamped=(%{public}d, %{public}d), "
+                "validWidth=%{public}d, validHeight=%{public}d",
+                targetDisplayId, x, y, clampedX, clampedY, displayInfo->validWidth, displayInfo->validHeight);
+        }
     }
 
-    int32_t x = item.GetDisplayX();
-    int32_t y = item.GetDisplayY();
-
-    if (x < 0 || x >= displayInfo->validWidth || y < 0 || y >= displayInfo->validHeight) {
-        MMI_HILOGE("Coordinates out of bounds for display %{public}d "
-            "(width=%{public}d, height=%{public}d)",
-            targetDisplayId, displayInfo->width, displayInfo->height);
-        return CONTROLLER_DISPLAY_NOT_EXIST;  // CONTROLLER_DISPLAY_NOT_EXIST
+    if (!isClamped) {
+        MMI_HILOGD("Validated Controller event: displayId=%{public}d, validWidth=%{public}d, validHeight=%{public}d",
+            targetDisplayId, displayInfo->validWidth, displayInfo->validHeight);
     }
-
-    MMI_HILOGD("Validated Controller event: displayId=%{public}d, x=%{public}d, y=%{public}d",
-               targetDisplayId, x, y);
     return RET_OK;
 }
+#endif // OHOS_BUILD_ENABLE_CONTROLLER_INJECT
 
 int32_t MMIService::CheckInjectPointerEvent(int32_t userId, const std::shared_ptr<PointerEvent> pointerEvent,
     int32_t pid, bool isNativeInject, bool isShell, int32_t useCoordinate)
@@ -2421,6 +2431,42 @@ int32_t MMIService::CheckTouchPadEvent(int32_t userId, const std::shared_ptr<Poi
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 }
 
+ErrCode MMIService::CheckControllerPointerEventPermission(const std::shared_ptr<PointerEvent> pointerEvent,
+    bool isNativeInject)
+{
+    CHKPR(pointerEvent, ERROR_NULL_POINTER);
+    if (pointerEvent->HasFlag(InputEvent::EVENT_FLAG_CONTROLLER) &&
+        pointerEvent->GetSourceType() != PointerEvent::SOURCE_TYPE_TOUCHSCREEN) {
+        MMI_HILOGD("Pointer event from Controller interface, using CONTROL_DEVICE permission check");
+        ErrCode ret = CheckControllerPermission();
+        if (ret != RET_OK) {
+            MMI_HILOGE("Controller permission check failed for pointer event, ret:%{public}d", ret);
+        }
+        return ret;
+    }
+#ifdef OHOS_BUILD_ENABLE_CONTROLLER_INJECT
+    if (pointerEvent->HasFlag(InputEvent::EVENT_FLAG_CONTROLLER) &&
+        pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHSCREEN) {
+        MMI_HILOGD("Touch event from Controller interface, using CONTROL_DEVICE permission check");
+        ErrCode ret = CheckControllerPermission();
+        if (ret != RET_OK) {
+            MMI_HILOGE("Controller permission check failed for touch event, ret:%{public}d", ret);
+            return ret;
+        }
+        ret = ValidateControllerEventCoordinates(pointerEvent);
+        if (ret != RET_OK) {
+            MMI_HILOGE("Controller touch event validation failed, ret=%{public}d", ret);
+        }
+        return ret;
+    }
+#endif // OHOS_BUILD_ENABLE_CONTROLLER_INJECT
+    if (!isNativeInject && !PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
+    return RET_OK;
+}
+
 ErrCode MMIService::InjectPointerEvent(const PointerEvent& pointerEvent, bool isNativeInject, int32_t useCoordinate)
 {
     CALL_DEBUG_ENTER;
@@ -2431,29 +2477,9 @@ ErrCode MMIService::InjectPointerEvent(const PointerEvent& pointerEvent, bool is
 
     auto pointerEventPtr = std::make_shared<PointerEvent>(pointerEvent);
     CHKPR(pointerEventPtr, ERROR_NULL_POINTER);
-
-    // Check if event is from Controller interface
-    bool isFromController = pointerEventPtr->HasFlag(InputEvent::EVENT_FLAG_CONTROLLER);
-
-    if (isFromController) {
-        // Controller permission model: CONTROL_DEVICE permission + PC device
-        MMI_HILOGD("Event from Controller interface, using CONTROL_DEVICE permission check");
-        ErrCode ret = CheckControllerPermission();
-        if (ret != RET_OK) {
-            MMI_HILOGE("Controller permission check failed for PointerEvent, ret:%{public}d", ret);
-            return ret;
-        }
-        if (int32_t validateRet = ValidateControllerEventCoordinates(pointerEventPtr); validateRet != RET_OK) {
-            MMI_HILOGE("Controller event validation failed, ret=%{public}d", validateRet);
-            return validateRet;
-        }
-        pointerEventPtr->ClearFlag(InputEvent::EVENT_FLAG_CONTROLLER);
-    } else {
-        // Original permission model: system app + INJECT_INPUT_EVENT permission
-        if (!isNativeInject && !PER_HELPER->VerifySystemApp()) {
-            MMI_HILOGE("Verify system APP failed");
-            return ERROR_NOT_SYSAPI;
-        }
+    ErrCode permissionRet = CheckControllerPointerEventPermission(pointerEventPtr, isNativeInject);
+    if (permissionRet != RET_OK) {
+        return permissionRet;
     }
 
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
@@ -2543,6 +2569,23 @@ ErrCode MMIService::CreateKeyboardController()
     MMI_HILOGI("CreateKeyboardController permission check passed");
     return RET_OK;
 }
+
+#ifdef OHOS_BUILD_ENABLE_CONTROLLER_INJECT
+ErrCode MMIService::CreateTouchController()
+{
+    CALL_DEBUG_ENTER;
+    if (!IsRunning()) {
+        MMI_HILOGE("Service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
+    if (ErrCode ret = CheckControllerPermission(); ret != RET_OK) {
+        MMI_HILOGE("CreateTouchController permission check failed, ret:%{public}d", ret);
+        return ret;
+    }
+    MMI_HILOGI("CreateTouchController permission check passed");
+    return RET_OK;
+}
+#endif // OHOS_BUILD_ENABLE_CONTROLLER_INJECT
 
 #ifdef OHOS_RSS_CLIENT
 void MMIService::OnAddResSchedSystemAbility(int32_t systemAbilityId, const std::string &deviceId)
