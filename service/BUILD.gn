@@ -1800,7 +1800,9 @@ ohos_unittest("InputWindowsManagerEXTest") {
   }
 
   sources = [
+    "window_manager/src/mouse_redispatch_store.cpp",
     "window_manager/src/pointer_dispatch_event_cache.cpp",
+    "window_manager/src/touch_redispatch_store.cpp",
     "window_manager/src/input_windows_manager.cpp",
     "window_manager/test/input_windows_manager_ex_test.cpp",
     "window_manager/test/mock.cpp",

@@ -3614,7 +3614,7 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_ReadWindowsInfo_002, TestSiz
     pkt << num << info.id << info.pid << info.uid << info.area << info.defaultHotAreas << info.pointerHotAreas
         << info.agentWindowId << info.flags << info.action << info.displayId << info.groupId << info.zOrder
         << info.pointerChangeAreas << info.transform << info.windowInputType << info.privacyMode << info.windowType
-        << info.isSkipSelfWhenShowOnVirtualScreen << info.windowNameType << info.agentPid << byteCount;
+        << info.isSkipSelfWhenShowOnVirtualScreen << info.windowNameType << info.agentPid << info.dragDisabledAreas << byteCount;
     EXPECT_EQ(handler.ReadWindowsInfo(pkt, displayGroupInfo, oldDisplayGroupInfo), RET_ERR);
 }
 
@@ -3642,7 +3642,7 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_ReadWindowsInfo_003, TestSiz
     pkt << num << info.id << info.pid << info.uid << info.area << info.defaultHotAreas << info.pointerHotAreas
         << info.agentWindowId << info.flags << info.action << info.displayId << info.groupId << info.zOrder
         << info.pointerChangeAreas << info.transform << info.windowInputType << info.privacyMode << info.windowType
-        << info.isSkipSelfWhenShowOnVirtualScreen << info.windowNameType << info.agentPid << byteCount
+        << info.isSkipSelfWhenShowOnVirtualScreen << info.windowNameType << info.agentPid << info.dragDisabledAreas << byteCount
         << windowsNum << info.rectChangeBySystem;
     EXPECT_EQ(handler.ReadWindowsInfo(pkt, displayGroupInfo, oldDisplayGroupInfo), RET_OK);
 }
@@ -4028,7 +4028,7 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnDisplayInfo_006, TestSize.
         pkt << num << info.id << info.pid << info.uid << info.area << info.defaultHotAreas << info.pointerHotAreas
             << info.agentWindowId << info.flags << info.action << info.displayId << info.groupId << info.zOrder
             << info.pointerChangeAreas << info.transform << info.windowInputType << info.privacyMode << info.windowType
-            << info.isSkipSelfWhenShowOnVirtualScreen << info.windowNameType << num3;
+            << info.isSkipSelfWhenShowOnVirtualScreen << info.windowNameType << info.dragDisabledAreas << num3;
     }
     {
         WindowInfo extensionInfo;
@@ -4038,7 +4038,8 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnDisplayInfo_006, TestSize.
             << extensionInfo.zOrder << extensionInfo.pointerChangeAreas << extensionInfo.transform
             << extensionInfo.windowInputType << extensionInfo.privacyMode << extensionInfo.windowType
             << extensionInfo.privacyUIFlag << extensionInfo.rectChangeBySystem
-            << extensionInfo.isSkipSelfWhenShowOnVirtualScreen << extensionInfo.windowNameType;
+            << extensionInfo.isSkipSelfWhenShowOnVirtualScreen << extensionInfo.windowNameType
+            << extensionInfo.dragDisabledAreas;
     }
     pkt << ret;
     EXPECT_EQ(handler.OnDisplayInfo(sess, pkt), RET_ERR);
@@ -4531,7 +4532,7 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnDisplayInfo_08, TestSize.L
         << windowInfo.pointerHotAreas << windowInfo.agentWindowId << windowInfo.flags << windowInfo.action
         << windowInfo.displayId << windowInfo.groupId << windowInfo.zOrder << windowInfo.pointerChangeAreas
         << windowInfo.transform << windowInfo.windowInputType << windowInfo.privacyMode << windowInfo.windowType
-        << windowInfo.isSkipSelfWhenShowOnVirtualScreen << windowInfo.windowNameType << byteCount;
+        << windowInfo.isSkipSelfWhenShowOnVirtualScreen << windowInfo.windowNameType << windowInfo.dragDisabledAreas << byteCount;
     int32_t result = handler.OnDisplayInfo(sess, pkt);
     EXPECT_EQ(result, RET_ERR);
 }

@@ -22,16 +22,13 @@
 
 #include "i_input_windows_manager.h"
 #include "input_display_bind_helper.h"
+#include "mouse_redispatch_store.h"
 #include "pointer_dispatch_event_cache.h"
+#include "touch_redispatch_store.h"
 
 namespace OHOS {
 namespace MMI {
 constexpr uint32_t SCREEN_CONTROL_WINDOW_TYPE = 2138;
-struct WindowInfoEX {
-    WindowInfo window;
-    bool flag { false };
-};
-
 struct SwitchFocusKey {
     int32_t keyCode { -1 };
     int32_t pressedKey { -1 };
@@ -43,30 +40,6 @@ enum AcrossDirection : int32_t {
     DOWNWARDS = 2,
     LEFTWARDS = 3,
     RIGHTWARDS = 4,
-};
-
-struct LastTouch {
-    int32_t deviceId_ { -1 };
-    int32_t pointerId_ { -1 };
- 
-    bool operator<(const LastTouch &other) const
-    {
-        if (deviceId_ != other.deviceId_) {
-            return (deviceId_ < other.deviceId_);
-        }
-        return (pointerId_ < other.pointerId_);
-    }
- 
-    bool operator==(const LastTouch &other) const
-    {
-        return (deviceId_ == other.deviceId_ && pointerId_ == other.pointerId_);
-    }
-};
- 
-struct LastTouchInfo {
-    int32_t lastTouchLogicX { -1 };
-    int32_t lastTouchLogicY { -1 };
-    WindowInfo lastTouchWindowInfo;
 };
 
 class InputWindowsManager final : public IInputWindowsManager {
@@ -165,6 +138,8 @@ public:
     int32_t GetNormalPointerStyle(int32_t pid, int32_t windowId, PointerStyle &pointerStyle) const;
     void DispatchPointer(int32_t pointerAction, int32_t windowId = -1);
     void DispatchPointerRedispatch(int32_t pointerAction, const WindowInfo& windowInfo);
+    void DispatchTouchRedispatch(int32_t pointerAction, float zOrder,
+        int32_t deviceId, int32_t pointerId, const WindowInfo& windowInfo);
     void SendPointerEvent(int32_t pointerAction);
     bool IsMouseSimulate();
     bool HasMouseHideFlag();
@@ -285,7 +260,7 @@ public:
     void CancelAllTouches(std::shared_ptr<PointerEvent> event, bool isDisplayChanged = false);
 #endif // defined(OHOS_BUILD_ENABLE_TOUCH) && defined(OHOS_BUILD_ENABLE_MONITOR)
 #ifdef OHOS_BUILD_ENABLE_TOUCH
-    std::shared_ptr<PointerEvent> GetLastPointerEventForGesture() { return lastPointerEventForGesture_; };
+    std::shared_ptr<PointerEvent> GetLastPointerEventForGesture() { return TouchLastPointerEventForGesture(); };
     std::pair<int32_t, int32_t> CalcDrawCoordinate(const OLD::DisplayInfo& displayInfo,
         PointerEvent::PointerItem pointerItem);
 #endif // OHOS_BUILD_ENABLE_TOUCH
@@ -466,6 +441,12 @@ void HandleOneHandMode(const OLD::DisplayInfo &displayInfo, std::shared_ptr<Poin
     void ErasePointerDeviceId(const std::shared_ptr<PointerEvent> pointerEvent,
         std::map<int32_t, std::map<int32_t, WindowInfoEX>> &touchItemDownInfos);
     void ClearPointerDeviceId(const std::shared_ptr<PointerEvent> pointerEvent);
+    std::map<int32_t, std::vector<std::shared_ptr<WindowInfo>>>& GetCancelEventList(
+        std::map<int32_t, std::vector<std::shared_ptr<WindowInfo>>>& realList);
+    bool AbandonTouchRedispatch(const std::shared_ptr<PointerEvent>& pointerEvent);
+    bool AbandonMouseRedispatch(const std::shared_ptr<PointerEvent>& pointerEvent);
+    MouseRedispatchStore& GetMouseRedispatchStore();
+    TouchRedispatchStore& GetTouchRedispatchStore();
     void DispatchTouch(int32_t pointerAction, int32_t groupId = DEFAULT_GROUP_ID);
     const OLD::DisplayInfo *FindPhysicalDisplayInfo(const std::string& uniq) const;
     bool GetPhysicalDisplayCoord(int32_t deviceId, struct libinput_event_touch* touch,
@@ -545,7 +526,6 @@ void HandleOneHandMode(const OLD::DisplayInfo &displayInfo, std::shared_ptr<Poin
     void ClearActiveWindow();
     void UpdateWindowInfoFlag(uint32_t flag, std::shared_ptr<InputEvent> event);
     bool IsTouchPadScrollAxis(const WindowInfo &window, const std::shared_ptr<PointerEvent> pointerEvent);
-    bool AbandonRedispatch(const std::shared_ptr<PointerEvent> pointerEvent);
 private:
     int32_t FindDisplayGroupId(int32_t displayId) const;
     const OLD::DisplayGroupInfo& FindDisplayGroupInfo(int32_t displayId) const;
@@ -620,15 +600,11 @@ private:
 
 
     std::map<int32_t, std::map<int32_t, WindowInfoEX>> touchItemDownInfos_;
+    std::map<int32_t, std::map<int32_t, WindowInfoEX>>& TouchItemDownInfos();
     std::map<int32_t, std::map<int32_t, WindowInfoEX>> thpFeatureTouchDownInfos_;
     std::map<int32_t, std::map<int32_t, WindowInfoEX>> touchItemDownInfosMap_;
     std::map<int32_t, std::vector<Rect>> windowsHotAreas_;
     std::map<int32_t, std::map<int32_t, std::vector<Rect>>> windowsHotAreasMap_;
-    struct WindowPartInfo {
-        int32_t displayId { -1 };
-        int32_t windowId { -1 };
-        uint32_t flags { 0 };
-    };
     std::map<int32_t, WindowPartInfo> firstTouchWindowInfos_;
     InputDisplayBindHelper bindInfo_;
     struct CaptureModeInfo {
@@ -665,6 +641,14 @@ private:
     };
     std::map<int32_t, ActiveTouchWin> activeTouchWinTypes_;
     std::map<int32_t, std::map<int32_t, std::set<int32_t>>> targetTouchWinIds_;
+    std::map<int32_t, std::map<int32_t, std::set<int32_t>>>& TouchTargetWinIds();
+    std::map<int32_t, WindowPartInfo>& TouchFirstTouchInfos();
+    WindowInfo& TouchLockWindowInfo();
+    std::shared_ptr<PointerEvent>& TouchLastTouchEventOnBackGesture();
+    std::map<int32_t, std::shared_ptr<PointerEvent>>& TouchLastPointerEventForWindowChangeMap();
+    std::shared_ptr<PointerEvent>& TouchLastPointerEventForGesture();
+    PointerDispatchEventCache& TouchDispatchEventCache();
+    std::map<LastTouch, LastTouchInfo>& TouchLastTouchInfos();
     std::map<int32_t, std::set<int32_t>> targetMouseWinIds_;
     int32_t pointerActionFlag_ { -1 };
     int32_t currentUserId_ { -1 };
@@ -695,9 +679,8 @@ private:
     mutable std::pair<int32_t, int32_t> currentDisplayXY_ { 0, 0 };
     WindowInfo pointerLockedWindow_;
     Coordinate2D pointerLockedCursorPos_ = { 0.0, 0.0 };
-    std::map<float, std::optional<WindowInfo>> axisBeginWindowInfoMap_;
-    std::map<int32_t, int32_t> windowLastEventIdMap_;
-    std::shared_ptr<PointerEvent> lastPointerEventRedispatch_ { nullptr };
+    MouseRedispatchStore mouseRedispatchStore_;
+    TouchRedispatchStore touchRedispatchStore_;
     int32_t activeDragToolType_ { -1 };
 };
 } // namespace MMI

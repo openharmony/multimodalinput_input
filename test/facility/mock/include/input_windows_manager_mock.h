@@ -20,6 +20,8 @@
 #include "nocopyable.h"
 
 #include "i_input_windows_manager.h"
+#include "mouse_redispatch_store.h"
+#include "touch_redispatch_store.h"
 
 namespace OHOS {
 namespace MMI {
@@ -137,10 +139,10 @@ public:
     int32_t GetWindowStateNotifyPid(int32_t userId) override { return 0; }
     int32_t GetPidByDisplayIdAndWindowId(int32_t displayId, int32_t windowId) override { return 0; }
     int32_t GetAgentPidByDisplayIdAndWindowId(int32_t displayId, int32_t windowId) override { return 0; }
-    bool AbandonRedispatch(std::shared_ptr<PointerEvent> pointerEvent) override { return false; }
+
     std::pair<int32_t, int32_t> CalcDrawCoordinate(const OLD::DisplayInfo& displayInfo,
         PointerEvent::PointerItem pointerItem) override { return { 0, 0 }; }
-    bool GetCancelEventFlag(std::shared_ptr<PointerEvent> pointerEvent) { return false; }
+    bool GetCancelEventFlag(std::shared_ptr<PointerEvent> pointerEvent) override { return false; }
     MOCK_METHOD(int32_t, SetPixelMapData, (int32_t infoId, void *pixelMap), (override));
 
     void GetTargetWindowIds(int32_t, int32_t, std::set<int32_t>&, int32_t) override {}
@@ -148,6 +150,12 @@ public:
     MOCK_METHOD(DisplayMode, GetDisplayMode, (), (const));
     MOCK_METHOD(int32_t, FindDisplayUserId, (int32_t), (const));
     void ClearPointerDeviceId(const std::shared_ptr<PointerEvent> pointerEvent) override {}
+    std::map<int32_t, std::vector<std::shared_ptr<WindowInfo>>>& GetCancelEventList(
+        std::map<int32_t, std::vector<std::shared_ptr<WindowInfo>>>& realList) override { return realList; }
+    bool AbandonTouchRedispatch(const std::shared_ptr<PointerEvent>& pointerEvent) override { return false; }
+    bool AbandonMouseRedispatch(const std::shared_ptr<PointerEvent>& pointerEvent) override { return false; }
+    MouseRedispatchStore& GetMouseRedispatchStore() override { return mouseStore_; }
+    TouchRedispatchStore& GetTouchRedispatchStore() override { return touchStore_; }
 #ifdef OHOS_BUILD_ENABLE_ANCO
     void InitializeAnco() override {}
     void SimulatePointerExt(std::shared_ptr<PointerEvent> pointerEvent) override {}
@@ -185,6 +193,8 @@ public:
     static void ReleaseInstance();
 
 private:
+    MouseRedispatchStore mouseStore_;
+    TouchRedispatchStore touchStore_;
     static std::mutex mutex_;
     static std::shared_ptr<InputWindowsManagerMock> instance_;
 };
