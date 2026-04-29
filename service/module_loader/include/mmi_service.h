@@ -133,6 +133,9 @@ public:
     ErrCode InjectPointerEvent(const PointerEvent& pointerEvent, bool isNativeInject, int32_t useCoordinate) override;
     ErrCode InjectTouchPadEvent(const PointerEvent& pointerEvent, const TouchpadCDG& touchpadCDG,
         bool isNativeInject) override;
+#ifdef OHOS_BUILD_ENABLE_CONTROLLER_INJECT
+    ErrCode CreateTouchController() override;
+#endif // OHOS_BUILD_ENABLE_CONTROLLER_INJECT
     ErrCode CreateMouseController() override;
     ErrCode CreateKeyboardController() override;
     ErrCode SetAnrObserver() override;
@@ -358,7 +361,12 @@ private:
     ~MMIService();
 
     ErrCode CheckControllerPermission();
+    ErrCode CheckControllerKeyEventPermission(const std::shared_ptr<KeyEvent> keyEvent, bool isNativeInject);
+    ErrCode CheckControllerPointerEventPermission(const std::shared_ptr<PointerEvent> pointerEvent,
+        bool isNativeInject);
+#ifdef OHOS_BUILD_ENABLE_CONTROLLER_INJECT
     int32_t ValidateControllerEventCoordinates(const std::shared_ptr<PointerEvent> pointerEvent);
+#endif // OHOS_BUILD_ENABLE_CONTROLLER_INJECT
     int32_t CheckPidPermission(int32_t pid);
     void PrintLog(const std::string &flag, int32_t duration, int32_t pid, int32_t tid);
     void OnSessionDelete(SessionPtr session);

@@ -14,10 +14,13 @@
  */
 #include "inputEventClient.h"
 
+#include <map>
+#include <memory>
 #include <thread>
 #include <chrono>
 #include <sstream>
 #include <iostream>
+#include <mutex>
 
 #include "define_multimodal.h"
 #include "input_manager.h"
@@ -36,6 +39,7 @@
 #include "ani_common.h"
 #include "mouse_controller_impl.h"
 #include "keyboard_controller_impl.h"
+#include "touch_controller_impl.h"
 #include "ohos.multimodalInput.mouseEvent.impl.h"
 #include "ohos.multimodalInput.keyCode.impl.h"
 
@@ -57,7 +61,7 @@ std::string MakePermissionCheckErrMsg(const std::string &moduleName,
 {
     std::stringstream ss;
     ss << "Permission denied. An attempt was made to " <<
-        moduleName << "forbidden by permission " <<
+        moduleName << " forbidden by permission:" <<
         permissionName << ".";
     return ss.str();
 }
@@ -732,7 +736,167 @@ private:
     return make_holder<MouseControllerImpl,
                       ::ohos::multimodalInput::inputEventClient::MouseController>(nativeImpl);
 }
- 
+
+constexpr int32_t TOUCH_STATE_ERROR = 4300001;
+constexpr int32_t TOUCH_ID_INVALID_ERROR = 4300003;
+constexpr const char* TOUCH_DOWN_STATE_ERROR_MSG = "The touch point is touching the display.";
+constexpr const char* TOUCH_NOT_DOWN_STATE_ERROR_MSG = "The touch point is not touching the display.";
+constexpr const char* TOUCH_ID_INVALID_ERROR_MSG = "The touch point ID is not within the valid range [0,9].";
+constexpr const char* CONTROL_DEVICE_PERMISSION = "ohos.permission.CONTROL_DEVICE";
+
+enum class TouchControllerOperation {
+    CREATE,
+    DOWN,
+    MOVE,
+    UP,
+};
+
+std::string GetTouchControllerActionName(TouchControllerOperation operation)
+{
+    switch (operation) {
+        case TouchControllerOperation::DOWN:
+            return "touch down";
+        case TouchControllerOperation::MOVE:
+            return "touch move";
+        case TouchControllerOperation::UP:
+            return "touch up";
+        case TouchControllerOperation::CREATE:
+        default:
+            return "create TouchController";
+    }
+}
+
+const char* GetTouchControllerStateErrorMsg(TouchControllerOperation operation)
+{
+    if (operation == TouchControllerOperation::DOWN) {
+        return TOUCH_DOWN_STATE_ERROR_MSG;
+    }
+    return TOUCH_NOT_DOWN_STATE_ERROR_MSG;
+}
+
+int32_t NormalizeTouchControllerErrorCode(int32_t errorCode)
+{
+    if (errorCode == ERROR_NO_PERMISSION) {
+        return OHOS::MMI::TaiheErrorCode::COMMON_PERMISSION_CHECK_ERROR;
+    }
+    if (errorCode == CAPABILITY_NOT_SUPPORTED) {
+        return OHOS::MMI::TaiheErrorCode::INPUT_DEVICE_NOT_SUPPORTED;
+    }
+    return errorCode;
+}
+
+void SetTouchControllerBusinessError(int32_t errorCode, TouchControllerOperation operation)
+{
+    errorCode = NormalizeTouchControllerErrorCode(errorCode);
+    if (errorCode == OHOS::MMI::TaiheErrorCode::COMMON_PERMISSION_CHECK_ERROR) {
+        std::string msg = MakePermissionCheckErrMsg(GetTouchControllerActionName(operation), CONTROL_DEVICE_PERMISSION);
+        taihe::set_business_error(errorCode, msg);
+        return;
+    }
+    if (errorCode == TOUCH_ID_INVALID_ERROR) {
+        taihe::set_business_error(TOUCH_STATE_ERROR, TOUCH_ID_INVALID_ERROR_MSG);
+        return;
+    }
+    if (errorCode == TOUCH_STATE_ERROR) {
+        taihe::set_business_error(errorCode, GetTouchControllerStateErrorMsg(operation));
+        return;
+    }
+    TaiheError_t codeMsg;
+    if (TaiheConverter::GetApiError(errorCode, codeMsg)) {
+        taihe::set_business_error(errorCode, codeMsg.msg);
+        return;
+    }
+    if (TaiheConverter::GetApiError(OHOS::MMI::TaiheErrorCode::INPUT_SERVICE_EXCEPTION, codeMsg)) {
+        taihe::set_business_error(OHOS::MMI::TaiheErrorCode::INPUT_SERVICE_EXCEPTION, codeMsg.msg);
+        return;
+    }
+    taihe::set_business_error(OHOS::MMI::TaiheErrorCode::INPUT_SERVICE_EXCEPTION, "Input service exception.");
+}
+
+class TaiheTouchControllerImpl {
+public:
+    explicit TaiheTouchControllerImpl(std::shared_ptr<OHOS::MMI::TouchControllerImpl> impl) : nativeImpl_(impl)
+    {
+        MMI_HILOGD("TaiheTouchControllerImpl created with native impl");
+    }
+
+    TaiheTouchControllerImpl() : nativeImpl_(nullptr)
+    {
+        MMI_HILOGW("TaiheTouchControllerImpl created without native impl");
+    }
+
+    ~TaiheTouchControllerImpl() = default;
+
+    void TouchDownSync(::ohos::multimodalInput::inputEventClient::TouchPoint touch)
+    {
+        if (nativeImpl_ == nullptr) {
+            MMI_HILOGE("Native implementation is null");
+            SetTouchControllerBusinessError(OHOS::MMI::TaiheErrorCode::INPUT_SERVICE_EXCEPTION,
+                TouchControllerOperation::DOWN);
+            return;
+        }
+
+        int32_t ret = nativeImpl_->TouchDown(touch.id, touch.displayId, touch.displayX, touch.displayY);
+        if (ret != RET_OK) {
+            MMI_HILOGE("TouchDown failed, ret=%{public}d", ret);
+            SetTouchControllerBusinessError(ret, TouchControllerOperation::DOWN);
+        }
+    }
+
+    void TouchMoveSync(::ohos::multimodalInput::inputEventClient::TouchPoint touch)
+    {
+        if (nativeImpl_ == nullptr) {
+            MMI_HILOGE("Native implementation is null");
+            SetTouchControllerBusinessError(OHOS::MMI::TaiheErrorCode::INPUT_SERVICE_EXCEPTION,
+                TouchControllerOperation::MOVE);
+            return;
+        }
+
+        int32_t ret = nativeImpl_->TouchMove(touch.id, touch.displayId, touch.displayX, touch.displayY);
+        if (ret != RET_OK) {
+            MMI_HILOGE("TouchMove failed, ret=%{public}d", ret);
+            SetTouchControllerBusinessError(ret, TouchControllerOperation::MOVE);
+        }
+    }
+
+    void TouchUpSync(::ohos::multimodalInput::inputEventClient::TouchPoint touch)
+    {
+        if (nativeImpl_ == nullptr) {
+            MMI_HILOGE("Native implementation is null");
+            SetTouchControllerBusinessError(OHOS::MMI::TaiheErrorCode::INPUT_SERVICE_EXCEPTION,
+                TouchControllerOperation::UP);
+            return;
+        }
+
+        int32_t ret = nativeImpl_->TouchUp(touch.id, touch.displayId, touch.displayX, touch.displayY);
+        if (ret != RET_OK) {
+            MMI_HILOGE("TouchUp failed, ret=%{public}d", ret);
+            SetTouchControllerBusinessError(ret, TouchControllerOperation::UP);
+        }
+    }
+
+private:
+    std::shared_ptr<OHOS::MMI::TouchControllerImpl> nativeImpl_;
+};
+
+::ohos::multimodalInput::inputEventClient::TouchController CreateTouchControllerSync()
+{
+    CALL_DEBUG_ENTER;
+
+    std::shared_ptr<OHOS::MMI::TouchControllerImpl> nativeImpl = nullptr;
+    int32_t ret = InputManager::GetInstance()->CreateTouchController(nativeImpl);
+    if (ret != RET_OK || nativeImpl == nullptr) {
+        MMI_HILOGE("Failed to create native TouchControllerImpl, ret=%{public}d", ret);
+        SetTouchControllerBusinessError(ret, TouchControllerOperation::CREATE);
+        return make_holder<TaiheTouchControllerImpl,
+            ::ohos::multimodalInput::inputEventClient::TouchController>();
+    }
+
+    MMI_HILOGD("TouchController created successfully");
+    return make_holder<TaiheTouchControllerImpl,
+        ::ohos::multimodalInput::inputEventClient::TouchController>(nativeImpl);
+}
+
 class KeyboardControllerImpl {
 public:
     // 构造函数：接收Native实现
@@ -829,5 +993,6 @@ TH_EXPORT_CPP_API_InjectMouseEventSync(InjectMouseEventSync);
 TH_EXPORT_CPP_API_InjectTouchEventSync(InjectTouchEventSync);
 TH_EXPORT_CPP_API_PermitInjectionSync(PermitInjectionSync);
 TH_EXPORT_CPP_API_CreateMouseControllerSync(CreateMouseControllerSync);
+TH_EXPORT_CPP_API_CreateTouchControllerSync(CreateTouchControllerSync);
 TH_EXPORT_CPP_API_CreateKeyboardControllerSync(CreateKeyboardControllerSync);
 // NOLINTEND

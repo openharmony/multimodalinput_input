@@ -22,6 +22,7 @@ config("inputeventclient_config") {
     "${mmi_path}/tools/event_inject/include",
     "${mmi_path}/interfaces/kits/c/input",
     "${mmi_path}/interfaces/native/innerkits/proxy/include",
+    "${mmi_path}/frameworks/proxy/event_handler/include",
     "${mmi_path}/frameworks/napi/joystick_event/include",
     "${mmi_path}/util/napi/include",
   ]
@@ -35,6 +36,8 @@ ohos_shared_library("inputeventclient") {
     "src/js_register_util.cpp",
     "src/js_mouse_controller.cpp",
     "src/js_mouse_controller_napi.cpp",
+    "src/js_touch_controller.cpp",
+    "src/js_touch_controller_napi.cpp",
     "src/js_keyboard_controller.cpp",
     "src/js_keyboard_controller_napi.cpp",
   ]
