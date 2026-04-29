@@ -678,7 +678,7 @@ bool KeySubscriberHandler::OnSubscribeKeyEvent(std::shared_ptr<KeyEvent> keyEven
 #endif // #ifdef OHOS_BUILD_ENABLE_KEY_PRESSED_HANDLER
     if (IsRepeatedKeyEvent(keyEvent)) {
         if (ShouldProcessRepeatEvent(keyEvent)) {
-            MMI_HILOGI("Repeat KeyEvent but new triggerType needs processing, continue, (KC:%{private}d, KA:%{public}d)",
+            MMI_HILOGI("Repeat KeyEvent but new triggerType needs processing,(KC:%{private}d, KA:%{public}d)",
                 keyEvent->GetKeyCode(), keyEvent->GetKeyAction());
         } else {
             MMI_HILOGD("Repeat KeyEvent, skip");
