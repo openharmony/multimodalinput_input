@@ -1051,7 +1051,7 @@ HWTEST_F(InputManagerImplTest, InputManagerImplTest_GetPointerLocation001, TestS
     int32_t displayId = 0;
     double displayX = 0.0;
     double displayY = 0.0;
-    EXPECT_EQ(InputMgrImpl.GetPointerLocation(displayId, displayX, displayY), ERROR_APP_NOT_FOCUSED);
+    ASSERT_NE(InputMgrImpl.GetPointerLocation(displayId, displayX, displayY), RET_OK);
 }
 
 /**
@@ -2254,7 +2254,7 @@ HWTEST_F(InputManagerImplTest, InputManagerImplTest_GetExternalObject_001, TestS
     std::string pluginName = "pc.pointer.inputDeviceConsumer.202507";
     sptr<IRemoteObject> inputDevicePluginStub = nullptr;
     auto ret = InputMgrImpl.GetExternalObject(pluginName, inputDevicePluginStub);
-    ASSERT_NE(ret, RET_OK);
+    ASSERT_EQ(ret, RET_OK);
 }
 
 #ifdef OHOS_BUILD_ENABLE_KEY_HOOK

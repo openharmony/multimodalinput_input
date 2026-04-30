@@ -22,11 +22,18 @@
 #include "libinput_mock.h"
 #include "pointer_device_manager.h"
 
+#define BUS_USB			0x03
+#define BUS_BLUETOOTH	0x05
+#define BUS_I2C			0x18
+#define BUS_SPI			0x1C
+
 namespace OHOS {
 namespace MMI {
 namespace {
 using namespace testing::ext;
 using namespace testing;
+
+constexpr int32_t COMMON_PARAMETER_ERROR { 401 };
 } // namespace
 
 class InputDeviceManagerTest : public testing::Test {
@@ -280,6 +287,123 @@ HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_NotifyDeviceFirstReportE
     EXPECT_CALL(*observer, OnDeviceFirstReportEvent(0)).Times(0);
     ASSERT_NO_FATAL_FAILURE(INPUT_DEV_MGR->NotifyDeviceFirstReportEvent(0));
     INPUT_DEV_MGR->Detach(observerNull);
+}
+
+/**
+ * @tc.name: InputDeviceManagerTest_GetDeviceBusType_Test_001
+ * @tc.desc: Test GetDeviceBusType
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_GetDeviceBusType_Test_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputDeviceManager inputDevice;
+    int32_t deviceId = 1;
+    int32_t busType = 0;
+
+    int32_t ret = inputDevice.GetDeviceBusType(deviceId, busType);
+    ASSERT_EQ(ret, COMMON_PARAMETER_ERROR);
+}
+
+/**
+ * @tc.name: InputDeviceManagerTest_GetDeviceBusType_Test_002
+ * @tc.desc: Test the function GetDeviceBusType
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_GetDeviceBusType_Test_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputDeviceManager inputDevice;
+    int32_t deviceId = 1;
+    int32_t busType = 0;
+
+    InputDeviceManager::InputDeviceInfo info;
+    info.enable = false;
+    inputDevice.inputDevice_.insert(std::make_pair(deviceId, info));
+
+    int32_t ret = inputDevice.GetDeviceBusType(deviceId, busType);
+    ASSERT_EQ(ret, RET_ERR);
+}
+
+/**
+ * @tc.name: InputDeviceManagerTest_GetDeviceBusType_Test_003
+ * @tc.desc: Test the function GetDeviceBusType
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_GetDeviceBusType_Test_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputDeviceManager inputDevice;
+    int32_t deviceId = 1;
+    int32_t busType = 0;
+
+    InputDeviceManager::InputDeviceInfo info;
+    info.enable = true;
+    info.inputDeviceOrigin = nullptr;
+    inputDevice.inputDevice_.insert(std::make_pair(deviceId, info));
+
+    int32_t ret = inputDevice.GetDeviceBusType(deviceId, busType);
+    ASSERT_EQ(ret, ERROR_NULL_POINTER);
+}
+
+/**
+ * @tc.name: InputDeviceManagerTest_GetDeviceConnectionType_Test_001
+ * @tc.desc: Test the function GetDeviceConnectionType
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_GetDeviceConnectionType_Test_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputDeviceManager inputDevice;
+    int32_t deviceId = 1;
+
+    std::string connectionType = inputDevice.GetDeviceConnectionType(deviceId);
+    ASSERT_EQ(connectionType, "UNKNOWN");
+}
+
+/**
+ * @tc.name: InputDeviceManagerTest_GetDeviceConnectionType_Test_002
+ * @tc.desc: Test the function GetDeviceConnectionType
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_GetDeviceConnectionType_Test_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputDeviceManager inputDevice;
+    int32_t deviceId = 1;
+
+    InputDeviceManager::InputDeviceInfo info;
+    info.enable = false;
+    inputDevice.inputDevice_.insert(std::make_pair(deviceId, info));
+
+    std::string connectionType = inputDevice.GetDeviceConnectionType(deviceId);
+    ASSERT_EQ(connectionType, "UNKNOWN");
+}
+
+/**
+ * @tc.name: InputDeviceManagerTest_GetDeviceConnectionType_Test_003
+ * @tc.desc: Test the function GetDeviceConnectionType
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_GetDeviceConnectionType_Test_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputDeviceManager inputDevice;
+    int32_t deviceId = 1;
+
+    InputDeviceManager::InputDeviceInfo info;
+    info.enable = true;
+    info.inputDeviceOrigin = nullptr;
+    inputDevice.inputDevice_.insert(std::make_pair(deviceId, info));
+
+    std::string connectionType = inputDevice.GetDeviceConnectionType(deviceId);
+    ASSERT_EQ(connectionType, "UNKNOWN");
 }
 } // namespace MMI
 } // namespace OHOS

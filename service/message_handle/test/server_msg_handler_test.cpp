@@ -7393,5 +7393,52 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_GetRequestInjectionCallbackR
         EXPECT_GT(reqId, 0);
     }
 }
+
+/**
+@tc.name: ServerMsgHandlerTest_IsApplicationType_001
+@tc.desc: Test the function IsApplicationType
+@tc.type: FUNC
+@tc.require:
+*/
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_IsApplicationType_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ServerMsgHandler handler;
+    int32_t pid = 2;
+
+    auto result = handler.IsApplicationType(pid);
+    EXPECT_FALSE(result);
+}
+
+/**
+@tc.name: ServerMsgHandlerTest_IsApplicationType_002
+@tc.desc: Test the function IsApplicationType
+@tc.type: FUNC
+@tc.require:
+*/
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_IsApplicationType_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ServerMsgHandler handler;
+    int32_t pid = -1;
+
+    auto result = handler.IsApplicationType(pid);
+    EXPECT_FALSE(result);
+}
+
+/**
+@tc.name: ServerMsgHandlerTest_IsApplicationType_003
+@tc.desc: Test the function IsApplicationType
+@tc.type: FUNC
+@tc.require:
+*/
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_IsApplicationType_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ServerMsgHandler handler;
+
+    auto result = handler.IsApplicationType(0);
+    EXPECT_FALSE(result);
+}
 } // namespace MMI
 } // namespace OHOS

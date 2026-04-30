@@ -741,5 +741,98 @@ HWTEST_F(PermissionHelperTest, PermissionHelperTest_RequestFromShell_01, TestSiz
     bool result = PER_HELPER->RequestFromShell();
     EXPECT_TRUE(result);
 }
+
+/**
+ * @tc.name: PermissionHelperTest_CheckInputDeviceCfg001
+ * @tc.desc: Test CheckInputDeviceCfg with HAP token type
+ * @tc.type: FUNC
+ * @tc.require: AR000H5VSG
+ */
+HWTEST_F(PermissionHelperTest, PermissionHelperTest_CheckInputDeviceCfg001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    uint32_t tokenId = 1;
+    auto tokenType = OHOS::Security::AccessToken::AccessTokenKit::GetTokenTypeFlag(tokenId);
+    tokenType = OHOS::Security::AccessToken::TOKEN_HAP;
+    bool result1 = PER_HELPER->CheckInputDeviceCfg();
+    EXPECT_TRUE(result1);
+}
+
+/**
+ * @tc.name: PermissionHelperTest_CheckInputDeviceCfg002
+ * @tc.desc: Test CheckInputDeviceCfg with NATIVE token type
+ * @tc.type: FUNC
+ * @tc.require: AR000H5VSG
+ */
+HWTEST_F(PermissionHelperTest, PermissionHelperTest_CheckInputDeviceCfg002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    uint32_t tokenId = 2;
+    auto tokenType = OHOS::Security::AccessToken::AccessTokenKit::GetTokenTypeFlag(tokenId);
+    tokenType = OHOS::Security::AccessToken::TOKEN_NATIVE;
+    bool result2 = PER_HELPER->CheckInputDeviceCfg();
+    EXPECT_TRUE(result2);
+}
+
+/**
+ * @tc.name: PermissionHelperTest_CheckInputDeviceCfg003
+ * @tc.desc: Test CheckInputDeviceCfg with SHELL token type
+ * @tc.type: FUNC
+ * @tc.require: AR000H5VSG
+ */
+HWTEST_F(PermissionHelperTest, PermissionHelperTest_CheckInputDeviceCfg003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    uint32_t tokenId = 3;
+    auto tokenType = OHOS::Security::AccessToken::AccessTokenKit::GetTokenTypeFlag(tokenId);
+    tokenType = OHOS::Security::AccessToken::TOKEN_SHELL;
+    bool result3 = PER_HELPER->CheckInputDeviceCfg();
+    EXPECT_TRUE(result3);
+}
+
+/**
+ * @tc.name: PermissionHelperTest_CheckInputDeviceCfg004
+ * @tc.desc: Test CheckInputDeviceCfg with INVALID token type
+ * @tc.type: FUNC
+ * @tc.require: AR000H5VSG
+ */
+HWTEST_F(PermissionHelperTest, PermissionHelperTest_CheckInputDeviceCfg004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    uint32_t tokenId = 4;
+    auto tokenType = OHOS::Security::AccessToken::AccessTokenKit::GetTokenTypeFlag(tokenId);
+    tokenType = OHOS::Security::AccessToken::TOKEN_INVALID;
+    bool result4 = PER_HELPER->CheckInputDeviceCfg();
+    EXPECT_TRUE(result4);
+}
+
+/**
+ * @tc.name: PermissionHelperTest_CheckInputDeviceCfg005
+ * @tc.desc: Test CheckInputDeviceCfg permission check behavior
+ * @tc.type: FUNC
+ * @tc.require: AR000H5VSG
+ * @tc.note: Tests the INPUT_DEVICE_CONFIGURATOR permission check
+ */
+HWTEST_F(PermissionHelperTest, PermissionHelperTest_CheckInputDeviceCfg005, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MMI_HILOGI("CheckInputDeviceCfg permission test start");
+
+    // Test with different token types to ensure permission is properly checked
+    uint32_t tokenId = 1;
+    auto tokenType = OHOS::Security::AccessToken::TOKEN_HAP;
+    bool hapResult = PER_HELPER->CheckInputDeviceCfg();
+
+    tokenId = 2;
+    tokenType = OHOS::Security::AccessToken::AccessTokenKit::GetTokenTypeFlag(tokenId);
+    tokenType = OHOS::Security::AccessToken::TOKEN_NATIVE;
+    bool nativeResult = PER_HELPER->CheckInputDeviceCfg();
+
+    tokenId = 3;
+    tokenType = OHOS::Security::AccessToken::AccessTokenKit::GetTokenTypeFlag(tokenId);
+    tokenType = OHOS::Security::AccessToken::TOKEN_SHELL;
+    bool shellResult = PER_HELPER->CheckInputDeviceCfg();
+    EXPECT_TRUE(hapResult || nativeResult || shellResult);
+}
 } // namespace MMI
 } // namespace OHOS

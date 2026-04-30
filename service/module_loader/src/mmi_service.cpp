@@ -3180,18 +3180,42 @@ ErrCode MMIService::GetAllMmiSubscribedEvents(MmiEventMap& mmiEventMap)
     return RET_OK;
 }
 
+int32_t MMIService::CheckSetDisplayBindPermission(int32_t deviceId)
+{
+    CALL_DEBUG_ENTER;
+    std::string connectType = INPUT_DEV_MGR->GetDeviceConnectionType(deviceId);
+    if (connectType != "USB" && connectType != "BLUETOOTH") {
+        MMI_HILOGE("Incorrect connection type [%{public}s]", connectType.c_str());
+        return RET_ERR;
+    }
+
+    if (!PER_HELPER->CheckInputDeviceCfg()) {
+        MMI_HILOGE("Failed to verify the INPUT_DEVICE_PERMISSION_CODE permission");
+        return RET_ERR;
+    }
+
+    int32_t pid = GetCallingPid();
+    if (!sMsgHandler_.IsApplicationType(pid)) {
+        MMI_HILOGE("Failed to check the application type, pid:%{public}d", pid);
+        return RET_ERR;
+    }
+
+    return RET_OK;
+}
+
 ErrCode MMIService::SetDisplayBind(int32_t deviceId, int32_t displayId, std::string &msg)
 {
     CALL_INFO_TRACE;
-    if (!PER_HELPER->VerifySystemApp()) {
-        MMI_HILOGE("Verify system APP failed");
-        return ERROR_NOT_SYSAPI;
+    int32_t ret = CheckSetDisplayBindPermission(deviceId);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Failed to verify the interface permission");
+        return ERROR_NO_PERMISSION;
     }
     if (!IsRunning()) {
         MMI_HILOGE("Service is not running");
         return MMISERVICE_NOT_RUNNING;
     }
-    int32_t ret = delegateTasks_.PostSyncTask(
+    ret = delegateTasks_.PostSyncTask(
         [deviceId, displayId, &msg] {
             return ::OHOS::MMI::IInputWindowsManager::GetInstance()->SetDisplayBind(deviceId, displayId, msg);
         }
@@ -3200,6 +3224,7 @@ ErrCode MMIService::SetDisplayBind(int32_t deviceId, int32_t displayId, std::str
         MMI_HILOGE("SetDisplayBind pid failed, ret:%{public}d", ret);
         return ret;
     }
+    MMI_HILOGI("Successfully bound device. deviceId:%{public}d, displayId:%{public}d", deviceId, displayId);
     return RET_OK;
 }
 
@@ -3292,8 +3317,10 @@ ErrCode MMIService::GetPointerLocation(int32_t &displayId, double &displayX, dou
     auto tokenId = IPCSkeleton::GetCallingTokenID();
     auto tokenType = OHOS::Security::AccessToken::AccessTokenKit::GetTokenTypeFlag(tokenId);
     if (tokenType != OHOS::Security::AccessToken::TOKEN_HAP) {
+        MMI_HILOGE("The caller is not an application");
         return ERROR_APP_NOT_FOCUSED;
     }
+
     int32_t clientPid = GetCallingPid();
     int32_t ret = delegateTasks_.PostSyncTask(
         [this, &displayId, &displayX, &displayY, clientPid] {
@@ -3302,10 +3329,12 @@ ErrCode MMIService::GetPointerLocation(int32_t &displayId, double &displayX, dou
                 return ERROR_DEVICE_NO_POINTER;
             }
             if (!WIN_MGR->CheckAppFocused(clientPid)) {
-                return ERROR_APP_NOT_FOCUSED;
+                if (!PER_HELPER->CheckInputDeviceCfg()) {
+                    MMI_HILOGE("App not focused and missing INPUT_DEVICE_PERMISSION_CODE permission");
+                    return ERROR_NO_PERMISSION;
+                }
             }
-            return MouseEventHdr->GetPointerLocation(displayId,
-                displayX, displayY);
+            return MouseEventHdr->GetPointerLocation(displayId, displayX, displayY);
         });
     if (ret != RET_OK) {
         MMI_HILOGE("Get pointer location failed, ret:%{public}d", ret);

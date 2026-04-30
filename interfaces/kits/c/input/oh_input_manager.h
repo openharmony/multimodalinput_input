@@ -2590,6 +2590,22 @@ Input_Result OH_Input_GetMouseEventCursorInfo(const struct Input_MouseEvent* mou
  * @since 22
  */
 Input_Result OH_Input_GetCursorInfo(Input_CursorInfo* cursorInfo, OH_PixelmapNative** pixelmap);
+
+/**
+ * @brief Bind the stylus to the display.
+ *
+ * @permission ohos.permission.INPUT_DEVICE_CONFIGURATOR
+ * @param inputDeviceId Input device id.
+ * @param displayId Display id.
+ * @return OH_Input_BindInputDeviceToDisplay function api result code.
+ *         {@link INPUT_SUCCESS} if the operation is successful.
+ *         {@link INPUT_PERMISSION_DENIED} Permission verification failed.
+ *         {@link INPUT_PARAMETER_ERROR} The input device does not exist or
+ *         the display does not exist or the input device is not a stylus.
+ *         {@link INPUT_SERVICE_EXCEPTION} if the service is exception.
+ * @since 26.0.0.0
+ */
+Input_Result OH_Input_BindInputDeviceToDisplay(int32_t inputDeviceId, int32_t displayId);
 #ifdef __cplusplus
 }
 #endif

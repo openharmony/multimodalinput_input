@@ -153,7 +153,8 @@ public:
         EventTouch& touchInfo, int32_t& targetDisplayId, bool isNeedClear = false,
         bool hasValidAreaDowned = false) = 0;
     virtual bool CalculateTipPoint(struct libinput_event_tablet_tool* tip,
-        int32_t& targetDisplayId, PhysicalCoordinate& coord, PointerEvent::PointerItem& pointerItem) = 0;
+        int32_t& targetDisplayId, PhysicalCoordinate& coord,
+        PointerEvent::PointerItem& pointerItem, int32_t deviceId) = 0;
     virtual const OLD::DisplayInfo *GetDefaultDisplayInfo() const = 0;
     virtual void ReverseXY(int32_t &x, int32_t &y) = 0;
     virtual void FoldScreenRotation(std::shared_ptr<PointerEvent> pointerEvent) = 0;
