@@ -5572,6 +5572,10 @@ void InputWindowsManager::ClearPointerDeviceId(const std::shared_ptr<PointerEven
         }
         if (pointerItem.GetToolType() == PointerEvent::TOOL_TYPE_THP_FEATURE) {
             ErasePointerDeviceId(pointerEvent, thpFeatureTouchDownInfos_);
+#ifdef OHOS_BUILD_ENABLE_ANCO
+        } else if (pointerEvent->GetAncoDeal()) {
+            ErasePointerDeviceId(pointerEvent, ancoTouchDownInfos_);
+#endif // OHOS_BUILD_ENABLE_ANCO
         } else {
             ErasePointerDeviceId(pointerEvent, touchItemDownInfos_);
         }
@@ -5807,8 +5811,14 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
             return RET_ERR;
         }
         auto it = tmpWindowInfo[pointerEvent->GetDeviceId()].find(pointerId);
+
+        auto outerIter = ancoTouchDownInfos_.find(pointerEvent->GetDeviceId());
+        bool foundInAnco = true;
+        if (outerIter != ancoTouchDownInfos_.end()) {
+            foundInAnco = (outerIter->second.find(pointerId) == outerIter->second.end());
+        }
         if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHSCREEN) {
-            if (it == tmpWindowInfo[pointerEvent->GetDeviceId()].end() ||
+            if ((it == tmpWindowInfo[pointerEvent->GetDeviceId()].end() && foundInAnco) ||
                 pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_DOWN) {
                 int32_t originPointerAction = pointerEvent->GetPointerAction();
                 pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_CANCEL);
@@ -5922,9 +5932,13 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
         int32_t focusWindowId = GetFocusWindowId(groupId);
         if (focusWindowId == touchWindow->id) {
             pointerEvent->SetAgentWindowId(touchWindow->agentWindowId);
+            if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_DOWN ||
+                pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_HOVER_ENTER) {
+                auto& deviceMap = ancoTouchDownInfos_[pointerEvent->GetDeviceId()];
+                deviceMap[pointerId] = WindowInfoEX{ *touchWindow, true };
+            }
             return RET_OK;
         }
-        pointerEvent->SetAncoDeal(false);
     }
 #endif // OHOS_BUILD_ENABLE_ANCO
     if (touchWindow->windowInputType == WindowInputType::MIX_LEFT_RIGHT_ANTI_AXIS_MOVE) {
