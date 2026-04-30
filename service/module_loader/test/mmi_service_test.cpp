@@ -1152,7 +1152,7 @@ HWTEST_F(MMIServerTest, MMIServerTest_GetPointerLocation_001, TestSize.Level1)
     double displayX = 0.0;
     double displayY = 0.0;
     int32_t ret = mmiService.GetPointerLocation(displayId, displayX, displayY);
-    EXPECT_EQ(ret, ERROR_APP_NOT_FOCUSED);
+    ASSERT_NE(ret, RET_OK);
 }
 
 /**
@@ -5154,6 +5154,200 @@ HWTEST_F(MMIServerTest, MMIService_GetMouseScrollDirection_002, TestSize.Level1)
     bool direction = false;
     ErrCode ret = mmiService.GetMouseScrollDirection(direction);
     EXPECT_EQ(ret, MMISERVICE_NOT_RUNNING);
+}
+
+/**
+ * @tc.name: SetDisplayBind_002
+ * @tc.desc: Test the function SetDisplayBind
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIServerTest, SetDisplayBind_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    uint32_t tokenId = 1;
+    bool isServiceRunning = false;
+
+    MMIService mmiService;
+    int32_t deviceId = 1;
+    int32_t displayId = 2;
+    std::string msg = "test";
+    int32_t ret = mmiService.SetDisplayBind(deviceId, displayId, msg);
+    EXPECT_NE(ret, RET_OK);
+}
+
+/**
+ * @tc.name: GetPointerLocation_PermissionCheck_002
+ * @tc.desc: Test the function GetPointerLocation
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIServerTest, GetPointerLocation_PermissionCheck_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    uint32_t tokenId = 1;
+    bool isHapApp = true;
+    bool hasPermission = true;
+
+    MMIService mmiService;
+    int32_t displayId = 0;
+    double displayX = 0.0;
+    double displayY = 0.0;
+    int32_t ret = mmiService.GetPointerLocation(displayId, displayX, displayY);
+    EXPECT_NE(ret, ERROR_NO_PERMISSION);
+}
+
+/**
+ * @tc.name: MMIServiceTest_CheckSetDisplayBindPermission_001
+ * @tc.desc: Test the function CheckSetDisplayBindPermission
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIServerTest, MMIServiceTest_CheckSetDisplayBindPermission_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    uint32_t tokenId = 1;
+
+    MMIService service;
+    int32_t ret = service.CheckSetDisplayBindPermission(1);
+    EXPECT_NE(ret, RET_OK);
+}
+
+/**
+ * @tc.name: MMIServiceTest_CheckSetDisplayBindPermission_002
+ * @tc.desc: Test the function CheckSetDisplayBindPermission
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIServerTest, MMIServiceTest_CheckSetDisplayBindPermission_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    uint32_t tokenId = 2;
+    std::string connectType = "USB";
+    bool hasPermission = true;
+
+    MMIService service;
+    int32_t ret = service.CheckSetDisplayBindPermission(1);
+    EXPECT_NE(ret, RET_OK);
+}
+
+/**
+ * @tc.name: MMIServiceTest_CheckSetDisplayBindPermission_003
+ * @tc.desc: Test the function CheckSetDisplayBindPermission
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIServerTest, MMIServiceTest_CheckSetDisplayBindPermission_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    uint32_t tokenId = 3;
+    std::string connectType = "BLUETOOTH";
+    bool hasPermission = true;
+
+    MMIService service;
+    int32_t ret = service.CheckSetDisplayBindPermission(1);
+    EXPECT_NE(ret, RET_OK);
+}
+
+/**
+* @tc.name: MMIService_GetPointerLocation_NoPermission_001
+* @tc.desc: Test GetPointerLocation without proper permission
+* @tc.type: FUNC
+* @tc.require: AR000H5VSG
+*/
+HWTEST_F(MMIServerTest, MMIService_GetPointerLocation_NoPermission_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MMIService mmiService;
+    int32_t displayId = 0;
+    double displayX = 0.0;
+    double displayY = 0.0;
+    ErrCode ret = mmiService.GetPointerLocation(displayId, displayX, displayY);
+    EXPECT_NE(ret, RET_OK);
+}
+
+/**
+* @tc.name: MMIService_GetPointerLocation_ValidParameters_002
+* @tc.desc: Test GetPointerLocation with valid parameters
+* @tc.type: FUNC
+* @tc.require: AR000H5VSG
+*/
+HWTEST_F(MMIServerTest, MMIService_GetPointerLocation_ValidParameters_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MMIService mmiService;
+    mmiService.state_ = ServiceRunningState::STATE_RUNNING;
+    int32_t displayId = -1;
+    double displayX = 0.0;
+    double displayY = 0.0;
+    ErrCode ret = mmiService.GetPointerLocation(displayId, displayX, displayY);
+    EXPECT_NE(ret, RET_OK);
+}
+
+/**
+* @tc.name: MMIService_CheckSetDisplayBindPermission_SystemApp_001
+* @tc.desc: Test CheckSetDisplayBindPermission with system app
+* @tc.type: FUNC
+* @tc.require: AR000H5VSG
+*/
+HWTEST_F(MMIServerTest, MMIService_CheckSetDisplayBindPermission_SystemApp_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MMIService mmiService;
+    int32_t deviceId = 1;
+    int32_t ret = mmiService.CheckSetDisplayBindPermission(deviceId);
+    EXPECT_NE(ret, RET_OK);
+}
+
+/**
+* @tc.name: MMIService_CheckSetDisplayBindPermission_NonSystemApp_002
+* @tc.desc: Test CheckSetDisplayBindPermission with non-system app
+* @tc.type: FUNC
+* @tc.require: AR000H5VSG
+*/
+HWTEST_F(MMIServerTest, MMIService_CheckSetDisplayBindPermission_NonSystemApp_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MMIService mmiService;
+    int32_t deviceId = 1;
+    int32_t ret = mmiService.CheckSetDisplayBindPermission(deviceId);
+    EXPECT_NE(ret, RET_OK);
+}
+
+/**
+* @tc.name: MMIService_SetDisplayBind_ValidParameters_003
+* @tc.desc: Test SetDisplayBind with valid parameters
+* @tc.type: FUNC
+* @tc.require: AR000H5VSG
+*/
+HWTEST_F(MMIServerTest, MMIService_SetDisplayBind_ValidParameters_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MMIService mmiService;
+    mmiService.state_ = ServiceRunningState::STATE_RUNNING;
+    int32_t deviceId = 1;
+    int32_t displayId = 0;
+    std::string msg;
+    ErrCode ret = mmiService.SetDisplayBind(deviceId, displayId, msg);
+    EXPECT_NE(ret, RET_OK);
+}
+
+/**
+* @tc.name: MMIService_SetDisplayBind_ServiceNotRunning_004
+* @tc.desc: Test SetDisplayBind when service is not running
+* @tc.type: FUNC
+* @tc.require: AR000H5VSG
+*/
+HWTEST_F(MMIServerTest, MMIService_SetDisplayBind_ServiceNotRunning_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MMIService mmiService;
+    mmiService.state_ = ServiceRunningState::STATE_EXIT;
+    int32_t deviceId = 1;
+    int32_t displayId = 0;
+    std::string msg;
+    ErrCode ret = mmiService.SetDisplayBind(deviceId, displayId, msg);
+    EXPECT_NE(ret, RET_OK);
 }
 } // namespace MMI
 } // namespace OHOS

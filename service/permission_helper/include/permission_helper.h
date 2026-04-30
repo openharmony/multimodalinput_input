@@ -52,6 +52,7 @@ public:
     bool CheckInputDeviceController();
     bool CheckFunctionKeyEnabled();
     bool CheckManageEdmPolicy();
+    bool CheckInputDeviceCfg();
 
 private:
     PermissionHelper() {}

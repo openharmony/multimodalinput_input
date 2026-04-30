@@ -1875,5 +1875,23 @@ int32_t ServerMsgHandler::EnableInputExtension(int32_t uid, const std::string &u
 
     return RET_OK;
 }
+
+bool ServerMsgHandler::IsApplicationType(int32_t pid)
+{
+    CALL_INFO_TRACE;
+    AppExecFwk::RunningProcessInfo processInfo;
+    auto appMgrClient = DelayedSingleton<AppExecFwk::AppMgrClient>::GetInstance();
+    CHKPF(appMgrClient);
+    int32_t ret = appMgrClient->GetRunningProcessInfoByPid(pid, processInfo);
+    if (ret != ERR_OK) {
+        MMI_HILOGE("Failed to get process info, pid:%{public}d, ret:%{public}d", pid, ret);
+        return false;
+    }
+    if (processInfo.extensionType_ != AppExecFwk::ExtensionAbilityType::DRIVER) {
+        MMI_HILOGW("Application is not DRIVER type");
+        return false;
+    }
+    return true;
+}
 } // namespace MMI
 } // namespace OHOS

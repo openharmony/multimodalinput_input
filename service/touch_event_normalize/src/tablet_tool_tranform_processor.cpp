@@ -776,7 +776,7 @@ bool TabletToolTransformProcessor::CalculateCalibratedTipPoint(struct libinput_e
         return CalculateWithCalibration(tabletEvent, targetDisplayId, coord);
     }
     MMI_HILOGD("Independent tablet (INPUT_PROP_DIRECT), use original CalculateTipPoint");
-    return WIN_MGR->CalculateTipPoint(tabletEvent, targetDisplayId, coord, pointerItem);
+    return WIN_MGR->CalculateTipPoint(tabletEvent, targetDisplayId, coord, pointerItem, deviceId_);
 }
 
 bool TabletToolTransformProcessor::IsScreenChanged(int32_t currentDisplayId) const
