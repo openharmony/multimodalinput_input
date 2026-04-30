@@ -6285,6 +6285,11 @@ int32_t MMIService::RedispatchInputEventInner(std::shared_ptr<PointerEvent> poin
     switch (pointerEvent->GetSourceType()) {
 #ifdef OHOS_BUILD_ENABLE_TOUCH
         case PointerEvent::SOURCE_TYPE_TOUCHSCREEN: {
+            PointerEvent::PointerItem pointerItem;
+            if (pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), pointerItem)) {
+                pointerItem.SetTargetWindowId(-1);
+                pointerEvent->UpdatePointerItem(pointerEvent->GetPointerId(), pointerItem);
+            }
             TouchRedispatchStore::Guard guard(pointerEvent);
             WIN_MGR->UpdateTargetPointer(pointerEvent);
             if (WIN_MGR->AbandonTouchRedispatch(pointerEvent)) {
