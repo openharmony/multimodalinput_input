@@ -17,6 +17,7 @@
 
 #include <string>
 
+#include "error_multimodal.h"
 #include "input_manager.h"
 #include "ipc_skeleton.h"
 #include "js_mouse_controller.h"
@@ -33,18 +34,105 @@ namespace MMI {
 
 namespace {
 
-napi_value CreateBusinessError(napi_env env, int32_t code, const std::string& msg)
+constexpr const char* CONTROL_DEVICE_PERMISSION = "ohos.permission.CONTROL_DEVICE";
+
+enum class MouseControllerOperation {
+    CREATE,
+    MOVE_TO,
+    PRESS_BUTTON,
+    RELEASE_BUTTON,
+    BEGIN_AXIS,
+    UPDATE_AXIS,
+    END_AXIS,
+};
+
+const char* GetMouseControllerActionName(MouseControllerOperation operation)
+{
+    switch (operation) {
+        case MouseControllerOperation::CREATE:
+            return "create MouseController";
+        case MouseControllerOperation::MOVE_TO:
+            return "move mouse cursor";
+        case MouseControllerOperation::PRESS_BUTTON:
+            return "press mouse button";
+        case MouseControllerOperation::RELEASE_BUTTON:
+            return "release mouse button";
+        case MouseControllerOperation::BEGIN_AXIS:
+            return "begin axis event";
+        case MouseControllerOperation::UPDATE_AXIS:
+            return "update axis event";
+        case MouseControllerOperation::END_AXIS:
+            return "end axis event";
+        default:
+            return "unknown operation";
+    }
+}
+
+int32_t NormalizeControllerErrorCode(int32_t code)
+{
+    if (code == ERROR_NO_PERMISSION) {
+        return COMMON_PERMISSION_CHECK_ERROR;
+    }
+    if (code == CAPABILITY_NOT_SUPPORTED) {
+        return INPUT_DEVICE_NOT_SUPPORTED;
+    }
+    if (code == ERROR_NOT_SYSAPI) {
+        return COMMON_USE_SYSAPI_ERROR;
+    }
+    return code;
+}
+
+std::string MakePermissionErrorMsg(int32_t code, MouseControllerOperation operation)
+{
+    NapiError codeMsg;
+    if (!UtilNapiError::GetApiError(code, codeMsg)) {
+        return "Permission denied.";
+    }
+    char msg[300] = {};
+    int32_t ret = sprintf_s(msg, sizeof(msg), codeMsg.msg.c_str(),
+        GetMouseControllerActionName(operation), CONTROL_DEVICE_PERMISSION);
+    if (ret <= 0) {
+        return codeMsg.msg;
+    }
+    return msg;
+}
+
+std::string GetControllerErrorMsg(int32_t code, MouseControllerOperation operation)
+{
+    if (code == COMMON_PERMISSION_CHECK_ERROR) {
+        return MakePermissionErrorMsg(code, operation);
+    }
+    NapiError codeMsg;
+    if (UtilNapiError::GetApiError(code, codeMsg)) {
+        return codeMsg.msg;
+    }
+    if (UtilNapiError::GetApiError(INPUT_SERVICE_EXCEPTION, codeMsg)) {
+        return codeMsg.msg;
+    }
+    return "Input service exception.";
+}
+
+napi_value CreateBusinessError(napi_env env, int32_t code, MouseControllerOperation operation)
 {
     napi_value businessError = nullptr;
     napi_value errorCode = nullptr;
     napi_value errorMsg = nullptr;
 
-    napi_create_int32(env, code, &errorCode);
+    int32_t normalizedCode = NormalizeControllerErrorCode(code);
+    std::string msg = GetControllerErrorMsg(normalizedCode, operation);
+
+    napi_create_int32(env, normalizedCode, &errorCode);
     napi_create_string_utf8(env, msg.c_str(), NAPI_AUTO_LENGTH, &errorMsg);
     napi_create_error(env, nullptr, errorMsg, &businessError);
     napi_set_named_property(env, businessError, "code", errorCode);
 
     return businessError;
+}
+
+void ThrowControllerError(napi_env env, int32_t code, MouseControllerOperation operation)
+{
+    napi_value businessError = CreateBusinessError(env, code, operation);
+    napi_throw(env, businessError);
 }
 
 } // namespace
@@ -57,7 +145,7 @@ napi_value CreateMouseController(napi_env env, napi_callback_info info)
     int32_t ret = InputManager::GetInstance()->CheckMouseControllerPermission();
     if (ret != RET_OK) {
         MMI_HILOGE("CheckMouseControllerPermission failed, ret=%{public}d", ret);
-        THROWERR_CUSTOM(env, ret, "Permission check failed");
+        ThrowControllerError(env, ret, MouseControllerOperation::CREATE);
         return nullptr;
     }
 
@@ -202,7 +290,7 @@ napi_value MouseControllerMoveTo(napi_env env, napi_callback_info info)
             return nullptr;
         }
     } else {
-        napi_value error = CreateBusinessError(env, result, "MoveTo failed");
+        napi_value error = CreateBusinessError(env, result, MouseControllerOperation::MOVE_TO);
         status = napi_reject_deferred(env, deferred, error);
         if (status != napi_ok) {
             MMI_HILOGE("REJECT_DEFERRED failed");
@@ -269,7 +357,7 @@ napi_value MouseControllerPressButton(napi_env env, napi_callback_info info)
             return nullptr;
         }
     } else {
-        napi_value error = CreateBusinessError(env, result, "PressButton failed");
+        napi_value error = CreateBusinessError(env, result, MouseControllerOperation::PRESS_BUTTON);
         status = napi_reject_deferred(env, deferred, error);
         if (status != napi_ok) {
             MMI_HILOGE("REJECT_DEFERRED failed");
@@ -335,7 +423,7 @@ napi_value MouseControllerReleaseButton(napi_env env, napi_callback_info info)
             return nullptr;
         }
     } else {
-        napi_value error = CreateBusinessError(env, result, "ReleaseButton failed");
+        napi_value error = CreateBusinessError(env, result, MouseControllerOperation::RELEASE_BUTTON);
         status = napi_reject_deferred(env, deferred, error);
         if (status != napi_ok) {
             MMI_HILOGE("REJECT_DEFERRED failed");
@@ -407,7 +495,7 @@ napi_value MouseControllerBeginAxis(napi_env env, napi_callback_info info)
             return nullptr;
         }
     } else {
-        napi_value error = CreateBusinessError(env, result, "BeginAxis failed");
+        napi_value error = CreateBusinessError(env, result, MouseControllerOperation::BEGIN_AXIS);
         status = napi_reject_deferred(env, deferred, error);
         if (status != napi_ok) {
             MMI_HILOGE("REJECT_DEFERRED failed");
@@ -479,7 +567,7 @@ napi_value MouseControllerUpdateAxis(napi_env env, napi_callback_info info)
             return nullptr;
         }
     } else {
-        napi_value error = CreateBusinessError(env, result, "UpdateAxis failed");
+        napi_value error = CreateBusinessError(env, result, MouseControllerOperation::UPDATE_AXIS);
         status = napi_reject_deferred(env, deferred, error);
         if (status != napi_ok) {
             MMI_HILOGE("REJECT_DEFERRED failed");
@@ -545,7 +633,7 @@ napi_value MouseControllerEndAxis(napi_env env, napi_callback_info info)
             return nullptr;
         }
     } else {
-        napi_value error = CreateBusinessError(env, result, "EndAxis failed");
+        napi_value error = CreateBusinessError(env, result, MouseControllerOperation::END_AXIS);
         status = napi_reject_deferred(env, deferred, error);
         if (status != napi_ok) {
             MMI_HILOGE("REJECT_DEFERRED failed");

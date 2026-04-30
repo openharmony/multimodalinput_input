@@ -17,6 +17,7 @@
 
 #include <string>
 
+#include "error_multimodal.h"
 #include "input_manager.h"
 #include "ipc_skeleton.h"
 #include "js_keyboard_controller.h"
@@ -33,18 +34,93 @@ namespace MMI {
 
 namespace {
 
-napi_value CreateBusinessError(napi_env env, int32_t code, const std::string& msg)
+constexpr const char* CONTROL_DEVICE_PERMISSION = "ohos.permission.CONTROL_DEVICE";
+
+enum class KeyboardControllerOperation {
+    CREATE,
+    PRESS_KEY,
+    RELEASE_KEY,
+};
+
+const char* GetKeyboardControllerActionName(KeyboardControllerOperation operation)
+{
+    switch (operation) {
+        case KeyboardControllerOperation::CREATE:
+            return "create KeyboardController";
+        case KeyboardControllerOperation::PRESS_KEY:
+            return "press key";
+        case KeyboardControllerOperation::RELEASE_KEY:
+            return "release key";
+        default:
+            return "unknown operation";
+    }
+}
+
+int32_t NormalizeControllerErrorCode(int32_t code)
+{
+    if (code == ERROR_NO_PERMISSION) {
+        return COMMON_PERMISSION_CHECK_ERROR;
+    }
+    if (code == CAPABILITY_NOT_SUPPORTED) {
+        return INPUT_DEVICE_NOT_SUPPORTED;
+    }
+    if (code == ERROR_NOT_SYSAPI) {
+        return COMMON_USE_SYSAPI_ERROR;
+    }
+    return code;
+}
+
+std::string MakePermissionErrorMsg(int32_t code, KeyboardControllerOperation operation)
+{
+    NapiError codeMsg;
+    if (!UtilNapiError::GetApiError(code, codeMsg)) {
+        return "Permission denied.";
+    }
+    char msg[300] = {};
+    int32_t ret = sprintf_s(msg, sizeof(msg), codeMsg.msg.c_str(),
+        GetKeyboardControllerActionName(operation), CONTROL_DEVICE_PERMISSION);
+    if (ret <= 0) {
+        return codeMsg.msg;
+    }
+    return msg;
+}
+
+std::string GetControllerErrorMsg(int32_t code, KeyboardControllerOperation operation)
+{
+    if (code == COMMON_PERMISSION_CHECK_ERROR) {
+        return MakePermissionErrorMsg(code, operation);
+    }
+    NapiError codeMsg;
+    if (UtilNapiError::GetApiError(code, codeMsg)) {
+        return codeMsg.msg;
+    }
+    if (UtilNapiError::GetApiError(INPUT_SERVICE_EXCEPTION, codeMsg)) {
+        return codeMsg.msg;
+    }
+    return "Input service exception.";
+}
+
+napi_value CreateBusinessError(napi_env env, int32_t code, KeyboardControllerOperation operation)
 {
     napi_value businessError = nullptr;
     napi_value errorCode = nullptr;
     napi_value errorMsg = nullptr;
 
-    napi_create_int32(env, code, &errorCode);
+    int32_t normalizedCode = NormalizeControllerErrorCode(code);
+    std::string msg = GetControllerErrorMsg(normalizedCode, operation);
+
+    napi_create_int32(env, normalizedCode, &errorCode);
     napi_create_string_utf8(env, msg.c_str(), NAPI_AUTO_LENGTH, &errorMsg);
     napi_create_error(env, nullptr, errorMsg, &businessError);
     napi_set_named_property(env, businessError, "code", errorCode);
 
     return businessError;
+}
+
+void ThrowControllerError(napi_env env, int32_t code, KeyboardControllerOperation operation)
+{
+    napi_value businessError = CreateBusinessError(env, code, operation);
+    napi_throw(env, businessError);
 }
 
 } // namespace
@@ -57,7 +133,7 @@ napi_value CreateKeyboardController(napi_env env, napi_callback_info info)
     int32_t ret = InputManager::GetInstance()->CheckKeyboardControllerPermission();
     if (ret != RET_OK) {
         MMI_HILOGE("CheckKeyboardControllerPermission failed, ret=%{public}d", ret);
-        THROWERR_CUSTOM(env, ret, "Permission check failed");
+        ThrowControllerError(env, ret, KeyboardControllerOperation::CREATE);
         return nullptr;
     }
 
@@ -187,7 +263,7 @@ napi_value KeyboardControllerPressKey(napi_env env, napi_callback_info info)
             return nullptr;
         }
     } else {
-        napi_value error = CreateBusinessError(env, result, "PressKey failed");
+        napi_value error = CreateBusinessError(env, result, KeyboardControllerOperation::PRESS_KEY);
         status = napi_reject_deferred(env, deferred, error);
         if (status != napi_ok) {
             MMI_HILOGE("REJECT_DEFERRED failed");
@@ -257,7 +333,7 @@ napi_value KeyboardControllerReleaseKey(napi_env env, napi_callback_info info)
             return nullptr;
         }
     } else {
-        napi_value error = CreateBusinessError(env, result, "ReleaseKey failed");
+        napi_value error = CreateBusinessError(env, result, KeyboardControllerOperation::RELEASE_KEY);
         status = napi_reject_deferred(env, deferred, error);
         if (status != napi_ok) {
             MMI_HILOGE("REJECT_DEFERRED failed");
