@@ -1090,7 +1090,7 @@ int32_t InputPlugin::CalculateTipPoint(libinput_event *event, int32_t &displayId
         MMI_HILOGE("get WIN_MGR failed");
         return RET_ERR;
     }
-    return WIN_MGR->CalculateTipPoint(toolEvent, displayId, coord, item);
+    return WIN_MGR->CalculateTipPoint(toolEvent, displayId, coord, item, deviceId);
 }
 
 void InputPlugin::SetMouseAccelerateMotionSwitch(libinput_event *event, bool enable)
