@@ -11485,6 +11485,58 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_DumpDisplayInfo_001, T
 }
 
 /**
+ * @tc.name: InputWindowsManagerTest_DumpWindowsInfo_001
+ * @tc.desc: Test DumpWindowsInfo
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_DumpWindowsInfo_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager manager;
+    WindowInfo windowInfo1;
+    windowInfo1.id = 1;
+    windowInfo1.pid = 100;
+    windowInfo1.uid = 200;
+    windowInfo1.area = {0, 0, 800, 600};
+    windowInfo1.defaultHotAreas = {{10, 10, 100, 100}, {200, 200, 50, 50}};
+    windowInfo1.pointerHotAreas = {{30, 30, 150, 150}, {400, 400, 70, 70}};
+    windowInfo1.agentWindowId = 10;
+    windowInfo1.flags = 1;
+    windowInfo1.displayId = 3;
+    windowInfo1.zOrder = 4.0f;
+    windowInfo1.pointerChangeAreas = {10, 20, 30};
+    windowInfo1.transform = {1.0f, 2.0f, 3.0f};
+
+    WindowInfo windowInfo2;
+    windowInfo2.id = 2;
+    windowInfo2.pid = 101;
+    windowInfo2.uid = 201;
+    windowInfo2.area = {800, 600, 1024, 768};
+    windowInfo2.defaultHotAreas = {{50, 50, 200, 200}, {600, 600, 100, 100}};
+    windowInfo2.pointerHotAreas = {{70, 70, 250, 250}, {800, 800, 120, 120}};
+    windowInfo2.agentWindowId = 20;
+    windowInfo2.flags = 2;
+    windowInfo2.displayId = 4;
+    windowInfo2.zOrder = 5.0f;
+    windowInfo2.pointerChangeAreas = {40, 50, 60};
+    windowInfo2.transform = {4.0f, 5.0f, 6.0f};
+
+    std::vector<WindowInfo> windowsInfo = {windowInfo1, windowInfo2};
+    auto fd = tmpfile();
+    ASSERT_NE(fd, nullptr);
+    manager.DumpWindowsInfo(fileno(fd), windowsInfo);
+    fclose(fd);
+    EXPECT_EQ(windowsInfo.size(), 2);
+    windowInfo1.uiExtentionWindowInfo.push_back(windowInfo2);
+    auto fdTmp = tmpfile();
+    ASSERT_NE(fdTmp, nullptr);
+    manager.DumpWindowsInfo(fileno(fdTmp), windowsInfo);
+    fclose(fdTmp);
+    EXPECT_EQ(windowsInfo.size(), 2);
+}
+
+/**
  * @tc.name: InputWindowsManagerTest_PrintZorderInfo_001
  * @tc.desc: Test PrintZorderInfo
  * @tc.type: FUNC
