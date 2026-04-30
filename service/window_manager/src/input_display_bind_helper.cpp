@@ -575,7 +575,7 @@ int32_t InputDisplayBindHelper::GetDisplayBindInfo(DisplayBindInfos &infos)
 int32_t InputDisplayBindHelper::SetDisplayBind(int32_t deviceId, int32_t displayId, std::string &msg)
 {
     CALL_DEBUG_ENTER;
-    MMI_HILOGD("Param: deviceId:%{public}d, displayId:%{public}d", deviceId, displayId);
+    MMI_HILOGI("Param: deviceId:%{public}d, displayId:%{public}d", deviceId, displayId);
     if ((deviceId == -1) || (displayId == -1)) {
         msg = "The deviceId or displayId is invalid";
         MMI_HILOGE("%s", msg.c_str());
@@ -591,16 +591,26 @@ int32_t InputDisplayBindHelper::SetDisplayBind(int32_t deviceId, int32_t display
     BindInfo bindByDisplay;
     for (const auto &item : infos_->GetInfos()) {
         if (item.GetInputDeviceId() == deviceId) {
+            MMI_HILOGD("InputDeviceId:%{public}d", bindByDevice.GetInputDeviceId());
             bindByDevice = item;
         }
         if (item.GetDisplayId() == displayId) {
+            MMI_HILOGD("item.GetDisplayId():%{public}d", item.GetDisplayId());
             bindByDisplay = item;
         }
     }
     if (bindByDevice.GetInputDeviceId() == -1) {
-        msg = "The deviceId is invalid";
-        MMI_HILOGE("%s", msg.c_str());
-        return RET_ERR;
+        auto device = INPUT_DEV_MGR->GetInputDevice(deviceId);
+        if (device != nullptr) {
+            BindInfo newDevice;
+            newDevice.AddInputDevice(deviceId, "", device->GetName());
+            bindByDevice = newDevice;
+            MMI_HILOGI("bindByDevice:%{public}d", bindByDevice.GetInputDeviceId());
+        } else {
+            msg = "The deviceId is invalid";
+            MMI_HILOGE("%s", msg.c_str());
+            return RET_ERR;
+        }
     }
     if (bindByDisplay.GetDisplayId() == -1) {
         msg = "The displayId is invalid";

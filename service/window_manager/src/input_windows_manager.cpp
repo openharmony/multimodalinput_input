@@ -1022,6 +1022,7 @@ int32_t InputWindowsManager::GetDisplayBindInfo(DisplayBindInfos &infos)
 int32_t InputWindowsManager::SetDisplayBind(int32_t deviceId, int32_t displayId, std::string &msg)
 {
     CALL_DEBUG_ENTER;
+    MMI_HILOGI("deviceId:%{public}d, displayId:%{public}d", deviceId, displayId);
     return bindInfo_.SetDisplayBind(deviceId, displayId, msg);
 }
 
@@ -3352,15 +3353,24 @@ bool InputWindowsManager::TouchPointToDisplayPoint(int32_t deviceId, struct libi
 }
 
 bool InputWindowsManager::TransformTipPoint(struct libinput_event_tablet_tool* tip,
-    PhysicalCoordinate& coord, int32_t& displayId, PointerEvent::PointerItem& pointerItem)
+    PhysicalCoordinate& coord, int32_t& displayId, PointerEvent::PointerItem& pointerItem, int32_t deviceId)
 {
     CHKPF(tip);
     auto displayInfo = FindPhysicalDisplayInfo("default0");
+    auto device = INPUT_DEV_MGR->GetInputDevice(deviceId);
+    if (device != nullptr && device->HasCapability(InputDeviceCapability::INPUT_DEV_CAP_TABLET_TOOL)) {
+        std::string screenId = bindInfo_.GetBindDisplayNameByInputDevice(deviceId);
+        MMI_HILOGD("Tablet tool device, screenId:%{public}s", screenId.c_str());
+        if (!screenId.empty()) {
+            displayInfo = FindPhysicalDisplayInfo(screenId);
+        }
+    }
     CHKPF(displayInfo);
     MMI_HILOGD("PhysicalDisplay.width:%{public}d, PhysicalDisplay.height:%{public}d, "
-               "PhysicalDisplay.topLeftX:%{private}d, PhysicalDisplay.topLeftY:%{private}d, "
-               "PhysicalDisplay.expandHeight:%{public}d",
-               displayInfo->width, displayInfo->height, displayInfo->x, displayInfo->y, displayInfo->expandHeight);
+                "PhysicalDisplay.topLeftX:%{private}d, PhysicalDisplay.topLeftY:%{private}d, "
+                "PhysicalDisplay.expandHeight:%{public}d, displayId:%{public}d",
+                displayInfo->width, displayInfo->height, displayInfo->x,
+                displayInfo->y, displayInfo->expandHeight, displayInfo->id);
     displayId = displayInfo->id;
     auto width = displayInfo->width;
     auto height = displayInfo->height;
@@ -3391,10 +3401,11 @@ bool InputWindowsManager::TransformTipPoint(struct libinput_event_tablet_tool* t
 }
 
 bool InputWindowsManager::CalculateTipPoint(struct libinput_event_tablet_tool* tip,
-    int32_t& targetDisplayId, PhysicalCoordinate& coord, PointerEvent::PointerItem& pointerItem)
+    int32_t& targetDisplayId, PhysicalCoordinate& coord,
+    PointerEvent::PointerItem& pointerItem, int32_t deviceId)
 {
     CHKPF(tip);
-    return TransformTipPoint(tip, coord, targetDisplayId, pointerItem);
+    return TransformTipPoint(tip, coord, targetDisplayId, pointerItem, deviceId);
 }
 
 const OLD::DisplayGroupInfo InputWindowsManager::GetDisplayGroupInfo(int32_t groupId)
