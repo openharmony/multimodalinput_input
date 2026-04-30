@@ -2025,5 +2025,51 @@ void InputDeviceManager::SetSpecialVirtualDevice(std::shared_ptr<InputDevice> in
         }
     }
 }
+
+int32_t InputDeviceManager::GetDeviceBusType(int32_t deviceId, int32_t &busType)
+{
+    CALL_DEBUG_ENTER;
+    auto iter = inputDevice_.find(deviceId);
+    if (iter == inputDevice_.end()) {
+        MMI_HILOGE("Failed to search for the device");
+        return COMMON_PARAMETER_ERROR;
+    }
+
+    if (!iter->second.enable) {
+        MMI_HILOGE("The current device has been disabled");
+        return RET_ERR;
+    }
+
+    struct libinput_device *inputDeviceOrigin = iter->second.inputDeviceOrigin;
+    CHKPR(inputDeviceOrigin, ERROR_NULL_POINTER);
+
+    busType = static_cast<int32_t>(libinput_device_get_id_bustype(inputDeviceOrigin));
+    MMI_HILOGI("Device bus type: %{public}d", busType);
+    return RET_OK;
+}
+
+std::string InputDeviceManager::GetDeviceConnectionType(int32_t deviceId)
+{
+    CALL_DEBUG_ENTER;
+    int32_t busType = 0;
+    int32_t ret = GetDeviceBusType(deviceId, busType);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Failed to get device bus type");
+        return "UNKNOWN";
+    }
+
+    switch (busType) {
+        case BUS_USB:
+            return "USB";
+        case BUS_BLUETOOTH:
+            return "BLUETOOTH";
+        case BUS_I2C:
+            return "I2C";
+        case BUS_SPI:
+            return "SPI";
+        default:
+            return "OTHER";
+    }
+}
 } // namespace MMI
 } // namespace OHOS

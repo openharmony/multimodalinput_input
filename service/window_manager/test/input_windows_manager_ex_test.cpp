@@ -593,9 +593,11 @@ HWTEST_F(InputWindowsManagerTest, TransformTipPoint_001, TestSize.Level1)
     libinput_event_tablet_tool event {};
     PhysicalCoordinate coord;
     int32_t displayId;
+    int32_t deviceId = 1;
     PointerEvent::PointerItem pointerItem {};
     pointerItem.SetToolType(PointerEvent::TOOL_TYPE_PEN);
-    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->TransformTipPoint(&event, coord, displayId, pointerItem));
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->TransformTipPoint(&event,
+        coord, displayId, pointerItem, deviceId));
     it->second.displaysInfo.clear();
 }
 
@@ -623,9 +625,11 @@ HWTEST_F(InputWindowsManagerTest, TransformTipPoint_002, TestSize.Level1)
     libinput_event_tablet_tool event {};
     PhysicalCoordinate coord;
     int32_t displayId;
+    int32_t deviceId = 1;
     PointerEvent::PointerItem pointerItem {};
     pointerItem.SetToolType(PointerEvent::TOOL_TYPE_PEN);
-    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->TransformTipPoint(&event, coord, displayId, pointerItem));
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->TransformTipPoint(&event,
+        coord, displayId, pointerItem, deviceId));
     it->second.displaysInfo.clear();
 }
 
@@ -652,9 +656,11 @@ HWTEST_F(InputWindowsManagerTest, TransformTipPoint_003, TestSize.Level1)
     libinput_event_tablet_tool event {};
     PhysicalCoordinate coord;
     int32_t displayId;
+    int32_t deviceId = 1;
     PointerEvent::PointerItem pointerItem {};
     pointerItem.SetToolType(PointerEvent::TOOL_TYPE_PEN);
-    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->TransformTipPoint(&event, coord, displayId, pointerItem));
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->TransformTipPoint(&event,
+        coord, displayId, pointerItem, deviceId));
     it->second.displaysInfo.clear();
 }
 
@@ -677,9 +683,10 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_TransformTipPoint_004,
     coord.x = 5.5;
     coord.y = 3.2;
     int32_t displayId = 2;
+    int32_t deviceId = 5;
     PointerEvent::PointerItem pointerItem {};
     pointerItem.SetToolType(PointerEvent::TOOL_TYPE_PEN);
-    bool ret = inputWindowsManager->TransformTipPoint(&event, coord, displayId, pointerItem);
+    bool ret = inputWindowsManager->TransformTipPoint(&event, coord, displayId, pointerItem, deviceId);
     EXPECT_FALSE(ret);
 }
 
@@ -702,9 +709,10 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_TransformTipPoint_005,
     coord.x = 6.5;
     coord.y = 8.2;
     int32_t displayId = 3;
+    int32_t deviceId = 5;
     PointerEvent::PointerItem pointerItem {};
     pointerItem.SetToolType(PointerEvent::TOOL_TYPE_PEN);
-    bool ret = inputWindowsManager->TransformTipPoint(&event, coord, displayId, pointerItem);
+    bool ret = inputWindowsManager->TransformTipPoint(&event, coord, displayId, pointerItem, deviceId);
     EXPECT_FALSE(ret);
 }
 
@@ -727,9 +735,10 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_TransformTipPoint_006,
     coord.x = 6.5;
     coord.y = 8.2;
     int32_t displayId = 3;
+    int32_t deviceId = 5;
     PointerEvent::PointerItem pointerItem {};
     pointerItem.SetToolType(PointerEvent::TOOL_TYPE_PEN);
-    bool ret = inputWindowsManager->TransformTipPoint(&event, coord, displayId, pointerItem);
+    bool ret = inputWindowsManager->TransformTipPoint(&event, coord, displayId, pointerItem, deviceId);
     EXPECT_FALSE(ret);
 }
 
@@ -953,9 +962,11 @@ HWTEST_F(InputWindowsManagerTest, CalculateTipPoint_001, TestSize.Level1)
     libinput_event_tablet_tool event {};
     PhysicalCoordinate coord;
     int32_t displayId;
+    int32_t deviceId = 1;
     PointerEvent::PointerItem pointerItem {};
     pointerItem.SetToolType(PointerEvent::TOOL_TYPE_PEN);
-    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->CalculateTipPoint(&event, displayId, coord, pointerItem));
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->CalculateTipPoint(&event,
+        displayId, coord, pointerItem, deviceId));
 }
 
 /**
@@ -981,9 +992,11 @@ HWTEST_F(InputWindowsManagerTest, CalculateTipPoint_002, TestSize.Level1)
     libinput_event_tablet_tool event {};
     PhysicalCoordinate coord;
     int32_t displayId;
+    int32_t deviceId = 1;
     PointerEvent::PointerItem pointerItem {};
     pointerItem.SetToolType(PointerEvent::TOOL_TYPE_PEN);
-    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->CalculateTipPoint(&event, displayId, coord, pointerItem));
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->CalculateTipPoint(&event,
+        displayId, coord, pointerItem, deviceId));
     it->second.displaysInfo.clear();
 }
 
@@ -1005,11 +1018,12 @@ HWTEST_F(InputWindowsManagerTest, CalculateTipPoint_003, TestSize.Level1)
     PhysicalCoordinate coord;
     coord.x = 3.5;
     coord.y = 5.2;
+    int32_t deviceId = 1;
     PointerEvent::PointerItem pointerItem {};
     pointerItem.SetToolType(PointerEvent::TOOL_TYPE_PEN);
-    bool result = inputWindowsManager->TransformTipPoint(&event, coord, targetDisplayId, pointerItem);
+    bool result = inputWindowsManager->TransformTipPoint(&event, coord, targetDisplayId, pointerItem, deviceId);
     EXPECT_FALSE(result);
-    bool ret = inputWindowsManager->CalculateTipPoint(&event, targetDisplayId, coord, pointerItem);
+    bool ret = inputWindowsManager->CalculateTipPoint(&event, targetDisplayId, coord, pointerItem, deviceId);
     EXPECT_FALSE(ret);
 }
 

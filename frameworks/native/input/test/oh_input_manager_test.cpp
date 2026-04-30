@@ -6131,5 +6131,32 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_InjectTouchEvent_Pressu
     int32_t ret = OH_Input_InjectTouchEvent(&touchEvent);
     EXPECT_EQ(ret, INPUT_SUCCESS);
 }
+
+/**
+ * @tc.name: OHInputManagerTest_OH_Input_BindInputDeviceToDisplay_001
+ * @tc.desc: Test OH_Input_BindInputDeviceToDisplay
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_BindInputDeviceToDisplay_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t inputDeviceId = 1;
+    int32_t displayId = -1;
+    EXPECT_EQ(OH_Input_BindInputDeviceToDisplay(inputDeviceId, displayId), INPUT_PARAMETER_ERROR);
+}
+
+/**
+ * @tc.name: OHInputManagerTest_OH_Input_BindInputDeviceToDisplay_002
+ * @tc.desc: Test OH_Input_BindInputDeviceToDisplay
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_BindInputDeviceToDisplay_002, TestSize.Level1)
+{
+    int32_t inputDeviceId = -1;
+    int32_t displayId = 1;
+    EXPECT_EQ(OH_Input_BindInputDeviceToDisplay(inputDeviceId, displayId), INPUT_PARAMETER_ERROR);
+}
 } // namespace MMI
 } // namespace OHOS

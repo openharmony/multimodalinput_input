@@ -166,6 +166,7 @@ public:
     bool IsLocalDevice(int32_t deviceId);
     void SetIsDeviceReportEvent(int32_t deviceId, bool isReportEvent);
     bool GetIsDeviceReportEvent(int32_t deviceId);
+    std::string GetDeviceConnectionType(int32_t deviceId);
 
 private:
     int32_t ParseDeviceId(struct libinput_device *inputDevice);
@@ -212,6 +213,7 @@ private:
     void RemoveInputDeviceFromPhysicalDevice(int32_t deviceId, const std::string& physicalId);
     void UpdateInputDeviceCaps(int32_t deviceId);
     void CheckInputDeviceCaps(int32_t deviceId);
+    int32_t GetDeviceBusType(int32_t deviceId, int32_t &busType);
 
 private:
     std::map<int32_t, struct InputDeviceInfo> inputDevice_;

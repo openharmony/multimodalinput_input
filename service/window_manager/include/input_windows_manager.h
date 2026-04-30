@@ -196,10 +196,10 @@ public:
     void RotateDisplayScreen(const OLD::DisplayInfo& info, PhysicalCoordinate& coord);
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 #ifdef OHOS_BUILD_ENABLE_TOUCH
-    bool TransformTipPoint(struct libinput_event_tablet_tool* tip, PhysicalCoordinate& coord, int32_t& displayId,
-        PointerEvent::PointerItem& pointerItem);
-    bool CalculateTipPoint(struct libinput_event_tablet_tool* tip,
-        int32_t& targetDisplayId, PhysicalCoordinate& coord, PointerEvent::PointerItem& pointerItem);
+    bool TransformTipPoint(struct libinput_event_tablet_tool* tip, PhysicalCoordinate& coord,
+        int32_t& displayId, PointerEvent::PointerItem& pointerItem, int32_t deviceId);
+    bool CalculateTipPoint(struct libinput_event_tablet_tool* tip, int32_t& targetDisplayId,
+        PhysicalCoordinate& coord, PointerEvent::PointerItem& pointerItem, int32_t deviceId);
     const OLD::DisplayInfo *GetDefaultDisplayInfo() const;
     void ReverseXY(int32_t &x, int32_t &y);
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
