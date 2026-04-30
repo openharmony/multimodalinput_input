@@ -6289,6 +6289,10 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
             infos[deviceId] = {};
         }
         infos[deviceId][pointerId] = windowInfoEX;
+        if (touchRedispatchStore_.IsActive()) {
+            touchRedispatchStore_.SetFingerActive(pointerEvent->GetZOrder(),
+                pointerEvent->GetDeviceId(), pointerEvent->GetPointerId(), pointerEvent);
+        }
         MMI_HILOGD("PointerId:%{public}d, touchWindow:%{public}d", pointerId, touchWindow->id);
     } else if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_PULL_UP) {
         MMI_HILOG_DISPATCHD("Clear extra data");
@@ -6722,11 +6726,6 @@ void InputWindowsManager::UpdateStashTouchEventInfo(int32_t logicalX, int32_t lo
     }
     LastTouch touch{
         .deviceId_ = pointerEvent->GetDeviceId(), .pointerId_ = pointerEvent->GetPointerId()};
-    if (touchRedispatchStore_.IsActive()) {
-        touchRedispatchStore_.SetFingerActive(pointerEvent->GetZOrder(),
-            pointerEvent->GetDeviceId(),
-            pointerEvent->GetPointerId(), pointerEvent);
-    }
     LastTouchInfo lastInfo = GetLastTouchInfo(pointerEvent);
     lastInfo.lastTouchLogicX = logicalX;
     lastInfo.lastTouchLogicY = logicalY;
