@@ -17,6 +17,7 @@
 
 #include <fstream>
 
+#include "input_device_manager.h"
 #include "parameters.h"
 #include "util.h"
 
