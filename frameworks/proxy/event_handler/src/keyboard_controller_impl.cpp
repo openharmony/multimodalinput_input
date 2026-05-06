@@ -46,18 +46,18 @@ KeyboardControllerImpl::~KeyboardControllerImpl()
     // Note: Copy the vector because we'll be modifying pressedKeys_
     std::vector<int32_t> keysToRelease = pressedKeys_;
     for (int32_t keyCode : keysToRelease) {
-        MMI_HILOGW("Auto-releasing key %{public}d in destructor", keyCode);
+        MMI_HILOGW("Auto-releasing key %{private}d in destructor", keyCode);
 
         // Directly create and inject KEY_UP event (bypass state validation)
         auto keyEvent = CreateKeyEvent(KeyEvent::KEY_ACTION_UP, keyCode);
         if (keyEvent != nullptr) {
             int32_t ret = InjectKeyEvent(keyEvent);
             if (ret != RET_OK) {
-                MMI_HILOGE("Failed to auto-release key %{public}d, ret=%{public}d", keyCode, ret);
+                MMI_HILOGE("Failed to auto-release key %{private}d, ret=%{public}d", keyCode, ret);
                 // Continue trying to release other keys
             }
         } else {
-            MMI_HILOGE("Failed to create key event for key %{public}d", keyCode);
+            MMI_HILOGE("Failed to create key event for key %{private}d", keyCode);
         }
 
         // Remove from state regardless of injection result (force cleanup)
@@ -89,7 +89,7 @@ int32_t KeyboardControllerImpl::PressKey(int32_t keyCode)
         if (it != pressedKeys_.end()) {
             // Key already pressed, check if it's the last pressed key
             if (pressedKeys_.back() != keyCode) {
-                MMI_HILOGE("Key %{public}d already pressed but not last pressed key", keyCode);
+                MMI_HILOGE("key %{private}d already pressed but not last pressed key", keyCode);
                 return ERROR_CODE_KEY_STATE_ERROR;
             }
             // Allow repeating the last pressed key (for recording/playback scenario)
@@ -149,7 +149,7 @@ int32_t KeyboardControllerImpl::ReleaseKey(int32_t keyCode)
         // 1. Check if key is pressed
         it = std::find(pressedKeys_.begin(), pressedKeys_.end(), keyCode);
         if (it == pressedKeys_.end()) {
-            MMI_HILOGE("Key %{public}d not pressed", keyCode);
+            MMI_HILOGE("key %{private}d not pressed", keyCode);
             return ERROR_CODE_KEY_STATE_ERROR;
         }
 
@@ -218,10 +218,10 @@ std::shared_ptr<KeyEvent> KeyboardControllerImpl::CreateKeyEvent(int32_t action,
             // For KEY_DOWN, the current key is in pressedKeys_ and already added
             // For KEY_UP, the current key is still in pressedKeys_ but being released
             if (action == KeyEvent::KEY_ACTION_DOWN) {
-                MMI_HILOGD("Skip adding key %{public}d to pressedKeys (already in KeyItem for KEY_DOWN)", keyCode);
+                MMI_HILOGD("Skip adding key %{private}d to pressedKeys (already in KeyItem for KEY_DOWN)", keyCode);
                 continue;  // Already added via AddKeyItem
             } else {
-                MMI_HILOGD("Skip adding key %{public}d to pressedKeys (being released in KEY_UP)", keyCode);
+                MMI_HILOGD("Skip adding key %{private}d to pressedKeys (being released in KEY_UP)", keyCode);
                 continue;  // Don't add the key being released to pressed keys
             }
         }

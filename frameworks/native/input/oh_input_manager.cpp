@@ -3764,3 +3764,25 @@ Input_Result OH_Input_GetCursorInfo(Input_CursorInfo* cursorInfo, OH_PixelmapNat
     }
     return INPUT_SUCCESS;
 }
+
+Input_Result OH_Input_BindInputDeviceToDisplay(int32_t inputDeviceId, int32_t displayId)
+{
+    if (inputDeviceId < 0 || displayId < 0) {
+        MMI_HILOGE("Incorrect peripheral ID");
+        return INPUT_PARAMETER_ERROR;
+    }
+    std::string cppMsg;
+    int32_t ret = OHOS::MMI::InputManager::GetInstance()->SetDisplayBind(inputDeviceId, displayId, cppMsg);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Failed to call function SetDisplayBind, error:%{public}d", ret);
+        switch (ret) {
+            case OHOS::MMI::ERROR_NO_PERMISSION:
+                return INPUT_PERMISSION_DENIED;
+            case OHOS::MMI::MMISERVICE_NOT_RUNNING:
+                return INPUT_SERVICE_EXCEPTION;
+            default:
+                return INPUT_PARAMETER_ERROR;
+        }
+    }
+    return INPUT_SUCCESS;
+}

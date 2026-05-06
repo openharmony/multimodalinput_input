@@ -99,7 +99,8 @@ public:
     int32_t ClearWindowPointerStyle(int32_t pid, int32_t windowId);
     void Dump(int32_t fd, const std::vector<std::string> &args);
     void DumpDisplayInfo(int32_t fd, const std::vector<OLD::DisplayInfo>& displaysInfo);
-    void DumpWindowInfo(int32_t fd, const std::vector<WindowInfo> windowsInfo);
+    void DumpWindowsInfo(int32_t fd, const std::vector<WindowInfo>& windowsInfo);
+    void DumpWindowInfo(int32_t fd, const WindowInfo &item);
     int32_t GetWindowPid(int32_t windowId, const std::vector<WindowInfo> &windowsInfo) const;
     int32_t GetWindowPid(int32_t windowId) const;
     int32_t GetWindowAgentPid(int32_t windowId) const;
@@ -195,10 +196,10 @@ public:
     void RotateDisplayScreen(const OLD::DisplayInfo& info, PhysicalCoordinate& coord);
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 #ifdef OHOS_BUILD_ENABLE_TOUCH
-    bool TransformTipPoint(struct libinput_event_tablet_tool* tip, PhysicalCoordinate& coord, int32_t& displayId,
-        PointerEvent::PointerItem& pointerItem);
-    bool CalculateTipPoint(struct libinput_event_tablet_tool* tip,
-        int32_t& targetDisplayId, PhysicalCoordinate& coord, PointerEvent::PointerItem& pointerItem);
+    bool TransformTipPoint(struct libinput_event_tablet_tool* tip, PhysicalCoordinate& coord,
+        int32_t& displayId, PointerEvent::PointerItem& pointerItem, int32_t deviceId);
+    bool CalculateTipPoint(struct libinput_event_tablet_tool* tip, int32_t& targetDisplayId,
+        PhysicalCoordinate& coord, PointerEvent::PointerItem& pointerItem, int32_t deviceId);
     const OLD::DisplayInfo *GetDefaultDisplayInfo() const;
     void ReverseXY(int32_t &x, int32_t &y);
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
@@ -621,6 +622,7 @@ private:
     std::map<int32_t, std::map<int32_t, WindowInfoEX>> touchItemDownInfos_;
     std::map<int32_t, std::map<int32_t, WindowInfoEX>> thpFeatureTouchDownInfos_;
     std::map<int32_t, std::map<int32_t, WindowInfoEX>> touchItemDownInfosMap_;
+    std::map<int32_t, std::map<int32_t, WindowInfoEX>> ancoTouchDownInfos_;
     std::map<int32_t, std::vector<Rect>> windowsHotAreas_;
     std::map<int32_t, std::map<int32_t, std::vector<Rect>>> windowsHotAreasMap_;
     struct WindowPartInfo {

@@ -13,40 +13,30 @@
  * limitations under the License.
  */
 
-#ifndef KEYBOARD_CONTROLLER_IMPL_H
-#define KEYBOARD_CONTROLLER_IMPL_H
+#ifndef JS_TOUCH_CONTROLLER_H
+#define JS_TOUCH_CONTROLLER_H
 
-#include <map>
 #include <memory>
-#include <mutex>
-#include <vector>
 
-#include "key_event.h"
+#include "touch_controller_impl.h"
 
 namespace OHOS {
 namespace MMI {
 
-class KeyboardControllerImpl {
+class JsTouchController {
 public:
-    KeyboardControllerImpl();
-    ~KeyboardControllerImpl();
+    explicit JsTouchController(std::shared_ptr<TouchControllerImpl> impl);
+    ~JsTouchController() = default;
 
-    int32_t PressKey(int32_t keyCode);
-    int32_t ReleaseKey(int32_t keyCode);
+    int32_t TouchDown(int32_t id, int32_t displayId, int32_t displayX, int32_t displayY);
+    int32_t TouchMove(int32_t id, int32_t displayId, int32_t displayX, int32_t displayY);
+    int32_t TouchUp(int32_t id, int32_t displayId, int32_t displayX, int32_t displayY);
 
 private:
-    std::shared_ptr<KeyEvent> CreateKeyEvent(int32_t action, int32_t keyCode);
-    int32_t InjectKeyEvent(std::shared_ptr<KeyEvent> event);
-
-    std::vector<int32_t> pressedKeys_;
-    std::map<int32_t, int64_t> keyDownTimes_;
-
-    mutable std::mutex mutex_;
-
-    static constexpr size_t MAX_PRESSED_KEYS = 5;
+    std::shared_ptr<TouchControllerImpl> impl_;
 };
 
 } // namespace MMI
 } // namespace OHOS
 
-#endif // KEYBOARD_CONTROLLER_IMPL_H
+#endif // JS_TOUCH_CONTROLLER_H

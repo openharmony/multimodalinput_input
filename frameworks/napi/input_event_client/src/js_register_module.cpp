@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2025 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -23,6 +23,7 @@
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
 #include "util_napi_error.h"
 #include "js_mouse_controller_napi.h"
+#include "js_touch_controller_napi.h"
 #include "js_keyboard_controller_napi.h"
 
 #undef MMI_LOG_TAG
@@ -883,6 +884,7 @@ static napi_value MmiInit(napi_env env, napi_value exports)
         DECLARE_NAPI_FUNCTION("injectJoystickEvent", InjectJoystickEvent),
         DECLARE_NAPI_FUNCTION("permitInjection", PermitInjection),
         DECLARE_NAPI_FUNCTION("createMouseController", CreateMouseController),
+        DECLARE_NAPI_FUNCTION("createTouchController", CreateTouchController),
         DECLARE_NAPI_FUNCTION("createKeyboardController", CreateKeyboardController),
     };
     if ((napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc)) != napi_ok) {

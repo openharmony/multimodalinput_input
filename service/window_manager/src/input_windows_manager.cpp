@@ -1022,6 +1022,7 @@ int32_t InputWindowsManager::GetDisplayBindInfo(DisplayBindInfos &infos)
 int32_t InputWindowsManager::SetDisplayBind(int32_t deviceId, int32_t displayId, std::string &msg)
 {
     CALL_DEBUG_ENTER;
+    MMI_HILOGI("deviceId:%{public}d, displayId:%{public}d", deviceId, displayId);
     return bindInfo_.SetDisplayBind(deviceId, displayId, msg);
 }
 
@@ -3352,15 +3353,24 @@ bool InputWindowsManager::TouchPointToDisplayPoint(int32_t deviceId, struct libi
 }
 
 bool InputWindowsManager::TransformTipPoint(struct libinput_event_tablet_tool* tip,
-    PhysicalCoordinate& coord, int32_t& displayId, PointerEvent::PointerItem& pointerItem)
+    PhysicalCoordinate& coord, int32_t& displayId, PointerEvent::PointerItem& pointerItem, int32_t deviceId)
 {
     CHKPF(tip);
     auto displayInfo = FindPhysicalDisplayInfo("default0");
+    auto device = INPUT_DEV_MGR->GetInputDevice(deviceId);
+    if (device != nullptr && device->HasCapability(InputDeviceCapability::INPUT_DEV_CAP_TABLET_TOOL)) {
+        std::string screenId = bindInfo_.GetBindDisplayNameByInputDevice(deviceId);
+        MMI_HILOGD("Tablet tool device, screenId:%{public}s", screenId.c_str());
+        if (!screenId.empty()) {
+            displayInfo = FindPhysicalDisplayInfo(screenId);
+        }
+    }
     CHKPF(displayInfo);
     MMI_HILOGD("PhysicalDisplay.width:%{public}d, PhysicalDisplay.height:%{public}d, "
-               "PhysicalDisplay.topLeftX:%{private}d, PhysicalDisplay.topLeftY:%{private}d, "
-               "PhysicalDisplay.expandHeight:%{public}d",
-               displayInfo->width, displayInfo->height, displayInfo->x, displayInfo->y, displayInfo->expandHeight);
+                "PhysicalDisplay.topLeftX:%{private}d, PhysicalDisplay.topLeftY:%{private}d, "
+                "PhysicalDisplay.expandHeight:%{public}d, displayId:%{public}d",
+                displayInfo->width, displayInfo->height, displayInfo->x,
+                displayInfo->y, displayInfo->expandHeight, displayInfo->id);
     displayId = displayInfo->id;
     auto width = displayInfo->width;
     auto height = displayInfo->height;
@@ -3391,10 +3401,11 @@ bool InputWindowsManager::TransformTipPoint(struct libinput_event_tablet_tool* t
 }
 
 bool InputWindowsManager::CalculateTipPoint(struct libinput_event_tablet_tool* tip,
-    int32_t& targetDisplayId, PhysicalCoordinate& coord, PointerEvent::PointerItem& pointerItem)
+    int32_t& targetDisplayId, PhysicalCoordinate& coord,
+    PointerEvent::PointerItem& pointerItem, int32_t deviceId)
 {
     CHKPF(tip);
-    return TransformTipPoint(tip, coord, targetDisplayId, pointerItem);
+    return TransformTipPoint(tip, coord, targetDisplayId, pointerItem, deviceId);
 }
 
 const OLD::DisplayGroupInfo InputWindowsManager::GetDisplayGroupInfo(int32_t groupId)
@@ -5572,6 +5583,10 @@ void InputWindowsManager::ClearPointerDeviceId(const std::shared_ptr<PointerEven
         }
         if (pointerItem.GetToolType() == PointerEvent::TOOL_TYPE_THP_FEATURE) {
             ErasePointerDeviceId(pointerEvent, thpFeatureTouchDownInfos_);
+#ifdef OHOS_BUILD_ENABLE_ANCO
+        } else if (pointerEvent->GetAncoDeal()) {
+            ErasePointerDeviceId(pointerEvent, ancoTouchDownInfos_);
+#endif // OHOS_BUILD_ENABLE_ANCO
         } else {
             ErasePointerDeviceId(pointerEvent, touchItemDownInfos_);
         }
@@ -5807,8 +5822,14 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
             return RET_ERR;
         }
         auto it = tmpWindowInfo[pointerEvent->GetDeviceId()].find(pointerId);
+
+        auto outerIter = ancoTouchDownInfos_.find(pointerEvent->GetDeviceId());
+        bool foundInAnco = true;
+        if (outerIter != ancoTouchDownInfos_.end()) {
+            foundInAnco = (outerIter->second.find(pointerId) == outerIter->second.end());
+        }
         if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHSCREEN) {
-            if (it == tmpWindowInfo[pointerEvent->GetDeviceId()].end() ||
+            if ((it == tmpWindowInfo[pointerEvent->GetDeviceId()].end() && foundInAnco) ||
                 pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_DOWN) {
                 int32_t originPointerAction = pointerEvent->GetPointerAction();
                 pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_CANCEL);
@@ -5922,9 +5943,13 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
         int32_t focusWindowId = GetFocusWindowId(groupId);
         if (focusWindowId == touchWindow->id) {
             pointerEvent->SetAgentWindowId(touchWindow->agentWindowId);
+            if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_DOWN ||
+                pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_HOVER_ENTER) {
+                auto& deviceMap = ancoTouchDownInfos_[pointerEvent->GetDeviceId()];
+                deviceMap[pointerId] = WindowInfoEX{ *touchWindow, true };
+            }
             return RET_OK;
         }
-        pointerEvent->SetAncoDeal(false);
     }
 #endif // OHOS_BUILD_ENABLE_ANCO
     if (touchWindow->windowInputType == WindowInputType::MIX_LEFT_RIGHT_ANTI_AXIS_MOVE) {
@@ -7550,53 +7575,61 @@ void InputWindowsManager::DumpDisplayInfo(int32_t fd, const std::vector<OLD::Dis
     }
 }
 
-void InputWindowsManager::DumpWindowInfo(int32_t fd, const std::vector<WindowInfo> windowsInfo)
+void InputWindowsManager::DumpWindowsInfo(int32_t fd, const std::vector<WindowInfo>& windowsInfo)
 {
     mprintf(fd, "  windowsInfos: num:%zu\n", windowsInfo.size());
     for (const auto &item : windowsInfo) {
-        mprintf(fd, "  windowsInfos: id:%d | pid:%d | uid:%d | area.x:%d | area.y:%d "
-            "| area.width:%d | area.height:%d | defaultHotAreas.size:%zu "
-            "| pointerHotAreas.size:%zu | agentWindowId:%d | flags:%u "
-            "| action:%d | displayId:%d | groupId:%d | zOrder:%f | Privacy:%d | Type:%d \t",
-            item.id, item.pid, item.uid, item.area.x, item.area.y, item.area.width,
-            item.area.height, item.defaultHotAreas.size(), item.pointerHotAreas.size(),
-            item.agentWindowId, item.flags, item.action, item.displayId, item.groupId, item.zOrder,
-            item.isSkipSelfWhenShowOnVirtualScreen, static_cast<int32_t>(item.windowInputType));
-        for (const auto &win : item.defaultHotAreas) {
-            mprintf(fd, "\t defaultHotAreas: x:%d | y:%d | width:%d | height:%d \t",
-                    win.x, win.y, win.width, win.height);
+        DumpWindowInfo(fd, item);
+        for (const auto &uiExtentionWindow : item.uiExtentionWindowInfo) {
+            DumpWindowInfo(fd, uiExtentionWindow);
         }
-        for (const auto &pointer : item.pointerHotAreas) {
-            mprintf(fd, "\t pointerHotAreas: x:%d | y:%d | width:%d | height:%d \t",
-                    pointer.x, pointer.y, pointer.width, pointer.height);
-        }
+    }
+}
 
-        std::string dump;
-        dump += StringPrintf("\t pointerChangeAreas: ");
-        for (const auto &it : item.pointerChangeAreas) {
-            dump += StringPrintf("%d | ", it);
-        }
-        dump += StringPrintf("\n\t transform: ");
-        for (const auto &it : item.transform) {
-            dump += StringPrintf("%f | ", it);
-        }
-        std::istringstream stream(dump);
-        std::string line;
-        while (std::getline(stream, line, '\n')) {
-            mprintf(fd, "%s\n", line.c_str());
-        }
+void InputWindowsManager::DumpWindowInfo(int32_t fd, const WindowInfo &item)
+{
+    mprintf(fd, "  windowsInfos: id:%d | pid:%d | uid:%d | area.x:%d | area.y:%d "
+        "| area.width:%d | area.height:%d | defaultHotAreas.size:%zu "
+        "| pointerHotAreas.size:%zu | agentWindowId:%d | flags:%u "
+        "| action:%d | displayId:%d | groupId:%d | zOrder:%f | Privacy:%d | Type:%d \t",
+        item.id, item.pid, item.uid, item.area.x, item.area.y, item.area.width,
+        item.area.height, item.defaultHotAreas.size(), item.pointerHotAreas.size(),
+        item.agentWindowId, item.flags, item.action, item.displayId, item.groupId, item.zOrder,
+        item.isSkipSelfWhenShowOnVirtualScreen, static_cast<int32_t>(item.windowInputType));
+    for (const auto &win : item.defaultHotAreas) {
+        mprintf(fd, "\t defaultHotAreas: x:%d | y:%d | width:%d | height:%d \t",
+                win.x, win.y, win.width, win.height);
+    }
+    for (const auto &pointer : item.pointerHotAreas) {
+        mprintf(fd, "\t pointerHotAreas: x:%d | y:%d | width:%d | height:%d \t",
+                pointer.x, pointer.y, pointer.width, pointer.height);
+    }
+
+    std::string dump;
+    dump += StringPrintf("\t pointerChangeAreas: ");
+    for (const auto &it : item.pointerChangeAreas) {
+        dump += StringPrintf("%d | ", it);
+    }
+    dump += StringPrintf("\n\t transform: ");
+    for (const auto &it : item.transform) {
+        dump += StringPrintf("%f | ", it);
+    }
+    std::istringstream stream(dump);
+    std::string line;
+    while (std::getline(stream, line, '\n')) {
+        mprintf(fd, "%s\n", line.c_str());
     }
 }
 
 void InputWindowsManager::Dump(int32_t fd, const std::vector<std::string> &args)
 {
     CALL_DEBUG_ENTER;
-    #ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
+#ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
     auto proxy = POINTER_DEV_MGR.GetDelegateProxy();
     if (proxy != nullptr) {
         CursorDrawingComponent::GetInstance().SetDelegateProxy(proxy);
     }
-    #endif  // OHOS_BUILD_ENABLE_POINTER_DRAWING
+#endif  // OHOS_BUILD_ENABLE_POINTER_DRAWING
     std::shared_ptr<DelegateInterface> delegateProxy =
         CursorDrawingComponent::GetInstance().GetDelegateProxy();
     CHKPV(delegateProxy);
@@ -7611,7 +7644,7 @@ void InputWindowsManager::Dump(int32_t fd, const std::vector<std::string> &args)
         mprintf(fd, "Windows of displayGroupInfoMap information:\t");
         mprintf(fd, "windowsInfos,,groupId:%d,mainDisplayId:%d,num:%zu",
             iterm.first, iterm.second.mainDisplayId, iterm.second.windowsInfo.size());
-        DumpWindowInfo(fd, iterm.second.windowsInfo);
+        DumpWindowsInfo(fd, iterm.second.windowsInfo);
         DumpDisplayInfo(fd, iterm.second.displaysInfo);
         mprintf(fd, "Input device and display bind info:\n%s", bindInfo_.Dumps().c_str());
     }
@@ -7627,7 +7660,7 @@ void InputWindowsManager::Dump(int32_t fd, const std::vector<std::string> &args)
         mprintf(fd, "windowsInfos,groupId:%d\t", it.first);
         for (const auto &iter : it.second) {
             mprintf(fd, "  windowsInfos,displayId:%d,num:%zu\t", iter.first, iter.second.windowsInfo.size());
-            DumpWindowInfo(fd, iter.second.windowsInfo);
+            DumpWindowsInfo(fd, iter.second.windowsInfo);
         }
     }
 #ifdef OHOS_BUILD_ENABLE_ANCO

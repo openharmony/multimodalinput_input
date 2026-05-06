@@ -161,6 +161,7 @@ void TabletToolTransformProcessor::SendTipUpEvent()
     if (inputChannel != nullptr) {
         LogTracer lt(pointerEvent_->GetId(), pointerEvent_->GetEventType(), pointerEvent_->GetPointerAction());
         inputChannel->HandlePointerEvent(pointerEvent_);
+        DrawTouchGraphic();
     }
 
     isPressed_ = false;
@@ -191,6 +192,7 @@ void TabletToolTransformProcessor::SendProximityOutEvent()
     if (inputChannel != nullptr) {
         LogTracer lt(pointerEvent_->GetId(), pointerEvent_->GetEventType(), pointerEvent_->GetPointerAction());
         inputChannel->HandlePointerEvent(pointerEvent_);
+        DrawTouchGraphic();
     }
 
     isProximity_ = false;
@@ -774,7 +776,7 @@ bool TabletToolTransformProcessor::CalculateCalibratedTipPoint(struct libinput_e
         return CalculateWithCalibration(tabletEvent, targetDisplayId, coord);
     }
     MMI_HILOGD("Independent tablet (INPUT_PROP_DIRECT), use original CalculateTipPoint");
-    return WIN_MGR->CalculateTipPoint(tabletEvent, targetDisplayId, coord, pointerItem);
+    return WIN_MGR->CalculateTipPoint(tabletEvent, targetDisplayId, coord, pointerItem, deviceId_);
 }
 
 bool TabletToolTransformProcessor::IsScreenChanged(int32_t currentDisplayId) const

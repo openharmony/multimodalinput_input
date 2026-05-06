@@ -42,7 +42,7 @@ constexpr int32_t BOOLEAN_FALSE { 0 };
 constexpr int32_t BOOLEAN_NONE { -1 };
 constexpr uint32_t DEFAULT_REFERENCE_COUNT { 1 };
 constexpr int32_t TRIGGER_TYPE_NOT_SET { 0 };
-constexpr int32_t TRIGGER_TYPE_MIN { 0 };
+constexpr int32_t TRIGGER_TYPE_MIN { 1 };
 constexpr int32_t TRIGGER_TYPE_MAX { 3 };
 constexpr size_t KEY_COMMAND_CALLBACK_ARGC { 2 };
 constexpr size_t ON_KEY_COMMAND_MIN_PARAMS { 2 };
@@ -348,7 +348,7 @@ static bool ParseTriggerTypeParameter(napi_env env, napi_value argv, std::shared
     }
     int32_t triggerType = tempTriggerType.value();
     if (triggerType < TRIGGER_TYPE_MIN || triggerType > TRIGGER_TYPE_MAX) {
-        MMI_HILOGE("triggerType:%{public}d is invalid, must be 0-3", triggerType);
+        MMI_HILOGE("triggerType:%{public}d is invalid, must be [1, 3]", triggerType);
         return false;
     }
     keyOption->SetTriggerType(triggerType);
@@ -701,8 +701,6 @@ static void OnKeyTriggerCallback(std::shared_ptr<KeyEvent> keyEvent, std::shared
         MMI_HILOGI("Event should not be dispatched");
         return;
     }
-
-    MMI_HILOGI("KC:%{public}d", keyEvent->GetKeyCode());
 
     // Generate subscribe key and find callback
     std::string subscribeKey = GenerateKeyOptionKey(keyOption);

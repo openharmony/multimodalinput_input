@@ -123,17 +123,18 @@ int32_t MouseControllerImpl::MoveTo(int32_t displayId, int32_t x, int32_t y)
 
         pointerEvent->SetTargetDisplayId(displayId);
 
-        int64_t downTime = !buttonDownTimes_.empty() ? buttonDownTimes_.begin()->second : -1;
-
-        PointerEvent::PointerItem item = CreatePointerItem();
-        item.SetDownTime(downTime);
-        pointerEvent->AddPointerItem(item);
-
         for (const auto& [button, pressed] : buttonStates_) {
             if (pressed) {
                 pointerEvent->SetButtonPressed(button);
             }
         }
+        PointerEvent::PointerItem item = CreatePointerItem();
+        int64_t downTime = !buttonDownTimes_.empty() ? buttonDownTimes_.begin()->second : -1;
+        item.SetDownTime(downTime);
+        if (auto buttons = pointerEvent->GetPressedButtons(); !buttons.empty()) {
+            item.SetPressed(true);
+        }
+        pointerEvent->AddPointerItem(item);
     }
 
     return InjectPointerEvent(pointerEvent);
@@ -271,6 +272,8 @@ int32_t MouseControllerImpl::BeginAxis(int32_t axis, int32_t value)
     if (ret != RET_OK) {
         std::lock_guard<std::mutex> lock(mutex_);
         axisState_.inProgress = false;
+        axisState_.axisType = -1;
+        axisState_.lastValue = 0;
     }
 
     return ret;
@@ -351,7 +354,7 @@ int32_t MouseControllerImpl::EndAxis(int32_t axis)
     }
 
     int32_t ret = InjectPointerEvent(pointerEvent);
-    if (ret == RET_OK) {
+    {
         std::lock_guard<std::mutex> lock(mutex_);
         axisState_.inProgress = false;
         axisState_.axisType = -1;

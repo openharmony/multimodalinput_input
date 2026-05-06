@@ -113,6 +113,9 @@ public:
         int32_t useCoordinate);
     int32_t InjectTouchPadEvent(std::shared_ptr<PointerEvent> pointerEvent, const TouchpadCDG &touchpadCDG,
         bool isNativeInject);
+#ifdef OHOS_BUILD_ENABLE_CONTROLLER_INJECT
+    int32_t CreateTouchController();
+#endif // OHOS_BUILD_ENABLE_CONTROLLER_INJECT
     int32_t CreateMouseController();
     int32_t CreateKeyboardController();
     int32_t SetAnrObserver();
@@ -229,12 +232,17 @@ private:
     void Clean(const wptr<IRemoteObject> &remoteObj);
     void NotifyServiceDeath();
     void NotifyDeath();
+    void OnServiceDiedCallback();
+    void CacheDisplayBindRelationship(int32_t deviceId, int32_t displayId);
+
     sptr<IMultimodalInputConnect> multimodalInputConnectService_ { nullptr };
     sptr<IRemoteObject::DeathRecipient> multimodalInputConnectRecipient_ { nullptr };
     int32_t socketFd_ { MultimodalInputConnectManager::INVALID_SOCKET_FD };
     int32_t tokenType_ { -1 };
     std::mutex lock_;
     std::set<std::shared_ptr<IInputServiceWatcher>> watchers_;
+    std::mutex displayBindMutex;
+    std::unordered_map<int32_t, int32_t> displayBindCache;
 };
 } // namespace MMI
 } // namespace OHOS

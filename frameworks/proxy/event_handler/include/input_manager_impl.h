@@ -135,6 +135,7 @@ public:
 
     int32_t CheckMouseControllerPermission();
     int32_t CheckKeyboardControllerPermission();
+    int32_t CheckTouchControllerPermission();
 
     void OnConnected();
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
@@ -289,6 +290,7 @@ public:
 
     std::shared_ptr<class MouseControllerImpl> CreateMouseController();
     std::shared_ptr<class KeyboardControllerImpl> CreateKeyboardController();
+    int32_t CreateTouchController(std::shared_ptr<class TouchControllerImpl> &controller);
 
 private:
     int32_t PackScreensInfo(NetPacket &pkt, const std::vector<ScreenInfo>& screens);
@@ -350,7 +352,6 @@ private:
     std::shared_ptr<AppExecFwk::EventHandler> eventHandler_ { nullptr };
     std::shared_ptr<PointerEvent> lastPointerEvent_ { nullptr };
     std::function<void(int32_t, int32_t)> windowStatecallback_;
-    bool knuckleSwitch_ { true };
     UserScreenInfo userScreenInfo_ = {0};
     std::atomic_int32_t currentUserId_ { -1 };
 #ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT

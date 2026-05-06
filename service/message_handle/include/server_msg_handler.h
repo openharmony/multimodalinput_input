@@ -151,6 +151,7 @@ public:
     int32_t OnTransferBinderClientSrv(const sptr<IRemoteObject> &binderClientObject, int32_t pid);
     int32_t RegisterWindowStateErrorCallback(SessionPtr sess, NetPacket &pkt);
     int32_t EnableInputExtension(int32_t uid, const std::string &uuid, bool enabled);
+    bool IsApplicationType(int32_t pid);
 
 protected:
     int32_t OnRegisterMsgHandler(SessionPtr sess, NetPacket& pkt);

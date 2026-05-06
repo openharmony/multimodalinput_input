@@ -37,6 +37,7 @@
 #include "util.h"
 #include "setting_datashare.h"
 #include "system_ability_definition.h"
+#include "cursor_drawing_component.h"
 
 #undef MMI_LOG_DOMAIN
 #define MMI_LOG_DOMAIN MMI_LOG_SERVER
@@ -536,8 +537,35 @@ void InputPluginManager::OnPluginLoaded(const std::string &uuid, std::shared_ptr
 {
     MMI_HILOGI("Dynamic plugin %{private}s loaded successfully", uuid.c_str());
     AddPluginToStages(plugin);
+    AddCallbackToPlugin(plugin);
     dynamicPlugins_[uuid] = plugin;
     PrintPlugins();
+}
+
+void InputPluginManager::AddCallbackToPlugin(const std::shared_ptr<IPluginContext> &cPin)
+{
+    if (cPin == nullptr) {
+        MMI_HILOGE("cPin is null");
+        return;
+    }
+    auto iPin = cPin->GetPlugin();
+    if (iPin == nullptr) {
+        MMI_HILOGE("iPin is null");
+        return;
+    }
+    for (const auto& stage : iPin->GetStages()) {
+        if (stage != InputPluginStage::INPUT_BEFORE_LIBINPUT_ADAPTER_ON_EVENT) {
+            continue;
+        }
+        auto funInputEvent = [](void *event, int64_t frameTime) { InputHandler->OnEvent(event, frameTime); };
+        auto callback = [funInputEvent](PluginEventType pluginEvent, int64_t frameTime) {
+            auto event = std::get_if<libinput_event*>(&pluginEvent);
+            if (!event) return;
+            funInputEvent(static_cast<void *>(*event), frameTime);
+        };
+        cPin->SetCallback(callback);
+        return;
+    }
 }
 
 int32_t InputPluginManager::UnloadDynamicPlugin(int32_t uid, const std::string &uuid)
@@ -896,6 +924,18 @@ InputPlugin::InputPlugin(void *handle)
 InputPlugin::~InputPlugin()
 {
     // LCOV_EXCL_START
+    // Cleanup all observers before destruction
+    {
+        std::lock_guard<std::mutex> lock(observersMutex_);
+        for (auto& [id, entry] : observers_) {
+            if (entry.observer != nullptr && IsDataShareReady()) {
+                auto& settingHelper = SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID);
+                settingHelper.UnregisterObserver(entry.observer, entry.uri);
+            }
+        }
+        observers_.clear();
+    }
+
     if (handle_ != nullptr) {
         dlclose(handle_);
         handle_ = nullptr;
@@ -1027,90 +1067,101 @@ bool InputPlugin::UnRegisterCommonEventCallback(int32_t callbackId)
     return ACCOUNT_MGR->UnRegisterCommonEventCallback(callbackId);
 }
 
-bool InputPlugin::GetSettingValue(const std::string& uri,
-                                  const std::string& key,
-                                  std::string& value)
+bool InputPlugin::GetSettingValue(const std::string& uri, const std::string& key, std::string& value)
 {
-    // Validate parameters
     if (uri.empty() || key.empty()) {
         MMI_HILOGE("Invalid parameters: uri or key is empty");
         return false;
     }
-
-    // Directly use SettingDataShare to get string value
+    if (!IsDataShareReady()) {
+        MMI_HILOGE("DatsShare is not ready");
+        return false;
+    }
     auto& settingHelper = SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID);
     ErrCode ret = settingHelper.GetStringValue(key, value, uri);
     if (ret != ERR_OK) {
         MMI_HILOGW("Failed to get setting value for key: %{public}s, ret=%{public}d", key.c_str(), ret);
         return false;
     }
-
     return true;
 }
 
-sptr<SettingObserver> InputPlugin::RegisterSettingObserver(
-    const std::string& uri,
-    const std::string& key,
-    SettingObserver::UpdateFunc callback)
+int32_t InputPlugin::RegisterSettingObserver(const std::string& uri, const std::string& key,
+    std::function<void(const std::string&)> callback)
 {
     // Validate parameters
     if (uri.empty() || key.empty() || !callback) {
-        MMI_HILOGE("Invalid parameters");
-        return nullptr;
+        MMI_HILOGE("Invalid parameters: uri or key is empty, or callback is null");
+        return static_cast<int32_t>(ObserverError::INVALID_PARAM);
     }
-
     MMI_HILOGI("Plugin '%{public}s' registering observer: uri=%{public}s, key=%{public}s",
                name_.c_str(), uri.c_str(), key.c_str());
-
-    // Create and register observer
+    if (!IsDataShareReady()) {
+        MMI_HILOGE("DatsShare is not ready");
+        return RET_ERR;
+    }
+    // Create observer
     auto& settingHelper = SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID);
     sptr<SettingObserver> observer = settingHelper.CreateObserver(key, callback);
     if (observer == nullptr) {
-        MMI_HILOGE("Failed to create observer");
-        return nullptr;
+        MMI_HILOGE("Failed to create observer for key: %{public}s", key.c_str());
+        return static_cast<int32_t>(ObserverError::CREATE_FAILED);
     }
 
+    // Register observer with DataShare
     ErrCode ret = settingHelper.RegisterObserver(observer, uri);
     if (ret != ERR_OK) {
-        MMI_HILOGE("Failed to register observer, error=%{public}d", ret);
-        return nullptr;
+        MMI_HILOGE("Failed to register observer with DataShare, error=%{public}d", ret);
+        return static_cast<int32_t>(ObserverError::REGISTER_FAILED);
     }
-
-    // Track observer for lifecycle management
+    int32_t observerId;
     {
         std::lock_guard<std::mutex> lock(observersMutex_);
-        observers_.push_back(observer);
+
+        if (nextObserverId_ < 0) {
+            MMI_HILOGW("Observer ID overflow detected, resetting to 1");
+            nextObserverId_ = 1;
+        }
+        observerId = nextObserverId_++;
+        observers_[observerId] = {observer, uri};
     }
 
-    return observer;
+    MMI_HILOGI("Plugin '%{public}s' registered observer successfully, ID=%{public}d",
+               name_.c_str(), observerId);
+    return observerId;
 }
 
-bool InputPlugin::UnregisterSettingObserver(const std::string& uri,
-                                            sptr<SettingObserver> observer)
+bool InputPlugin::UnregisterSettingObserver(int32_t observerId)
 {
-    if (uri.empty() || observer == nullptr) {
-        MMI_HILOGE("Invalid parameters");
+    if (observerId < 0) {
+        MMI_HILOGE("Invalid observer ID: %{public}d", observerId);
         return false;
+    }
+    if (!IsDataShareReady()) {
+        MMI_HILOGE("DatsShare is not ready");
+        return false;
+    }
+    ObserverEntry entry;
+    {
+        std::lock_guard<std::mutex> lock(observersMutex_);
+        auto it = observers_.find(observerId);
+        if (it == observers_.end()) {
+            MMI_HILOGW("Observer ID not found: %{public}d", observerId);
+            return false;
+        }
+        entry = it->second;
+        observers_.erase(it);
     }
 
     auto& settingHelper = SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID);
-    ErrCode ret = settingHelper.UnregisterObserver(observer, uri);
-
+    ErrCode ret = settingHelper.UnregisterObserver(entry.observer, entry.uri);
     if (ret != ERR_OK) {
-        MMI_HILOGW("Failed to unregister observer, error=%{public}d", ret);
+        MMI_HILOGW("Failed to unregister observer ID=%{public}d from DataShare, error=%{public}d",
+                   observerId, ret);
         return false;
     }
-
-    // Remove from tracking list
-    {
-        std::lock_guard<std::mutex> lock(observersMutex_);
-        auto it = std::find(observers_.begin(), observers_.end(), observer);
-        if (it != observers_.end()) {
-            observers_.erase(it);
-        }
-    }
-
-    MMI_HILOGI("Plugin '%{public}s' unregistered observer successfully", name_.c_str());
+    MMI_HILOGI("Plugin '%{public}s' unregistered observer ID=%{public}d successfully",
+        name_.c_str(), observerId);
     return true;
 }
 
@@ -1121,8 +1172,82 @@ bool InputPlugin::IsDataShareReady()
         MMI_HILOGE("Setting manager is null");
         return false;
     }
-
     return settingMgr->IsDatabaseReady();
+}
+
+void InputPlugin::HideMouseCursorTemporary()
+{
+    MMI_HILOGD("hide mouse in stylus mouse mode");
+    auto& instance = CursorDrawingComponent::GetInstance();
+    if (instance.GetMouseDisplayState()) {
+        instance.SetMouseDisplayState(false);
+    }
+}
+
+int32_t InputPlugin::CalculateTipPoint(libinput_event *event, int32_t &displayId, PhysicalCoordinate &coord)
+{
+    if (event == nullptr) {
+        MMI_HILOGE("event is invalid");
+        return RET_ERR;
+    }
+    libinput_event_tablet_tool *toolEvent = nullptr;
+    toolEvent = libinput_event_get_tablet_tool_event(event);
+    if (toolEvent == nullptr) {
+        MMI_HILOGE("event is invalid");
+        return RET_ERR;
+    }
+    auto inputDevice = libinput_event_get_device(event);
+    if (inputDevice == nullptr || INPUT_DEV_MGR == nullptr) {
+        MMI_HILOGE("inputDevice or INPUT_DEV_MGR is null");
+        return RET_ERR;
+    }
+    auto deviceId = INPUT_DEV_MGR->FindInputDeviceId(inputDevice);
+    if (deviceId < 0) {
+        return RET_ERR;
+    }
+    PointerEvent::PointerItem item;
+    item.SetPointerId(0);
+    item.SetDeviceId(deviceId);
+    item.SetToolType(PointerEvent::TOOL_TYPE_PEN);
+    if (WIN_MGR == nullptr) {
+        MMI_HILOGE("get WIN_MGR failed");
+        return RET_ERR;
+    }
+    return WIN_MGR->CalculateTipPoint(toolEvent, displayId, coord, item, deviceId);
+}
+
+void InputPlugin::SetMouseAccelerateMotionSwitch(libinput_event *event, bool enable)
+{
+    if (event == nullptr) {
+        MMI_HILOGE("event is invalid");
+        return;
+    }
+    if (MouseEventHdr == nullptr) {
+        MMI_HILOGE("get MouseEventHdr failed");
+        return;
+    }
+    auto inputDevice = libinput_event_get_device(event);
+    if (inputDevice == nullptr || INPUT_DEV_MGR == nullptr) {
+        MMI_HILOGE("inputDevice or INPUT_DEV_MGR is null");
+        return;
+    }
+    auto deviceId = INPUT_DEV_MGR->FindInputDeviceId(inputDevice);
+    if (deviceId < 0) {
+        return;
+    }
+    MouseEventHdr->SetMouseAccelerateMotionSwitch(deviceId, enable);
+}
+
+int32_t InputPlugin::GetCurrentMouseLocation(double &mouseX, double &mouseY)
+{
+    if (WIN_MGR == nullptr) {
+        MMI_HILOGE("get WIN_MGR failed");
+        return RET_ERR;
+    }
+    auto mouseLocation = WIN_MGR->GetMouseInfo();
+    mouseX = mouseLocation.physicalX;
+    mouseY = mouseLocation.physicalY;
+    return RET_OK;
 }
 } // namespace MMI
 } // namespace OHOS

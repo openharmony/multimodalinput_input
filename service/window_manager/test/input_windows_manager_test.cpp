@@ -65,8 +65,10 @@ constexpr uint32_t TEST_WINDOW_END {100000};
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
 constexpr int32_t TEST_PROCESS_ID = 100;
 constexpr int32_t TEST_WINDOW_ID = 1;
+constexpr int32_t TEST_WINDOW_ID_MAX = 10;
 constexpr int32_t POINTER_STYLE_ID_1 = 1;
 constexpr int32_t POINTER_STYLE_ID_2 = 2;
+constexpr int32_t TEST_DEFAULT_POINTER_STYLE = 0;
 } // namespace
 
 #ifdef WIN_MGR
@@ -6565,6 +6567,91 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateTouchScreenTarge
 }
 
 /**
+ * @tc.name: InputWindowsManagerTest_UpdateTouchScreenTarget_020
+ * @tc.desc: Test UpdateTouchScreenTarget
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateTouchScreenTarget_020, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsMgr;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    OLD::DisplayInfo displayInfo;
+    WindowGroupInfo winGroupInfo;
+    WindowInfo winInfo;
+    Rect rect;
+    PointerEvent::PointerItem item;
+    constexpr int32_t pointerId = 0;
+    constexpr int32_t displayId = 1;
+    constexpr int32_t windowId = 1;
+    displayInfo.id = displayId;
+    displayInfo.x = 300;
+    displayInfo.y = 500;
+    displayInfo.width = 100;
+    displayInfo.height = 100;
+    pointerEvent->SetTargetDisplayId(displayId);
+    pointerEvent->SetPointerId(pointerId);
+    pointerEvent->SetDeviceId(1);
+    item.SetPointerId(pointerId);
+    item.SetDisplayXPos(500);
+    item.SetDisplayYPos(500);
+    item.SetTargetWindowId(windowId);
+    item.SetToolType(PointerEvent::TOOL_TYPE_FINGER);
+    item.SetPressure(1.0);
+    pointerEvent->AddPointerItem(item);
+    pointerEvent->SetZOrder(15.5f);
+    pointerEvent->ClearFlag();
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+    rect.x = 0;
+    rect.width = 0;
+    rect.y = 0;
+    rect.height = 0;
+    winInfo.defaultHotAreas.push_back(rect);
+    winInfo.id = windowId;
+    winInfo.flags = 0;
+    winInfo.pixelMap = nullptr;
+    winInfo.transform = {1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f};
+    winInfo.windowInputType = WindowInputType::NORMAL;
+    OLD::DisplayGroupInfo displayGroupInfo;
+    displayGroupInfo.focusWindowId = windowId;
+    displayGroupInfo.windowsInfo.push_back(winInfo);
+    WindowInfoEX winEx;
+    winEx.flag = true;
+    winEx.window = winInfo;
+    inputWindowsMgr.extraData_.appended = true;
+    inputWindowsMgr.extraData_.pointerId = pointerId;
+    inputWindowsMgr.extraData_.sourceType = PointerEvent::SOURCE_TYPE_TOUCHSCREEN;
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
+    auto displayGroupIter = inputWindowsMgr.displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
+    if (displayGroupIter != inputWindowsMgr.displayGroupInfoMap_.end()) {
+        displayGroupIter->second.displaysInfo.push_back(displayInfo);
+    }
+    winGroupInfo.windowsInfo.push_back(winInfo);
+    auto windowsPerDisplayIter = inputWindowsMgr.windowsPerDisplayMap_.find(DEFAULT_GROUP_ID);
+    if (windowsPerDisplayIter != inputWindowsMgr.windowsPerDisplayMap_.end()) {
+        windowsPerDisplayIter->second.insert(std::make_pair(windowId, winGroupInfo));
+    }
+    inputWindowsMgr.touchItemDownInfos_[1].insert(std::make_pair(8, winEx));
+    inputWindowsMgr.ancoTouchDownInfos_[1].insert(std::make_pair(8, winEx));
+    EXPECT_EQ(inputWindowsMgr.UpdateTouchScreenTarget(pointerEvent), RET_ERR);
+
+
+    inputWindowsMgr.touchItemDownInfos_.clear();
+    inputWindowsMgr.ancoTouchDownInfos_.clear();
+    inputWindowsMgr.touchItemDownInfos_[1].insert(std::make_pair(pointerId, winEx));
+    inputWindowsMgr.ancoTouchDownInfos_[1].insert(std::make_pair(pointerId, winEx));
+    auto pair = inputWindowsMgr.touchItemDownInfos_[pointerEvent->GetDeviceId()].find(pointerId);
+    if (pair != inputWindowsMgr.touchItemDownInfos_[pointerEvent->GetDeviceId()].end()) {
+        pair->second.window.transform.clear();
+        pair->second.window.transform = winInfo.transform;
+    }
+    EXPECT_EQ(inputWindowsMgr.UpdateTouchScreenTarget(pointerEvent), RET_OK);
+}
+
+
+/**
  * @tc.name: InputWindowsManagerTest_SendCancelEventWhenLock_001
  * @tc.desc: Test the function SendCancelEventWhenLock
  * @tc.type: FUNC
@@ -11483,6 +11570,58 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_DumpDisplayInfo_001, T
 }
 
 /**
+ * @tc.name: InputWindowsManagerTest_DumpWindowsInfo_001
+ * @tc.desc: Test DumpWindowsInfo
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_DumpWindowsInfo_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager manager;
+    WindowInfo windowInfo1;
+    windowInfo1.id = 1;
+    windowInfo1.pid = 100;
+    windowInfo1.uid = 200;
+    windowInfo1.area = {0, 0, 800, 600};
+    windowInfo1.defaultHotAreas = {{10, 10, 100, 100}, {200, 200, 50, 50}};
+    windowInfo1.pointerHotAreas = {{30, 30, 150, 150}, {400, 400, 70, 70}};
+    windowInfo1.agentWindowId = 10;
+    windowInfo1.flags = 1;
+    windowInfo1.displayId = 3;
+    windowInfo1.zOrder = 4.0f;
+    windowInfo1.pointerChangeAreas = {10, 20, 30};
+    windowInfo1.transform = {1.0f, 2.0f, 3.0f};
+
+    WindowInfo windowInfo2;
+    windowInfo2.id = 2;
+    windowInfo2.pid = 101;
+    windowInfo2.uid = 201;
+    windowInfo2.area = {800, 600, 1024, 768};
+    windowInfo2.defaultHotAreas = {{50, 50, 200, 200}, {600, 600, 100, 100}};
+    windowInfo2.pointerHotAreas = {{70, 70, 250, 250}, {800, 800, 120, 120}};
+    windowInfo2.agentWindowId = 20;
+    windowInfo2.flags = 2;
+    windowInfo2.displayId = 4;
+    windowInfo2.zOrder = 5.0f;
+    windowInfo2.pointerChangeAreas = {40, 50, 60};
+    windowInfo2.transform = {4.0f, 5.0f, 6.0f};
+
+    std::vector<WindowInfo> windowsInfo = {windowInfo1, windowInfo2};
+    auto fd = tmpfile();
+    ASSERT_NE(fd, nullptr);
+    manager.DumpWindowsInfo(fileno(fd), windowsInfo);
+    fclose(fd);
+    EXPECT_EQ(windowsInfo.size(), 2);
+    windowInfo1.uiExtentionWindowInfo.push_back(windowInfo2);
+    auto fdTmp = tmpfile();
+    ASSERT_NE(fdTmp, nullptr);
+    manager.DumpWindowsInfo(fileno(fdTmp), windowsInfo);
+    fclose(fdTmp);
+    EXPECT_EQ(windowsInfo.size(), 2);
+}
+
+/**
  * @tc.name: InputWindowsManagerTest_PrintZorderInfo_001
  * @tc.desc: Test PrintZorderInfo
  * @tc.type: FUNC
@@ -14158,11 +14297,11 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_DispatchPointerRedispa
 }
 
 /**
- * @tc.name: InputWindowsManagerTest_ClearPointerDeviceId_001
- * @tc.desc: Test branch
- * @tc.type: FUNC
- * @tc.require:
- */
+* @tc.name: InputWindowsManagerTest_ClearPointerDeviceId_001
+* @tc.desc: Test ClearPointerDeviceId
+* @tc.type: FUNC
+* @tc.require:
+*/
 HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_ClearPointerDeviceId_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
@@ -14186,6 +14325,21 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_ClearPointerDeviceId_0
     winEx.window = winInfo;
     inputWindowsMgr.touchItemDownInfos_[pointerEvent->GetDeviceId()].insert(std::make_pair(pointerId, winEx));
     EXPECT_NO_FATAL_FAILURE(inputWindowsMgr.ClearPointerDeviceId(pointerEvent));
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
+    inputWindowsMgr.touchItemDownInfos_[1].insert(std::make_pair(pointerId, winEx));
+    inputWindowsMgr.ClearPointerDeviceId(pointerEvent);
+    EXPECT_TRUE(inputWindowsMgr.touchItemDownInfos_.find(1) != inputWindowsMgr.touchItemDownInfos_.end());
+    pointerEvent->ClearFlag(InputEvent::EVENT_FLAG_SHELL);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_HOVER_EXIT);
+    inputWindowsMgr.ClearPointerDeviceId(pointerEvent);
+    EXPECT_TRUE(inputWindowsMgr.touchItemDownInfos_[1].find(150) == inputWindowsMgr.touchItemDownInfos_[1].end());
+#ifdef OHOS_BUILD_ENABLE_ANCO
+    pointerEvent->SetAncoDeal(true);
+    inputWindowsMgr.touchItemDownInfos_[pointerEvent->GetDeviceId()].insert(std::make_pair(pointerId, winEx));
+    inputWindowsMgr.ClearPointerDeviceId(pointerEvent);
+    EXPECT_TRUE(inputWindowsMgr.touchItemDownInfos_[1].find(150) != inputWindowsMgr.touchItemDownInfos_[1].end());
+    pointerEvent->SetAncoDeal(false);
+#endif  // OHOS_BUILD_ENABLE_ANCO
     item.SetToolType(PointerEvent::TOOL_TYPE_THP_FEATURE);
     pointerEvent->AddPointerItem(item);
     EXPECT_NO_FATAL_FAILURE(inputWindowsMgr.ClearPointerDeviceId(pointerEvent));
@@ -15593,6 +15747,36 @@ HWTEST_F(InputWindowsManagerTest, UpdateNormalPointerStyle_AddNewStyle_001, Test
 }
 
 /**
+ * @tc.name: UpdateNormalPointerStyle_AddNewStyle_002
+ * @tc.desc: Test UpdateNormalPointerStyle adding new pointer style
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, UpdateNormalPointerStyle_AddNewStyle_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto inputWindowsManager = std::make_shared<InputWindowsManager>();
+    ASSERT_NE(inputWindowsManager, nullptr);
+
+    PointerStyle pointerStyle;
+    pointerStyle.id = POINTER_STYLE_ID_1;
+
+    for (int32_t windowId = 1; windowId <= TEST_WINDOW_ID_MAX; windowId++) {
+        inputWindowsManager->pointerStyle_[TEST_PROCESS_ID][windowId] = pointerStyle;
+    }
+
+    int32_t result = inputWindowsManager->UpdateNormalPointerStyle(
+        TEST_PROCESS_ID, 0, pointerStyle);
+
+    EXPECT_EQ(result, RET_OK);
+    auto iter = inputWindowsManager->pointerStyle_.find(TEST_PROCESS_ID);
+    ASSERT_NE(iter, inputWindowsManager->pointerStyle_.end());
+    auto windowIter = iter->second.find(0);
+    ASSERT_NE(windowIter, iter->second.end());
+    EXPECT_EQ(windowIter->second.id, POINTER_STYLE_ID_1);
+}
+
+/**
  * @tc.name: UpdateNormalPointerStyle_UpdateExistingStyle_002
  * @tc.desc: Test UpdateNormalPointerStyle updating existing pointer style
  * @tc.type: FUNC
@@ -15726,6 +15910,335 @@ HWTEST_F(InputWindowsManagerTest, SaveLatestPointerStyleInfo_NullToken_002, Test
     EXPECT_FALSE(inputWindowsManager->isUIExtension_);
     EXPECT_EQ(inputWindowsManager->uiExtensionPid_, TEST_PROCESS_ID);
     EXPECT_EQ(inputWindowsManager->uiExtensionWindowId_, TEST_WINDOW_ID);
+}
+
+/**
+ * @tc.name: GetPointerStyle_GlobalWindowId_001
+ * @tc.desc: Test GetPointerStyle returns global style when windowId is GLOBAL_WINDOW_ID
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, GetPointerStyle_GlobalWindowId_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager winMgr;
+    PointerStyle style;
+    style.id = MOUSE_ICON::DEVELOPER_DEFINED_ICON;
+    style.options = MAGIC_STYLE_OPT;
+    winMgr.SetPointerStyle(1, GLOBAL_WINDOW_ID, style);
+
+    PointerStyle styleRet;
+    int32_t ret = winMgr.GetPointerStyle(1, GLOBAL_WINDOW_ID, styleRet);
+
+    EXPECT_EQ(ret, RET_OK);
+    EXPECT_EQ(styleRet.id, MOUSE_ICON::DEVELOPER_DEFINED_ICON);
+    EXPECT_EQ(styleRet.options, MAGIC_STYLE_OPT);
+}
+
+/**
+ * @tc.name: GetPointerStyle_UIExtensionToken_002
+ * @tc.desc: Test GetPointerStyle with UIExtension token (calls GetUIExtensionPointerStyle)
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, GetPointerStyle_UIExtensionToken_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager winMgr;
+
+    sptr<IRemoteObject> token = new (std::nothrow) IPCObjectProxy(0);
+    ASSERT_NE(token, nullptr);
+    UIExtensionInfo uecInfo(token, TEST_PROCESS_ID, TEST_WINDOW_ID);
+    winMgr.uiExtensionInfos_.push_back(uecInfo);
+
+    PointerStyle pointerStyle;
+    pointerStyle.id = POINTER_STYLE_ID_1;
+    winMgr.uiExtensionPointerStyle_[TEST_PROCESS_ID][TEST_WINDOW_ID] = pointerStyle;
+
+    PointerStyle styleRet;
+    int32_t ret = winMgr.GetPointerStyle(TEST_PROCESS_ID, TEST_WINDOW_ID, styleRet, token);
+
+    EXPECT_EQ(ret, RET_OK);
+    EXPECT_EQ(styleRet.id, POINTER_STYLE_ID_1);
+}
+
+/**
+ * @tc.name: GetPointerStyle_NormalWindow_003
+ * @tc.desc: Test GetPointerStyle for normal window (calls GetNormalPointerStyle)
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, GetPointerStyle_NormalWindow_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager winMgr;
+
+    PointerStyle pointerStyle;
+    pointerStyle.id = POINTER_STYLE_ID_2;
+    winMgr.pointerStyle_[TEST_PROCESS_ID][TEST_WINDOW_ID] = pointerStyle;
+
+    PointerStyle styleRet;
+    int32_t ret = winMgr.GetPointerStyle(TEST_PROCESS_ID, TEST_WINDOW_ID, styleRet, nullptr);
+
+    EXPECT_EQ(ret, RET_OK);
+    EXPECT_EQ(styleRet.id, POINTER_STYLE_ID_2);
+}
+
+/**
+ * @tc.name: GetUIExtensionPointerStyle_PidNotFound_001
+ * @tc.desc: Test GetUIExtensionPointerStyle when pid not found (returns global style)
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, GetUIExtensionPointerStyle_PidNotFound_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager winMgr;
+
+    PointerStyle globalStyle;
+    globalStyle.id = MOUSE_ICON::DEVELOPER_DEFINED_ICON;
+    winMgr.globalStyle_ = globalStyle;
+
+    UIExtensionInfo uecInfo(nullptr, TEST_PROCESS_ID, TEST_WINDOW_ID);
+    PointerStyle styleRet;
+    int32_t ret = winMgr.GetUIExtensionPointerStyle(uecInfo, styleRet);
+
+    EXPECT_EQ(ret, RET_OK);
+    EXPECT_EQ(styleRet.id, MOUSE_ICON::DEVELOPER_DEFINED_ICON);
+}
+
+/**
+ * @tc.name: GetUIExtensionPointerStyle_WindowIdNotFound_002
+ * @tc.desc: Test GetUIExtensionPointerStyle when hostWindowId not found (returns global style)
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, GetUIExtensionPointerStyle_WindowIdNotFound_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager winMgr;
+
+    PointerStyle globalStyle;
+    globalStyle.id = MOUSE_ICON::DEVELOPER_DEFINED_ICON;
+    winMgr.globalStyle_ = globalStyle;
+
+    PointerStyle tmpStyle;
+    tmpStyle.id = MOUSE_ICON::EAST;
+    winMgr.uiExtensionPointerStyle_[TEST_PROCESS_ID][TEST_WINDOW_ID + 1] = tmpStyle;
+
+    UIExtensionInfo uecInfo(nullptr, TEST_PROCESS_ID, TEST_WINDOW_ID);
+    PointerStyle styleRet;
+    int32_t ret = winMgr.GetUIExtensionPointerStyle(uecInfo, styleRet);
+
+    EXPECT_EQ(ret, RET_OK);
+    EXPECT_EQ(styleRet.id, MOUSE_ICON::DEVELOPER_DEFINED_ICON);
+}
+
+/**
+ * @tc.name: GetUIExtensionPointerStyle_Found_003
+ * @tc.desc: Test GetUIExtensionPointerStyle when pid and windowId both found
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, GetUIExtensionPointerStyle_Found_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager winMgr;
+
+    PointerStyle pointerStyle;
+    pointerStyle.id = POINTER_STYLE_ID_1;
+    winMgr.uiExtensionPointerStyle_[TEST_PROCESS_ID][TEST_WINDOW_ID] = pointerStyle;
+
+    UIExtensionInfo uecInfo(nullptr, TEST_PROCESS_ID, TEST_WINDOW_ID);
+    PointerStyle styleRet;
+    int32_t ret = winMgr.GetUIExtensionPointerStyle(uecInfo, styleRet);
+
+    EXPECT_EQ(ret, RET_OK);
+    EXPECT_EQ(styleRet.id, POINTER_STYLE_ID_1);
+}
+
+/**
+ * @tc.name: GetNormalPointerStyle_PidNotFound_SceneBoardEnabled_001
+ * @tc.desc: Test GetNormalPointerStyle when pid not found but SceneBoard enabled (returns global style)
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, GetNormalPointerStyle_PidNotFound_SceneBoardEnabled_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager winMgr;
+
+    PointerStyle globalStyle;
+    globalStyle.id = MOUSE_ICON::DEVELOPER_DEFINED_ICON;
+    winMgr.globalStyle_ = globalStyle;
+
+    PointerStyle styleRet;
+    int32_t ret = winMgr.GetNormalPointerStyle(TEST_PROCESS_ID, TEST_WINDOW_ID, styleRet);
+
+    EXPECT_EQ(ret, RET_OK);
+    EXPECT_EQ(styleRet.id, MOUSE_ICON::DEVELOPER_DEFINED_ICON);
+}
+
+/**
+ * @tc.name: GetNormalPointerStyle_WindowIdNotFound_002
+ * @tc.desc: Test GetNormalPointerStyle when windowId not found (returns global style)
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, GetNormalPointerStyle_WindowIdNotFound_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager winMgr;
+
+    PointerStyle globalStyle;
+    globalStyle.id = MOUSE_ICON::DEVELOPER_DEFINED_ICON;
+    winMgr.globalStyle_ = globalStyle;
+
+    PointerStyle tmpStyle;
+    tmpStyle.id = MOUSE_ICON::EAST;
+    winMgr.uiExtensionPointerStyle_[TEST_PROCESS_ID][TEST_WINDOW_ID + 1] = tmpStyle;
+
+    PointerStyle styleRet;
+    int32_t ret = winMgr.GetNormalPointerStyle(TEST_PROCESS_ID, TEST_WINDOW_ID, styleRet);
+
+    EXPECT_EQ(ret, RET_OK);
+    EXPECT_EQ(styleRet.id, MOUSE_ICON::DEVELOPER_DEFINED_ICON);
+}
+
+/**
+ * @tc.name: GetNormalPointerStyle_DefaultStyleId_003
+ * @tc.desc: Test GetNormalPointerStyle when style.id equals TEST_DEFAULT_POINTER_STYLE (returns global style)
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, GetNormalPointerStyle_DefaultStyleId_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager winMgr;
+
+    PointerStyle globalStyle;
+    globalStyle.id = MOUSE_ICON::DEVELOPER_DEFINED_ICON;
+    winMgr.globalStyle_ = globalStyle;
+
+    PointerStyle storedStyle;
+    storedStyle.id = TEST_DEFAULT_POINTER_STYLE;
+    winMgr.pointerStyle_[TEST_PROCESS_ID][TEST_WINDOW_ID] = storedStyle;
+
+    PointerStyle styleRet;
+    int32_t ret = winMgr.GetNormalPointerStyle(TEST_PROCESS_ID, TEST_WINDOW_ID, styleRet);
+
+    EXPECT_EQ(ret, RET_OK);
+    EXPECT_EQ(styleRet.id, MOUSE_ICON::DEVELOPER_DEFINED_ICON);
+}
+
+/**
+ * @tc.name: GetNormalPointerStyle_Found_004
+ * @tc.desc: Test GetNormalPointerStyle when both pid and windowId found with valid style
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, GetNormalPointerStyle_Found_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager winMgr;
+
+    PointerStyle pointerStyle;
+    pointerStyle.id = POINTER_STYLE_ID_1;
+    winMgr.pointerStyle_[TEST_PROCESS_ID][TEST_WINDOW_ID] = pointerStyle;
+
+    PointerStyle styleRet;
+    int32_t ret = winMgr.GetNormalPointerStyle(TEST_PROCESS_ID, TEST_WINDOW_ID, styleRet);
+
+    EXPECT_EQ(ret, RET_OK);
+    EXPECT_EQ(styleRet.id, POINTER_STYLE_ID_1);
+}
+
+/**
+ * @tc.name: InputWindowsManager_UpdateUIExtensionInfo_EmptyVector
+ * @tc.desc: Test InputWindowsManager::UpdateUIExtensionInfo with empty vector
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManager_UpdateUIExtensionInfo_EmptyVector, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto inputWindowsManager = std::make_shared<InputWindowsManager>();
+    ASSERT_NE(inputWindowsManager, nullptr);
+
+    std::vector<UIExtensionInfo> emptyInfos;
+    inputWindowsManager->UpdateUIExtensionInfo(emptyInfos);
+
+    EXPECT_EQ(inputWindowsManager->uiExtensionInfos_.size(), 0);
+}
+
+/**
+ * @tc.name: InputWindowsManager_UpdateUIExtensionInfo_SingleElement
+ * @tc.desc: Test InputWindowsManager::UpdateUIExtensionInfo with single element
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManager_UpdateUIExtensionInfo_SingleElement, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto inputWindowsManager = std::make_shared<InputWindowsManager>();
+    ASSERT_NE(inputWindowsManager, nullptr);
+
+    UIExtensionInfo uecInfo(nullptr, TEST_PROCESS_ID, TEST_WINDOW_ID);
+    std::vector<UIExtensionInfo> uecInfos = { uecInfo };
+    inputWindowsManager->UpdateUIExtensionInfo(uecInfos);
+
+    EXPECT_EQ(inputWindowsManager->uiExtensionInfos_.size(), 1);
+    EXPECT_EQ(inputWindowsManager->uiExtensionInfos_[0].pid, TEST_PROCESS_ID);
+    EXPECT_EQ(inputWindowsManager->uiExtensionInfos_[0].hostWindowId, TEST_WINDOW_ID);
+}
+
+/**
+ * @tc.name: InputWindowsManager_UpdateUIExtensionInfo_MultipleElements
+ * @tc.desc: Test InputWindowsManager::UpdateUIExtensionInfo with multiple elements
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManager_UpdateUIExtensionInfo_MultipleElements, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto inputWindowsManager = std::make_shared<InputWindowsManager>();
+    ASSERT_NE(inputWindowsManager, nullptr);
+
+    UIExtensionInfo uecInfo1(nullptr, TEST_PROCESS_ID, TEST_WINDOW_ID);
+    UIExtensionInfo uecInfo2(nullptr, TEST_PROCESS_ID + 1, TEST_WINDOW_ID + 1);
+    UIExtensionInfo uecInfo3(nullptr, TEST_PROCESS_ID + 2, TEST_WINDOW_ID + 2);
+    std::vector<UIExtensionInfo> uecInfos = { uecInfo1, uecInfo2, uecInfo3 };
+    inputWindowsManager->UpdateUIExtensionInfo(uecInfos);
+
+    EXPECT_EQ(inputWindowsManager->uiExtensionInfos_.size(), 3);
+    EXPECT_EQ(inputWindowsManager->uiExtensionInfos_[0].pid, TEST_PROCESS_ID);
+    EXPECT_EQ(inputWindowsManager->uiExtensionInfos_[1].pid, TEST_PROCESS_ID + 1);
+    EXPECT_EQ(inputWindowsManager->uiExtensionInfos_[2].pid, TEST_PROCESS_ID + 2);
+}
+
+/**
+ * @tc.name: InputWindowsManager_UpdateUIExtensionInfo_UpdateExisting
+ * @tc.desc: Test InputWindowsManager::UpdateUIExtensionInfo replacing existing data
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManager_UpdateUIExtensionInfo_UpdateExisting, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto inputWindowsManager = std::make_shared<InputWindowsManager>();
+    ASSERT_NE(inputWindowsManager, nullptr);
+
+    UIExtensionInfo uecInfoOld(nullptr, TEST_PROCESS_ID, TEST_WINDOW_ID);
+    std::vector<UIExtensionInfo> oldInfos = { uecInfoOld };
+    inputWindowsManager->UpdateUIExtensionInfo(oldInfos);
+    EXPECT_EQ(inputWindowsManager->uiExtensionInfos_.size(), 1);
+
+    UIExtensionInfo uecInfoNew(nullptr, TEST_PROCESS_ID + 10, TEST_WINDOW_ID + 10);
+    std::vector<UIExtensionInfo> newInfos = { uecInfoNew };
+    inputWindowsManager->UpdateUIExtensionInfo(newInfos);
+
+    EXPECT_EQ(inputWindowsManager->uiExtensionInfos_.size(), 1);
+    EXPECT_EQ(inputWindowsManager->uiExtensionInfos_[0].pid, TEST_PROCESS_ID + 10);
 }
 } // namespace MMI
 } // namespace OHOS

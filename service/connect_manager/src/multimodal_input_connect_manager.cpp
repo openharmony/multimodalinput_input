@@ -94,7 +94,16 @@ int32_t MultimodalInputConnectManager::SetDisplayBind(int32_t deviceId, int32_t 
 {
     std::lock_guard<std::mutex> guard(lock_);
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
-    return multimodalInputConnectService_->SetDisplayBind(deviceId, displayId, msg);
+
+    int32_t ret = multimodalInputConnectService_->SetDisplayBind(deviceId, displayId, msg);
+    if (ret != RET_OK) {
+        MMI_HILOGE("SetDisplayBind failed, ret:%{public}d", ret);
+        return ret;
+    }
+
+    CacheDisplayBindRelationship(deviceId, displayId);
+    MMI_HILOGI("SetDisplayBind success: deviceId:%{public}d, displayId:%{public}d", deviceId, displayId);
+    return ret;
 }
 
 int32_t MultimodalInputConnectManager::GetWindowPid(int32_t windowId)
@@ -584,6 +593,16 @@ int32_t MultimodalInputConnectManager::InjectTouchPadEvent(std::shared_ptr<Point
     return multimodalInputConnectService_->InjectTouchPadEvent(*pointerEvent.get(), touchpadCDG, isNativeInject);
 }
 
+#ifdef OHOS_BUILD_ENABLE_CONTROLLER_INJECT
+int32_t MultimodalInputConnectManager::CreateTouchController()
+{
+    CALL_DEBUG_ENTER;
+    std::lock_guard<std::mutex> guard(lock_);
+    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    return multimodalInputConnectService_->CreateTouchController();
+}
+#endif // OHOS_BUILD_ENABLE_CONTROLLER_INJECT
+
 int32_t MultimodalInputConnectManager::CreateMouseController()
 {
     CALL_DEBUG_ENTER;
@@ -678,6 +697,9 @@ void MultimodalInputConnectManager::OnDeath(const wptr<IRemoteObject> &remoteObj
     Clean(remoteObj);
     NotifyServiceDeath();
     NotifyDeath();
+
+    MMI_HILOGI("Service died, triggering display bind restoration");
+    OnServiceDiedCallback();
 }
 
 void MultimodalInputConnectManager::Clean(const wptr<IRemoteObject> &remoteObj)
@@ -1434,6 +1456,32 @@ int32_t MultimodalInputConnectManager::UpdateUIExtensionInfo(const std::vector<U
         return INVALID_HANDLER_ID;
     }
     return multimodalInputConnectService_->UpdateUIExtensionInfo(uiExtensionInfos);
+}
+
+void MultimodalInputConnectManager::OnServiceDiedCallback()
+{
+    CALL_DEBUG_ENTER;
+    std::lock_guard<std::mutex> lock(displayBindMutex);
+    if (multimodalInputConnectService_ == nullptr) {
+        MMI_HILOGE("MultimodalInputConnectService_ is nullptr");
+        return;
+    }
+    for (const auto& [deviceId, displayId] : displayBindCache) {
+        std::string msg;
+        int32_t ret = multimodalInputConnectService_->SetDisplayBind(deviceId, displayId, msg);
+        if (ret != RET_OK) {
+            MMI_HILOGE("Failed to restore bind for deviceId:%{public}d, ret:%{public}d", deviceId, ret);
+        }
+    }
+    MMI_HILOGI("Display bind relationships restoration completed");
+}
+
+void MultimodalInputConnectManager::CacheDisplayBindRelationship(int32_t deviceId, int32_t displayId)
+{
+    CALL_DEBUG_ENTER;
+    std::lock_guard<std::mutex> lock(displayBindMutex);
+    displayBindCache[deviceId] = displayId;
+    MMI_HILOGI("Cached display bind: deviceId:%{public}d, displayId:%{public}d", deviceId, displayId);
 }
 } // namespace MMI
 } // namespace OHOS

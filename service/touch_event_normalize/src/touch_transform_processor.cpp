@@ -536,6 +536,7 @@ void TouchTransformProcessor::CancelAllTouches()
             pointerEvent_->GetPointerId(), deviceId_);
         LogTracer lt(pointerEvent_->GetId(), pointerEvent_->GetEventType(), pointerEvent_->GetPointerAction());
         inputChannel->HandleTouchEvent(pointerEvent_);
+        WIN_MGR->DrawTouchGraphic(pointerEvent_);
     }
 }
 } // namespace MMI

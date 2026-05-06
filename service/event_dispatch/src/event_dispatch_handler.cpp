@@ -331,8 +331,13 @@ void EventDispatchHandler::HandlePointerEventInner(const std::shared_ptr<Pointer
     CALL_DEBUG_ENTER;
     CHKPV(point);
 #ifdef OHOS_BUILD_ENABLE_ANCO
-    if (point->GetAncoDeal() && point->GetSourceType() == PointerEvent::SOURCE_TYPE_MOUSE) {
-        WIN_MGR->SimulatePointerExt(point);
+    if (point->GetAncoDeal()) {
+        if (point->GetSourceType() == PointerEvent::SOURCE_TYPE_MOUSE) {
+            WIN_MGR->SimulatePointerExt(point);
+        } else if (point->GetPointerAction() == PointerEvent::POINTER_ACTION_UP ||
+            point->GetPointerAction() == PointerEvent::POINTER_ACTION_HOVER_EXIT) {
+            WIN_MGR->ClearPointerDeviceId(point);
+        }
     }
 #endif // OHOS_BUILD_ENABLE_ANCO
     int32_t pointerId = point->GetPointerId();
@@ -361,6 +366,8 @@ void EventDispatchHandler::HandlePointerEventInner(const std::shared_ptr<Pointer
         if (point->GetTargetWindowId() == windowStateErrorInfo_.windowId && agentPid == windowStateErrorInfo_.pid) {
             if (GetSysClockTime() - windowStateErrorInfo_.startTime >= ERROR_TIME) {
                 auto userId = WIN_MGR->FindDisplayUserId(point->GetTargetDisplayId());
+                MMI_HILOGW("Exception occurred in the window:%{private}d|%{public}d|%{public}d|%{public}" PRId64,
+                    userId, point->GetTargetWindowId(), agentPid, windowStateErrorInfo_.startTime);
                 SendWindowStateError(userId, agentPid, point->GetTargetWindowId());
             }
         } else {
@@ -430,6 +437,7 @@ void EventDispatchHandler::ResetDisplayXY(const std::shared_ptr<PointerEvent> &p
 {
 #ifdef OHOS_BUILD_ENABLE_ONE_HAND_MODE
     CHKPV(point);
+    WIN_MGR->ClearPointerDeviceId(point);
     int32_t pointerId = point->GetPointerId();
     PointerEvent::PointerItem pointerItem;
     if (!point->GetPointerItem(pointerId, pointerItem)) {
