@@ -208,7 +208,7 @@ void PointerDrawingManager::RsRemoteDiedCallback()
     IPointerDrawingManager::GetInstance()->DestroyPointerWindow();
 }
 
-void PointerDrawingManager::InitPointerCallback()
+void PointerDrawingManager::InitRsCallback()
 {
     MMI_HILOGI("Init RS Callback start");
     g_isRsRemoteDied = false;
@@ -221,6 +221,22 @@ void PointerDrawingManager::InitPointerCallback()
 #ifdef OHOS_BUILD_ENABLE_DFX_RADAR
     DfxHisysevent::ReportApiCallTimes(ApiDurationStatistics::Api::SET_ON_REMOTE_DIED_CALLBACK, durationMS);
 #endif // OHOS_BUILD_ENABLE_DFX_RADAR
+}
+
+void PointerDrawingManager::InitPointerThread()
+{
+    if (GetHardCursorEnabled() && !initEventHandlerFlag_.load()) {
+        renderThread_ = std::make_unique<std::thread>([this] { this->RenderThreadLoop(); });
+        softCursorRenderThread_ =
+            std::make_unique<std::thread>([this] { this->SoftCursorRenderThreadLoop(); });
+        moveRetryThread_ = std::make_unique<std::thread>([this] { this->MoveRetryThreadLoop(); });
+        initEventHandlerFlag_.store(true);
+    }
+}
+
+void PointerDrawingManager::InitPointerCallback()
+{
+    InitRsCallback();
     if (GetSurfaceNode() != nullptr) {
         SetSurfaceNode(nullptr);
         // Flush commands to remove surfaceNode from render tree
@@ -231,13 +247,7 @@ void PointerDrawingManager::InitPointerCallback()
         MAGIC_CURSOR->RsRemoteInitCallbackForMagicCursor();
     }
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
-    if (GetHardCursorEnabled() && !initEventHandlerFlag_.load()) {
-        renderThread_ = std::make_unique<std::thread>([this] { this->RenderThreadLoop(); });
-        softCursorRenderThread_ =
-            std::make_unique<std::thread>([this] { this->SoftCursorRenderThreadLoop(); });
-        moveRetryThread_ = std::make_unique<std::thread>([this] { this->MoveRetryThreadLoop(); });
-        initEventHandlerFlag_.store(true);
-    }
+    InitPointerThread();
 }
 
 void PointerDrawingManager::DestroyPointerWindow()
@@ -815,6 +825,11 @@ int32_t PointerDrawingManager::InitLayer(const MOUSE_ICON mouseStyle)
     }
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
     if (GetHardCursorEnabled()) {
+        if (!initEventHandlerFlag_.load()) {
+            MMI_HILOGI("pointer thread has not start, start now");
+            InitRsCallback();
+            InitPointerThread();
+        }
         MMI_HILOGI("mouseStyle:%{public}u", static_cast<uint32_t>(mouseStyle));
         if (GetCursorBlurEnabled()) {
             return RET_OK;

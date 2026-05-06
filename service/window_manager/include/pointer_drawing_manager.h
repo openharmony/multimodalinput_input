@@ -316,6 +316,8 @@ private:
     void RsFlushImplicitTransaction();
     std::shared_ptr<Rosen::RSUIDirector> GetRSUIDirector();
     std::shared_ptr<Rosen::RSUIContext> GetRSUIContext();
+    void InitRsCallback();
+    void InitPointerThread();
 private:
     bool hasDisplay_ { false };
     bool hasPointerDevice_ { false };
