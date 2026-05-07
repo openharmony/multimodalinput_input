@@ -337,6 +337,14 @@ void InputDisplayBindHelper::AddInputDevice(int32_t id, const std::string &nodeN
     MMI_HILOGD("Param: id:%{public}d, nodeName:%{public}s, name:%{public}s", id, nodeName.c_str(), sysUid.c_str());
     CHKPV(configFileInfos_);
     auto displayName = configFileInfos_->GetDisplayNameByInputDevice(sysUid);
+    if (displayName.empty()) {
+        int32_t cfgRsId = -1;
+        if (GetRsIdByInputNodeNameCfg(nodeName, cfgRsId)) {
+            displayName = "default" + std::to_string(cfgRsId);
+            MMI_HILOGI("DisplayName is empty for device:%{public}s, generated displayName:%{public}s from input_device_name.cfg",
+                       sysUid.c_str(), displayName.c_str());
+        }
+    }
     BindInfo info = infos_->GetUnbindInputDevice(displayName);
     info.AddInputDevice(id, nodeName, sysUid);
     infos_->Add(info);
@@ -680,6 +688,45 @@ void InputDisplayBindHelper::Load()
     }
     ifs >> *configFileInfos_;
     ifs.close();
+}
+
+bool InputDisplayBindHelper::GetRsIdByInputNodeNameCfg(const std::string &nodeName, int32_t &cfgRsId) const
+{
+    CALL_DEBUG_ENTER;
+    std::ifstream file(INPUT_DEVICE_NAME_CONFIG);
+    if (!file.is_open()) {
+        MMI_HILOGE("Failed to open input_device_name.cfg file");
+        return false;
+    }
+
+    std::string line;
+    while (getline(file, line)) {
+        const std::string delim = "<=>";
+        size_t pos = line.find(delim);
+        if (pos != std::string::npos) {
+            std::string displayIdStr = line.substr(0, pos);
+            std::string cfgInputNodeName = line.substr(pos + delim.length());
+
+            // 清理可能的换行符
+            if (!displayIdStr.empty() && (displayIdStr.back() == '\n' || displayIdStr.back() == '\r')) {
+                displayIdStr.pop_back();
+            }
+            if (!cfgInputNodeName.empty() && (cfgInputNodeName.back() == '\n' || cfgInputNodeName.back() == '\r')) {
+                cfgInputNodeName.pop_back();
+            }
+
+            if (!displayIdStr.empty() && !cfgInputNodeName.empty() &&
+                std::all_of(displayIdStr.begin(), displayIdStr.end(), ::isdigit) &&
+                cfgInputNodeName == nodeName) {
+                cfgRsId = std::stoi(displayIdStr);
+                file.close();
+                MMI_HILOGI("Found RsId:%{public}d for nodeName:%{public}s", cfgRsId, nodeName.c_str());
+                return true;
+            }
+        }
+    }
+    file.close();
+    return false;
 }
 
 std::string InputDisplayBindHelper::Dumps() const
