@@ -2273,7 +2273,7 @@ ErrCode MMIService::MoveMouseEvent(int32_t offsetX, int32_t offsetY)
     return RET_OK;
 }
 
-ErrCode MMIService::CheckInjectKeyEventPermission(const std::shared_ptr<KeyEvent> keyEvent,
+ErrCode MMIService::CheckControllerKeyEventPermission(const std::shared_ptr<KeyEvent> keyEvent,
     bool isNativeInject)
 {
     CHKPR(keyEvent, ERROR_NULL_POINTER);
@@ -2285,16 +2285,9 @@ ErrCode MMIService::CheckInjectKeyEventPermission(const std::shared_ptr<KeyEvent
         }
         return ret;
     }
-    if (isNativeInject) {
-        return RET_OK;
-    }
-    if (!PER_HELPER->VerifySystemApp()) {
+    if (!isNativeInject && !PER_HELPER->VerifySystemApp()) {
         MMI_HILOGE("Verify system APP failed");
         return ERROR_NOT_SYSAPI;
-    }
-    if (!PER_HELPER->CheckInjectPermission()) {
-        MMI_HILOGE("Check inject permission failed");
-        return ERROR_NO_PERMISSION;
     }
     return RET_OK;
 }
@@ -2309,7 +2302,7 @@ ErrCode MMIService::InjectKeyEvent(const KeyEvent& keyEvent, bool isNativeInject
 
     auto keyEventPtr = std::make_shared<KeyEvent>(keyEvent);
     CHKPR(keyEventPtr, ERROR_NULL_POINTER);
-    ErrCode permissionRet = CheckInjectKeyEventPermission(keyEventPtr, isNativeInject);
+    ErrCode permissionRet = CheckControllerKeyEventPermission(keyEventPtr, isNativeInject);
     if (permissionRet != RET_OK) {
         return permissionRet;
     }
@@ -2438,7 +2431,7 @@ int32_t MMIService::CheckTouchPadEvent(int32_t userId, const std::shared_ptr<Poi
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 }
 
-ErrCode MMIService::CheckInjectPointerEventPermission(const std::shared_ptr<PointerEvent> pointerEvent,
+ErrCode MMIService::CheckControllerPointerEventPermission(const std::shared_ptr<PointerEvent> pointerEvent,
     bool isNativeInject)
 {
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
@@ -2467,17 +2460,9 @@ ErrCode MMIService::CheckInjectPointerEventPermission(const std::shared_ptr<Poin
         return ret;
     }
 #endif // OHOS_BUILD_ENABLE_CONTROLLER_INJECT
-
-    if (isNativeInject) {
-        return RET_OK;
-    }
-    if (!PER_HELPER->VerifySystemApp()) {
+    if (!isNativeInject && !PER_HELPER->VerifySystemApp()) {
         MMI_HILOGE("Verify system APP failed");
         return ERROR_NOT_SYSAPI;
-    }
-    if (!PER_HELPER->CheckInjectPermission()) {
-        MMI_HILOGE("Check inject permission failed");
-        return ERROR_NO_PERMISSION;
     }
     return RET_OK;
 }
@@ -2492,7 +2477,7 @@ ErrCode MMIService::InjectPointerEvent(const PointerEvent& pointerEvent, bool is
 
     auto pointerEventPtr = std::make_shared<PointerEvent>(pointerEvent);
     CHKPR(pointerEventPtr, ERROR_NULL_POINTER);
-    ErrCode permissionRet = CheckInjectPointerEventPermission(pointerEventPtr, isNativeInject);
+    ErrCode permissionRet = CheckControllerPointerEventPermission(pointerEventPtr, isNativeInject);
     if (permissionRet != RET_OK) {
         return permissionRet;
     }
