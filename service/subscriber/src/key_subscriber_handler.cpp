@@ -116,6 +116,7 @@ int32_t KeySubscriberHandler::SubscribeKeyEvent(
     SessionPtr sess, int32_t subscribeId, std::shared_ptr<KeyOption> keyOption)
 {
     CALL_DEBUG_ENTER;
+    MMI_HILOGI("KeySubscriberHandler::SubscribeKeyEvent enter, subscribeId:%{public}d", subscribeId);
     if (subscribeId < 0) {
         MMI_HILOGE("Invalid subscribe");
         return RET_ERR;
