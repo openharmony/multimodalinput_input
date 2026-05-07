@@ -514,6 +514,19 @@ void HandleOneHandMode(const OLD::DisplayInfo &displayInfo, std::shared_ptr<Poin
     bool IsValidDisplayChange(const OLD::DisplayInfo &displayInfo);
     void UpdateKeyEventDisplayId(std::shared_ptr<KeyEvent> keyEvent, int32_t focusWindowId, int32_t groupId = DEFAULT_GROUP_ID);
     bool OnDisplayRemovedOrCombinationChanged(const OLD::DisplayGroupInfo &displayGroupInfo);
+    bool IsBackCenterDisplayChange(const OLD::DisplayGroupInfo &oldGroupInfo,
+        const OLD::DisplayGroupInfo &newGroupInfo, bool hasOldGroupInfo) const;
+    bool GetCachedDisplayGroupInfo(int32_t groupId, OLD::DisplayGroupInfo &displayGroupInfo) const;
+    bool IsMainDisplayChanged(const OLD::DisplayGroupInfo &oldGroupInfo,
+        const OLD::DisplayGroupInfo &newGroupInfo) const;
+    bool IsDisplayDirectionChanged(const OLD::DisplayInfo &oldDisplay,
+        const OLD::DisplayInfo &newDisplay) const;
+    bool IsDisplayResolutionChanged(const OLD::DisplayInfo &oldDisplay,
+        const OLD::DisplayInfo &newDisplay) const;
+    bool IsDisplayLayoutChanged(const OLD::DisplayInfo &oldDisplay,
+        const OLD::DisplayInfo &newDisplay) const;
+    bool IsDisplayPropertyChanged(const OLD::DisplayInfo &oldDisplay,
+        const OLD::DisplayInfo &newDisplay) const;
     void ChangeWindowArea(int32_t x, int32_t y, WindowInfo &windowInfo);
     void ResetPointerPosition(const OLD::DisplayGroupInfo &displayGroupInfo);
     int32_t GetMainScreenDisplayInfo(const std::vector<OLD::DisplayInfo> &displaysInfo,
@@ -602,6 +615,7 @@ private:
 #endif // defined(OHOS_BUILD_ENABLE_TOUCH) && defined(OHOS_BUILD_ENABLE_MONITOR)
     std::map<int32_t, OLD::DisplayGroupInfo> displayGroupInfoMap_;
     std::map<int32_t, OLD::DisplayGroupInfo> displayGroupInfoMapTmp_;
+    std::map<int32_t, bool> backCenterDisplayChangeMap_;
     bool mainGroupExisted_;
     DisplayGroupInfo displayGroupInfoTmp_;
     std::mutex tmpInfoMutex_;
