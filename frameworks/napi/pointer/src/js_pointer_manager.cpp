@@ -16,6 +16,7 @@
 #include "js_pointer_manager.h"
 
 #include "pixel_map.h"
+#include "mmi_api_metrics_histograms.h"
 
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "JsPointerManager"
@@ -162,6 +163,7 @@ napi_value JsPointerManager::SetPointerVisible(napi_env env, bool visible, napi_
     asyncContext->errorCode = InputManager::GetInstance()->SetPointerVisible(visible);
     asyncContext->reserve << ReturnType::VOID;
 
+    MMI_HISTOGRAM_ERROR("InputKit.pointer.setPointerVisible.Error", asyncContext->errorCode);
     napi_value promise = nullptr;
     if (handle != nullptr) {
         CHKRP(napi_create_reference(env, handle, 1, &asyncContext->callback), CREATE_REFERENCE);
@@ -176,7 +178,8 @@ napi_value JsPointerManager::SetPointerVisible(napi_env env, bool visible, napi_
 napi_value JsPointerManager::SetPointerVisibleSync(napi_env env, bool visible)
 {
     CALL_DEBUG_ENTER;
-    InputManager::GetInstance()->SetPointerVisible(visible);
+    auto errorCode = InputManager::GetInstance()->SetPointerVisible(visible);
+    MMI_HISTOGRAM_ERROR("InputKit.pointer.setPointerVisibleSync.Error", errorCode);
     napi_value result = nullptr;
     if (napi_get_undefined(env, &result) != napi_ok) {
         MMI_HILOGE("Get undefined result is failed");
@@ -224,6 +227,7 @@ napi_value JsPointerManager::SetPointerColor(napi_env env, int32_t color, napi_v
     sptr<AsyncContext> asyncContext = new (std::nothrow) AsyncContext(env);
     CHKPP(asyncContext);
     asyncContext->errorCode = InputManager::GetInstance()->SetPointerColor(color);
+    MMI_HISTOGRAM_ERROR("InputKit.pointer.setPointerColor.Error", asyncContext->errorCode);
     if (asyncContext->errorCode == COMMON_USE_SYSAPI_ERROR) {
         MMI_HILOGE("Non system applications use system API");
         THROWERR_CUSTOM(env, COMMON_USE_SYSAPI_ERROR, "Non system applications use system API");
@@ -251,6 +255,7 @@ napi_value JsPointerManager::GetPointerColor(napi_env env, napi_value handle)
     CHKPP(asyncContext);
     int32_t color = 1;
     asyncContext->errorCode = InputManager::GetInstance()->GetPointerColor(color);
+    MMI_HISTOGRAM_ERROR("InputKit.pointer.getPointerColor.Error", asyncContext->errorCode);
     if (asyncContext->errorCode == COMMON_USE_SYSAPI_ERROR) {
         MMI_HILOGE("Non system applications use system API");
         THROWERR_CUSTOM(env, COMMON_USE_SYSAPI_ERROR, "Non system applications use system API");
@@ -276,6 +281,7 @@ napi_value JsPointerManager::SetPointerColorSync(napi_env env, int32_t color)
 {
     CALL_DEBUG_ENTER;
     auto errorCode = InputManager::GetInstance()->SetPointerColor(color);
+    MMI_HISTOGRAM_ERROR("InputKit.pointer.setPointerColorSync.Error", errorCode);
     if (errorCode == COMMON_USE_SYSAPI_ERROR) {
         MMI_HILOGE("Non system applications use system API");
         THROWERR_CUSTOM(env, COMMON_USE_SYSAPI_ERROR, "Non system applications use system API");
@@ -295,6 +301,7 @@ napi_value JsPointerManager::GetPointerColorSync(napi_env env)
     CALL_DEBUG_ENTER;
     int32_t color = 1;
     auto errorCode = InputManager::GetInstance()->GetPointerColor(color);
+    MMI_HISTOGRAM_ERROR("InputKit.pointer.getPointerColorSync.Error", errorCode);
     if (errorCode == COMMON_USE_SYSAPI_ERROR) {
         MMI_HILOGE("Non system applications use system API");
         THROWERR_CUSTOM(env, COMMON_USE_SYSAPI_ERROR, "Non system applications use system API");
@@ -315,6 +322,7 @@ napi_value JsPointerManager::SetPointerSpeed(napi_env env, int32_t pointerSpeed,
     CHKPP(asyncContext);
     asyncContext->errorCode = InputManager::GetInstance()->SetPointerSpeed(pointerSpeed);
     asyncContext->reserve << ReturnType::VOID;
+    MMI_HISTOGRAM_ERROR("InputKit.pointer.setPointerSpeed.Error", asyncContext->errorCode);
     napi_value promise = nullptr;
     if (handle != nullptr) {
         CHKRP(napi_create_reference(env, handle, 1, &asyncContext->callback), CREATE_REFERENCE);
@@ -329,7 +337,8 @@ napi_value JsPointerManager::SetPointerSpeed(napi_env env, int32_t pointerSpeed,
 napi_value JsPointerManager::SetPointerSpeedSync(napi_env env, int32_t pointerSpeed)
 {
     CALL_DEBUG_ENTER;
-    InputManager::GetInstance()->SetPointerSpeed(pointerSpeed);
+    auto errorCode = InputManager::GetInstance()->SetPointerSpeed(pointerSpeed);
+    MMI_HISTOGRAM_ERROR("InputKit.pointer.setPointerSpeedSync.Error", errorCode);
     napi_value result = nullptr;
     if (napi_get_undefined(env, &result) != napi_ok) {
         MMI_HILOGE("Get undefined result is failed");
@@ -346,6 +355,7 @@ napi_value JsPointerManager::GetPointerSpeed(napi_env env, napi_value handle)
     int32_t pointerSpeed = 0;
     asyncContext->errorCode = InputManager::GetInstance()->GetPointerSpeed(pointerSpeed);
     asyncContext->reserve << ReturnType::NUMBER << pointerSpeed;
+    MMI_HISTOGRAM_ERROR("InputKit.pointer.getPointerSpeed.Error", asyncContext->errorCode);
     napi_value promise = nullptr;
     uint32_t initial_refcount = 1;
     if (handle != nullptr) {
@@ -362,7 +372,8 @@ napi_value JsPointerManager::GetPointerSpeedSync(napi_env env)
 {
     CALL_DEBUG_ENTER;
     int32_t pointerSpeed = 0;
-    InputManager::GetInstance()->GetPointerSpeed(pointerSpeed);
+    auto errorCode = InputManager::GetInstance()->GetPointerSpeed(pointerSpeed);
+    MMI_HISTOGRAM_ERROR("InputKit.pointer.getPointerSpeedSync.Error", errorCode);
     napi_value result = nullptr;
     if ((napi_create_int32(env, pointerSpeed, &result)) != napi_ok) {
         MMI_HILOGE("%{public}s failed", std::string("GetPointerSpeedSync napi_create_int32").c_str());
@@ -377,6 +388,7 @@ napi_value JsPointerManager::SetMouseScrollRows(napi_env env, int32_t rows, napi
     sptr<AsyncContext> asyncContext = new (std::nothrow) AsyncContext(env);
     CHKPP(asyncContext);
     asyncContext->errorCode = InputManager::GetInstance()->SetMouseScrollRows(rows);
+    MMI_HISTOGRAM_ERROR("InputKit.pointer.setMouseScrollRows.Error", asyncContext->errorCode);
     if (asyncContext->errorCode == COMMON_USE_SYSAPI_ERROR) {
         MMI_HILOGE("Non system applications use system API");
         THROWERR_CUSTOM(env, COMMON_USE_SYSAPI_ERROR, "Non system applications use system API");
@@ -404,6 +416,7 @@ napi_value JsPointerManager::GetMouseScrollRows(napi_env env, napi_value handle)
     CHKPP(asyncContext);
     int32_t rows = 3;
     asyncContext->errorCode = InputManager::GetInstance()->GetMouseScrollRows(rows);
+    MMI_HISTOGRAM_ERROR("InputKit.pointer.getMouseScrollRows.Error", asyncContext->errorCode);
     if (asyncContext->errorCode == COMMON_USE_SYSAPI_ERROR) {
         MMI_HILOGE("Non system applications use system API");
         THROWERR_CUSTOM(env, COMMON_USE_SYSAPI_ERROR, "Non system applications use system API");
@@ -457,6 +470,7 @@ napi_value JsPointerManager::SetCustomCursor(napi_env env, int32_t windowId, voi
     sptr<AsyncContext> asyncContext = new (std::nothrow) AsyncContext(env);
     CHKPP(asyncContext);
     asyncContext->errorCode = InputManager::GetInstance()->SetCustomCursor(windowId, pixelMap, focus.x, focus.y);
+    MMI_HISTOGRAM_ERROR("InputKit.pointer.setCustomCursor.Error", asyncContext->errorCode);
     if (asyncContext->errorCode == COMMON_USE_SYSAPI_ERROR) {
         MMI_HILOGE("Non system applications use system API");
         THROWERR_CUSTOM(env, COMMON_USE_SYSAPI_ERROR, "Non system applications use system API");
@@ -472,7 +486,8 @@ napi_value JsPointerManager::SetCustomCursor(napi_env env, int32_t windowId, voi
 napi_value JsPointerManager::SetCustomCursorSync(napi_env env, int32_t windowId, void* pixelMap, CursorFocus focus)
 {
     CALL_DEBUG_ENTER;
-    InputManager::GetInstance()->SetCustomCursor(windowId, pixelMap, focus.x, focus.y);
+    auto errorCode = InputManager::GetInstance()->SetCustomCursor(windowId, pixelMap, focus.x, focus.y);
+    MMI_HISTOGRAM_ERROR("InputKit.pointer.setCustomCursorSync.Error", errorCode);
     napi_value result = nullptr;
     if (napi_get_undefined(env, &result) != napi_ok) {
         MMI_HILOGE("Get undefined result is failed");
@@ -487,6 +502,7 @@ napi_value JsPointerManager::SetPointerSize(napi_env env, int32_t size, napi_val
     sptr<AsyncContext> asyncContext = new (std::nothrow) AsyncContext(env);
     CHKPP(asyncContext);
     asyncContext->errorCode = InputManager::GetInstance()->SetPointerSize(size);
+    MMI_HISTOGRAM_ERROR("InputKit.pointer.setPointerSize.Error", asyncContext->errorCode);
     if (asyncContext->errorCode == COMMON_USE_SYSAPI_ERROR) {
         MMI_HILOGE("Non system applications use system API");
         THROWERR_CUSTOM(env, COMMON_USE_SYSAPI_ERROR, "Non system applications use system API");
@@ -514,6 +530,7 @@ napi_value JsPointerManager::GetPointerSize(napi_env env, napi_value handle)
     CHKPP(asyncContext);
     int32_t size = 1;
     asyncContext->errorCode = InputManager::GetInstance()->GetPointerSize(size);
+    MMI_HISTOGRAM_ERROR("InputKit.pointer.getPointerSize.Error", asyncContext->errorCode);
     if (asyncContext->errorCode == COMMON_USE_SYSAPI_ERROR) {
         MMI_HILOGE("Non system applications use system API");
         THROWERR_CUSTOM(env, COMMON_USE_SYSAPI_ERROR, "Non system applications use system API");
@@ -539,6 +556,7 @@ napi_value JsPointerManager::SetPointerSizeSync(napi_env env, int32_t size)
 {
     CALL_DEBUG_ENTER;
     auto errorCode = InputManager::GetInstance()->SetPointerSize(size);
+    MMI_HISTOGRAM_ERROR("InputKit.pointer.setPointerSizeSync.Error", errorCode);
     if (errorCode == COMMON_USE_SYSAPI_ERROR) {
         MMI_HILOGE("Non system applications use system API");
         THROWERR_CUSTOM(env, COMMON_USE_SYSAPI_ERROR, "Non system applications use system API");
@@ -558,6 +576,7 @@ napi_value JsPointerManager::GetPointerSizeSync(napi_env env)
     CALL_DEBUG_ENTER;
     int32_t size = 1;
     auto errorCode = InputManager::GetInstance()->GetPointerSize(size);
+    MMI_HISTOGRAM_ERROR("InputKit.pointer.getPointerSizeSync.Error", errorCode);
     if (errorCode == COMMON_USE_SYSAPI_ERROR) {
         MMI_HILOGE("Non system applications use system API");
         THROWERR_CUSTOM(env, COMMON_USE_SYSAPI_ERROR, "Non system applications use system API");
@@ -579,6 +598,7 @@ napi_value JsPointerManager::SetPointerStyle(napi_env env, int32_t windowid, int
     PointerStyle style;
     style.id = pointerStyle;
     asyncContext->errorCode = InputManager::GetInstance()->SetPointerStyle(windowid, style);
+    MMI_HISTOGRAM_ERROR("InputKit.pointer.setPointerStyle.Error", asyncContext->errorCode);
     if (asyncContext->errorCode == COMMON_USE_SYSAPI_ERROR) {
         MMI_HILOGE("The windowId is negative number and no system applications use system API");
         THROWERR_CUSTOM(env, COMMON_USE_SYSAPI_ERROR,
@@ -606,6 +626,7 @@ napi_value JsPointerManager::SetPointerStyleSync(napi_env env, int32_t windowid,
     PointerStyle style;
     style.id = pointerStyle;
     asyncContext->errorCode = InputManager::GetInstance()->SetPointerStyle(windowid, style);
+    MMI_HISTOGRAM_ERROR("InputKit.pointer.setPointerStyleSync.Error", asyncContext->errorCode);
     if (asyncContext->errorCode == COMMON_USE_SYSAPI_ERROR) {
         MMI_HILOGE("The WindowId is negative number and no system applications use system API");
         THROWERR_CUSTOM(env, COMMON_USE_SYSAPI_ERROR,
@@ -627,6 +648,7 @@ napi_value JsPointerManager::GetPointerStyle(napi_env env, int32_t windowid, nap
     CHKPP(asyncContext);
     PointerStyle pointerStyle;
     asyncContext->errorCode = InputManager::GetInstance()->GetPointerStyle(windowid, pointerStyle);
+    MMI_HISTOGRAM_ERROR("InputKit.pointer.getPointerStyle.Error", asyncContext->errorCode);
     if (asyncContext->errorCode == COMMON_USE_SYSAPI_ERROR) {
         MMI_HILOGE("WindowId is negative number and no system applications use system API");
         THROWERR_CUSTOM(env, COMMON_USE_SYSAPI_ERROR,
@@ -652,6 +674,7 @@ napi_value JsPointerManager::GetPointerStyleSync(napi_env env, int32_t windowid)
     CHKPP(asyncContext);
     PointerStyle pointerStyle;
     asyncContext->errorCode = InputManager::GetInstance()->GetPointerStyle(windowid, pointerStyle);
+    MMI_HISTOGRAM_ERROR("InputKit.pointer.getPointerStyleSync.Error", asyncContext->errorCode);
     if (asyncContext->errorCode == COMMON_USE_SYSAPI_ERROR) {
         MMI_HILOGE("WindowId is negative number and no system applications use system API");
         THROWERR_CUSTOM(env, COMMON_USE_SYSAPI_ERROR,
@@ -718,6 +741,7 @@ napi_value JsPointerManager::SetMousePrimaryButton(napi_env env, int32_t primary
     CHKPP(asyncContext);
 
     asyncContext->errorCode = InputManager::GetInstance()->SetMousePrimaryButton(primaryButton);
+    MMI_HISTOGRAM_ERROR("InputKit.pointer.setMousePrimaryButton.Error", asyncContext->errorCode);
     if (asyncContext->errorCode == COMMON_USE_SYSAPI_ERROR) {
         MMI_HILOGE("Non system applications use system API");
         THROWERR_CUSTOM(env, COMMON_USE_SYSAPI_ERROR, "Non system applications use system API");
@@ -743,6 +767,7 @@ napi_value JsPointerManager::GetMousePrimaryButton(napi_env env, napi_value hand
     CHKPP(asyncContext);
     int32_t primaryButton = 0;
     asyncContext->errorCode = InputManager::GetInstance()->GetMousePrimaryButton(primaryButton);
+    MMI_HISTOGRAM_ERROR("InputKit.pointer.getMousePrimaryButton.Error", asyncContext->errorCode);
     if (asyncContext->errorCode == COMMON_USE_SYSAPI_ERROR) {
         MMI_HILOGE("Non system applications use system API");
         THROWERR_CUSTOM(env, COMMON_USE_SYSAPI_ERROR, "Non system applications use system API");
@@ -767,6 +792,7 @@ napi_value JsPointerManager::SetHoverScrollState(napi_env env, bool state, napi_
     CHKPP(asyncContext);
 
     asyncContext->errorCode = InputManager::GetInstance()->SetHoverScrollState(state);
+    MMI_HISTOGRAM_ERROR("InputKit.pointer.setHoverScrollState.Error", asyncContext->errorCode);
     if (asyncContext->errorCode == COMMON_USE_SYSAPI_ERROR) {
         MMI_HILOGE("Non system applications use system API");
         THROWERR_CUSTOM(env, COMMON_USE_SYSAPI_ERROR, "Non system applications use system API");
@@ -793,6 +819,7 @@ napi_value JsPointerManager::GetHoverScrollState(napi_env env, napi_value handle
 
     bool state;
     asyncContext->errorCode = InputManager::GetInstance()->GetHoverScrollState(state);
+    MMI_HISTOGRAM_ERROR("InputKit.pointer.getHoverScrollState.Error", asyncContext->errorCode);
     if (asyncContext->errorCode == COMMON_USE_SYSAPI_ERROR) {
         MMI_HILOGE("Non system applications use system API");
         THROWERR_CUSTOM(env, COMMON_USE_SYSAPI_ERROR, "Non system applications use system API");
@@ -902,6 +929,7 @@ napi_value JsPointerManager::SetTouchpadScrollSwitch(napi_env env, bool switchFl
 {
     CALL_DEBUG_ENTER;
     int32_t ret = InputManager::GetInstance()->SetTouchpadScrollSwitch(switchFlag);
+    MMI_HISTOGRAM_ERROR("InputKit.pointer.setTouchpadScrollSwitch.Error", ret);
     return SetTouchpadData(env, handle, ret);
 }
 
@@ -910,6 +938,7 @@ napi_value JsPointerManager::GetTouchpadScrollSwitch(napi_env env, napi_value ha
     CALL_DEBUG_ENTER;
     bool switchFlag = true;
     int32_t ret = InputManager::GetInstance()->GetTouchpadScrollSwitch(switchFlag);
+    MMI_HISTOGRAM_ERROR("InputKit.pointer.getTouchpadScrollSwitch.Error", ret);
     return GetTouchpadBoolData(env, handle, switchFlag, ret);
 }
 
@@ -917,6 +946,7 @@ napi_value JsPointerManager::SetTouchpadScrollDirection(napi_env env, bool state
 {
     CALL_DEBUG_ENTER;
     int32_t ret = InputManager::GetInstance()->SetTouchpadScrollDirection(state);
+    MMI_HISTOGRAM_ERROR("InputKit.pointer.setTouchpadScrollDirection.Error", ret);
     return SetTouchpadData(env, handle, ret);
 }
 
@@ -925,6 +955,7 @@ napi_value JsPointerManager::GetTouchpadScrollDirection(napi_env env, napi_value
     CALL_DEBUG_ENTER;
     bool state = true;
     int32_t ret = InputManager::GetInstance()->GetTouchpadScrollDirection(state);
+    MMI_HISTOGRAM_ERROR("InputKit.pointer.getTouchpadScrollDirection.Error", ret);
     return GetTouchpadBoolData(env, handle, state, ret);
 }
 
@@ -932,6 +963,7 @@ napi_value JsPointerManager::SetTouchpadTapSwitch(napi_env env, bool switchFlag,
 {
     CALL_DEBUG_ENTER;
     int32_t ret = InputManager::GetInstance()->SetTouchpadTapSwitch(switchFlag);
+    MMI_HISTOGRAM_ERROR("InputKit.pointer.setTouchpadTapSwitch.Error", ret);
     return SetTouchpadData(env, handle, ret);
 }
 
@@ -940,12 +972,14 @@ napi_value JsPointerManager::GetTouchpadTapSwitch(napi_env env, napi_value handl
     CALL_DEBUG_ENTER;
     bool switchFlag = true;
     int32_t ret = InputManager::GetInstance()->GetTouchpadTapSwitch(switchFlag);
+    MMI_HISTOGRAM_ERROR("InputKit.pointer.getTouchpadTapSwitch.Error", ret);
     return GetTouchpadBoolData(env, handle, switchFlag, ret);
 }
 napi_value JsPointerManager::SetTouchpadPointerSpeed(napi_env env, int32_t speed, napi_value handle)
 {
     CALL_DEBUG_ENTER;
     int32_t ret = InputManager::GetInstance()->SetTouchpadPointerSpeed(speed);
+    MMI_HISTOGRAM_ERROR("InputKit.pointer.setTouchpadPointerSpeed.Error", ret);
     return SetTouchpadData(env, handle, ret);
 }
 
@@ -954,6 +988,7 @@ napi_value JsPointerManager::GetTouchpadPointerSpeed(napi_env env, napi_value ha
     CALL_DEBUG_ENTER;
     int32_t speed = 0;
     int32_t ret = InputManager::GetInstance()->GetTouchpadPointerSpeed(speed);
+    MMI_HISTOGRAM_ERROR("InputKit.pointer.getTouchpadPointerSpeed.Error", ret);
     return GetTouchpadInt32Data(env, handle, speed, ret);
 }
 
@@ -961,6 +996,7 @@ napi_value JsPointerManager::SetTouchpadPinchSwitch(napi_env env, bool switchFla
 {
     CALL_DEBUG_ENTER;
     int32_t ret = InputManager::GetInstance()->SetTouchpadPinchSwitch(switchFlag);
+    MMI_HISTOGRAM_ERROR("InputKit.pointer.setTouchpadPinchSwitch.Error", ret);
     return SetTouchpadData(env, handle, ret);
 }
 
@@ -969,6 +1005,7 @@ napi_value JsPointerManager::GetTouchpadPinchSwitch(napi_env env, napi_value han
     CALL_DEBUG_ENTER;
     bool switchFlag = true;
     int32_t ret = InputManager::GetInstance()->GetTouchpadPinchSwitch(switchFlag);
+    MMI_HISTOGRAM_ERROR("InputKit.pointer.getTouchpadPinchSwitch.Error", ret);
     return GetTouchpadBoolData(env, handle, switchFlag, ret);
 }
 
@@ -976,6 +1013,7 @@ napi_value JsPointerManager::SetTouchpadSwipeSwitch(napi_env env, bool switchFla
 {
     CALL_DEBUG_ENTER;
     int32_t ret = InputManager::GetInstance()->SetTouchpadSwipeSwitch(switchFlag);
+    MMI_HISTOGRAM_ERROR("InputKit.pointer.setTouchpadSwipeSwitch.Error", ret);
     return SetTouchpadData(env, handle, ret);
 }
 
@@ -984,6 +1022,7 @@ napi_value JsPointerManager::GetTouchpadSwipeSwitch(napi_env env, napi_value han
     CALL_DEBUG_ENTER;
     bool switchFlag = true;
     int32_t ret = InputManager::GetInstance()->GetTouchpadSwipeSwitch(switchFlag);
+    MMI_HISTOGRAM_ERROR("InputKit.pointer.getTouchpadSwipeSwitch.Error", ret);
     return GetTouchpadBoolData(env, handle, switchFlag, ret);
 }
 
@@ -991,6 +1030,7 @@ napi_value JsPointerManager::SetTouchpadRightClickType(napi_env env, int32_t typ
 {
     CALL_DEBUG_ENTER;
     int32_t ret = InputManager::GetInstance()->SetTouchpadRightClickType(type);
+    MMI_HISTOGRAM_ERROR("InputKit.pointer.setTouchpadRightClickType.Error", ret);
     return SetTouchpadData(env, handle, ret);
 }
 
@@ -999,6 +1039,7 @@ napi_value JsPointerManager::GetTouchpadRightClickType(napi_env env, napi_value 
     CALL_DEBUG_ENTER;
     int32_t type = 1;
     int32_t ret = InputManager::GetInstance()->GetTouchpadRightClickType(type);
+    MMI_HISTOGRAM_ERROR("InputKit.pointer.getTouchpadRightClickType.Error", ret);
     return GetTouchpadInt32Data(env, handle, type, ret);
 }
 
@@ -1021,6 +1062,7 @@ napi_value JsPointerManager::SetTouchpadDoubleTapAndDragState(napi_env env, bool
 {
     CALL_DEBUG_ENTER;
     int32_t ret = InputManager::GetInstance()->SetTouchpadDoubleTapAndDragState(switchFlag);
+    MMI_HISTOGRAM_ERROR("InputKit.pointer.setTouchpadDoubleTapAndDragState.Error", ret);
     return SetTouchpadData(env, handle, ret);
 }
 
@@ -1029,6 +1071,7 @@ napi_value JsPointerManager::GetTouchpadDoubleTapAndDragState(napi_env env, napi
     CALL_DEBUG_ENTER;
     bool switchFlag = true;
     int32_t ret = InputManager::GetInstance()->GetTouchpadDoubleTapAndDragState(switchFlag);
+    MMI_HISTOGRAM_ERROR("InputKit.pointer.getTouchpadDoubleTapAndDragState.Error", ret);
     return GetTouchpadBoolData(env, handle, switchFlag, ret);
 }
 
@@ -1171,16 +1214,19 @@ napi_value JsPointerManager::SetMouseScrollDirection(napi_env env, bool state)
     if (asyncContext->errorCode == COMMON_USE_SYSAPI_ERROR) {
         MMI_HILOGE("Non system applications use system API");
         THROWERR_CUSTOM(env, COMMON_USE_SYSAPI_ERROR, "Non system applications use system API");
+        MMI_HISTOGRAM_ERROR("InputKit.pointer.setMouseScrollDirection.Error", COMMON_USE_SYSAPI_ERROR);
         return nullptr;
     }
     if (asyncContext->errorCode == -COMMON_PERMISSION_CHECK_ERROR) {
         MMI_HILOGE("Permission Denied");
         THROWERR_CUSTOM(env, COMMON_PERMISSION_CHECK_ERROR, "Permission Denied");
+        MMI_HISTOGRAM_ERROR("InputKit.pointer.setMouseScrollDirection.Error", COMMON_PERMISSION_CHECK_ERROR);
         return nullptr;
     }
     if (asyncContext->errorCode < RET_OK) {
         MMI_HILOGE("Input Service Exception, errorCode: %{public}d", asyncContext->errorCode);
         THROWERR_CUSTOM(env, INPUT_SERVICE_EXCEPTION, "Input Service Exception");
+        MMI_HISTOGRAM_ERROR("InputKit.pointer.setMouseScrollDirection.Error", INPUT_SERVICE_EXCEPTION);
         return nullptr;
     }
     asyncContext->reserve << ReturnType::VOID;
@@ -1203,16 +1249,19 @@ napi_value JsPointerManager::GetMouseScrollDirection(napi_env env)
     if (asyncContext->errorCode == COMMON_USE_SYSAPI_ERROR) {
         MMI_HILOGE("Non system applications use system API");
         THROWERR_CUSTOM(env, COMMON_USE_SYSAPI_ERROR, "Non system applications use system API");
+        MMI_HISTOGRAM_ERROR("InputKit.pointer.getMouseScrollDirection.Error", COMMON_USE_SYSAPI_ERROR);
         return nullptr;
     }
     if (asyncContext->errorCode == -COMMON_PERMISSION_CHECK_ERROR) {
         MMI_HILOGE("Permission Denied");
         THROWERR_CUSTOM(env, COMMON_PERMISSION_CHECK_ERROR, "Permission Denied");
+        MMI_HISTOGRAM_ERROR("InputKit.pointer.getMouseScrollDirection.Error", COMMON_PERMISSION_CHECK_ERROR);
         return nullptr;
     }
     if (asyncContext->errorCode < RET_OK) {
         MMI_HILOGE("Input Service Exception, errorCode: %{public}d", asyncContext->errorCode);
         THROWERR_CUSTOM(env, INPUT_SERVICE_EXCEPTION, "Input Service Exception");
+        MMI_HISTOGRAM_ERROR("InputKit.pointer.getMouseScrollDirection.Error", INPUT_SERVICE_EXCEPTION);
         return nullptr;
     }
     asyncContext->reserve << ReturnType::BOOL << state;

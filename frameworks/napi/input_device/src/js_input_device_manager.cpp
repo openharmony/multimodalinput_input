@@ -15,6 +15,7 @@
 
 #include "js_input_device_manager.h"
 
+#include "mmi_api_metrics_histograms.h"
 #include "util_napi_error.h"
 
 #undef MMI_LOG_TAG
@@ -40,6 +41,9 @@ napi_value JsInputDeviceManager::GetDeviceIds(napi_env env, napi_value handle)
     CALL_DEBUG_ENTER;
     sptr<JsUtil::CallbackInfo> cb = new (std::nothrow) JsUtil::CallbackInfo();
     CHKPP(cb);
+    cb->histogramError = [](int32_t errorCode) {
+        MMI_HISTOGRAM_ERROR("InputKit.inputDevice.getDeviceIds.Error", errorCode);
+    };
     napi_value ret = CreateCallbackInfo(env, handle, cb);
     EmitJsIds(cb, cb->data.ids);
     return ret;
@@ -50,6 +54,9 @@ napi_value JsInputDeviceManager::GetDevice(napi_env env, int32_t id, napi_value 
     CALL_DEBUG_ENTER;
     sptr<JsUtil::CallbackInfo> cb = new (std::nothrow) JsUtil::CallbackInfo();
     CHKPP(cb);
+    cb->histogramError = [](int32_t errorCode) {
+        MMI_HISTOGRAM_ERROR("InputKit.inputDevice.getDevice.Error", errorCode);
+    };
     napi_value ret = CreateCallbackInfo(env, handle, cb);
     EmitJsDev(cb, id);
     return ret;
@@ -61,6 +68,9 @@ napi_value JsInputDeviceManager::SupportKeys(napi_env env, int32_t id, std::vect
     CALL_DEBUG_ENTER;
     sptr<JsUtil::CallbackInfo> cb = new (std::nothrow) JsUtil::CallbackInfo();
     CHKPP(cb);
+    cb->histogramError = [](int32_t errorCode) {
+        MMI_HISTOGRAM_ERROR("InputKit.inputDevice.supportKeys.Error", errorCode);
+    };
     napi_value ret = CreateCallbackInfo(env, handle, cb);
     EmitSupportKeys(cb, keyCodes, id);
     return ret;
@@ -87,6 +97,7 @@ napi_value JsInputDeviceManager::SupportKeysSync(napi_env env, int32_t id, std::
     int32_t napiCode = InputManager::GetInstance()->SupportKeys(id, keyCodes, callback);
     if (napiCode != OTHER_ERROR && napiCode != RET_OK) {
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Invalid input device id");
+        MMI_HISTOGRAM_ERROR("InputKit.inputDevice.supportKeysSync.Error", COMMON_PARAMETER_ERROR);
     }
     return result;
 }
@@ -96,6 +107,9 @@ napi_value JsInputDeviceManager::GetKeyboardType(napi_env env, int32_t id, napi_
     CALL_DEBUG_ENTER;
     sptr<JsUtil::CallbackInfo> cb = new (std::nothrow) JsUtil::CallbackInfo();
     CHKPP(cb);
+    cb->histogramError = [](int32_t errorCode) {
+        MMI_HISTOGRAM_ERROR("InputKit.inputDevice.getKeyboardType.Error", errorCode);
+    };
     napi_value ret = CreateCallbackInfo(env, handle, cb);
     EmitJsKeyboardType(cb, id);
     return ret;
@@ -107,6 +121,7 @@ void JsInputDeviceManager::GetKeyboardTypeSyncCallback(napi_env env, napi_value*
     auto status = napi_create_int32(env, keyboardType, &(*result));
     if (status != napi_ok) {
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Get keyboard type fail");
+        MMI_HISTOGRAM_ERROR("InputKit.inputDevice.getKeyboardTypeSync.Error", COMMON_PARAMETER_ERROR);
     }
 }
 
@@ -120,6 +135,7 @@ napi_value JsInputDeviceManager::GetKeyboardTypeSync(napi_env env, int32_t id)
     int32_t napiCode = InputManager::GetInstance()->GetKeyboardType(id, callback);
     if (napiCode != OTHER_ERROR && napiCode != RET_OK) {
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Invalid input device id");
+        MMI_HISTOGRAM_ERROR("InputKit.inputDevice.getKeyboardTypeSync.Error", COMMON_PARAMETER_ERROR);
     }
     return result;
 }
@@ -129,6 +145,9 @@ napi_value JsInputDeviceManager::GetDeviceList(napi_env env, napi_value handle)
     CALL_DEBUG_ENTER;
     sptr<JsUtil::CallbackInfo> cb = new (std::nothrow) JsUtil::CallbackInfo();
     CHKPP(cb);
+    cb->histogramError = [](int32_t errorCode) {
+        MMI_HISTOGRAM_ERROR("InputKit.inputDevice.getDeviceList.Error", errorCode);
+    };
     napi_value ret = CreateCallbackInfo(env, handle, cb);
     EmitJsIds(cb, cb->data.ids);
     return ret;
@@ -139,6 +158,9 @@ napi_value JsInputDeviceManager::GetDeviceInfo(napi_env env, int32_t id, napi_va
     CALL_DEBUG_ENTER;
     sptr<JsUtil::CallbackInfo> cb = new (std::nothrow) JsUtil::CallbackInfo();
     CHKPP(cb);
+    cb->histogramError = [](int32_t errorCode) {
+        MMI_HISTOGRAM_ERROR("InputKit.inputDevice.getDeviceInfo.Error", errorCode);
+    };
     napi_value ret = CreateCallbackInfo(env, handle, cb);
     EmitJsDev(cb, id);
     return ret;
@@ -174,6 +196,7 @@ napi_value JsInputDeviceManager::GetDeviceInfoSync(napi_env env, int32_t id, nap
     int32_t napiCode = InputManager::GetInstance()->GetDevice(id, callback);
     if (napiCode != OTHER_ERROR && napiCode != RET_OK) {
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Invalid input device id");
+        MMI_HISTOGRAM_ERROR("InputKit.inputDevice.getDeviceInfoSync.Error", COMMON_PARAMETER_ERROR);
     }
     return result;
 }
@@ -183,6 +206,9 @@ napi_value JsInputDeviceManager::SetKeyboardRepeatDelay(napi_env env, int32_t de
     CALL_DEBUG_ENTER;
     sptr<JsUtil::CallbackInfo> cb = new (std::nothrow) JsUtil::CallbackInfo();
     CHKPP(cb);
+    cb->histogramError = [](int32_t errorCode) {
+        MMI_HISTOGRAM_ERROR("InputKit.inputDevice.setKeyboardRepeatDelay.Error", errorCode);
+    };
     napi_value ret = CreateCallbackInfo(env, handle, cb);
     EmitJsSetKeyboardRepeatDelay(cb, delay);
     return ret;
@@ -193,6 +219,9 @@ napi_value JsInputDeviceManager::SetKeyboardRepeatRate(napi_env env, int32_t rat
     CALL_DEBUG_ENTER;
     sptr<JsUtil::CallbackInfo> cb = new (std::nothrow) JsUtil::CallbackInfo();
     CHKPP(cb);
+    cb->histogramError = [](int32_t errorCode) {
+        MMI_HISTOGRAM_ERROR("InputKit.inputDevice.setKeyboardRepeatRate.Error", errorCode);
+    };
     napi_value ret = CreateCallbackInfo(env, handle, cb);
     EmitJsSetKeyboardRepeatRate(cb, rate);
     return ret;
@@ -203,6 +232,9 @@ napi_value JsInputDeviceManager::GetKeyboardRepeatDelay(napi_env env, napi_value
     CALL_DEBUG_ENTER;
     sptr<JsUtil::CallbackInfo> cb = new (std::nothrow) JsUtil::CallbackInfo();
     CHKPP(cb);
+    cb->histogramError = [](int32_t errorCode) {
+        MMI_HISTOGRAM_ERROR("InputKit.inputDevice.getKeyboardRepeatDelay.Error", errorCode);
+    };
     napi_value ret = CreateCallbackInfo(env, handle, cb);
     EmitJsKeyboardRepeatDelay(cb, cb->data.keyboardRepeatDelay);
     return ret;
@@ -213,6 +245,9 @@ napi_value JsInputDeviceManager::GetKeyboardRepeatRate(napi_env env, napi_value 
     CALL_DEBUG_ENTER;
     sptr<JsUtil::CallbackInfo> cb = new (std::nothrow) JsUtil::CallbackInfo();
     CHKPP(cb);
+    cb->histogramError = [](int32_t errorCode) {
+        MMI_HISTOGRAM_ERROR("InputKit.inputDevice.getKeyboardRepeatRate.Error", errorCode);
+    };
     napi_value ret = CreateCallbackInfo(env, handle, cb);
     EmitJsKeyboardRepeatRate(cb, cb->data.keyboardRepeatRate);
     return ret;
@@ -239,6 +274,9 @@ napi_value JsInputDeviceManager::SetInputDeviceEnabled(napi_env env, int32_t dev
     CALL_DEBUG_ENTER;
     sptr<JsUtil::CallbackInfo> cb = new (std::nothrow) JsUtil::CallbackInfo();
     CHKPP(cb);
+    cb->histogramError = [](int32_t errorCode) {
+        MMI_HISTOGRAM_ERROR("InputKit.inputDevice.setInputDeviceEnabled.Error", errorCode);
+    };
     napi_value ret = CreateCallbackInfo(env, nullptr, cb);
     auto callback = [cb] (int32_t errcode) { return EmitJsSetInputDeviceEnabled(cb, errcode); };
     int32_t napiCode = InputManager::GetInstance()->SetInputDeviceEnabled(deviceId, enable, callback);
@@ -246,11 +284,13 @@ napi_value JsInputDeviceManager::SetInputDeviceEnabled(napi_env env, int32_t dev
         MMI_HILOGE("System applications use only");
         THROWERR_CUSTOM(env, ERROR_NOT_SYSAPI,
             "System applications use only");
+        MMI_HISTOGRAM_ERROR("InputKit.inputDevice.setInputDeviceEnabled.Error", ERROR_NOT_SYSAPI);
     }
     if (napiCode == ERROR_NO_PERMISSION) {
         MMI_HILOGE("Permission denied");
         THROWERR_CUSTOM(env, ERROR_NO_PERMISSION,
             "Permission denied");
+        MMI_HISTOGRAM_ERROR("InputKit.inputDevice.setInputDeviceEnabled.Error", ERROR_NO_PERMISSION);
     }
     return ret;
 }
@@ -260,6 +300,9 @@ napi_value JsInputDeviceManager::SetFunctionKeyEnabled(napi_env env, int32_t fun
     CALL_DEBUG_ENTER;
     sptr<JsUtil::CallbackInfo> cb = new (std::nothrow) JsUtil::CallbackInfo();
     CHKPP(cb);
+    cb->histogramError = [](int32_t errorCode) {
+        MMI_HISTOGRAM_ERROR("InputKit.inputDevice.setFunctionKeyEnabled.Error", errorCode);
+    };
     napi_value ret = CreateCallbackInfo(env, handle, cb);
     EmitJsSetFunctionKeyState(cb, funcKey, state);
     return ret;
@@ -270,6 +313,9 @@ napi_value JsInputDeviceManager::IsFunctionKeyEnabled(napi_env env, int32_t func
     CALL_DEBUG_ENTER;
     sptr<JsUtil::CallbackInfo> cb = new (std::nothrow) JsUtil::CallbackInfo();
     CHKPP(cb);
+    cb->histogramError = [](int32_t errorCode) {
+        MMI_HISTOGRAM_ERROR("InputKit.inputDevice.isFunctionKeyEnabled.Error", errorCode);
+    };
     napi_value ret = CreateCallbackInfo(env, handle, cb);
     EmitJsGetFunctionKeyState(cb, funcKey);
     return ret;

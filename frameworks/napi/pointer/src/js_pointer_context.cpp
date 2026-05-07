@@ -15,6 +15,7 @@
 
 #include "js_pointer_context.h"
 #include "pixel_map_napi.h"
+#include "mmi_api_metrics_histograms.h"
 
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "JsPointerContext"
@@ -149,17 +150,20 @@ std::shared_ptr<JsPointerManager> JsPointerContext::GetJsPointerMgr() const
 napi_value JsPointerContext::SetPointerVisible(napi_env env, napi_callback_info info)
 {
     CALL_DEBUG_ENTER;
+    MMI_HISTOGRAM_BOOLEAN("InputKit.pointer.setPointerVisible.Call", true);
     size_t argc = 2;
     napi_value argv[2] = { 0 };
     CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
     if (argc < 1) {
         MMI_HILOGE("At least one parameter is required");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "visible", "boolean");
+        MMI_HISTOGRAM_ERROR("InputKit.pointer.setPointerVisible.Error", COMMON_PARAMETER_ERROR);
         return nullptr;
     }
     if (!JsCommon::TypeOf(env, argv[0], napi_boolean)) {
         MMI_HILOGE("Visible parameter type is invalid");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "visible", "boolean");
+        MMI_HISTOGRAM_ERROR("InputKit.pointer.setPointerVisible.Error", COMMON_PARAMETER_ERROR);
         return nullptr;
     }
     bool visible = true;
@@ -175,6 +179,7 @@ napi_value JsPointerContext::SetPointerVisible(napi_env env, napi_callback_info 
     if (!JsCommon::TypeOf(env, argv[1], napi_function)) {
         MMI_HILOGE("Callback parameter type is invalid");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "callback", "function");
+        MMI_HISTOGRAM_ERROR("InputKit.pointer.setPointerVisible.Error", COMMON_PARAMETER_ERROR);
         return nullptr;
     }
     return jsPointerMgr->SetPointerVisible(env, visible, argv[1]);
@@ -183,17 +188,20 @@ napi_value JsPointerContext::SetPointerVisible(napi_env env, napi_callback_info 
 napi_value JsPointerContext::SetPointerVisibleSync(napi_env env, napi_callback_info info)
 {
     CALL_DEBUG_ENTER;
+    MMI_HISTOGRAM_BOOLEAN("InputKit.pointer.setPointerVisibleSync.Call", true);
     size_t argc = 1;
     napi_value argv[1] = { 0 };
     CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
     if (argc < 1) {
         MMI_HILOGE("At least one parameter is required");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "visible", "boolean");
+        MMI_HISTOGRAM_ERROR("InputKit.pointer.setPointerVisibleSync.Error", COMMON_PARAMETER_ERROR);
         return nullptr;
     }
     if (!JsCommon::TypeOf(env, argv[0], napi_boolean)) {
         MMI_HILOGE("Visible parameter type is invalid");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "visible", "boolean");
+        MMI_HISTOGRAM_ERROR("InputKit.pointer.setPointerVisibleSync.Error", COMMON_PARAMETER_ERROR);
         return nullptr;
     }
     bool visible = true;
@@ -209,6 +217,7 @@ napi_value JsPointerContext::SetPointerVisibleSync(napi_env env, napi_callback_i
 napi_value JsPointerContext::IsPointerVisible(napi_env env, napi_callback_info info)
 {
     CALL_DEBUG_ENTER;
+    MMI_HISTOGRAM_BOOLEAN("InputKit.pointer.isPointerVisible.Call", true);
     size_t argc = 1;
     napi_value argv[1] = { 0 };
     CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
@@ -223,6 +232,7 @@ napi_value JsPointerContext::IsPointerVisible(napi_env env, napi_callback_info i
     if (!JsCommon::TypeOf(env, argv[0], napi_function)) {
         MMI_HILOGE("Callback parameter type is invalid");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "callback", "function");
+        MMI_HISTOGRAM_ERROR("InputKit.pointer.isPointerVisible.Error", COMMON_PARAMETER_ERROR);
         return nullptr;
     }
 
@@ -232,6 +242,7 @@ napi_value JsPointerContext::IsPointerVisible(napi_env env, napi_callback_info i
 napi_value JsPointerContext::IsPointerVisibleSync(napi_env env, napi_callback_info info)
 {
     CALL_DEBUG_ENTER;
+    MMI_HISTOGRAM_BOOLEAN("InputKit.pointer.isPointerVisibleSync.Call", true);
     JsPointerContext *jsPointer = JsPointerContext::GetInstance(env);
     CHKPP(jsPointer);
     auto jsPointerMgr = jsPointer->GetJsPointerMgr();
@@ -242,17 +253,20 @@ napi_value JsPointerContext::IsPointerVisibleSync(napi_env env, napi_callback_in
 napi_value JsPointerContext::SetPointerColor(napi_env env, napi_callback_info info)
 {
     CALL_DEBUG_ENTER;
+    MMI_HISTOGRAM_BOOLEAN("InputKit.pointer.setPointerColor.Call", true);
     size_t argc = 2;
     napi_value argv[2] = { 0 };
     CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
     if (argc < 1) {
         MMI_HILOGE("At least 1 parameter is required");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "color", "number");
+        MMI_HISTOGRAM_ERROR("InputKit.pointer.setPointerColor.Error", COMMON_PARAMETER_ERROR);
         return nullptr;
     }
     if (!JsCommon::TypeOf(env, argv[0], napi_number)) {
         MMI_HILOGE("Color parameter type is invalid");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "color", "number");
+        MMI_HISTOGRAM_ERROR("InputKit.pointer.setPointerColor.Error", COMMON_PARAMETER_ERROR);
         return nullptr;
     }
     int32_t color = MIN_POINTER_COLOR;
@@ -275,6 +289,7 @@ napi_value JsPointerContext::SetPointerColor(napi_env env, napi_callback_info in
 napi_value JsPointerContext::GetPointerColor(napi_env env, napi_callback_info info)
 {
     CALL_DEBUG_ENTER;
+    MMI_HISTOGRAM_BOOLEAN("InputKit.pointer.getPointerColor.Call", true);
     size_t argc = 1;
     napi_value argv[1] = { 0 };
     CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
@@ -288,6 +303,7 @@ napi_value JsPointerContext::GetPointerColor(napi_env env, napi_callback_info in
     if (!JsCommon::TypeOf(env, argv[0], napi_function)) {
         MMI_HILOGE("Callback parameter type is invalid");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "callback", "function");
+        MMI_HISTOGRAM_ERROR("InputKit.pointer.getPointerColor.Error", COMMON_PARAMETER_ERROR);
         return nullptr;
     }
 
@@ -297,17 +313,20 @@ napi_value JsPointerContext::GetPointerColor(napi_env env, napi_callback_info in
 napi_value JsPointerContext::SetPointerColorSync(napi_env env, napi_callback_info info)
 {
     CALL_DEBUG_ENTER;
+    MMI_HISTOGRAM_BOOLEAN("InputKit.pointer.setPointerColorSync.Call", true);
     size_t argc = 1;
     napi_value argv[1] = { 0 };
     CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
     if (argc < 1) {
         MMI_HILOGE("At least 1 parameter is required");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "color", "number");
+        MMI_HISTOGRAM_ERROR("InputKit.pointer.setPointerColorSync.Error", COMMON_PARAMETER_ERROR);
         return nullptr;
     }
     if (!JsCommon::TypeOf(env, argv[0], napi_number)) {
         MMI_HILOGE("Color parameter type is invalid");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "color", "number");
+        MMI_HISTOGRAM_ERROR("InputKit.pointer.setPointerColorSync.Error", COMMON_PARAMETER_ERROR);
         return nullptr;
     }
     int32_t color = MIN_POINTER_COLOR;
@@ -322,6 +341,7 @@ napi_value JsPointerContext::SetPointerColorSync(napi_env env, napi_callback_inf
 napi_value JsPointerContext::GetPointerColorSync(napi_env env, napi_callback_info info)
 {
     CALL_DEBUG_ENTER;
+    MMI_HISTOGRAM_BOOLEAN("InputKit.pointer.getPointerColorSync.Call", true);
     JsPointerContext *jsPointer = JsPointerContext::GetInstance(env);
     CHKPP(jsPointer);
     auto jsPointerMgr = jsPointer->GetJsPointerMgr();
@@ -332,17 +352,20 @@ napi_value JsPointerContext::GetPointerColorSync(napi_env env, napi_callback_inf
 napi_value JsPointerContext::SetPointerSpeed(napi_env env, napi_callback_info info)
 {
     CALL_DEBUG_ENTER;
+    MMI_HISTOGRAM_BOOLEAN("InputKit.pointer.setPointerSpeed.Call", true);
     size_t argc = 2;
     napi_value argv[2] = { 0 };
     CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
     if (argc < 1) {
         MMI_HILOGE("At least 1 parameter is required");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "speed", "number");
+        MMI_HISTOGRAM_ERROR("InputKit.pointer.setPointerSpeed.Error", COMMON_PARAMETER_ERROR);
         return nullptr;
     }
     if (!JsCommon::TypeOf(env, argv[0], napi_number)) {
         MMI_HILOGE("Speed parameter type is invalid");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "speed", "number");
+        MMI_HISTOGRAM_ERROR("InputKit.pointer.setPointerSpeed.Error", COMMON_PARAMETER_ERROR);
         return nullptr;
     }
     int32_t pointerSpeed = STANDARD_SPEED;
@@ -362,6 +385,7 @@ napi_value JsPointerContext::SetPointerSpeed(napi_env env, napi_callback_info in
     if (!JsCommon::TypeOf(env, argv[1], napi_function)) {
         MMI_HILOGE("Callback parameter type is invalid");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "callback", "function");
+        MMI_HISTOGRAM_ERROR("InputKit.pointer.setPointerSpeed.Error", COMMON_PARAMETER_ERROR);
         return nullptr;
     }
     return jsPointerMgr->SetPointerSpeed(env, pointerSpeed, argv[1]);
@@ -370,17 +394,20 @@ napi_value JsPointerContext::SetPointerSpeed(napi_env env, napi_callback_info in
 napi_value JsPointerContext::SetPointerSpeedSync(napi_env env, napi_callback_info info)
 {
     CALL_DEBUG_ENTER;
+    MMI_HISTOGRAM_BOOLEAN("InputKit.pointer.setPointerSpeedSync.Call", true);
     size_t argc = 1;
     napi_value argv[1] = { 0 };
     CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
     if (argc < 1) {
         MMI_HILOGE("At least 1 parameter is required");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "speed", "number");
+        MMI_HISTOGRAM_ERROR("InputKit.pointer.setPointerSpeedSync.Error", COMMON_PARAMETER_ERROR);
         return nullptr;
     }
     if (!JsCommon::TypeOf(env, argv[0], napi_number)) {
         MMI_HILOGE("Speed parameter type is invalid");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "speed", "number");
+        MMI_HISTOGRAM_ERROR("InputKit.pointer.setPointerSpeedSync.Error", COMMON_PARAMETER_ERROR);
         return nullptr;
     }
     int32_t pointerSpeed = STANDARD_SPEED;
@@ -400,6 +427,7 @@ napi_value JsPointerContext::SetPointerSpeedSync(napi_env env, napi_callback_inf
 napi_value JsPointerContext::GetPointerSpeed(napi_env env, napi_callback_info info)
 {
     CALL_DEBUG_ENTER;
+    MMI_HISTOGRAM_BOOLEAN("InputKit.pointer.getPointerSpeed.Call", true);
     size_t argc = 1;
     napi_value argv[1] = { 0 };
     CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
@@ -413,6 +441,7 @@ napi_value JsPointerContext::GetPointerSpeed(napi_env env, napi_callback_info in
     if (!JsCommon::TypeOf(env, argv[0], napi_function)) {
         MMI_HILOGE("Callback parameter type is invalid");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "callback", "function");
+        MMI_HISTOGRAM_ERROR("InputKit.pointer.getPointerSpeed.Error", COMMON_PARAMETER_ERROR);
         return nullptr;
     }
 
@@ -422,6 +451,7 @@ napi_value JsPointerContext::GetPointerSpeed(napi_env env, napi_callback_info in
 napi_value JsPointerContext::GetPointerSpeedSync(napi_env env, napi_callback_info info)
 {
     CALL_DEBUG_ENTER;
+    MMI_HISTOGRAM_BOOLEAN("InputKit.pointer.getPointerSpeedSync.Call", true);
     JsPointerContext *jsPointer = JsPointerContext::GetInstance(env);
     CHKPP(jsPointer);
     auto jsPointerMgr = jsPointer->GetJsPointerMgr();
@@ -432,17 +462,20 @@ napi_value JsPointerContext::GetPointerSpeedSync(napi_env env, napi_callback_inf
 napi_value JsPointerContext::SetMouseScrollRows(napi_env env, napi_callback_info info)
 {
     CALL_DEBUG_ENTER;
+    MMI_HISTOGRAM_BOOLEAN("InputKit.pointer.setMouseScrollRows.Call", true);
     size_t argc = 2;
     napi_value argv[2] = { 0 };
     CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
     if (argc < 1) {
         MMI_HILOGE("At least 1 parameter is required");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "rows", "number");
+        MMI_HISTOGRAM_ERROR("InputKit.pointer.setMouseScrollRows.Error", COMMON_PARAMETER_ERROR);
         return nullptr;
     }
     if (!JsCommon::TypeOf(env, argv[0], napi_number)) {
         MMI_HILOGE("Rows parameter type is invalid");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "rows", "number");
+        MMI_HISTOGRAM_ERROR("InputKit.pointer.setMouseScrollRows.Error", COMMON_PARAMETER_ERROR);
         return nullptr;
     }
     int32_t rows = DEFAULT_ROWS;
@@ -462,6 +495,7 @@ napi_value JsPointerContext::SetMouseScrollRows(napi_env env, napi_callback_info
     if (!JsCommon::TypeOf(env, argv[1], napi_function)) {
         MMI_HILOGE("Callback parameter type is invalid");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "callback", "function");
+        MMI_HISTOGRAM_ERROR("InputKit.pointer.setMouseScrollRows.Error", COMMON_PARAMETER_ERROR);
         return nullptr;
     }
     return jsPointerMgr->SetMouseScrollRows(env, rows, argv[1]);
@@ -470,6 +504,7 @@ napi_value JsPointerContext::SetMouseScrollRows(napi_env env, napi_callback_info
 napi_value JsPointerContext::GetMouseScrollRows(napi_env env, napi_callback_info info)
 {
     CALL_DEBUG_ENTER;
+    MMI_HISTOGRAM_BOOLEAN("InputKit.pointer.getMouseScrollRows.Call", true);
     size_t argc = 1;
     napi_value argv[1] = { 0 };
     CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
@@ -482,6 +517,7 @@ napi_value JsPointerContext::GetMouseScrollRows(napi_env env, napi_callback_info
     if (!JsCommon::TypeOf(env, argv[0], napi_function)) {
         MMI_HILOGE("Callback parameter type is invalid");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "callback", "function");
+        MMI_HISTOGRAM_ERROR("InputKit.pointer.getMouseScrollRows.Error", COMMON_PARAMETER_ERROR);
         return nullptr;
     }
 
@@ -541,18 +577,21 @@ napi_value JsPointerContext::SetPointerLocation(napi_env env, napi_callback_info
 napi_value JsPointerContext::SetCustomCursor(napi_env env, napi_callback_info info)
 {
     CALL_DEBUG_ENTER;
+    MMI_HISTOGRAM_BOOLEAN("InputKit.pointer.setCustomCursor.Call", true);
     size_t argc = 4;
     napi_value argv[4] = { 0 };
     CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
     if (argc < INPUT_PARAMETER) {
         MMI_HILOGE("At least 2 parameter is required");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "windowId", "number");
+        MMI_HISTOGRAM_ERROR("InputKit.pointer.setCustomCursor.Error", COMMON_PARAMETER_ERROR);
         return nullptr;
     }
 
     int32_t windowId = GetWindowId(env, argv[0]);
     if (windowId < 0) {
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "windowId is invalid");
+        MMI_HISTOGRAM_ERROR("InputKit.pointer.setCustomCursor.Error", COMMON_PARAMETER_ERROR);
         return nullptr;
     }
     JsPointerContext *jsPointer = JsPointerContext::GetInstance(env);
@@ -566,11 +605,13 @@ napi_value JsPointerContext::SetCustomCursor(napi_env env, napi_callback_info in
     }
     if (!JsCommon::TypeOf(env, argv[1], napi_object)) {
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "pixelMap", "object");
+        MMI_HISTOGRAM_ERROR("InputKit.pointer.setCustomCursor.Error", COMMON_PARAMETER_ERROR);
         return nullptr;
     }
     std::shared_ptr<Media::PixelMap> pixelMap = Media::PixelMapNapi::GetPixelMap(env, argv[1]);
     if (pixelMap == nullptr) {
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "pixelMap is invalid");
+        MMI_HISTOGRAM_ERROR("InputKit.pointer.setCustomCursor.Error", COMMON_PARAMETER_ERROR);
         return nullptr;
     }
     CursorFocus cursorFocus;
@@ -596,12 +637,14 @@ napi_value JsPointerContext::SetCustomCursor(napi_env env, napi_callback_info in
 napi_value JsPointerContext::SetCustomCursorSync(napi_env env, napi_callback_info info)
 {
     CALL_DEBUG_ENTER;
+    MMI_HISTOGRAM_BOOLEAN("InputKit.pointer.setCustomCursorSync.Call", true);
     size_t argc = 4;
     napi_value argv[4] = { 0 };
     CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
     if (argc < INPUT_PARAMETER) {
         MMI_HILOGE("At least 2 parameter is required");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "windowId", "number");
+        MMI_HISTOGRAM_ERROR("InputKit.pointer.setCustomCursorSync.Error", COMMON_PARAMETER_ERROR);
         return nullptr;
     }
 
@@ -612,11 +655,13 @@ napi_value JsPointerContext::SetCustomCursorSync(napi_env env, napi_callback_inf
 
     if (!JsCommon::TypeOf(env, argv[1], napi_object)) {
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "pixelMap", "napi_object");
+        MMI_HISTOGRAM_ERROR("InputKit.pointer.setCustomCursorSync.Error", COMMON_PARAMETER_ERROR);
         return nullptr;
     }
     std::shared_ptr<Media::PixelMap> pixelMap = Media::PixelMapNapi::GetPixelMap(env, argv[1]);
     if (pixelMap == nullptr) {
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "pixelMap is invalid");
+        MMI_HISTOGRAM_ERROR("InputKit.pointer.setCustomCursorSync.Error", COMMON_PARAMETER_ERROR);
         return nullptr;
     }
     JsPointerContext *jsPointer = JsPointerContext::GetInstance(env);
@@ -719,17 +764,20 @@ int32_t JsPointerContext::GetCursorFocusY(napi_env env, napi_value value)
 napi_value JsPointerContext::SetPointerSize(napi_env env, napi_callback_info info)
 {
     CALL_DEBUG_ENTER;
+    MMI_HISTOGRAM_BOOLEAN("InputKit.pointer.setPointerSize.Call", true);
     size_t argc = 2;
     napi_value argv[2] = { 0 };
     CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
     if (argc < 1) {
         MMI_HILOGE("At least 1 parameter is required");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "size", "number");
+        MMI_HISTOGRAM_ERROR("InputKit.pointer.setPointerSize.Error", COMMON_PARAMETER_ERROR);
         return nullptr;
     }
     if (!JsCommon::TypeOf(env, argv[0], napi_number)) {
         MMI_HILOGE("Size parameter type is invalid");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "size", "number");
+        MMI_HISTOGRAM_ERROR("InputKit.pointer.setPointerSize.Error", COMMON_PARAMETER_ERROR);
         return nullptr;
     }
     int32_t size = DEFAULT_POINTER_SIZE;
@@ -749,6 +797,7 @@ napi_value JsPointerContext::SetPointerSize(napi_env env, napi_callback_info inf
     if (!JsCommon::TypeOf(env, argv[1], napi_function)) {
         MMI_HILOGE("Callback parameter type is invalid");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "callback", "function");
+        MMI_HISTOGRAM_ERROR("InputKit.pointer.setPointerSize.Error", COMMON_PARAMETER_ERROR);
         return nullptr;
     }
     return jsPointerMgr->SetPointerSize(env, size, argv[1]);
@@ -757,6 +806,7 @@ napi_value JsPointerContext::SetPointerSize(napi_env env, napi_callback_info inf
 napi_value JsPointerContext::GetPointerSize(napi_env env, napi_callback_info info)
 {
     CALL_DEBUG_ENTER;
+    MMI_HISTOGRAM_BOOLEAN("InputKit.pointer.getPointerSize.Call", true);
     size_t argc = 1;
     napi_value argv[1] = { 0 };
     CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
@@ -769,6 +819,7 @@ napi_value JsPointerContext::GetPointerSize(napi_env env, napi_callback_info inf
     if (!JsCommon::TypeOf(env, argv[0], napi_function)) {
         MMI_HILOGE("Callback parameter type is invalid");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "callback", "function");
+        MMI_HISTOGRAM_ERROR("InputKit.pointer.getPointerSize.Error", COMMON_PARAMETER_ERROR);
         return nullptr;
     }
 
@@ -778,17 +829,20 @@ napi_value JsPointerContext::GetPointerSize(napi_env env, napi_callback_info inf
 napi_value JsPointerContext::SetPointerSizeSync(napi_env env, napi_callback_info info)
 {
     CALL_DEBUG_ENTER;
+    MMI_HISTOGRAM_BOOLEAN("InputKit.pointer.setPointerSizeSync.Call", true);
     size_t argc = 1;
     napi_value argv[1] = { 0 };
     CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
     if (argc < 1) {
         MMI_HILOGE("At least 1 parameter is required");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "size", "number");
+        MMI_HISTOGRAM_ERROR("InputKit.pointer.setPointerSizeSync.Error", COMMON_PARAMETER_ERROR);
         return nullptr;
     }
     if (!JsCommon::TypeOf(env, argv[0], napi_number)) {
         MMI_HILOGE("Size parameter type is invalid");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "size", "number");
+        MMI_HISTOGRAM_ERROR("InputKit.pointer.setPointerSizeSync.Error", COMMON_PARAMETER_ERROR);
         return nullptr;
     }
     int32_t size = DEFAULT_POINTER_SIZE;
@@ -808,6 +862,7 @@ napi_value JsPointerContext::SetPointerSizeSync(napi_env env, napi_callback_info
 napi_value JsPointerContext::GetPointerSizeSync(napi_env env, napi_callback_info info)
 {
     CALL_DEBUG_ENTER;
+    MMI_HISTOGRAM_BOOLEAN("InputKit.pointer.getPointerSizeSync.Call", true);
     JsPointerContext *jsPointer = JsPointerContext::GetInstance(env);
     CHKPP(jsPointer);
     auto jsPointerMgr = jsPointer->GetJsPointerMgr();
@@ -817,17 +872,20 @@ napi_value JsPointerContext::GetPointerSizeSync(napi_env env, napi_callback_info
 napi_value JsPointerContext::SetPointerStyle(napi_env env, napi_callback_info info)
 {
     CALL_DEBUG_ENTER;
+    MMI_HISTOGRAM_BOOLEAN("InputKit.pointer.setPointerStyle.Call", true);
     size_t argc = 3;
     napi_value argv[3] = { 0 };
     CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
     if (argc < INPUT_PARAMETER) {
         MMI_HILOGE("At least 2 parameter is required");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "windowId", "number");
+        MMI_HISTOGRAM_ERROR("InputKit.pointer.setPointerStyle.Error", COMMON_PARAMETER_ERROR);
         return nullptr;
     }
     if (!JsCommon::TypeOf(env, argv[0], napi_number)) {
         MMI_HILOGE("windowId parameter type is invalid");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "windowId", "number");
+        MMI_HISTOGRAM_ERROR("InputKit.pointer.setPointerStyle.Error", COMMON_PARAMETER_ERROR);
         return nullptr;
     }
     int32_t windowid = 0;
@@ -835,11 +893,13 @@ napi_value JsPointerContext::SetPointerStyle(napi_env env, napi_callback_info in
     if (windowid < 0 && windowid != GLOBAL_WINDOW_ID) {
         MMI_HILOGE("Invalid windowid");
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Windowid is invalid");
+        MMI_HISTOGRAM_ERROR("InputKit.pointer.setPointerStyle.Error", COMMON_PARAMETER_ERROR);
         return nullptr;
     }
     if (!JsCommon::TypeOf(env, argv[1], napi_number)) {
         MMI_HILOGE("pointerStyle parameter type is invalid");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "pointerStyle", "number");
+        MMI_HISTOGRAM_ERROR("InputKit.pointer.setPointerStyle.Error", COMMON_PARAMETER_ERROR);
         return nullptr;
     }
     int32_t pointerStyle = 0;
@@ -847,6 +907,7 @@ napi_value JsPointerContext::SetPointerStyle(napi_env env, napi_callback_info in
     if ((pointerStyle < DEFAULT && pointerStyle != DEVELOPER_DEFINED_ICON) || pointerStyle > LASER_CURSOR_DOT_RED) {
         MMI_HILOGE("Undefined pointer style");
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Pointer style does not exist");
+        MMI_HISTOGRAM_ERROR("InputKit.pointer.setPointerStyle.Error", COMMON_PARAMETER_ERROR);
         return nullptr;
     }
     JsPointerContext *jsPointer = JsPointerContext::GetInstance(env);
@@ -859,6 +920,7 @@ napi_value JsPointerContext::SetPointerStyle(napi_env env, napi_callback_info in
     if (!JsCommon::TypeOf(env, argv[INPUT_PARAMETER], napi_function)) {
         MMI_HILOGE("Callback parameter type is invalid");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "callback", "function");
+        MMI_HISTOGRAM_ERROR("InputKit.pointer.setPointerStyle.Error", COMMON_PARAMETER_ERROR);
         return nullptr;
     }
     return jsPointerMgr->SetPointerStyle(env, windowid, pointerStyle, argv[INPUT_PARAMETER]);
@@ -867,17 +929,20 @@ napi_value JsPointerContext::SetPointerStyle(napi_env env, napi_callback_info in
 napi_value JsPointerContext::SetPointerStyleSync(napi_env env, napi_callback_info info)
 {
     CALL_DEBUG_ENTER;
+    MMI_HISTOGRAM_BOOLEAN("InputKit.pointer.setPointerStyleSync.Call", true);
     size_t argc = 2;
     napi_value argv[2] = { 0 };
     CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
     if (argc < INPUT_PARAMETER) {
         MMI_HILOGE("At least 2 parameter is required");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "windowId", "number");
+        MMI_HISTOGRAM_ERROR("InputKit.pointer.setPointerStyleSync.Error", COMMON_PARAMETER_ERROR);
         return nullptr;
     }
     if (!JsCommon::TypeOf(env, argv[0], napi_number)) {
         MMI_HILOGE("windowId parameter type is invalid");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "windowId", "number");
+        MMI_HISTOGRAM_ERROR("InputKit.pointer.setPointerStyleSync.Error", COMMON_PARAMETER_ERROR);
         return nullptr;
     }
     int32_t windowid = 0;
@@ -885,11 +950,13 @@ napi_value JsPointerContext::SetPointerStyleSync(napi_env env, napi_callback_inf
     if (windowid < 0 && windowid != GLOBAL_WINDOW_ID) {
         MMI_HILOGE("Invalid windowid");
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Windowid is invalid");
+        MMI_HISTOGRAM_ERROR("InputKit.pointer.setPointerStyleSync.Error", COMMON_PARAMETER_ERROR);
         return nullptr;
     }
     if (!JsCommon::TypeOf(env, argv[1], napi_number)) {
         MMI_HILOGE("pointerStyle parameter type is invalid");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "pointerStyle", "number");
+        MMI_HISTOGRAM_ERROR("InputKit.pointer.setPointerStyleSync.Error", COMMON_PARAMETER_ERROR);
         return nullptr;
     }
     int32_t pointerStyle = 0;
@@ -897,6 +964,7 @@ napi_value JsPointerContext::SetPointerStyleSync(napi_env env, napi_callback_inf
     if ((pointerStyle < DEFAULT && pointerStyle != DEVELOPER_DEFINED_ICON) || pointerStyle > LASER_CURSOR_DOT_RED) {
         MMI_HILOGE("Undefined pointer style");
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Pointer style does not exist");
+        MMI_HISTOGRAM_ERROR("InputKit.pointer.setPointerStyleSync.Error", COMMON_PARAMETER_ERROR);
         return nullptr;
     }
     JsPointerContext *jsPointer = JsPointerContext::GetInstance(env);
@@ -909,17 +977,20 @@ napi_value JsPointerContext::SetPointerStyleSync(napi_env env, napi_callback_inf
 napi_value JsPointerContext::GetPointerStyle(napi_env env, napi_callback_info info)
 {
     CALL_DEBUG_ENTER;
+    MMI_HISTOGRAM_BOOLEAN("InputKit.pointer.getPointerStyle.Call", true);
     size_t argc = 2;
     napi_value argv[2] = { 0 };
     CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
     if (argc < 1) {
         MMI_HILOGE("At least 1 parameter is required");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "windowId", "number");
+        MMI_HISTOGRAM_ERROR("InputKit.pointer.getPointerStyle.Error", COMMON_PARAMETER_ERROR);
         return nullptr;
     }
     if (!JsCommon::TypeOf(env, argv[0], napi_number)) {
         MMI_HILOGE("windowId parameter type is invalid");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "windowId", "number");
+        MMI_HISTOGRAM_ERROR("InputKit.pointer.getPointerStyle.Error", COMMON_PARAMETER_ERROR);
         return nullptr;
     }
     int32_t windowid = 0;
@@ -927,6 +998,7 @@ napi_value JsPointerContext::GetPointerStyle(napi_env env, napi_callback_info in
     if (windowid < 0 && windowid != GLOBAL_WINDOW_ID) {
         MMI_HILOGE("Invalid windowid");
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Windowid is invalid");
+        MMI_HISTOGRAM_ERROR("InputKit.pointer.getPointerStyle.Error", COMMON_PARAMETER_ERROR);
         return nullptr;
     }
     JsPointerContext *jsPointer = JsPointerContext::GetInstance(env);
@@ -939,6 +1011,7 @@ napi_value JsPointerContext::GetPointerStyle(napi_env env, napi_callback_info in
     if (!JsCommon::TypeOf(env, argv[1], napi_function)) {
         MMI_HILOGE("Callback parameter type is invalid");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "callback", "function");
+        MMI_HISTOGRAM_ERROR("InputKit.pointer.getPointerStyle.Error", COMMON_PARAMETER_ERROR);
         return nullptr;
     }
     return jsPointerMgr->GetPointerStyle(env, windowid, argv[1]);
@@ -947,17 +1020,20 @@ napi_value JsPointerContext::GetPointerStyle(napi_env env, napi_callback_info in
 napi_value JsPointerContext::GetPointerStyleSync(napi_env env, napi_callback_info info)
 {
     CALL_DEBUG_ENTER;
+    MMI_HISTOGRAM_BOOLEAN("InputKit.pointer.getPointerStyleSync.Call", true);
     size_t argc = 1;
     napi_value argv[1] = { 0 };
     CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
     if (argc < 1) {
         MMI_HILOGE("At least 1 parameter is required");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "windowId", "number");
+        MMI_HISTOGRAM_ERROR("InputKit.pointer.getPointerStyleSync.Error", COMMON_PARAMETER_ERROR);
         return nullptr;
     }
     if (!JsCommon::TypeOf(env, argv[0], napi_number)) {
         MMI_HILOGE("windowId parameter type is invalid");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "windowId", "number");
+        MMI_HISTOGRAM_ERROR("InputKit.pointer.getPointerStyleSync.Error", COMMON_PARAMETER_ERROR);
         return nullptr;
     }
     int32_t windowId = 0;
@@ -965,6 +1041,7 @@ napi_value JsPointerContext::GetPointerStyleSync(napi_env env, napi_callback_inf
     if (windowId < 0 && windowId != GLOBAL_WINDOW_ID) {
         MMI_HILOGE("Invalid windowId");
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "WindowId is invalid");
+        MMI_HISTOGRAM_ERROR("InputKit.pointer.getPointerStyleSync.Error", COMMON_PARAMETER_ERROR);
         return nullptr;
     }
     JsPointerContext *jsPointer = JsPointerContext::GetInstance(env);
@@ -1275,17 +1352,20 @@ napi_value JsPointerContext::CreateMousePrimaryButton(napi_env env, napi_value e
 napi_value JsPointerContext::SetMousePrimaryButton(napi_env env, napi_callback_info info)
 {
     CALL_DEBUG_ENTER;
+    MMI_HISTOGRAM_BOOLEAN("InputKit.pointer.setMousePrimaryButton.Call", true);
     size_t argc = 2;
     napi_value argv[2] = { 0 };
     CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
     if (argc < 1) {
         MMI_HILOGE("At least one parameter is required");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "primaryButton", "number");
+        MMI_HISTOGRAM_ERROR("InputKit.pointer.setMousePrimaryButton.Error", COMMON_PARAMETER_ERROR);
         return nullptr;
     }
     if (!JsCommon::TypeOf(env, argv[0], napi_number)) {
         MMI_HILOGE("primaryButton parameter type is invalid");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "primaryButton", "number");
+        MMI_HISTOGRAM_ERROR("InputKit.pointer.setMousePrimaryButton.Error", COMMON_PARAMETER_ERROR);
         return nullptr;
     }
     int32_t primaryButton = 0;
@@ -1293,6 +1373,7 @@ napi_value JsPointerContext::SetMousePrimaryButton(napi_env env, napi_callback_i
     if (primaryButton < LEFT_BUTTON || primaryButton > RIGHT_BUTTON) {
         MMI_HILOGE("Undefined mouse primary button");
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Mouse primary button does not exist");
+        MMI_HISTOGRAM_ERROR("InputKit.pointer.setMousePrimaryButton.Error", COMMON_PARAMETER_ERROR);
         return nullptr;
     }
     JsPointerContext *jsPointer = JsPointerContext::GetInstance(env);
@@ -1305,6 +1386,7 @@ napi_value JsPointerContext::SetMousePrimaryButton(napi_env env, napi_callback_i
     if (!JsCommon::TypeOf(env, argv[1], napi_function)) {
         MMI_HILOGE("Callback parameter type is invalid");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "callback", "function");
+        MMI_HISTOGRAM_ERROR("InputKit.pointer.setMousePrimaryButton.Error", COMMON_PARAMETER_ERROR);
         return nullptr;
     }
     return jsPointerMgr->SetMousePrimaryButton(env, primaryButton, argv[1]);
@@ -1313,6 +1395,7 @@ napi_value JsPointerContext::SetMousePrimaryButton(napi_env env, napi_callback_i
 napi_value JsPointerContext::GetMousePrimaryButton(napi_env env, napi_callback_info info)
 {
     CALL_DEBUG_ENTER;
+    MMI_HISTOGRAM_BOOLEAN("InputKit.pointer.getMousePrimaryButton.Call", true);
     size_t argc = 1;
     napi_value argv[1] = { 0 };
     CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
@@ -1326,6 +1409,7 @@ napi_value JsPointerContext::GetMousePrimaryButton(napi_env env, napi_callback_i
     if (!JsCommon::TypeOf(env, argv[0], napi_function)) {
         MMI_HILOGE("Callback parameter type is invalid");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "callback", "function");
+        MMI_HISTOGRAM_ERROR("InputKit.pointer.getMousePrimaryButton.Error", COMMON_PARAMETER_ERROR);
         return nullptr;
     }
     return jsPointerMgr->GetMousePrimaryButton(env, argv[0]);
@@ -1334,17 +1418,20 @@ napi_value JsPointerContext::GetMousePrimaryButton(napi_env env, napi_callback_i
 napi_value JsPointerContext::SetHoverScrollState(napi_env env, napi_callback_info info)
 {
     CALL_DEBUG_ENTER;
+    MMI_HISTOGRAM_BOOLEAN("InputKit.pointer.setHoverScrollState.Call", true);
     size_t argc = 2;
     napi_value argv[2] = { 0 };
     CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
     if (argc < 1) {
         MMI_HILOGE("At least one parameter is required");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "state", "boolean");
+        MMI_HISTOGRAM_ERROR("InputKit.pointer.setHoverScrollState.Error", COMMON_PARAMETER_ERROR);
         return nullptr;
     }
     if (!JsCommon::TypeOf(env, argv[0], napi_boolean)) {
         MMI_HILOGE("State parameter type is invalid");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "state", "boolean");
+        MMI_HISTOGRAM_ERROR("InputKit.pointer.setHoverScrollState.Error", COMMON_PARAMETER_ERROR);
         return nullptr;
     }
     bool state = true;
@@ -1368,6 +1455,7 @@ napi_value JsPointerContext::SetHoverScrollState(napi_env env, napi_callback_inf
 napi_value JsPointerContext::GetHoverScrollState(napi_env env, napi_callback_info info)
 {
     CALL_DEBUG_ENTER;
+    MMI_HISTOGRAM_BOOLEAN("InputKit.pointer.getHoverScrollState.Call", true);
     size_t argc = 1;
     napi_value argv[1] = { 0 };
     CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
@@ -1386,7 +1474,8 @@ napi_value JsPointerContext::GetHoverScrollState(napi_env env, napi_callback_inf
     return jsPointerMgr->GetHoverScrollState(env, argv[0]);
 }
 
-napi_value JsPointerContext::SetTouchpadBoolData(napi_env env, napi_callback_info info, SetTouchpadBoolDataFunc func)
+napi_value JsPointerContext::SetTouchpadBoolData(napi_env env, napi_callback_info info,
+    SetTouchpadBoolDataFunc func, std::function<void(int32_t)> histogramError)
 {
     CALL_DEBUG_ENTER;
     if (!func) {
@@ -1399,11 +1488,13 @@ napi_value JsPointerContext::SetTouchpadBoolData(napi_env env, napi_callback_inf
     if (argc == 0) {
         MMI_HILOGE("At least one parameter is required");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "switchFlag", "boolean");
+        histogramError(COMMON_PARAMETER_ERROR);
         return nullptr;
     }
     if (!JsCommon::TypeOf(env, argv[0], napi_boolean)) {
         MMI_HILOGE("Bool data parameter type is invalid");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "switchFlag", "boolean");
+        histogramError(COMMON_PARAMETER_ERROR);
         return nullptr;
     }
     bool switchFlag = true;
@@ -1415,13 +1506,14 @@ napi_value JsPointerContext::SetTouchpadBoolData(napi_env env, napi_callback_inf
     if (!JsCommon::TypeOf(env, argv[1], napi_function)) {
         MMI_HILOGE("Callback parameter type is invalid");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "callback", "function");
+        histogramError(COMMON_PARAMETER_ERROR);
         return nullptr;
     }
     return func(env, switchFlag, argv[1]);
 }
 
 napi_value JsPointerContext::SetTouchpadInt32Data(napi_env env, napi_callback_info info, SetTouchpadInt32DataFunc func,
-    int32_t dataMax, int32_t dataMin)
+    int32_t dataMax, int32_t dataMin, std::function<void(int32_t)> histogramError)
 {
     CALL_DEBUG_ENTER;
     size_t argc = 2;
@@ -1430,11 +1522,13 @@ napi_value JsPointerContext::SetTouchpadInt32Data(napi_env env, napi_callback_in
     if (argc < 0) {
         MMI_HILOGE("At least 1 parameter is required");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "data", "number");
+        histogramError(COMMON_PARAMETER_ERROR);
         return nullptr;
     }
     if (!JsCommon::TypeOf(env, argv[0], napi_number)) {
         MMI_HILOGE("Int32 data parameter type is invalid");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "data", "number");
+        histogramError(COMMON_PARAMETER_ERROR);
         return nullptr;
     }
     int32_t data = 0;
@@ -1451,13 +1545,15 @@ napi_value JsPointerContext::SetTouchpadInt32Data(napi_env env, napi_callback_in
     if (!JsCommon::TypeOf(env, argv[1], napi_function)) {
         MMI_HILOGE("Callback parameter type is invalid");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "callback", "function");
+        histogramError(COMMON_PARAMETER_ERROR);
         return nullptr;
     }
 
     return func(env, data, argv[1]);
 }
 
-napi_value JsPointerContext::GetTouchpadData(napi_env env, napi_callback_info info, GetTouchpadFunc func)
+napi_value JsPointerContext::GetTouchpadData(napi_env env, napi_callback_info info,
+    GetTouchpadFunc func, std::function<void(int32_t)> histogramError)
 {
     CALL_DEBUG_ENTER;
     size_t argc = 1;
@@ -1470,6 +1566,7 @@ napi_value JsPointerContext::GetTouchpadData(napi_env env, napi_callback_info in
     if (!JsCommon::TypeOf(env, argv[0], napi_function)) {
         MMI_HILOGE("Callback parameter type is invalid");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "callback", "function");
+        histogramError(COMMON_PARAMETER_ERROR);
         return nullptr;
     }
 
@@ -1479,6 +1576,7 @@ napi_value JsPointerContext::GetTouchpadData(napi_env env, napi_callback_info in
 napi_value JsPointerContext::SetTouchpadScrollSwitch(napi_env env, napi_callback_info info)
 {
     CALL_DEBUG_ENTER;
+    MMI_HISTOGRAM_BOOLEAN("InputKit.pointer.setTouchpadScrollSwitch.Call", true);
     JsPointerContext *jsPointer = JsPointerContext::GetInstance(env);
     CHKPP(jsPointer);
     auto jsPointerMgr = jsPointer->GetJsPointerMgr();
@@ -1486,12 +1584,16 @@ napi_value JsPointerContext::SetTouchpadScrollSwitch(napi_env env, napi_callback
     auto func = [jsPointerMgr] (napi_env env, bool switchFlag, napi_value handle) -> napi_value {
         return jsPointerMgr->SetTouchpadScrollSwitch(env, switchFlag, handle);
     };
-    return SetTouchpadBoolData(env, info, func);
+    auto histogramError = [](int32_t errorCode) {
+        MMI_HISTOGRAM_ERROR("InputKit.pointer.setTouchpadScrollSwitch.Error", errorCode);
+    };
+    return SetTouchpadBoolData(env, info, func, histogramError);
 }
 
 napi_value JsPointerContext::GetTouchpadScrollSwitch(napi_env env, napi_callback_info info)
 {
     CALL_DEBUG_ENTER;
+    MMI_HISTOGRAM_BOOLEAN("InputKit.pointer.getTouchpadScrollSwitch.Call", true);
     JsPointerContext *jsPointer = JsPointerContext::GetInstance(env);
     CHKPP(jsPointer);
     auto jsPointerMgr = jsPointer->GetJsPointerMgr();
@@ -1499,12 +1601,16 @@ napi_value JsPointerContext::GetTouchpadScrollSwitch(napi_env env, napi_callback
     auto func = [jsPointerMgr] (napi_env env, napi_value handle) -> napi_value {
         return jsPointerMgr->GetTouchpadScrollSwitch(env, handle);
     };
-    return GetTouchpadData(env, info, func);
+    auto histogramError = [](int32_t errorCode) {
+        MMI_HISTOGRAM_ERROR("InputKit.pointer.getTouchpadScrollSwitch.Error", errorCode);
+    };
+    return GetTouchpadData(env, info, func, histogramError);
 }
 
 napi_value JsPointerContext::SetTouchpadScrollDirection(napi_env env, napi_callback_info info)
 {
     CALL_DEBUG_ENTER;
+    MMI_HISTOGRAM_BOOLEAN("InputKit.pointer.setTouchpadScrollDirection.Call", true);
     JsPointerContext *jsPointer = JsPointerContext::GetInstance(env);
     CHKPP(jsPointer);
     auto jsPointerMgr = jsPointer->GetJsPointerMgr();
@@ -1512,12 +1618,16 @@ napi_value JsPointerContext::SetTouchpadScrollDirection(napi_env env, napi_callb
     auto func = [jsPointerMgr] (napi_env env, bool state, napi_value handle) -> napi_value {
         return jsPointerMgr->SetTouchpadScrollDirection(env, state, handle);
     };
-    return SetTouchpadBoolData(env, info, func);
+    auto histogramError = [](int32_t errorCode) {
+        MMI_HISTOGRAM_ERROR("InputKit.pointer.setTouchpadScrollDirection.Error", errorCode);
+    };
+    return SetTouchpadBoolData(env, info, func, histogramError);
 }
 
 napi_value JsPointerContext::GetTouchpadScrollDirection(napi_env env, napi_callback_info info)
 {
     CALL_DEBUG_ENTER;
+    MMI_HISTOGRAM_BOOLEAN("InputKit.pointer.getTouchpadScrollDirection.Call", true);
     JsPointerContext *jsPointer = JsPointerContext::GetInstance(env);
     CHKPP(jsPointer);
     auto jsPointerMgr = jsPointer->GetJsPointerMgr();
@@ -1525,12 +1635,16 @@ napi_value JsPointerContext::GetTouchpadScrollDirection(napi_env env, napi_callb
     auto func = [jsPointerMgr] (napi_env env, napi_value handle) -> napi_value {
         return jsPointerMgr->GetTouchpadScrollDirection(env, handle);
     };
-    return GetTouchpadData(env, info, func);
+    auto histogramError = [](int32_t errorCode) {
+        MMI_HISTOGRAM_ERROR("InputKit.pointer.getTouchpadScrollDirection.Error", errorCode);
+    };
+    return GetTouchpadData(env, info, func, histogramError);
 }
 
 napi_value JsPointerContext::SetTouchpadTapSwitch(napi_env env, napi_callback_info info)
 {
     CALL_DEBUG_ENTER;
+    MMI_HISTOGRAM_BOOLEAN("InputKit.pointer.setTouchpadTapSwitch.Call", true);
     JsPointerContext *jsPointer = JsPointerContext::GetInstance(env);
     CHKPP(jsPointer);
     auto jsPointerMgr = jsPointer->GetJsPointerMgr();
@@ -1538,12 +1652,16 @@ napi_value JsPointerContext::SetTouchpadTapSwitch(napi_env env, napi_callback_in
     auto func = [jsPointerMgr] (napi_env env, bool switchFlag, napi_value handle) -> napi_value {
         return jsPointerMgr->SetTouchpadTapSwitch(env, switchFlag, handle);
     };
-    return SetTouchpadBoolData(env, info, func);
+    auto histogramError = [](int32_t errorCode) {
+        MMI_HISTOGRAM_ERROR("InputKit.pointer.setTouchpadTapSwitch.Error", errorCode);
+    };
+    return SetTouchpadBoolData(env, info, func, histogramError);
 }
 
 napi_value JsPointerContext::GetTouchpadTapSwitch(napi_env env, napi_callback_info info)
 {
     CALL_DEBUG_ENTER;
+    MMI_HISTOGRAM_BOOLEAN("InputKit.pointer.getTouchpadTapSwitch.Call", true);
     JsPointerContext *jsPointer = JsPointerContext::GetInstance(env);
     CHKPP(jsPointer);
     auto jsPointerMgr = jsPointer->GetJsPointerMgr();
@@ -1551,12 +1669,16 @@ napi_value JsPointerContext::GetTouchpadTapSwitch(napi_env env, napi_callback_in
     auto func = [jsPointerMgr] (napi_env env, napi_value handle) -> napi_value {
         return jsPointerMgr->GetTouchpadTapSwitch(env, handle);
     };
-    return GetTouchpadData(env, info, func);
+    auto histogramError = [](int32_t errorCode) {
+        MMI_HISTOGRAM_ERROR("InputKit.pointer.getTouchpadTapSwitch.Error", errorCode);
+    };
+    return GetTouchpadData(env, info, func, histogramError);
 }
 
 napi_value JsPointerContext::SetTouchpadPointerSpeed(napi_env env, napi_callback_info info)
 {
     CALL_DEBUG_ENTER;
+    MMI_HISTOGRAM_BOOLEAN("InputKit.pointer.setTouchpadPointerSpeed.Call", true);
     JsPointerContext *jsPointer = JsPointerContext::GetInstance(env);
     CHKPP(jsPointer);
     auto jsPointerMgr = jsPointer->GetJsPointerMgr();
@@ -1564,12 +1686,16 @@ napi_value JsPointerContext::SetTouchpadPointerSpeed(napi_env env, napi_callback
     auto func = [jsPointerMgr] (napi_env env, int32_t data, napi_value handle) -> napi_value {
         return jsPointerMgr->SetTouchpadPointerSpeed(env, data, handle);
     };
-    return SetTouchpadInt32Data(env, info, func, MAX_TOUCHPAD_SPEED, MIN_SPEED);
+    auto histogramError = [](int32_t errorCode) {
+        MMI_HISTOGRAM_ERROR("InputKit.pointer.setTouchpadPointerSpeed.Error", errorCode);
+    };
+    return SetTouchpadInt32Data(env, info, func, MAX_TOUCHPAD_SPEED, MIN_SPEED, histogramError);
 }
 
 napi_value JsPointerContext::GetTouchpadPointerSpeed(napi_env env, napi_callback_info info)
 {
     CALL_DEBUG_ENTER;
+    MMI_HISTOGRAM_BOOLEAN("InputKit.pointer.getTouchpadPointerSpeed.Call", true);
     JsPointerContext *jsPointer = JsPointerContext::GetInstance(env);
     CHKPP(jsPointer);
     auto jsPointerMgr = jsPointer->GetJsPointerMgr();
@@ -1577,12 +1703,16 @@ napi_value JsPointerContext::GetTouchpadPointerSpeed(napi_env env, napi_callback
     auto func = [jsPointerMgr] (napi_env env, napi_value handle) -> napi_value {
         return jsPointerMgr->GetTouchpadPointerSpeed(env, handle);
     };
-    return GetTouchpadData(env, info, func);
+    auto histogramError = [](int32_t errorCode) {
+        MMI_HISTOGRAM_ERROR("InputKit.pointer.getTouchpadPointerSpeed.Error", errorCode);
+    };
+    return GetTouchpadData(env, info, func, histogramError);
 }
 
 napi_value JsPointerContext::SetTouchpadPinchSwitch(napi_env env, napi_callback_info info)
 {
     CALL_DEBUG_ENTER;
+    MMI_HISTOGRAM_BOOLEAN("InputKit.pointer.setTouchpadPinchSwitch.Call", true);
     JsPointerContext *jsPointer = JsPointerContext::GetInstance(env);
     CHKPP(jsPointer);
     auto jsPointerMgr = jsPointer->GetJsPointerMgr();
@@ -1590,12 +1720,16 @@ napi_value JsPointerContext::SetTouchpadPinchSwitch(napi_env env, napi_callback_
     auto func = [jsPointerMgr] (napi_env env, bool switchFlag, napi_value handle) -> napi_value {
         return jsPointerMgr->SetTouchpadPinchSwitch(env, switchFlag, handle);
     };
-    return SetTouchpadBoolData(env, info, func);
+    auto histogramError = [](int32_t errorCode) {
+        MMI_HISTOGRAM_ERROR("InputKit.pointer.setTouchpadPinchSwitch.Error", errorCode);
+    };
+    return SetTouchpadBoolData(env, info, func, histogramError);
 }
 
 napi_value JsPointerContext::GetTouchpadPinchSwitch(napi_env env, napi_callback_info info)
 {
     CALL_DEBUG_ENTER;
+    MMI_HISTOGRAM_BOOLEAN("InputKit.pointer.getTouchpadPinchSwitch.Call", true);
     JsPointerContext *jsPointer = JsPointerContext::GetInstance(env);
     CHKPP(jsPointer);
     auto jsPointerMgr = jsPointer->GetJsPointerMgr();
@@ -1603,12 +1737,16 @@ napi_value JsPointerContext::GetTouchpadPinchSwitch(napi_env env, napi_callback_
     auto func = [jsPointerMgr] (napi_env env, napi_value handle) -> napi_value {
         return jsPointerMgr->GetTouchpadPinchSwitch(env, handle);
     };
-    return GetTouchpadData(env, info, func);
+    auto histogramError = [](int32_t errorCode) {
+        MMI_HISTOGRAM_ERROR("InputKit.pointer.getTouchpadPinchSwitch.Error", errorCode);
+    };
+    return GetTouchpadData(env, info, func, histogramError);
 }
 
 napi_value JsPointerContext::SetTouchpadSwipeSwitch(napi_env env, napi_callback_info info)
 {
     CALL_DEBUG_ENTER;
+    MMI_HISTOGRAM_BOOLEAN("InputKit.pointer.setTouchpadSwipeSwitch.Call", true);
     JsPointerContext *jsPointer = JsPointerContext::GetInstance(env);
     CHKPP(jsPointer);
     auto jsPointerMgr = jsPointer->GetJsPointerMgr();
@@ -1616,12 +1754,16 @@ napi_value JsPointerContext::SetTouchpadSwipeSwitch(napi_env env, napi_callback_
     auto func = [jsPointerMgr] (napi_env env, bool switchFlag, napi_value handle) -> napi_value {
         return jsPointerMgr->SetTouchpadSwipeSwitch(env, switchFlag, handle);
     };
-    return SetTouchpadBoolData(env, info, func);
+    auto histogramError = [](int32_t errorCode) {
+        MMI_HISTOGRAM_ERROR("InputKit.pointer.setTouchpadSwipeSwitch.Error", errorCode);
+    };
+    return SetTouchpadBoolData(env, info, func, histogramError);
 }
 
 napi_value JsPointerContext::GetTouchpadSwipeSwitch(napi_env env, napi_callback_info info)
 {
     CALL_DEBUG_ENTER;
+    MMI_HISTOGRAM_BOOLEAN("InputKit.pointer.getTouchpadSwipeSwitch.Call", true);
     JsPointerContext *jsPointer = JsPointerContext::GetInstance(env);
     CHKPP(jsPointer);
     auto jsPointerMgr = jsPointer->GetJsPointerMgr();
@@ -1629,12 +1771,16 @@ napi_value JsPointerContext::GetTouchpadSwipeSwitch(napi_env env, napi_callback_
     auto func = [jsPointerMgr] (napi_env env, napi_value handle) -> napi_value {
         return jsPointerMgr->GetTouchpadSwipeSwitch(env, handle);
     };
-    return GetTouchpadData(env, info, func);
+    auto histogramError = [](int32_t errorCode) {
+        MMI_HISTOGRAM_ERROR("InputKit.pointer.getTouchpadSwipeSwitch.Error", errorCode);
+    };
+    return GetTouchpadData(env, info, func, histogramError);
 }
 
 napi_value JsPointerContext::SetTouchpadRightClickType(napi_env env, napi_callback_info info)
 {
     CALL_DEBUG_ENTER;
+    MMI_HISTOGRAM_BOOLEAN("InputKit.pointer.setTouchpadRightClickType.Call", true);
     JsPointerContext *jsPointer = JsPointerContext::GetInstance(env);
     CHKPP(jsPointer);
     auto jsPointerMgr = jsPointer->GetJsPointerMgr();
@@ -1642,12 +1788,16 @@ napi_value JsPointerContext::SetTouchpadRightClickType(napi_env env, napi_callba
     auto func = [jsPointerMgr] (napi_env env, int32_t data, napi_value handle) -> napi_value {
         return jsPointerMgr->SetTouchpadRightClickType(env, data, handle);
     };
-    return SetTouchpadInt32Data(env, info, func, MAX_TOUCHPAD_SPEED, MIN_SPEED);
+    auto histogramError = [](int32_t errorCode) {
+        MMI_HISTOGRAM_ERROR("InputKit.pointer.setTouchpadRightClickType.Error", errorCode);
+    };
+    return SetTouchpadInt32Data(env, info, func, MAX_TOUCHPAD_SPEED, MIN_SPEED, histogramError);
 }
 
 napi_value JsPointerContext::GetTouchpadRightClickType(napi_env env, napi_callback_info info)
 {
     CALL_DEBUG_ENTER;
+    MMI_HISTOGRAM_BOOLEAN("InputKit.pointer.getTouchpadRightClickType.Call", true);
     JsPointerContext *jsPointer = JsPointerContext::GetInstance(env);
     CHKPP(jsPointer);
     auto jsPointerMgr = jsPointer->GetJsPointerMgr();
@@ -1655,7 +1805,10 @@ napi_value JsPointerContext::GetTouchpadRightClickType(napi_env env, napi_callba
     auto func = [jsPointerMgr] (napi_env env, napi_value handle) -> napi_value {
         return jsPointerMgr->GetTouchpadRightClickType(env, handle);
     };
-    return GetTouchpadData(env, info, func);
+    auto histogramError = [](int32_t errorCode) {
+        MMI_HISTOGRAM_ERROR("InputKit.pointer.getTouchpadRightClickType.Error", errorCode);
+    };
+    return GetTouchpadData(env, info, func, histogramError);
 }
 
 napi_value JsPointerContext::SetTouchpadRotateSwitch(napi_env env, napi_callback_info info)
@@ -1668,7 +1821,8 @@ napi_value JsPointerContext::SetTouchpadRotateSwitch(napi_env env, napi_callback
     auto func = [jsPointerMgr] (napi_env env, bool rotateSwitch, napi_value handle) -> napi_value {
         return jsPointerMgr->SetTouchpadRotateSwitch(env, rotateSwitch, handle);
     };
-    return SetTouchpadBoolData(env, info, func);
+    auto histogramError = [](int32_t errorCode) {};
+    return SetTouchpadBoolData(env, info, func, histogramError);
 }
 
 napi_value JsPointerContext::GetTouchpadRotateSwitch(napi_env env, napi_callback_info info)
@@ -1681,12 +1835,14 @@ napi_value JsPointerContext::GetTouchpadRotateSwitch(napi_env env, napi_callback
     auto func = [jsPointerMgr] (napi_env env, napi_value handle) -> napi_value {
         return jsPointerMgr->GetTouchpadRotateSwitch(env, handle);
     };
-    return GetTouchpadData(env, info, func);
+    auto histogramError = [](int32_t errorCode) {};
+    return GetTouchpadData(env, info, func, histogramError);
 }
 
 napi_value JsPointerContext::SetTouchpadDoubleTapAndDragState(napi_env env, napi_callback_info info)
 {
     CALL_DEBUG_ENTER;
+    MMI_HISTOGRAM_BOOLEAN("InputKit.pointer.setTouchpadDoubleTapAndDragState.Call", true);
     JsPointerContext *jsPointer = JsPointerContext::GetInstance(env);
     CHKPP(jsPointer);
     auto jsPointerMgr = jsPointer->GetJsPointerMgr();
@@ -1694,12 +1850,16 @@ napi_value JsPointerContext::SetTouchpadDoubleTapAndDragState(napi_env env, napi
     auto func = [jsPointerMgr] (napi_env env, bool switchFlag, napi_value handle) -> napi_value {
         return jsPointerMgr->SetTouchpadDoubleTapAndDragState(env, switchFlag, handle);
     };
-    return SetTouchpadBoolData(env, info, func);
+    auto histogramError = [](int32_t errorCode) {
+        MMI_HISTOGRAM_ERROR("InputKit.pointer.setTouchpadDoubleTapAndDragState.Error", errorCode);
+    };
+    return SetTouchpadBoolData(env, info, func, histogramError);
 }
 
 napi_value JsPointerContext::GetTouchpadDoubleTapAndDragState(napi_env env, napi_callback_info info)
 {
     CALL_DEBUG_ENTER;
+    MMI_HISTOGRAM_BOOLEAN("InputKit.pointer.getTouchpadDoubleTapAndDragState.Call", true);
     JsPointerContext *jsPointer = JsPointerContext::GetInstance(env);
     CHKPP(jsPointer);
     auto jsPointerMgr = jsPointer->GetJsPointerMgr();
@@ -1707,7 +1867,10 @@ napi_value JsPointerContext::GetTouchpadDoubleTapAndDragState(napi_env env, napi
     auto func = [jsPointerMgr] (napi_env env, napi_value handle) -> napi_value {
         return jsPointerMgr->GetTouchpadDoubleTapAndDragState(env, handle);
     };
-    return GetTouchpadData(env, info, func);
+    auto histogramError = [](int32_t errorCode) {
+        MMI_HISTOGRAM_ERROR("InputKit.pointer.getTouchpadDoubleTapAndDragState.Error", errorCode);
+    };
+    return GetTouchpadData(env, info, func, histogramError);
 }
 
 napi_value JsPointerContext::SetTouchpadThreeFingersTapSwitch(napi_env env, napi_callback_info info)
@@ -1720,7 +1883,8 @@ napi_value JsPointerContext::SetTouchpadThreeFingersTapSwitch(napi_env env, napi
     auto func = [jsPointerMgr] (napi_env env, bool switchFlag, napi_value handle) -> napi_value {
         return jsPointerMgr->SetTouchpadThreeFingersTapSwitch(env, switchFlag, handle);
     };
-    return SetTouchpadBoolData(env, info, func);
+    auto histogramError = [](int32_t errorCode) {};
+    return SetTouchpadBoolData(env, info, func, histogramError);
 }
 
 napi_value JsPointerContext::GetTouchpadThreeFingersTapSwitch(napi_env env, napi_callback_info info)
@@ -1733,7 +1897,8 @@ napi_value JsPointerContext::GetTouchpadThreeFingersTapSwitch(napi_env env, napi
     auto func = [jsPointerMgr] (napi_env env, napi_value handle) -> napi_value {
         return jsPointerMgr->GetTouchpadThreeFingersTapSwitch(env, handle);
     };
-    return GetTouchpadData(env, info, func);
+    auto histogramError = [](int32_t errorCode) {};
+    return GetTouchpadData(env, info, func, histogramError);
 }
 
 napi_value JsPointerContext::EnableHardwareCursorStats(napi_env env, napi_callback_info info)
@@ -1836,6 +2001,7 @@ napi_value JsPointerContext::GetTouchpadScrollRows(napi_env env, napi_callback_i
 napi_value JsPointerContext::SetMouseScrollDirection(napi_env env, napi_callback_info info)
 {
     CALL_DEBUG_ENTER;
+    MMI_HISTOGRAM_BOOLEAN("InputKit.pointer.setMouseScrollDirection.Call", true);
     size_t argc = 1;
     napi_value argv[1];
     if (napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr) != napi_ok) {
@@ -1845,11 +2011,13 @@ napi_value JsPointerContext::SetMouseScrollDirection(napi_env env, napi_callback
     if (argc == 0) {
         MMI_HILOGE("At least 1 parameter is required");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "mouseScrollDirection", "boolean");
+        MMI_HISTOGRAM_ERROR("InputKit.pointer.setMouseScrollDirection.Error", COMMON_PARAMETER_ERROR);
         return nullptr;
     }
     if (!JsCommon::TypeOf(env, argv[0], napi_boolean)) {
         MMI_HILOGE("state parameter type is invalid");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "mouseScrollDirection", "boolean");
+        MMI_HISTOGRAM_ERROR("InputKit.pointer.setMouseScrollDirection.Error", COMMON_PARAMETER_ERROR);
         return nullptr;
     }
     bool state = true;
@@ -1873,6 +2041,7 @@ napi_value JsPointerContext::SetMouseScrollDirection(napi_env env, napi_callback
 napi_value JsPointerContext::GetMouseScrollDirection(napi_env env, napi_callback_info info)
 {
     CALL_DEBUG_ENTER;
+    MMI_HISTOGRAM_BOOLEAN("InputKit.pointer.getMouseScrollDirection.Call", true);
     size_t argc = 1;
     napi_value argv[1];
     if (napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr) != napi_ok) {

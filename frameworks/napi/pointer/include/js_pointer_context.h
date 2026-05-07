@@ -90,10 +90,12 @@ public:
     static napi_value GetMouseScrollDirection(napi_env env, napi_callback_info info);
 
 private:
-    static napi_value SetTouchpadBoolData(napi_env env, napi_callback_info info, SetTouchpadBoolDataFunc func);
+    static napi_value SetTouchpadBoolData(napi_env env, napi_callback_info info,
+        SetTouchpadBoolDataFunc func, std::function<void(int32_t)> histogramError);
     static napi_value SetTouchpadInt32Data(napi_env env, napi_callback_info info, SetTouchpadInt32DataFunc func,
-        int32_t dataMax, int32_t dataMin);
-    static napi_value GetTouchpadData(napi_env env, napi_callback_info info, GetTouchpadFunc func);
+        int32_t dataMax, int32_t dataMin, std::function<void(int32_t)> histogramError);
+    static napi_value GetTouchpadData(napi_env env, napi_callback_info info,
+        GetTouchpadFunc func, std::function<void(int32_t)> histogramError);
     static napi_value CreateInstance(napi_env env);
     static JsPointerContext* GetInstance(napi_env env);
     static napi_value CreateJsObject(napi_env env, napi_callback_info info);

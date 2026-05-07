@@ -455,6 +455,9 @@ void JsEventTarget::CallKeystrokeAbilityPromise(uv_work_t *work, int32_t status)
             MMI_HILOGE("Error code %{public}d not found", cb->errCode);
             return;
         }
+        if (cb->histogramError) {
+            cb->histogramError(cb->errCode);
+        }
         callResult = GreateBusinessError(cb->env, cb->errCode, codeMsg.msg);
         if (callResult == nullptr) {
             MMI_HILOGE("The callResult is nullptr");
@@ -506,6 +509,9 @@ void JsEventTarget::CallKeystrokeAbilityAsync(uv_work_t *work, int32_t status)
             napi_close_handle_scope(cb->env, scope);
             MMI_HILOGE("Error code %{public}d not found", cb->errCode);
             return;
+        }
+        if (cb->histogramError) {
+            cb->histogramError(cb->errCode);
         }
         callResult[0] = GreateBusinessError(cb->env, cb->errCode, codeMsg.msg);
         if (callResult[0] == nullptr) {
@@ -642,6 +648,9 @@ void JsEventTarget::CallKeyboardTypeAsync(uv_work_t *work, int32_t status)
             MMI_HILOGE("Error code %{public}d not found", cb->errCode);
             return;
         }
+        if (cb->histogramError) {
+            cb->histogramError(cb->errCode);
+        }
         callResult[0] = GreateBusinessError(cb->env, cb->errCode, codeMsg.msg);
         if (callResult[0] == nullptr) {
             MMI_HILOGE("The callResult[0] is nullptr");
@@ -692,6 +701,9 @@ void JsEventTarget::CallKeyboardTypePromise(uv_work_t *work, int32_t status)
             MMI_HILOGE("Error code %{public}d not found", cb->errCode);
             return;
         }
+        if (cb->histogramError) {
+            cb->histogramError(cb->errCode);
+        }
         callResult = GreateBusinessError(cb->env, cb->errCode, codeMsg.msg);
         if (callResult == nullptr) {
             MMI_HILOGE("The callResult is nullptr");
@@ -735,6 +747,9 @@ void JsEventTarget::CallDevListAsyncWork(uv_work_t *work, int32_t status)
             napi_close_handle_scope(cb->env, scope);
             MMI_HILOGE("Error code %{public}d not found", cb->errCode);
             return;
+        }
+        if (cb->histogramError) {
+            cb->histogramError(cb->errCode);
         }
         callResult[0] = GreateBusinessError(cb->env, cb->errCode, codeMsg.msg);
         CHKNRV_SCOPE(cb->env, callResult[0], "callResult[0]", scope);
@@ -788,6 +803,9 @@ void JsEventTarget::CallDevListPromiseWork(uv_work_t *work, int32_t status)
             MMI_HILOGE("Error code %{public}d not found", cb->errCode);
             return;
         }
+        if (cb->histogramError) {
+            cb->histogramError(cb->errCode);
+        }
         callResult = GreateBusinessError(cb->env, cb->errCode, codeMsg.msg);
         if (callResult == nullptr) {
             MMI_HILOGE("The callResult is nullptr");
@@ -838,6 +856,9 @@ void JsEventTarget::CallDevInfoPromiseWork(uv_work_t *work, int32_t status)
             MMI_HILOGE("Error code %{public}d not found", cb->errCode);
             return;
         }
+        if (cb->histogramError) {
+            cb->histogramError(cb->errCode);
+        }
         callResult = GreateBusinessError(cb->env, cb->errCode, codeMsg.msg);
         if (callResult == nullptr) {
             MMI_HILOGE("The callResult is nullptr");
@@ -885,6 +906,9 @@ void JsEventTarget::CallDevInfoAsyncWork(uv_work_t *work, int32_t status)
             napi_close_handle_scope(cb->env, scope);
             MMI_HILOGE("Error code %{public}d not found", cb->errCode);
             return;
+        }
+        if (cb->histogramError) {
+            cb->histogramError(cb->errCode);
         }
         callResult[0] = GreateBusinessError(cb->env, cb->errCode, codeMsg.msg);
         if (callResult[0] == nullptr) {
@@ -1013,6 +1037,9 @@ void JsEventTarget::CallKeyboardRepeatDelayAsync(uv_work_t *work, int32_t status
             MMI_HILOGE("Error code %{public}d not found", cb->errCode);
             return;
         }
+        if (cb->histogramError) {
+            cb->histogramError(cb->errCode);
+        }
         callResult[0] = GreateBusinessError(cb->env, cb->errCode, codeMsg.msg);
         if (callResult[0] == nullptr) {
             MMI_HILOGE("callResult[0] is nullptr");
@@ -1065,6 +1092,9 @@ void JsEventTarget::CallKeyboardRepeatDelayPromise(uv_work_t *work, int32_t stat
             napi_close_handle_scope(cb->env, scope);
             MMI_HILOGE("Error code %{public}d not found", cb->errCode);
             return;
+        }
+        if (cb->histogramError) {
+            cb->histogramError(cb->errCode);
         }
         callResult = GreateBusinessError(cb->env, cb->errCode, codeMsg.msg);
         if (callResult == nullptr) {
@@ -1188,6 +1218,9 @@ void JsEventTarget::CallKeyboardRepeatRateAsync(uv_work_t *work, int32_t status)
             MMI_HILOGE("Error code %{public}d not found", cb->errCode);
             return;
         }
+        if (cb->histogramError) {
+            cb->histogramError(cb->errCode);
+        }
         callResult[0] = GreateBusinessError(cb->env, cb->errCode, codeMsg.msg);
         if (callResult[0] == nullptr) {
             MMI_HILOGE("The callResult[0] is nullptr");
@@ -1240,6 +1273,9 @@ void JsEventTarget::CallKeyboardRepeatRatePromise(uv_work_t *work, int32_t statu
             napi_close_handle_scope(cb->env, scope);
             MMI_HILOGE("Error code %{public}d not found", cb->errCode);
             return;
+        }
+        if (cb->histogramError) {
+            cb->histogramError(cb->errCode);
         }
         callResult = GreateBusinessError(cb->env, cb->errCode, codeMsg.msg);
         if (callResult == nullptr) {
@@ -1458,6 +1494,9 @@ void JsEventTarget::CallSetInputDeviceEnabledPromise(uv_work_t *work, int32_t st
             MMI_HILOGE("Error code %{public}d not found", cb->errCode);
             return;
         }
+        if (cb->histogramError) {
+            cb->histogramError(cb->errCode);
+        }
         callResult = GreateBusinessError(cb->env, cb->errCode, codeMsg.msg);
         if (callResult == nullptr) {
             MMI_HILOGE("The callResult is nullptr");
@@ -1600,6 +1639,9 @@ bool JsEventTarget::GetFunctionKeyStateErrCode(sptr<JsUtil::CallbackInfo> cb, na
         napi_close_handle_scope(cb->env, scope);
         MMI_HILOGE("Error code %{public}d not found", cb->errCode);
         return false;
+    }
+    if (cb->histogramError) {
+        cb->histogramError(cb->errCode);
     }
     callResult = GreateBusinessError(cb->env, cb->errCode, codeMsg.msg);
     if (callResult == nullptr) {

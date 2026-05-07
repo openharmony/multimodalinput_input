@@ -15,6 +15,7 @@
 
 #include "input_manager.h"
 #include "js_register_manager.h"
+#include "mmi_api_metrics_histograms.h"
 #include "mmi_log.h"
 #include "napi_constants.h"
 #include "util_napi_error.h"
@@ -126,7 +127,8 @@ bool ParseTransmitInfraredJSParam(const napi_env& env, const napi_callback_info 
     return true;
 }
 
-static void ThrowError(napi_env env, int32_t code, std::string operateType)
+static void ThrowError(napi_env env, int32_t code, std::string operateType,
+    std::function<void(int32_t)> histogramError)
 {
     int32_t errorCode = -code;
     if (code > 0) {
@@ -135,8 +137,10 @@ static void ThrowError(napi_env env, int32_t code, std::string operateType)
     MMI_HILOGE("Operate %{public}s requst error. returnCode:%{public}d", operateType.c_str(), code);
     if (errorCode == COMMON_PERMISSION_CHECK_ERROR) {
         THROWERR_API9(env, COMMON_PERMISSION_CHECK_ERROR, "Infrared", "ohos.permission.MANAGE_INPUT_INFRARED_EMITTER");
+        histogramError(COMMON_PERMISSION_CHECK_ERROR);
     } else if (COMMON_USE_SYSAPI_ERROR == errorCode) {
         THROWERR_API9(env, COMMON_USE_SYSAPI_ERROR, "Infrared", "Non system applications use system API");
+        histogramError(COMMON_USE_SYSAPI_ERROR);
     } else {
         return;
     }
@@ -159,12 +163,14 @@ napi_value CreateInfraredFrequencyItem(napi_env env, const InfraredFrequency &in
 static napi_value HasIrEmitter(napi_env env, napi_callback_info info)
 {
     CALL_DEBUG_ENTER;
+    MMI_HISTOGRAM_BOOLEAN("InputKit.infraredEmitter.hasIrEmitter.Call", true);
     return JS_REGISTER_MGR.JsHasIrEmitter(env);
 }
 
 static napi_value GetInfraredFrequencies(napi_env env, napi_callback_info info)
 {
     CALL_DEBUG_ENTER;
+    MMI_HISTOGRAM_BOOLEAN("InputKit.infraredEmitter.getInfraredFrequencies.Call", true);
     napi_value result = nullptr;
     CHKRP(napi_create_array(env, &result), CREATE_ARRAY);
     std::vector<InfraredFrequency> requencys;
@@ -172,7 +178,10 @@ static napi_value GetInfraredFrequencies(napi_env env, napi_callback_info info)
     if (ret != RET_OK) {
         if (RET_OK > ret || COMMON_PERMISSION_CHECK_ERROR == ret || ERROR_NOT_SYSAPI == ret) {
             MMI_HILOGE("js_register.GetFreq reqErr. Permi Err or Not System APP. Positive retCode:%{public}d", ret);
-            ThrowError(env, ret, "GetInfraredFrequencies");
+            auto histogramError = [](int32_t errorCode) {
+                MMI_HISTOGRAM_ERROR("InputKit.infraredEmitter.getInfraredFrequencies.Error", errorCode);
+            };
+            ThrowError(env, ret, "GetInfraredFrequencies", histogramError);
         }
         MMI_HILOGE("Parse GetInfraredFrequencies requst error. returnCode:%{public}d", ret);
         if (ret == ERROR_UNSUPPORTED_IR_EMITTER) {
@@ -216,12 +225,14 @@ static napi_value GetInfraredFrequencies(napi_env env, napi_callback_info info)
 static napi_value TransmitInfrared(napi_env env, napi_callback_info info)
 {
     CALL_DEBUG_ENTER;
+    MMI_HISTOGRAM_BOOLEAN("InputKit.infraredEmitter.transmitInfrared.Call", true);
     napi_value result = nullptr;
     int64_t number = -1;
     std::vector<int64_t> pattern;
     if (!ParseTransmitInfraredJSParam(env, info, number, pattern)) {
         MMI_HILOGE("Parse TransmitInfrared JSParam error");
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Parse TransmitInfrared JSParam error");
+        MMI_HISTOGRAM_ERROR("InputKit.infraredEmitter.transmitInfrared.Error", COMMON_PARAMETER_ERROR);
         return nullptr;
     }
     int32_t size = static_cast<int32_t>(pattern.size());
@@ -242,7 +253,10 @@ static napi_value TransmitInfrared(napi_env env, napi_callback_info info)
     if (ret != RET_OK) {
         if (RET_OK > ret || COMMON_PERMISSION_CHECK_ERROR == ret || ERROR_NOT_SYSAPI == ret) {
             MMI_HILOGE("js_register.Transmit req err. Per Er or Not Sys APP. Posi retCode:%{public}d", ret);
-            ThrowError(env, ret, "TransmitInfrared");
+            auto histogramError = [](int32_t errorCode) {
+                MMI_HISTOGRAM_ERROR("InputKit.infraredEmitter.transmitInfrared.Error", errorCode);
+            };
+            ThrowError(env, ret, "TransmitInfrared", histogramError);
         }
         MMI_HILOGE("js_register_module.TransmitInfrared requst error. returnCode:%{public}d", ret);
         return nullptr;

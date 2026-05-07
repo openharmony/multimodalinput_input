@@ -18,6 +18,7 @@
 #include <unordered_set>
 
 #include "define_multimodal.h"
+#include "mmi_api_metrics_histograms.h"
 #include "permission_helper.h"
 #include "js_input_monitor_manager.h"
 #include "napi_constants.h"
@@ -60,10 +61,12 @@ static napi_value JsOnApi9(napi_env env, napi_callback_info info)
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "EventType is invalid");
         return nullptr;
     }
+    JS_MONITOR_HISTOGRAM_ON(typeName);
     CHKRP(napi_typeof(env, argv[1], &valueType), TYPEOF);
     if (valueType != napi_function) {
         MMI_HILOGE("Second Parameter type error");
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Second Parameter type error");
+        JS_MONITOR_HISTOGRAM_ON_ERROR(typeName, COMMON_PARAMETER_ERROR);
         return nullptr;
     }
     if (!JS_INPUT_MONITOR_MGR.AddEnv(env, info)) {
@@ -83,6 +86,7 @@ static void AddMouseMonitor(napi_env env, napi_callback_info info, napi_value na
     if (rectArrayLength <= 0 || rectArrayLength > RECT_LIST_SIZE) {
         MMI_HILOGE("Hot Rect Area Parameter error");
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Hot Rect Area Parameter error");
+        JS_MONITOR_HISTOGRAM_ON_ERROR(std::string("mouse"), COMMON_PARAMETER_ERROR);
         return;
     }
     hotRectAreaList = JS_INPUT_MONITOR_MGR.GetHotRectAreaList(env, napiRect, rectArrayLength);
@@ -95,6 +99,7 @@ static void AddMouseMonitor(napi_env env, napi_callback_info info, napi_value na
     if (valueType != napi_function) {
         MMI_HILOGE("Third Parameter type error");
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Third Parameter type error");
+        JS_MONITOR_HISTOGRAM_ON_ERROR(std::string("mouse"), COMMON_PARAMETER_ERROR);
         return;
     }
     if (!JS_INPUT_MONITOR_MGR.AddEnv(env, info)) {
@@ -113,14 +118,17 @@ static void AddPreMonitor(napi_env env, napi_callback_info info, napi_value napi
     if (keysLength <= 0 || keysLength > KEY_LIST_SIZE) {
         MMI_HILOGE("keys Parameter error");
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "keys Parameter error");
+        JS_MONITOR_HISTOGRAM_ON_ERROR(std::string("keyPressed"), COMMON_PARAMETER_ERROR);
         return;
     }
     if (!JS_INPUT_MONITOR_MGR.GetKeysArray(env, napiKeys, keysLength, keys)) {
         THROWERR_CUSTOM(env, PRE_KEY_NOT_SUPPORTED, "Event listening not supported for the key");
+        JS_MONITOR_HISTOGRAM_ON_ERROR(std::string("keyPressed"), PRE_KEY_NOT_SUPPORTED);
         return;
     }
     if (keys.size() != keysLength) {
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "keys Parameter error");
+        JS_MONITOR_HISTOGRAM_ON_ERROR(std::string("keyPressed"), COMMON_PARAMETER_ERROR);
         MMI_HILOGE("keys Parameter error");
         return;
     }
@@ -129,6 +137,7 @@ static void AddPreMonitor(napi_env env, napi_callback_info info, napi_value napi
     if (valueType != napi_function) {
         MMI_HILOGE("Third Parameter type error");
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Third Parameter type error");
+        JS_MONITOR_HISTOGRAM_ON_ERROR(std::string("keyPressed"), COMMON_PARAMETER_ERROR);
         return;
     }
     if (!JS_INPUT_MONITOR_MGR.AddEnv(env, info)) {
@@ -158,6 +167,7 @@ static napi_value AddMonitor(napi_env env, napi_callback_info info)
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "EventType is invalid");
         return nullptr;
     }
+    JS_MONITOR_HISTOGRAM_ON(typeName);
     if (strcmp(typeName, "mouse") == 0) {
         AddMouseMonitor(env, info, argv[1], argv[TWO_PARAMETERS]);
     } else if (strcmp(typeName, "keyPressed") == 0) {
@@ -166,18 +176,21 @@ static napi_value AddMonitor(napi_env env, napi_callback_info info)
         CHKRP(napi_typeof(env, argv[1], &valueType), TYPEOF);
         if (valueType != napi_number) {
             THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Second Parameter type error");
+            JS_MONITOR_HISTOGRAM_ON_ERROR(typeName, COMMON_PARAMETER_ERROR);
             return nullptr;
         }
         int32_t fingers = 0;
         CHKRP(napi_get_value_int32(env, argv[1], &fingers), GET_VALUE_INT32);
         if (fingers < 0) {
             THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "fingers is invalid");
+            JS_MONITOR_HISTOGRAM_ON_ERROR(typeName, COMMON_PARAMETER_ERROR);
             return nullptr;
         }
 
         CHKRP(napi_typeof(env, argv[TWO_PARAMETERS], &valueType), TYPEOF);
         if (valueType != napi_function) {
             THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Third Parameter type error");
+            JS_MONITOR_HISTOGRAM_ON_ERROR(typeName, COMMON_PARAMETER_ERROR);
             return nullptr;
         }
         if (!JS_INPUT_MONITOR_MGR.AddEnv(env, info)) {
@@ -232,6 +245,7 @@ static napi_value JsOffApi9(napi_env env, napi_callback_info info)
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "EventType is invalid");
         return nullptr;
     }
+    JS_MONITOR_HISTOGRAM_OFF(typeName);
     if (argc < TWO_PARAMETERS) {
         JS_INPUT_MONITOR_MGR.RemoveMonitor(env, typeName);
         MMI_HILOGD("Remove all monitor");
@@ -242,6 +256,7 @@ static napi_value JsOffApi9(napi_env env, napi_callback_info info)
     if (valueType != napi_function) {
         MMI_HILOGE("Second Parameter type error");
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Second Parameter type error");
+        JS_MONITOR_HISTOGRAM_OFF_ERROR(typeName, COMMON_PARAMETER_ERROR);
         return nullptr;
     }
 
@@ -274,10 +289,12 @@ static napi_value RemoveMonitor(napi_env env, napi_callback_info info)
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "EventType is invalid");
         return nullptr;
     }
+    JS_MONITOR_HISTOGRAM_OFF(typeName);
     CHKRP(napi_typeof(env, argv[1], &valueType), TYPEOF);
     if (valueType != napi_number) {
         MMI_HILOGE("Second Parameter type error");
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Second Parameter type error");
+        JS_MONITOR_HISTOGRAM_OFF_ERROR(typeName, COMMON_PARAMETER_ERROR);
         return nullptr;
     }
     int32_t fingers = 0;
@@ -285,6 +302,7 @@ static napi_value RemoveMonitor(napi_env env, napi_callback_info info)
     if (fingers < 0) {
         MMI_HILOGE("Invalid fingers");
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "fingers is invalid");
+        JS_MONITOR_HISTOGRAM_OFF_ERROR(typeName, COMMON_PARAMETER_ERROR);
         return nullptr;
     }
     if (argc < THREE_PARAMETERS) {
@@ -296,6 +314,7 @@ static napi_value RemoveMonitor(napi_env env, napi_callback_info info)
     if (valueType != napi_function) {
         MMI_HILOGE("Second Parameter type error");
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Second Parameter type error");
+        JS_MONITOR_HISTOGRAM_OFF_ERROR(typeName, COMMON_PARAMETER_ERROR);
         return nullptr;
     }
     if (!JS_INPUT_MONITOR_MGR.AddEnv(env, info)) {
@@ -336,6 +355,7 @@ static napi_value JsOff(napi_env env, napi_callback_info info)
 static napi_value JsQueryTouchEvents(napi_env env, napi_callback_info info)
 {
     CALL_DEBUG_ENTER;
+    MMI_HISTOGRAM_BOOLEAN("InputKit.inputMonitor.queryTouchEvents.Call", true);
     size_t argc = 1;
     napi_value argv[1] = { 0 };
     napi_valuetype valueType = napi_undefined;
@@ -348,6 +368,7 @@ static napi_value JsQueryTouchEvents(napi_env env, napi_callback_info info)
     if (valueType != napi_number) {
         MMI_HILOGE("First parameter type error");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "count", "number");
+        MMI_HISTOGRAM_ERROR("InputKit.inputMonitor.queryTouchEvents.Error", COMMON_PARAMETER_ERROR);
         return nullptr;
     }
     int32_t count = 0;

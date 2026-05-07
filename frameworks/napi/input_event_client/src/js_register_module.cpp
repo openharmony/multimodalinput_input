@@ -17,6 +17,7 @@
 
 #include "input_manager.h"
 #include "js_register_util.h"
+#include "mmi_api_metrics_histograms.h"
 #include "napi_constants.h"
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
 #include "oh_input_manager.h"
@@ -172,6 +173,7 @@ static void GetInjectionEventData(napi_env env, std::shared_ptr<KeyEvent> keyEve
 static napi_value InjectEvent(napi_env env, napi_callback_info info)
 {
     CALL_DEBUG_ENTER;
+    MMI_HISTOGRAM_BOOLEAN("InputKit.inputEventClient.injectEvent.Call", true);
     napi_value result = nullptr;
     size_t argc = 1;
     napi_value argv[1] = { 0 };
@@ -218,6 +220,7 @@ static napi_value InjectEvent(napi_env env, napi_callback_info info)
 static napi_value InjectKeyEvent(napi_env env, napi_callback_info info)
 {
     CALL_DEBUG_ENTER;
+    MMI_HISTOGRAM_BOOLEAN("InputKit.inputEventClient.injectKeyEvent.Call", true);
     napi_value result = nullptr;
     size_t argc = 1;
     napi_value argv[1] = { 0 };
@@ -404,6 +407,7 @@ static void HandleMousePropertyInt32(napi_env env, napi_value mouseHandle,
 static napi_value InjectMouseEvent(napi_env env, napi_callback_info info)
 {
     CALL_DEBUG_ENTER;
+    MMI_HISTOGRAM_BOOLEAN("InputKit.inputEventClient.injectMouseEvent.Call", true);
     napi_value result = nullptr;
     size_t argc = 1;
     napi_value argv[1] = { 0 };
@@ -643,6 +647,7 @@ static bool HandleTouchPropertyInt32(napi_env env, napi_value touchHandle,
 static napi_value InjectTouchEvent(napi_env env, napi_callback_info info)
 {
     CALL_DEBUG_ENTER;
+    MMI_HISTOGRAM_BOOLEAN("InputKit.inputEventClient.injectTouchEvent.Call", true);
     napi_value result = nullptr;
     size_t argc = 1;
     napi_value argv[1] = { 0 };
@@ -848,6 +853,7 @@ static napi_value InjectJoystickEvent(napi_env env, napi_callback_info info)
 static napi_value PermitInjection(napi_env env, napi_callback_info info)
 {
     CALL_DEBUG_ENTER;
+    MMI_HISTOGRAM_BOOLEAN("InputKit.inputEventClient.permitInjection.Call", true);
     napi_value result = nullptr;
     size_t argc = 1;
     napi_value argv[1] = { 0 };

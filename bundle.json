@@ -68,6 +68,7 @@
     ],
     "deps": {
       "components": [
+        "api_metrics",
         "window_manager",
         "hisysevent",
         "start",

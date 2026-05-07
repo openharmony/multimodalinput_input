@@ -25,6 +25,8 @@ config("pointer_config") {
 }
 
 ohos_shared_library("pointer") {
+  defines = input_default_defines
+
   sources = [
     "${mmi_path}/util/napi/src/util_napi.cpp",
     "${mmi_path}/util/napi/src/util_napi_error.cpp",
@@ -62,6 +64,10 @@ ohos_shared_library("pointer") {
     "ipc:ipc_single",
     "napi:ace_napi",
   ]
+
+  if (input_feature_api_metrics_histogram) {
+    external_deps += [ "api_metrics:histogrammanager" ]
+  }
 
   relative_install_dir = "module/multimodalinput"
 
