@@ -91,6 +91,7 @@ public:
     std::string GetInputNodeNameByCfg(int32_t id);
     std::string GetContent(const std::string &fileName);
     std::string GetInputNode(const std::string &inputNodeName);
+    bool GetRsIdByInputNodeNameCfg(const std::string &nodeName, int32_t &cfgRsId) const;
 
 private:
     const std::string fileName_;
