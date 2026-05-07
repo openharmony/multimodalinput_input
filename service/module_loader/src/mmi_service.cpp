@@ -2292,10 +2292,6 @@ ErrCode MMIService::CheckInjectKeyEventPermission(const std::shared_ptr<KeyEvent
         MMI_HILOGE("Verify system APP failed");
         return ERROR_NOT_SYSAPI;
     }
-    if (!PER_HELPER->CheckInjectPermission()) {
-        MMI_HILOGE("Check inject permission failed");
-        return ERROR_NO_PERMISSION;
-    }
     return RET_OK;
 }
 
@@ -2474,10 +2470,6 @@ ErrCode MMIService::CheckInjectPointerEventPermission(const std::shared_ptr<Poin
     if (!PER_HELPER->VerifySystemApp()) {
         MMI_HILOGE("Verify system APP failed");
         return ERROR_NOT_SYSAPI;
-    }
-    if (!PER_HELPER->CheckInjectPermission()) {
-        MMI_HILOGE("Check inject permission failed");
-        return ERROR_NO_PERMISSION;
     }
     return RET_OK;
 }
