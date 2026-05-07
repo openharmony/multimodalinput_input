@@ -116,7 +116,7 @@ int32_t KeySubscriberHandler::SubscribeKeyEvent(
     SessionPtr sess, int32_t subscribeId, std::shared_ptr<KeyOption> keyOption)
 {
     CALL_DEBUG_ENTER;
-    MMI_HILOGI("KeySubscriberHandler::SubscribeKeyEvent enter, subscribeId:%{public}d", subscribeId);
+    MMI_HILOGI("SubscribeKeyEvent enter, subscribeId:%{public}d", subscribeId);
     if (subscribeId < 0) {
         MMI_HILOGE("Invalid subscribe");
         return RET_ERR;
@@ -138,6 +138,7 @@ int32_t KeySubscriberHandler::SubscribeKeyEvent(
         keyOption->GetFinalKeyDownDuration(), sess->GetPid());
     DfxHisysevent::ReportSubscribeKeyEvent(subscribeId, keyOption->GetFinalKey(),
         sess->GetProgramName(), sess->GetPid());
+    PrintCriticalKeySubscribeInfo(subscribeId, sess, keyOption);
     auto subscriber = std::make_shared<Subscriber>(subscribeId, sess, keyOption);
     if (keyGestureMgr_.ShouldIntercept(keyOption)) {
         auto ret = AddKeyGestureSubscriber(subscriber, keyOption);
@@ -1588,6 +1589,38 @@ void KeySubscriberHandler::PrintKeyOption(const std::shared_ptr<KeyOption> keyOp
     for (const auto &keyCode : keyOption->GetPreKeys()) {
         MMI_HILOGD("keyOption->prekey:%{private}d", keyCode);
     }
+}
+
+void KeySubscriberHandler::PrintCriticalKeySubscribeInfo(int32_t subscribeId,
+    SessionPtr sess, const std::shared_ptr<KeyOption> keyOption)
+{
+    if (keyOption->GetFinalKey() != KeyEvent::KEYCODE_POWER &&
+        keyOption->GetFinalKey() != KeyEvent::KEYCODE_VOLUME_UP &&
+        keyOption->GetFinalKey() != KeyEvent::KEYCODE_VOLUME_DOWN) {
+        return;
+    }
+    std::ostringstream info;
+    info << "subscribeId:" << subscribeId;
+    if (sess != nullptr) {
+        info << ", pid:" << sess->GetPid()
+             << ", uid:" << sess->GetUid()
+             << ", programName:" << sess->GetProgramName();
+    }
+    info << ", finalKey:" << keyOption->GetFinalKey()
+         << ", isFinalKeyDown:" << (keyOption->IsFinalKeyDown() ? "true" : "false")
+         << ", finalKeyDownDuration:" << keyOption->GetFinalKeyDownDuration()
+         << ", isRepeat:" << (keyOption->IsRepeat() ? "true" : "false");
+    auto preKeys = keyOption->GetPreKeys();
+    info << ", preKeys:[";
+    size_t idx = 0;
+    for (const auto &key : preKeys) {
+        if (idx++ > 0) {
+            info << ",";
+        }
+        info << key;
+    }
+    info << "]";
+    MMI_HILOGI("[CriticalKey] %{public}s", info.str().c_str());
 }
 
 void KeySubscriberHandler::PrintKeyUpLog(const std::shared_ptr<Subscriber> &subscriber)

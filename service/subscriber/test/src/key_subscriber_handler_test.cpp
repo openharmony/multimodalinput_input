@@ -3495,5 +3495,61 @@ HWTEST_F(KeySubscriberHandlerTest, TabletSubscriberHandlerTest_OnSessionDelete, 
     ASSERT_NO_FATAL_FAILURE(tabletSubscriberHandler->OnSessionDelete(sess));
     ASSERT_NO_FATAL_FAILURE(tabletSubscriberHandler->OnSessionDelete(sess));
 }
+
+/**
+ * @tc.name: KeySubscriberHandlerTest_PrintCriticalKeySubscribeInfo_001
+ * @tc.desc: Test PrintCriticalKeySubscribeInfo with power key
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_PrintCriticalKeySubscribeInfo_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeySubscriberHandler handler;
+    UDSServer udsServer;
+    SessionPtr sess = std::make_shared<UDSSession>(PROGRAM_NAME, MODULE_TYPE, UDS_FD, UDS_UID, UDS_PID);
+    auto keyOption = std::make_shared<KeyOption>();
+    keyOption->SetFinalKey(KeyEvent::KEYCODE_POWER);
+    keyOption->SetFinalKeyDown(true);
+    keyOption->SetFinalKeyDownDuration(0);
+    ASSERT_NO_FATAL_FAILURE(handler.PrintCriticalKeySubscribeInfo(0, sess, keyOption));
+}
+
+/**
+ * @tc.name: KeySubscriberHandlerTest_PrintCriticalKeySubscribeInfo_002
+ * @tc.desc: Test PrintCriticalKeySubscribeInfo with volume up/down keys
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_PrintCriticalKeySubscribeInfo_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeySubscriberHandler handler;
+    SessionPtr sess;
+    auto keyOption = std::make_shared<KeyOption>();
+    keyOption->SetPreKeys({1, 2, 3});
+    keyOption->SetFinalKey(KeyEvent::KEYCODE_VOLUME_UP);
+    keyOption->SetFinalKeyDown(false);
+    keyOption->SetFinalKeyDownDuration(500);
+    ASSERT_NO_FATAL_FAILURE(handler.PrintCriticalKeySubscribeInfo(1, sess, keyOption));
+    keyOption->SetFinalKey(KeyEvent::KEYCODE_VOLUME_DOWN);
+    ASSERT_NO_FATAL_FAILURE(handler.PrintCriticalKeySubscribeInfo(2, sess, keyOption));
+}
+
+/**
+ * @tc.name: KeySubscriberHandlerTest_PrintCriticalKeySubscribeInfo_003
+ * @tc.desc: Test PrintCriticalKeySubscribeInfo with non-critical key (should skip)
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_PrintCriticalKeySubscribeInfo_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeySubscriberHandler handler;
+    SessionPtr sess;
+    auto keyOption = std::make_shared<KeyOption>();
+    keyOption->SetFinalKey(KeyEvent::KEYCODE_A);
+    ASSERT_NO_FATAL_FAILURE(handler.PrintCriticalKeySubscribeInfo(3, sess, keyOption));
+}
 } // namespace MMI
 } // namespace OHOS
