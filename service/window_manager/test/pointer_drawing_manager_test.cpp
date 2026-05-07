@@ -4219,10 +4219,10 @@ HWTEST_F(PointerDrawingManagerTest, PointerDrawingManagerTest_InitLayer_001, Tes
     pointerDrawingManager.displayId_ = TEST_INVALID_DISPLAY_ID;
     int32_t styleId = 0;
     int32_t ret = pointerDrawingManager.Initlayer(MOUSE_ICON(styleId));
-    EXPECT_EQ(ret , RET_OK);
+    EXPECT_EQ(ret, RET_OK);
     // wait for render thread create done and running
     usleep(WAIT_TIME);
-    EXPECT_EQ(pointerDrawingManager.initEventHandlerFlag_.load() , true);
+    EXPECT_EQ(pointerDrawingManager.initEventHandlerFlag_.load(), true);
 }
 } // namespace MMI
 } // namespace OHOS
