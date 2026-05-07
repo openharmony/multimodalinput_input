@@ -4218,7 +4218,7 @@ HWTEST_F(PointerDrawingManagerTest, PointerDrawingManagerTest_InitLayer_001, Tes
     pointerDrawingManager.hardwareCursorPointerManager_->isEnableState_ = true;
     pointerDrawingManager.displayId_ = TEST_INVALID_DISPLAY_ID;
     int32_t styleId = 0;
-    int32_t ret = pointerDrawingManager.Initlayer(MOUSE_ICON(styleId));
+    int32_t ret = pointerDrawingManager.InitLayer(MOUSE_ICON(styleId));
     EXPECT_EQ(ret, RET_OK);
     // wait for render thread create done and running
     usleep(WAIT_TIME);
