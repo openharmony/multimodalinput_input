@@ -361,8 +361,8 @@ private:
     ~MMIService();
 
     ErrCode CheckControllerPermission();
-    ErrCode CheckInjectKeyEventPermission(const std::shared_ptr<KeyEvent> keyEvent, bool isNativeInject);
-    ErrCode CheckInjectPointerEventPermission(const std::shared_ptr<PointerEvent> pointerEvent,
+    ErrCode CheckControllerKeyEventPermission(const std::shared_ptr<KeyEvent> keyEvent, bool isNativeInject);
+    ErrCode CheckControllerPointerEventPermission(const std::shared_ptr<PointerEvent> pointerEvent,
         bool isNativeInject);
 #ifdef OHOS_BUILD_ENABLE_CONTROLLER_INJECT
     int32_t ValidateControllerEventCoordinates(const std::shared_ptr<PointerEvent> pointerEvent);
