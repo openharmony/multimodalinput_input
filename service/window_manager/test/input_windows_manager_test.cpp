@@ -16240,5 +16240,104 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManager_UpdateUIExtensionInfo_Upda
     EXPECT_EQ(inputWindowsManager->uiExtensionInfos_.size(), 1);
     EXPECT_EQ(inputWindowsManager->uiExtensionInfos_[0].pid, TEST_PROCESS_ID + 10);
 }
+
+/**
+ * @tc.name: InputWindowsManagerTest_RemovePixelMapData_001
+ * @tc.desc: Test RemovePixelMapData when the specified windowId exists in transparentWins_
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_RemovePixelMapData_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsManager;
+    int32_t windowId = 100;
+    std::unique_ptr<Media::PixelMap> pixelMap = nullptr;
+    inputWindowsManager.transparentWins_.insert_or_assign(windowId, std::move(pixelMap));
+    EXPECT_EQ(inputWindowsManager.transparentWins_.count(windowId), 1u);
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.RemovePixelMapData(windowId));
+    EXPECT_EQ(inputWindowsManager.transparentWins_.count(windowId), 0u);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_RemovePixelMapData_002
+ * @tc.desc: Test RemovePixelMapData when the specified windowId does not exist in transparentWins_
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_RemovePixelMapData_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsManager;
+    int32_t windowId = 200;
+    EXPECT_EQ(inputWindowsManager.transparentWins_.count(windowId), 0u);
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.RemovePixelMapData(windowId));
+    EXPECT_EQ(inputWindowsManager.transparentWins_.count(windowId), 0u);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_RemovePixelMapData_003
+ * @tc.desc: Test RemovePixelMapData only removes the specified windowId, not affecting others
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_RemovePixelMapData_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsManager;
+    int32_t windowId1 = 100;
+    int32_t windowId2 = 200;
+    int32_t windowId3 = 300;
+    std::unique_ptr<Media::PixelMap> pixelMap1 = nullptr;
+    std::unique_ptr<Media::PixelMap> pixelMap2 = nullptr;
+    std::unique_ptr<Media::PixelMap> pixelMap3 = nullptr;
+    inputWindowsManager.transparentWins_.insert_or_assign(windowId1, std::move(pixelMap1));
+    inputWindowsManager.transparentWins_.insert_or_assign(windowId2, std::move(pixelMap2));
+    inputWindowsManager.transparentWins_.insert_or_assign(windowId3, std::move(pixelMap3));
+    EXPECT_EQ(inputWindowsManager.transparentWins_.size(), 3u);
+
+    inputWindowsManager.RemovePixelMapData(windowId2);
+    EXPECT_EQ(inputWindowsManager.transparentWins_.size(), 2u);
+    EXPECT_EQ(inputWindowsManager.transparentWins_.count(windowId1), 1u);
+    EXPECT_EQ(inputWindowsManager.transparentWins_.count(windowId2), 0u);
+    EXPECT_EQ(inputWindowsManager.transparentWins_.count(windowId3), 1u);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_RemovePixelMapData_004
+ * @tc.desc: Test RemovePixelMapData with valid PixelMap data
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_RemovePixelMapData_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsManager;
+    int32_t windowId = 100;
+    std::unique_ptr<Media::PixelMap> pixelMap = nullptr;
+    inputWindowsManager.transparentWins_.insert_or_assign(windowId, std::move(pixelMap));
+    EXPECT_EQ(inputWindowsManager.transparentWins_.count(windowId), 1u);
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.RemovePixelMapData(windowId));
+    EXPECT_EQ(inputWindowsManager.transparentWins_.count(windowId), 0u);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_RemovePixelMapData_005
+ * @tc.desc: Test RemovePixelMapData called twice with the same windowId
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_RemovePixelMapData_005, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsManager;
+    int32_t windowId = 100;
+    std::unique_ptr<Media::PixelMap> pixelMap = nullptr;
+    inputWindowsManager.transparentWins_.insert_or_assign(windowId, std::move(pixelMap));
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.RemovePixelMapData(windowId));
+    EXPECT_EQ(inputWindowsManager.transparentWins_.count(windowId), 0u);
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.RemovePixelMapData(windowId));
+    EXPECT_EQ(inputWindowsManager.transparentWins_.count(windowId), 0u);
+}
 } // namespace MMI
 } // namespace OHOS

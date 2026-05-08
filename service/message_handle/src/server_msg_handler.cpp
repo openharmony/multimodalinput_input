@@ -1168,6 +1168,9 @@ int32_t ServerMsgHandler::ReadWindowsInfo(NetPacket &pkt, DisplayGroupInfo &disp
                 >> info.windowInputType >> info.privacyMode >> info.windowType
                 >> info.isSkipSelfWhenShowOnVirtualScreen >> info.windowNameType >> info.agentPid >> byteCount;
             CHKRWER(pkt, RET_ERR);
+            if (byteCount == 0) {
+                WIN_MGR->RemovePixelMapData(info.id);
+            }
             OnUiExtentionWindowInfo(pkt, info);
             pkt >> info.rectChangeBySystem;
             CHKRWER(pkt, RET_ERR);
