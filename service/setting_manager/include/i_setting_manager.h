@@ -45,6 +45,7 @@ public:
     virtual void OnAddUser(int32_t userId) = 0;
     virtual void OnRemoveUser(int32_t userId) = 0;
     virtual bool IsUserConfigLoaded(int32_t userId) const = 0;
+    virtual bool IsDatabaseReady() const = 0;
     static std::shared_ptr<ISettingManager> GetInstance();
 
 private:

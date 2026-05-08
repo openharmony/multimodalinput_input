@@ -253,6 +253,11 @@ void SettingManager::OnRemoveUser(int32_t userId)
     }
 }
 
+bool SettingManager::IsDatabaseReady() const
+{
+    return databaseReadyFlag_.load();
+}
+
 void SettingManager::CommitStagedChanges()
 {
     MMI_HILOGI("In CommitStagedChanges");
