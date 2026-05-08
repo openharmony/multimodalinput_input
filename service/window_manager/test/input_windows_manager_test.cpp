@@ -13800,7 +13800,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsHitFirstTouchWindow_
 {
     CALL_TEST_DEBUG;
     InputWindowsManager inputWindowsManager;
-    InputWindowsManager::WindowPartInfo firstTouchWindow;
+    WindowPartInfo firstTouchWindow;
     firstTouchWindow.windowId = 1;
     inputWindowsManager.firstTouchWindowInfos_.insert(std::make_pair(0, firstTouchWindow));
     std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
@@ -13848,7 +13848,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsHitFirstTouchWindow_
 {
     CALL_TEST_DEBUG;
     InputWindowsManager inputWindowsManager;
-    InputWindowsManager::WindowPartInfo firstTouchWindow;
+    WindowPartInfo firstTouchWindow;
     firstTouchWindow.windowId = 1;
     inputWindowsManager.firstTouchWindowInfos_.insert(std::make_pair(0, firstTouchWindow));
     std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
@@ -13874,7 +13874,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsHitFirstTouchWindow_
 {
     CALL_TEST_DEBUG;
     InputWindowsManager inputWindowsManager;
-    InputWindowsManager::WindowPartInfo firstTouchWindow;
+    WindowPartInfo firstTouchWindow;
     firstTouchWindow.windowId = 1;
     firstTouchWindow.flags |= WindowInputPolicy::FLAG_FIRST_TOUCH_HIT;
     inputWindowsManager.firstTouchWindowInfos_.insert(std::make_pair(0, firstTouchWindow));
@@ -13901,7 +13901,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_ProcessNoFirstTouchHit
 {
     CALL_TEST_DEBUG;
     InputWindowsManager inputWindowsManager;
-    InputWindowsManager::WindowPartInfo firstTouchWindow;
+    WindowPartInfo firstTouchWindow;
     firstTouchWindow.windowId = 1;
     inputWindowsManager.firstTouchWindowInfos_.insert(std::make_pair(0, firstTouchWindow));
     WindowInfo touchWindow;
@@ -13929,7 +13929,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_ProcessNoFirstTouchHit
 {
     CALL_TEST_DEBUG;
     InputWindowsManager inputWindowsManager;
-    InputWindowsManager::WindowPartInfo firstTouchWindow;
+    WindowPartInfo firstTouchWindow;
     firstTouchWindow.windowId = 1;
     inputWindowsManager.firstTouchWindowInfos_.insert(std::make_pair(0, firstTouchWindow));
     WindowInfo touchWindow;
@@ -13958,7 +13958,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_ProcessNoFirstTouchHit
 {
     CALL_TEST_DEBUG;
     InputWindowsManager inputWindowsManager;
-    InputWindowsManager::WindowPartInfo firstTouchWindow;
+    WindowPartInfo firstTouchWindow;
     firstTouchWindow.windowId = 1;
     inputWindowsManager.firstTouchWindowInfos_.insert(std::make_pair(0, firstTouchWindow));
     WindowInfo touchWindow;
@@ -13988,7 +13988,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsFindFirstTouchWindow
 {
     CALL_TEST_DEBUG;
     InputWindowsManager inputWindowsManager;
-    InputWindowsManager::WindowPartInfo firstTouchWindow;
+    WindowPartInfo firstTouchWindow;
     firstTouchWindow.windowId = 1;
     firstTouchWindow.displayId = 0;
     firstTouchWindow.flags |= WindowInputPolicy::FLAG_FIRST_TOUCH_HIT;
@@ -14019,7 +14019,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsFindFirstTouchWindow
 {
     CALL_TEST_DEBUG;
     InputWindowsManager inputWindowsManager;
-    InputWindowsManager::WindowPartInfo firstTouchWindow;
+    WindowPartInfo firstTouchWindow;
     firstTouchWindow.windowId = 1;
     firstTouchWindow.displayId = 0;
     firstTouchWindow.flags |= WindowInputPolicy::FLAG_FIRST_TOUCH_HIT;
@@ -14056,7 +14056,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsFindFirstTouchWindow
 {
     CALL_TEST_DEBUG;
     InputWindowsManager inputWindowsManager;
-    InputWindowsManager::WindowPartInfo firstTouchWindow;
+    WindowPartInfo firstTouchWindow;
     firstTouchWindow.windowId = 1;
     firstTouchWindow.displayId = 0;
     firstTouchWindow.flags |= WindowInputPolicy::FLAG_FIRST_TOUCH_HIT;
@@ -14185,7 +14185,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_ClearFirstTouchWindowI
     InputWindowsManager inputWindowsManager;
     inputWindowsManager.firstTouchWindowInfos_.clear();
     inputWindowsManager.ClearFirstTouchWindowInfos(0);
-    InputWindowsManager::WindowPartInfo firstTouchWindow;
+    WindowPartInfo firstTouchWindow;
     firstTouchWindow.windowId = 1;
     inputWindowsManager.firstTouchWindowInfos_.insert(std::make_pair(0, firstTouchWindow));
     inputWindowsManager.ClearFirstTouchWindowInfos(0);
@@ -14254,18 +14254,19 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_AbandonRedispatch_001,
     std::shared_ptr<InputWindowsManager> inputWindowsManager = std::make_shared<InputWindowsManager>();
     std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
     ASSERT_NE(pointerEvent, nullptr);
-    int32_t eventId = 2000;
     int32_t targetWindowId = 1;
     pointerEvent->SetTargetWindowId(targetWindowId);
-    auto result = inputWindowsManager->AbandonRedispatch(pointerEvent);
-    EXPECT_FALSE(result);
-    inputWindowsManager->windowLastEventIdMap_[targetWindowId] = eventId;
-    pointerEvent->SetId(eventId);
-    result = inputWindowsManager->AbandonRedispatch(pointerEvent);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
+    auto result = inputWindowsManager->mouseRedispatchStore_.Abandon(pointerEvent);
     EXPECT_TRUE(result);
-    pointerEvent->SetId(eventId + 1);
-    result = inputWindowsManager->AbandonRedispatch(pointerEvent);
+    inputWindowsManager->mouseRedispatchStore_.SetWindowActive(targetWindowId);
+    result = inputWindowsManager->mouseRedispatchStore_.Abandon(pointerEvent);
     EXPECT_FALSE(result);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_AXIS_END);
+    result = inputWindowsManager->mouseRedispatchStore_.Abandon(pointerEvent);
+    EXPECT_FALSE(result);
+    result = inputWindowsManager->mouseRedispatchStore_.Abandon(pointerEvent);
+    EXPECT_TRUE(result);
 }
 
 /**
@@ -14283,17 +14284,17 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_DispatchPointerRedispa
     windowInfo.id = 1;
     windowInfo.agentWindowId = 1;
     inputWindowsManager->DispatchPointerRedispatch(pointerAction, windowInfo);
-    EXPECT_EQ(inputWindowsManager->lastPointerEventRedispatch_, nullptr);
+    EXPECT_EQ(inputWindowsManager->mouseRedispatchStore_.GetLastEvent(), nullptr);
     std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
     ASSERT_NE(pointerEvent, nullptr);
-    inputWindowsManager->lastPointerEventRedispatch_ = pointerEvent;
+    inputWindowsManager->mouseRedispatchStore_.CacheLastEvent(pointerEvent);
     inputWindowsManager->DispatchPointerRedispatch(pointerAction, windowInfo);
-    EXPECT_NE(inputWindowsManager->lastPointerEventRedispatch_, nullptr);
+    EXPECT_NE(inputWindowsManager->mouseRedispatchStore_.GetLastEvent(), nullptr);
     PointerEvent::PointerItem item;
     item.SetPointerId(0);
-    inputWindowsManager->lastPointerEventRedispatch_->AddPointerItem(item);
-    inputWindowsManager->lastPointerEventRedispatch_->SetPointerId(0);
-    EXPECT_NE(inputWindowsManager->lastPointerEventRedispatch_, nullptr);
+    inputWindowsManager->mouseRedispatchStore_.GetLastEvent()->AddPointerItem(item);
+    inputWindowsManager->mouseRedispatchStore_.GetLastEvent()->SetPointerId(0);
+    EXPECT_NE(inputWindowsManager->mouseRedispatchStore_.GetLastEvent(), nullptr);
 }
 
 /**
@@ -15523,7 +15524,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_SelectWindowInfo_Touch
 /**
  * @tc.name: InputWindowsManagerTest_SelectWindowInfo_ButtonDown_WithRedispatchFlag
  * @tc.desc: Test SelectWindowInfo with POINTER_ACTION_BUTTON_DOWN and EVENT_FLAG_REDISPATCH,
- *           firstBtnDownWindowInfo_ should not be modified (dispatchEventFlag == true branch)
+ *           firstBtnDownWindowInfo_ should not be modified (mouseRedispatchStore_.IsActive() == true branch)
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -15559,7 +15560,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_SelectWindowInfo_Butto
 
     auto result = inputWindowsManager.SelectWindowInfo(logicalX, logicalY, pointerEvent);
 
-    // When dispatchEventFlag is true and action is BUTTON_DOWN (not AXIS_UPDATE/AXIS_END),
+    // When mouseRedispatchStore_.IsActive() is true and action is BUTTON_DOWN (not AXIS_UPDATE/AXIS_END),
     // firstBtnDownWindowInfo_ should not be modified
     EXPECT_EQ(inputWindowsManager.firstBtnDownWindowInfo_.first, originalValue.first);
     EXPECT_EQ(inputWindowsManager.firstBtnDownWindowInfo_.second, originalValue.second);
@@ -15568,7 +15569,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_SelectWindowInfo_Butto
 /**
  * @tc.name: InputWindowsManagerTest_SelectWindowInfo_AxisUpdate_WithRedispatchFlag
  * @tc.desc: Test SelectWindowInfo with POINTER_ACTION_AXIS_UPDATE and EVENT_FLAG_REDISPATCH,
- *           axisBeginWindowInfoMap_ branch (dispatchEventFlag == true && action == AXIS_UPDATE)
+ *           axisBeginWindowMap_ branch (mouseRedispatchStore_.IsActive() == true && action == AXIS_UPDATE)
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -15602,15 +15603,15 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_SelectWindowInfo_AxisU
     inputWindowsManager.firstBtnDownWindowInfo_.second = 1;
     auto originalValue = inputWindowsManager.firstBtnDownWindowInfo_;
 
-    // Set axisBeginWindowInfoMap_ with a window info
+    // Set axisBeginWindowMap_ with a window info
     WindowInfo axisWindowInfo;
     axisWindowInfo.id = 60;
     axisWindowInfo.displayId = 1;
-    inputWindowsManager.axisBeginWindowInfoMap_[0] = axisWindowInfo;
+    inputWindowsManager.mouseRedispatchStore_.SetAxisBeginWindow(axisWindowInfo);
 
     auto result = inputWindowsManager.SelectWindowInfo(logicalX, logicalY, pointerEvent);
 
-    // When dispatchEventFlag is true and action is AXIS_UPDATE, firstBtnDownWindowInfo_ should not be modified
+    // When mouseRedispatchStore_.IsActive() is true and action is AXIS_UPDATE, firstBtnDownWindowInfo_ should not be modified
     // because the assignment only happens in the else-if branch
     EXPECT_EQ(inputWindowsManager.firstBtnDownWindowInfo_.first, originalValue.first);
     EXPECT_EQ(inputWindowsManager.firstBtnDownWindowInfo_.second, originalValue.second);

@@ -778,7 +778,8 @@ int32_t InputManagerImpl::PackWindowGroupInfo(NetPacket &pkt)
             << item.agentWindowId << resultFlags << item.action
             << item.displayId << item.groupId << item.zOrder << item.pointerChangeAreas
             << item.transform << item.windowInputType << item.privacyMode
-            << item.windowType << item.isSkipSelfWhenShowOnVirtualScreen << item.windowNameType << item.agentPid;
+            << item.windowType << item.isSkipSelfWhenShowOnVirtualScreen << item.windowNameType << item.agentPid
+            << item.dragDisabledAreas;
         uint32_t uiExtentionWindowInfoNum = static_cast<uint32_t>(item.uiExtentionWindowInfo.size());
         pkt << uiExtentionWindowInfoNum;
         MMI_HILOGD("uiExtentionWindowInfoNum:%{public}u", uiExtentionWindowInfoNum);
@@ -823,7 +824,8 @@ int32_t InputManagerImpl::PackUiExtentionWindowInfo(const std::vector<WindowInfo
             << item.displayId << item.groupId << item.zOrder << item.pointerChangeAreas
             << item.transform << item.windowInputType << item.privacyMode
             << item.windowType << item.privacyUIFlag << item.rectChangeBySystem
-            << item.isSkipSelfWhenShowOnVirtualScreen << item.windowNameType << item.agentPid;
+            << item.isSkipSelfWhenShowOnVirtualScreen << item.windowNameType << item.agentPid
+            << item.dragDisabledAreas;
     }
     if (pkt.ChkRWError()) {
         MMI_HILOGE("Packet write windows data failed");
@@ -902,8 +904,9 @@ int32_t InputManagerImpl::PackWindowInfo(NetPacket &pkt,
         pkt << item.id << item.pid << item.uid << item.area << item.defaultHotAreas
             << item.pointerHotAreas << item.agentWindowId << resultFlags << item.action
             << item.displayId << item.groupId << item.zOrder << item.pointerChangeAreas << item.transform
-            << item.windowInputType << item.privacyMode << item.windowType << item.isSkipSelfWhenShowOnVirtualScreen
-            << item.windowNameType << item.agentPid;
+            << item.windowInputType << item.privacyMode << item.windowType
+            << item.isSkipSelfWhenShowOnVirtualScreen << item.windowNameType
+            << item.agentPid << item.dragDisabledAreas;
 
         if (item.pixelMap == nullptr) {
             pkt << byteCount;
@@ -981,6 +984,10 @@ void InputManagerImpl::PrintWindowInfo(const std::vector<WindowInfo> &windowsInf
         for (const auto &pointer : item.pointerHotAreas) {
             MMI_HILOGD("pointerHotAreas:x:%{private}d,y:%{private}d,width:%{public}d,height:%{public}d",
                 pointer.x, pointer.y, pointer.width, pointer.height);
+        }
+        for (const auto &area : item.dragDisabledAreas) {
+            MMI_HILOGD("dragDisabledAreas:x:%{private}d,y:%{private}d,width:%{public}d,height:%{public}d",
+                area.x, area.y, area.width, area.height);
         }
 
         std::string dump;
@@ -3514,7 +3521,7 @@ int32_t InputManagerImpl::DeliverNonce(const std::string &nonce)
 int32_t InputManagerImpl::RedispatchInputEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
     CALL_DEBUG_ENTER;
-#if defined(OHOS_BUILD_ENABLE_POINTER)
+#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     if (pointerEvent == nullptr) {
         MMI_HILOGE("pointerEvent is null");
         return RET_ERR;
@@ -3527,7 +3534,7 @@ int32_t InputManagerImpl::RedispatchInputEvent(std::shared_ptr<PointerEvent> poi
 #else
     MMI_HILOGW("Pointer and touchscreen device does not support");
     return RET_ERR;
-#endif // OHOS_BUILD_ENABLE_POINTER
+#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 }
 
 int32_t InputManagerImpl::CheckMouseControllerPermission()

@@ -486,6 +486,8 @@ struct WindowInfo {
      * @since 21
      */
     int32_t agentPid { -1 };
+
+    std::vector<Rect> dragDisabledAreas;
 };
 
 /**
