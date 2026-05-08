@@ -640,13 +640,32 @@ int32_t EventNormalizeHandler::HandleMouseEvent(libinput_event* event)
     PointerEvent::PointerItem item;
     pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), item);
     if (!item.IsCanceled()) {
-        nextHandler_->HandlePointerEvent(pointerEvent);
+        if (!AfterInputEventNormalized(pointerEvent)) {
+            nextHandler_->HandlePointerEvent(pointerEvent);          
+        }
     }
     ResetRightButtonSource(pointerEvent);
 #else
     MMI_HILOGW("Pointer device does not support");
 #endif // OHOS_BUILD_ENABLE_POINTER
     return RET_OK;
+}
+
+bool EventNormalizeHandler::AfterInputEventNormalized(const std::shared_ptr<PointerEvent> pointerEvent)
+{
+    if (pointerEvent == nullptr) {
+        MMI_HILOGE("pointerEvent is nullptr");
+        return false;
+    }
+    auto manager = InputPluginManager::GetInstance();
+    if (manager == nullptr) {
+        MMI_HILOGE("InputPluginManager instance is nullptr");
+        return false;
+    }
+    auto pData = std::make_shared<IPluginData>();
+    pData->stage = InputPluginStage::INPUT_AFTER_NORMALIZED;
+    int32_t result = manager->HandlePluginData(pData);
+    return true;
 }
 
 void EventNormalizeHandler::ResetRightButtonSource(std::shared_ptr<PointerEvent> pointerEvent)
