@@ -76,6 +76,7 @@ external_deps = [
     "window_manager:libwsutils",
     "libinput:libinput-third-mmi",
     "ability_runtime:ability_manager",
+    "icu:shared_icuuc",
 ]
 
 part_name = "${mmi_part_name}"

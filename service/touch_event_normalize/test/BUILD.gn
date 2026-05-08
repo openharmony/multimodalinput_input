@@ -109,6 +109,7 @@ ohos_unittest("TouchEventNormalizeTestWithMock") {
     "ipc:ipc_single",
     "preferences:native_preferences",
     "ability_runtime:ability_manager",
+    "icu:shared_icuuc",
   ]
 
   if (hitrace_enabled) {
