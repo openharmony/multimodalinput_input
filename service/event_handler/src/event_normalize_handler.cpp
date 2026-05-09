@@ -665,7 +665,7 @@ bool EventNormalizeHandler::AfterInputEventNormalized(const std::shared_ptr<Poin
     auto pData = std::make_shared<IPluginData>();
     pData->stage = InputPluginStage::INPUT_AFTER_NORMALIZED;
     int32_t result = manager->HandlePluginData(pData);
-    return true;
+    return result == RET_DO;
 }
 
 void EventNormalizeHandler::ResetRightButtonSource(std::shared_ptr<PointerEvent> pointerEvent)
