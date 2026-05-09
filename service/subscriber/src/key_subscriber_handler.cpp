@@ -86,6 +86,19 @@ void KeySubscriberHandler::HandleKeyEvent(const std::shared_ptr<KeyEvent> keyEve
         DfxHisysevent::ReportKeyEvent("subcriber");
         return;
     }
+    if (keyEvent->IsExtendedFunctionKey()) {
+        if (keyEvent->IsBusinessExclusiveKey()) {
+            MMI_HILOGI("Business exclusive key %{public}d has no subscriber, "
+                       "event terminated and will not dispatch to focus window",
+                       keyEvent->GetKeyCode());
+            return;
+        }
+        auto eventDispatchHandler = InputHandler->GetEventDispatchHandler();
+        if (eventDispatchHandler != nullptr) {
+            eventDispatchHandler->HandleKeyEvent(keyEvent);
+        }
+        return;
+    }
     CHKPV(nextHandler_);
     nextHandler_->HandleKeyEvent(keyEvent);
 }

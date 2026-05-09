@@ -139,10 +139,10 @@ void KeyCommandHandler::HandleKeyEvent(const std::shared_ptr<KeyEvent> keyEvent)
     }
 
     if (keyEvent->IsExtendedFunctionKey()) {
-        MMI_HILOGI("Extended function key not consumed by KeyCommandHandler, dispatch directly");
-        auto eventDispatchHandler = InputHandler->GetEventDispatchHandler();
-        if (eventDispatchHandler != nullptr) {
-            eventDispatchHandler->HandleKeyEvent(keyEvent);
+        MMI_HILOGI("Extended function key not consumed by KeyCommandHandler, forward to subscriber");
+        auto keySubscriberHandler = InputHandler->GetSubscriberHandler();
+        if (keySubscriberHandler != nullptr) {
+            keySubscriberHandler->HandleKeyEvent(keyEvent);
         }
         return;
     }
