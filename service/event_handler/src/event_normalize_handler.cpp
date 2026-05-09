@@ -651,13 +651,10 @@ int32_t EventNormalizeHandler::HandleMouseEvent(libinput_event* event)
 
 bool EventNormalizeHandler::AfterInputEventNormalized(const std::shared_ptr<PointerEvent> pointerEvent)
 {
-    if (pointerEvent == nullptr) {
-        MMI_HILOGE("pointerEvent is nullptr");
-        return false;
-    }
     auto manager = InputPluginManager::GetInstance();
     if (manager == nullptr) {
         MMI_HILOGE("InputPluginManager instance is nullptr");
+        nextHandler_->HandlePointerEvent(pointerEvent);
         return false;
     }
     auto pData = std::make_shared<IPluginData>();
