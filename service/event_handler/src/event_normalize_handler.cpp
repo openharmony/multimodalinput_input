@@ -659,7 +659,7 @@ bool EventNormalizeHandler::AfterInputEventNormalized(const std::shared_ptr<Poin
     }
     auto pData = std::make_shared<IPluginData>();
     pData->stage = InputPluginStage::INPUT_AFTER_NORMALIZED;
-    int32_t result = manager->HandlePluginData(pData);
+    int32_t result = manager->HandleEvent(pointerEvent, pData);
     if (result != RET_DO) {
         nextHandler_->HandlePointerEvent(pointerEvent);
     }
