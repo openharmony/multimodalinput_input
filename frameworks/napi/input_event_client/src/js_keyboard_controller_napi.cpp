@@ -228,7 +228,8 @@ napi_value KeyboardControllerPressKey(napi_env env, napi_callback_info info)
     int32_t keyCode;
     status = napi_get_value_int32(env, argv[0], &keyCode);
     if (status != napi_ok) {
-        MMI_HILOGE("GET_VALUE_INT32 failed");
+        MMI_HILOGE("Failed to get keyCode parameter, must be KeyCode enum");
+        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Parameter error. The type of keyCode must be KeyCode enum");
         return nullptr;
     }
 
@@ -298,7 +299,8 @@ napi_value KeyboardControllerReleaseKey(napi_env env, napi_callback_info info)
     int32_t keyCode;
     status = napi_get_value_int32(env, argv[0], &keyCode);
     if (status != napi_ok) {
-        MMI_HILOGE("GET_VALUE_INT32 failed");
+        MMI_HILOGE("Failed to get keyCode parameter, must be KeyCode enum");
+        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Parameter error. The type of keyCode must be KeyCode enum");
         return nullptr;
     }
 
