@@ -245,17 +245,20 @@ napi_value MouseControllerMoveTo(napi_env env, napi_callback_info info)
     int32_t y = 0;
     status = napi_get_value_int32(env, argv[0], &displayId);
     if (status != napi_ok) {
-        MMI_HILOGE("GET_VALUE_INT32 failed");
+        MMI_HILOGE("Failed to get displayId parameter, must be integer");
+        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Parameter error. The type of displayId must be integer");
         return nullptr;
     }
     status = napi_get_value_int32(env, argv[1], &x);
     if (status != napi_ok) {
-        MMI_HILOGE("GET_VALUE_INT32 failed");
+        MMI_HILOGE("Failed to get x parameter, must be integer");
+        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Parameter error. The type of x must be integer");
         return nullptr;
     }
     status = napi_get_value_int32(env, argv[2], &y);
     if (status != napi_ok) {
-        MMI_HILOGE("GET_VALUE_INT32 failed");
+        MMI_HILOGE("Failed to get y parameter, must be integer");
+        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Parameter error. The type of y must be integer");
         return nullptr;
     }
 
@@ -323,7 +326,8 @@ napi_value MouseControllerPressButton(napi_env env, napi_callback_info info)
     int32_t button;
     status = napi_get_value_int32(env, argv[0], &button);
     if (status != napi_ok) {
-        MMI_HILOGE("GET_VALUE_INT32 failed");
+        MMI_HILOGE("Failed to get button parameter, must be Button enum");
+        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Parameter error. The type of button must be Button enum");
         return nullptr;
     }
 
@@ -389,7 +393,8 @@ napi_value MouseControllerReleaseButton(napi_env env, napi_callback_info info)
     int32_t button;
     status = napi_get_value_int32(env, argv[0], &button);
     if (status != napi_ok) {
-        MMI_HILOGE("GET_VALUE_INT32 failed");
+        MMI_HILOGE("Failed to get button parameter, must be Button enum");
+        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Parameter error. The type of button must be Button enum");
         return nullptr;
     }
 
@@ -456,12 +461,14 @@ napi_value MouseControllerBeginAxis(napi_env env, napi_callback_info info)
     int32_t value = 0;
     status = napi_get_value_int32(env, argv[0], &axis);
     if (status != napi_ok) {
-        MMI_HILOGE("GET_VALUE_INT32 failed");
+        MMI_HILOGE("Failed to get axis parameter, must be Axis enum");
+        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Parameter error. The type of axis must be Axis enum");
         return nullptr;
     }
     status = napi_get_value_int32(env, argv[1], &value);
     if (status != napi_ok) {
-        MMI_HILOGE("GET_VALUE_INT32 failed");
+        MMI_HILOGE("Failed to get value parameter, must be integer");
+        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Parameter error. The type of value must be integer");
         return nullptr;
     }
 
@@ -528,12 +535,14 @@ napi_value MouseControllerUpdateAxis(napi_env env, napi_callback_info info)
     int32_t value = 0;
     status = napi_get_value_int32(env, argv[0], &axis);
     if (status != napi_ok) {
-        MMI_HILOGE("GET_VALUE_INT32 failed");
+        MMI_HILOGE("Failed to get axis parameter, must be Axis enum");
+        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Parameter error. The type of axis must be Axis enum");
         return nullptr;
     }
     status = napi_get_value_int32(env, argv[1], &value);
     if (status != napi_ok) {
-        MMI_HILOGE("GET_VALUE_INT32 failed");
+        MMI_HILOGE("Failed to get value parameter, must be integer");
+        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Parameter error. The type of value must be integer");
         return nullptr;
     }
 
@@ -599,7 +608,8 @@ napi_value MouseControllerEndAxis(napi_env env, napi_callback_info info)
     int32_t axis;
     status = napi_get_value_int32(env, argv[0], &axis);
     if (status != napi_ok) {
-        MMI_HILOGE("GET_VALUE_INT32 failed");
+        MMI_HILOGE("Failed to get axis parameter, must be Axis enum");
+        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Parameter error. The type of axis must be Axis enum");
         return nullptr;
     }
 
