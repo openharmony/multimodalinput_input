@@ -640,9 +640,7 @@ int32_t EventNormalizeHandler::HandleMouseEvent(libinput_event* event)
     PointerEvent::PointerItem item;
     pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), item);
     if (!item.IsCanceled()) {
-        if (!AfterInputEventNormalized(pointerEvent)) {
-            nextHandler_->HandlePointerEvent(pointerEvent);          
-        }
+        AfterInputEventNormalized(pointerEvent);
     }
     ResetRightButtonSource(pointerEvent);
 #else
@@ -665,6 +663,9 @@ bool EventNormalizeHandler::AfterInputEventNormalized(const std::shared_ptr<Poin
     auto pData = std::make_shared<IPluginData>();
     pData->stage = InputPluginStage::INPUT_AFTER_NORMALIZED;
     int32_t result = manager->HandlePluginData(pData);
+    if (result != RET_DO) {
+        nextHandler_->HandlePointerEvent(pointerEvent);
+    }
     return true;
 }
 
