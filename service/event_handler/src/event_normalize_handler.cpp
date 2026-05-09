@@ -641,7 +641,7 @@ int32_t EventNormalizeHandler::HandleMouseEvent(libinput_event* event)
     pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), item);
     if (!item.IsCanceled()) {
         if (!AfterInputEventNormalized(pointerEvent)) {
-            nextHandler_->HandlePointerEvent(pointerEvent);          
+            nextHandler_->HandlePointerEvent(pointerEvent);      
         }
     }
     ResetRightButtonSource(pointerEvent);
