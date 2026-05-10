@@ -738,10 +738,7 @@ private:
 }
 
 constexpr int32_t TOUCH_STATE_ERROR = 4300001;
-constexpr int32_t TOUCH_ID_INVALID_ERROR = 4300003;
-constexpr const char* TOUCH_DOWN_STATE_ERROR_MSG = "The touch point is touching the display.";
-constexpr const char* TOUCH_NOT_DOWN_STATE_ERROR_MSG = "The touch point is not touching the display.";
-constexpr const char* TOUCH_ID_INVALID_ERROR_MSG = "The touch point ID is not within the valid range [0,9].";
+constexpr const char* TOUCH_STATE_ERROR_MSG = "Invalid input event sequence.";
 constexpr const char* CONTROL_DEVICE_PERMISSION = "ohos.permission.CONTROL_DEVICE";
 
 enum class TouchControllerOperation {
@@ -766,14 +763,6 @@ std::string GetTouchControllerActionName(TouchControllerOperation operation)
     }
 }
 
-const char* GetTouchControllerStateErrorMsg(TouchControllerOperation operation)
-{
-    if (operation == TouchControllerOperation::DOWN) {
-        return TOUCH_DOWN_STATE_ERROR_MSG;
-    }
-    return TOUCH_NOT_DOWN_STATE_ERROR_MSG;
-}
-
 int32_t NormalizeTouchControllerErrorCode(int32_t errorCode)
 {
     if (errorCode == ERROR_NO_PERMISSION) {
@@ -793,12 +782,8 @@ void SetTouchControllerBusinessError(int32_t errorCode, TouchControllerOperation
         taihe::set_business_error(errorCode, msg);
         return;
     }
-    if (errorCode == TOUCH_ID_INVALID_ERROR) {
-        taihe::set_business_error(TOUCH_STATE_ERROR, TOUCH_ID_INVALID_ERROR_MSG);
-        return;
-    }
     if (errorCode == TOUCH_STATE_ERROR) {
-        taihe::set_business_error(errorCode, GetTouchControllerStateErrorMsg(operation));
+        taihe::set_business_error(TOUCH_STATE_ERROR, TOUCH_STATE_ERROR_MSG);
         return;
     }
     TaiheError_t codeMsg;

@@ -63,8 +63,7 @@ const std::map<int32_t, TaiheError> TAIHE_ERRORS = {
     { INPUT_OCCUPIED_BY_SYSTEM, { INPUT_OCCUPIED_BY_SYSTEM, "The hotkey has been subscribed by system." } },
     { INPUT_OCCUPIED_BY_OTHER, { INPUT_OCCUPIED_BY_OTHER, "The hotkey has been subscribed by other one." } },
     { INPUT_SERVICE_EXCEPTION, { INPUT_SERVICE_EXCEPTION, "Input service exception." } },
-    { ERROR_CODE_STATE_ERROR, { ERROR_CODE_STATE_ERROR,
-        "Controller state error. The operation is invalid in current state." } },
+    { ERROR_CODE_STATE_ERROR, { ERROR_CODE_STATE_ERROR, "Invalid input event sequence." } },
     { CONTROLLER_DISPLAY_NOT_EXIST, { CONTROLLER_DISPLAY_NOT_EXIST,
         "The display does not exist." } },
 };
