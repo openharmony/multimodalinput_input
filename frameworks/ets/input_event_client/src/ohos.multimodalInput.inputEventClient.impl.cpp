@@ -737,8 +737,6 @@ private:
                       ::ohos::multimodalInput::inputEventClient::MouseController>(nativeImpl);
 }
 
-constexpr int32_t TOUCH_STATE_ERROR = 4300001;
-constexpr const char* TOUCH_STATE_ERROR_MSG = "Invalid input event sequence.";
 constexpr const char* CONTROL_DEVICE_PERMISSION = "ohos.permission.CONTROL_DEVICE";
 
 enum class TouchControllerOperation {
@@ -780,10 +778,6 @@ void SetTouchControllerBusinessError(int32_t errorCode, TouchControllerOperation
     if (errorCode == OHOS::MMI::TaiheErrorCode::COMMON_PERMISSION_CHECK_ERROR) {
         std::string msg = MakePermissionCheckErrMsg(GetTouchControllerActionName(operation), CONTROL_DEVICE_PERMISSION);
         taihe::set_business_error(errorCode, msg);
-        return;
-    }
-    if (errorCode == TOUCH_STATE_ERROR) {
-        taihe::set_business_error(TOUCH_STATE_ERROR, TOUCH_STATE_ERROR_MSG);
         return;
     }
     TaiheError_t codeMsg;
