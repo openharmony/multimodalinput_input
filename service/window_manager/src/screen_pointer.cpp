@@ -81,7 +81,6 @@ ScreenPointer::ScreenPointer(hwcmgr_ptr_t hwcMgr, handler_ptr_t handler, const O
         std::swap(width_, height_);
     }
     dpi_ = float(di.dpi) / BASELINE_DENSITY;
-    InitRSUIContext(screenId_);
     MMI_HILOGI("Construct with DisplayInfo, id=%{public}" PRIu64 ", shape=(%{public}u, %{public}u), mode=%{public}u, "
         "rotation=%{public}u, dpi=%{public}f", screenId_, width_, height_, mode_, rotation_, dpi_);
 }
@@ -99,7 +98,6 @@ ScreenPointer::ScreenPointer(hwcmgr_ptr_t hwcMgr, handler_ptr_t handler, screen_
     mirrorWidth_ = si->GetMirrorWidth();
     mirrorHeight_ = si->GetMirrorHeight();
 #endif // OHOS_BUILD_EXTERNAL_SCREEN
-    InitRSUIContext(screenId_);
     MMI_HILOGI("Construct with ScreenInfo, id=%{public}" PRIu64 ", shape=(%{public}u, %{public}u), mode=%{public}u, "
         "rotation=%{public}u, dpi=%{public}f", screenId_, width_, height_, mode_, rotation_, dpi_);
 }
@@ -271,6 +269,18 @@ buffer_ptr_t ScreenPointer::CreateSurfaceBuffer(const OHOS::BufferRequestConfig 
 
 bool ScreenPointer::InitSurface(bool needDrawPointer)
 {
+    // Remove surfaceNode from render tree
+    if (surfaceNode_ != nullptr) {
+        surfaceNode_ = nullptr;
+        RsFlushImplicitTransaction();
+    }
+
+    // create RSUIDirector and RSUIContext
+    if (!InitRSUIContext(screenId_)) {
+        MMI_HILOGE("Init RSUIContext fail");
+        return false;
+    }
+
     // create SurfaceNode
     Rosen::RSSurfaceNodeConfig surfaceNodeConfig;
     surfaceNodeConfig.SurfaceNodeName = RS_SURFACE_NODE_NAME;
@@ -517,7 +527,19 @@ bool ScreenPointer::Move(int32_t x, int32_t y)
 
 bool ScreenPointer::MoveSoft(int32_t x, int32_t y)
 {
-    CHKPF(surfaceNode_);
+    if (surfaceNode_ == nullptr) {
+        MMI_HILOGW("SurfaceNode is null in MoveSoft");
+        return false;
+    }
+    if (rsUIContext_ == nullptr) {
+        MMI_HILOGW("RSUIContext is null in MoveSoft");
+        return false;
+    }
+    if (rsUIContext_->GetRSRenderInterface() == nullptr) {
+        MMI_HILOGW("RSRenderInterface is null in MoveSoft");
+        return false;
+    }
+
     if (IsMirror()) {
         CalculateHwcPositionForMirror(x, y);
     }
@@ -591,26 +613,38 @@ bool ScreenPointer::IsPositionOutScreen(int32_t x, int32_t y)
     return false;
 }
 
-void ScreenPointer::InitRSUIContext(uint64_t screenId)
+bool ScreenPointer::InitRSUIContext(uint64_t screenId)
 {
+    bool isInited = (rsUIDirector_ != nullptr && rsUIContext_ != nullptr);
+    bool isScreenChanged = (screenId != screenId_);
+    if (isInited) {
+        if (!isScreenChanged) {
+            return true;
+        } else {
+            RsFlushImplicitTransaction();
+        }
+    }
+
     sptr<IRemoteObject> renderToken = Rosen::RSInterfaces::GetInstance().GetConnectToRenderToken(screenId);
     if (renderToken == nullptr) {
         MMI_HILOGE("Get connect to render token fail, screenId=%{public}" PRIu64, screenId);
-        return;
+        return false;
     }
 
     rsUIDirector_ = Rosen::RSUIDirector::Create(renderToken);
     if (rsUIDirector_ == nullptr) {
         MMI_HILOGE("Create RSUIDirector fail, screenId=%{public}" PRIu64, screenId);
-        return;
+        return false;
     }
 
     rsUIContext_ = rsUIDirector_->GetRSUIContext();
     if (rsUIContext_ == nullptr) {
         rsUIDirector_ = nullptr;
         MMI_HILOGE("Create RSUIContext fail, screenId=%{public}" PRIu64, screenId);
-        return;
+        return false;
     }
+    MMI_HILOGI("Init RSUIContext success, screenId=%{public}" PRIu64, screenId);
+    return true;
 }
 
 void ScreenPointer::RsFlushImplicitTransaction()
@@ -618,5 +652,19 @@ void ScreenPointer::RsFlushImplicitTransaction()
     if (rsUIDirector_ != nullptr) {
         rsUIDirector_->SendMessages();
     }
+}
+
+void ScreenPointer::DestroyPointerWindow()
+{
+    // Remove surfaceNode from render tree
+    if (surfaceNode_ != nullptr) {
+        surfaceNode_->DetachToDisplay(screenId_);
+        surfaceNode_ = nullptr;
+    }
+
+    RsFlushImplicitTransaction();
+    rsUIDirector_ = nullptr;
+    rsUIContext_ = nullptr;
+    MMI_HILOGI("Destroy pointer window, screenId=%{public}" PRIu64, screenId_);
 }
 } // namespace OHOS::MMI

@@ -60,32 +60,34 @@ const std::string CUSTOM_CURSOR_ICON_PATH = IMAGE_POINTER_DEFAULT_PATH + "Custom
 const std::string DEFAULT_ICON_PATH = IMAGE_POINTER_DEFAULT_PATH + "Default.svg";
 constexpr int32_t AECH_DEVELOPER_DEFINED_STYLE { 47 };
 constexpr int32_t AECH_DEVELOPER_DEFINED { 4 };
-std::atomic<bool> g_isRsRestart;
 constexpr int32_t DEFAULT_VALUE { -1 };
-constexpr uint64_t TEST_INVALID_DISPLAY_ID { 999 };
 } // namespace
 
 class PointerDrawingManagerTest : public testing::Test {
 public:
+    static std::shared_ptr<OHOS::Rosen::RSUIDirector> rsUIDirector_;
     static std::shared_ptr<OHOS::Rosen::RSUIContext> rsUIContext_;
-    static std::shared_ptr<OHOS::Rosen::RSUIContext> GetRSUIContext(uint64_t screenId = 0)
+    static void GetRSUIContext(uint64_t screenId,
+        std::shared_ptr<OHOS::Rosen::RSUIDirector> &rsUIDirector,
+        std::shared_ptr<OHOS::Rosen::RSUIContext> &rsUIContext)
     {
         sptr<IRemoteObject> renderToken = Rosen::RSInterfaces::GetInstance().GetConnectToRenderToken(screenId);
         if (renderToken == nullptr) {
-            return nullptr;
+            return;
         }
-        auto rsUIDirector = Rosen::RSUIDirector::Create(renderToken);
+        rsUIDirector = Rosen::RSUIDirector::Create(renderToken);
         if (rsUIDirector == nullptr) {
-            return nullptr;
+            return;
         }
-        return rsUIDirector->GetRSUIContext();
+        rsUIContext = rsUIDirector->GetRSUIContext();
     }
     static void SetUpTestCase(void)
     {
-        rsUIContext_ = GetRSUIContext(0);
+        GetRSUIContext(0, rsUIDirector_, rsUIContext_);
     }
     static void TearDownTestCase(void)
     {
+        rsUIDirector_ = nullptr;
         rsUIContext_ = nullptr;
     }
     static std::shared_ptr<Media::PixelMap> CreatePixelMap(int32_t width, int32_t height);
@@ -97,6 +99,7 @@ public:
 private:
 };
 
+std::shared_ptr<OHOS::Rosen::RSUIDirector> PointerDrawingManagerTest::rsUIDirector_ = nullptr;
 std::shared_ptr<OHOS::Rosen::RSUIContext> PointerDrawingManagerTest::rsUIContext_ = nullptr;
 
 std::unique_ptr<OHOS::Media::PixelMap> PointerDrawingManagerTest::SetMouseIconTest(const std::string iconPath)
@@ -3288,7 +3291,7 @@ HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_CreatePointerWindowF
     OLD::DisplayInfo displaysInfo_;
     displaysInfo_.rsId = 1;
     pointerDrawingManager->displayInfo_ = displaysInfo_;
-    g_isRsRestart.store(false);
+    pointerDrawingManager->isHardCursorSurfaceNodeInited_.store(false);
     int32_t result = pointerDrawingManager->CreatePointerWindowForScreenPointer(rsId, physicalX, physicalY);
     EXPECT_EQ(result, RET_ERR);
 }
@@ -3314,7 +3317,7 @@ HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_CreatePointerWindowF
     OLD::DisplayInfo displaysInfo_;
     displaysInfo_.rsId = 2;
     pointerDrawingManager->displayInfo_ = displaysInfo_;
-    g_isRsRestart.store(false);
+    pointerDrawingManager->isHardCursorSurfaceNodeInited_.store(false);
     int32_t result = pointerDrawingManager->CreatePointerWindowForScreenPointer(rsId, physicalX, physicalY);
     EXPECT_NE(result, RET_OK);
 }
@@ -3338,7 +3341,7 @@ HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_CreatePointerWindowF
     auto pointerDrawingManager = static_cast<PointerDrawingManager *>(IPointerDrawingManager::GetInstance());
     pointerDrawingManager->screenPointers_[rsId] = sp;
 
-    g_isRsRestart.store(false);
+    pointerDrawingManager->isHardCursorSurfaceNodeInited_.store(false);
     int32_t result = pointerDrawingManager->CreatePointerWindowForScreenPointer(rsId, physicalX, physicalY);
     EXPECT_NE(result, RET_OK);
 }
@@ -4023,7 +4026,7 @@ HWTEST_F(PointerDrawingManagerTest, PointerDrawingManagerTest_ClearScreenPointer
 
 /**
  * @tc.name: CreatePointerWindowForScreenPointer_006
- * @tc.desc: Test CreatePointerWindowForScreenPointer with g_isRsRestart=true and screenPointers
+ * @tc.desc: Test CreatePointerWindowForScreenPointer with isHardCursorSurfaceNodeInited_=true and screenPointers
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -4046,10 +4049,10 @@ HWTEST_F(PointerDrawingManagerTest, CreatePointerWindowForScreenPointer_006, Tes
     displaysInfo_.rsId = 2;
     pointerDrawingManager->displayInfo_ = displaysInfo_;
 
-    g_isRsRestart.store(true);
+    pointerDrawingManager->isHardCursorSurfaceNodeInited_.store(true);
     int32_t result = pointerDrawingManager->CreatePointerWindowForScreenPointer(rsId, physicalX, physicalY);
     EXPECT_NE(result, RET_OK);
-    g_isRsRestart.store(false);
+    pointerDrawingManager->isHardCursorSurfaceNodeInited_.store(false);
 }
 
 /**
@@ -4131,6 +4134,60 @@ HWTEST_F(PointerDrawingManagerTest, PointerDrawingManagerTest_RsFlushImplicitTra
 }
 
 /**
+ * @tc.name: PointerDrawingManagerTest_RsFlushImplicitTransaction_002
+ * @tc.desc: Test RsFlushImplicitTransaction with hard cursor but ScreenPointer not found
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerTest, PointerDrawingManagerTest_RsFlushImplicitTransaction_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerDrawingManager pointerDrawingManager;
+    pointerDrawingManager.hardwareCursorPointerManager_ = std::make_shared<HardwareCursorPointerManager>();
+    pointerDrawingManager.hardwareCursorPointerManager_->SetHdiServiceState(true);
+    pointerDrawingManager.hardwareCursorPointerManager_->isEnableState_ = true;
+    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.RsFlushImplicitTransaction());
+}
+
+/**
+ * @tc.name: PointerDrawingManagerTest_RsFlushImplicitTransaction_003
+ * @tc.desc: Test RsFlushImplicitTransaction with hard cursor but ScreenPointer is nullptr
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerTest, PointerDrawingManagerTest_RsFlushImplicitTransaction_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerDrawingManager pointerDrawingManager;
+    pointerDrawingManager.hardwareCursorPointerManager_ = std::make_shared<HardwareCursorPointerManager>();
+    pointerDrawingManager.hardwareCursorPointerManager_->SetHdiServiceState(true);
+    pointerDrawingManager.hardwareCursorPointerManager_->isEnableState_ = true;
+    pointerDrawingManager.screenPointers_[0] = nullptr;
+    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.RsFlushImplicitTransaction());
+}
+
+/**
+ * @tc.name: PointerDrawingManagerTest_RsFlushImplicitTransaction_004
+ * @tc.desc: Test RsFlushImplicitTransaction with hard cursor and ScreenPointer is valid
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerTest, PointerDrawingManagerTest_RsFlushImplicitTransaction_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerDrawingManager pointerDrawingManager;
+    pointerDrawingManager.hardwareCursorPointerManager_ = std::make_shared<HardwareCursorPointerManager>();
+    pointerDrawingManager.hardwareCursorPointerManager_->SetHdiServiceState(true);
+    pointerDrawingManager.hardwareCursorPointerManager_->isEnableState_ = true;
+
+    auto screenPointer = std::make_shared<ScreenPointer>(nullptr, nullptr, OLD::DisplayInfo{});
+    ASSERT_NE(screenPointer, nullptr);
+    pointerDrawingManager.screenPointers_[0] = screenPointer;
+
+    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.RsFlushImplicitTransaction());
+}
+
+/**
  * @tc.name: PointerDrawingManagerTest_GetRSUIContext_001
  * @tc.desc: Test GetRSUIContext when hard cursor disabled and rsUIContext_ is null
  * @tc.type: FUNC
@@ -4147,22 +4204,6 @@ HWTEST_F(PointerDrawingManagerTest, PointerDrawingManagerTest_GetRSUIContext_001
 }
 
 /**
- * @tc.name: PointerDrawingManagerTest_GetRSUIDirector_001
- * @tc.desc: Test GetRSUIDirector when hard cursor disabled and rsUIDirector_ is null
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(PointerDrawingManagerTest, PointerDrawingManagerTest_GetRSUIDirector_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    PointerDrawingManager pointerDrawingManager;
-    pointerDrawingManager.hardwareCursorPointerManager_ = nullptr;
-    pointerDrawingManager.rsUIDirector_ = nullptr;
-    auto director = pointerDrawingManager.GetRSUIDirector();
-    EXPECT_EQ(director, nullptr);
-}
-
-/**
  * @tc.name: PointerDrawingManagerTest_GetRSUIContext_002
  * @tc.desc: Test GetRSUIContext when hard cursor enabled but screen pointer not found
  * @tc.type: FUNC
@@ -4175,29 +4216,196 @@ HWTEST_F(PointerDrawingManagerTest, PointerDrawingManagerTest_GetRSUIContext_002
     pointerDrawingManager.hardwareCursorPointerManager_ = std::make_shared<HardwareCursorPointerManager>();
     pointerDrawingManager.hardwareCursorPointerManager_->SetHdiServiceState(true);
     pointerDrawingManager.hardwareCursorPointerManager_->isEnableState_ = true;
-    pointerDrawingManager.displayId_ = TEST_INVALID_DISPLAY_ID;
+    pointerDrawingManager.displayId_ = 0;
     pointerDrawingManager.rsUIContext_ = nullptr;
     auto context = pointerDrawingManager.GetRSUIContext();
     EXPECT_EQ(context, nullptr);
 }
 
 /**
- * @tc.name: PointerDrawingManagerTest_GetRSUIDirector_002
- * @tc.desc: Test GetRSUIDirector when hard cursor enabled but screen pointer not found
+ * @tc.name: PointerDrawingManagerTest_GetRSUIContext_003
+ * @tc.desc: Test GetRSUIContext when hard cursor enabled and screen pointer found
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(PointerDrawingManagerTest, PointerDrawingManagerTest_GetRSUIDirector_002, TestSize.Level1)
+HWTEST_F(PointerDrawingManagerTest, PointerDrawingManagerTest_GetRSUIContext_003, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     PointerDrawingManager pointerDrawingManager;
     pointerDrawingManager.hardwareCursorPointerManager_ = std::make_shared<HardwareCursorPointerManager>();
     pointerDrawingManager.hardwareCursorPointerManager_->SetHdiServiceState(true);
     pointerDrawingManager.hardwareCursorPointerManager_->isEnableState_ = true;
-    pointerDrawingManager.displayId_ = TEST_INVALID_DISPLAY_ID;
+    pointerDrawingManager.displayId_ = 0;
+
+    auto screenPointer = std::make_shared<ScreenPointer>(nullptr, nullptr, OLD::DisplayInfo{});
+    ASSERT_NE(screenPointer, nullptr);
+    pointerDrawingManager.screenPointers_[0] = screenPointer;
+
+    auto context = pointerDrawingManager.GetRSUIContext();
+    EXPECT_EQ(context, nullptr);
+}
+
+/**
+ * @tc.name: PointerDrawingManagerTest_DestroyPointerWindowOfHardCursor_001
+ * @tc.desc: Test DestroyPointerWindowOfHardCursor with valid screen pointers
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerTest, PointerDrawingManagerTest_DestroyPointerWindowOfHardCursor_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerDrawingManager pointerDrawingManager;
+    auto screenPointer = std::make_shared<ScreenPointer>(nullptr, nullptr, OLD::DisplayInfo{});
+    ASSERT_NE(screenPointer, nullptr);
+    pointerDrawingManager.screenPointers_[0] = screenPointer;
+    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.DestroyPointerWindowOfHardCursor());
+}
+
+/**
+ * @tc.name: PointerDrawingManagerTest_DestroyPointerWindowOfHardCursor_002
+ * @tc.desc: Test DestroyPointerWindowOfHardCursor with null screen pointer
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerTest, PointerDrawingManagerTest_DestroyPointerWindowOfHardCursor_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerDrawingManager pointerDrawingManager;
+    pointerDrawingManager.screenPointers_[0] = nullptr;
+    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.DestroyPointerWindowOfHardCursor());
+}
+
+/**
+ * @tc.name: PointerDrawingManagerTest_DestroyPointerWindowOfHardCursor_003
+ * @tc.desc: Test DestroyPointerWindowOfHardCursor with empty screenPointers_
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerTest, PointerDrawingManagerTest_DestroyPointerWindowOfHardCursor_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerDrawingManager pointerDrawingManager;
+    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.DestroyPointerWindowOfHardCursor());
+}
+
+/**
+ * @tc.name: PointerDrawingManagerTest_DestroyPointerWindowOfSoftCursor_001
+ * @tc.desc: Test DestroyPointerWindowOfSoftCursor with valid surface node
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerTest, PointerDrawingManagerTest_DestroyPointerWindowOfSoftCursor_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerDrawingManager pointerDrawingManager;
+
+    Rosen::RSSurfaceNodeConfig surfaceNodeConfig;
+    surfaceNodeConfig.SurfaceNodeName = "pointer window";
+    Rosen::RSSurfaceNodeType surfaceNodeType = Rosen::RSSurfaceNodeType::SELF_DRAWING_WINDOW_NODE;
+    auto surfaceNode = Rosen::RSSurfaceNode::Create(surfaceNodeConfig, surfaceNodeType, true, false, rsUIContext_);
+    ASSERT_NE(surfaceNode, nullptr);
+    pointerDrawingManager.SetSurfaceNode(surfaceNode);
+    pointerDrawingManager.screenId_ = 0;
+    pointerDrawingManager.rsUIDirector_ = rsUIDirector_;
+
+    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.DestroyPointerWindowOfSoftCursor());
+    EXPECT_EQ(pointerDrawingManager.GetSurfaceNode(), nullptr);
+    EXPECT_EQ(pointerDrawingManager.rsUIDirector_, nullptr);
+    EXPECT_EQ(pointerDrawingManager.rsUIContext_, nullptr);
+}
+
+/**
+ * @tc.name: PointerDrawingManagerTest_DestroyPointerWindowOfSoftCursor_002
+ * @tc.desc: Test DestroyPointerWindowOfSoftCursor with null surface node
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerTest, PointerDrawingManagerTest_DestroyPointerWindowOfSoftCursor_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerDrawingManager pointerDrawingManager;
+    pointerDrawingManager.SetSurfaceNode(nullptr);
+    pointerDrawingManager.screenId_ = 0;
+    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.DestroyPointerWindowOfSoftCursor());
+}
+
+/**
+ * @tc.name: PointerDrawingManagerTest_InitRSUIContext_First_Initialization_001
+ * @tc.desc: Test InitRSUIContext with first initialization
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerTest, PointerDrawingManagerTest_InitRSUIContext_First_Initialization_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerDrawingManager pointerDrawingManager;
     pointerDrawingManager.rsUIDirector_ = nullptr;
-    auto director = pointerDrawingManager.GetRSUIDirector();
-    EXPECT_EQ(director, nullptr);
+    pointerDrawingManager.rsUIContext_ = nullptr;
+    pointerDrawingManager.screenId_ = 0;
+    EXPECT_TRUE(pointerDrawingManager.InitRSUIContext(0));
+}
+
+/**
+ * @tc.name: PointerDrawingManagerTest_InitRSUIContext_ScreenChanged_002
+ * @tc.desc: Test InitRSUIContext when screen is changed
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerTest, PointerDrawingManagerTest_InitRSUIContext_ScreenChanged_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerDrawingManager pointerDrawingManager;
+    pointerDrawingManager.rsUIDirector_ = rsUIDirector_;
+    pointerDrawingManager.rsUIContext_ = rsUIContext_;
+    pointerDrawingManager.screenId_ = 0;
+    EXPECT_TRUE(pointerDrawingManager.InitRSUIContext(1));
+}
+
+/**
+ * @tc.name: PointerDrawingManagerTest_InitRSUIContext_ScreenUnchanged_003
+ * @tc.desc: Test InitRSUIContext when screen is unchanged and already initialized
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerTest, PointerDrawingManagerTest_InitRSUIContext_ScreenUnchanged_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerDrawingManager pointerDrawingManager;
+    pointerDrawingManager.screenId_ = 0;
+
+    pointerDrawingManager.rsUIDirector_ = rsUIDirector_;
+    pointerDrawingManager.rsUIContext_ = rsUIContext_;
+
+    bool result = pointerDrawingManager.InitRSUIContext(0);
+    EXPECT_NE(pointerDrawingManager.rsUIDirector_, nullptr);
+    EXPECT_NE(pointerDrawingManager.rsUIContext_, nullptr);
+    EXPECT_EQ(result, true);
+}
+
+/**
+ * @tc.name: CreatePointerWindowForScreenPointer_InitSuccess
+ * @tc.desc: Test CreatePointerWindowForScreenPointer when ScreenPointer::Init returns true
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerTest, CreatePointerWindowForScreenPointer_InitSuccess, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerDrawingManager pointerDrawingManager;
+    uint64_t rsId = 0;
+    int32_t physicalX = 100;
+    int32_t physicalY = 100;
+    
+    OLD::DisplayInfo displayInfo;
+    displayInfo.rsId = rsId;
+    pointerDrawingManager.displayInfo_ = displayInfo;
+    pointerDrawingManager.isHardCursorSurfaceNodeInited_.store(false);
+    
+    auto sp = std::make_shared<ScreenPointer>(nullptr, nullptr, displayInfo);
+    pointerDrawingManager.screenPointers_[rsId] = sp;
+    
+    int32_t result = pointerDrawingManager.CreatePointerWindowForScreenPointer(rsId, physicalX, physicalY);
+    EXPECT_EQ(result, RET_OK);
 }
 } // namespace MMI
 } // namespace OHOS

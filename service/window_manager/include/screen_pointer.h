@@ -201,15 +201,14 @@ public:
         isVirtualExtend_ = isVirtualExtend;
     }
 
-    std::shared_ptr<Rosen::RSUIDirector> GetRSUIDirector() const
-    {
-        return rsUIDirector_;
-    }
-
     std::shared_ptr<Rosen::RSUIContext> GetRSUIContext() const
     {
         return rsUIContext_;
     }
+
+    void RsFlushImplicitTransaction();
+
+    void DestroyPointerWindow();
 
 private:
     bool InitSurfaceNode();
@@ -223,8 +222,7 @@ private:
     bool InitCommonBuffer(const OHOS::BufferRequestConfig &bufferCfg);
     buffer_ptr_t CreateSurfaceBuffer(const OHOS::BufferRequestConfig &bufferCfg);
     bool IsDefaultCfg(const RenderConfig &cfg);
-    void InitRSUIContext(uint64_t screenId);
-    void RsFlushImplicitTransaction();
+    bool InitRSUIContext(uint64_t screenId);
 
 private:
     std::mutex mtx_;
