@@ -890,6 +890,10 @@ int32_t MMIService::SetMouseIconInner(int32_t windowId, const CursorPixelMap& cu
         return MMISERVICE_NOT_RUNNING;
     }
     CHKPR(curPixelMap.pixelMap, ERROR_NULL_POINTER);
+    if (windowId <= 0) {
+        MMI_HILOGE("Invalid windowId:%{public}d", windowId);
+        return RET_ERR;
+    }
 #if defined OHOS_BUILD_ENABLE_POINTER
     int32_t pid = GetCallingPid();
     int32_t ret = CheckPidPermission(pid);
@@ -1185,9 +1189,6 @@ ErrCode MMIService::SetPointerVisible(bool visible, int32_t priority)
     int32_t clientPid = GetCallingPid();
     int32_t ret = delegateTasks_.PostSyncTask(
         [clientPid, visible, priority, isHap] {
-            if (!POINTER_DEV_MGR.isInit) {
-                return RET_ERR;
-            }
             return CursorDrawingComponent::GetInstance().SetPointerVisible(clientPid, visible, priority, isHap);
         }
         );
@@ -1203,9 +1204,7 @@ ErrCode MMIService::SetPointerVisible(bool visible, int32_t priority)
 int32_t MMIService::CheckPointerVisible(bool &visible)
 {
     WIN_MGR->UpdatePointerDrawingManagerWindowInfo();
-    if (POINTER_DEV_MGR.isInit) {
-        visible = CursorDrawingComponent::GetInstance().IsPointerVisible();
-    }
+    visible = CursorDrawingComponent::GetInstance().IsPointerVisible();
     return RET_OK;
 }
 #endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
@@ -1286,9 +1285,7 @@ ErrCode MMIService::SetPointerColor(int32_t color)
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
 int32_t MMIService::ReadPointerColor(int32_t userId, int32_t &color)
 {
-    if (POINTER_DEV_MGR.isInit) {
-        color = CursorDrawingComponent::GetInstance().GetPointerColor(userId);
-    }
+    color = CursorDrawingComponent::GetInstance().GetPointerColor(userId);
     return RET_OK;
 }
 #endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
@@ -1429,9 +1426,6 @@ int32_t MMIService::SetPointerStyleInner(int32_t windowId, PointerStyle pointerS
     int32_t userId = GetCallingUser();
     int32_t ret = delegateTasks_.PostSyncTask(
         [userId, clientPid, windowId, pointerStyle, token] {
-            if (!POINTER_DEV_MGR.isInit) {
-                return RET_ERR;
-            }
             return CursorDrawingComponent::GetInstance().SetPointerStyle(
                 userId, clientPid, windowId, pointerStyle, token);
         }
@@ -1494,9 +1488,6 @@ ErrCode MMIService::GetPointerStyleInner(int32_t windowId, PointerStyle& pointer
     int32_t userId = GetCallingUser();
     int32_t ret = delegateTasks_.PostSyncTask(
         [userId, clientPid, windowId, &pointerStyle, token] {
-            if (!POINTER_DEV_MGR.isInit) {
-                return RET_ERR;
-            }
             return CursorDrawingComponent::GetInstance().GetPointerStyle(
                 userId, clientPid, windowId, pointerStyle, token);
         }
@@ -5565,9 +5556,6 @@ int32_t MMIService::SetCustomCursorInner(int32_t windowId, const CustomCursorPar
     CursorDrawingComponent::GetInstance();
     ret = delegateTasks_.PostSyncTask(std::bind(
         [pid, windowId, cursor, options, token] {
-            if (!POINTER_DEV_MGR.isInit) {
-                return RET_ERR;
-            }
             return CursorDrawingComponent::GetInstance().SetCustomCursor(pid, windowId, cursor, options, token);
         }
         ));
@@ -5694,7 +5682,7 @@ ErrCode MMIService::GetKnuckleSwitch(bool &knuckleSwitch)
         MMI_HILOGE("GetKnuckleSwitch failed, return:%{public}d", ret);
         return ret;
     }
-    return RET_OK
+    return RET_OK;
 #endif // OHOS_BUILD_KNUCKLE
     return RET_UNSUPPORT;
 }
