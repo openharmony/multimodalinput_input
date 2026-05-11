@@ -2431,18 +2431,8 @@ ErrCode MMIService::CheckInjectPointerEventPermission(const std::shared_ptr<Poin
     bool isNativeInject)
 {
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
-    if (pointerEvent->HasFlag(InputEvent::EVENT_FLAG_CONTROLLER) &&
-        pointerEvent->GetSourceType() != PointerEvent::SOURCE_TYPE_TOUCHSCREEN) {
-        MMI_HILOGD("Pointer event from Controller interface, using CONTROL_DEVICE permission check");
-        ErrCode ret = CheckControllerPermission();
-        if (ret != RET_OK) {
-            MMI_HILOGE("Controller permission check failed for pointer event, ret:%{public}d", ret);
-        }
-        return ret;
-    }
 #ifdef OHOS_BUILD_ENABLE_CONTROLLER_INJECT
-    if (pointerEvent->HasFlag(InputEvent::EVENT_FLAG_CONTROLLER) &&
-        pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHSCREEN) {
+    if (pointerEvent->HasFlag(InputEvent::EVENT_FLAG_CONTROLLER)) {
         MMI_HILOGD("Touch event from Controller interface, using CONTROL_DEVICE permission check");
         ErrCode ret = CheckControllerPermission();
         if (ret != RET_OK) {
