@@ -55,6 +55,7 @@ ohos_shared_library("mmi_joystick_event_normalization") {
     "ipc:ipc_single",
     "libinput:libinput-third-mmi",
     "preferences:native_preferences",
+    "icu:shared_icuuc",
   ]
 
   part_name = "${mmi_part_name}"

@@ -154,6 +154,7 @@ ohos_unittest("MouseEventNormalizeTest") {
     "preferences:native_preferences",
     "window_manager:libwm",
     "ability_runtime:ability_manager",
+    "icu:shared_icuuc",
   ]
 }
 
