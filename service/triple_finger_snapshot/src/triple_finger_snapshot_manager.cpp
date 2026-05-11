@@ -37,7 +37,7 @@ const std::string TRIPLE_FINGER_SNAPSHOT_SWITCH_KEY { "sceneboard.navigation.tri
 constexpr int32_t CAST_INPUT_DEVICEID { 0xAAAAAAFF };
 constexpr int32_t CAST_SCREEN_DEVICEID { 0xAAAAAAFE };
 const std::string DATASHARE_BASE_URI =
-    "datashare:///com.ohos.settingsdata/entry/settingsdata/USER_SETTINGSDATA_SECURE_";
+    "datashare:///com.ohos.settingsdata/entry/settingsdata/USER_SETTINGSDATA_";
 const std::string ENABLE_TRIPLE_FINGER_SNAPSHOT = "1";
 const std::string DISABLE_TRIPLE_FINGER_SNAPSHOT = "0";
 }

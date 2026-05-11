@@ -776,6 +776,7 @@ ohos_unittest("TouchpadGestureTest") {
     "${mmi_path}/service/subscriber/src/key_subscriber_handler.cpp",
     "${mmi_path}/service/common/timer_manager/src/timer_manager.cpp",
     "${mmi_path}/service/touch_event_normalize/src/touchpad_transform_processor.cpp",
+    "${mmi_path}/frameworks/proxy/events/src/i_anco_consumer.cpp",
     "${mmi_path}/service/window_manager/src/i_pointer_drawing_manager.cpp",
     "${mmi_path}/service/window_manager/src/input_display_bind_helper.cpp",
     "${mmi_path}/service/window_manager/src/touch_drawing_manager.cpp",
