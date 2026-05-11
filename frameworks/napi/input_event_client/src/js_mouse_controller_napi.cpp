@@ -25,6 +25,7 @@
 #include "napi_constants.h"
 #include "util_napi.h"
 #include "util_napi_error.h"
+#include "js_register_module.h"
 
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "JsMouseControllerNapi"
@@ -133,6 +134,16 @@ void ThrowControllerError(napi_env env, int32_t code, MouseControllerOperation o
 {
     napi_value businessError = CreateBusinessError(env, code, operation);
     napi_throw(env, businessError);
+}
+
+bool IsValidJsButton(int32_t button)
+{
+    return (button >= JS_MOUSE_BUTTON_LEFT && button <= JS_MOUSE_BUTTON_TASK);
+}
+
+bool IsValidJsAxis(int32_t axis)
+{
+    return (axis >= JS_MOUSE_AXIS_SCROLL_VERTICAL && axis <= JS_MOUSE_AXIS_PINCH);
 }
 
 } // namespace
@@ -331,6 +342,12 @@ napi_value MouseControllerPressButton(napi_env env, napi_callback_info info)
         return nullptr;
     }
 
+    if (!IsValidJsButton(button)) {
+        MMI_HILOGE("Invalid button value: %{public}d", button);
+        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Parameter error. Invalid button value");
+        return nullptr;
+    }
+
     JsMouseController* controller = nullptr;
     status = napi_unwrap(env, thisVar, reinterpret_cast<void**>(&controller));
     if (status != napi_ok) {
@@ -395,6 +412,12 @@ napi_value MouseControllerReleaseButton(napi_env env, napi_callback_info info)
     if (status != napi_ok) {
         MMI_HILOGE("Failed to get button parameter, must be Button enum");
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Parameter error. The type of button must be Button enum");
+        return nullptr;
+    }
+
+    if (!IsValidJsButton(button)) {
+        MMI_HILOGE("Invalid button value: %{public}d", button);
+        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Parameter error. Invalid button value");
         return nullptr;
     }
 
@@ -465,6 +488,13 @@ napi_value MouseControllerBeginAxis(napi_env env, napi_callback_info info)
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Parameter error. The type of axis must be Axis enum");
         return nullptr;
     }
+
+    if (!IsValidJsAxis(axis)) {
+        MMI_HILOGE("Invalid axis value: %{public}d", axis);
+        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Parameter error. Invalid axis value");
+        return nullptr;
+    }
+
     status = napi_get_value_int32(env, argv[1], &value);
     if (status != napi_ok) {
         MMI_HILOGE("Failed to get value parameter, must be integer");
@@ -539,6 +569,13 @@ napi_value MouseControllerUpdateAxis(napi_env env, napi_callback_info info)
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Parameter error. The type of axis must be Axis enum");
         return nullptr;
     }
+
+    if (!IsValidJsAxis(axis)) {
+        MMI_HILOGE("Invalid axis value: %{public}d", axis);
+        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Parameter error. Invalid axis value");
+        return nullptr;
+    }
+
     status = napi_get_value_int32(env, argv[1], &value);
     if (status != napi_ok) {
         MMI_HILOGE("Failed to get value parameter, must be integer");
@@ -610,6 +647,12 @@ napi_value MouseControllerEndAxis(napi_env env, napi_callback_info info)
     if (status != napi_ok) {
         MMI_HILOGE("Failed to get axis parameter, must be Axis enum");
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Parameter error. The type of axis must be Axis enum");
+        return nullptr;
+    }
+
+    if (!IsValidJsAxis(axis)) {
+        MMI_HILOGE("Invalid axis value: %{public}d", axis);
+        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Parameter error. Invalid axis value");
         return nullptr;
     }
 
