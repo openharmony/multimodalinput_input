@@ -486,10 +486,9 @@ void TouchDrawingHandler::DrawPointerPositionHandler()
         }
         auto displayXY = CalcDrawCoordinate(displayInfo_, pointerItem);
         DrawTracker(displayXY.first, displayXY.second, pointerId);
-        if ((pointerEvent_->GetPointerAction() != PointerEvent::POINTER_ACTION_UP &&
+        if (pointerEvent_->GetPointerAction() != PointerEvent::POINTER_ACTION_UP &&
             pointerEvent_->GetPointerAction() != PointerEvent::POINTER_ACTION_PULL_UP &&
-            pointerEvent_->GetPointerAction() != PointerEvent::POINTER_ACTION_CANCEL) &&
-            pointerEvent_->GetPointerId() == pointerId) {
+            pointerEvent_->GetPointerAction() != PointerEvent::POINTER_ACTION_CANCEL) {
             DrawCrosshairs(canvas, displayXY.first, displayXY.second);
             UpdateLastPointerItem(pointerItem);
         }
