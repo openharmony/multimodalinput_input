@@ -18,6 +18,9 @@
 
 #include <map>
 #include <mutex>
+#include <set>
+#include <unordered_map>
+#include <vector>
 
 #include "key_event.h"
 #include "key_option.h"
@@ -61,11 +64,19 @@ public:
     bool NotifyPendingMonitors();
     void ResetAll(int32_t keyCode);
     void SetMeeTimeSubcriber(bool status, std::string monitorType);
+    std::vector<int32_t> GetSubscribedKeysByPid(int32_t pid) const;
+ 
+    using KeyMonitorChangedCallback =
+        std::function<void(int32_t pid, int32_t keyCode, std::string bundleName, bool isAdd)>;
+    int32_t RegisterKeyMonitorCallback(KeyMonitorChangedCallback callback);
+    bool UnregisterKeyMonitorCallback(int32_t callbackId);
 
     static std::shared_ptr<KeyMonitorManager> GetInstance();
 
 private:
     void OnSessionLost(int32_t session);
+    void RegisterSessionLostCallback();
+    void TriggerKeyMonitorCallback(int32_t pid, int32_t keyCode, const std::string &bundleName, bool isAdd);
     bool CheckMonitor(const Monitor &monitor);
     void NotifyKeyMonitor(std::shared_ptr<KeyEvent> keyEvent, int32_t session, int32_t status);
     bool CheckMeeTimeMonitor(std::shared_ptr<KeyEvent> keyEvent);
@@ -76,7 +87,11 @@ private:
     std::map<Monitor, PendingMonitor> pending_;
     static const std::set<int32_t> allowedKeys_;
     std::atomic_bool isMeeTimeSubcriber_ { false };
+    std::atomic_bool sessionCallbackRegistered_ { false };
     std::map<std::string, int32_t> meeTimeMonitor_;
+    int32_t keyMonitorCallbackId_{ 0 };
+    std::mutex keyMonitorCallbackMutex_;
+    std::unordered_map<int32_t, KeyMonitorChangedCallback> keyMonitorCallbacks_;
 };
 
 #define KEY_MONITOR_MGR KeyMonitorManager::GetInstance()

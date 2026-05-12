@@ -179,6 +179,13 @@ struct IPluginContext {
     virtual int32_t CalculateTipPoint(libinput_event *event, int32_t &displayId, PhysicalCoordinate &coord) = 0;
     virtual void SetMouseAccelerateMotionSwitch(libinput_event *event, bool enable) = 0;
     virtual int32_t GetCurrentMouseLocation(double &mouseX, double &mouseY) = 0;
+#ifdef OHOS_BUILD_ENABLE_KEY_PRESSED_HANDLER
+    virtual std::vector<int32_t> GetSubscribedKeysByPid(int32_t pid) const = 0;
+    virtual int32_t RegisterKeyMonitorCallback(
+        const std::function<void(int32_t pid, int32_t keyCode,
+        std::string bundleName, bool isAdd)> &callback) const = 0;
+    virtual bool UnregisterKeyMonitorCallback(int32_t callbackId) const = 0;
+#endif
 };
 
 inline bool checkPluginEventNull(PluginEventType &event)

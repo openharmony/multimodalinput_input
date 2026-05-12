@@ -117,18 +117,55 @@ bool KeyMonitorManager::Monitor::Want(std::shared_ptr<KeyEvent> keyEvent) const
 
 KeyMonitorManager::KeyMonitorManager()
 {
+    RegisterSessionLostCallback();
+}
+ 
+void KeyMonitorManager::RegisterSessionLostCallback()
+{
+    if (sessionCallbackRegistered_) {
+        return;
+    }
     auto udsServer = InputHandler->GetUDSServer();
     if (udsServer != nullptr) {
         udsServer->AddSessionDeletedCallback([this](SessionPtr sess) {
             CHKPV(sess);
             OnSessionLost(sess->GetPid());
         });
+        sessionCallbackRegistered_ = true;
+    }
+}
+
+int32_t KeyMonitorManager::RegisterKeyMonitorCallback(KeyMonitorChangedCallback callback)
+{
+    if (!callback) {
+        MMI_HILOGE("RegisterKeyMonitorCallback failed: callback is null");
+        return -1;
+    }
+    std::lock_guard<std::mutex> lock(keyMonitorCallbackMutex_);
+    int32_t id = ++keyMonitorCallbackId_;
+    keyMonitorCallbacks_[id] = std::move(callback);
+    return id;
+}
+ 
+bool KeyMonitorManager::UnregisterKeyMonitorCallback(int32_t callbackId)
+{
+    std::lock_guard<std::mutex> lock(keyMonitorCallbackMutex_);
+    return keyMonitorCallbacks_.erase(callbackId) > 0;
+}
+ 
+void KeyMonitorManager::TriggerKeyMonitorCallback(int32_t pid, int32_t keyCode,
+                                                  const std::string &bundleName, bool isAdd)
+{
+    std::lock_guard<std::mutex> lock(keyMonitorCallbackMutex_);
+    for (auto &kv : keyMonitorCallbacks_) {
+        kv.second(pid, keyCode, bundleName, isAdd);
     }
 }
 
 int32_t KeyMonitorManager::AddMonitor(const Monitor &monitor, const std::string &bundleName)
 {
     MMI_HILOGI("Add key monitor(%{public}s)", monitor.Dump().c_str());
+    RegisterSessionLostCallback();
     if (!CheckMonitor(monitor)) {
         MMI_HILOGE("Invalid monitor(%{public}s)", monitor.Dump().c_str());
         return -PARAM_INPUT_INVALID;
@@ -143,6 +180,7 @@ int32_t KeyMonitorManager::AddMonitor(const Monitor &monitor, const std::string 
         SetMeeTimeSubcriber(true, "Subscriber");
         meeTimeMonitor_.emplace(bundleName, monitor.session_);
     }
+    TriggerKeyMonitorCallback(monitor.session_, monitor.key_, bundleName, true);
 
     return RET_OK;
 }
@@ -165,6 +203,18 @@ void KeyMonitorManager::RemoveMonitor(const Monitor &monitor, const std::string 
             meeTimeMonitor_.erase(bundleName);
         }
     }
+    TriggerKeyMonitorCallback(monitor.session_, monitor.key_, bundleName, false);
+}
+
+std::vector<int32_t> KeyMonitorManager::GetSubscribedKeysByPid(int32_t pid) const
+{
+    std::set<int32_t> keySet;
+    for (const auto &monitor : monitors_) {
+        if (monitor.session_ == pid) {
+            keySet.emplace(monitor.key_);
+        }
+    }
+    return std::vector<int32_t>(keySet.begin(), keySet.end());
 }
 
 void KeyMonitorManager::NotifyMeeTimeMonitor(std::shared_ptr<KeyEvent> keyEvent)
@@ -300,6 +350,7 @@ void KeyMonitorManager::OnSessionLost(int32_t session)
 
     for (auto mIter = monitors_.cbegin(); mIter != monitors_.cend();) {
         if (mIter->session_ == session) {
+            TriggerKeyMonitorCallback(mIter->session_, mIter->key_, "", false);
             mIter = monitors_.erase(mIter);
         } else {
             ++mIter;

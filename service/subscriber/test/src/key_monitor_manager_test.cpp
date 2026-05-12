@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 
+#include <algorithm>
 #include <gtest/gtest.h>
 
 #include "bundle_name_parser.h"
@@ -1057,6 +1058,295 @@ HWTEST_F(KeyMonitorManagerTest, KeyMonitorManagerTest_OnSessionLost_06, TestSize
     auto it = keyMonitorManager->meeTimeMonitor_.find(name);
     EXPECT_NE(it, keyMonitorManager->meeTimeMonitor_.cend());
     EXPECT_EQ(it->second, 500);
+}
+
+/**
+ * @tc.name: KeyMonitorManagerTest_RegisterKeyMonitorCallback_01
+ * @tc.desc: Verify the RegisterKeyMonitorCallback with valid callback
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyMonitorManagerTest, KeyMonitorManagerTest_RegisterKeyMonitorCallback_01, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<KeyMonitorManager> keyMonitorManager = std::make_shared<KeyMonitorManager>();
+    KeyMonitorManager::KeyMonitorChangedCallback callback = [](int32_t pid, int32_t keyCode, std::string bundleName, bool isAdd) {
+        MMI_HILOGI("KeyMonitor callback invoked, pid:%{public}d, keyCode:%{public}d", pid, keyCode);
+    };
+    int32_t id = keyMonitorManager->RegisterKeyMonitorCallback(callback);
+    EXPECT_GT(id, 0);
+}
+ 
+/**
+ * @tc.name: KeyMonitorManagerTest_RegisterKeyMonitorCallback_02
+ * @tc.desc: Verify the RegisterKeyMonitorCallback with null callback
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyMonitorManagerTest, KeyMonitorManagerTest_RegisterKeyMonitorCallback_02, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<KeyMonitorManager> keyMonitorManager = std::make_shared<KeyMonitorManager>();
+    int32_t id = keyMonitorManager->RegisterKeyMonitorCallback(nullptr);
+    EXPECT_EQ(id, -1);
+}
+ 
+/**
+ * @tc.name: KeyMonitorManagerTest_RegisterKeyMonitorCallback_03
+ * @tc.desc: Verify the RegisterKeyMonitorCallback with multiple callbacks returns different ids
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyMonitorManagerTest, KeyMonitorManagerTest_RegisterKeyMonitorCallback_03, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<KeyMonitorManager> keyMonitorManager = std::make_shared<KeyMonitorManager>();
+    KeyMonitorManager::KeyMonitorChangedCallback callback1 = [](int32_t pid, int32_t keyCode, std::string bundleName, bool isAdd) {
+        MMI_HILOGI("Callback1 invoked");
+    };
+    KeyMonitorManager::KeyMonitorChangedCallback callback2 = [](int32_t pid, int32_t keyCode, std::string bundleName, bool isAdd) {
+        MMI_HILOGI("Callback2 invoked");
+    };
+    KeyMonitorManager::KeyMonitorChangedCallback callback3 = [](int32_t pid, int32_t keyCode, std::string bundleName, bool isAdd) {
+        MMI_HILOGI("Callback3 invoked");
+    };
+ 
+    int32_t id1 = keyMonitorManager->RegisterKeyMonitorCallback(callback1);
+    int32_t id2 = keyMonitorManager->RegisterKeyMonitorCallback(callback2);
+    int32_t id3 = keyMonitorManager->RegisterKeyMonitorCallback(callback3);
+ 
+    EXPECT_GT(id1, 0);
+    EXPECT_GT(id2, 0);
+    EXPECT_GT(id3, 0);
+    EXPECT_NE(id1, id2);
+    EXPECT_NE(id2, id3);
+    EXPECT_NE(id1, id3);
+    EXPECT_EQ(id2, id1 + 1);
+    EXPECT_EQ(id3, id2 + 1);
+}
+ 
+/**
+ * @tc.name: KeyMonitorManagerTest_RegisterKeyMonitorCallback_04
+ * @tc.desc: Verify the registered callback exists in keyMonitorCallbacks_ container
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyMonitorManagerTest, KeyMonitorManagerTest_RegisterKeyMonitorCallback_04, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<KeyMonitorManager> keyMonitorManager = std::make_shared<KeyMonitorManager>();
+    KeyMonitorManager::KeyMonitorChangedCallback callback = [](int32_t pid, int32_t keyCode, std::string bundleName, bool isAdd) {
+        MMI_HILOGI("Callback invoked");
+    };
+    int32_t id = keyMonitorManager->RegisterKeyMonitorCallback(callback);
+    EXPECT_GT(id, 0);
+    EXPECT_NE(keyMonitorManager->keyMonitorCallbacks_.find(id), keyMonitorManager->keyMonitorCallbacks_.end());
+}
+ 
+/**
+ * @tc.name: KeyMonitorManagerTest_UnregisterKeyMonitorCallback_01
+ * @tc.desc: Verify the UnregisterKeyMonitorCallback can remove registered callback
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyMonitorManagerTest, KeyMonitorManagerTest_UnregisterKeyMonitorCallback_01, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<KeyMonitorManager> keyMonitorManager = std::make_shared<KeyMonitorManager>();
+    KeyMonitorManager::KeyMonitorChangedCallback callback = [](int32_t pid, int32_t keyCode, std::string bundleName, bool isAdd) {
+        MMI_HILOGI("Callback invoked");
+    };
+    int32_t id = keyMonitorManager->RegisterKeyMonitorCallback(callback);
+    EXPECT_GT(id, 0);
+    EXPECT_NE(keyMonitorManager->keyMonitorCallbacks_.find(id), keyMonitorManager->keyMonitorCallbacks_.end());
+ 
+    keyMonitorManager->UnregisterKeyMonitorCallback(id);
+    EXPECT_EQ(keyMonitorManager->keyMonitorCallbacks_.find(id), keyMonitorManager->keyMonitorCallbacks_.end());
+}
+ 
+/**
+ * @tc.name: KeyMonitorManagerTest_UnregisterKeyMonitorCallback_02
+ * @tc.desc: Verify the UnregisterKeyMonitorCallback with non-existent id does not crash
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyMonitorManagerTest, KeyMonitorManagerTest_UnregisterKeyMonitorCallback_02, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<KeyMonitorManager> keyMonitorManager = std::make_shared<KeyMonitorManager>();
+    bool result = keyMonitorManager->UnregisterKeyMonitorCallback(9999);
+    EXPECT_FALSE(result);
+}
+ 
+/**
+ * @tc.name: KeyMonitorManagerTest_UnregisterKeyMonitorCallback_03
+ * @tc.desc: Verify the UnregisterKeyMonitorCallback removes only the specified callback
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyMonitorManagerTest, KeyMonitorManagerTest_UnregisterKeyMonitorCallback_03, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<KeyMonitorManager> keyMonitorManager = std::make_shared<KeyMonitorManager>();
+    KeyMonitorManager::KeyMonitorChangedCallback callback1 = [](int32_t pid, int32_t keyCode, std::string bundleName, bool isAdd) {
+        MMI_HILOGI("Callback1 invoked");
+    };
+    KeyMonitorManager::KeyMonitorChangedCallback callback2 = [](int32_t pid, int32_t keyCode, std::string bundleName, bool isAdd) {
+        MMI_HILOGI("Callback2 invoked");
+    };
+ 
+    int32_t id1 = keyMonitorManager->RegisterKeyMonitorCallback(callback1);
+    int32_t id2 = keyMonitorManager->RegisterKeyMonitorCallback(callback2);
+    EXPECT_EQ(keyMonitorManager->keyMonitorCallbacks_.size(), 2);
+ 
+    keyMonitorManager->UnregisterKeyMonitorCallback(id1);
+    EXPECT_EQ(keyMonitorManager->keyMonitorCallbacks_.size(), 1);
+    EXPECT_EQ(keyMonitorManager->keyMonitorCallbacks_.find(id1), keyMonitorManager->keyMonitorCallbacks_.end());
+    EXPECT_NE(keyMonitorManager->keyMonitorCallbacks_.find(id2), keyMonitorManager->keyMonitorCallbacks_.end());
+}
+ 
+/**
+ * @tc.name: KeyMonitorManagerTest_GetSubscribedKeysByPid_01
+ * @tc.desc: Verify the GetSubscribedKeysByPid with no monitors
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyMonitorManagerTest, KeyMonitorManagerTest_GetSubscribedKeysByPid_01, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<KeyMonitorManager> keyMonitorManager = std::make_shared<KeyMonitorManager>();
+    std::vector<int32_t> result = keyMonitorManager->GetSubscribedKeysByPid(100);
+    EXPECT_TRUE(result.empty());
+}
+ 
+/**
+ * @tc.name: KeyMonitorManagerTest_GetSubscribedKeysByPid_02
+ * @tc.desc: Verify the GetSubscribedKeysByPid with a single monitor
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyMonitorManagerTest, KeyMonitorManagerTest_GetSubscribedKeysByPid_02, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<KeyMonitorManager> keyMonitorManager = std::make_shared<KeyMonitorManager>();
+    KeyMonitorManager::Monitor monitor {
+        .session_ = 100,
+        .key_ = KeyEvent::KEYCODE_VOLUME_UP,
+        .action_ = KeyMonitorManager::MonitorType::MONITOR_ACTION_ONLY_DOWN,
+        .isRepeat_ = false,
+    };
+    std::string bundleName = "com.test.app";
+    keyMonitorManager->AddMonitor(monitor, bundleName);
+ 
+    std::vector<int32_t> result = keyMonitorManager->GetSubscribedKeysByPid(100);
+    EXPECT_EQ(result.size(), 1);
+    EXPECT_EQ(result[0], KeyEvent::KEYCODE_VOLUME_UP);
+}
+ 
+/**
+ * @tc.name: KeyMonitorManagerTest_GetSubscribedKeysByPid_03
+ * @tc.desc: Verify the GetSubscribedKeysByPid with multiple monitors under same pid
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyMonitorManagerTest, KeyMonitorManagerTest_GetSubscribedKeysByPid_03, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<KeyMonitorManager> keyMonitorManager = std::make_shared<KeyMonitorManager>();
+    KeyMonitorManager::Monitor monitor1 {
+        .session_ = 200,
+        .key_ = KeyEvent::KEYCODE_VOLUME_UP,
+        .action_ = KeyMonitorManager::MonitorType::MONITOR_ACTION_ONLY_DOWN,
+        .isRepeat_ = false,
+    };
+    KeyMonitorManager::Monitor monitor2 {
+        .session_ = 200,
+        .key_ = KeyEvent::KEYCODE_VOLUME_DOWN,
+        .action_ = KeyMonitorManager::MonitorType::MONITOR_ACTION_DOWN_AND_UP,
+        .isRepeat_ = false,
+    };
+    KeyMonitorManager::Monitor monitor3 {
+        .session_ = 200,
+        .key_ = KeyEvent::KEYCODE_HOME,
+        .action_ = KeyMonitorManager::MonitorType::MONITOR_ACTION_DOWN_AND_UP,
+        .isRepeat_ = false,
+    };
+    std::string bundleName = "com.test.app";
+    keyMonitorManager->AddMonitor(monitor1, bundleName);
+    keyMonitorManager->AddMonitor(monitor2, bundleName);
+    keyMonitorManager->AddMonitor(monitor3, bundleName);
+ 
+    std::vector<int32_t> result = keyMonitorManager->GetSubscribedKeysByPid(200);
+    EXPECT_EQ(result.size(), 3);
+    EXPECT_NE(std::find(result.begin(), result.end(), KeyEvent::KEYCODE_VOLUME_UP), result.end());
+    EXPECT_NE(std::find(result.begin(), result.end(), KeyEvent::KEYCODE_VOLUME_DOWN), result.end());
+    EXPECT_NE(std::find(result.begin(), result.end(), KeyEvent::KEYCODE_HOME), result.end());
+}
+ 
+/**
+ * @tc.name: KeyMonitorManagerTest_GetSubscribedKeysByPid_04
+ * @tc.desc: Verify the GetSubscribedKeysByPid with non-existent pid
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyMonitorManagerTest, KeyMonitorManagerTest_GetSubscribedKeysByPid_04, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<KeyMonitorManager> keyMonitorManager = std::make_shared<KeyMonitorManager>();
+    KeyMonitorManager::Monitor monitor {
+        .session_ = 100,
+        .key_ = KeyEvent::KEYCODE_VOLUME_UP,
+        .action_ = KeyMonitorManager::MonitorType::MONITOR_ACTION_ONLY_DOWN,
+        .isRepeat_ = false,
+    };
+    std::string bundleName = "com.test.app";
+    keyMonitorManager->AddMonitor(monitor, bundleName);
+ 
+    std::vector<int32_t> result = keyMonitorManager->GetSubscribedKeysByPid(999);
+    EXPECT_TRUE(result.empty());
+}
+ 
+/**
+ * @tc.name: KeyMonitorManagerTest_GetSubscribedKeysByPid_05
+ * @tc.desc: Verify the GetSubscribedKeysByPid with multiple pids returns only the queried pid's keys
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyMonitorManagerTest, KeyMonitorManagerTest_GetSubscribedKeysByPid_05, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<KeyMonitorManager> keyMonitorManager = std::make_shared<KeyMonitorManager>();
+    KeyMonitorManager::Monitor monitor1 {
+        .session_ = 100,
+        .key_ = KeyEvent::KEYCODE_VOLUME_UP,
+        .action_ = KeyMonitorManager::MonitorType::MONITOR_ACTION_ONLY_DOWN,
+        .isRepeat_ = false,
+    };
+    KeyMonitorManager::Monitor monitor2 {
+        .session_ = 200,
+        .key_ = KeyEvent::KEYCODE_VOLUME_DOWN,
+        .action_ = KeyMonitorManager::MonitorType::MONITOR_ACTION_ONLY_DOWN,
+        .isRepeat_ = false,
+    };
+    KeyMonitorManager::Monitor monitor3 {
+        .session_ = 200,
+        .key_ = KeyEvent::KEYCODE_HOME,
+        .action_ = KeyMonitorManager::MonitorType::MONITOR_ACTION_ONLY_DOWN,
+        .isRepeat_ = false,
+    };
+    std::string bundleName = "com.test.app";
+    keyMonitorManager->AddMonitor(monitor1, bundleName);
+    keyMonitorManager->AddMonitor(monitor2, bundleName);
+    keyMonitorManager->AddMonitor(monitor3, bundleName);
+ 
+    std::vector<int32_t> result1 = keyMonitorManager->GetSubscribedKeysByPid(100);
+    EXPECT_EQ(result1.size(), 1);
+    EXPECT_EQ(result1[0], KeyEvent::KEYCODE_VOLUME_UP);
+ 
+    std::vector<int32_t> result2 = keyMonitorManager->GetSubscribedKeysByPid(200);
+    EXPECT_EQ(result2.size(), 2);
+    EXPECT_NE(std::find(result2.begin(), result2.end(), KeyEvent::KEYCODE_VOLUME_DOWN), result2.end());
+    EXPECT_NE(std::find(result2.begin(), result2.end(), KeyEvent::KEYCODE_HOME), result2.end());
 }
 } // namespace MMI
 } // namespace OHOS
