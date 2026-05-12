@@ -41,6 +41,8 @@ const char* NAME { "name" };
 // Product type constants
 const std::string PRODUCT_TYPE = system::GetParameter("const.product.devicetype", "unknown");
 const std::string PRODUCT_TYPE_CAR = "car";
+const bool PRODUCT_PC_OR_TABLET = (PRODUCT_TYPE == "2in1") || (PRODUCT_TYPE == "tablet");
+const std::string DEFAULT_TP_DEVICE = "input_mt_warpper";
 }
 
 namespace fs = std::filesystem;
@@ -297,7 +299,7 @@ BindInfo BindInfos::GetUnbindDisplay(const std::string &inputDeviceName)
         }
         ++it;
     }
-    return GetUnbindDisplay();
+    return PRODUCT_PC_OR_TABLET ? BindInfo() : GetUnbindDisplay();
 }
 
 std::ostream &operator << (std::ostream &os, const BindInfos &r)
@@ -443,7 +445,12 @@ std::string InputDisplayBindHelper::GetInputDeviceById(int32_t id)
     CALL_DEBUG_ENTER;
     std::string inputNodeName = GetInputNodeNameByCfg(id);
     if (inputNodeName.empty()) {
-        return "";
+        // make sure the default tp bind to screen 0
+        if (id == 0 && PRODUCT_PC_OR_TABLET) {
+            inputNodeName = DEFAULT_TP_DEVICE;
+        } else {
+            return "";
+        }
     }
 
     std::string inputNode = GetInputNode(inputNodeName);
