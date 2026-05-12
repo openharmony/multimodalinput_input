@@ -2489,6 +2489,8 @@ ErrCode MMIService::InjectPointerEvent(const PointerEvent& pointerEvent, bool is
     int32_t pid = GetCallingPid();
     bool isShell = PER_HELPER->RequestFromShell();
     int32_t userId = GetCallingUser();
+    int32_t callingUid = GetCallingUid();
+    pointerEventPtr->SetCallingUid(callingUid);
 #ifdef OHOS_BUILD_ENABLE_ANCO
     ret = InjectPointerEventExt(userId, pointerEventPtr, pid, isNativeInject, isShell);
 #else

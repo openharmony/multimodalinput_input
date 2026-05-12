@@ -300,6 +300,7 @@ int32_t InputEventDataTransformation::Marshalling(std::shared_ptr<PointerEvent> 
     pkt << event->GetPullId();
     pkt << event->GetThrowAngle();
     pkt << event->GetThrowSpeed();
+    pkt << event->GetCallingUid();
     if (pkt.ChkRWError()) {
         MMI_HILOGE("Marshalling pointer event failed");
         return RET_ERR;
@@ -470,9 +471,11 @@ int32_t InputEventDataTransformation::Unmarshalling(NetPacket &pkt, std::shared_
     double throwSpeed {0.0};
     pkt >> throwAngle;
     pkt >> throwSpeed;
+    pkt >> tField;
     CHKRWER(pkt, RET_ERR);
     event->SetThrowAngle(throwAngle);
     event->SetThrowSpeed(throwSpeed);
+    event->SetCallingUid(tField);
 
     if (!DeserializeSettings(pkt, event)) {
         MMI_HILOGE("DeserializeSettings fail");
