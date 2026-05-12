@@ -1707,8 +1707,8 @@ HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_Inpu
  * @tc.desc: Test UnregisterKeyMonitorCallback normal flow
  * @tc.require: test UnregisterKeyMonitorCallback
  */
-HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_InputPlugin_UnregisterKeyMonitorCallback_001,
-    TestSize.Level1)
+HWTEST_F(MultimodalInputPluginManagerTest,
+    MultimodalInputPluginManagerTest_InputPlugin_UnregisterKeyMonitorCallback_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     std::shared_ptr<InputPlugin> inputPluginContext = std::make_shared<InputPlugin>(nullptr);
@@ -1727,8 +1727,8 @@ HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_Inpu
  * @tc.desc: Test UnregisterKeyMonitorCallback with invalid callback id
  * @tc.require: test UnregisterKeyMonitorCallback
  */
-HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_InputPlugin_UnregisterKeyMonitorCallback_002,
-    TestSize.Level1)
+HWTEST_F(MultimodalInputPluginManagerTest,
+    MultimodalInputPluginManagerTest_InputPlugin_UnregisterKeyMonitorCallback_002, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     std::shared_ptr<InputPlugin> inputPluginContext = std::make_shared<InputPlugin>(nullptr);
