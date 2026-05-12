@@ -133,9 +133,9 @@ void TouchDrawingHandler::TouchDrawHandler(std::shared_ptr<PointerEvent> pointer
         AddCanvasNode(bubbleCanvasNode_, false);
         DrawBubbleHandler();
     }
-    if ((pointerEvent_->GetPointerAction() == PointerEvent::POINTER_ACTION_UP ||
-        pointerEvent_->GetPointerAction() == PointerEvent::POINTER_ACTION_PULL_UP ||
-        pointerEvent_->GetPointerAction() == PointerEvent::POINTER_ACTION_CANCEL) &&
+    if ((pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_UP ||
+        pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_PULL_UP ||
+        pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_CANCEL) &&
         pointerEvent->GetAllPointerItems().size() == 1) {
         lastPointerItem_.clear();
     }
@@ -702,9 +702,9 @@ void TouchDrawingHandler::UpdatePointerPosition()
             InitLabels();
         }
         maxPointerCount_ = ++currentPointerCount_;
-    } else if ((pointerAction == PointerEvent::POINTER_ACTION_UP ||
+    } else if (pointerAction == PointerEvent::POINTER_ACTION_UP ||
         pointerAction == PointerEvent::POINTER_ACTION_PULL_UP ||
-        pointerAction == PointerEvent::POINTER_ACTION_CANCEL)) {
+        pointerAction == PointerEvent::POINTER_ACTION_CANCEL) {
         isDownAction_ = false;
         isFirstDownAction_ = false;
         for (auto it = lastPointerItem_.begin(); it != lastPointerItem_.end(); it++) {
