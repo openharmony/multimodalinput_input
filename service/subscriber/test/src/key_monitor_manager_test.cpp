@@ -1070,8 +1070,9 @@ HWTEST_F(KeyMonitorManagerTest, KeyMonitorManagerTest_RegisterKeyMonitorCallback
 {
     CALL_TEST_DEBUG;
     std::shared_ptr<KeyMonitorManager> keyMonitorManager = std::make_shared<KeyMonitorManager>();
-    KeyMonitorManager::KeyMonitorChangedCallback callback = [](int32_t pid, int32_t keyCode, std::string bundleName, bool isAdd) {
-        MMI_HILOGI("KeyMonitor callback invoked, pid:%{public}d, keyCode:%{public}d", pid, keyCode);
+    KeyMonitorManager::KeyMonitorChangedCallback callback = [](int32_t pid, int32_t keyCode,
+        std::string bundleName, bool isAdd) {
+            MMI_HILOGI("KeyMonitor callback invoked, pid:%{public}d, keyCode:%{public}d", pid, keyCode);
     };
     int32_t id = keyMonitorManager->RegisterKeyMonitorCallback(callback);
     EXPECT_GT(id, 0);
@@ -1101,14 +1102,17 @@ HWTEST_F(KeyMonitorManagerTest, KeyMonitorManagerTest_RegisterKeyMonitorCallback
 {
     CALL_TEST_DEBUG;
     std::shared_ptr<KeyMonitorManager> keyMonitorManager = std::make_shared<KeyMonitorManager>();
-    KeyMonitorManager::KeyMonitorChangedCallback callback1 = [](int32_t pid, int32_t keyCode, std::string bundleName, bool isAdd) {
-        MMI_HILOGI("Callback1 invoked");
+    KeyMonitorManager::KeyMonitorChangedCallback callback1 = [](int32_t pid, int32_t keyCode,
+        std::string bundleName, bool isAdd) {
+            MMI_HILOGI("Callback1 invoked");
     };
-    KeyMonitorManager::KeyMonitorChangedCallback callback2 = [](int32_t pid, int32_t keyCode, std::string bundleName, bool isAdd) {
-        MMI_HILOGI("Callback2 invoked");
+    KeyMonitorManager::KeyMonitorChangedCallback callback2 = [](int32_t pid, int32_t keyCode,
+        std::string bundleName, bool isAdd) {
+            MMI_HILOGI("Callback2 invoked");
     };
-    KeyMonitorManager::KeyMonitorChangedCallback callback3 = [](int32_t pid, int32_t keyCode, std::string bundleName, bool isAdd) {
-        MMI_HILOGI("Callback3 invoked");
+    KeyMonitorManager::KeyMonitorChangedCallback callback3 = [](int32_t pid, int32_t keyCode,
+        std::string bundleName, bool isAdd) {
+            MMI_HILOGI("Callback3 invoked");
     };
  
     int32_t id1 = keyMonitorManager->RegisterKeyMonitorCallback(callback1);
