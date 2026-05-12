@@ -705,7 +705,7 @@ PointerEvent::PointerEvent(const PointerEvent& other)
       handOption_(other.handOption_), fixedMode_(other.fixedMode_),
       rightButtonSource_(other.rightButtonSource_),
       signature_(other.signature_),
-      distributeEventTime_(other.distributeEventTime_)，
+      distributeEventTime_(other.distributeEventTime_),
       callingUid_(other.callingUid_)
       {}
 
@@ -1856,7 +1856,7 @@ int32_t PointerEvent::GetCallingUid() const
 {
     return callingUid_;
 }
- 
+
 void PointerEvent::SetCallingUid(int32_t callingUid)
 {
     callingUid_ = callingUid;
