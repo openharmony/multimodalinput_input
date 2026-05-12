@@ -133,8 +133,10 @@ void TouchDrawingHandler::TouchDrawHandler(std::shared_ptr<PointerEvent> pointer
         AddCanvasNode(bubbleCanvasNode_, false);
         DrawBubbleHandler();
     }
-    if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_UP
-        && pointerEvent->GetAllPointerItems().size() == 1) {
+    if ((pointerEvent_->GetPointerAction() == PointerEvent::POINTER_ACTION_UP ||
+        pointerEvent_->GetPointerAction() == PointerEvent::POINTER_ACTION_PULL_UP ||
+        pointerEvent_->GetPointerAction() == PointerEvent::POINTER_ACTION_CANCEL) &&
+        pointerEvent->GetAllPointerItems().size() == 1) {
         lastPointerItem_.clear();
     }
     if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_DOWN
@@ -484,7 +486,10 @@ void TouchDrawingHandler::DrawPointerPositionHandler()
         }
         auto displayXY = CalcDrawCoordinate(displayInfo_, pointerItem);
         DrawTracker(displayXY.first, displayXY.second, pointerId);
-        if (pointerEvent_->GetPointerAction() != PointerEvent::POINTER_ACTION_UP) {
+        if ((pointerEvent_->GetPointerAction() != PointerEvent::POINTER_ACTION_UP &&
+            pointerEvent_->GetPointerAction() != PointerEvent::POINTER_ACTION_PULL_UP &&
+            pointerEvent_->GetPointerAction() != PointerEvent::POINTER_ACTION_CANCEL) &&
+            pointerEvent_->GetPointerId() == pointerId) {
             DrawCrosshairs(canvas, displayXY.first, displayXY.second);
             UpdateLastPointerItem(pointerItem);
         }
@@ -697,7 +702,9 @@ void TouchDrawingHandler::UpdatePointerPosition()
             InitLabels();
         }
         maxPointerCount_ = ++currentPointerCount_;
-    } else if (pointerAction == PointerEvent::POINTER_ACTION_UP) {
+    } else if ((pointerAction == PointerEvent::POINTER_ACTION_UP ||
+        pointerAction == PointerEvent::POINTER_ACTION_PULL_UP ||
+        pointerAction == PointerEvent::POINTER_ACTION_CANCEL)) {
         isDownAction_ = false;
         isFirstDownAction_ = false;
         for (auto it = lastPointerItem_.begin(); it != lastPointerItem_.end(); it++) {
