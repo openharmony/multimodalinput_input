@@ -42,7 +42,7 @@ const char* NAME { "name" };
 const std::string PRODUCT_TYPE = system::GetParameter("const.product.devicetype", "unknown");
 const std::string PRODUCT_TYPE_CAR = "car";
 const bool PRODUCT_PC_OR_TABLET = (PRODUCT_TYPE == "2in1") || (PRODUCT_TYPE == "tablet");
-const std::string DEFAULT_TP_DEVICE = "input_mt_warpper";
+const std::string DEFAULT_TP_DEVICE = "input_mt_wrapper";
 }
 
 namespace fs = std::filesystem;
