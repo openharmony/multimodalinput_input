@@ -688,6 +688,7 @@ int32_t PointerRenderer::DynamicRender(uint8_t *addr, uint32_t width, uint32_t h
 {
     CHKPR(addr, RET_ERR);
     uint32_t addrSize = width * height * RENDER_STRIDE;
+    SetPointerCfg(cfg);
     if (cfg.style_ == MOUSE_ICON::TRANSPARENT_ICON) {
         memset_s(addr, addrSize, 0, addrSize);
         return RET_OK;
