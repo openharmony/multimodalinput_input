@@ -1586,8 +1586,9 @@ bool KeyEvent::IsExtendedFunctionKey() const
 bool KeyEvent::IsBusinessExclusiveKey() const
 {
     CALL_DEBUG_ENTER;
+    const uint32_t keyCode = static_cast<uint32_t>(keyCode_);
     return IsExtendedFunctionKey() &&
-           (keyCode_ & BUSINESS_EXCLUSIVE_KEY_MASK) == BUSINESS_EXCLUSIVE_KEY_FLAG;
+           (keyCode & BUSINESS_EXCLUSIVE_KEY_MASK) == BUSINESS_EXCLUSIVE_KEY_FLAG;
 }
 
 } // namespace MMI
