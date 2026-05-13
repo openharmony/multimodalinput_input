@@ -30,14 +30,17 @@ constexpr int32_t FILE_MAX_SIZE = 100 * 1024 * 1024;
 constexpr int32_t EVENT_OUT_SIZE = 30;
 constexpr int32_t FUNC_EXE_OK = 0;
 constexpr int32_t STRING_WIDTH = 3;
-constexpr int32_t POINTER_RECORD_MAX_SIZE = 100;
 }
 
 std::queue<std::string> EventStatistic::eventQueue_;
 std::list<std::string> EventStatistic::dumperEventList_;
 std::mutex EventStatistic::queueMutex_;
 std::condition_variable EventStatistic::queueCondition_;
-std::deque<EventStatistic::PointerEventRecord> EventStatistic::pointerRecordDeque_;
+std::array<EventStatistic::PointerEventRecord, EventStatistic::RING_BUFFER_SIZE>
+    EventStatistic::pointerRecordRingBuffer_ = {};
+int32_t EventStatistic::ringHead_ = 0;
+int32_t EventStatistic::ringTail_ = 0;
+int32_t EventStatistic::ringSize_ = 0;
 bool EventStatistic::writeFileEnabled_ = false;
 static const std::unordered_map<int32_t, std::string> pointerActionMap = {
     { PointerEvent::POINTER_ACTION_CANCEL, "cancel" },
@@ -131,7 +134,9 @@ std::string EventStatistic::ConvertTimeToStr(int64_t timestamp)
 void EventStatistic::PushPointerEvent(std::shared_ptr<PointerEvent> eventPtr)
 {
     CHKPV(eventPtr);
-    PushPointerRecord(eventPtr);
+    if (eventPtr->GetSourceType() == InputEvent::SOURCE_TYPE_TOUCHSCREEN) {
+        PushPointerRecord(eventPtr);
+    }
     int32_t pointerAction = eventPtr->GetPointerAction();
     if (pointerAction == PointerEvent::POINTER_ACTION_MOVE || pointerAction == PointerEvent::POINTER_ACTION_PULL_MOVE ||
         pointerAction == PointerEvent::POINTER_ACTION_HOVER_MOVE ||
@@ -252,71 +257,77 @@ void EventStatistic::PushEventStr(std::string eventStr)
 
 void EventStatistic::PushPointerRecord(std::shared_ptr<PointerEvent> eventPtr)
 {
-    std::list<PointerEvent::PointerItem> pointerItems = eventPtr->GetAllPointerItems();
-    std::vector<int32_t> pointerIds;
-    std::vector<double> pressures;
-    std::vector<double> tiltXs;
-    std::vector<double> tiltYs;
-    std::vector<int32_t> displayXs;
-    std::vector<int32_t> displayYs;
-    for (auto it = pointerItems.begin(); it != pointerItems.end(); ++it) {
-        pointerIds.push_back(it->GetPointerId());
-        pressures.push_back(it->GetPressure());
-        tiltXs.push_back(it->GetTiltX());
-        tiltYs.push_back(it->GetTiltY());
-        displayXs.push_back(it->GetDisplayX());
-        displayYs.push_back(it->GetDisplayY());
+    CHKPV(eventPtr);
+    int32_t pointerAction = eventPtr->GetPointerAction();
+    if (pointerAction == PointerEvent::POINTER_ACTION_MOVE ||
+        pointerAction == PointerEvent::POINTER_ACTION_PULL_MOVE) {
+        return;
     }
-    pointerRecordDeque_.emplace_back(eventPtr->GetActionTime(),
-        eventPtr->GetPointerAction(),
-        eventPtr->GetSourceType(),
-        eventPtr->GetPointerId(),
-        eventPtr->HasFlag(InputEvent::EVENT_FLAG_SIMULATE),
-        pointerIds,
-        pressures,
-        tiltXs,
-        tiltYs,
-        displayXs,
-        displayYs);
-    if (pointerRecordDeque_.size() > POINTER_RECORD_MAX_SIZE) {
-        pointerRecordDeque_.pop_front();
+    std::list<PointerEvent::PointerItem> pointerItems = eventPtr->GetAllPointerItems();
+    auto& record = pointerRecordRingBuffer_[ringTail_];
+    record.actionTime = eventPtr->GetActionTime();
+    record.actionType = eventPtr->GetPointerAction();
+    record.sourceType = eventPtr->GetSourceType();
+    record.pointerId = eventPtr->GetPointerId();
+    record.isInject = eventPtr->HasFlag(InputEvent::EVENT_FLAG_SIMULATE);
+    record.targetDisplayId = eventPtr->GetTargetDisplayId();
+    record.pointerIds.clear();
+    record.pressures.clear();
+    record.tiltXs.clear();
+    record.tiltYs.clear();
+    record.displayXs.clear();
+    record.displayYs.clear();
+    for (auto it = pointerItems.begin(); it != pointerItems.end(); ++it) {
+        record.pointerIds.push_back(it->GetPointerId());
+        record.pressures.push_back(it->GetPressure());
+        record.tiltXs.push_back(it->GetTiltX());
+        record.tiltYs.push_back(it->GetTiltY());
+        record.displayXs.push_back(it->GetDisplayX());
+        record.displayYs.push_back(it->GetDisplayY());
+    }
+    ringTail_ = (ringTail_ + 1) % RING_BUFFER_SIZE;
+    if (ringSize_ < RING_BUFFER_SIZE) {
+        ringSize_++;
+    } else {
+        ringHead_ = (ringHead_ + 1) % RING_BUFFER_SIZE;
     }
 }
 
-int32_t EventStatistic::QueryPointerRecord(int32_t count, std::vector<std::shared_ptr<PointerEvent>> &pointerList,
-                                           bool inWhitelist)
+int32_t EventStatistic::QueryPointerRecord(int32_t count, std::vector<std::shared_ptr<PointerEvent>> &pointerList)
 {
-    if (count <= 0 || pointerRecordDeque_.empty()) {
+    if (count <= 0 || ringSize_ == 0) {
         MMI_HILOGD("Return pointerList is empty");
         return RET_OK;
     }
-    count = std::min(count, static_cast<int32_t>(pointerRecordDeque_.size()));
-    for (auto it = pointerRecordDeque_.end() - count; it != pointerRecordDeque_.end(); ++it) {
+    count = std::min(count, ringSize_);
+    for (int32_t i = 0; i < count; ++i) {
+        int32_t idx = (ringHead_ + ringSize_ - count + i) % RING_BUFFER_SIZE;
+        auto& record = pointerRecordRingBuffer_[idx];
         auto pointerEvent = PointerEvent::Create();
-        pointerEvent->SetActionTime(it->actionTime);
-        pointerEvent->SetPointerAction(it->actionType);
-        pointerEvent->SetSourceType(it->sourceType);
-        pointerEvent->SetPointerId(it->pointerId);
-        if (it->isInject) {
+        pointerEvent->SetActionTime(record.actionTime);
+        pointerEvent->SetPointerAction(record.actionType);
+        pointerEvent->SetSourceType(record.sourceType);
+        pointerEvent->SetPointerId(record.pointerId);
+        pointerEvent->SetTargetDisplayId(record.targetDisplayId);
+        if (record.isInject) {
             pointerEvent->AddFlag(InputEvent::EVENT_FLAG_SIMULATE);
         }
-        auto pointerIdIt = it->pointerIds.begin();
-        auto displayXsIt = it->displayXs.begin();
-        auto displayYsIt = it->displayYs.begin();
-        for (auto pressuresIt = it->pressures.begin(), tiltXsIt = it->tiltXs.begin(), tiltYsIt = it->tiltYs.begin();
-             pointerIdIt != it->pointerIds.end() && pressuresIt != it->pressures.end() &&
-             tiltXsIt != it->tiltXs.end() && tiltYsIt != it->tiltYs.end() &&
-             displayXsIt != it->displayXs.end() && displayYsIt != it->displayYs.end();
+        auto pointerIdIt = record.pointerIds.begin();
+        auto displayXsIt = record.displayXs.begin();
+        auto displayYsIt = record.displayYs.begin();
+        for (auto pressuresIt = record.pressures.begin(), tiltXsIt = record.tiltXs.begin(),
+             tiltYsIt = record.tiltYs.begin();
+             pointerIdIt != record.pointerIds.end() && pressuresIt != record.pressures.end() &&
+             tiltXsIt != record.tiltXs.end() && tiltYsIt != record.tiltYs.end() &&
+             displayXsIt != record.displayXs.end() && displayYsIt != record.displayYs.end();
              ++pointerIdIt, ++pressuresIt, ++tiltXsIt, ++tiltYsIt, ++displayXsIt, ++displayYsIt) {
             PointerEvent::PointerItem pointerItem;
             pointerItem.SetPointerId(*pointerIdIt);
             pointerItem.SetPressure(*pressuresIt);
             pointerItem.SetTiltX(*tiltXsIt);
             pointerItem.SetTiltY(*tiltYsIt);
-            if (inWhitelist) {
-                pointerItem.SetDisplayX(*displayXsIt);
-                pointerItem.SetDisplayY(*displayYsIt);
-            }
+            pointerItem.SetDisplayX(*displayXsIt);
+            pointerItem.SetDisplayY(*displayYsIt);
             pointerEvent->AddPointerItem(pointerItem);
         }
         pointerList.push_back(pointerEvent);

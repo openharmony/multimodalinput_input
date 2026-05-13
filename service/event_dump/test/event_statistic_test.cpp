@@ -26,7 +26,7 @@ namespace MMI {
 namespace {
 using namespace testing::ext;
 constexpr int32_t EVENT_OUT_SIZE { 30 };
-constexpr int32_t POINTER_RECORD_MAX_SIZE { 100 };
+constexpr int32_t RING_BUFFER_SIZE { 60 };
 const char* EVENT_FILE_NAME = "/data/service/el1/public/multimodalinput/multimodal_event.dmp";
 const char* EVENT_FILE_NAME_HISTORY = "/data/service/el1/public/multimodalinput/multimodal_event_history.dmp";
 constexpr int32_t FILE_MAX_SIZE = 100 * 1024 * 1024;
@@ -399,11 +399,11 @@ HWTEST_F(EventStatisticTest, EventStatisticTest_PushPointerRecord, TestSize.Leve
     pointerItem.SetTiltY(0);
     pointerEvent->AddPointerItem(pointerItem);
     ASSERT_NO_FATAL_FAILURE(eventStatistic.PushPointerRecord(pointerEvent));
-    for (auto i = 0; i <= POINTER_RECORD_MAX_SIZE; ++i) {
+    for (auto i = 0; i <= RING_BUFFER_SIZE; ++i) {
         auto pointerEvent = PointerEvent::Create();
         eventStatistic.PushPointerRecord(pointerEvent);
     }
-    EXPECT_EQ(eventStatistic.pointerRecordDeque_.size(), POINTER_RECORD_MAX_SIZE);
+    EXPECT_EQ(eventStatistic.ringSize_, RING_BUFFER_SIZE);
 }
 
 /**
@@ -418,7 +418,9 @@ HWTEST_F(EventStatisticTest, EventStatisticTest_QueryPointerRecord_001, TestSize
     EventStatistic eventStatistic;
     int32_t count = -1;
     std::vector<std::shared_ptr<PointerEvent>> pointerList;
-    eventStatistic.pointerRecordDeque_.clear();
+    eventStatistic.ringHead_ = 0;
+    eventStatistic.ringTail_ = 0;
+    eventStatistic.ringSize_ = 0;
     EXPECT_EQ(eventStatistic.QueryPointerRecord(count, pointerList), RET_OK);
 }
 
@@ -451,7 +453,9 @@ HWTEST_F(EventStatisticTest, EventStatisticTest_QueryPointerRecord_003, TestSize
     EventStatistic eventStatistic;
     int32_t count = 30;
     std::vector<std::shared_ptr<PointerEvent>> pointerList;
-    eventStatistic.pointerRecordDeque_.clear();
+    eventStatistic.ringHead_ = 0;
+    eventStatistic.ringTail_ = 0;
+    eventStatistic.ringSize_ = 0;
     EXPECT_EQ(eventStatistic.QueryPointerRecord(count, pointerList), RET_OK);
 }
 
@@ -731,7 +735,7 @@ HWTEST_F(EventStatisticTest, EventStatisticTest_QueryPointerRecord_007, TestSize
 
 /**
  * @tc.name: EventStatisticTest_QueryPointerRecord_008
- * @tc.desc: Verify QueryPointerRecord when count exceeds pointerRecordDeque_ size
+ * @tc.desc: Verify QueryPointerRecord when count exceeds ring buffer size
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -739,7 +743,9 @@ HWTEST_F(EventStatisticTest, EventStatisticTest_QueryPointerRecord_008, TestSize
 {
     CALL_TEST_DEBUG;
     EventStatistic eventStatistic;
-    eventStatistic.pointerRecordDeque_.clear();
+    eventStatistic.ringHead_ = 0;
+    eventStatistic.ringTail_ = 0;
+    eventStatistic.ringSize_ = 0;
     std::vector<std::shared_ptr<PointerEvent>> pointerList;
     for (int i = 0; i < 3; i++) {
         auto pointerEvent = PointerEvent::Create();
@@ -784,9 +790,132 @@ HWTEST_F(EventStatisticTest, EventStatisticTest_QueryPointerRecord_010, TestSize
         pointerEvent->AddPointerItem(item);
     }
     eventStatistic.PushPointerRecord(pointerEvent);
-    bool inWhitelist = true;
-    EXPECT_EQ(eventStatistic.QueryPointerRecord(3, pointerList, inWhitelist), RET_OK);
+    EXPECT_EQ(eventStatistic.QueryPointerRecord(3, pointerList), RET_OK);
     EXPECT_EQ(pointerList.size(), 3u);
+}
+
+/**
+ * @tc.name: EventStatisticTest_PushPointerEvent_SourceTypeFilter
+ * @tc.desc: Verify PushPointerEvent filters out non-touchscreen source types
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventStatisticTest, EventStatisticTest_PushPointerEvent_SourceTypeFilter, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EventStatistic eventStatistic;
+    eventStatistic.ringHead_ = 0;
+    eventStatistic.ringTail_ = 0;
+    eventStatistic.ringSize_ = 0;
+
+    auto mouseEvent = PointerEvent::Create();
+    mouseEvent->SetSourceType(InputEvent::SOURCE_TYPE_MOUSE);
+    mouseEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
+    PointerEvent::PointerItem mouseItem;
+    mouseItem.SetDisplayX(100);
+    mouseItem.SetDisplayY(200);
+    mouseItem.SetPressure(0.5);
+    mouseEvent->AddPointerItem(mouseItem);
+    eventStatistic.PushPointerEvent(mouseEvent);
+    EXPECT_EQ(eventStatistic.ringSize_, 0u);
+
+    auto touchEvent = PointerEvent::Create();
+    touchEvent->SetSourceType(InputEvent::SOURCE_TYPE_TOUCHSCREEN);
+    touchEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
+    PointerEvent::PointerItem touchItem;
+    touchItem.SetDisplayX(50);
+    touchItem.SetDisplayY(60);
+    touchItem.SetPressure(1.0);
+    touchEvent->AddPointerItem(touchItem);
+    eventStatistic.PushPointerEvent(touchEvent);
+    EXPECT_EQ(eventStatistic.ringSize_, 1u);
+}
+
+/**
+ * @tc.name: EventStatisticTest_PushPointerEvent_MoveFiltered
+ * @tc.desc: Verify PushPointerEvent filters out MOVE and PULL_MOVE for touchscreen
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventStatisticTest, EventStatisticTest_PushPointerEvent_MoveFiltered, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EventStatistic eventStatistic;
+    eventStatistic.ringHead_ = 0;
+    eventStatistic.ringTail_ = 0;
+    eventStatistic.ringSize_ = 0;
+
+    auto moveEvent = PointerEvent::Create();
+    moveEvent->SetSourceType(InputEvent::SOURCE_TYPE_TOUCHSCREEN);
+    moveEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
+    PointerEvent::PointerItem item1;
+    item1.SetDisplayX(100);
+    item1.SetDisplayY(200);
+    moveEvent->AddPointerItem(item1);
+    eventStatistic.PushPointerEvent(moveEvent);
+    EXPECT_EQ(eventStatistic.ringSize_, 0u);
+
+    auto pullMoveEvent = PointerEvent::Create();
+    pullMoveEvent->SetSourceType(InputEvent::SOURCE_TYPE_TOUCHSCREEN);
+    pullMoveEvent->SetPointerAction(PointerEvent::POINTER_ACTION_PULL_MOVE);
+    PointerEvent::PointerItem item2;
+    item2.SetDisplayX(150);
+    item2.SetDisplayY(250);
+    pullMoveEvent->AddPointerItem(item2);
+    eventStatistic.PushPointerEvent(pullMoveEvent);
+    EXPECT_EQ(eventStatistic.ringSize_, 0u);
+}
+
+/**
+ * @tc.name: EventStatisticTest_QueryPointerRecord_TargetDisplayId
+ * @tc.desc: Verify targetDisplayId is recorded and restored in QueryPointerRecord
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventStatisticTest, EventStatisticTest_QueryPointerRecord_TargetDisplayId, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EventStatistic eventStatistic;
+    eventStatistic.ringHead_ = 0;
+    eventStatistic.ringTail_ = 0;
+    eventStatistic.ringSize_ = 0;
+    std::vector<std::shared_ptr<PointerEvent>> pointerList;
+
+    auto pointerEvent = PointerEvent::Create();
+    pointerEvent->SetSourceType(InputEvent::SOURCE_TYPE_TOUCHSCREEN);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
+    pointerEvent->SetTargetDisplayId(2);
+    PointerEvent::PointerItem item;
+    item.SetPointerId(0);
+    item.SetPressure(1.0);
+    pointerEvent->AddPointerItem(item);
+    eventStatistic.PushPointerRecord(pointerEvent);
+
+    EXPECT_EQ(eventStatistic.QueryPointerRecord(1, pointerList), RET_OK);
+    EXPECT_EQ(pointerList.size(), 1u);
+    EXPECT_EQ(pointerList[0]->GetTargetDisplayId(), 2);
+}
+
+/**
+ * @tc.name: EventStatisticTest_PushPointerRecord_MaxCapacity
+ * @tc.desc: Verify ring buffer max capacity is RING_BUFFER_SIZE
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventStatisticTest, EventStatisticTest_PushPointerRecord_MaxCapacity, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EventStatistic eventStatistic;
+    eventStatistic.ringHead_ = 0;
+    eventStatistic.ringTail_ = 0;
+    eventStatistic.ringSize_ = 0;
+    for (int i = 0; i < RING_BUFFER_SIZE + 10; i++) {
+        auto pointerEvent = PointerEvent::Create();
+        pointerEvent->SetSourceType(InputEvent::SOURCE_TYPE_TOUCHSCREEN);
+        pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
+        eventStatistic.PushPointerRecord(pointerEvent);
+    }
+    EXPECT_EQ(eventStatistic.ringSize_, static_cast<size_t>(RING_BUFFER_SIZE));
 }
 
 /**
