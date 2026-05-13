@@ -466,10 +466,38 @@ int32_t MultimodalInputConnectManager::MarkEventConsumed(int32_t eventId)
 
 int32_t MultimodalInputConnectManager::SubscribeKeyEvent(int32_t subscribeId, const std::shared_ptr<KeyOption> option)
 {
-    std::lock_guard<std::mutex> guard(lock_);
-    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
     CHKPR(option, ERR_INVALID_VALUE);
-    return multimodalInputConnectService_->SubscribeKeyEvent(subscribeId, *option);
+    constexpr int32_t MAX_RETRY_COUNT = 5;
+    constexpr int32_t RETRY_INTERVAL_MS = 1000;
+
+    for (int32_t retryIndex = 0; retryIndex <= MAX_RETRY_COUNT; ++retryIndex) {
+        int32_t ret = RET_ERR;
+        {
+            std::lock_guard<std::mutex> guard(lock_);
+            CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+            ret = multimodalInputConnectService_->SubscribeKeyEvent(subscribeId, *option);
+        }
+        if (ret == RET_OK) {
+            return ret;
+        }
+        if (ret != ETASKS_WAIT_TIMEOUT &&
+            ret != ETASKS_WAIT_DEFERRED &&
+            ret != static_cast<int32_t>(MMISERVICE_NOT_RUNNING)) {
+            MMI_HILOGE("SubscribeKeyEvent failed with non-retryable error:%{public}d", ret);
+            return ret;
+        }
+        if (retryIndex < MAX_RETRY_COUNT) {
+            MMI_HILOGW("SubscribeKeyEvent retry (%{public}d/%{public}d), "
+                "last error:%{public}d, wait %{public}dms",
+                retryIndex + 1, MAX_RETRY_COUNT, ret, RETRY_INTERVAL_MS);
+            std::this_thread::sleep_for(std::chrono::milliseconds(RETRY_INTERVAL_MS));
+        } else {
+            MMI_HILOGE("SubscribeKeyEvent failed after %{public}d retries, "
+                "final error:%{public}d", MAX_RETRY_COUNT, ret);
+            return ret;
+        }
+    }
+    return RET_ERR;
 }
 
 int32_t MultimodalInputConnectManager::UnsubscribeKeyEvent(int32_t subscribeId)
