@@ -243,6 +243,7 @@ public:
 #endif // OHOS_BUILD_ENABLE_ANCO
 
     int32_t SetPixelMapData(int32_t infoId, void *pixelMap);
+    void RemovePixelMapData(int32_t infoId);
 
     void CleanInvalidPixelMap(int32_t groupId = DEFAULT_GROUP_ID);
     void HandleWindowPositionChange(const OLD::DisplayGroupInfo &displayGroupInfo);

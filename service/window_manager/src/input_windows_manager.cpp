@@ -8390,6 +8390,16 @@ int32_t InputWindowsManager::SetPixelMapData(int32_t infoId, void *pixelMap)
     return RET_OK;
 }
 
+void InputWindowsManager::RemovePixelMapData(int32_t infoId)
+{
+    CALL_DEBUG_ENTER;
+    auto it = transparentWins_.find(infoId);
+    if (it != transparentWins_.end()) {
+        transparentWins_.erase(it);
+        MMI_HILOGI("Removed pixelMap data for window:%{public}d", infoId);
+    }
+}
+
 void InputWindowsManager::CleanInvalidPixelMap(int32_t groupId)
 {
     auto &WindowInfo = GetWindowInfoVector(groupId);

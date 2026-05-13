@@ -144,6 +144,7 @@ public:
         PointerEvent::PointerItem pointerItem) override { return { 0, 0 }; }
     bool GetCancelEventFlag(std::shared_ptr<PointerEvent> pointerEvent) override { return false; }
     MOCK_METHOD(int32_t, SetPixelMapData, (int32_t infoId, void *pixelMap), (override));
+    MOCK_METHOD(void, RemovePixelMapData, (int32_t infoId), (override));
 
     void GetTargetWindowIds(int32_t, int32_t, std::set<int32_t>&, int32_t) override {}
     MOCK_METHOD(int32_t, SetCurrentUser, (int32_t));
