@@ -1249,5 +1249,35 @@ int32_t InputPlugin::GetCurrentMouseLocation(double &mouseX, double &mouseY)
     mouseY = mouseLocation.physicalY;
     return RET_OK;
 }
+
+#ifdef OHOS_BUILD_ENABLE_KEY_PRESSED_HANDLER
+std::vector<int32_t> InputPlugin::GetSubscribedKeysByPid(int32_t pid) const
+{
+    if (KEY_MONITOR_MGR == nullptr) {
+        MMI_HILOGE("Key monitor manager is null");
+        return {};
+    }
+    return KEY_MONITOR_MGR->GetSubscribedKeysByPid(pid);
+}
+ 
+int32_t InputPlugin::RegisterKeyMonitorCallback(
+    const std::function<void(int32_t pid, int32_t keyCode, std::string bundleName, bool isAdd)> &callback) const
+{
+    if (KEY_MONITOR_MGR == nullptr) {
+        MMI_HILOGE("RegisterKeyMonitorCallback failed: key monitor manager is null");
+        return -1;
+    }
+    return KEY_MONITOR_MGR->RegisterKeyMonitorCallback(callback);
+}
+ 
+bool InputPlugin::UnregisterKeyMonitorCallback(int32_t callbackId) const
+{
+    if (KEY_MONITOR_MGR == nullptr) {
+        MMI_HILOGE("UnregisterKeyMonitorCallback failed: key monitor manager is null");
+        return false;
+    }
+    return KEY_MONITOR_MGR->UnregisterKeyMonitorCallback(callbackId);
+}
+#endif // OHOS_BUILD_ENABLE_KEY_PRESSED_HANDLER
 } // namespace MMI
 } // namespace OHOS

@@ -93,6 +93,12 @@ public:
                 (override));
     MOCK_METHOD(bool, UnregisterSettingObserver, (int32_t observerId), (override));
     MOCK_METHOD(bool, IsDataShareReady, ());
+#ifdef OHOS_BUILD_ENABLE_KEY_PRESSED_HANDLER
+    MOCK_METHOD(std::vector<int32_t>, GetSubscribedKeysByPid, (int32_t pid), (override, const));
+    MOCK_METHOD(int32_t, RegisterKeyMonitorCallback,
+                (const std::function<void(int32_t, int32_t, std::string, bool)> &), (override, const));
+    MOCK_METHOD(bool, UnregisterKeyMonitorCallback, (int32_t), (override, const));
+#endif
 };
 
 class MockInputPlugin : public IInputPlugin {
@@ -1662,5 +1668,87 @@ HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_Obse
     EXPECT_EQ(inputPluginContext->observers_.size(), 1);
     EXPECT_TRUE(inputPluginContext->observers_.find(1) != inputPluginContext->observers_.end());
 }
+
+#ifdef OHOS_BUILD_ENABLE_KEY_PRESSED_HANDLER
+/**
+ * @tc.name: MultimodalInputPluginManagerTest_InputPlugin_RegisterKeyMonitorCallback_001
+ * @tc.desc: Test RegisterKeyMonitorCallback with valid callback
+ * @tc.require: test RegisterKeyMonitorCallback
+ */
+HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_InputPlugin_RegisterKeyMonitorCallback_001,
+    TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<InputPlugin> inputPluginContext = std::make_shared<InputPlugin>(nullptr);
+    std::function<void(int32_t pid, int32_t keyCode, std::string bundleName, bool isAdd)> callback =
+        [](int32_t pid, int32_t keyCode, std::string bundleName, bool isAdd) {
+            MMI_HILOGI("KeyMonitor callback invoked, pid:%{public}d, keyCode:%{public}d", pid, keyCode);
+        };
+    int32_t callbackId = inputPluginContext->RegisterKeyMonitorCallback(callback);
+    EXPECT_GT(callbackId, 0);
+}
+ 
+/**
+ * @tc.name: MultimodalInputPluginManagerTest_InputPlugin_RegisterKeyMonitorCallback_002
+ * @tc.desc: Test RegisterKeyMonitorCallback with null callback
+ * @tc.require: test RegisterKeyMonitorCallback
+ */
+HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_InputPlugin_RegisterKeyMonitorCallback_002,
+    TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<InputPlugin> inputPluginContext = std::make_shared<InputPlugin>(nullptr);
+    int32_t callbackId = inputPluginContext->RegisterKeyMonitorCallback(nullptr);
+    EXPECT_EQ(callbackId, -1);
+}
+ 
+/**
+ * @tc.name: MultimodalInputPluginManagerTest_InputPlugin_UnregisterKeyMonitorCallback_001
+ * @tc.desc: Test UnregisterKeyMonitorCallback normal flow
+ * @tc.require: test UnregisterKeyMonitorCallback
+ */
+HWTEST_F(MultimodalInputPluginManagerTest,
+    MultimodalInputPluginManagerTest_InputPlugin_UnregisterKeyMonitorCallback_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<InputPlugin> inputPluginContext = std::make_shared<InputPlugin>(nullptr);
+    std::function<void(int32_t pid, int32_t keyCode, std::string bundleName, bool isAdd)> callback =
+        [](int32_t pid, int32_t keyCode, std::string bundleName, bool isAdd) {
+            MMI_HILOGI("KeyMonitor callback invoked");
+        };
+    int32_t callbackId = inputPluginContext->RegisterKeyMonitorCallback(callback);
+    EXPECT_GT(callbackId, 0);
+    bool result = inputPluginContext->UnregisterKeyMonitorCallback(callbackId);
+    EXPECT_TRUE(result);
+}
+ 
+/**
+ * @tc.name: MultimodalInputPluginManagerTest_InputPlugin_UnregisterKeyMonitorCallback_002
+ * @tc.desc: Test UnregisterKeyMonitorCallback with invalid callback id
+ * @tc.require: test UnregisterKeyMonitorCallback
+ */
+HWTEST_F(MultimodalInputPluginManagerTest,
+    MultimodalInputPluginManagerTest_InputPlugin_UnregisterKeyMonitorCallback_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<InputPlugin> inputPluginContext = std::make_shared<InputPlugin>(nullptr);
+    bool result = inputPluginContext->UnregisterKeyMonitorCallback(9999);
+    EXPECT_FALSE(result);
+}
+ 
+/**
+ * @tc.name: MultimodalInputPluginManagerTest_InputPlugin_GetSubscribedKeysByPid_001
+ * @tc.desc: Test GetSubscribedKeysByPid returns empty when no subscribes
+ * @tc.require: test GetSubscribedKeysByPid
+ */
+HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_InputPlugin_GetSubscribedKeysByPid_001,
+    TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<InputPlugin> inputPluginContext = std::make_shared<InputPlugin>(nullptr);
+    std::vector<int32_t> result = inputPluginContext->GetSubscribedKeysByPid(100);
+    EXPECT_TRUE(result.empty());
+}
+#endif // OHOS_BUILD_ENABLE_KEY_PRESSED_HANDLER
 } // namespace MMI
 } // namespace OHOS

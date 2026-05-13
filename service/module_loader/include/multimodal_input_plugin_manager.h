@@ -99,6 +99,13 @@ public:
     int32_t RegisterSettingObserver(const std::string& uri, const std::string& key,
         std::function<void(const std::string&)> callback) override;
     bool UnregisterSettingObserver(int32_t observerId) override;
+#ifdef OHOS_BUILD_ENABLE_KEY_PRESSED_HANDLER
+    std::vector<int32_t> GetSubscribedKeysByPid(int32_t pid) const override;
+    int32_t RegisterKeyMonitorCallback(
+        const std::function<void(int32_t pid, int32_t keyCode,
+        std::string bundleName, bool isAdd)> &callback) const override;
+    bool UnregisterKeyMonitorCallback(int32_t callbackId) const override;
+#endif
 
     int32_t prio_ = 200;
     std::function<void(PluginEventType, int64_t)> callback_;
