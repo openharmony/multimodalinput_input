@@ -1,130 +1,86 @@
-# Display Group Model Knowledge
+# 显示组模型知识
 
-OpenHarmony multimodal input runs across users, display groups, and windows.
-This document records the stable model used when reasoning about input target
-scope.
+OpenHarmony 多模输入运行在用户、显示组和窗口之上。本文记录分析输入目标作用域时使用的稳定模型。
 
-## User And Group Scope
+## 用户和显示组作用域
 
-The runtime environment can contain multiple user spaces. A user space can have
-one or more foreground display groups. Each display group contains one or more
-physical displays arranged as an extended screen group, and each group has its
-own focus and window state.
+运行环境可以包含多个用户空间。一个用户空间可以拥有一个或多个前台显示组。每个显示组包含一个或多个按扩展屏组合排列的物理显示，每个显示组都有独立的焦点和窗口状态。
 
-Display groups are isolated for input. A pointer, keyboard, touchpad, stylus,
-axis, joystick, or generated synthetic event that belongs to one display group
-must not read or update another display group's target, focus, cursor, or
-sequence state.
+显示组之间的输入应相互隔离。属于某个显示组的指针、键盘、触控板、手写笔、轴事件、摇杆或生成的合成事件，不应读取或更新另一个显示组的目标、焦点、光标或序列状态。
 
-## Identity Model
+## 身份模型
 
-Keep these identities distinct when reading code:
+阅读代码时需要区分这些身份：
 
-- User scope owns the active user space and can contain one or more foreground
-  display groups.
-- Display group scope owns focus, window state, cursor state, coordinate
-  boundary, capture state, and active input sequences for a group of displays.
-- Physical display scope identifies one screen inside a display group. It is not
-  always enough to select a target-sensitive cache.
-- Window group or window scope is selected after the event is associated with
-  the owning user and display group.
+- 用户作用域拥有当前活跃用户空间，并可包含一个或多个前台显示组。
+- 显示组作用域拥有该组显示的焦点、窗口状态、光标状态、坐标边界、捕获状态和活跃输入序列。
+- 物理显示作用域标识显示组中的一个屏幕。仅凭它并不总是足以选择目标敏感缓存。
+- 窗口组或窗口作用域在事件关联到所属用户和显示组之后再选择。
 
-If a function receives only a display id or window id, check where the owning
-user and display group are resolved before it reads or writes target-sensitive
-state.
+如果函数只接收 display id 或 window id，在读取或写入目标敏感状态前，需要确认所属用户和显示组在哪里解析。
 
-## Scope Ownership Table
+## 作用域归属表
 
-| State or decision | Expected owner | Do not use as sole authority |
+| 状态或决策 | 期望归属 | 不要作为唯一依据 |
 | --- | --- | --- |
-| Focus window and focus pid | Resolved display group | Physical display id alone |
-| Pointer coordinate boundary | Resolved display group plus physical display layout | Last cursor display alone |
-| Cursor visibility/style/range | Resolved display group, with user settings when applicable | Global singleton state |
-| Mouse capture mode | Resolved display group/window scope | Default group after non-default target resolution |
-| Pointer sequence target | Sequence snapshot from original resolved scope | Current default focus |
-| Cancel, axis end, redispatch | Original resolved context or sequence snapshot | Recomputed default-group context |
-| Device-display binding | Device plus owning display/group context | Device id alone |
+| 焦点窗口和焦点 pid | 已解析显示组 | 仅物理 display id |
+| 指针坐标边界 | 已解析显示组加物理显示布局 | 仅上一次光标显示 |
+| 光标可见性/样式/范围 | 已解析显示组，必要时叠加用户设置 | 全局单例状态 |
+| 鼠标捕获模式 | 已解析显示组/窗口作用域 | 非默认目标解析后的默认组 |
+| 指针序列目标 | 原始已解析作用域中的序列快照 | 当前默认焦点 |
+| 取消、axis end、重分发 | 原始已解析上下文或序列快照 | 重新计算出的默认组上下文 |
+| 设备-显示绑定 | 设备加所属显示/组上下文 | 仅 device id |
 
-## Device Targeting Scope
+## 设备目标作用域
 
-Input code should distinguish a physical display from the display group that
-owns focus, window state, cursor state, and coordinate boundaries. A feature may
-start from a display identifier, but target-sensitive logic often needs the
-owning user and display group before selecting windows or updating state.
+输入代码应区分物理显示和拥有焦点、窗口状态、光标状态、坐标边界的显示组。某个特性可以从显示标识开始，但目标敏感逻辑通常需要先得到所属用户和显示组，再选择窗口或更新状态。
 
-Pointer-class devices may need to move across displays that belong to the same
-extended display group while staying inside that group's coordinate and window
-scope. Keyboard-class paths should use the focus state of the resolved target
-scope.
+指针类设备可能需要在同一扩展显示组内跨显示移动，同时仍保持在该显示组的坐标和窗口作用域内。键盘类路径应使用已解析目标作用域的焦点状态。
 
-Device-specific configuration paths should remain separate when their ownership
-rules differ from generic pointer or keyboard routing.
+当设备专属配置路径的归属规则不同于通用指针或键盘路由时，应保持路径分离。
 
-## Code Anchors
+## 代码锚点
 
-- Display and window targeting: `service/window_manager/`, especially
-  `InputWindowsManager`, `InputDisplayBindHelper`, and
-  `PointerDispatchEventCache`.
-- Display lifecycle and display event monitoring:
-  `service/display_state_manager/`.
-- Pointer drawing and cursor state: `PointerDrawingManager`,
-  `CursorDrawingComponent`, `PointerRenderer`, and `ScreenPointer` under
-  `service/window_manager/`.
-- Device-display binding and category-specific behavior:
-  `service/device_manager/` and `service/mouse_event_normalize/`.
+- 显示和窗口目标选择：`service/window_manager/`，尤其是 `InputWindowsManager`、`InputDisplayBindHelper` 和 `PointerDispatchEventCache`。
+- 显示生命周期和显示事件监听：`service/display_state_manager/`。
+- 指针绘制和光标状态：`service/window_manager/` 下的 `PointerDrawingManager`、`CursorDrawingComponent`、`PointerRenderer` 和 `ScreenPointer`。
+- 设备-显示绑定和分类专属行为：`service/device_manager/` 和 `service/mouse_event_normalize/`。
 
-These anchors are not ownership boundaries by themselves. Follow the call chain
-from the API or event entry to the state cache being touched.
+这些锚点本身不是归属边界。需要从 API 或事件入口沿调用链追踪到被触碰的状态缓存。
 
-## Common Failure Patterns
+## 常见失败模式
 
-- Treating a physical display id as if it owns focus, cursor, and window state.
-- Updating default-group focus or cursor state after a non-default event has
-  already resolved a target group.
-- Recomputing target scope during cancel, axis-end, or redispatch instead of
-  using the sequence snapshot.
-- Moving device-specific binding rules into generic pointer or keyboard helpers.
-- Adding tests that only cover the default group for behavior that is supposed
-  to be group-isolated.
+- 把物理 display id 当作焦点、光标和窗口状态的拥有者。
+- 非默认事件已经解析出目标显示组后，仍更新默认组焦点或光标状态。
+- 在 cancel、axis-end 或 redispatch 中重新计算目标作用域，而不是使用序列快照。
+- 把设备专属绑定规则移动到通用指针或键盘 helper 中。
+- 行为应按组隔离，却只增加默认组测试。
 
-## Default Group Boundary
+## 默认组边界
 
-Default display group identifiers are valid for default initialization, legacy
-helper behavior, and explicit default-group queries.
+默认显示组标识可用于默认初始化、遗留 helper 行为和显式默认组查询。
 
-After an event has resolved to a non-default target scope, target selection,
-focus, cursor, capture mode, synthetic events, cancel, axis end, redispatch, and
-drawing state should continue using the resolved context or the sequence
-snapshot instead of falling back to default-group state.
+事件已经解析到非默认目标作用域后，目标选择、焦点、光标、捕获模式、合成事件、取消、axis end、重分发和绘制状态应继续使用已解析上下文或序列快照，而不是回退到默认组状态。
 
-Default-group state is acceptable for:
+默认组状态可用于：
 
-- Service startup and default initialization.
-- Legacy helper behavior that is explicitly documented as default-group only.
-- Read-only default queries that do not allocate optional per-context state.
-- Tests that intentionally verify legacy default behavior.
+- 服务启动和默认初始化。
+- 明确记录为仅默认组的遗留 helper 行为。
+- 不分配可选上下文状态的只读默认查询。
+- 有意验证遗留默认行为的测试。
 
-Default-group state is not acceptable after a non-default event chain has
-resolved a user/display group or captured a sequence snapshot.
+当非默认事件链已经解析出用户/显示组或捕获了序列快照后，不应再使用默认组状态。
 
-## Decision Checklist
+## 决策检查清单
 
-Before changing display-group-sensitive logic, answer these questions in the
-patch or test design:
+修改显示组敏感逻辑前，需要在补丁或测试设计中回答：
 
-- Which user and display group owns this event or query?
-- Is the physical display only an input to group resolution, or is it the final
-  behavior scope?
-- Does the state being touched affect focus, target selection, coordinates,
-  cursor, capture, sequence, redispatch, or drawing?
-- What happens when another display group has different focus or pointer state?
-- Does cleanup happen when display, user, or device ownership changes?
+- 该事件或查询属于哪个用户和显示组？
+- 物理显示只是组解析的输入，还是最终行为作用域？
+- 被触碰的状态是否影响焦点、目标选择、坐标、光标、捕获、序列、重分发或绘制？
+- 当另一个显示组拥有不同焦点或指针状态时会发生什么？
+- 显示、用户或设备归属变化时是否会清理？
 
-## Test Mapping
+## 测试映射
 
-Use `InputWindowsManager*` for focus, target, capture, redispatch, cancel, and
-axis-end behavior. Use `InputDisplayBindHelper*` for display binding behavior.
-Use `PointerDrawingManager*`, `CursorDrawingComponent*`, and
-`PointerDispatchEventCacheStandaloneTest` for cursor, drawing, and sequence
-state. Add board-side evidence when behavior depends on real display/window
-integration.
+焦点、目标、捕获、重分发、取消和 axis-end 行为使用 `InputWindowsManager*`。显示绑定行为使用 `InputDisplayBindHelper*`。光标、绘制和序列状态使用 `PointerDrawingManager*`、`CursorDrawingComponent*` 和 `PointerDispatchEventCacheStandaloneTest`。当行为依赖真实显示/窗口集成时，补充板侧证据。

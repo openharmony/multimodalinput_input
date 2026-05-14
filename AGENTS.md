@@ -45,47 +45,19 @@ Keep input processing stages explicit: normalize raw events, resolve targets, di
 
 ## Agent-Specific Instructions
 
-Do not revert unrelated user changes in a dirty worktree. Prefer `grep` or `rg` for search and `Edit` for manual edits. Keep edits narrowly scoped, follow existing module boundaries, and document non-obvious behavior in the closest design or test file.
-
-## Design Documentation
-
-Design specs live under `docs/superpowers/`. Before implementing task-specific changes to input dispatch, pointer drawing, window management, or device routing, read the relevant spec and plan files. Task-specific architectural decisions should not be re-litigated without updating the specs.
+Do not revert unrelated user changes in a dirty worktree. Prefer `rg` for search and keep edits narrowly scoped to existing module boundaries. Document non-obvious behavior in the closest design or test file.
 
 ## Multimodal Input Knowledge
 
-Stable multimodal input background lives directly under `docs/knowledge/`.
-Before changing input dispatch, pointer drawing, window management, focus state,
-or display/device binding, read the relevant knowledge file first:
+Stable multimodal input background lives under `docs/knowledge/`. Before code changes in these areas, read the matching file:
 
-- `docs/knowledge/input-event-pipeline.md`: event normalization, context
-  resolution, hit testing, focus or target selection, dispatch, coordinate
-  conversion, synthetic events, cursor updates, or high-frequency move/draw
-  paths.
-- `docs/knowledge/display-group-model.md`: user, display group, physical
-  display, window group, focus isolation, cross-display pointer movement,
-  capture/cancel/axis-end/redispatch, or default-group fallback behavior.
-- `docs/knowledge/input-device-scope.md`: device category rules, device/display
-  binding, virtual or remote input, joystick/tablet/stylus/touchpad handling,
-  lifecycle cleanup after device/display/user changes, or compatibility fields
-  used near routing decisions.
-- `docs/knowledge/input-context-state.md`: scoped caches for mouse position,
-  cursor state, capture mode, pointer sequences, axis end state, keyboard focus
-  reissue, UDS dispatch state, lazy allocation, or cleanup timing.
-- `docs/knowledge/board-verification.md`: build, board-side test, or PR evidence
-  for changes to dispatch, device binding, window management, pointer drawing,
-  public API behavior, configuration parsing, or rebuilt shared libraries.
-
-Keyword routing can help when the task description is short:
-
-| Task words | Read first |
+| Area | Read first |
 | --- | --- |
-| dispatch, target, hit test, coordinate, synthetic, redispatch | `input-event-pipeline.md` |
-| display group, multi-display, focus, capture, cancel, axis end | `display-group-model.md` |
-| device id, bind, hotplug, virtual, remote, touchpad, tablet, stylus | `input-device-scope.md` |
-| cache, mouse position, cursor state, sequence, cleanup, lazy allocation | `input-context-state.md` |
-| board, hdc, ninja target, gtest, evidence, shared library | `board-verification.md` |
-
-Use `docs/knowledge/` for durable architecture and workflow knowledge. Use `docs/superpowers/` for task-specific specs, plans, reports, and design alignment records.
+| Event flow: dispatch, target selection, hit testing, coordinates, synthetic events, cursor updates, high-frequency move/draw paths | `docs/knowledge/input-event-pipeline.md` |
+| Display/window scope: display groups, focus isolation, capture/cancel/axis-end/redispatch, default-group fallback | `docs/knowledge/display-group-model.md` |
+| Device scope: device/display binding, hotplug, virtual/remote devices, joystick/tablet/stylus/touchpad rules, lifecycle cleanup | `docs/knowledge/input-device-scope.md` |
+| Context state: mouse/cursor caches, capture state, pointer sequences, keyboard focus reissue, UDS dispatch state, lazy allocation | `docs/knowledge/input-context-state.md` |
+| Verification: build, board-side tests, PR evidence, rebuilt shared libraries, public API or configuration behavior | `docs/knowledge/board-verification.md` |
 
 ## Project-Specific Constraints
 
