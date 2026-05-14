@@ -253,6 +253,7 @@ public:
     ErrCode GetUserDefinedCursorPixelMap(std::shared_ptr<PixelMap>& pixelMap) override;
     ErrCode DeliverNonce(const std::string &nonce) override;
     ErrCode RedispatchInputEvent(const PointerEvent &pointerEvent) override;
+    int32_t RedispatchInputEventInner(std::shared_ptr<PointerEvent> pointerEvent);
 #ifdef OHOS_BUILD_ENABLE_ANCO_GAME_EVENT_MAPPING
     ErrCode ControlMouseEventToAnco(int32_t windowId, bool enable) override;
 #endif // OHOS_BUILD_ENABLE_ANCO_GAME_EVENT_MAPPING
@@ -361,8 +362,8 @@ private:
     ~MMIService();
 
     ErrCode CheckControllerPermission();
-    ErrCode CheckControllerKeyEventPermission(const std::shared_ptr<KeyEvent> keyEvent, bool isNativeInject);
-    ErrCode CheckControllerPointerEventPermission(const std::shared_ptr<PointerEvent> pointerEvent,
+    ErrCode CheckInjectKeyEventPermission(const std::shared_ptr<KeyEvent> keyEvent, bool isNativeInject);
+    ErrCode CheckInjectPointerEventPermission(const std::shared_ptr<PointerEvent> pointerEvent,
         bool isNativeInject);
 #ifdef OHOS_BUILD_ENABLE_CONTROLLER_INJECT
     int32_t ValidateControllerEventCoordinates(const std::shared_ptr<PointerEvent> pointerEvent);

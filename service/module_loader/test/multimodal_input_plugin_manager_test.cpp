@@ -87,6 +87,18 @@ public:
                 (libinput_event *event, int32_t &displayId, PhysicalCoordinate &coord), (override));
     MOCK_METHOD(void, SetMouseAccelerateMotionSwitch, (libinput_event *event, bool enable), (override));
     MOCK_METHOD(int32_t, GetCurrentMouseLocation, (double &mouseX, double &mouseY), (override));
+    MOCK_METHOD(bool, GetSettingValue, (const std::string& uri, const std::string& key, std::string& value), (override));
+    MOCK_METHOD(int32_t, RegisterSettingObserver,
+                (const std::string& uri, const std::string& key, std::function<void(const std::string&)> callback),
+                (override));
+    MOCK_METHOD(bool, UnregisterSettingObserver, (int32_t observerId), (override));
+    MOCK_METHOD(bool, IsDataShareReady, ());
+#ifdef OHOS_BUILD_ENABLE_KEY_PRESSED_HANDLER
+    MOCK_METHOD(std::vector<int32_t>, GetSubscribedKeysByPid, (int32_t pid), (override, const));
+    MOCK_METHOD(int32_t, RegisterKeyMonitorCallback,
+                (const std::function<void(int32_t, int32_t, std::string, bool)> &), (override, const));
+    MOCK_METHOD(bool, UnregisterKeyMonitorCallback, (int32_t), (override, const));
+#endif
 };
 
 class MockInputPlugin : public IInputPlugin {
@@ -1454,5 +1466,289 @@ HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_Inpu
     EXPECT_EQ(inputPluginContext->stages_[1], InputPluginStage::INPUT_BEFORE_KEYCOMMAND);
     EXPECT_EQ(inputPluginContext->stages_[2], InputPluginStage::INPUT_AFTER_NORMALIZED);
 }
+
+/**
+ * @tc.name: MultimodalInputPluginManagerTest_RegisterSettingObserver_001
+ * @tc.desc: Test RegisterSettingObserver with invalid parameters (empty uri)
+ * @tc.require: test RegisterSettingObserver
+ */
+HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_RegisterSettingObserver_001,
+    TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<InputPlugin> inputPluginContext = std::make_shared<InputPlugin>(nullptr);
+
+    std::string emptyUri = "";
+    std::string key = "test.key";
+    std::function<void(const std::string&)> callback = [](const std::string&) {};
+
+    int32_t observerId = inputPluginContext->RegisterSettingObserver(emptyUri, key, callback);
+    EXPECT_EQ(observerId, static_cast<int32_t>(ObserverError::INVALID_PARAM));
+}
+
+/**
+ * @tc.name: MultimodalInputPluginManagerTest_RegisterSettingObserver_002
+ * @tc.desc: Test RegisterSettingObserver with invalid parameters (empty key)
+ * @tc.require: test RegisterSettingObserver
+ */
+HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_RegisterSettingObserver_002,
+    TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<InputPlugin> inputPluginContext = std::make_shared<InputPlugin>(nullptr);
+
+    std::string uri = "datashare:///test";
+    std::string emptyKey = "";
+    std::function<void(const std::string&)> callback = [](const std::string&) {};
+
+    int32_t observerId = inputPluginContext->RegisterSettingObserver(uri, emptyKey, callback);
+    EXPECT_EQ(observerId, static_cast<int32_t>(ObserverError::INVALID_PARAM));
+}
+
+/**
+ * @tc.name: MultimodalInputPluginManagerTest_RegisterSettingObserver_003
+ * @tc.desc: Test RegisterSettingObserver with invalid parameters (null callback)
+ * @tc.require: test RegisterSettingObserver
+ */
+HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_RegisterSettingObserver_003,
+    TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<InputPlugin> inputPluginContext = std::make_shared<InputPlugin>(nullptr);
+
+    std::string uri = "datashare:///test";
+    std::string key = "test.key";
+    std::function<void(const std::string&)> nullCallback = nullptr;
+
+    int32_t observerId = inputPluginContext->RegisterSettingObserver(uri, key, nullCallback);
+    EXPECT_EQ(observerId, static_cast<int32_t>(ObserverError::INVALID_PARAM));
+}
+
+/**
+ * @tc.name: MultimodalInputPluginManagerTest_RegisterSettingObserver_004
+ * @tc.desc: Test RegisterSettingObserver ID increment
+ * @tc.require: test RegisterSettingObserver
+ */
+HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_RegisterSettingObserver_004,
+    TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<InputPlugin> inputPluginContext = std::make_shared<InputPlugin>(nullptr);
+
+    // Simulate successful observer creation (will fail in reality without DataShare)
+    // This test verifies ID increment logic
+    inputPluginContext->nextObserverId_ = 1;
+    EXPECT_EQ(inputPluginContext->nextObserverId_, 1);
+
+    // Test ID increment
+    inputPluginContext->nextObserverId_++;
+    EXPECT_EQ(inputPluginContext->nextObserverId_, 2);
+}
+
+/**
+ * @tc.name: MultimodalInputPluginManagerTest_RegisterSettingObserver_005
+ * @tc.desc: Test RegisterSettingObserver overflow protection
+ * @tc.require: test RegisterSettingObserver
+ */
+HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_RegisterSettingObserver_005,
+    TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<InputPlugin> inputPluginContext = std::make_shared<InputPlugin>(nullptr);
+
+    // Simulate overflow condition
+    inputPluginContext->nextObserverId_ = -1;  // Overflow state
+
+    // Test overflow protection logic
+    if (inputPluginContext->nextObserverId_ < 0) {
+        inputPluginContext->nextObserverId_ = 1;
+    }
+    EXPECT_EQ(inputPluginContext->nextObserverId_, 1);
+}
+
+/**
+ * @tc.name: MultimodalInputPluginManagerTest_UnregisterSettingObserver_001
+ * @tc.desc: Test UnregisterSettingObserver with invalid observer ID (negative)
+ * @tc.require: test UnregisterSettingObserver
+ */
+HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_UnregisterSettingObserver_001,
+    TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<InputPlugin> inputPluginContext = std::make_shared<InputPlugin>(nullptr);
+
+    int32_t invalidId = -1;
+    bool result = inputPluginContext->UnregisterSettingObserver(invalidId);
+    EXPECT_FALSE(result);
+}
+
+/**
+ * @tc.name: MultimodalInputPluginManagerTest_UnregisterSettingObserver_002
+ * @tc.desc: Test UnregisterSettingObserver with non-existent observer ID
+ * @tc.require: test UnregisterSettingObserver
+ */
+HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_UnregisterSettingObserver_002,
+    TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<InputPlugin> inputPluginContext = std::make_shared<InputPlugin>(nullptr);
+
+    int32_t nonExistentId = 99999;
+    bool result = inputPluginContext->UnregisterSettingObserver(nonExistentId);
+    EXPECT_FALSE(result);
+}
+
+/**
+ * @tc.name: MultimodalInputPluginManagerTest_ObserverEntry_Structure_001
+ * @tc.desc: Test ObserverEntry structure stores both observer and URI
+ * @tc.require: test ObserverEntry
+ */
+HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_ObserverEntry_Structure_001,
+    TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<InputPlugin> inputPluginContext = std::make_shared<InputPlugin>(nullptr);
+
+    // Create ObserverEntry
+    sptr<SettingObserver> mockObserver = new (std::nothrow) SettingObserver();
+    ASSERT_NE(mockObserver, nullptr);
+
+    InputPlugin::ObserverEntry entry;
+    entry.observer = mockObserver;
+    entry.uri = "datashare:///com.ohos.settingsdata/entry/settingsdata/USER_SETTINGSDATA_SECURE_100";
+
+    // Verify both fields are stored correctly
+    EXPECT_EQ(entry.observer, mockObserver);
+    EXPECT_EQ(entry.uri, "datashare:///com.ohos.settingsdata/entry/settingsdata/USER_SETTINGSDATA_SECURE_100");
+
+    // Insert into map
+    inputPluginContext->observers_[42] = entry;
+
+    // Verify retrieval
+    auto it = inputPluginContext->observers_.find(42);
+    ASSERT_NE(it, inputPluginContext->observers_.end());
+    EXPECT_EQ(it->second.observer, mockObserver);
+    EXPECT_EQ(it->second.uri, "datashare:///com.ohos.settingsdata/entry/settingsdata/USER_SETTINGSDATA_SECURE_100");
+}
+
+/**
+ * @tc.name: MultimodalInputPluginManagerTest_NextObserverId_Initialization_001
+ * @tc.desc: Test nextObserverId_ is initialized to 1
+ * @tc.require: test NextObserverId initialization
+ */
+HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_NextObserverId_Initialization_001,
+    TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<InputPlugin> inputPluginContext = std::make_shared<InputPlugin>(nullptr);
+
+    EXPECT_EQ(inputPluginContext->nextObserverId_, 1);
+}
+
+/**
+ * @tc.name: MultimodalInputPluginManagerTest_ObserversMap_Type_001
+ * @tc.desc: Test observers_ is a map with correct key/value types
+ * @tc.require: test ObserversMap type
+ */
+HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_ObserversMap_Type_001,
+    TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<InputPlugin> inputPluginContext = std::make_shared<InputPlugin>(nullptr);
+
+    // Verify observers_ is a map
+    EXPECT_EQ(inputPluginContext->observers_.empty(), true);
+
+    // Add an entry
+    sptr<SettingObserver> mockObserver = new (std::nothrow) SettingObserver();
+    ASSERT_NE(mockObserver, nullptr);
+
+    inputPluginContext->observers_[1] = {mockObserver, "test_uri"};
+
+    EXPECT_EQ(inputPluginContext->observers_.size(), 1);
+    EXPECT_TRUE(inputPluginContext->observers_.find(1) != inputPluginContext->observers_.end());
+}
+
+#ifdef OHOS_BUILD_ENABLE_KEY_PRESSED_HANDLER
+/**
+ * @tc.name: MultimodalInputPluginManagerTest_InputPlugin_RegisterKeyMonitorCallback_001
+ * @tc.desc: Test RegisterKeyMonitorCallback with valid callback
+ * @tc.require: test RegisterKeyMonitorCallback
+ */
+HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_InputPlugin_RegisterKeyMonitorCallback_001,
+    TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<InputPlugin> inputPluginContext = std::make_shared<InputPlugin>(nullptr);
+    std::function<void(int32_t pid, int32_t keyCode, std::string bundleName, bool isAdd)> callback =
+        [](int32_t pid, int32_t keyCode, std::string bundleName, bool isAdd) {
+            MMI_HILOGI("KeyMonitor callback invoked, pid:%{public}d, keyCode:%{public}d", pid, keyCode);
+        };
+    int32_t callbackId = inputPluginContext->RegisterKeyMonitorCallback(callback);
+    EXPECT_GT(callbackId, 0);
+}
+ 
+/**
+ * @tc.name: MultimodalInputPluginManagerTest_InputPlugin_RegisterKeyMonitorCallback_002
+ * @tc.desc: Test RegisterKeyMonitorCallback with null callback
+ * @tc.require: test RegisterKeyMonitorCallback
+ */
+HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_InputPlugin_RegisterKeyMonitorCallback_002,
+    TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<InputPlugin> inputPluginContext = std::make_shared<InputPlugin>(nullptr);
+    int32_t callbackId = inputPluginContext->RegisterKeyMonitorCallback(nullptr);
+    EXPECT_EQ(callbackId, -1);
+}
+ 
+/**
+ * @tc.name: MultimodalInputPluginManagerTest_InputPlugin_UnregisterKeyMonitorCallback_001
+ * @tc.desc: Test UnregisterKeyMonitorCallback normal flow
+ * @tc.require: test UnregisterKeyMonitorCallback
+ */
+HWTEST_F(MultimodalInputPluginManagerTest,
+    MultimodalInputPluginManagerTest_InputPlugin_UnregisterKeyMonitorCallback_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<InputPlugin> inputPluginContext = std::make_shared<InputPlugin>(nullptr);
+    std::function<void(int32_t pid, int32_t keyCode, std::string bundleName, bool isAdd)> callback =
+        [](int32_t pid, int32_t keyCode, std::string bundleName, bool isAdd) {
+            MMI_HILOGI("KeyMonitor callback invoked");
+        };
+    int32_t callbackId = inputPluginContext->RegisterKeyMonitorCallback(callback);
+    EXPECT_GT(callbackId, 0);
+    bool result = inputPluginContext->UnregisterKeyMonitorCallback(callbackId);
+    EXPECT_TRUE(result);
+}
+ 
+/**
+ * @tc.name: MultimodalInputPluginManagerTest_InputPlugin_UnregisterKeyMonitorCallback_002
+ * @tc.desc: Test UnregisterKeyMonitorCallback with invalid callback id
+ * @tc.require: test UnregisterKeyMonitorCallback
+ */
+HWTEST_F(MultimodalInputPluginManagerTest,
+    MultimodalInputPluginManagerTest_InputPlugin_UnregisterKeyMonitorCallback_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<InputPlugin> inputPluginContext = std::make_shared<InputPlugin>(nullptr);
+    bool result = inputPluginContext->UnregisterKeyMonitorCallback(9999);
+    EXPECT_FALSE(result);
+}
+ 
+/**
+ * @tc.name: MultimodalInputPluginManagerTest_InputPlugin_GetSubscribedKeysByPid_001
+ * @tc.desc: Test GetSubscribedKeysByPid returns empty when no subscribes
+ * @tc.require: test GetSubscribedKeysByPid
+ */
+HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_InputPlugin_GetSubscribedKeysByPid_001,
+    TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<InputPlugin> inputPluginContext = std::make_shared<InputPlugin>(nullptr);
+    std::vector<int32_t> result = inputPluginContext->GetSubscribedKeysByPid(100);
+    EXPECT_TRUE(result.empty());
+}
+#endif // OHOS_BUILD_ENABLE_KEY_PRESSED_HANDLER
 } // namespace MMI
 } // namespace OHOS

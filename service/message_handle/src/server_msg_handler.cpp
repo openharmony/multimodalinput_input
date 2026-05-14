@@ -896,7 +896,8 @@ int32_t ServerMsgHandler::OnUiExtentionWindowInfo(NetPacket &pkt, WindowInfo& in
             >> extensionInfo.windowInputType >> extensionInfo.privacyMode >> extensionInfo.windowType
             >> extensionInfo.privacyUIFlag >> extensionInfo.rectChangeBySystem
             >> extensionInfo.isSkipSelfWhenShowOnVirtualScreen
-            >> extensionInfo.windowNameType >> extensionInfo.agentPid;
+            >> extensionInfo.windowNameType >> extensionInfo.agentPid
+            >> extensionInfo.dragDisabledAreas;
         CHKRWER(pkt, RET_ERR);
         info.uiExtentionWindowInfo.push_back(extensionInfo);
     }
@@ -1015,8 +1016,9 @@ int32_t ServerMsgHandler::OnWindowGroupInfo(SessionPtr sess, NetPacket &pkt)
         pkt >> info.id >> info.pid >> info.uid >> info.area >> info.defaultHotAreas
             >> info.pointerHotAreas >> info.agentWindowId >> info.flags >> info.action
             >> info.displayId >> info.groupId >> info.zOrder >> info.pointerChangeAreas >> info.transform
-            >> info.windowInputType >> info.privacyMode >> info.windowType >> info.isSkipSelfWhenShowOnVirtualScreen
-            >> info.windowNameType >> info.agentPid;
+            >> info.windowInputType >> info.privacyMode >> info.windowType
+            >> info.isSkipSelfWhenShowOnVirtualScreen >> info.windowNameType
+            >> info.agentPid >> info.dragDisabledAreas;
         CHKRWER(pkt, RET_ERR);
         OnUiExtentionWindowInfo(pkt, info);
         pkt >> info.rectChangeBySystem;
@@ -1166,8 +1168,12 @@ int32_t ServerMsgHandler::ReadWindowsInfo(NetPacket &pkt, DisplayGroupInfo &disp
                 >> info.pointerHotAreas >> info.agentWindowId >> info.flags >> info.action
                 >> info.displayId >> info.groupId >> info.zOrder >> info.pointerChangeAreas >> info.transform
                 >> info.windowInputType >> info.privacyMode >> info.windowType
-                >> info.isSkipSelfWhenShowOnVirtualScreen >> info.windowNameType >> info.agentPid >> byteCount;
+                >> info.isSkipSelfWhenShowOnVirtualScreen >> info.windowNameType >> info.agentPid
+                >> info.dragDisabledAreas >> byteCount;
             CHKRWER(pkt, RET_ERR);
+            if (byteCount == 0) {
+                WIN_MGR->RemovePixelMapData(info.id);
+            }
             OnUiExtentionWindowInfo(pkt, info);
             pkt >> info.rectChangeBySystem;
             CHKRWER(pkt, RET_ERR);

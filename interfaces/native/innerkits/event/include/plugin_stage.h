@@ -168,10 +168,24 @@ struct IPluginContext {
     virtual int32_t RegisterCommonEventCallback(
         const std::function<void(const EventFwk::CommonEventData &)> &callback) = 0;
     virtual bool UnRegisterCommonEventCallback(int32_t callbackId) = 0;
+    virtual bool GetSettingValue(const std::string& uri, const std::string& key, std::string& value) = 0;
+    // Register observer for configuration changes
+    // Returns observer ID (>= 0 on success, < 0 on failure)
+    // Error codes: INVALID_PARAM=-1, CREATE_FAILED=-2, REGISTER_FAILED=-3
+    virtual int32_t RegisterSettingObserver(const std::string& uri, const std::string& key,
+        std::function<void(const std::string&)> callback) = 0;
+    virtual bool UnregisterSettingObserver(int32_t observerId) = 0;
     virtual void HideMouseCursorTemporary() = 0;
     virtual int32_t CalculateTipPoint(libinput_event *event, int32_t &displayId, PhysicalCoordinate &coord) = 0;
     virtual void SetMouseAccelerateMotionSwitch(libinput_event *event, bool enable) = 0;
     virtual int32_t GetCurrentMouseLocation(double &mouseX, double &mouseY) = 0;
+#ifdef OHOS_BUILD_ENABLE_KEY_PRESSED_HANDLER
+    virtual std::vector<int32_t> GetSubscribedKeysByPid(int32_t pid) const = 0;
+    virtual int32_t RegisterKeyMonitorCallback(
+        const std::function<void(int32_t pid, int32_t keyCode,
+        std::string bundleName, bool isAdd)> &callback) const = 0;
+    virtual bool UnregisterKeyMonitorCallback(int32_t callbackId) const = 0;
+#endif
 };
 
 inline bool checkPluginEventNull(PluginEventType &event)

@@ -40,6 +40,8 @@ public:
     MOCK_METHOD(void, OnSwitchUser, (int32_t userId), (override));
     MOCK_METHOD(void, OnAddUser, (int32_t userId), (override));
     MOCK_METHOD(void, OnRemoveUser, (int32_t userId), (override));
+    MOCK_METHOD(bool, IsUserConfigLoaded, (int32_t userId), (override, const));
+    MOCK_METHOD(bool, IsDatabaseReady, (), (override, const));
 };
 
 }  // namespace MMI

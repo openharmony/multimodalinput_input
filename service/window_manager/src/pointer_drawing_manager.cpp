@@ -130,12 +130,10 @@ constexpr int32_t CHECK_SLEEP_TIME { 10 };
 constexpr int32_t PC_PRIORITY { 2 };
 #endif // OHOS_BUILD_PC_PRIORITY
 const int32_t MULTIMODAL_INPUT_SERVICE_ID = 3101;
-bool g_isRsRemoteDied { false };
 bool g_isHdiRemoteDied { false };
 bool g_isReStartVsync { false };
 float g_hardwareCanvasSize = { 512.0f };
 float g_focalPoint = { 256.0f };
-std::atomic<bool> g_isRsRestart { false };
 constexpr int32_t INVALID_USER { -1 };
 constexpr int32_t DIRECTION_NUM { 4 };
 constexpr int64_t VSYNC_CALIBRATION_TIME { 3 }; // ms
@@ -198,10 +196,10 @@ static bool IsSingleDisplayFoldDevice()
 void PointerDrawingManager::RsRemoteDiedCallback()
 {
     CALL_INFO_TRACE;
-    g_isRsRemoteDied = true;
+    isRsRemoteDied_ = true;
     g_isHdiRemoteDied = true;
     g_isReStartVsync = true;
-    g_isRsRestart = false;
+    isHardCursorSurfaceNodeInited_ = false;
 #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
     MAGIC_CURSOR->RsRemoteDiedCallbackForMagicCursor();
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
@@ -211,8 +209,8 @@ void PointerDrawingManager::RsRemoteDiedCallback()
 void PointerDrawingManager::InitRsCallback()
 {
     MMI_HILOGI("Init RS Callback start");
-    g_isRsRemoteDied = false;
-    g_isRsRestart = false;
+    isRsRemoteDied_ = false;
+    isHardCursorSurfaceNodeInited_ = false;
     OnRemoteDiedCallback_ = [this]() -> void { this->RsRemoteDiedCallback(); };
     auto begin = std::chrono::high_resolution_clock::now();
     Rosen::RSInterfaces::GetInstance().SetOnRemoteDiedCallback(OnRemoteDiedCallback_);
@@ -255,22 +253,42 @@ void PointerDrawingManager::DestroyPointerWindow()
     CALL_INFO_TRACE;
     CHKPV(delegateProxy_);
     delegateProxy_->OnPostSyncTask([this] {
-        {
-            auto surfaceNodePtr = GetSurfaceNode();
-            if (surfaceNodePtr == nullptr) {
-                MMI_HILOGW("SurfaceNode pointer is nullptr.");
-                return RET_OK;
-            }
-            MMI_HILOGI("Pointer window destroy start screenId_ %{public}" PRIu64, screenId_);
-            g_isRsRemoteDied = false;
-            surfaceNodePtr->DetachToDisplay(screenId_);
-            SetSurfaceNode(nullptr);
-            MMI_HILOGI("Detach screenId:%{public}" PRIu64, screenId_);
+        if (GetHardCursorEnabled()) {
+            DestroyPointerWindowOfHardCursor();
+        } else {
+            DestroyPointerWindowOfSoftCursor();
         }
-        RsFlushImplicitTransaction();
         MMI_HILOGI("Pointer window destroy success");
         return RET_OK;
     });
+}
+
+void PointerDrawingManager::DestroyPointerWindowOfHardCursor()
+{
+    SetSurfaceNode(nullptr);
+    auto screenPointers = CopyScreenPointers();
+    for (auto &[screenId, sp] : screenPointers) {
+        if (sp == nullptr) {
+            MMI_HILOGE("ScreenPointer is null, screenId=%{public}" PRIu64, screenId);
+            continue;
+        }
+        sp->DestroyPointerWindow();
+    }
+}
+
+void PointerDrawingManager::DestroyPointerWindowOfSoftCursor()
+{
+    MMI_HILOGI("Destroy pointer window, screenId=%{public}" PRIu64, screenId_);
+    auto surfaceNodePtr = GetSurfaceNode();
+    if (surfaceNodePtr != nullptr) {
+        SetSurfaceNode(nullptr);
+        surfaceNodePtr->DetachToDisplay(screenId_);
+        surfaceNodePtr = nullptr;
+        RsFlushImplicitTransaction();
+    }
+    // The RSUIDirector and RSUIContext is invalid after the render_service dies.
+    rsUIDirector_ = nullptr;
+    rsUIContext_ = nullptr;
 }
 
 static inline bool IsNum(const std::string &str)
@@ -1762,22 +1780,23 @@ int32_t PointerDrawingManager::CreatePointerWindowForScreenPointer(uint64_t rsId
     CALL_DEBUG_ENTER;
     // suface node init
     auto sp = GetScreenPointer(rsId);
-    if (sp != nullptr && !g_isRsRestart) {
+    if (sp != nullptr && !isHardCursorSurfaceNodeInited_) {
         auto screenPointers = CopyScreenPointers();
         for (auto it : screenPointers) {
             CHKPR(it.second, RET_ERR);
             if (it.second == nullptr) {
                 return RET_ERR;
             }
-            it.second->Init(pointerRenderer_);
+            if (!it.second->Init(pointerRenderer_)) {
+                return RET_ERR;
+            }
         }
         if (rsId == displayInfo_.rsId) {
             SetSurfaceNode(sp->GetSurfaceNode());
         }
         RsFlushImplicitTransaction();
-        g_isRsRestart = true;
+        isHardCursorSurfaceNodeInited_ = true;
     } else if (sp == nullptr) {
-        g_isRsRestart = true;
         sp = std::make_shared<ScreenPointer>(hardwareCursorPointerManager_, handler_, displayInfo_);
         CHKPR(sp, RET_ERR);
         InsertScreenPointer(displayInfo_.rsId, sp);
@@ -1791,6 +1810,7 @@ int32_t PointerDrawingManager::CreatePointerWindowForScreenPointer(uint64_t rsId
         MMI_HILOGI("ScreenPointer rsId %{public}" PRIu64 " displayInfo_.rsId %{public}" PRIu64,
             rsId, displayInfo_.rsId);
         RsFlushImplicitTransaction();
+        isHardCursorSurfaceNodeInited_ = true;
     }
     CHKPR(sp, RET_ERR);
     SetSurfaceNode(sp->GetSurfaceNode()); // use SurfaceNode from current display
@@ -1806,6 +1826,9 @@ int32_t PointerDrawingManager::CreatePointerWindowForNoScreenPointer(uint64_t rs
     Rosen::RSSurfaceNodeConfig surfaceNodeConfig;
     surfaceNodeConfig.SurfaceNodeName = "pointer window";
     Rosen::RSSurfaceNodeType surfaceNodeType = Rosen::RSSurfaceNodeType::CURSOR_NODE;
+    // Remove surfaceNode from render tree
+    SetSurfaceNode(nullptr);
+    RsFlushImplicitTransaction();
     if (!InitRSUIContext(rsId)) {
         MMI_HILOGE("Init RSUIContext fail, rsId=%{public}" PRIu64, rsId);
         return RET_ERR;
@@ -2772,10 +2795,9 @@ void PointerDrawingManager::HideCursorWhenHardwareCursorEnabled()
 void PointerDrawingManager::DeleteSurfaceNode()
 {
     CALL_DEBUG_ENTER;
-    MMI_HILOGI("The g_isRsRemoteDied:%{public}d", g_isRsRemoteDied ? 1 : 0);
+    MMI_HILOGI("The isRsRemoteDied:%{public}d", isRsRemoteDied_ ? 1 : 0);
     auto surfaceNodePtr = GetSurfaceNode();
-    if (g_isRsRemoteDied && (surfaceNodePtr != nullptr)) {
-        g_isRsRemoteDied = false;
+    if (isRsRemoteDied_ && (surfaceNodePtr != nullptr)) {
         MMI_HILOGI("Pointer window DetachToDisplay start screenId_:%{public}" PRIu64, screenId_);
         surfaceNodePtr->DetachToDisplay(screenId_);
         SetSurfaceNode(nullptr);
@@ -4113,6 +4135,16 @@ ResampleAlgorithm::Point ResampleAlgorithm::LinearInterpolation(const Point& his
 
 bool PointerDrawingManager::InitRSUIContext(uint64_t screenId)
 {
+    bool isInited = (rsUIDirector_ != nullptr && rsUIContext_ != nullptr);
+    bool isScreenChanged = (screenId != screenId_);
+    if (isInited) {
+        if (!isScreenChanged) {
+            return true;
+        } else {
+            RsFlushImplicitTransaction();
+        }
+    }
+
     sptr<IRemoteObject> renderToken = Rosen::RSInterfaces::GetInstance().GetConnectToRenderToken(screenId);
     if (renderToken == nullptr) {
         MMI_HILOGE("Get connect to render token fail, screenId=%{public}" PRIu64, screenId);
@@ -4137,12 +4169,20 @@ bool PointerDrawingManager::InitRSUIContext(uint64_t screenId)
 
 void PointerDrawingManager::RsFlushImplicitTransaction()
 {
-    std::shared_ptr<Rosen::RSUIDirector> rsUIDirector = GetRSUIDirector();
-    if (rsUIDirector == nullptr) {
-        MMI_HILOGE("rsUIDirector is null");
-        return;
+    if (GetHardCursorEnabled()) {
+        auto screenPointers = CopyScreenPointers();
+        for (auto &[screenId, sp] : screenPointers) {
+            if (sp == nullptr) {
+                MMI_HILOGE("ScreenPointer is null, screenId=%{public}" PRIu64, screenId);
+                continue;
+            }
+            sp->RsFlushImplicitTransaction();
+        }
+    } else {
+        if (rsUIDirector_ != nullptr) {
+            rsUIDirector_->SendMessages();
+        }
     }
-    rsUIDirector->SendMessages();
 }
 
 std::shared_ptr<Rosen::RSUIContext> PointerDrawingManager::GetRSUIContext()
@@ -4156,20 +4196,6 @@ std::shared_ptr<Rosen::RSUIContext> PointerDrawingManager::GetRSUIContext()
         return sp->GetRSUIContext();
     } else {
         return rsUIContext_;
-    }
-}
-
-std::shared_ptr<Rosen::RSUIDirector> PointerDrawingManager::GetRSUIDirector()
-{
-    if (GetHardCursorEnabled()) {
-        auto sp = GetScreenPointer(displayId_);
-        if (sp == nullptr) {
-            MMI_HILOGE("Get ScreenPointer fail, displayId=%{public}" PRIu64, displayId_);
-            return nullptr;
-        }
-        return sp->GetRSUIDirector();
-    } else {
-        return rsUIDirector_;
     }
 }
 } // namespace MMI

@@ -33,7 +33,10 @@
 #include "account_manager.h"
 #include "common_event_data.h"
 #include "bytrace_adapter.h"
+#include "i_setting_manager.h"
 #include "util.h"
+#include "setting_datashare.h"
+#include "system_ability_definition.h"
 #include "cursor_drawing_component.h"
 
 #undef MMI_LOG_DOMAIN
@@ -921,6 +924,18 @@ InputPlugin::InputPlugin(void *handle)
 InputPlugin::~InputPlugin()
 {
     // LCOV_EXCL_START
+    // Cleanup all observers before destruction
+    {
+        std::lock_guard<std::mutex> lock(observersMutex_);
+        for (auto& [id, entry] : observers_) {
+            if (entry.observer != nullptr && IsDataShareReady()) {
+                auto& settingHelper = SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID);
+                settingHelper.UnregisterObserver(entry.observer, entry.uri);
+            }
+        }
+        observers_.clear();
+    }
+
     if (handle_ != nullptr) {
         dlclose(handle_);
         handle_ = nullptr;
@@ -1052,6 +1067,114 @@ bool InputPlugin::UnRegisterCommonEventCallback(int32_t callbackId)
     return ACCOUNT_MGR->UnRegisterCommonEventCallback(callbackId);
 }
 
+bool InputPlugin::GetSettingValue(const std::string& uri, const std::string& key, std::string& value)
+{
+    if (uri.empty() || key.empty()) {
+        MMI_HILOGE("Invalid parameters: uri or key is empty");
+        return false;
+    }
+    if (!IsDataShareReady()) {
+        MMI_HILOGE("DatsShare is not ready");
+        return false;
+    }
+    auto& settingHelper = SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID);
+    ErrCode ret = settingHelper.GetStringValue(key, value, uri);
+    if (ret != ERR_OK) {
+        MMI_HILOGW("Failed to get setting value for key: %{public}s, ret=%{public}d", key.c_str(), ret);
+        return false;
+    }
+    return true;
+}
+
+int32_t InputPlugin::RegisterSettingObserver(const std::string& uri, const std::string& key,
+    std::function<void(const std::string&)> callback)
+{
+    // Validate parameters
+    if (uri.empty() || key.empty() || !callback) {
+        MMI_HILOGE("Invalid parameters: uri or key is empty, or callback is null");
+        return static_cast<int32_t>(ObserverError::INVALID_PARAM);
+    }
+    MMI_HILOGI("Plugin '%{public}s' registering observer: uri=%{public}s, key=%{public}s",
+               name_.c_str(), uri.c_str(), key.c_str());
+    if (!IsDataShareReady()) {
+        MMI_HILOGE("DatsShare is not ready");
+        return RET_ERR;
+    }
+    // Create observer
+    auto& settingHelper = SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID);
+    sptr<SettingObserver> observer = settingHelper.CreateObserver(key, callback);
+    if (observer == nullptr) {
+        MMI_HILOGE("Failed to create observer for key: %{public}s", key.c_str());
+        return static_cast<int32_t>(ObserverError::CREATE_FAILED);
+    }
+
+    // Register observer with DataShare
+    ErrCode ret = settingHelper.RegisterObserver(observer, uri);
+    if (ret != ERR_OK) {
+        MMI_HILOGE("Failed to register observer with DataShare, error=%{public}d", ret);
+        return static_cast<int32_t>(ObserverError::REGISTER_FAILED);
+    }
+    int32_t observerId;
+    {
+        std::lock_guard<std::mutex> lock(observersMutex_);
+
+        if (nextObserverId_ < 0) {
+            MMI_HILOGW("Observer ID overflow detected, resetting to 1");
+            nextObserverId_ = 1;
+        }
+        observerId = nextObserverId_++;
+        observers_[observerId] = {observer, uri};
+    }
+
+    MMI_HILOGI("Plugin '%{public}s' registered observer successfully, ID=%{public}d",
+               name_.c_str(), observerId);
+    return observerId;
+}
+
+bool InputPlugin::UnregisterSettingObserver(int32_t observerId)
+{
+    if (observerId < 0) {
+        MMI_HILOGE("Invalid observer ID: %{public}d", observerId);
+        return false;
+    }
+    if (!IsDataShareReady()) {
+        MMI_HILOGE("DatsShare is not ready");
+        return false;
+    }
+    ObserverEntry entry;
+    {
+        std::lock_guard<std::mutex> lock(observersMutex_);
+        auto it = observers_.find(observerId);
+        if (it == observers_.end()) {
+            MMI_HILOGW("Observer ID not found: %{public}d", observerId);
+            return false;
+        }
+        entry = it->second;
+        observers_.erase(it);
+    }
+
+    auto& settingHelper = SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID);
+    ErrCode ret = settingHelper.UnregisterObserver(entry.observer, entry.uri);
+    if (ret != ERR_OK) {
+        MMI_HILOGW("Failed to unregister observer ID=%{public}d from DataShare, error=%{public}d",
+                   observerId, ret);
+        return false;
+    }
+    MMI_HILOGI("Plugin '%{public}s' unregistered observer ID=%{public}d successfully",
+        name_.c_str(), observerId);
+    return true;
+}
+
+bool InputPlugin::IsDataShareReady()
+{
+    auto settingMgr = INPUT_SETTING_MANAGER;
+    if (settingMgr == nullptr) {
+        MMI_HILOGE("Setting manager is null");
+        return false;
+    }
+    return settingMgr->IsDatabaseReady();
+}
+
 void InputPlugin::HideMouseCursorTemporary()
 {
     MMI_HILOGD("hide mouse in stylus mouse mode");
@@ -1126,5 +1249,35 @@ int32_t InputPlugin::GetCurrentMouseLocation(double &mouseX, double &mouseY)
     mouseY = mouseLocation.physicalY;
     return RET_OK;
 }
+
+#ifdef OHOS_BUILD_ENABLE_KEY_PRESSED_HANDLER
+std::vector<int32_t> InputPlugin::GetSubscribedKeysByPid(int32_t pid) const
+{
+    if (KEY_MONITOR_MGR == nullptr) {
+        MMI_HILOGE("Key monitor manager is null");
+        return {};
+    }
+    return KEY_MONITOR_MGR->GetSubscribedKeysByPid(pid);
+}
+ 
+int32_t InputPlugin::RegisterKeyMonitorCallback(
+    const std::function<void(int32_t pid, int32_t keyCode, std::string bundleName, bool isAdd)> &callback) const
+{
+    if (KEY_MONITOR_MGR == nullptr) {
+        MMI_HILOGE("RegisterKeyMonitorCallback failed: key monitor manager is null");
+        return -1;
+    }
+    return KEY_MONITOR_MGR->RegisterKeyMonitorCallback(callback);
+}
+ 
+bool InputPlugin::UnregisterKeyMonitorCallback(int32_t callbackId) const
+{
+    if (KEY_MONITOR_MGR == nullptr) {
+        MMI_HILOGE("UnregisterKeyMonitorCallback failed: key monitor manager is null");
+        return false;
+    }
+    return KEY_MONITOR_MGR->UnregisterKeyMonitorCallback(callbackId);
+}
+#endif // OHOS_BUILD_ENABLE_KEY_PRESSED_HANDLER
 } // namespace MMI
 } // namespace OHOS

@@ -314,10 +314,11 @@ private:
     void GetValidWidthAndHeight(const OLD::DisplayInfo *displayInfo, int32_t &validWidth, int32_t &validHeight);
     bool InitRSUIContext(uint64_t screenId);
     void RsFlushImplicitTransaction();
-    std::shared_ptr<Rosen::RSUIDirector> GetRSUIDirector();
     std::shared_ptr<Rosen::RSUIContext> GetRSUIContext();
     void InitRsCallback();
     void InitPointerThread();
+    void DestroyPointerWindowOfHardCursor();
+    void DestroyPointerWindowOfSoftCursor();
 private:
     bool hasDisplay_ { false };
     bool hasPointerDevice_ { false };
@@ -406,6 +407,8 @@ private:
     bool lastCursorBlurEnabled_ { true };
     std::atomic<bool> moveFinished_ { false };
     std::mutex cursorBlurEnableMutex_;
+    bool isRsRemoteDied_ { false };
+    std::atomic<bool> isHardCursorSurfaceNodeInited_ { false };
 };
 } // namespace MMI
 } // namespace OHOS

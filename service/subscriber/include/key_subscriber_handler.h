@@ -120,6 +120,8 @@ private:
     void NotifyKeyUpSubscriber(const std::shared_ptr<KeyEvent> &keyEvent,
         std::list<std::shared_ptr<Subscriber>> subscribers, bool &handled);
     void PrintKeyOption(const std::shared_ptr<KeyOption> keyOption);
+    void PrintCriticalKeySubscribeInfo(int32_t subscribeId,
+        SessionPtr sess, const std::shared_ptr<KeyOption> keyOption);
     void ClearSubscriberTimer(std::list<std::shared_ptr<Subscriber>> subscribers);
     void GetForegroundPids(std::set<int32_t> &pidList);
     void PublishKeyPressCommonEvent(std::shared_ptr<KeyEvent> keyEvent);

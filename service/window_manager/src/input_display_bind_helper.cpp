@@ -37,6 +37,12 @@ const char* SUFFIX { "0000:0000" };
 const std::string INPUT { "input" };
 const std::string EVENT { "event" };
 const char* NAME { "name" };
+
+// Product type constants
+const std::string PRODUCT_TYPE = system::GetParameter("const.product.devicetype", "unknown");
+const std::string PRODUCT_TYPE_CAR = "car";
+const bool PRODUCT_PC_OR_TABLET = (PRODUCT_TYPE == "2in1") || (PRODUCT_TYPE == "tablet");
+const std::string DEFAULT_TP_DEVICE = "input_mt_wrapper";
 }
 
 namespace fs = std::filesystem;
@@ -293,7 +299,7 @@ BindInfo BindInfos::GetUnbindDisplay(const std::string &inputDeviceName)
         }
         ++it;
     }
-    return GetUnbindDisplay();
+    return PRODUCT_PC_OR_TABLET ? BindInfo() : GetUnbindDisplay();
 }
 
 std::ostream &operator << (std::ostream &os, const BindInfos &r)
@@ -337,6 +343,14 @@ void InputDisplayBindHelper::AddInputDevice(int32_t id, const std::string &nodeN
     MMI_HILOGD("Param: id:%{public}d, nodeName:%{public}s, name:%{public}s", id, nodeName.c_str(), sysUid.c_str());
     CHKPV(configFileInfos_);
     auto displayName = configFileInfos_->GetDisplayNameByInputDevice(sysUid);
+    if (displayName.empty()) {
+        if (PRODUCT_TYPE == PRODUCT_TYPE_CAR) {
+            int32_t cfgRsId = -1;
+            if (GetRsIdByInputNodeNameCfg(nodeName, cfgRsId)) {
+                displayName = "default" + std::to_string(cfgRsId);
+            }
+        }
+    }
     BindInfo info = infos_->GetUnbindInputDevice(displayName);
     info.AddInputDevice(id, nodeName, sysUid);
     infos_->Add(info);
@@ -431,7 +445,12 @@ std::string InputDisplayBindHelper::GetInputDeviceById(int32_t id)
     CALL_DEBUG_ENTER;
     std::string inputNodeName = GetInputNodeNameByCfg(id);
     if (inputNodeName.empty()) {
-        return "";
+        // make sure the default tp bind to screen 0
+        if (id == 0 && PRODUCT_PC_OR_TABLET) {
+            inputNodeName = DEFAULT_TP_DEVICE;
+        } else {
+            return "";
+        }
     }
 
     std::string inputNode = GetInputNode(inputNodeName);
@@ -680,6 +699,40 @@ void InputDisplayBindHelper::Load()
     }
     ifs >> *configFileInfos_;
     ifs.close();
+}
+
+bool InputDisplayBindHelper::GetRsIdByInputNodeNameCfg(const std::string &nodeName, int32_t &cfgRsId) const
+{
+    CALL_DEBUG_ENTER;
+    char realPath[PATH_MAX] = {};
+    if (realpath(INPUT_DEVICE_NAME_CONFIG, realPath) == nullptr) {
+        MMI_HILOGW("Invalid file path for input_device_name.cfg, errno:%{public}d", errno);
+        return false;
+    }
+
+    std::ifstream file(realPath);
+    if (file.is_open()) {
+        std::string line;
+        while (getline(file, line)) {
+            const std::string delim = "<=>";
+            size_t pos = line.find(delim);
+            if (pos == std::string::npos) {
+                continue;
+            }
+            std::string displayIdStr = line.substr(0, pos);
+            std::string cfgInputNodeName = line.substr(pos + delim.length());
+            if (!displayIdStr.empty() && !cfgInputNodeName.empty()
+                && std::all_of(displayIdStr.begin(), displayIdStr.end(), ::isdigit)
+                && cfgInputNodeName == nodeName) {
+                cfgRsId = std::atoi(displayIdStr.c_str());
+                MMI_HILOGI("Found RsId:%{public}d for nodeName:%{public}s", cfgRsId, nodeName.c_str());
+                file.close();
+                return true;
+            }
+        }
+        file.close();
+    }
+    return false;
 }
 
 std::string InputDisplayBindHelper::Dumps() const

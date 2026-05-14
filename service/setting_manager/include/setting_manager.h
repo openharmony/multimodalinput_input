@@ -42,6 +42,7 @@ public:
     void OnSwitchUser(int32_t userId) override;
     void OnAddUser(int32_t userId) override;
     void OnRemoveUser(int32_t userId) override;
+    bool IsDatabaseReady() const override;
 
 private:
     template<typename T>

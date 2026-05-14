@@ -111,6 +111,8 @@
 #ifdef OHOS_BUILD_ENABLE_POINTER
 #include "mouse_event_interface.h"
 #endif // OHOS_BUILD_ENABLE_POINTER
+#include "mouse_redispatch_store.h"
+#include "touch_redispatch_store.h"
 
 #ifdef OHOS_BUILD_ENABLE_TRIPLE_FINGER_SNAPSHOT
 #include "triple_finger_snapshot_manager.h"
@@ -888,6 +890,10 @@ int32_t MMIService::SetMouseIconInner(int32_t windowId, const CursorPixelMap& cu
         return MMISERVICE_NOT_RUNNING;
     }
     CHKPR(curPixelMap.pixelMap, ERROR_NULL_POINTER);
+    if (windowId <= 0) {
+        MMI_HILOGE("Invalid windowId:%{public}d", windowId);
+        return RET_ERR;
+    }
 #if defined OHOS_BUILD_ENABLE_POINTER
     int32_t pid = GetCallingPid();
     int32_t ret = CheckPidPermission(pid);
@@ -1183,9 +1189,6 @@ ErrCode MMIService::SetPointerVisible(bool visible, int32_t priority)
     int32_t clientPid = GetCallingPid();
     int32_t ret = delegateTasks_.PostSyncTask(
         [clientPid, visible, priority, isHap] {
-            if (!POINTER_DEV_MGR.isInit) {
-                return RET_ERR;
-            }
             return CursorDrawingComponent::GetInstance().SetPointerVisible(clientPid, visible, priority, isHap);
         }
         );
@@ -1201,9 +1204,7 @@ ErrCode MMIService::SetPointerVisible(bool visible, int32_t priority)
 int32_t MMIService::CheckPointerVisible(bool &visible)
 {
     WIN_MGR->UpdatePointerDrawingManagerWindowInfo();
-    if (POINTER_DEV_MGR.isInit) {
-        visible = CursorDrawingComponent::GetInstance().IsPointerVisible();
-    }
+    visible = CursorDrawingComponent::GetInstance().IsPointerVisible();
     return RET_OK;
 }
 #endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
@@ -1284,9 +1285,7 @@ ErrCode MMIService::SetPointerColor(int32_t color)
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
 int32_t MMIService::ReadPointerColor(int32_t userId, int32_t &color)
 {
-    if (POINTER_DEV_MGR.isInit) {
-        color = CursorDrawingComponent::GetInstance().GetPointerColor(userId);
-    }
+    color = CursorDrawingComponent::GetInstance().GetPointerColor(userId);
     return RET_OK;
 }
 #endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
@@ -1427,9 +1426,6 @@ int32_t MMIService::SetPointerStyleInner(int32_t windowId, PointerStyle pointerS
     int32_t userId = GetCallingUser();
     int32_t ret = delegateTasks_.PostSyncTask(
         [userId, clientPid, windowId, pointerStyle, token] {
-            if (!POINTER_DEV_MGR.isInit) {
-                return RET_ERR;
-            }
             return CursorDrawingComponent::GetInstance().SetPointerStyle(
                 userId, clientPid, windowId, pointerStyle, token);
         }
@@ -1492,9 +1488,6 @@ ErrCode MMIService::GetPointerStyleInner(int32_t windowId, PointerStyle& pointer
     int32_t userId = GetCallingUser();
     int32_t ret = delegateTasks_.PostSyncTask(
         [userId, clientPid, windowId, &pointerStyle, token] {
-            if (!POINTER_DEV_MGR.isInit) {
-                return RET_ERR;
-            }
             return CursorDrawingComponent::GetInstance().GetPointerStyle(
                 userId, clientPid, windowId, pointerStyle, token);
         }
@@ -2273,7 +2266,7 @@ ErrCode MMIService::MoveMouseEvent(int32_t offsetX, int32_t offsetY)
     return RET_OK;
 }
 
-ErrCode MMIService::CheckControllerKeyEventPermission(const std::shared_ptr<KeyEvent> keyEvent,
+ErrCode MMIService::CheckInjectKeyEventPermission(const std::shared_ptr<KeyEvent> keyEvent,
     bool isNativeInject)
 {
     CHKPR(keyEvent, ERROR_NULL_POINTER);
@@ -2285,7 +2278,10 @@ ErrCode MMIService::CheckControllerKeyEventPermission(const std::shared_ptr<KeyE
         }
         return ret;
     }
-    if (!isNativeInject && !PER_HELPER->VerifySystemApp()) {
+    if (isNativeInject) {
+        return RET_OK;
+    }
+    if (!PER_HELPER->VerifySystemApp()) {
         MMI_HILOGE("Verify system APP failed");
         return ERROR_NOT_SYSAPI;
     }
@@ -2302,7 +2298,7 @@ ErrCode MMIService::InjectKeyEvent(const KeyEvent& keyEvent, bool isNativeInject
 
     auto keyEventPtr = std::make_shared<KeyEvent>(keyEvent);
     CHKPR(keyEventPtr, ERROR_NULL_POINTER);
-    ErrCode permissionRet = CheckControllerKeyEventPermission(keyEventPtr, isNativeInject);
+    ErrCode permissionRet = CheckInjectKeyEventPermission(keyEventPtr, isNativeInject);
     if (permissionRet != RET_OK) {
         return permissionRet;
     }
@@ -2431,22 +2427,12 @@ int32_t MMIService::CheckTouchPadEvent(int32_t userId, const std::shared_ptr<Poi
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 }
 
-ErrCode MMIService::CheckControllerPointerEventPermission(const std::shared_ptr<PointerEvent> pointerEvent,
+ErrCode MMIService::CheckInjectPointerEventPermission(const std::shared_ptr<PointerEvent> pointerEvent,
     bool isNativeInject)
 {
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
-    if (pointerEvent->HasFlag(InputEvent::EVENT_FLAG_CONTROLLER) &&
-        pointerEvent->GetSourceType() != PointerEvent::SOURCE_TYPE_TOUCHSCREEN) {
-        MMI_HILOGD("Pointer event from Controller interface, using CONTROL_DEVICE permission check");
-        ErrCode ret = CheckControllerPermission();
-        if (ret != RET_OK) {
-            MMI_HILOGE("Controller permission check failed for pointer event, ret:%{public}d", ret);
-        }
-        return ret;
-    }
 #ifdef OHOS_BUILD_ENABLE_CONTROLLER_INJECT
-    if (pointerEvent->HasFlag(InputEvent::EVENT_FLAG_CONTROLLER) &&
-        pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHSCREEN) {
+    if (pointerEvent->HasFlag(InputEvent::EVENT_FLAG_CONTROLLER)) {
         MMI_HILOGD("Touch event from Controller interface, using CONTROL_DEVICE permission check");
         ErrCode ret = CheckControllerPermission();
         if (ret != RET_OK) {
@@ -2460,7 +2446,11 @@ ErrCode MMIService::CheckControllerPointerEventPermission(const std::shared_ptr<
         return ret;
     }
 #endif // OHOS_BUILD_ENABLE_CONTROLLER_INJECT
-    if (!isNativeInject && !PER_HELPER->VerifySystemApp()) {
+
+    if (isNativeInject) {
+        return RET_OK;
+    }
+    if (!PER_HELPER->VerifySystemApp()) {
         MMI_HILOGE("Verify system APP failed");
         return ERROR_NOT_SYSAPI;
     }
@@ -2477,7 +2467,7 @@ ErrCode MMIService::InjectPointerEvent(const PointerEvent& pointerEvent, bool is
 
     auto pointerEventPtr = std::make_shared<PointerEvent>(pointerEvent);
     CHKPR(pointerEventPtr, ERROR_NULL_POINTER);
-    ErrCode permissionRet = CheckControllerPointerEventPermission(pointerEventPtr, isNativeInject);
+    ErrCode permissionRet = CheckInjectPointerEventPermission(pointerEventPtr, isNativeInject);
     if (permissionRet != RET_OK) {
         return permissionRet;
     }
@@ -5556,9 +5546,6 @@ int32_t MMIService::SetCustomCursorInner(int32_t windowId, const CustomCursorPar
     CursorDrawingComponent::GetInstance();
     ret = delegateTasks_.PostSyncTask(std::bind(
         [pid, windowId, cursor, options, token] {
-            if (!POINTER_DEV_MGR.isInit) {
-                return RET_ERR;
-            }
             return CursorDrawingComponent::GetInstance().SetCustomCursor(pid, windowId, cursor, options, token);
         }
         ));
@@ -5685,7 +5672,7 @@ ErrCode MMIService::GetKnuckleSwitch(bool &knuckleSwitch)
         MMI_HILOGE("GetKnuckleSwitch failed, return:%{public}d", ret);
         return ret;
     }
-    return RET_OK
+    return RET_OK;
 #endif // OHOS_BUILD_KNUCKLE
     return RET_UNSUPPORT;
 }
@@ -6340,6 +6327,55 @@ void MMIService::RegisterForDisplayManagerService(int32_t systemAbilityId)
 }
 #endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
 
+int32_t MMIService::RedispatchInputEventInner(std::shared_ptr<PointerEvent> pointerEvent)
+{
+    pointerEvent->SetTargetWindowId(-1);
+    pointerEvent->AddFlag(OHOS::MMI::InputEvent::EVENT_FLAG_REDISPATCH);
+    LogTracer lt(pointerEvent->GetId(), pointerEvent->GetEventType(),
+        pointerEvent->GetPointerAction());
+    auto eventDispatchHandler = InputHandler->GetEventDispatchHandler();
+    if (eventDispatchHandler == nullptr) {
+        MMI_HILOGE("eventDispatchHandler is null");
+        return RET_ERR;
+    }
+
+    switch (pointerEvent->GetSourceType()) {
+#ifdef OHOS_BUILD_ENABLE_TOUCH
+        case PointerEvent::SOURCE_TYPE_TOUCHSCREEN: {
+            PointerEvent::PointerItem pointerItem;
+            if (pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), pointerItem)) {
+                pointerItem.SetTargetWindowId(-1);
+                pointerEvent->UpdatePointerItem(pointerEvent->GetPointerId(), pointerItem);
+            }
+            TouchRedispatchStore::Guard guard(pointerEvent);
+            WIN_MGR->UpdateTargetPointer(pointerEvent);
+            if (WIN_MGR->AbandonTouchRedispatch(pointerEvent)) {
+                return RET_ERR;
+            }
+            eventDispatchHandler->HandleTouchEvent(pointerEvent);
+            break;
+        }
+#endif // OHOS_BUILD_ENABLE_TOUCH
+#ifdef OHOS_BUILD_ENABLE_POINTER
+        case PointerEvent::SOURCE_TYPE_MOUSE: {
+            MouseRedispatchStore::Guard guard(pointerEvent);
+            WIN_MGR->UpdateTargetPointer(pointerEvent);
+            if (WIN_MGR->AbandonMouseRedispatch(pointerEvent)) {
+                return RET_ERR;
+            }
+            eventDispatchHandler->HandlePointerEvent(pointerEvent);
+            break;
+        }
+#endif // OHOS_BUILD_ENABLE_POINTER
+        default:
+            MMI_HILOGE("Unsupported sourceType:%{public}d", pointerEvent->GetSourceType());
+            return RET_ERR;
+    }
+    MMI_HILOGD("Redispatch, id:%{public}d, source:%{public}d",
+        pointerEvent->GetId(), pointerEvent->GetSourceType());
+    return RET_OK;
+}
+
 ErrCode MMIService::RedispatchInputEvent(const PointerEvent &pointerEvent)
 {
     CALL_DEBUG_ENTER;
@@ -6348,8 +6384,10 @@ ErrCode MMIService::RedispatchInputEvent(const PointerEvent &pointerEvent)
         MMI_HILOGE("pointerEvent is null");
         return RET_ERR;
     }
-    if (pointerEventPtr->GetSourceType() != PointerEvent::SOURCE_TYPE_MOUSE) {
-        MMI_HILOGD("Unsupported sourceType");
+    auto sourceType = pointerEventPtr->GetSourceType();
+    if (sourceType != PointerEvent::SOURCE_TYPE_MOUSE &&
+        sourceType != PointerEvent::SOURCE_TYPE_TOUCHSCREEN) {
+        MMI_HILOGE("Unsupported sourceType:%{private}d", sourceType);
         return RET_ERR;
     }
     if (!IsRunning()) {
@@ -6364,22 +6402,8 @@ ErrCode MMIService::RedispatchInputEvent(const PointerEvent &pointerEvent)
         MMI_HILOGE("Verify Inject Permission failed");
         return ERROR_NOT_SYSAPI;
     }
-    int32_t ret = delegateTasks_.PostSyncTask([pointerEventPtr] {
-        pointerEventPtr->SetTargetWindowId(-1);
-        pointerEventPtr->AddFlag(OHOS::MMI::InputEvent::EVENT_FLAG_REDISPATCH);
-        WIN_MGR->UpdateTargetPointer(pointerEventPtr);
-        if (WIN_MGR->AbandonRedispatch(pointerEventPtr)) {
-            return RET_ERR;
-        }
-        LogTracer lt(pointerEventPtr->GetId(), pointerEventPtr->GetEventType(), pointerEventPtr->GetPointerAction());
-        auto eventDispatchHandler = InputHandler->GetEventDispatchHandler();
-        if (eventDispatchHandler == nullptr) {
-            MMI_HILOGE("eventDispatchHandler is null");
-            return RET_ERR;
-        }
-        eventDispatchHandler->HandlePointerEvent(pointerEventPtr);
-        MMI_HILOGD("Redispatch directly, id:%{public}d", pointerEventPtr->GetId());
-        return RET_OK;
+    int32_t ret = delegateTasks_.PostSyncTask([this, pointerEventPtr] {
+        return RedispatchInputEventInner(pointerEventPtr);
     });
     if (ret != RET_OK) {
         MMI_HILOGE("PostSyncTask RedispatchInputEvent failed, ret:%{public}d", ret);

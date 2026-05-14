@@ -28,6 +28,7 @@
 #include "input_event_data_transformation.h"
 #include "key_command_handler.h"
 #include "key_option.h"
+#include "setting_observer.h"
 
 namespace OHOS {
 namespace MMI {
@@ -49,6 +50,14 @@ typedef int32_t (*UnintPlugin)(std::shared_ptr<IInputPlugin> &plugin);
 
 const int32_t RET_NOTDO = 0;
 const int32_t RET_DO = 1;
+
+enum class ObserverError : int32_t {
+    SUCCESS = 0,
+    INVALID_PARAM = -1,      // Invalid parameters (empty uri/key/null callback)
+    CREATE_FAILED = -2,      // Failed to create observer
+    REGISTER_FAILED = -3,    // Failed to register observer with DataShare
+    NOT_FOUND = -4,          // Observer ID not found during unregister
+};
 
 struct InputPlugin : public IPluginContext {
 public:
@@ -86,6 +95,17 @@ public:
     int32_t CalculateTipPoint(libinput_event *event, int32_t &displayId, PhysicalCoordinate &coord) override;
     void SetMouseAccelerateMotionSwitch(libinput_event *event, bool enable) override;
     int32_t GetCurrentMouseLocation(double &mouseX, double &mouseY) override;
+    bool GetSettingValue(const std::string& uri, const std::string& key, std::string& value) override;
+    int32_t RegisterSettingObserver(const std::string& uri, const std::string& key,
+        std::function<void(const std::string&)> callback) override;
+    bool UnregisterSettingObserver(int32_t observerId) override;
+#ifdef OHOS_BUILD_ENABLE_KEY_PRESSED_HANDLER
+    std::vector<int32_t> GetSubscribedKeysByPid(int32_t pid) const override;
+    int32_t RegisterKeyMonitorCallback(
+        const std::function<void(int32_t pid, int32_t keyCode,
+        std::string bundleName, bool isAdd)> &callback) const override;
+    bool UnregisterKeyMonitorCallback(int32_t callbackId) const override;
+#endif
 
     int32_t prio_ = 200;
     std::function<void(PluginEventType, int64_t)> callback_;
@@ -94,10 +114,20 @@ public:
     std::string name_;
 
 private:
+    bool IsDataShareReady();
+
+private:
     void* handle_ { nullptr };
     InputPluginStage stage_ { InputPluginStage::INPUT_GLOBAL_INIT };
     std::vector<InputPluginStage> stages_;
     int32_t timerCnt_ = 0;
+    struct ObserverEntry {
+        sptr<SettingObserver> observer;
+        std::string uri;
+    };
+    std::map<int32_t, ObserverEntry> observers_;  // ID -> observer+uri mapping
+    std::mutex observersMutex_;
+    int32_t nextObserverId_ { 1 };  // Next available observer ID (start from 1)
 };
 
 class InputPluginManager final {

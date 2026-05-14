@@ -132,6 +132,20 @@ int32_t ConvertTaiheAxisToNative(::ohos::multimodalInput::mouseEvent::Axis axis)
     return axisValue;
 }
 
+bool IsValidEtsButton(::ohos::multimodalInput::mouseEvent::Button button)
+{
+    int32_t buttonValue = static_cast<int32_t>(button);
+    return (buttonValue >= static_cast<int32_t>(::ohos::multimodalInput::mouseEvent::Button::key_t::LEFT) &&
+            buttonValue <= static_cast<int32_t>(::ohos::multimodalInput::mouseEvent::Button::key_t::TASK));
+}
+
+bool IsValidEtsAxis(::ohos::multimodalInput::mouseEvent::Axis axis)
+{
+    int32_t axisValue = static_cast<int32_t>(axis);
+    return (axisValue >= static_cast<int32_t>(::ohos::multimodalInput::mouseEvent::Axis::key_t::SCROLL_VERTICAL) &&
+            axisValue <= static_cast<int32_t>(::ohos::multimodalInput::mouseEvent::Axis::key_t::PINCH));
+}
+
 
 static std::unordered_map<int32_t, int32_t> THMouseButton2Native = {
     { JS_MOUSE_BUTTON_LEFT, PointerEvent::MOUSE_BUTTON_LEFT },
@@ -609,7 +623,14 @@ public:
             return;
         }
 
-        // 使用现有的Button转换函数
+        if (!IsValidEtsButton(button)) {
+            int32_t buttonValue = static_cast<int32_t>(button);
+            MMI_HILOGE("Invalid button value: %{public}d", buttonValue);
+            taihe::set_business_error(OHOS::MMI::TaiheErrorCode::COMMON_PARAMETER_ERROR,
+                "Parameter error. Invalid button value");
+            return;
+        }
+
         int32_t nativeButton = TaiheMouseButonConverter::ConvertEts2Native(button);
         int32_t ret = nativeImpl_->PressButton(nativeButton);
         if (ret != RET_OK) {
@@ -632,7 +653,14 @@ public:
             return;
         }
 
-        // 使用现有的Button转换函数
+        if (!IsValidEtsButton(button)) {
+            int32_t buttonValue = static_cast<int32_t>(button);
+            MMI_HILOGE("Invalid button value: %{public}d", buttonValue);
+            taihe::set_business_error(OHOS::MMI::TaiheErrorCode::COMMON_PARAMETER_ERROR,
+                "Parameter error. Invalid button value");
+            return;
+        }
+
         int32_t nativeButton = TaiheMouseButonConverter::ConvertEts2Native(button);
         int32_t ret = nativeImpl_->ReleaseButton(nativeButton);
         if (ret != RET_OK) {
@@ -652,6 +680,14 @@ public:
         if (nativeImpl_ == nullptr) {
             MMI_HILOGE("Native implementation is null");
             taihe::set_business_error(OHOS::MMI::TaiheErrorCode::INPUT_SERVICE_EXCEPTION, "Controller not initialized");
+            return;
+        }
+
+        if (!IsValidEtsAxis(axis)) {
+            int32_t axisValue = static_cast<int32_t>(axis);
+            MMI_HILOGE("Invalid axis value: %{public}d", axisValue);
+            taihe::set_business_error(OHOS::MMI::TaiheErrorCode::COMMON_PARAMETER_ERROR,
+                "Parameter error. Invalid axis value");
             return;
         }
 
@@ -677,6 +713,14 @@ public:
             return;
         }
 
+        if (!IsValidEtsAxis(axis)) {
+            int32_t axisValue = static_cast<int32_t>(axis);
+            MMI_HILOGE("Invalid axis value: %{public}d", axisValue);
+            taihe::set_business_error(OHOS::MMI::TaiheErrorCode::COMMON_PARAMETER_ERROR,
+                "Parameter error. Invalid axis value");
+            return;
+        }
+
         int32_t nativeAxis = ConvertTaiheAxisToNative(axis);
         int32_t ret = nativeImpl_->UpdateAxis(nativeAxis, value);
         if (ret != RET_OK) {
@@ -696,6 +740,14 @@ public:
         if (nativeImpl_ == nullptr) {
             MMI_HILOGE("Native implementation is null");
             taihe::set_business_error(OHOS::MMI::TaiheErrorCode::INPUT_SERVICE_EXCEPTION, "Controller not initialized");
+            return;
+        }
+
+        if (!IsValidEtsAxis(axis)) {
+            int32_t axisValue = static_cast<int32_t>(axis);
+            MMI_HILOGE("Invalid axis value: %{public}d", axisValue);
+            taihe::set_business_error(OHOS::MMI::TaiheErrorCode::COMMON_PARAMETER_ERROR,
+                "Parameter error. Invalid axis value");
             return;
         }
 

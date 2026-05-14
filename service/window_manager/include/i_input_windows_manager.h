@@ -39,6 +39,8 @@ struct libinput_event_tablet_tool;
 
 namespace OHOS {
 namespace MMI {
+class MouseRedispatchStore;
+class TouchRedispatchStore;
 struct MouseLocation {
     int32_t displayId { -1 };
     int32_t physicalX { 0 };
@@ -102,6 +104,7 @@ public:
     virtual std::pair<double, double> TransformDisplayXY(const OLD::DisplayInfo &info,
         double logicX, double logicY) const = 0;
     virtual int32_t SetPixelMapData(int32_t infoId, void *pixelMap) = 0;
+    virtual void RemovePixelMapData(int32_t infoId) = 0;
     virtual void SetFoldState () = 0;
     virtual bool CheckAppFocused(int32_t pid) = 0;
     virtual bool GetCancelEventFlag(std::shared_ptr<PointerEvent> pointerEvent) = 0;
@@ -184,6 +187,12 @@ public:
     virtual int32_t GetAgentPidByDisplayIdAndWindowId(int32_t displayId, int32_t windowId) = 0;
     virtual int32_t FindDisplayUserId(int32_t displayId) const = 0;
     virtual void ClearPointerDeviceId(const std::shared_ptr<PointerEvent> pointerEvent) = 0;
+    virtual std::map<int32_t, std::vector<std::shared_ptr<WindowInfo>>>& GetCancelEventList(
+        std::map<int32_t, std::vector<std::shared_ptr<WindowInfo>>>& realList) = 0;
+    virtual bool AbandonTouchRedispatch(const std::shared_ptr<PointerEvent>& pointerEvent) = 0;
+    virtual bool AbandonMouseRedispatch(const std::shared_ptr<PointerEvent>& pointerEvent) = 0;
+    virtual MouseRedispatchStore& GetMouseRedispatchStore() = 0;
+    virtual TouchRedispatchStore& GetTouchRedispatchStore() = 0;
 #ifdef OHOS_BUILD_ENABLE_ANCO
     virtual void InitializeAnco() = 0;
     virtual void SimulatePointerExt(std::shared_ptr<PointerEvent> pointerEvent) = 0;
@@ -222,7 +231,6 @@ public:
     virtual int32_t ControlMouseEventToAnco(int32_t windowId, bool enable, const std::string &callingTokenName) = 0;
 #endif // OHOS_BUILD_ENABLE_ANCO_GAME_EVENT_MAPPING
     virtual const OLD::DisplayGroupInfo& GetDefaultDisplayGroupInfo() = 0;
-    virtual bool AbandonRedispatch(std::shared_ptr<PointerEvent> pointerEvent);
 private:
     static std::mutex mutex_;
     static std::shared_ptr<IInputWindowsManager> instance_;

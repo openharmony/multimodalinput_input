@@ -20,6 +20,9 @@
 #include "screen_pointer.h"
 #include "product_name_definition.h"
 #include "product_type_parser.h"
+#include "transaction/rs_interfaces.h"
+#include "ui/rs_ui_context.h"
+#include "ui/rs_ui_director.h"
 
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "ScreenPointerTest"
@@ -204,8 +207,9 @@ HWTEST_F(ScreenPointerTest, ScreenPointerTest_MoveSoft_001, TestSize.Level1)
     ASSERT_NE(hwcmgr, nullptr);
     handler_ptr_t handler = nullptr;
     OLD::DisplayInfo di;
-    ScreenPointer* screenpointer = new ScreenPointer(hwcmgr, handler, di);
+    std::shared_ptr<ScreenPointer> screenpointer = std::make_shared<ScreenPointer>(hwcmgr, handler, di);
     ASSERT_NE(screenpointer, nullptr);
+    ASSERT_TRUE(screenpointer->InitRSUIContext(screenpointer->screenId_));
     Rosen::RSSurfaceNodeConfig surfaceNodeConfig;
     surfaceNodeConfig.SurfaceNodeName = "pointer window";
     screenpointer->surfaceNode_ = Rosen::RSSurfaceNode::Create(surfaceNodeConfig,
@@ -238,7 +242,9 @@ HWTEST_F(ScreenPointerTest, ScreenPointerTest_MoveSoft_002, TestSize.Level1)
     handler_ptr_t handler = nullptr;
     OLD::DisplayInfo di;
     di.id = 1;
-    ScreenPointer* screenpointer = new ScreenPointer(hwcmgr, handler, di);
+    std::shared_ptr<ScreenPointer> screenpointer = std::make_shared<ScreenPointer>(hwcmgr, handler, di);
+    ASSERT_NE(screenpointer, nullptr);
+    ASSERT_TRUE(screenpointer->InitRSUIContext(screenpointer->screenId_));
     Rosen::RSSurfaceNodeConfig surfaceNodeConfig;
     surfaceNodeConfig.SurfaceNodeName = "pointer window";
     screenpointer->surfaceNode_ = Rosen::RSSurfaceNode::Create(surfaceNodeConfig,
@@ -265,7 +271,7 @@ HWTEST_F(ScreenPointerTest, ScreenPointerTest_Move_001, TestSize.Level1)
     ASSERT_NE(hwcmgr, nullptr);
     handler_ptr_t handler = nullptr;
     OLD::DisplayInfo di;
-    ScreenPointer* screenpointer = new ScreenPointer(hwcmgr, handler, di);
+    std::shared_ptr<ScreenPointer> screenpointer = std::make_shared<ScreenPointer>(hwcmgr, handler, di);
     ASSERT_NE(screenpointer, nullptr);
     PointerRenderer renderer;
     ASSERT_TRUE(screenpointer->Init(renderer));
@@ -295,7 +301,6 @@ HWTEST_F(ScreenPointerTest, ScreenPointerTest_Move_001, TestSize.Level1)
     screenpointer->isCurrentOffScreenRendering_ = false;
     ret = screenpointer->Move(x, y);
     EXPECT_FALSE(ret);
-    delete screenpointer;
 }
 
 /**
@@ -1571,12 +1576,12 @@ HWTEST_F(ScreenPointerTest, ScreenPointerTest_RsFlushImplicitTransaction_001, Te
 }
 
 /**
- * @tc.name: ScreenPointerTest_GetRSUIDirector_001
- * @tc.desc: Test GetRSUIDirector when rsUIDirector_ is null
+ * @tc.name: ScreenPointerTest_RsFlushImplicitTransaction_002
+ * @tc.desc: Test RsFlushImplicitTransaction with valid rsUIDirector_
  * @tc.type: Function
  * @tc.require:
  */
-HWTEST_F(ScreenPointerTest, ScreenPointerTest_GetRSUIDirector_001, TestSize.Level1)
+HWTEST_F(ScreenPointerTest, ScreenPointerTest_RsFlushImplicitTransaction_002, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     hwcmgr_ptr_t hwcmgr = std::make_shared<HardwareCursorPointerManager>();
@@ -1585,9 +1590,13 @@ HWTEST_F(ScreenPointerTest, ScreenPointerTest_GetRSUIDirector_001, TestSize.Leve
     OLD::DisplayInfo di;
     auto screenpointer = std::make_unique<ScreenPointer>(hwcmgr, handler, di);
     ASSERT_NE(screenpointer, nullptr);
-    screenpointer->rsUIDirector_ = nullptr;
-    auto director = screenpointer->GetRSUIDirector();
-    EXPECT_EQ(director, nullptr);
+
+    auto renderToken = Rosen::RSInterfaces::GetInstance().GetConnectToRenderToken(0);
+    ASSERT_NE(renderToken, nullptr);
+    screenpointer->rsUIDirector_ = Rosen::RSUIDirector::Create(renderToken);
+    ASSERT_NE(screenpointer->rsUIDirector_, nullptr);
+
+    ASSERT_NO_FATAL_FAILURE(screenpointer->RsFlushImplicitTransaction());
 }
 
 /**
@@ -1611,12 +1620,12 @@ HWTEST_F(ScreenPointerTest, ScreenPointerTest_GetRSUIContext_001, TestSize.Level
 }
 
 /**
- * @tc.name: ScreenPointerTest_RsFlushImplicitTransaction_002
- * @tc.desc: Test RsFlushImplicitTransaction with valid rsUIDirector_
+ * @tc.name: ScreenPointerTest_DestroyPointerWindow_001
+ * @tc.desc: Test DestroyPointerWindow with valid surface node
  * @tc.type: Function
  * @tc.require:
  */
-HWTEST_F(ScreenPointerTest, ScreenPointerTest_RsFlushImplicitTransaction_002, TestSize.Level1)
+HWTEST_F(ScreenPointerTest, ScreenPointerTest_DestroyPointerWindow_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     hwcmgr_ptr_t hwcmgr = std::make_shared<HardwareCursorPointerManager>();
@@ -1625,8 +1634,157 @@ HWTEST_F(ScreenPointerTest, ScreenPointerTest_RsFlushImplicitTransaction_002, Te
     OLD::DisplayInfo di;
     auto screenpointer = std::make_unique<ScreenPointer>(hwcmgr, handler, di);
     ASSERT_NE(screenpointer, nullptr);
-    screenpointer->rsUIDirector_ = nullptr;
-    ASSERT_NO_FATAL_FAILURE(screenpointer->RsFlushImplicitTransaction());
+
+    Rosen::RSSurfaceNodeConfig surfaceNodeConfig;
+    surfaceNodeConfig.SurfaceNodeName = "pointer window";
+    Rosen::RSSurfaceNodeType surfaceNodeType = Rosen::RSSurfaceNodeType::SELF_DRAWING_WINDOW_NODE;
+    screenpointer->surfaceNode_ = Rosen::RSSurfaceNode::Create(surfaceNodeConfig, surfaceNodeType, true, false,
+        nullptr);
+    ASSERT_NE(screenpointer->surfaceNode_, nullptr);
+
+    ASSERT_NO_FATAL_FAILURE(screenpointer->DestroyPointerWindow());
+    EXPECT_EQ(screenpointer->surfaceNode_, nullptr);
+    EXPECT_EQ(screenpointer->rsUIDirector_, nullptr);
+    EXPECT_EQ(screenpointer->rsUIContext_, nullptr);
+}
+
+/**
+ * @tc.name: ScreenPointerTest_DestroyPointerWindow_002
+ * @tc.desc: Test DestroyPointerWindow with null surface node
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(ScreenPointerTest, ScreenPointerTest_DestroyPointerWindow_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    hwcmgr_ptr_t hwcmgr = std::make_shared<HardwareCursorPointerManager>();
+    ASSERT_NE(hwcmgr, nullptr);
+    handler_ptr_t handler = nullptr;
+    OLD::DisplayInfo di;
+    auto screenpointer = std::make_unique<ScreenPointer>(hwcmgr, handler, di);
+    ASSERT_NE(screenpointer, nullptr);
+    screenpointer->surfaceNode_ = nullptr;
+    
+    ASSERT_NO_FATAL_FAILURE(screenpointer->DestroyPointerWindow());
+}
+
+/**
+ * @tc.name: ScreenPointerTest_InitRSUIContext_ScreenChanged_001
+ * @tc.desc: Test InitRSUIContext when screen is changed
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(ScreenPointerTest, ScreenPointerTest_InitRSUIContext_ScreenChanged_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    hwcmgr_ptr_t hwcmgr = std::make_shared<HardwareCursorPointerManager>();
+    ASSERT_NE(hwcmgr, nullptr);
+    handler_ptr_t handler = nullptr;
+    OLD::DisplayInfo di;
+    di.id = 1;
+    auto screenpointer = std::make_unique<ScreenPointer>(hwcmgr, handler, di);
+    ASSERT_NE(screenpointer, nullptr);
+    ASSERT_TRUE(screenpointer->InitRSUIContext(0));
+    ASSERT_TRUE(screenpointer->InitRSUIContext(2));
+}
+
+/**
+ * @tc.name: ScreenPointerTest_InitRSUIContext_ScreenUnchanged_001
+ * @tc.desc: Test InitRSUIContext when screen is unchanged and already initialized
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(ScreenPointerTest, ScreenPointerTest_InitRSUIContext_ScreenUnchanged_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    hwcmgr_ptr_t hwcmgr = std::make_shared<HardwareCursorPointerManager>();
+    ASSERT_NE(hwcmgr, nullptr);
+    handler_ptr_t handler = nullptr;
+    OLD::DisplayInfo di;
+    di.id = 1;
+    auto screenpointer = std::make_unique<ScreenPointer>(hwcmgr, handler, di);
+    ASSERT_NE(screenpointer, nullptr);
+    ASSERT_TRUE(screenpointer->InitRSUIContext(0));
+    ASSERT_TRUE(screenpointer->InitRSUIContext(0));
+}
+
+/**
+ * @tc.name: ScreenPointerTest_MoveSoft_NullCheck_001
+ * @tc.desc: Test MoveSoft with null surfaceNode
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(ScreenPointerTest, ScreenPointerTest_MoveSoft_NullCheck_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    hwcmgr_ptr_t hwcmgr = std::make_shared<HardwareCursorPointerManager>();
+    ASSERT_NE(hwcmgr, nullptr);
+    handler_ptr_t handler = nullptr;
+    OLD::DisplayInfo di;
+    auto screenpointer = std::make_unique<ScreenPointer>(hwcmgr, handler, di);
+    ASSERT_NE(screenpointer, nullptr);
+    screenpointer->surfaceNode_ = nullptr;
+
+    bool result = screenpointer->MoveSoft(100, 100);
+    EXPECT_EQ(result, false);
+}
+
+/**
+ * @tc.name: ScreenPointerTest_MoveSoft_NullCheck_002
+ * @tc.desc: Test MoveSoft with null rsUIContext
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(ScreenPointerTest, ScreenPointerTest_MoveSoft_NullCheck_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    hwcmgr_ptr_t hwcmgr = std::make_shared<HardwareCursorPointerManager>();
+    ASSERT_NE(hwcmgr, nullptr);
+    handler_ptr_t handler = nullptr;
+    OLD::DisplayInfo di;
+    auto screenpointer = std::make_unique<ScreenPointer>(hwcmgr, handler, di);
+    ASSERT_NE(screenpointer, nullptr);
+
+    Rosen::RSSurfaceNodeConfig surfaceNodeConfig;
+    surfaceNodeConfig.SurfaceNodeName = "pointer window";
+    Rosen::RSSurfaceNodeType surfaceNodeType = Rosen::RSSurfaceNodeType::SELF_DRAWING_WINDOW_NODE;
+    screenpointer->surfaceNode_ = Rosen::RSSurfaceNode::Create(surfaceNodeConfig, surfaceNodeType, true, false,
+        nullptr);
+    ASSERT_NE(screenpointer->surfaceNode_, nullptr);
+    screenpointer->rsUIContext_ = nullptr;
+
+    bool result = screenpointer->MoveSoft(100, 100);
+    EXPECT_EQ(result, false);
+}
+
+/**
+ * @tc.name: ScreenPointerTest_InitRSUIContext_AlreadyInitialized_001
+ * @tc.desc: Test InitRSUIContext when already initialized with same screen
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(ScreenPointerTest, ScreenPointerTest_InitRSUIContext_AlreadyInitialized_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    hwcmgr_ptr_t hwcmgr = std::make_shared<HardwareCursorPointerManager>();
+    ASSERT_NE(hwcmgr, nullptr);
+    handler_ptr_t handler = nullptr;
+    OLD::DisplayInfo di;
+    di.id = 1;
+    auto screenpointer = std::make_unique<ScreenPointer>(hwcmgr, handler, di);
+    ASSERT_NE(screenpointer, nullptr);
+
+    auto renderToken = Rosen::RSInterfaces::GetInstance().GetConnectToRenderToken(0);
+    ASSERT_NE(renderToken, nullptr);
+    screenpointer->rsUIDirector_ = Rosen::RSUIDirector::Create(renderToken);
+    ASSERT_NE(screenpointer->rsUIDirector_, nullptr);
+    screenpointer->rsUIContext_ = screenpointer->rsUIDirector_->GetRSUIContext();
+    ASSERT_NE(screenpointer->rsUIContext_, nullptr);
+
+    bool result = screenpointer->InitRSUIContext(0);
+    EXPECT_EQ(result, true);
+    EXPECT_NE(screenpointer->rsUIDirector_, nullptr);
+    EXPECT_NE(screenpointer->rsUIContext_, nullptr);
 }
 } // namespace MMI
 } // namespace OHOS

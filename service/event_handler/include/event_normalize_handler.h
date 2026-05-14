@@ -73,6 +73,7 @@ private:
     bool HandleTouchpadSyncEvent(libinput_event* event);
 #endif // OHOS_BUILD_ENABLE_TOUCHPAD
     int32_t HandleMouseEvent(libinput_event* event);
+    bool AfterInputEventNormalized(const std::shared_ptr<PointerEvent> pointerEvent);
     int32_t HandleTouchEvent(libinput_event* event, int64_t frameTime);
     int32_t HandleSwitchInputEvent(libinput_event* event);
 #ifdef OHOS_BUILD_ENABLE_JOYSTICK
