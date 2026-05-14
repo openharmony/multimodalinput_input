@@ -1420,7 +1420,12 @@ typedef enum {
      * Wrist Turn key
      * @since 26.0.0
      */
-    KEYCODE_WRIST_TURN = 16777216
+    KEYCODE_WRIST_TURN = 16777216,
+    /**
+     * Back panel double tap key
+     * @since 26.0.0
+     */
+    KEYCODE_BACK_PANEL_DOUBLE_TAP = 16842752
 } Input_KeyCode;
 
 #ifdef __cplusplus

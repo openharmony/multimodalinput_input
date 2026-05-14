@@ -410,3 +410,137 @@ HWTEST_F(KeyEventExtendedFunctionTest, TestExtendedFunctionKeyExpandedCapacity00
     keyEvent->SetKeyCode(expandedRangeMax);
     EXPECT_TRUE(keyEvent->IsExtendedFunctionKey());
 }
+
+/**
+ * @tc.name: TestBusinessExclusiveKey001
+ * @tc.desc: Test IsBusinessExclusiveKey with KEYCODE_BACK_PANEL_DOUBLE_TAP
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyEventExtendedFunctionTest, TestBusinessExclusiveKey001, TestSize.Level1)
+{
+    auto keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_BACK_PANEL_DOUBLE_TAP);
+    EXPECT_TRUE(keyEvent->IsExtendedFunctionKey());
+    EXPECT_TRUE(keyEvent->IsBusinessExclusiveKey());
+}
+
+/**
+ * @tc.name: TestBusinessExclusiveKey002
+ * @tc.desc: Test IsBusinessExclusiveKey with boundary values
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyEventExtendedFunctionTest, TestBusinessExclusiveKey002, TestSize.Level1)
+{
+    auto keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+
+    // Test KEYCODE_BIZ_EXCLUSIVE_MIN (0x01010000)
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_BIZ_EXCLUSIVE_MIN);
+    EXPECT_TRUE(keyEvent->IsExtendedFunctionKey());
+    EXPECT_TRUE(keyEvent->IsBusinessExclusiveKey());
+
+    // Test KEYCODE_BIZ_EXCLUSIVE_MAX (0x0101FFFF)
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_BIZ_EXCLUSIVE_MAX);
+    EXPECT_TRUE(keyEvent->IsExtendedFunctionKey());
+    EXPECT_TRUE(keyEvent->IsBusinessExclusiveKey());
+
+    // Test just before business exclusive range (0x0100FFFF)
+    int32_t keyBeforeBizExclusive = 0x0100FFFF;
+    keyEvent->SetKeyCode(keyBeforeBizExclusive);
+    EXPECT_TRUE(keyEvent->IsExtendedFunctionKey());
+    EXPECT_FALSE(keyEvent->IsBusinessExclusiveKey());
+
+    // Test just after business exclusive range (0x01020000)
+    int32_t keyAfterBizExclusive = 0x01020000;
+    keyEvent->SetKeyCode(keyAfterBizExclusive);
+    EXPECT_TRUE(keyEvent->IsExtendedFunctionKey());
+    EXPECT_FALSE(keyEvent->IsBusinessExclusiveKey());
+}
+
+/**
+ * @tc.name: TestBusinessExclusiveKey003
+ * @tc.desc: Test IsBusinessExclusiveKey with regular and non-exclusive extended keys
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyEventExtendedFunctionTest, TestBusinessExclusiveKey003, TestSize.Level1)
+{
+    auto keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+
+    // Regular keys are not business exclusive
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_A);
+    EXPECT_FALSE(keyEvent->IsBusinessExclusiveKey());
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_ENTER);
+    EXPECT_FALSE(keyEvent->IsBusinessExclusiveKey());
+
+    // KEYCODE_WRIST_TURN (0x01000000) is extended but not business exclusive
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_WRIST_TURN);
+    EXPECT_TRUE(keyEvent->IsExtendedFunctionKey());
+    EXPECT_FALSE(keyEvent->IsBusinessExclusiveKey());
+
+    // Keys in extended function range but not in business exclusive sub-range
+    keyEvent->SetKeyCode(0x01020000);
+    EXPECT_TRUE(keyEvent->IsExtendedFunctionKey());
+    EXPECT_FALSE(keyEvent->IsBusinessExclusiveKey());
+}
+
+/**
+ * @tc.name: TestBusinessExclusiveKeyValues001
+ * @tc.desc: Test business exclusive key constant values
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyEventExtendedFunctionTest, TestBusinessExclusiveKeyValues001, TestSize.Level1)
+{
+    // KEYCODE_BACK_PANEL_DOUBLE_TAP = 16842752 (0x01010000)
+    EXPECT_EQ(KeyEvent::KEYCODE_BACK_PANEL_DOUBLE_TAP, 16842752);
+    EXPECT_EQ(KeyEvent::KEYCODE_BACK_PANEL_DOUBLE_TAP, 0x01010000);
+
+    // Business exclusive range
+    EXPECT_EQ(KeyEvent::KEYCODE_BIZ_EXCLUSIVE_MIN, 16842752);
+    EXPECT_EQ(KeyEvent::KEYCODE_BIZ_EXCLUSIVE_MAX, 16859135);
+
+    // Mask and flag
+    EXPECT_EQ(KeyEvent::BUSINESS_EXCLUSIVE_KEY_MASK, 0x00FF0000);
+    EXPECT_EQ(KeyEvent::BUSINESS_EXCLUSIVE_KEY_FLAG, 0x00010000);
+}
+
+/**
+ * @tc.name: TestBusinessExclusiveKeyBitOperation001
+ * @tc.desc: Test bit operation for business exclusive key detection
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyEventExtendedFunctionTest, TestBusinessExclusiveKeyBitOperation001, TestSize.Level1)
+{
+    // Verify the bit operation logic
+    int32_t bizExclusiveKey = KeyEvent::KEYCODE_BACK_PANEL_DOUBLE_TAP;
+    EXPECT_TRUE((bizExclusiveKey & KeyEvent::EXTENDED_FUNCTION_KEY_MASK) == KeyEvent::EXTENDED_FUNCTION_KEY_FLAG);
+    EXPECT_TRUE((bizExclusiveKey & KeyEvent::BUSINESS_EXCLUSIVE_KEY_MASK) == KeyEvent::BUSINESS_EXCLUSIVE_KEY_FLAG);
+
+    // Non-business-exclusive extended key
+    int32_t regularExtKey = KeyEvent::KEYCODE_WRIST_TURN;
+    EXPECT_TRUE((regularExtKey & KeyEvent::EXTENDED_FUNCTION_KEY_MASK) == KeyEvent::EXTENDED_FUNCTION_KEY_FLAG);
+    EXPECT_NE((regularExtKey & KeyEvent::BUSINESS_EXCLUSIVE_KEY_MASK), KeyEvent::BUSINESS_EXCLUSIVE_KEY_FLAG);
+}
+
+/**
+ * @tc.name: TestBusinessExclusiveKeyRange001
+ * @tc.desc: Test business exclusive key range properties
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyEventExtendedFunctionTest, TestBusinessExclusiveKeyRange001, TestSize.Level1)
+{
+    // Business exclusive range is within extended function key range
+    EXPECT_GE(KeyEvent::KEYCODE_BIZ_EXCLUSIVE_MIN, KeyEvent::KEYCODE_EXT_FN_MIN);
+    EXPECT_LE(KeyEvent::KEYCODE_BIZ_EXCLUSIVE_MAX, KeyEvent::KEYCODE_EXT_FN_MAX);
+    EXPECT_LT(KeyEvent::KEYCODE_BIZ_EXCLUSIVE_MIN, KeyEvent::KEYCODE_BIZ_EXCLUSIVE_MAX);
+
+    // KEYCODE_BACK_PANEL_DOUBLE_TAP is at the start of business exclusive range
+    EXPECT_EQ(KeyEvent::KEYCODE_BACK_PANEL_DOUBLE_TAP, KeyEvent::KEYCODE_BIZ_EXCLUSIVE_MIN);
+}

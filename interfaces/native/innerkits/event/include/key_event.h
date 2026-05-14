@@ -3238,6 +3238,14 @@ public:
     static const int32_t KEYCODE_WRIST_TURN;
 
     /**
+     * Back panel double tap key
+     * Used for LuGu privacy mode
+     * @internal
+     * @since 26.0.0
+     */
+    static const int32_t KEYCODE_BACK_PANEL_DOUBLE_TAP;
+
+    /**
      * Extended function key mask (fourth byte)
      * Used to identify extended function keys by checking bits 24-31
      * @internal
@@ -3274,6 +3282,36 @@ public:
      * @since 26.0.0
      */
     static const int32_t KEYCODE_EXT_FN_MAX;
+
+    /**
+     * Business exclusive key mask (third byte)
+     * Used to identify business exclusive keys within extended function key range
+     * @internal
+     * @since 26.0.0
+     */
+    static const uint32_t BUSINESS_EXCLUSIVE_KEY_MASK;
+
+    /**
+     * Business exclusive key flag (third byte = 0x01)
+     * @internal
+     * @since 26.0.0
+     */
+    static const uint32_t BUSINESS_EXCLUSIVE_KEY_FLAG;
+
+    /**
+     * Business exclusive key minimum value
+     * Reserved range: 16842752 - 16859135 (0x01010000 - 0x0101FFFF)
+     * @internal
+     * @since 26.0.0
+     */
+    static const int32_t KEYCODE_BIZ_EXCLUSIVE_MIN;
+
+    /**
+     * Business exclusive key maximum value
+     * @internal
+     * @since 26.0.0
+     */
+    static const int32_t KEYCODE_BIZ_EXCLUSIVE_MAX;
 
 public:
     class KeyItem {
@@ -3617,6 +3655,14 @@ public:
      * @since 26.0.0
      */
     bool IsExtendedFunctionKey() const;
+
+    /**
+     * @brief Check if this key event is a business exclusive key
+     * @return Returns true if this event is a business exclusive key; returns false otherwise
+     * @internal
+     * @since 26.0.0
+     */
+    bool IsBusinessExclusiveKey() const;
 #ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
     /**
      * @brief Set the enhance data.
