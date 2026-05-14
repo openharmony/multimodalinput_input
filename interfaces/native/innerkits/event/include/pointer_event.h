@@ -2116,6 +2116,8 @@ public:
     uint64_t GetDistributeEventTime();
     void SetSignature(const std::string &signature);
     std::string GetSignature() const;
+    void SetCallingUid(int32_t callingUid);
+    int32_t GetCallingUid() const;
 
 protected:
     /**
@@ -2180,6 +2182,7 @@ private:
     RightButtonSource rightButtonSource_ { RightButtonSource::INVALID };
     std::string signature_;
     uint64_t distributeEventTime_ = 0;
+    int32_t callingUid_ { -1 };
 };
 
 inline bool PointerEvent::HasAxis(AxisType axis) const

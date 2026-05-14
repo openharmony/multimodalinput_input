@@ -259,9 +259,9 @@ int32_t ClientMsgHandler::OnPointerEvent(const UDSClient& client, NetPacket& pkt
         processedCount_ = 0;
         lastEventId_ = pointerEvent->GetId();
     }
-    MMI_HILOGD("Report current pointer event, No:%{public}d,PA:%{public}s,PI:%{public}d,WI:%{public}d",
+    MMI_HILOGD("Report current pointer event, No:%{public}d,PA:%{public}s,PI:%{public}d,WI:%{public}d,DI:%{public}d",
         pointerEvent->GetId(), pointerEvent->DumpPointerAction(), pointerEvent->GetPointerId(),
-        pointerEvent->GetTargetWindowId());
+        pointerEvent->GetTargetWindowId(), pointerEvent->GetTargetDisplayId());
     std::list<PointerEvent::PointerItem> pointerItems{ pointerEvent->GetAllPointerItems() };
     for (const auto &item : pointerItems) {
         MMI_HILOGD("Report pointer event,PI:%{public}d,WI:%{public}d,DX:%{private}d,DY:%{private}d"
