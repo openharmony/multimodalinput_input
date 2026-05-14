@@ -28,7 +28,6 @@ namespace MMI {
 
 namespace {
 constexpr int32_t ERROR_CODE_TOUCH_SEQUENCE_ERROR = 4300001;
-constexpr int32_t ERROR_CODE_TOUCH_ID_INVALID = 4300003;
 constexpr int32_t TOUCH_TOOL_TYPE_FINGER = PointerEvent::TOOL_TYPE_FINGER;
 constexpr int32_t INVALID_DEVICE_ID = -1;
 constexpr int32_t MIN_TOUCH_ID = 0;
@@ -202,7 +201,7 @@ int32_t TouchControllerImpl::TouchDown(int32_t touchId, int32_t displayId, int32
 {
     if (!IsTouchIdValid(touchId)) {
         MMI_HILOGE("Invalid touch id %{public}d", touchId);
-        return ERROR_CODE_TOUCH_ID_INVALID;
+        return ERROR_CODE_TOUCH_SEQUENCE_ERROR;
     }
 
     int64_t now = GetSysClockTime();
@@ -226,7 +225,7 @@ int32_t TouchControllerImpl::TouchMove(int32_t touchId, int32_t displayId, int32
 {
     if (!IsTouchIdValid(touchId)) {
         MMI_HILOGE("Invalid touch id %{public}d", touchId);
-        return ERROR_CODE_TOUCH_ID_INVALID;
+        return ERROR_CODE_TOUCH_SEQUENCE_ERROR;
     }
 
     auto pointerEvent = BuildTouchMoveEvent(touchId, displayId, displayX, displayY, GetSysClockTime());
@@ -249,7 +248,7 @@ int32_t TouchControllerImpl::TouchUp(int32_t touchId, int32_t displayId, int32_t
 {
     if (!IsTouchIdValid(touchId)) {
         MMI_HILOGE("Invalid touch id %{public}d", touchId);
-        return ERROR_CODE_TOUCH_ID_INVALID;
+        return ERROR_CODE_TOUCH_SEQUENCE_ERROR;
     }
 
     auto pointerEvent = BuildTouchUpEvent(touchId, displayId, displayX, displayY, GetSysClockTime());

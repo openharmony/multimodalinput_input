@@ -35,8 +35,6 @@ namespace MMI {
 
 namespace {
 
-// Internal code used only to select the public 4300001 error message.
-constexpr int32_t TOUCH_ID_INVALID_ERROR = 4300003;
 constexpr size_t TOUCH_CONTROLLER_ARG_COUNT = 1;
 constexpr size_t CREATE_CONTROLLER_ARG_COUNT = 0;
 constexpr const char* CONTROL_DEVICE_PERMISSION = "ohos.permission.CONTROL_DEVICE";
@@ -63,20 +61,6 @@ const char* GetTouchControllerActionName(TouchControllerOperation operation)
     }
 }
 
-const char* GetTouchControllerStateErrorMsg(TouchControllerOperation operation)
-{
-    switch (operation) {
-        case TouchControllerOperation::DOWN:
-            return TOUCH_DOWN_STATE_ERROR_MSG;
-        case TouchControllerOperation::MOVE:
-        case TouchControllerOperation::UP:
-            return TOUCH_NOT_DOWN_STATE_ERROR_MSG;
-        case TouchControllerOperation::CREATE:
-        default:
-            return "Input service exception.";
-    }
-}
-
 int32_t NormalizeTouchControllerErrorCode(int32_t code)
 {
     if (code == ERROR_NO_PERMISSION) {
@@ -90,7 +74,17 @@ int32_t NormalizeTouchControllerErrorCode(int32_t code)
 
 int32_t GetExposedTouchControllerErrorCode(int32_t code)
 {
-    return code == TOUCH_ID_INVALID_ERROR ? ERROR_CODE_STATE_ERROR : code;
+    switch (code) {
+        case COMMON_PERMISSION_CHECK_ERROR:
+        case COMMON_PARAMETER_ERROR:
+        case INPUT_DEVICE_NOT_SUPPORTED:
+        case CONTROLLER_INPUT_SERVICE_EXCEPTION:
+        case ERROR_CODE_STATE_ERROR:
+        case CONTROLLER_DISPLAY_NOT_EXIST:
+            return code;
+        default:
+            return CONTROLLER_INPUT_SERVICE_EXCEPTION;
+    }
 }
 
 std::string MakePermissionErrorMsg(int32_t code, TouchControllerOperation operation)
@@ -113,11 +107,8 @@ std::string GetTouchControllerErrorMsg(int32_t code, TouchControllerOperation op
     if (code == COMMON_PERMISSION_CHECK_ERROR) {
         return MakePermissionErrorMsg(code, operation);
     }
-    if (code == TOUCH_ID_INVALID_ERROR) {
-        return TOUCH_ID_INVALID_ERROR_MSG;
-    }
     if (code == ERROR_CODE_STATE_ERROR) {
-        return GetTouchControllerStateErrorMsg(operation);
+        return TOUCH_STATE_ERROR_MSG;
     }
     NapiError codeMsg;
     if (UtilNapiError::GetApiError(code, codeMsg)) {
@@ -153,18 +144,40 @@ void ThrowTouchControllerError(napi_env env, int32_t code,
     napi_throw(env, businessError);
 }
 
+bool ParseTouchPointField(napi_env env, napi_value value, const char* name, int32_t &field)
+{
+    napi_value property = nullptr;
+    if (napi_get_named_property(env, value, name, &property) != napi_ok) {
+        MMI_HILOGE("Get touch point property %{public}s failed", name);
+        THROWERR_API9(env, COMMON_PARAMETER_ERROR, name, "number");
+        return false;
+    }
+    napi_valuetype type = napi_undefined;
+    if (napi_typeof(env, property, &type) != napi_ok || type != napi_number) {
+        MMI_HILOGE("Touch point property %{public}s is not number", name);
+        THROWERR_API9(env, COMMON_PARAMETER_ERROR, name, "number");
+        return false;
+    }
+    if (napi_get_value_int32(env, property, &field) != napi_ok) {
+        MMI_HILOGE("Get touch point property %{public}s int32 value failed", name);
+        THROWERR_API9(env, COMMON_PARAMETER_ERROR, name, "number");
+        return false;
+    }
+    return true;
+}
+
 bool ParseTouchPoint(napi_env env, napi_value value, TouchPointParams &touchPoint)
 {
-    if (GetNamedPropertyInt32(env, value, "id", touchPoint.id) != RET_OK) {
+    if (!ParseTouchPointField(env, value, "id", touchPoint.id)) {
         return false;
     }
-    if (GetNamedPropertyInt32(env, value, "displayId", touchPoint.displayId) != RET_OK) {
+    if (!ParseTouchPointField(env, value, "displayId", touchPoint.displayId)) {
         return false;
     }
-    if (GetNamedPropertyInt32(env, value, "displayX", touchPoint.displayX) != RET_OK) {
+    if (!ParseTouchPointField(env, value, "displayX", touchPoint.displayX)) {
         return false;
     }
-    if (GetNamedPropertyInt32(env, value, "displayY", touchPoint.displayY) != RET_OK) {
+    if (!ParseTouchPointField(env, value, "displayY", touchPoint.displayY)) {
         return false;
     }
     return true;
