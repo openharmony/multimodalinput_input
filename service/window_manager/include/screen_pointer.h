@@ -16,6 +16,8 @@
 #ifndef SCREEN_POINTER_H
 #define SCREEN_POINTER_H
 
+#include <atomic>
+
 #include "screen_info.h"
 
 #include "hardware_cursor_pointer_manager.h"
@@ -174,7 +176,7 @@ public:
 
     uint32_t GetBufferId()
     {
-        return bufferId_;
+        return bufferId_.load(std::memory_order_relaxed);
     }
 
     void SetMirrorWidth(const uint32_t mirrorWidth)
@@ -257,7 +259,7 @@ private:
     buffer_ptr_t defaultBuffer_{nullptr};
     buffer_ptr_t currentBuffer_{nullptr};
     std::vector<buffer_ptr_t> commonBuffers_;
-    uint32_t bufferId_ {0};
+    std::atomic<uint32_t> bufferId_ {0};
 
     // isCurrentOffScreenRendering
     bool isCurrentOffScreenRendering_ = false;
