@@ -16340,5 +16340,174 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_RemovePixelMapData_005
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager.RemovePixelMapData(windowId));
     EXPECT_EQ(inputWindowsManager.transparentWins_.count(windowId), 0u);
 }
+
+/**
+ * @tc.name: InputWindowsManagerTest_TouchRedispatchWindowLock_001
+ * @tc.desc: Test MOVE/UP should reuse DOWN's windowId from TouchRedispatchStore
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_TouchRedispatchWindowLock_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto inputWindowsManager = std::make_shared<InputWindowsManager>();
+    ASSERT_NE(inputWindowsManager, nullptr);
+    auto& store = inputWindowsManager->touchRedispatchStore_;
+
+    int32_t deviceId = 1;
+    int32_t pointerId = 0;
+    float zOrder = 1.0f;
+    int32_t downWindowId = 42;
+
+    std::shared_ptr<PointerEvent> downEvent = PointerEvent::Create();
+    ASSERT_NE(downEvent, nullptr);
+    downEvent->SetTargetWindowId(downWindowId);
+    downEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+    downEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
+    downEvent->SetDeviceId(deviceId);
+    downEvent->SetPointerId(pointerId);
+    downEvent->SetZOrder(zOrder);
+    PointerEvent::PointerItem item;
+    item.SetPointerId(pointerId);
+    downEvent->AddPointerItem(item);
+
+    store.SetFingerActive(zOrder, deviceId, pointerId, downEvent);
+    EXPECT_TRUE(store.IsFingerActive(zOrder, deviceId, pointerId));
+    EXPECT_EQ(store.GetFingerWindowId(zOrder, deviceId, pointerId), downWindowId);
+
+    PointerEvent::PointerItem moveItem;
+    moveItem.SetPointerId(pointerId);
+    moveItem.SetTargetWindowId(-1);
+    std::shared_ptr<PointerEvent> moveEvent = PointerEvent::Create();
+    ASSERT_NE(moveEvent, nullptr);
+    moveEvent->SetTargetWindowId(-1);
+    moveEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+    moveEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
+    moveEvent->SetDeviceId(deviceId);
+    moveEvent->SetPointerId(pointerId);
+    moveEvent->SetZOrder(zOrder);
+    moveEvent->AddPointerItem(moveItem);
+
+    EXPECT_TRUE(store.IsFingerActive(zOrder, deviceId, pointerId));
+    int32_t savedWindowId = store.GetFingerWindowId(zOrder, deviceId, pointerId);
+    EXPECT_EQ(savedWindowId, downWindowId);
+
+    moveEvent->SetTargetWindowId(savedWindowId);
+    moveItem.SetTargetWindowId(savedWindowId);
+    moveEvent->UpdatePointerItem(pointerId, moveItem);
+    EXPECT_EQ(moveEvent->GetTargetWindowId(), downWindowId);
+    PointerEvent::PointerItem checkItem;
+    ASSERT_TRUE(moveEvent->GetPointerItem(pointerId, checkItem));
+    EXPECT_EQ(checkItem.GetTargetWindowId(), downWindowId);
+
+    PointerEvent::PointerItem upItem;
+    upItem.SetPointerId(pointerId);
+    std::shared_ptr<PointerEvent> upEvent = PointerEvent::Create();
+    ASSERT_NE(upEvent, nullptr);
+    upEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+    upEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
+    upEvent->SetDeviceId(deviceId);
+    upEvent->SetPointerId(pointerId);
+    upEvent->SetZOrder(zOrder);
+    upEvent->AddPointerItem(upItem);
+
+    EXPECT_FALSE(store.Abandon(upEvent));
+    EXPECT_FALSE(store.IsFingerActive(zOrder, deviceId, pointerId));
+    EXPECT_EQ(store.GetFingerWindowId(zOrder, deviceId, pointerId), -1);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_TouchRedispatchWindowLock_002
+ * @tc.desc: Test inactive finger should not get window lock
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_TouchRedispatchWindowLock_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto inputWindowsManager = std::make_shared<InputWindowsManager>();
+    ASSERT_NE(inputWindowsManager, nullptr);
+    auto& store = inputWindowsManager->touchRedispatchStore_;
+
+    int32_t deviceId = 1;
+    int32_t pointerId = 5;
+    float zOrder = 2.0f;
+
+    EXPECT_FALSE(store.IsFingerActive(zOrder, deviceId, pointerId));
+    EXPECT_EQ(store.GetFingerWindowId(zOrder, deviceId, pointerId), -1);
+
+    std::shared_ptr<PointerEvent> moveEvent = PointerEvent::Create();
+    ASSERT_NE(moveEvent, nullptr);
+    moveEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+    moveEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
+    moveEvent->SetDeviceId(deviceId);
+    moveEvent->SetPointerId(pointerId);
+    moveEvent->SetZOrder(zOrder);
+    EXPECT_TRUE(store.Abandon(moveEvent));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_IsRealFingerDown_001
+ * @tc.desc: Test IsRealFingerDown returns true when real DOWN exists with flag=true
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsRealFingerDown_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto inputWindowsManager = std::make_shared<InputWindowsManager>();
+    ASSERT_NE(inputWindowsManager, nullptr);
+
+    int32_t deviceId = 1;
+    int32_t pointerId = 0;
+    int32_t windowId = 42;
+
+    EXPECT_FALSE(inputWindowsManager->IsRealFingerDown(deviceId, pointerId));
+
+    WindowInfo windowInfo;
+    windowInfo.id = windowId;
+    WindowInfoEX windowInfoEX;
+    windowInfoEX.window = windowInfo;
+    windowInfoEX.flag = true;
+    inputWindowsManager->touchItemDownInfos_[deviceId][pointerId] = windowInfoEX;
+
+    EXPECT_TRUE(inputWindowsManager->IsRealFingerDown(deviceId, pointerId));
+
+    inputWindowsManager->touchItemDownInfos_[deviceId][pointerId].flag = false;
+    EXPECT_FALSE(inputWindowsManager->IsRealFingerDown(deviceId, pointerId));
+
+    inputWindowsManager->touchItemDownInfos_.clear();
+    EXPECT_FALSE(inputWindowsManager->IsRealFingerDown(deviceId, pointerId));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_IsRealFingerDown_002
+ * @tc.desc: Test IsRealFingerDown with different deviceId/pointerId combinations
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsRealFingerDown_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto inputWindowsManager = std::make_shared<InputWindowsManager>();
+    ASSERT_NE(inputWindowsManager, nullptr);
+
+    int32_t deviceId = 2;
+    int32_t pointerId = 3;
+    int32_t otherDeviceId = 99;
+    int32_t otherPointerId = 88;
+
+    WindowInfo windowInfo;
+    windowInfo.id = 10;
+    WindowInfoEX windowInfoEX;
+    windowInfoEX.window = windowInfo;
+    windowInfoEX.flag = true;
+    inputWindowsManager->touchItemDownInfos_[deviceId][pointerId] = windowInfoEX;
+
+    EXPECT_TRUE(inputWindowsManager->IsRealFingerDown(deviceId, pointerId));
+    EXPECT_FALSE(inputWindowsManager->IsRealFingerDown(otherDeviceId, pointerId));
+    EXPECT_FALSE(inputWindowsManager->IsRealFingerDown(deviceId, otherPointerId));
+    EXPECT_FALSE(inputWindowsManager->IsRealFingerDown(otherDeviceId, otherPointerId));
+}
 } // namespace MMI
 } // namespace OHOS

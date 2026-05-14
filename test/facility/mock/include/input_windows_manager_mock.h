@@ -157,6 +157,7 @@ public:
     bool AbandonMouseRedispatch(const std::shared_ptr<PointerEvent>& pointerEvent) override { return false; }
     MouseRedispatchStore& GetMouseRedispatchStore() override { return mouseStore_; }
     TouchRedispatchStore& GetTouchRedispatchStore() override { return touchStore_; }
+    bool IsRealFingerDown(int32_t deviceId, int32_t pointerId) override { return false; }
 #ifdef OHOS_BUILD_ENABLE_ANCO
     void InitializeAnco() override {}
     void SimulatePointerExt(std::shared_ptr<PointerEvent> pointerEvent) override {}
