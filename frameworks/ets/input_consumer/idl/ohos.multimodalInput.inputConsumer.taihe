@@ -59,61 +59,61 @@ enum ShieldMode: i32 {
 }
 
 @!sts_inject("""
-    function on(type: 'key', keyOptions: KeyOptions, callback: (info: KeyOptions) => void) {
+    function on(type: 'key', keyOptions: KeyOptions, callback: (info: KeyOptions) => void): void {
         return onKeyImpl(keyOptions, callback, callback);
     }
-    function off(type: 'key', keyOptions: KeyOptions, callback?: (info: KeyOptions) => void) {
+    function off(type: 'key', keyOptions: KeyOptions, callback?: (info: KeyOptions) => void): void {
         return offKeyImpl(keyOptions, callback);
     }
 """)
 @!sts_inject("""
-    function on(type: 'hotkeyChange', hotkeyOptions: HotkeyOptions, callback: (info: HotkeyOptions) => void) {
+    function on(type: 'hotkeyChange', hotkeyOptions: HotkeyOptions, callback: (info: HotkeyOptions) => void): void {
         return onHotkeyChangeImpl(hotkeyOptions, callback, callback);
     }
-    function off(type: 'hotkeyChange', hotkeyOptions: HotkeyOptions, callback?: (info: HotkeyOptions) => void) {
+    function off(type: 'hotkeyChange', hotkeyOptions: HotkeyOptions, callback?: (info: HotkeyOptions) => void): void {
         return offHotkeyChangeImpl(hotkeyOptions, callback);
     }
 """)
 @!sts_inject("""
     function on(type: 'keyPressed', options: KeyPressedConfig,
-        callback: (info: ohos_multimodalInput_keyEvent.KeyEvent) => void) {
+        callback: (info: ohos_multimodalInput_keyEvent.KeyEvent) => void): void {
         return onKeyPressedImpl(options, callback, callback);
     }
-    function off(type: 'keyPressed', callback?: (info: ohos_multimodalInput_keyEvent.KeyEvent) => void) {
+    function off(type: 'keyPressed', callback?: (info: ohos_multimodalInput_keyEvent.KeyEvent) => void): void {
         return offKeyPressedImpl(callback);
     }
 """)
 
 @!sts_inject("""
-    function onKey(keyOptions: KeyOptions, callback: (info: KeyOptions) => void) {
+    function onKey(keyOptions: KeyOptions, callback: (info: KeyOptions) => void): void {
         return onKeyImpl(keyOptions, callback, callback);
     }
-    function offKey(keyOptions: KeyOptions, callback?: (info: KeyOptions) => void) {
+    function offKey(keyOptions: KeyOptions, callback?: (info: KeyOptions) => void): void {
         return offKeyImpl(keyOptions, callback);
     }
 """)
 @!sts_inject("""
-    function onKey(keyOptions: KeyOptions, callback: (keyOptions: KeyOptions, keyEvent: ohos_multimodalInput_keyEvent.KeyEvent) => void) {
+    function onKey(keyOptions: KeyOptions, callback: (keyOptions: KeyOptions, keyEvent: ohos_multimodalInput_keyEvent.KeyEvent) => void): void {
         return onKeyCommandImpl(keyOptions, callback, callback);
     }
-    function offKey(keyOptions: KeyOptions, callback?: (keyOptions: KeyOptions, keyEvent: ohos_multimodalInput_keyEvent.KeyEvent) => void) {
+    function offKey(keyOptions: KeyOptions, callback?: (keyOptions: KeyOptions, keyEvent: ohos_multimodalInput_keyEvent.KeyEvent) => void): void {
         return offKeyCommandImpl(keyOptions, callback);
     }
 """)
 @!sts_inject("""
-    function onHotkeyChange(hotkeyOptions: HotkeyOptions, callback: (info: HotkeyOptions) => void) {
+    function onHotkeyChange(hotkeyOptions: HotkeyOptions, callback: (info: HotkeyOptions) => void): void {
         return onHotkeyChangeImpl(hotkeyOptions, callback, callback);
     }
-    function offHotkeyChange(hotkeyOptions: HotkeyOptions, callback?: (info: HotkeyOptions) => void) {
+    function offHotkeyChange(hotkeyOptions: HotkeyOptions, callback?: (info: HotkeyOptions) => void): void {
         return offHotkeyChangeImpl(hotkeyOptions, callback);
     }
 """)
 @!sts_inject("""
     function onKeyPressed(options: KeyPressedConfig,
-        callback: (info: ohos_multimodalInput_keyEvent.KeyEvent) => void) {
+        callback: (info: ohos_multimodalInput_keyEvent.KeyEvent) => void): void {
         return onKeyPressedImpl(options, callback, callback);
     }
-    function offKeyPressed(callback?: (info: ohos_multimodalInput_keyEvent.KeyEvent) => void) {
+    function offKeyPressed(callback?: (info: ohos_multimodalInput_keyEvent.KeyEvent) => void): void {
         return offKeyPressedImpl(callback);
     }
 """)

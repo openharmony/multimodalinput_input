@@ -150,19 +150,19 @@ function GetKeyboardTypeSync(deviceId: i32): KeyboardType;
 function GetKeyboardTypeSyncWrapper(deviceId: i32): KeyboardType;
 
 @!sts_inject("""
-    function on(type: 'change', callback: (info: DeviceListener) => void) {
+    function on(type: 'change', callback: (info: DeviceListener) => void): void {
         return onKeyImpl(callback, callback);
     }
-    function off(type: 'change', callback?: (info: DeviceListener) => void) {
+    function off(type: 'change', callback?: (info: DeviceListener) => void): void {
         return offKeyImpl(callback);
     }
 """)
 
 @!sts_inject("""
-    function onChange(callback: (info: DeviceListener) => void) {
+    function onChange(callback: (info: DeviceListener) => void): void {
         return onKeyImpl(callback, callback);
     }
-    function offChange(callback?: (info: DeviceListener) => void) {
+    function offChange(callback?: (info: DeviceListener) => void): void {
         return offKeyImpl(callback);
     }
 """)
