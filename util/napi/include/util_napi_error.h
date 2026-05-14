@@ -49,9 +49,7 @@ enum NapiErrorCode : int32_t {
     INPUT_SERVICE_EXCEPTION = 3800001,
 };
 
-constexpr const char* TOUCH_DOWN_STATE_ERROR_MSG = "The touch point is touching the display.";
-constexpr const char* TOUCH_NOT_DOWN_STATE_ERROR_MSG = "The touch point is not touching the display.";
-constexpr const char* TOUCH_ID_INVALID_ERROR_MSG = "The touch point ID is not within the valid range [0,9].";
+constexpr const char* TOUCH_STATE_ERROR_MSG = "Invalid input event sequence.";
 
 const std::map<int32_t, NapiError> NAPI_ERRORS = {
     { COMMON_PERMISSION_CHECK_ERROR,
@@ -70,8 +68,7 @@ const std::map<int32_t, NapiError> NAPI_ERRORS = {
     { INPUT_OCCUPIED_BY_SYSTEM, { INPUT_OCCUPIED_BY_SYSTEM, "The hotkey has been subscribed by system." } },
     { INPUT_OCCUPIED_BY_OTHER, { INPUT_OCCUPIED_BY_OTHER, "The hotkey has been subscribed by other one." } },
     { CONTROLLER_INPUT_SERVICE_EXCEPTION, { CONTROLLER_INPUT_SERVICE_EXCEPTION, "Input service exception." } },
-    { ERROR_CODE_STATE_ERROR, { ERROR_CODE_STATE_ERROR,
-        "Controller state error. The operation is invalid in current state." } },
+    { ERROR_CODE_STATE_ERROR, { ERROR_CODE_STATE_ERROR, TOUCH_STATE_ERROR_MSG } },
     { CONTROLLER_DISPLAY_NOT_EXIST, { CONTROLLER_DISPLAY_NOT_EXIST,
         "The display does not exist." } },
     { INPUT_SERVICE_EXCEPTION, { INPUT_SERVICE_EXCEPTION, "Input service exception." } },
