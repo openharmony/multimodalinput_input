@@ -164,17 +164,39 @@ bool TouchRedispatchStore::Abandon(const std::shared_ptr<PointerEvent>& pointerE
     int32_t deviceId = pointerEvent->GetDeviceId();
     int32_t pointerId = pointerEvent->GetPointerId();
     float zOrder = pointerEvent->GetZOrder();
+    PointerEvent::PointerItem pointerItem;
+    int32_t toolType = PointerEvent::TOOL_TYPE_FINGER;
+    if (pointerEvent->GetPointerItem(pointerId, pointerItem)) {
+        toolType = pointerItem.GetToolType();
+    }
+    int32_t action = pointerEvent->GetPointerAction();
+    if (toolType == PointerEvent::TOOL_TYPE_PEN &&
+        action == PointerEvent::POINTER_ACTION_PROXIMITY_IN) {
+        SetFingerActive(zOrder, deviceId, pointerId, pointerEvent);
+        MMI_HILOGD("Auto-activate pen on PROXIMITY_IN, z:%{public}f d:%{public}d p:%{public}d",
+            zOrder, deviceId, pointerId);
+        return false;
+    }
     if (!IsFingerActive(zOrder, deviceId, pointerId)) {
-        MMI_HILOGD("Abandon touch redispatch, z:%{public}f d:%{public}d p:%{public}d not active",
+        MMI_HILOGD("Abandon touch redispatch, not active, z:%{public}f d:%{public}d p:%{public}d",
             zOrder, deviceId, pointerId);
         return true;
     }
-    int32_t action = pointerEvent->GetPointerAction();
-    if (action == PointerEvent::POINTER_ACTION_UP ||
-        action == PointerEvent::POINTER_ACTION_CANCEL ||
-        action == PointerEvent::POINTER_ACTION_HOVER_CANCEL ||
-        action == PointerEvent::POINTER_ACTION_HOVER_EXIT) {
-        DeactivateFinger(zOrder, deviceId, pointerId);
+    if (toolType == PointerEvent::TOOL_TYPE_PEN) {
+        if (action == PointerEvent::POINTER_ACTION_PROXIMITY_OUT) {
+            DeactivateFinger(zOrder, deviceId, pointerId);
+            MMI_HILOGD("Deactivate pen on PROXIMITY_OUT, d:%{public}d p:%{public}d",
+                deviceId, pointerId);
+        }
+    } else {
+        if (action == PointerEvent::POINTER_ACTION_UP ||
+            action == PointerEvent::POINTER_ACTION_CANCEL ||
+            action == PointerEvent::POINTER_ACTION_HOVER_CANCEL ||
+            action == PointerEvent::POINTER_ACTION_HOVER_EXIT) {
+            DeactivateFinger(zOrder, deviceId, pointerId);
+            MMI_HILOGD("Deactivate finger on action:%{public}d, d:%{public}d p:%{public}d",
+                action, deviceId, pointerId);
+        }
     }
     return false;
 }
