@@ -116,7 +116,7 @@ HWTEST_F(PointerDrawingManagerSupTest, PointerDrawingManagerSupTest_DrawDynamicH
 
     PointerRenderer renderer;
     ASSERT_TRUE(screenpointer->Init(renderer));
-    screenpointer->bufferId_ = 5;
+    screenpointer->bufferId_.store(5, std::memory_order_relaxed);
     cfg.style_ = TRANSPARENT_ICON;
     rlt = pointerDrawingManager.DrawDynamicHardwareCursor(screenpointer, cfg);
     EXPECT_EQ(rlt, RET_OK);

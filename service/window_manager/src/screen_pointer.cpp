@@ -219,10 +219,11 @@ buffer_ptr_t ScreenPointer::GetCommonBuffer()
         return nullptr;
     }
 
-    bufferId_++;
-    bufferId_ %= bufferSize;
-    currentBuffer_ = commonBuffers_[bufferId_];
-    return commonBuffers_[bufferId_];
+    uint32_t newId = bufferId_.load(std::memory_order_relaxed) + 1;
+    newId %= bufferSize;
+    bufferId_.store(newId, std::memory_order_relaxed);
+    currentBuffer_ = commonBuffers_[newId];
+    return commonBuffers_[newId];
 }
 
 buffer_ptr_t ScreenPointer::RequestBuffer(const RenderConfig &cfg, bool &isCommonBuffer)
@@ -514,7 +515,8 @@ bool ScreenPointer::Move(int32_t x, int32_t y)
     }
     int32_t px = x - FOCUS_POINT;
     int32_t py = y - FOCUS_POINT;
-    BytraceAdapter::StartHardPointerMove(buffer->GetWidth(), buffer->GetHeight(), bufferId_, screenId_);
+    uint32_t bid = bufferId_.load(std::memory_order_relaxed);
+    BytraceAdapter::StartHardPointerMove(buffer->GetWidth(), buffer->GetHeight(), bid, screenId_);
     auto ret = hwcMgr_->SetPosition(screenId_, px, py, bh);
     BytraceAdapter::StopHardPointerMove();
     if (ret != RET_OK) {

@@ -637,7 +637,7 @@ HWTEST_F(ScreenPointerTest, ScreenPointerTest_RequestBuffer_001, TestSize.Level1
     ASSERT_NE(screenpointer, nullptr);
     PointerRenderer renderer;
     ASSERT_TRUE(screenpointer->Init(renderer));
-    screenpointer->bufferId_ = 5;
+    screenpointer->bufferId_.store(5, std::memory_order_relaxed);
     bool isCommonBuffer;
     const RenderConfig cfg = {
         .style_ = TRANSPARENT_ICON,
@@ -665,7 +665,7 @@ HWTEST_F(ScreenPointerTest, ScreenPointerTest_RequestBuffer_002, TestSize.Level1
     ASSERT_NE(screenpointer, nullptr);
     PointerRenderer renderer;
     ASSERT_TRUE(screenpointer->Init(renderer));
-    screenpointer->bufferId_ = 5;
+    screenpointer->bufferId_.store(5, std::memory_order_relaxed);
     RenderConfig defaultCursorCfg {
         .style_ = MOUSE_ICON::DEFAULT,
         .align_ = ICON_TYPE::ANGLE_NW,
@@ -749,9 +749,9 @@ HWTEST_F(ScreenPointerTest, ScreenPointerTest_OnDisplayInfo_001, TestSize.Level1
     di.id = 1;
     ScreenPointer* screenpointer = new ScreenPointer(hwcmgr, handler, di);
     ASSERT_NE(screenpointer, nullptr);
-    screenpointer->bufferId_ = 5;
+    screenpointer->bufferId_.store(5, std::memory_order_relaxed);
     EXPECT_NO_FATAL_FAILURE(screenpointer->OnDisplayInfo(di));
-    screenpointer->bufferId_ = 1;
+    screenpointer->bufferId_.store(1, std::memory_order_relaxed);
     screenpointer->isCurrentOffScreenRendering_ = true;
     EXPECT_NO_FATAL_FAILURE(screenpointer->OnDisplayInfo(di));
     screenpointer->isCurrentOffScreenRendering_ = false;
