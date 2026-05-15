@@ -1,67 +1,42 @@
-# Repository Guidelines
+# 多模输入组件指引
 
-## Project Structure & Module Organization
+## 项目定位
 
-This is the OpenHarmony multimodal input component at `foundation/multimodalinput/input`. Core server logic is in `service/`; client/proxy code is in `frameworks/proxy/`; JS/NAPI, ETS, and native APIs are in `frameworks/` and `interfaces/`. Shared helpers live in `common/` and `util/`. Runtime configuration is under `etc/`, `sa_profile/`, `multimodalinput.cfg`, and `mmi_uinput.rc`. Tests are colocated in module `test/` directories, with fuzz targets under `test/fuzztest/`.
+本仓库对应 OpenHarmony `foundation/multimodalinput/input`。优先按这些目录定位问题：
 
-## Build, Test, and Development Commands
+- `service/`：服务端输入处理、分发、窗口管理、设备管理和指针绘制。
+- `frameworks/`、`interfaces/`：Native、NAPI、ETS 和 C API。
+- `common/`、`util/`：共享工具和基础结构。
+- `etc/`、`sa_profile/`、`multimodalinput.cfg`、`mmi_uinput.rc`：运行配置。
+- `test/`、`test/fuzztest/`：单元测试和 fuzz 目标。
 
-Run build commands from the OpenHarmony source root, not this subdirectory.
+## 构建和验证
+
+构建命令从 OpenHarmony 源码根目录执行，不在本子目录执行。
 
 ```sh
 ./build.sh --product-name rk3568 --build-target input --ccache
-```
-
-Builds the input component for `rk3568`.
-
-```sh
 prebuilts/build-tools/linux-x86/bin/ninja -C out/rk3568 InputWindowsManagerTest
 ```
 
-Incrementally builds one unit-test target after GN output exists.
+涉及真实窗口、显示、设备、图形或服务集成的行为，需要补充板侧证据。提交使用 `git commit -s`，并保留 `Co-Authored-By: Agent`。
 
-```sh
-hdc file send out/rk3568/tests/unittest/input/input/InputWindowsManagerTest <device-temp-dir>/
-hdc shell "cd <device-temp-dir> && ./InputWindowsManagerTest"
-```
+## 知识索引
 
-Pushes and runs a board-side test binary.
+稳定背景知识放在 `docs/knowledge/`。改动前按场景读取对应文件：
 
-## Coding Style & Naming Conventions
-
-Most code is C++ built with GN. Follow nearby style: 4-space indentation, `CamelCase` types, `lowerCamelCase` functions and locals, and trailing `_` for member fields. Keep GN targets aligned with existing `BUILD.gn` files. Prefer existing macros and helpers such as `CHKPV`, `CHKPR`, `MMI_HILOG*`, `RET_OK`, and `RET_ERR`.
-
-## Testing Guidelines
-
-Unit tests use GoogleTest/HWTEST (`HWTEST_F`, `EXPECT_*`, `ASSERT_*`) through `ohos_unittest` targets. Name tests descriptively, commonly `Feature_Behavior_001`. Add or update the closest module test when changing service logic, API behavior, event dispatch, or configuration parsing. Keep tests deterministic and clean up singleton or global state touched during setup.
-
-## Commit & Pull Request Guidelines
-
-Recent history uses concise Conventional Commit prefixes such as `fix:`, `docs:`, and `test:`. Keep commits scoped to one logical change. PRs should summarize behavior, list affected modules, link related issues or design docs, and include build/test evidence. Include board-side results for input dispatch, device, or window-manager changes.
-
-## Architecture Principles
-
-Keep input processing stages explicit: normalize raw events, resolve targets, dispatch to consumers, then update drawing or rendering state. Avoid mixing policy decisions into low-level parsing or transport code. Prefer context objects over scattered global state, and allocate optional feature state lazily. Maintain clear ownership between `service/`, `frameworks/`, and `interfaces/`.
-
-## Agent-Specific Instructions
-
-Do not revert unrelated user changes in a dirty worktree. Prefer `rg` for search and keep edits narrowly scoped to existing module boundaries. Document non-obvious behavior in the closest design or test file.
-
-## Multimodal Input Knowledge
-
-Stable multimodal input background lives under `docs/knowledge/`. Before code changes in these areas, read the matching file:
-
-| Area | Read first |
+| 场景 | 先读 |
 | --- | --- |
-| Event flow: dispatch, target selection, hit testing, coordinates, synthetic events, cursor updates, high-frequency move/draw paths | `docs/knowledge/input-event-pipeline.md` |
-| Display/window scope: display groups, focus isolation, capture/cancel/axis-end/redispatch, default-group fallback | `docs/knowledge/display-group-model.md` |
-| Device scope: device/display binding, hotplug, virtual/remote devices, joystick/tablet/stylus/touchpad rules, lifecycle cleanup | `docs/knowledge/input-device-scope.md` |
-| Context state: mouse/cursor caches, capture state, pointer sequences, keyboard focus reissue, UDS dispatch state, lazy allocation | `docs/knowledge/input-context-state.md` |
-| Verification: build, board-side tests, PR evidence, rebuilt shared libraries, public API or configuration behavior | `docs/knowledge/board-verification.md` |
+| 事件归一化、目标选择、命中测试、坐标转换、分发、合成事件、高频移动/绘制路径 | `docs/knowledge/input-event-pipeline.md` |
+| 显示组、焦点隔离、捕获、取消、axis-end、重分发、默认组回退 | `docs/knowledge/display-group-model.md` |
+| 设备/显示绑定、热插拔、虚拟/远端设备、摇杆、手写板、手写笔、触控板、生命周期清理 | `docs/knowledge/input-device-scope.md` |
+| 鼠标/光标缓存、捕获状态、指针序列、键盘焦点重发、UDS 分发状态、懒分配 | `docs/knowledge/input-context-state.md` |
+| 构建、板侧测试、PR 证据、重构建共享库、公开 API 或配置行为验证 | `docs/knowledge/board-verification.md` |
 
-## Project-Specific Constraints
+## 项目约束
 
-- Event dispatch and cursor rendering paths are high-frequency; do not add full-iteration scans, string formatting, or INFO logs in per-move or per-draw code.
-- Keep device-category-specific ownership rules explicit instead of folding them into unrelated routing paths.
-- Default-group state is valid for default initialization and legacy helper behavior. Non-default event chains should keep using their resolved context or sequence snapshot.
-- Keep optional feature state lazy; do not allocate dispatch or rendering context state for ordinary default paths unless the code path requires it.
+- 事件分发和光标绘制是高频路径，不要在每次移动或绘制中增加全量扫描、字符串格式化或 INFO 日志。
+- 设备分类的归属规则要保持显式，不要把手写板、手写笔、触控板、远端或虚拟输入规则折叠进通用鼠标/键盘路径。
+- 默认组状态只适合默认初始化和明确的遗留 helper。非默认事件链应继续使用已解析上下文或序列快照。
+- 可选上下文状态保持懒分配，不要为了普通默认路径预先分配分发或渲染上下文。
+- C++ 改动优先复用附近的 `CHKPV`、`CHKPR`、`MMI_HILOG*`、`RET_OK`、`RET_ERR` 等项目宏和返回约定。
