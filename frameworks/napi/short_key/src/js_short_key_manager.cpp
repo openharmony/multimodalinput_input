@@ -15,6 +15,8 @@
 
 #include "js_short_key_manager.h"
 
+#include "mmi_api_metrics_histograms.h"
+
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "JsShortKeyManager"
 
@@ -155,10 +157,12 @@ napi_value JsShortKeyManager::SetKeyDownDuration(napi_env env, const std::string
     if (ret == COMMON_USE_SYSAPI_ERROR) {
         MMI_HILOGE("Non system applications use system API");
         THROWERR_CUSTOM(env, COMMON_USE_SYSAPI_ERROR, "Non system applications use system API");
+        MMI_HISTOGRAM_ERROR("InputKit.shortKey.setKeyDownDuration.Error", COMMON_USE_SYSAPI_ERROR);
         return nullptr;
     } else if (ret == COMMON_PARAMETER_ERROR) {
         MMI_HILOGE("Invalid param");
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "param is invalid");
+        MMI_HISTOGRAM_ERROR("InputKit.shortKey.setKeyDownDuration.Error", COMMON_PARAMETER_ERROR);
         return nullptr;
     }
     sptr<AsyncContext> asyncContext = new (std::nothrow) AsyncContext(env);

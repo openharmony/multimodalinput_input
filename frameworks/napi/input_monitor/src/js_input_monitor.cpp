@@ -18,6 +18,7 @@
 #include "input_manager.h"
 #include "js_input_monitor_manager.h"
 #include "js_gesture_event.h"
+#include "mmi_api_metrics_histograms.h"
 #include "napi_constants.h"
 #include "util_napi_error.h"
 #include "util_napi_value.h"
@@ -2258,6 +2259,7 @@ void JsInputMonitor::CallJsQueryTouchEventsPromise(uv_work_t *work, int32_t stat
             MMI_HILOGE("The callResult is nullptr");
             return;
         }
+        MMI_HISTOGRAM_ERROR("InputKit.inputMonitor.queryTouchEvents.Error", cb->errCode);
         CHKRV_SCOPE(cb->env, napi_reject_deferred(cb->env, cb->deferred, callResult), REJECT_DEFERRED, scope);
     } else {
         JsQueryTouchEventsResolveDeferred(cb, scope, callResult);

@@ -44,7 +44,7 @@ extern std::mutex sCallBacksMutex;
 class JsCommon {
 public:
     static bool TypeOf(napi_env env, napi_value value, napi_valuetype type);
-    static void ThrowError(napi_env env, int32_t code);
+    static void ThrowError(napi_env env, int32_t code, std::function<void(int32_t)> histogramError);
 };
 
 struct KeyEventMonitorInfo : RefBase {

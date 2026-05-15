@@ -59,7 +59,7 @@ void JsInputMonitorManager::AddMonitor(napi_env jsEnv, const std::string &typeNa
     int32_t ret = monitor->Start(typeName);
     if (ret < 0) {
         MMI_HILOGE("Js monitor startup failed");
-        ThrowError(jsEnv, ret);
+        ThrowError(jsEnv, typeName, ret);
         return;
     }
     std::lock_guard<std::mutex> guard(mutex_);
@@ -83,7 +83,7 @@ void JsInputMonitorManager::AddMonitor(napi_env jsEnv, const std::string &typeNa
     int32_t ret = monitor->Start(typeName);
     if (ret < 0) {
         MMI_HILOGE("Js monitor startup failed");
-        ThrowError(jsEnv, ret);
+        ThrowError(jsEnv, typeName, ret);
         return;
     }
     std::lock_guard<std::mutex> guard(mutex_);
@@ -107,7 +107,7 @@ void JsInputMonitorManager::AddPreMonitor(napi_env jsEnv, const std::string &typ
     int32_t ret = monitor->Start(typeName);
     if (ret < 0) {
         MMI_HILOGE("Js monitor startup failed");
-        ThrowError(jsEnv, ret);
+        ThrowError(jsEnv, typeName, ret);
         return;
     }
     std::lock_guard<std::mutex> guard(mutex_);
@@ -360,17 +360,21 @@ bool JsInputMonitorManager::IsExisting(napi_env env)
     return true;
 }
 
-void JsInputMonitorManager::ThrowError(napi_env env, int32_t code)
+void JsInputMonitorManager::ThrowError(napi_env env, const std::string &typeName, int32_t code)
 {
     int32_t errorCode = -code;
     if (errorCode == MONITOR_REGISTER_EXCEED_MAX) {
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Maximum number of listeners exceeded for a single process");
+        JS_MONITOR_HISTOGRAM_ON_ERROR(typeName, COMMON_PARAMETER_ERROR);
     } else if (errorCode == COMMON_USE_SYSAPI_ERROR) {
         THROWERR_API9(env, COMMON_USE_SYSAPI_ERROR, "monitor", "Non system applications use system API");
+        JS_MONITOR_HISTOGRAM_ON_ERROR(typeName, COMMON_USE_SYSAPI_ERROR);
     } else if (errorCode == COMMON_PARAMETER_ERROR) {
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "monitor", "Parameter error.");
+        JS_MONITOR_HISTOGRAM_ON_ERROR(typeName, COMMON_PARAMETER_ERROR);
     } else if (errorCode == COMMON_PERMISSION_CHECK_ERROR) {
         THROWERR_API9(env, COMMON_PERMISSION_CHECK_ERROR, "monitor", "ohos.permission.INPUT_MONITORING");
+        JS_MONITOR_HISTOGRAM_ON_ERROR(typeName, COMMON_PERMISSION_CHECK_ERROR);
     } else {
         MMI_HILOGE("Add monitor failed");
     }

@@ -15,6 +15,8 @@
 
 #include "js_short_key_context.h"
 
+#include "mmi_api_metrics_histograms.h"
+
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "JsShortKeyContext"
 
@@ -144,6 +146,7 @@ std::shared_ptr<JsShortKeyManager> JsShortKeyContext::GetJsShortKeyMgr() const
 napi_value JsShortKeyContext::SetKeyDownDuration(napi_env env, napi_callback_info info)
 {
     CALL_DEBUG_ENTER;
+    MMI_HISTOGRAM_BOOLEAN("InputKit.shortKey.setKeyDownDuration.Call", true);
     size_t argc = 3;
     napi_value argv[3];
     CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
@@ -151,11 +154,13 @@ napi_value JsShortKeyContext::SetKeyDownDuration(napi_env env, napi_callback_inf
     if (argc < paramsNum) {
         MMI_HILOGE("At least 2 parameter is required");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "businessId", "string");
+        MMI_HISTOGRAM_ERROR("InputKit.shortKey.setKeyDownDuration.Error", COMMON_PARAMETER_ERROR);
         return nullptr;
     }
     if (!JsCommon::TypeOf(env, argv[0], napi_string)) {
         MMI_HILOGE("businessId parameter type is invalid");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "businessId", "string");
+        MMI_HISTOGRAM_ERROR("InputKit.shortKey.setKeyDownDuration.Error", COMMON_PARAMETER_ERROR);
         return nullptr;
     }
 
@@ -165,6 +170,7 @@ napi_value JsShortKeyContext::SetKeyDownDuration(napi_env env, napi_callback_inf
     if (ret <= 0) {
         MMI_HILOGE("Invalid businessId");
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "businessId is invalid");
+        MMI_HISTOGRAM_ERROR("InputKit.shortKey.setKeyDownDuration.Error", COMMON_PARAMETER_ERROR);
         return nullptr;
     }
 
@@ -173,11 +179,13 @@ napi_value JsShortKeyContext::SetKeyDownDuration(napi_env env, napi_callback_inf
     if (delay < MIN_DELAY || delay > MAX_DELAY) {
         MMI_HILOGE("Invalid delay");
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Delay is invalid");
+        MMI_HISTOGRAM_ERROR("InputKit.shortKey.setKeyDownDuration.Error", COMMON_PARAMETER_ERROR);
         return nullptr;
     }
     if (!JsCommon::TypeOf(env, argv[1], napi_number)) {
         MMI_HILOGE("Delay parameter type is invalid");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "delay", "number");
+        MMI_HISTOGRAM_ERROR("InputKit.shortKey.setKeyDownDuration.Error", COMMON_PARAMETER_ERROR);
         return nullptr;
     }
     JsShortKeyContext *jsShortKey = JsShortKeyContext::GetInstance(env);

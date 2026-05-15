@@ -15,6 +15,7 @@
 
 #include "input_manager.h"
 #include "js_register_util.h"
+#include "mmi_api_metrics_histograms.h"
 #include "napi_constants.h"
 #include "util_napi_error.h"
 #include "trigger_event_dispatcher.h"
@@ -89,15 +90,17 @@ bool JsCommon::TypeOf(napi_env env, napi_value value, napi_valuetype type)
     return true;
 }
 
-void JsCommon::ThrowError(napi_env env, int32_t code)
+void JsCommon::ThrowError(napi_env env, int32_t code, std::function<void(int32_t)> histogramError)
 {
     int32_t errorCode = std::abs(code);
     if (errorCode == COMMON_USE_SYSAPI_ERROR) {
         MMI_HILOGE("Non system applications use system API");
         THROWERR_CUSTOM(env, COMMON_USE_SYSAPI_ERROR, "Non system applications use system API");
+        histogramError(COMMON_USE_SYSAPI_ERROR);
     } else if (errorCode == COMMON_PERMISSION_CHECK_ERROR) {
         MMI_HILOGE("Shield api need ohos.permission.INPUT_CONTROL_DISPATCHING");
         THROWERR_API9(env, COMMON_PERMISSION_CHECK_ERROR, "shiled API", "ohos.permission.INPUT_CONTROL_DISPATCHING");
+        histogramError(COMMON_PERMISSION_CHECK_ERROR);
     } else {
         MMI_HILOGE("Dispatch control failed");
     }
@@ -114,7 +117,7 @@ static void EnvCleanUp(void *data)
 }
 
 napi_value GetHotkeyEventInfo(napi_env env, napi_callback_info info, sptr<KeyEventMonitorInfo> event,
-    std::shared_ptr<KeyOption> keyOption)
+    std::shared_ptr<KeyOption> keyOption, std::function<void(int32_t)> histogramError)
 {
     CALL_DEBUG_ENTER;
     CHKPP(event);
@@ -126,6 +129,7 @@ napi_value GetHotkeyEventInfo(napi_env env, napi_callback_info info, sptr<KeyEve
     CHKRP(napi_get_named_property(env, argv[1], "preKeys", &receiveValue), GET_NAMED_PROPERTY);
     if (receiveValue == nullptr) {
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "PreKeys not found");
+        histogramError(COMMON_PARAMETER_ERROR);
         return nullptr;
     }
     std::set<int32_t> preKeys;
@@ -136,6 +140,7 @@ napi_value GetHotkeyEventInfo(napi_env env, napi_callback_info info, sptr<KeyEve
     if (preKeys.size() <= 0 || preKeys.size() > PRE_KEYS_SIZE) {
         MMI_HILOGE("PreKeys size invalid");
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "PreKeys size invalid");
+        histogramError(COMMON_PARAMETER_ERROR);
         return nullptr;
     }
     MMI_HILOGD("PreKeys size:%{public}zu", preKeys.size());
@@ -146,6 +151,7 @@ napi_value GetHotkeyEventInfo(napi_env env, napi_callback_info info, sptr<KeyEve
         if (it == pressKeyCodes.end()) {
             MMI_HILOGE("PreKeys is not expect");
             THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "PreKeys size invalid");
+            histogramError(COMMON_PARAMETER_ERROR);
             return nullptr;
         }
         subKeyNames += std::to_string(item);
@@ -161,12 +167,14 @@ napi_value GetHotkeyEventInfo(napi_env env, napi_callback_info info, sptr<KeyEve
     if (finalKey < 0) {
         MMI_HILOGE("FinalKey:%{private}d is less 0, can not process", finalKey);
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "FinalKey must be greater than or equal to 0");
+        histogramError(COMMON_PARAMETER_ERROR);
         return nullptr;
     }
     auto it = std::find(finalKeyCodes.begin(), finalKeyCodes.end(), finalKey);
     if (it != finalKeyCodes.end()) {
         MMI_HILOGE("FinalKey is not expect");
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "FinalKey is not expect");
+        histogramError(COMMON_PARAMETER_ERROR);
         return nullptr;
     }
     subKeyNames += std::to_string(finalKey);
@@ -200,7 +208,7 @@ napi_value GetHotkeyEventInfo(napi_env env, napi_callback_info info, sptr<KeyEve
 }
 
 napi_value GetEventInfoAPI9(napi_env env, napi_callback_info info, sptr<KeyEventMonitorInfo> event,
-    std::shared_ptr<KeyOption> keyOption)
+    std::shared_ptr<KeyOption> keyOption, std::function<void(int32_t)> histogramError)
 {
     CALL_DEBUG_ENTER;
     CHKPP(event);
@@ -212,6 +220,7 @@ napi_value GetEventInfoAPI9(napi_env env, napi_callback_info info, sptr<KeyEvent
     CHKRP(napi_get_named_property(env, argv[1], "preKeys", &receiveValue), GET_NAMED_PROPERTY);
     if (receiveValue == nullptr) {
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "preKeys not found");
+        histogramError(COMMON_PARAMETER_ERROR);
         return nullptr;
     }
     std::set<int32_t> preKeys;
@@ -222,6 +231,7 @@ napi_value GetEventInfoAPI9(napi_env env, napi_callback_info info, sptr<KeyEvent
     if (preKeys.size() > PRE_KEYS_SIZE) {
         MMI_HILOGE("PreKeys size invalid");
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "preKeys size invalid");
+        histogramError(COMMON_PARAMETER_ERROR);
         return nullptr;
     }
     MMI_HILOGD("PreKeys size:%{public}zu", preKeys.size());
@@ -241,6 +251,7 @@ napi_value GetEventInfoAPI9(napi_env env, napi_callback_info info, sptr<KeyEvent
     if (finalKey < 0) {
         MMI_HILOGE("finalKey:%{private}d is less 0, can not process", finalKey);
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "finalKey must be greater than or equal to 0");
+        histogramError(COMMON_PARAMETER_ERROR);
         return nullptr;
     }
     subKeyNames += std::to_string(finalKey);
@@ -266,6 +277,7 @@ napi_value GetEventInfoAPI9(napi_env env, napi_callback_info info, sptr<KeyEvent
     if (finalKeyDownDuration < 0) {
         MMI_HILOGE("finalKeyDownDuration:%{public}d is less 0, can not process", finalKeyDownDuration);
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "finalKeyDownDuration must be greater than or equal to 0");
+        histogramError(COMMON_PARAMETER_ERROR);
         return nullptr;
     }
     subKeyNames += std::to_string(finalKeyDownDuration);
@@ -598,9 +610,13 @@ napi_value SubscribeKey(napi_env env, napi_callback_info info, sptr<KeyEventMoni
     std::shared_ptr<KeyOption> keyOption)
 {
     CALL_DEBUG_ENTER;
+    MMI_HISTOGRAM_BOOLEAN("InputKit.inputConsumer.on_key.Call", true);
     CHKPP(event);
     CHKPP(keyOption);
-    if (GetEventInfoAPI9(env, info, event, keyOption) == nullptr) {
+    auto histogramError = [](int32_t errorCode) {
+        MMI_HISTOGRAM_ERROR("InputKit.inputConsumer.on_key.Error", errorCode);
+    };
+    if (GetEventInfoAPI9(env, info, event, keyOption, histogramError) == nullptr) {
         MMI_HILOGE("GetEventInfoAPI9 failed");
         return nullptr;
     }
@@ -636,9 +652,13 @@ napi_value SubscribeHotkey(napi_env env, napi_callback_info info, sptr<KeyEventM
     std::shared_ptr<KeyOption> keyOption)
 {
     CALL_DEBUG_ENTER;
+    MMI_HISTOGRAM_BOOLEAN("InputKit.inputConsumer.on_hotkeyChange.Call", true);
     CHKPP(event);
     CHKPP(keyOption);
-    if (GetHotkeyEventInfo(env, info, event, keyOption) == nullptr) {
+    auto histogramError = [](int32_t errorCode) {
+        MMI_HISTOGRAM_ERROR("InputKit.inputConsumer.on_hotkeyChange.Error", errorCode);
+    };
+    if (GetHotkeyEventInfo(env, info, event, keyOption, histogramError) == nullptr) {
         MMI_HILOGE("GetHotkeyEventInfo failed");
         return nullptr;
     }
@@ -651,16 +671,19 @@ napi_value SubscribeHotkey(napi_env env, napi_callback_info info, sptr<KeyEventM
         if (subscribeId == ERROR_UNSUPPORT) {
             MMI_HILOGE("SubscribeId invalid:%{public}d", subscribeId);
             THROWERR_CUSTOM(env, INPUT_DEVICE_NOT_SUPPORTED, "Hotkey occupied by other");
+            MMI_HISTOGRAM_ERROR("InputKit.inputConsumer.on_hotkeyChange.Error", INPUT_DEVICE_NOT_SUPPORTED);
             return nullptr;
         }
         if (subscribeId == OCCUPIED_BY_SYSTEM) {
             MMI_HILOGE("SubscribeId invalid:%{public}d", subscribeId);
             THROWERR_CUSTOM(env, INPUT_OCCUPIED_BY_SYSTEM, "Hotkey occupied by system");
+            MMI_HISTOGRAM_ERROR("InputKit.inputConsumer.on_hotkeyChange.Error", INPUT_OCCUPIED_BY_SYSTEM);
             return nullptr;
         }
         if (subscribeId == OCCUPIED_BY_OTHER) {
             MMI_HILOGE("SubscribeId invalid:%{public}d", subscribeId);
             THROWERR_CUSTOM(env, INPUT_OCCUPIED_BY_OTHER, "Hotkey occupied by other");
+            MMI_HISTOGRAM_ERROR("InputKit.inputConsumer.on_hotkeyChange.Error", INPUT_OCCUPIED_BY_OTHER);
             return nullptr;
         }
         MMI_HILOGD("SubscribeId:%{public}d", subscribeId);
@@ -671,6 +694,7 @@ napi_value SubscribeHotkey(napi_env env, napi_callback_info info, sptr<KeyEventM
     if (AddEventCallback(env, hotkeyCallbacks, event) < 0) {
         MMI_HILOGE("AddEventCallback failed");
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "AddEventCallback failed");
+        MMI_HISTOGRAM_ERROR("InputKit.inputConsumer.on_hotkeyChange.Error", COMMON_PARAMETER_ERROR);
         return nullptr;
     }
     napi_value ret;
@@ -1091,7 +1115,11 @@ static napi_value JsOff(napi_env env, napi_callback_info info)
     event->name = keyType;
     int32_t subscribeId = -1;
     if (keyType == HOTKEY_SUBSCRIBE_TYPE) {
-        if (GetHotkeyEventInfo(env, info, event, keyOption) == nullptr) {
+        MMI_HISTOGRAM_BOOLEAN("InputKit.inputConsumer.off_hotkeyChange.Call", true);
+        auto histogramError = [](int32_t errorCode) {
+            MMI_HISTOGRAM_ERROR("InputKit.inputConsumer.off_hotkeyChange.Error", errorCode);
+        };
+        if (GetHotkeyEventInfo(env, info, event, keyOption, histogramError) == nullptr) {
             MMI_HILOGE("GetHotkeyEventInfo failed");
             return nullptr;
         }
@@ -1102,7 +1130,11 @@ static napi_value JsOff(napi_env env, napi_callback_info info)
         MMI_HILOGI("Unsubscribe hot key(%{public}d)", subscribeId);
         InputManager::GetInstance()->UnsubscribeHotkey(subscribeId);
     } else {
-        if (GetEventInfoAPI9(env, info, event, keyOption) == nullptr) {
+        MMI_HISTOGRAM_BOOLEAN("InputKit.inputConsumer.off_key.Call", true);
+        auto histogramError = [](int32_t errorCode) {
+            MMI_HISTOGRAM_ERROR("InputKit.inputConsumer.off_key.Error", errorCode);
+        };
+        if (GetEventInfoAPI9(env, info, event, keyOption, histogramError) == nullptr) {
             MMI_HILOGE("GetEventInfoAPI9 failed");
             return nullptr;
         }
@@ -1258,17 +1290,20 @@ static napi_value JsOffKeyCommand(napi_env env, napi_callback_info info)
 static napi_value SetShieldStatus(napi_env env, napi_callback_info info)
 {
     CALL_DEBUG_ENTER;
+    MMI_HISTOGRAM_BOOLEAN("InputKit.inputConsumer.setShieldStatus.Call", true);
     size_t argc = 2;
     napi_value argv[2] = { 0 };
     CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
     if (argc < INPUT_PARAMETER_MIDDLE) {
         MMI_HILOGE("At least two parameters is required");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "shieldMode", "number");
+        MMI_HISTOGRAM_ERROR("InputKit.inputConsumer.setShieldStatus.Error", COMMON_PARAMETER_ERROR);
         return nullptr;
     }
     if (!JsCommon::TypeOf(env, argv[0], napi_number)) {
         MMI_HILOGE("shieldMode parameter type is invalid");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "shieldMode", "number");
+        MMI_HISTOGRAM_ERROR("InputKit.inputConsumer.setShieldStatus.Error", COMMON_PARAMETER_ERROR);
         return nullptr;
     }
     int32_t shieldMode = 0;
@@ -1276,19 +1311,24 @@ static napi_value SetShieldStatus(napi_env env, napi_callback_info info)
     if (shieldMode < FACTORY_MODE || shieldMode > OOBE_MODE) {
         MMI_HILOGE("Undefined shield mode");
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Shield mode does not exist");
+        MMI_HISTOGRAM_ERROR("InputKit.inputConsumer.setShieldStatus.Error", COMMON_PARAMETER_ERROR);
         return nullptr;
     }
 
     if (!JsCommon::TypeOf(env, argv[1], napi_boolean)) {
         MMI_HILOGE("isShield parameter type is invalid");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "isShield", "boolean");
+        MMI_HISTOGRAM_ERROR("InputKit.inputConsumer.setShieldStatus.Error", COMMON_PARAMETER_ERROR);
         return nullptr;
     }
     bool isShield = true;
     CHKRP(napi_get_value_bool(env, argv[1], &isShield), GET_VALUE_BOOL);
 
     int32_t errCode = InputManager::GetInstance()->SetShieldStatus(shieldMode, isShield);
-    JsCommon::ThrowError(env, errCode);
+    auto histogramError = [](int32_t errorCode) {
+        MMI_HISTOGRAM_ERROR("InputKit.inputConsumer.setShieldStatus.Error", errorCode);
+    };
+    JsCommon::ThrowError(env, errCode, histogramError);
     napi_value result = nullptr;
     if (napi_get_undefined(env, &result) != napi_ok) {
         MMI_HILOGE("Get undefined result is failed");
@@ -1300,17 +1340,20 @@ static napi_value SetShieldStatus(napi_env env, napi_callback_info info)
 static napi_value GetShieldStatus(napi_env env, napi_callback_info info)
 {
     CALL_DEBUG_ENTER;
+    MMI_HISTOGRAM_BOOLEAN("InputKit.inputConsumer.getShieldStatus.Call", true);
     size_t argc = 1;
     napi_value argv[1] = { 0 };
     CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
     if (argc < 1) {
         MMI_HILOGE("At least 1 parameter is required");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "shieldMode", "number");
+        MMI_HISTOGRAM_ERROR("InputKit.inputConsumer.getShieldStatus.Error", COMMON_PARAMETER_ERROR);
         return nullptr;
     }
     if (!JsCommon::TypeOf(env, argv[0], napi_number)) {
         MMI_HILOGE("shieldMode parameter type is invalid");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "shieldMode", "number");
+        MMI_HISTOGRAM_ERROR("InputKit.inputConsumer.getShieldStatus.Error", COMMON_PARAMETER_ERROR);
         return nullptr;
     }
     int32_t shieldMode = 0;
@@ -1318,11 +1361,15 @@ static napi_value GetShieldStatus(napi_env env, napi_callback_info info)
     if (shieldMode < FACTORY_MODE || shieldMode > OOBE_MODE) {
         MMI_HILOGE("Undefined shield mode");
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Shield mode does not exist");
+        MMI_HISTOGRAM_ERROR("InputKit.inputConsumer.getShieldStatus.Error", COMMON_PARAMETER_ERROR);
         return nullptr;
     }
     bool isShield { false };
     auto errCode = InputManager::GetInstance()->GetShieldStatus(shieldMode, isShield);
-    JsCommon::ThrowError(env, errCode);
+    auto histogramError = [](int32_t errorCode) {
+        MMI_HISTOGRAM_ERROR("InputKit.inputConsumer.getShieldStatus.Error", errorCode);
+    };
+    JsCommon::ThrowError(env, errCode, histogramError);
     napi_value result = nullptr;
     if ((napi_get_boolean(env, isShield, &result)) != napi_ok) {
         MMI_HILOGE("%{public}s failed", std::string("GetShieldStatus napi_get_boolean").c_str());
@@ -1334,6 +1381,7 @@ static napi_value GetShieldStatus(napi_env env, napi_callback_info info)
 static napi_value GetAllSystemHotkeys(napi_env env, napi_callback_info info)
 {
     CALL_DEBUG_ENTER;
+    MMI_HISTOGRAM_BOOLEAN("InputKit.inputConsumer.getAllSystemHotkeys.Call", true);
     return GetSystemHotkey(env);
 }
 
@@ -1541,6 +1589,7 @@ bool JsInputConsumer::KeyMonitor::ParseUnsubscription(napi_env env, napi_callbac
 
 void JsInputConsumer::SubscribeKeyMonitor(napi_env env, napi_callback_info info)
 {
+    MMI_HISTOGRAM_BOOLEAN("InputKit.inputConsumer.on_keyPressed.Call", true);
     std::lock_guard guard(mutex_);
     KeyMonitor keyMonitor {};
 
@@ -1556,6 +1605,7 @@ void JsInputConsumer::SubscribeKeyMonitor(napi_env env, napi_callback_info info)
 
 void JsInputConsumer::UnsubscribeKeyMonitor(napi_env env, napi_callback_info info)
 {
+    MMI_HISTOGRAM_BOOLEAN("InputKit.inputConsumer.off_keyPressed.Call", true);
     std::lock_guard guard(mutex_);
     KeyMonitor keyMonitor {};
 
@@ -1661,9 +1711,11 @@ bool JsInputConsumer::SubscribeKeyMonitor(napi_env env, KeyMonitor &keyMonitor)
         if (subscriberId == -CAPABILITY_NOT_SUPPORTED) {
             MMI_HILOGE("Capability not supported");
             THROWERR_CUSTOM(env, INPUT_DEVICE_NOT_SUPPORTED, "Capability not supported.");
+            MMI_HISTOGRAM_ERROR("InputKit.inputConsumer.on_keyPressed.Error", INPUT_DEVICE_NOT_SUPPORTED);
         } else if (subscriberId == -PARAM_INPUT_INVALID) {
             MMI_HILOGE("Input is invalid");
             THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Input is invalid");
+            MMI_HISTOGRAM_ERROR("InputKit.inputConsumer.on_keyPressed.Error", COMMON_PARAMETER_ERROR);
         } else {
             MMI_HILOGE("SubscribeKeyMonitor fail, error:%{public}d", subscriberId);
         }
@@ -1692,9 +1744,11 @@ void JsInputConsumer::UnsubscribeKeyMonitor(napi_env env, const KeyMonitor &keyM
             if (ret == -CAPABILITY_NOT_SUPPORTED) {
                 MMI_HILOGE("Capability not supported");
                 THROWERR_CUSTOM(env, INPUT_DEVICE_NOT_SUPPORTED, "Capability not supported.");
+                MMI_HISTOGRAM_ERROR("InputKit.inputConsumer.off_keyPressed.Call", INPUT_DEVICE_NOT_SUPPORTED);
             } else if (ret == -PARAM_INPUT_INVALID) {
                 MMI_HILOGE("Input is invalid");
                 THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Input is invalid");
+                MMI_HISTOGRAM_ERROR("InputKit.inputConsumer.off_keyPressed.Call", COMMON_PARAMETER_ERROR);
             } else if (ret != RET_OK) {
                 MMI_HILOGE("UnsubscribeKeyMonitor fail, error:%{public}d", ret);
             }

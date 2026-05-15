@@ -16,6 +16,7 @@
 #ifndef JS_UTIL_H
 #define JS_UTIL_H
 
+#include <functional>
 #include <uv.h>
 
 #include "napi/native_node_api.h"
@@ -57,6 +58,7 @@ public:
         bool isApi9 { false };
         bool setFuncKeyType { false };
         bool getFuncKeyType { false };
+        std::function<void(int32_t)> histogramError {};
     };
     struct DeviceType {
         std::string sourceTypeName;

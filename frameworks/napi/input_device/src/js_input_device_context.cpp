@@ -15,6 +15,7 @@
 
 #include "js_input_device_context.h"
 
+#include "mmi_api_metrics_histograms.h"
 #include "napi_constants.h"
 #include "util_napi_error.h"
 
@@ -170,9 +171,11 @@ napi_value JsInputDeviceContext::On(napi_env env, napi_callback_info info)
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "type must be change");
         return nullptr;
     }
+    MMI_HISTOGRAM_BOOLEAN("InputKit.inputDevice.on_change.Call", true);
     if (!JsUtil::TypeOf(env, argv[1], napi_function)) {
         MMI_HILOGE("Second parameter type error");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "listener", "function");
+        MMI_HISTOGRAM_ERROR("InputKit.inputDevice.on_change.Error", COMMON_PARAMETER_ERROR);
         return nullptr;
     }
 
@@ -210,7 +213,7 @@ napi_value JsInputDeviceContext::Off(napi_env env, napi_callback_info info)
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "type must be change");
         return nullptr;
     }
-
+    MMI_HISTOGRAM_BOOLEAN("InputKit.inputDevice.off_change.Call", true);
     JsInputDeviceContext *jsIds = JsInputDeviceContext::GetInstance(env);
     CHKPP(jsIds);
     auto jsInputDeviceMgr = jsIds->GetJsInputDeviceMgr();
@@ -222,6 +225,7 @@ napi_value JsInputDeviceContext::Off(napi_env env, napi_callback_info info)
     if (!JsUtil::TypeOf(env, argv[1], napi_function)) {
         MMI_HILOGE("Second parameter type error");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "listener", "function");
+        MMI_HISTOGRAM_ERROR("InputKit.inputDevice.off_change.Error", COMMON_PARAMETER_ERROR);
         return nullptr;
     }
     jsInputDeviceMgr->UnregisterDevListener(env, type, argv[1]);
@@ -231,6 +235,7 @@ napi_value JsInputDeviceContext::Off(napi_env env, napi_callback_info info)
 napi_value JsInputDeviceContext::GetDeviceIds(napi_env env, napi_callback_info info)
 {
     CALL_DEBUG_ENTER;
+    MMI_HISTOGRAM_BOOLEAN("InputKit.inputDevice.getDeviceIds.Call", true);
     size_t argc = 1;
     napi_value argv[1] = { 0 };
     CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
@@ -256,6 +261,7 @@ napi_value JsInputDeviceContext::GetDeviceIds(napi_env env, napi_callback_info i
 napi_value JsInputDeviceContext::GetDevice(napi_env env, napi_callback_info info)
 {
     CALL_DEBUG_ENTER;
+    MMI_HISTOGRAM_BOOLEAN("InputKit.inputDevice.getDevice.Call", true);
     size_t argc = 2;
     napi_value argv[2] = { 0 };
     CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
@@ -286,6 +292,7 @@ napi_value JsInputDeviceContext::GetDevice(napi_env env, napi_callback_info info
 napi_value JsInputDeviceContext::SupportKeys(napi_env env, napi_callback_info info)
 {
     CALL_DEBUG_ENTER;
+    MMI_HISTOGRAM_BOOLEAN("InputKit.inputDevice.supportKeys.Call", true);
     size_t argc = 3;
     napi_value argv[3] = { 0 };
     CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
@@ -347,18 +354,21 @@ napi_value JsInputDeviceContext::SupportKeys(napi_env env, napi_callback_info in
 napi_value JsInputDeviceContext::SupportKeysSync(napi_env env, napi_callback_info info)
 {
     CALL_DEBUG_ENTER;
+    MMI_HISTOGRAM_BOOLEAN("InputKit.inputDevice.supportKeysSync.Call", true);
     size_t argc = ARGC_NUM;
     napi_value argv[ARGC_NUM] = { 0 };
     CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
     if (argc != ARGC_NUM) {
         MMI_HILOGE("Require two parameters");
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Parameter count error");
+        MMI_HISTOGRAM_ERROR("InputKit.inputDevice.supportKeysSync.Error", COMMON_PARAMETER_ERROR);
         return nullptr;
     }
 
     if (!JsUtil::TypeOf(env, argv[0], napi_number)) {
         MMI_HILOGE("First parameter type error");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "deviceId", "number");
+        MMI_HISTOGRAM_ERROR("InputKit.inputDevice.supportKeysSync.Error", COMMON_PARAMETER_ERROR);
         return nullptr;
     }
     int32_t deviceId = 0;
@@ -367,6 +377,7 @@ napi_value JsInputDeviceContext::SupportKeysSync(napi_env env, napi_callback_inf
     if (!JsUtil::TypeOf(env, argv[1], napi_object)) {
         MMI_HILOGE("Second parameter type error");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "keys", "array");
+        MMI_HISTOGRAM_ERROR("InputKit.inputDevice.supportKeysSync.Error", COMMON_PARAMETER_ERROR);
         return nullptr;
     }
     uint32_t size = 0;
@@ -374,6 +385,7 @@ napi_value JsInputDeviceContext::SupportKeysSync(napi_env env, napi_callback_inf
     if (size < MIN_N_SIZE || size > MAX_N_SIZE) {
         MMI_HILOGE("Size range error");
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "size range error");
+        MMI_HISTOGRAM_ERROR("InputKit.inputDevice.supportKeysSync.Error", COMMON_PARAMETER_ERROR);
         return nullptr;
     }
 
@@ -385,6 +397,7 @@ napi_value JsInputDeviceContext::SupportKeysSync(napi_env env, napi_callback_inf
         if (!JsUtil::TypeOf(env, keyValue, napi_number)) {
             MMI_HILOGE("Second parameter type error");
             THROWERR_API9(env, COMMON_PARAMETER_ERROR, "KeyCode", "number");
+            MMI_HISTOGRAM_ERROR("InputKit.inputDevice.supportKeysSync.Error", COMMON_PARAMETER_ERROR);
             return nullptr;
         }
         CHKRP(napi_get_value_int32(env, keyValue, &data), GET_VALUE_INT32);
@@ -401,18 +414,21 @@ napi_value JsInputDeviceContext::SupportKeysSync(napi_env env, napi_callback_inf
 napi_value JsInputDeviceContext::GetKeyboardType(napi_env env, napi_callback_info info)
 {
     CALL_DEBUG_ENTER;
+    MMI_HISTOGRAM_BOOLEAN("InputKit.inputDevice.getKeyboardType.Call", true);
     size_t argc = 2;
     napi_value argv[2] = { 0 };
     CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
     if (argc < 1) {
         MMI_HILOGE("Require two parameters");
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Parameter count error");
+        MMI_HISTOGRAM_ERROR("InputKit.inputDevice.getKeyboardType.Error", COMMON_PARAMETER_ERROR);
         return nullptr;
     }
 
     if (!JsUtil::TypeOf(env, argv[0], napi_number)) {
         MMI_HILOGE("First parameter type error");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "deviceId", "number");
+        MMI_HISTOGRAM_ERROR("InputKit.inputDevice.getKeyboardType.Error", COMMON_PARAMETER_ERROR);
         return nullptr;
     }
     int32_t id = 0;
@@ -436,18 +452,21 @@ napi_value JsInputDeviceContext::GetKeyboardType(napi_env env, napi_callback_inf
 napi_value JsInputDeviceContext::GetKeyboardTypeSync(napi_env env, napi_callback_info info)
 {
     CALL_DEBUG_ENTER;
+    MMI_HISTOGRAM_BOOLEAN("InputKit.inputDevice.getKeyboardTypeSync.Call", true);
     size_t argc = 1;
     napi_value argv[1] = { 0 };
     CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
     if (argc != 1) {
         MMI_HILOGE("Require one parameters");
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Parameter count error");
+        MMI_HISTOGRAM_ERROR("InputKit.inputDevice.getKeyboardTypeSync.Error", COMMON_PARAMETER_ERROR);
         return nullptr;
     }
 
     if (!JsUtil::TypeOf(env, argv[0], napi_number)) {
         MMI_HILOGE("First parameter type error");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "deviceId", "number");
+        MMI_HISTOGRAM_ERROR("InputKit.inputDevice.getKeyboardTypeSync.Error", COMMON_PARAMETER_ERROR);
         return nullptr;
     }
     int32_t id = 0;
@@ -464,6 +483,7 @@ napi_value JsInputDeviceContext::GetKeyboardTypeSync(napi_env env, napi_callback
 napi_value JsInputDeviceContext::GetDeviceList(napi_env env, napi_callback_info info)
 {
     CALL_DEBUG_ENTER;
+    MMI_HISTOGRAM_BOOLEAN("InputKit.inputDevice.getDeviceList.Call", true);
     size_t argc = 1;
     napi_value argv[1] = { 0 };
     CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
@@ -478,6 +498,7 @@ napi_value JsInputDeviceContext::GetDeviceList(napi_env env, napi_callback_info 
     if (!JsUtil::TypeOf(env, argv[0], napi_function)) {
         MMI_HILOGE("First parameter type error");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "callback", "function");
+        MMI_HISTOGRAM_ERROR("InputKit.inputDevice.getDeviceList.Error", COMMON_PARAMETER_ERROR);
         return nullptr;
     }
     return jsInputDeviceMgr->GetDeviceList(env, argv[0]);
@@ -486,17 +507,20 @@ napi_value JsInputDeviceContext::GetDeviceList(napi_env env, napi_callback_info 
 napi_value JsInputDeviceContext::GetDeviceInfo(napi_env env, napi_callback_info info)
 {
     CALL_DEBUG_ENTER;
+    MMI_HISTOGRAM_BOOLEAN("InputKit.inputDevice.getDeviceInfo.Call", true);
     size_t argc = 2;
     napi_value argv[2] = { 0 };
     CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
     if (argc < 1) {
         MMI_HILOGE("Require two parameters");
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Parameter count error");
+        MMI_HISTOGRAM_ERROR("InputKit.inputDevice.getDeviceInfo.Error", COMMON_PARAMETER_ERROR);
         return nullptr;
     }
     if (!JsUtil::TypeOf(env, argv[0], napi_number)) {
         MMI_HILOGE("First parameter type error");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "deviceId", "number");
+        MMI_HISTOGRAM_ERROR("InputKit.inputDevice.getDeviceInfo.Error", COMMON_PARAMETER_ERROR);
         return nullptr;
     }
     int32_t id = 0;
@@ -512,6 +536,7 @@ napi_value JsInputDeviceContext::GetDeviceInfo(napi_env env, napi_callback_info 
     if (!JsUtil::TypeOf(env, argv[1], napi_function)) {
         MMI_HILOGE("Second parameter type error");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "callback", "function");
+        MMI_HISTOGRAM_ERROR("InputKit.inputDevice.getDeviceInfo.Error", COMMON_PARAMETER_ERROR);
         return nullptr;
     }
     return jsInputDeviceMgr->GetDeviceInfo(env, id, argv[1]);
@@ -520,17 +545,20 @@ napi_value JsInputDeviceContext::GetDeviceInfo(napi_env env, napi_callback_info 
 napi_value JsInputDeviceContext::GetDeviceInfoSync(napi_env env, napi_callback_info info)
 {
     CALL_DEBUG_ENTER;
+    MMI_HISTOGRAM_BOOLEAN("InputKit.inputDevice.getDeviceInfoSync.Call", true);
     size_t argc = 1;
     napi_value argv[1] = { 0 };
     CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
     if (argc != 1) {
         MMI_HILOGE("Require one parameters");
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Parameter count error");
+        MMI_HISTOGRAM_ERROR("InputKit.inputDevice.getDeviceInfoSync.Error", COMMON_PARAMETER_ERROR);
         return nullptr;
     }
     if (!JsUtil::TypeOf(env, argv[0], napi_number)) {
         MMI_HILOGE("First parameter type error");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "deviceId", "number");
+        MMI_HISTOGRAM_ERROR("InputKit.inputDevice.getDeviceInfoSync.Error", COMMON_PARAMETER_ERROR);
         return nullptr;
     }
     int32_t id = 0;
@@ -546,17 +574,20 @@ napi_value JsInputDeviceContext::GetDeviceInfoSync(napi_env env, napi_callback_i
 napi_value JsInputDeviceContext::SetKeyboardRepeatDelay(napi_env env, napi_callback_info info)
 {
     CALL_DEBUG_ENTER;
+    MMI_HISTOGRAM_BOOLEAN("InputKit.inputDevice.setKeyboardRepeatDelay.Call", true);
     size_t argc = 2;
     napi_value argv[2] = { 0 };
     CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
     if (argc < 1) {
         MMI_HILOGE("At least 1 parameter is required");
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Parameter count error");
+        MMI_HISTOGRAM_ERROR("InputKit.inputDevice.setKeyboardRepeatDelay.Error", COMMON_PARAMETER_ERROR);
         return nullptr;
     }
     if (!JsUtil::TypeOf(env, argv[0], napi_number)) {
         MMI_HILOGE("The delay parameter type is invalid");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "delay", "number");
+        MMI_HISTOGRAM_ERROR("InputKit.inputDevice.setKeyboardRepeatDelay.Error", COMMON_PARAMETER_ERROR);
         return nullptr;
     }
     int32_t repeatDelay = STANDARD_KEY_REPEAT_DELAY;
@@ -584,17 +615,20 @@ napi_value JsInputDeviceContext::SetKeyboardRepeatDelay(napi_env env, napi_callb
 napi_value JsInputDeviceContext::SetKeyboardRepeatRate(napi_env env, napi_callback_info info)
 {
     CALL_DEBUG_ENTER;
+    MMI_HISTOGRAM_BOOLEAN("InputKit.inputDevice.setKeyboardRepeatRate.Call", true);
     size_t argc = 2;
     napi_value argv[2] = { 0 };
     CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
     if (argc < 1) {
         MMI_HILOGE("At least 1 parameter is required");
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Parameter count error");
+        MMI_HISTOGRAM_ERROR("InputKit.inputDevice.setKeyboardRepeatRate.Error", COMMON_PARAMETER_ERROR);
         return nullptr;
     }
     if (!JsUtil::TypeOf(env, argv[0], napi_number)) {
         MMI_HILOGE("The rate parameter type is invalid");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "rate", "number");
+        MMI_HISTOGRAM_ERROR("InputKit.inputDevice.setKeyboardRepeatRate.Error", COMMON_PARAMETER_ERROR);
         return nullptr;
     }
     int32_t repeatRate = STANDARD_KEY_REPEAT_RATE;
@@ -614,6 +648,7 @@ napi_value JsInputDeviceContext::SetKeyboardRepeatRate(napi_env env, napi_callba
     if (!JsUtil::TypeOf(env, argv[1], napi_function)) {
         MMI_HILOGE("Callback parameter type is invalid");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "callback", "function");
+        MMI_HISTOGRAM_ERROR("InputKit.inputDevice.setKeyboardRepeatRate.Error", COMMON_PARAMETER_ERROR);
         return nullptr;
     }
     return jsInputDeviceMgr->SetKeyboardRepeatRate(env, repeatRate, argv[1]);
@@ -622,6 +657,7 @@ napi_value JsInputDeviceContext::SetKeyboardRepeatRate(napi_env env, napi_callba
 napi_value JsInputDeviceContext::GetKeyboardRepeatDelay(napi_env env, napi_callback_info info)
 {
     CALL_DEBUG_ENTER;
+    MMI_HISTOGRAM_BOOLEAN("InputKit.inputDevice.getKeyboardRepeatDelay.Call", true);
     size_t argc = 1;
     napi_value argv[1] = { 0 };
     CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
@@ -635,6 +671,7 @@ napi_value JsInputDeviceContext::GetKeyboardRepeatDelay(napi_env env, napi_callb
     if (!JsUtil::TypeOf(env, argv[0], napi_function)) {
         MMI_HILOGE("Callback parameter type is invalid");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "callback", "function");
+        MMI_HISTOGRAM_ERROR("InputKit.inputDevice.getKeyboardRepeatDelay.Error", COMMON_PARAMETER_ERROR);
         return nullptr;
     }
     return jsInputDeviceMgr->GetKeyboardRepeatDelay(env, argv[0]);
@@ -643,6 +680,7 @@ napi_value JsInputDeviceContext::GetKeyboardRepeatDelay(napi_env env, napi_callb
 napi_value JsInputDeviceContext::GetKeyboardRepeatRate(napi_env env, napi_callback_info info)
 {
     CALL_DEBUG_ENTER;
+    MMI_HISTOGRAM_BOOLEAN("InputKit.inputDevice.getKeyboardRepeatRate.Call", true);
     size_t argc = 1;
     napi_value argv[1] = { 0 };
     CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
@@ -656,6 +694,7 @@ napi_value JsInputDeviceContext::GetKeyboardRepeatRate(napi_env env, napi_callba
     if (!JsUtil::TypeOf(env, argv[0], napi_function)) {
         MMI_HILOGE("Callback parameter type is invalid");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "callback", "function");
+        MMI_HISTOGRAM_ERROR("InputKit.inputDevice.getKeyboardRepeatRate.Error", COMMON_PARAMETER_ERROR);
         return nullptr;
     }
     return jsInputDeviceMgr->GetKeyboardRepeatRate(env, argv[0]);
@@ -664,6 +703,7 @@ napi_value JsInputDeviceContext::GetKeyboardRepeatRate(napi_env env, napi_callba
 napi_value JsInputDeviceContext::GetIntervalSinceLastInput(napi_env env, napi_callback_info info)
 {
     CALL_DEBUG_ENTER;
+    MMI_HISTOGRAM_BOOLEAN("InputKit.inputDevice.getIntervalSinceLastInput.Call", true);
     JsInputDeviceContext *jsDev = JsInputDeviceContext::GetInstance(env);
     CHKPP(jsDev);
     auto jsInputDeviceMgr = jsDev->GetJsInputDeviceMgr();
@@ -674,18 +714,21 @@ napi_value JsInputDeviceContext::GetIntervalSinceLastInput(napi_env env, napi_ca
 napi_value JsInputDeviceContext::SetInputDeviceEnabled(napi_env env, napi_callback_info info)
 {
     CALL_DEBUG_ENTER;
+    MMI_HISTOGRAM_BOOLEAN("InputKit.inputDevice.setInputDeviceEnabled.Call", true);
     size_t argc = 2;
     napi_value argv[2] = { 0 };
     CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
     if (argc < INPUT_PARAMETER) {
         MMI_HILOGE("At least 2 parameter is required");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "deviceId", "number");
+        MMI_HISTOGRAM_ERROR("InputKit.inputDevice.setInputDeviceEnabled.Error", COMMON_PARAMETER_ERROR);
         return nullptr;
     }
 
     if (!JsUtil::TypeOf(env, argv[0], napi_number)) {
         MMI_HILOGE("Rows parameter type is invalid");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "deviceId", "number");
+        MMI_HISTOGRAM_ERROR("InputKit.inputDevice.setInputDeviceEnabled.Error", COMMON_PARAMETER_ERROR);
         return nullptr;
     }
     int32_t deviceId = -1;
@@ -693,12 +736,14 @@ napi_value JsInputDeviceContext::SetInputDeviceEnabled(napi_env env, napi_callba
     if (deviceId < 0) {
         MMI_HILOGE("Invalid deviceId");
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "deviceId is invalid");
+        MMI_HISTOGRAM_ERROR("InputKit.inputDevice.setInputDeviceEnabled.Error", COMMON_PARAMETER_ERROR);
         return nullptr;
     }
 
     if (!JsUtil::TypeOf(env, argv[1], napi_boolean)) {
         MMI_HILOGE("enable parameter type is invalid");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "enable", "boolean");
+        MMI_HISTOGRAM_ERROR("InputKit.inputDevice.setInputDeviceEnabled.Error", COMMON_PARAMETER_ERROR);
         return nullptr;
     }
     bool enable = true;
@@ -714,6 +759,7 @@ napi_value JsInputDeviceContext::SetInputDeviceEnabled(napi_env env, napi_callba
 napi_value JsInputDeviceContext::SetFunctionKeyEnabled(napi_env env, napi_callback_info info)
 {
     CALL_DEBUG_ENTER;
+    MMI_HISTOGRAM_BOOLEAN("InputKit.inputDevice.setFunctionKeyEnabled.Call", true);
     size_t argc = 2;
     size_t count = 2;
     napi_value argv[2] = { 0 };
@@ -721,11 +767,13 @@ napi_value JsInputDeviceContext::SetFunctionKeyEnabled(napi_env env, napi_callba
     if (argc < count) {
         MMI_HILOGE("At least 2 parameter is required");
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Parameter count error");
+        MMI_HISTOGRAM_ERROR("InputKit.inputDevice.setFunctionKeyEnabled.Error", COMMON_PARAMETER_ERROR);
         return nullptr;
     }
     if (!JsUtil::TypeOf(env, argv[0], napi_number)) {
         MMI_HILOGE("First parameter type error");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "funckey", "FunctionKey");
+        MMI_HISTOGRAM_ERROR("InputKit.inputDevice.setFunctionKeyEnabled.Error", COMMON_PARAMETER_ERROR);
         return nullptr;
     }
     int32_t funcKey = -1;
@@ -733,11 +781,13 @@ napi_value JsInputDeviceContext::SetFunctionKeyEnabled(napi_env env, napi_callba
     if (funcKey != FunctionKey::FUNCTION_KEY_CAPSLOCK) {
         MMI_HILOGE("First parameter value error");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "funckey", "FunctionKey");
+        MMI_HISTOGRAM_ERROR("InputKit.inputDevice.setFunctionKeyEnabled.Error", COMMON_PARAMETER_ERROR);
         return nullptr;
     }
     if (!JsUtil::TypeOf(env, argv[1], napi_boolean)) {
         MMI_HILOGE("Second parameter type error");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "state", "boolean");
+        MMI_HISTOGRAM_ERROR("InputKit.inputDevice.setFunctionKeyEnabled.Error", COMMON_PARAMETER_ERROR);
         return nullptr;
     }
     bool state = false;
@@ -752,17 +802,20 @@ napi_value JsInputDeviceContext::SetFunctionKeyEnabled(napi_env env, napi_callba
 napi_value JsInputDeviceContext::IsFunctionKeyEnabled(napi_env env, napi_callback_info info)
 {
     CALL_DEBUG_ENTER;
+    MMI_HISTOGRAM_BOOLEAN("InputKit.inputDevice.isFunctionKeyEnabled.Call", true);
     size_t argc = 1;
     napi_value argv[1] = { 0 };
     CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
     if (argc < 1) {
         MMI_HILOGE("At least 1 parameter is required");
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Parameter count error");
+        MMI_HISTOGRAM_ERROR("InputKit.inputDevice.isFunctionKeyEnabled.Error", COMMON_PARAMETER_ERROR);
         return nullptr;
     }
     if (!JsUtil::TypeOf(env, argv[0], napi_number)) {
         MMI_HILOGE("First parameter type error");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "funckey", "FunctionKey");
+        MMI_HISTOGRAM_ERROR("InputKit.inputDevice.isFunctionKeyEnabled.Error", COMMON_PARAMETER_ERROR);
         return nullptr;
     }
     int32_t funcKey = -1;
@@ -770,6 +823,7 @@ napi_value JsInputDeviceContext::IsFunctionKeyEnabled(napi_env env, napi_callbac
     if (funcKey != FunctionKey::FUNCTION_KEY_CAPSLOCK) {
         MMI_HILOGE("First parameter value error");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "funckey", "FunctionKey");
+        MMI_HISTOGRAM_ERROR("InputKit.inputDevice.isFunctionKeyEnabled.Error", COMMON_PARAMETER_ERROR);
         return nullptr;
     }
     JsInputDeviceContext *jsDev = JsInputDeviceContext::GetInstance(env);

@@ -65,6 +65,7 @@
             OHOS::MMI::CursorPixelMap;
             OHOS::MMI::IsNumeric*;
             OHOS::MMI::JsonParser*;
+            OHOS::MMI::HistogramError*;
             "OHOS::MMI::SetAccessTokenReady()";
             "OHOS::MMI::GetProcessName(unsigned int, int)";
             "OHOS::MMI::GetBundleName(unsigned int)";

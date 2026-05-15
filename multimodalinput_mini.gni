@@ -73,6 +73,7 @@ declare_args() {
   input_feature_universal_drag_enable = false
   input_feature_triple_finger_snapshot = false
   input_controller_inject_enable = false
+  input_feature_api_metrics_histogram = false
 
   if (defined(global_parts_info) &&
       defined(global_parts_info.msdp_device_status)) {
@@ -596,4 +597,13 @@ if (input_feature_touch_gesture) {
 
 if (input_controller_inject_enable) {
   input_default_defines += [ "OHOS_BUILD_ENABLE_CONTROLLER_INJECT" ]
+}
+
+if (defined(global_parts_info) &&
+    defined(global_parts_info.hiviewdfx_api_metrics)) {
+  input_feature_api_metrics_histogram = true
+}
+
+if (input_feature_api_metrics_histogram) {
+  input_default_defines += [ "OHOS_BUILD_ENABLE_API_METRICS_HISTOGRAM" ]
 }

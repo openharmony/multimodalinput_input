@@ -95,6 +95,10 @@ ohos_shared_library("oh_input_manager") {
     ]
   }
 
+  if (input_feature_api_metrics_histogram) {
+    external_deps += [ "api_metrics:histogrammanager" ]
+  }
+
   innerapi_tags = [ "ndk" ]
 
   output_name = "ohinput"
@@ -165,6 +169,10 @@ ohos_unittest("OHInputManagerTest") {
   if (enable_player_framework) {
     external_deps += [ "player_framework:media_client" ]
   }
+
+  if (input_feature_api_metrics_histogram) {
+    external_deps += [ "api_metrics:histogrammanager" ]
+  }
 }
 
 ohos_unittest("OHInputManagerEXTest") {
@@ -218,6 +226,10 @@ ohos_unittest("OHInputManagerEXTest") {
 
   if (enable_player_framework) {
     external_deps += [ "player_framework:media_client" ]
+  }
+
+  if (input_feature_api_metrics_histogram) {
+    external_deps += [ "api_metrics:histogrammanager" ]
   }
 }
 

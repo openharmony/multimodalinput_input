@@ -19,6 +19,7 @@
 #include "error_multimodal.h"
 #include "input_manager.h"
 #include "js_register_manager.h"
+#include "mmi_api_metrics_histograms.h"
 #include "napi_constants.h"
 #include "util_napi_error.h"
 #include "util_napi_value.h"
@@ -91,6 +92,7 @@ void JsRegister::CallJsHasIrEmitterPromiseEx(sptr<CallbackInfo> cb, napi_handle_
             MMI_HILOGE("Error code %{public}d not found", cb->errCode);
             return;
         }
+        MMI_HISTOGRAM_ERROR("InputKit.infraredEmitter.hasIrEmitter.Error", cb->errCode);
         callResult = CreateBusinessError(cb->env, cb->errCode, codeMsg.msg);
         if (callResult == nullptr) {
             napi_close_handle_scope(cb->env, scope);

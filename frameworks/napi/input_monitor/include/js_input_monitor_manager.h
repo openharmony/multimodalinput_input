@@ -18,6 +18,25 @@
 
 #include "js_input_monitor.h"
 
+#ifdef OHOS_BUILD_ENABLE_API_METRICS_HISTOGRAM
+#include "js_input_monitor_histogram.h"
+
+#define JS_MONITOR_HISTOGRAM_ON(type)   ::OHOS::MMI::JsInputMonitorHistogram::HistogramOn((type), true)
+#define JS_MONITOR_HISTOGRAM_OFF(type)  ::OHOS::MMI::JsInputMonitorHistogram::HistogramOff((type), true)
+#define JS_MONITOR_HISTOGRAM_ON_ERROR(type, errorCode)  \
+    ::OHOS::MMI::JsInputMonitorHistogram::HistogramOnError((type), (errorCode))
+#define JS_MONITOR_HISTOGRAM_OFF_ERROR(type, errorCode) \
+    ::OHOS::MMI::JsInputMonitorHistogram::HistogramOffError((type), (errorCode))
+
+#else // OHOS_BUILD_ENABLE_API_METRICS_HISTOGRAM
+
+#define JS_MONITOR_HISTOGRAM_ON(type)
+#define JS_MONITOR_HISTOGRAM_OFF(type)
+#define JS_MONITOR_HISTOGRAM_ON_ERROR(type, errorCode)
+#define JS_MONITOR_HISTOGRAM_OFF_ERROR(type, errorCode)
+
+#endif // OHOS_BUILD_ENABLE_API_METRICS_HISTOGRAM
+
 namespace OHOS {
 namespace MMI {
 class JsInputMonitorManager final {
@@ -41,7 +60,7 @@ public:
     std::string GetPreMonitorTypeName(int32_t id);
     bool AddEnv(napi_env env, napi_callback_info cbInfo);
     void RemoveEnv(napi_env env);
-    void ThrowError(napi_env env, int32_t code);
+    void ThrowError(napi_env env, const std::string &typeName, int32_t code);
     std::vector<Rect> GetHotRectAreaList(napi_env env, napi_value rectNapiValue, uint32_t rectListLength);
     bool GetKeysArray(napi_env env, napi_value keysNapiValue, uint32_t keysLength, std::vector<int32_t>& keys);
     napi_value JsQueryTouchEvents(napi_env env, int32_t count);

@@ -57,6 +57,10 @@ ohos_shared_library("shortkey") {
     "napi:ace_napi",
   ]
 
+  if (input_feature_api_metrics_histogram) {
+    external_deps += [ "api_metrics:histogrammanager" ]
+  }
+
   relative_install_dir = "module/multimodalinput"
 
   part_name = "input"
