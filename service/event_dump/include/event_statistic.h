@@ -17,6 +17,7 @@
 #define EVENT_STATISTIC_H
 
 #include <algorithm>
+#include <array>
 #include <fstream>
 #include <queue>
 #include <sys/stat.h>
@@ -35,8 +36,7 @@ public:
     static void PushKeyEvent(std::shared_ptr<KeyEvent> eventPtr);
     static void PushSwitchEvent(std::shared_ptr<SwitchEvent> eventPtr);
     static void PushPointerRecord(std::shared_ptr<PointerEvent> eventPtr);
-    static int32_t QueryPointerRecord(int32_t count, std::vector<std::shared_ptr<PointerEvent>> &pointerList,
-                                      bool inWhitelist = false);
+    static int32_t QueryPointerRecord(int32_t count, std::vector<std::shared_ptr<PointerEvent>> &pointerList);
     static std::string PopEvent();
     static void WriteEventFile();
     static void Dump(int32_t fd, const std::vector<std::string> &args);
@@ -55,17 +55,20 @@ private:
         int32_t sourceType;
         int32_t pointerId;
         bool isInject;
+        int32_t targetDisplayId;
         std::vector<int32_t> pointerIds;
         std::vector<double> pressures;
         std::vector<double> tiltXs;
         std::vector<double> tiltYs;
         std::vector<int32_t> displayXs;
         std::vector<int32_t> displayYs;
+        PointerEventRecord() = default;
         PointerEventRecord(int64_t actionTime, int32_t actionType, int32_t sourceType, int32_t pointerId, bool isInject,
-            std::vector<int32_t> pointerIds, std::vector<double> pressures, std::vector<double> tiltXs,
-            std::vector<double> tiltYs, std::vector<int32_t> displayXs, std::vector<int32_t> displayYs)
+            int32_t targetDisplayId, std::vector<int32_t> pointerIds, std::vector<double> pressures,
+            std::vector<double> tiltXs, std::vector<double> tiltYs, std::vector<int32_t> displayXs,
+            std::vector<int32_t> displayYs)
             : actionTime(actionTime), actionType(actionType), sourceType(sourceType), pointerId(pointerId),
-              isInject(isInject),
+              isInject(isInject), targetDisplayId(targetDisplayId),
               pointerIds(pointerIds), pressures(pressures), tiltXs(tiltXs), tiltYs(tiltYs),
               displayXs(displayXs), displayYs(displayYs)
         {}
@@ -75,7 +78,11 @@ private:
     static std::mutex queueMutex_;
     static std::condition_variable queueCondition_;
     static bool writeFileEnabled_;
-    static std::deque<EventStatistic::PointerEventRecord> pointerRecordDeque_;
+    static constexpr int32_t RING_BUFFER_SIZE = 60;
+    static std::array<PointerEventRecord, RING_BUFFER_SIZE> pointerRecordRingBuffer_;
+    static int32_t ringHead_;
+    static int32_t ringTail_;
+    static int32_t ringSize_;
 };
 } // namespace MMI
 } // namespace OHOS
