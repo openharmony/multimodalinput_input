@@ -65,6 +65,7 @@ public:
     MOCK_METHOD(void, OnInputDeviceAdded, (struct libinput_device*));
     MOCK_METHOD(void, OnInputDeviceRemoved, (struct libinput_device*));
     MOCK_METHOD(void, SetIsDeviceReportEvent, (int32_t, bool));
+    MOCK_METHOD(std::uint32_t, GetFlag, (int32_t));
 
     static std::shared_ptr<InputDeviceManagerMock> GetInstance();
     static void ReleaseInstance();

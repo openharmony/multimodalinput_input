@@ -60,6 +60,7 @@ public:
     virtual void OnInputDeviceAdded(struct libinput_device *inputDevice) = 0;
     virtual void OnInputDeviceRemoved(struct libinput_device *inputDevice) = 0;
     virtual void SetIsDeviceReportEvent(int32_t deviceId, bool isReportEvent) = 0;
+    virtual std::uint32_t GetFlag(int32_t deviceId) = 0;
 };
 } // namespace MMI
 } // namespace OHOS
