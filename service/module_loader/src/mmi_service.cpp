@@ -6348,14 +6348,6 @@ int32_t MMIService::RedispatchInputEventInner(std::shared_ptr<PointerEvent> poin
                 pointerEvent->UpdatePointerItem(pointerEvent->GetPointerId(), pointerItem);
             }
             int32_t pointerAction = pointerEvent->GetPointerAction();
-            if (pointerAction == PointerEvent::POINTER_ACTION_DOWN ||
-                pointerAction == PointerEvent::POINTER_ACTION_HOVER_ENTER) {
-                if (WIN_MGR->IsRealFingerDown(pointerEvent->GetDeviceId(), pointerEvent->GetPointerId())) {
-                    MMI_HILOGI("Redispatch DOWN conflicts with real finger, deviceId:%{public}d pointerId:%{public}d",
-                        pointerEvent->GetDeviceId(), pointerEvent->GetPointerId());
-                    return RET_ERR;
-                }
-            }
             TouchRedispatchStore::Guard guard(pointerEvent);
             if (pointerAction != PointerEvent::POINTER_ACTION_DOWN &&
                 pointerAction != PointerEvent::POINTER_ACTION_HOVER_ENTER) {
@@ -6375,6 +6367,17 @@ int32_t MMIService::RedispatchInputEventInner(std::shared_ptr<PointerEvent> poin
                 }
             }
             WIN_MGR->UpdateTargetPointer(pointerEvent);
+            if ((pointerAction == PointerEvent::POINTER_ACTION_DOWN ||
+                 pointerAction == PointerEvent::POINTER_ACTION_HOVER_ENTER)) {
+                int32_t realWindowId = WIN_MGR->GetRealFingerDownWindowId(
+                    pointerEvent->GetDeviceId(), pointerEvent->GetPointerId());
+                if (realWindowId >= 0 && realWindowId == pointerEvent->GetTargetWindowId()) {
+                    MMI_HILOGI("Redispatch DOWN conflicts with real finger in same window, "
+                        "deviceId:%{public}d pointerId:%{public}d windowId:%{public}d",
+                        pointerEvent->GetDeviceId(), pointerEvent->GetPointerId(), realWindowId);
+                    return RET_ERR;
+                }
+            }
             if (WIN_MGR->AbandonTouchRedispatch(pointerEvent)) {
                 return RET_ERR;
             }

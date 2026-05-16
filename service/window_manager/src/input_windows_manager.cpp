@@ -5761,17 +5761,20 @@ TouchRedispatchStore& InputWindowsManager::GetTouchRedispatchStore()
     return touchRedispatchStore_;
 }
 
-bool InputWindowsManager::IsRealFingerDown(int32_t deviceId, int32_t pointerId)
+int32_t InputWindowsManager::GetRealFingerDownWindowId(int32_t deviceId, int32_t pointerId)
 {
     auto devIter = touchItemDownInfos_.find(deviceId);
     if (devIter == touchItemDownInfos_.end()) {
-        return false;
+        return -1;
     }
     auto ptrIter = devIter->second.find(pointerId);
     if (ptrIter == devIter->second.end()) {
-        return false;
+        return -1;
     }
-    return ptrIter->second.flag;
+    if (!ptrIter->second.flag) {
+        return -1;
+    }
+    return ptrIter->second.window.id;
 }
 
 std::map<int32_t, std::map<int32_t, WindowInfoEX>>& InputWindowsManager::TouchItemDownInfos()

@@ -16447,12 +16447,12 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_TouchRedispatchWindowL
 }
 
 /**
- * @tc.name: InputWindowsManagerTest_IsRealFingerDown_001
- * @tc.desc: Test IsRealFingerDown returns true when real DOWN exists with flag=true
+ * @tc.name: InputWindowsManagerTest_GetRealFingerDownWindowId_001
+ * @tc.desc: Test GetRealFingerDownWindowId returns windowId when real DOWN exists with flag=true
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsRealFingerDown_001, TestSize.Level1)
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetRealFingerDownWindowId_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     auto inputWindowsManager = std::make_shared<InputWindowsManager>();
@@ -16462,7 +16462,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsRealFingerDown_001, 
     int32_t pointerId = 0;
     int32_t windowId = 42;
 
-    EXPECT_FALSE(inputWindowsManager->IsRealFingerDown(deviceId, pointerId));
+    EXPECT_EQ(inputWindowsManager->GetRealFingerDownWindowId(deviceId, pointerId), -1);
 
     WindowInfo windowInfo;
     windowInfo.id = windowId;
@@ -16471,22 +16471,22 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsRealFingerDown_001, 
     windowInfoEX.flag = true;
     inputWindowsManager->touchItemDownInfos_[deviceId][pointerId] = windowInfoEX;
 
-    EXPECT_TRUE(inputWindowsManager->IsRealFingerDown(deviceId, pointerId));
+    EXPECT_EQ(inputWindowsManager->GetRealFingerDownWindowId(deviceId, pointerId), windowId);
 
     inputWindowsManager->touchItemDownInfos_[deviceId][pointerId].flag = false;
-    EXPECT_FALSE(inputWindowsManager->IsRealFingerDown(deviceId, pointerId));
+    EXPECT_EQ(inputWindowsManager->GetRealFingerDownWindowId(deviceId, pointerId), -1);
 
     inputWindowsManager->touchItemDownInfos_.clear();
-    EXPECT_FALSE(inputWindowsManager->IsRealFingerDown(deviceId, pointerId));
+    EXPECT_EQ(inputWindowsManager->GetRealFingerDownWindowId(deviceId, pointerId), -1);
 }
 
 /**
- * @tc.name: InputWindowsManagerTest_IsRealFingerDown_002
- * @tc.desc: Test IsRealFingerDown with different deviceId/pointerId combinations
+ * @tc.name: InputWindowsManagerTest_GetRealFingerDownWindowId_002
+ * @tc.desc: Test GetRealFingerDownWindowId with different deviceId/pointerId combinations
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsRealFingerDown_002, TestSize.Level1)
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetRealFingerDownWindowId_002, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     auto inputWindowsManager = std::make_shared<InputWindowsManager>();
@@ -16496,18 +16496,19 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsRealFingerDown_002, 
     int32_t pointerId = 3;
     int32_t otherDeviceId = 99;
     int32_t otherPointerId = 88;
+    int32_t windowId = 10;
 
     WindowInfo windowInfo;
-    windowInfo.id = 10;
+    windowInfo.id = windowId;
     WindowInfoEX windowInfoEX;
     windowInfoEX.window = windowInfo;
     windowInfoEX.flag = true;
     inputWindowsManager->touchItemDownInfos_[deviceId][pointerId] = windowInfoEX;
 
-    EXPECT_TRUE(inputWindowsManager->IsRealFingerDown(deviceId, pointerId));
-    EXPECT_FALSE(inputWindowsManager->IsRealFingerDown(otherDeviceId, pointerId));
-    EXPECT_FALSE(inputWindowsManager->IsRealFingerDown(deviceId, otherPointerId));
-    EXPECT_FALSE(inputWindowsManager->IsRealFingerDown(otherDeviceId, otherPointerId));
+    EXPECT_EQ(inputWindowsManager->GetRealFingerDownWindowId(deviceId, pointerId), windowId);
+    EXPECT_EQ(inputWindowsManager->GetRealFingerDownWindowId(otherDeviceId, pointerId), -1);
+    EXPECT_EQ(inputWindowsManager->GetRealFingerDownWindowId(deviceId, otherPointerId), -1);
+    EXPECT_EQ(inputWindowsManager->GetRealFingerDownWindowId(otherDeviceId, otherPointerId), -1);
 }
 } // namespace MMI
 } // namespace OHOS
