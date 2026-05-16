@@ -6685,9 +6685,13 @@ bool InputWindowsManager::IsTabletToolEvent(const PointerEvent::PointerItem &poi
 bool InputWindowsManager::IsEnterWindowTriggered(const std::shared_ptr<PointerEvent> pointerEvent,
     const WindowInfo* touchWindow)
 {
-    if (pointerEvent != nullptr && touchWindow != nullptr) {
-        LastTouchInfo lastInfo = GetLastTouchInfo(pointerEvent);
-        return lastInfo.lastTouchWindowInfo.id != touchWindow->id;
+    if (pointerEvent == nullptr || touchWindow == nullptr) {
+        return false;
+    }
+    const LastTouch touch { pointerEvent->GetDeviceId(), pointerEvent->GetPointerId()};
+    auto& lastTouchInfos = TouchLastTouchInfos();
+    if (auto iter = lastTouchInfos.find(touch); iter != lastTouchInfos.end()) {
+        return iter->second.lastTouchWindowInfo.id != touchWindow->id;
     }
     return false;
 }
@@ -6695,9 +6699,16 @@ bool InputWindowsManager::IsEnterWindowTriggered(const std::shared_ptr<PointerEv
 bool InputWindowsManager::IsLeaveWindowTriggered(const std::shared_ptr<PointerEvent> pointerEvent,
     const WindowInfo* touchWindow)
 {
+    if (pointerEvent == nullptr || touchWindow == nullptr) {
+        return false;
+    }
+    const LastTouch touch { pointerEvent->GetDeviceId(), pointerEvent->GetPointerId()};
     if (pointerEvent != nullptr && touchWindow != nullptr) {
-        LastTouchInfo lastInfo = GetLastTouchInfo(pointerEvent);
-        return lastInfo.lastTouchWindowInfo.id != touchWindow->id && lastInfo.lastTouchWindowInfo.id != -1;
+        auto& lastTouchInfos = TouchLastTouchInfos();
+        if (auto iter = lastTouchInfos.find(touch); iter != lastTouchInfos.end()) {
+            return iter->second.lastTouchWindowInfo.id != touchWindow->id &&
+                iter->second.lastTouchWindowInfo.id != -1;
+        }
     }
     return false;
 }
