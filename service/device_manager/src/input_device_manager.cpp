@@ -2071,5 +2071,30 @@ std::string InputDeviceManager::GetDeviceConnectionType(int32_t deviceId)
             return "OTHER";
     }
 }
+
+void InputDeviceManager::AddFlag(int32_t deviceId, uint32_t flag)
+{
+    inputDeviceFlags_[deviceId] = flag;
+}
+
+void InputDeviceManager::RemoveFlag(int32_t deviceId)
+{
+    auto iter = inputDeviceFlags_.find(deviceId);
+    if (iter == inputDeviceFlags_.end()) {
+        MMI_HILOGE("Failed to search for the device");
+        return;
+    }
+    inputDeviceFlags_.erase(iter);
+}
+
+uint32_t InputDeviceManager::GetFlag(int32_t deviceId)
+{
+    auto iter = inputDeviceFlags_.find(deviceId);
+    if (iter == inputDeviceFlags_.end()) {
+        MMI_HILOGE("Failed to search for the device");
+        return 0;
+    }
+    return iter->second;
+}
 } // namespace MMI
 } // namespace OHOS

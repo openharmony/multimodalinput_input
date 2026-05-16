@@ -1279,5 +1279,43 @@ bool InputPlugin::UnregisterKeyMonitorCallback(int32_t callbackId) const
     return KEY_MONITOR_MGR->UnregisterKeyMonitorCallback(callbackId);
 }
 #endif // OHOS_BUILD_ENABLE_KEY_PRESSED_HANDLER
+
+void InputPlugin::AddFlagForDevice(libinput_event *event)
+{
+    if (event == nullptr) {
+        MMI_HILOGE("event is invalid");
+        return;
+    }
+    auto inputDevice = libinput_event_get_device(event);
+    if (inputDevice == nullptr || INPUT_DEV_MGR == nullptr) {
+        MMI_HILOGE("inputDevice or INPUT_DEV_MGR is null");
+        return;
+    }
+    auto deviceId = INPUT_DEV_MGR->FindInputDeviceId(inputDevice);
+    if (deviceId < 0) {
+        MMI_HILOGE("deviceId is invalid");
+        return;
+    }
+    INPUT_DEV_MGR->AddFlag(deviceId, InputEvent::EVENT_FLAG_STYLUS_MOUSE_MODE);
+}
+
+void InputPlugin::RemoveFlagForDevice(libinput_event *event)
+{
+    if (event == nullptr) {
+        MMI_HILOGE("event is invalid");
+        return;
+    }
+    auto inputDevice = libinput_event_get_device(event);
+    if (inputDevice == nullptr || INPUT_DEV_MGR == nullptr) {
+        MMI_HILOGE("inputDevice or INPUT_DEV_MGR is null");
+        return;
+    }
+    auto deviceId = INPUT_DEV_MGR->FindInputDeviceId(inputDevice);
+    if (deviceId < 0) {
+        MMI_HILOGE("deviceId is invalid");
+        return;
+    }
+    INPUT_DEV_MGR->RemoveFlag(deviceId);
+}
 } // namespace MMI
 } // namespace OHOS

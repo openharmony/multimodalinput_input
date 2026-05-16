@@ -105,6 +105,8 @@ public:
         const std::function<void(int32_t pid, int32_t keyCode,
         std::string bundleName, bool isAdd)> &callback) const override;
     bool UnregisterKeyMonitorCallback(int32_t callbackId) const override;
+    void AddFlagForDevice(libinput_event *event) override;
+    void RemoveFlagForDevice(libinput_event *event) override;
 #endif
 
     int32_t prio_ = 200;
