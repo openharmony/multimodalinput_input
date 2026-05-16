@@ -186,6 +186,8 @@ struct IPluginContext {
         std::string bundleName, bool isAdd)> &callback) const = 0;
     virtual bool UnregisterKeyMonitorCallback(int32_t callbackId) const = 0;
 #endif
+    virtual void AddFlagForDevice(libinput_event *event) = 0;
+    virtual void RemoveFlagForDevice(libinput_event *event) = 0;
 };
 
 inline bool checkPluginEventNull(PluginEventType &event)

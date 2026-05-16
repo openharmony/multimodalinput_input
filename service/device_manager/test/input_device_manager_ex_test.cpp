@@ -405,5 +405,68 @@ HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_GetDeviceConnectionType_
     std::string connectionType = inputDevice.GetDeviceConnectionType(deviceId);
     ASSERT_EQ(connectionType, "UNKNOWN");
 }
+
+/**
+ * @tc.name: InputDeviceManagerTest_AddFlag_001
+ * @tc.desc: Test the function AddFlag
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_AddFlag_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputDeviceManager inputDeviceManager;
+    int32_t deviceId = 1;
+    std::uint32_t flag = 0x00060000;
+    ASSERT_NO_FATAL_FAILURE(inputDeviceManager.AddFlag(deviceId, flag));
+}
+
+/**
+ * @tc.name: InputDeviceManagerTest_RemoveFlag_001
+ * @tc.desc: Test the function RemoveFlag
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_RemoveFlag_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputDeviceManager inputDeviceManager;
+    int32_t deviceId = 1;
+    std::uint32_t flag = 0x00060000;
+    inputDeviceManager.inputDeviceFlags_.insert(std::make_pair(deviceId, flag));
+    ASSERT_NO_FATAL_FAILURE(inputDeviceManager.RemoveFlag(deviceId));
+}
+
+/**
+ * @tc.name: InputDeviceManagerTest_GetFlag_001
+ * @tc.desc: Test the function GetFlag
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_GetFlag_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputDeviceManager inputDeviceManager;
+    int32_t deviceId = 1;
+    std::uint32_t flag = 0x00060000;
+    inputDeviceManager.inputDeviceFlags_.insert(std::make_pair(deviceId, flag));
+    EXPECT_EQ(inputDeviceManager.GetFlag(deviceId) == flag, true);
+}
+
+/**
+ * @tc.name: InputDeviceManagerTest_GetFlag_002
+ * @tc.desc: Test the function GetFlag
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_GetFlag_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputDeviceManager inputDeviceManager;
+    int32_t deviceId = 1;
+    std::uint32_t flag = 0x00060000;
+    inputDeviceManager.inputDeviceFlags_.insert(std::make_pair(deviceId, flag));
+    EXPECT_EQ(inputDeviceManager.GetFlag(deviceId) == 0x00080000, false);
+}
 } // namespace MMI
 } // namespace OHOS

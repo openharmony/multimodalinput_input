@@ -1253,6 +1253,12 @@ int32_t MouseTransformProcessor::Normalize(struct libinput_event *event)
         pointerEvent_->ClearFlag(InputEvent::EVENT_FLAG_ACCESSIBILITY);
     }
     pointerEvent_->ClearAxisValue();
+    if (INPUT_DEV_MGR != nullptr) {
+        auto flag = INPUT_DEV_MGR->GetFlag(deviceId_);
+        if (flag > 0) {
+            pointerEvent_->AddFlag(flag);
+        }
+    }
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
     isVirtualDeviceEvent_ = IsEventFromVirtualSource(event);
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD

@@ -100,6 +100,8 @@ public:
     MOCK_METHOD(int32_t, RegisterKeyMonitorCallback,
                 (const std::function<void(int32_t, int32_t, std::string, bool)> &), (override, const));
     MOCK_METHOD(bool, UnregisterKeyMonitorCallback, (int32_t), (override, const));
+    MOCK_METHOD(void, AddFlagForDevice, (libinput_event *event), (override));
+    MOCK_METHOD(void, RemoveFlagForDevice, (libinput_event *event), (override));
 #endif
 };
 

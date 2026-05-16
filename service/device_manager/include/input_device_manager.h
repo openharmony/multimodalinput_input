@@ -167,6 +167,9 @@ public:
     void SetIsDeviceReportEvent(int32_t deviceId, bool isReportEvent);
     bool GetIsDeviceReportEvent(int32_t deviceId);
     std::string GetDeviceConnectionType(int32_t deviceId);
+    void AddFlag(int32_t deviceId, uint32_t flag);
+    void RemoveFlag(int32_t deviceId);
+    uint32_t GetFlag(int32_t deviceId);
 
 private:
     int32_t ParseDeviceId(struct libinput_device *inputDevice);
@@ -232,6 +235,7 @@ private:
     std::map<std::string, PhysicalInputDevice> physicalInputDevices_;
     bool eduInputDisabled_ { false }; // Disable status of global input set by **DisableInputEventDispatch**
     int32_t eduInputDisabledPid_ { -1 }; // The application that disabled global input
+    std::map<int32_t, uint32_t> inputDeviceFlags_;
 
     static std::shared_ptr<InputDeviceManager> instance_;
     static std::mutex mutex_;

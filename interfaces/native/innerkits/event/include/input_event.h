@@ -173,6 +173,8 @@ public:
      */
     static constexpr uint32_t EVENT_FLAG_CONTROLLER = 0x00200000;
 
+    static constexpr uint32_t EVENT_FLAG_STYLUS_MOUSE_MODE = 0x00400000;
+
     /**
      * The multimodal input event for the device to enable the intercom mode flag.
      *
