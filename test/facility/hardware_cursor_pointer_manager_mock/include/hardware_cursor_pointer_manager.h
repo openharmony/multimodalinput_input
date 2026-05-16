@@ -30,6 +30,7 @@ public:
     IHardwareCursorPointerManager() = default;
     virtual ~IHardwareCursorPointerManager() = default;
 
+    virtual void SetTargetDevice(uint32_t devId);
     virtual void SetHdiServiceState(bool hdiServiceState);
     virtual bool IsSupported();
     virtual int32_t SetPosition(uint32_t devId, int32_t x, int32_t y, BufferHandle* buffer);
@@ -42,6 +43,7 @@ public:
     HardwareCursorPointerManager() = default;
     ~HardwareCursorPointerManager() override = default;
 
+    MOCK_METHOD(void, SetTargetDevice, (uint32_t));
     MOCK_METHOD(void, SetHdiServiceState, (bool));
     MOCK_METHOD(bool, IsSupported, ());
     MOCK_METHOD(int32_t, SetPosition, (uint32_t, int32_t, int32_t, BufferHandle*));
