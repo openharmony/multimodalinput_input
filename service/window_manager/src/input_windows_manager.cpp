@@ -2064,9 +2064,8 @@ void InputWindowsManager::UpdateDisplayInfo(OLD::DisplayGroupInfo &displayGroupI
     auto action = UpdateWindowInfo(displayGroupInfo);
     CheckFocusWindowChange(displayGroupInfo);
     UpdateCaptureMode(displayGroupInfo);
-    bool isDisplayChanged = false;
 #ifdef OHOS_BUILD_ENABLE_EXTERNAL_SCREEN
-    isDisplayChanged = needBackCenter;
+    bool isDisplayChanged = needBackCenter;
 #endif // OHOS_BUILD_ENABLE_EXTERNAL_SCREEN
     OLD::DisplayGroupInfo displayGroupInfoTemp;
     if (displayGroupInfo.userState == UserState::USER_ACTIVE) {

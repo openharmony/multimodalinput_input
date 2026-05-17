@@ -3312,7 +3312,7 @@ ErrCode MMIService::GetPointerLocation(int32_t &displayId, double &displayX, dou
 
     int32_t clientPid = GetCallingPid();
     int32_t ret = delegateTasks_.PostSyncTask(
-        [this, &displayId, &displayX, &displayY, clientPid] {
+        [&displayId, &displayX, &displayY, clientPid] {
             if (!INPUT_DEV_MGR->HasPointerDeviceIncludingVirtual()) {
                 MMI_HILOGE("There hasn't any pointer device");
                 return ERROR_DEVICE_NO_POINTER;
@@ -5071,7 +5071,7 @@ ErrCode MMIService::SetMouseScrollDirection(bool state)
     }
 #ifdef OHOS_BUILD_ENABLE_POINTER
     int32_t userId = GetCallingUser();
-    int32_t ret = delegateTasks_.PostSyncTask([this, userId, &state] {
+    int32_t ret = delegateTasks_.PostSyncTask([userId, &state] {
         return MouseEventHdr->SetMouseScrollDirection(userId, state);
     });
     if (ret != RET_OK) {
@@ -5100,7 +5100,7 @@ ErrCode MMIService::GetMouseScrollDirection(bool &state)
     state = true;
 #ifdef OHOS_BUILD_ENABLE_POINTER
     int32_t userId = GetCallingUser();
-    int32_t ret = delegateTasks_.PostSyncTask([this, userId, &state] {
+    int32_t ret = delegateTasks_.PostSyncTask([userId, &state] {
         return MouseEventHdr->GetMouseScrollDirection(userId, state);
     });
     if (ret != RET_OK) {
@@ -5434,7 +5434,7 @@ ErrCode MMIService::DisableInputEventDispatch(bool disabled)
     }
     int32_t pid = GetCallingPid();
     int32_t ret = delegateTasks_.PostSyncTask(
-        [this, disabled, pid] {
+        [disabled, pid] {
             return INPUT_DEV_MGR->DisableInputEventDispatch(disabled, pid);
         });
     if (ret != RET_OK) {
@@ -6071,7 +6071,7 @@ ErrCode MMIService::AddInputEventHook(HookEventType hookEventType)
             return ERROR_NO_PERMISSION;
         }
     }
-    int32_t ret = delegateTasks_.PostSyncTask([pid = GetCallingPid(), this, hookEventType] () -> int32_t {
+    int32_t ret = delegateTasks_.PostSyncTask([pid = GetCallingPid(), hookEventType] () -> int32_t {
         auto hookMgr = InputHandler->GetInputEventHook();
         CHKPR(hookMgr, RET_ERR);
         if (int32_t result = hookMgr->AddInputEventHook(pid, hookEventType); result != RET_OK) {
@@ -6091,7 +6091,7 @@ ErrCode MMIService::AddInputEventHook(HookEventType hookEventType)
 ErrCode MMIService::RemoveInputEventHook(HookEventType hookEventType)
 {
     CALL_INFO_TRACE;
-    int32_t ret = delegateTasks_.PostSyncTask([pid = GetCallingPid(), this, hookEventType] () -> int32_t {
+    int32_t ret = delegateTasks_.PostSyncTask([pid = GetCallingPid(), hookEventType] () -> int32_t {
         auto hookMgr = InputHandler->GetInputEventHook();
         CHKPR(hookMgr, RET_ERR);
         if (int32_t result = hookMgr->RemoveInputEventHook(pid, hookEventType); result != RET_OK) {

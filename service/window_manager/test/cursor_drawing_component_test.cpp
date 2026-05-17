@@ -661,26 +661,6 @@ HWTEST_F(CursorDrawingComponentTest, CursorDrawingComponentTest_RegisterDisplayS
     EXPECT_NO_FATAL_FAILURE(instance_->RegisterDisplayStatusReceiver());
 }
 
-#ifndef OHOS_BUILD_ENABLE_WATCH
-/**
- * @tc.name: CursorDrawingComponentTest_NotifyPointerEventToRS
- * @tc.desc: Test NotifyPointerEventToRS
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(CursorDrawingComponentTest, CursorDrawingComponentTest_NotifyPointerEventToRS, TestSize.Level1)
-{
-    instance_->isLoaded_ = false;
-    int32_t pointAction = 1;
-    int32_t pointCnt = 0;
-    int32_t sourceType = 1;
-    EXPECT_NO_FATAL_FAILURE(instance_->NotifyPointerEventToRS(pointAction, pointCnt, sourceType));
-
-    instance_->isLoaded_ = true;
-    EXPECT_NO_FATAL_FAILURE(instance_->NotifyPointerEventToRS(pointAction, pointCnt, sourceType));
-}
-#endif // OHOS_BUILD_ENABLE_WATCH
-
 /**
  * @tc.name: CursorDrawingComponentTest_InitPointerCallback_001
  * @tc.desc: Test DrawPointer

@@ -177,9 +177,6 @@ public:
     void DrawScreenCenterPointer(const PointerStyle& pointerStyle) override;
     void OnScreenModeChange(const std::vector<sptr<OHOS::Rosen::ScreenInfo>> &screens);
     int32_t UpdateMouseLayer(int32_t physicalX, int32_t physicalY) override;
-#ifndef OHOS_BUILD_ENABLE_WATCH
-    void NotifyPointerEventToRS(int32_t pointAction, int32_t pointCnt, int32_t sourceType) override;
-#endif // OHOS_BUILD_ENABLE_WATCH
     void RsRemoteDiedCallback();
     int32_t GetCurrentCursorInfo(bool& visible, PointerStyle& pointerStyle) override;
     int32_t GetUserDefinedCursorPixelMap(void *pixelMapPtr) override;

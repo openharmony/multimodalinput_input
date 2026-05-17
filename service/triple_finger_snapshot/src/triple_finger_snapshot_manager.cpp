@@ -137,7 +137,7 @@ bool TripleFingerSnapshotManager::Disable()
         MMI_HILOGE("delegateProxy is nullptr");
         return false;
     }
-    delegateProxy->OnPostSyncTask([this, impl] {
+    delegateProxy->OnPostSyncTask([impl] {
         impl->Disable();
         return RET_OK;
     });
