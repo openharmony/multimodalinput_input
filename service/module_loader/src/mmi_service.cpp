@@ -6375,6 +6375,9 @@ int32_t MMIService::RedispatchInputEventInner(std::shared_ptr<PointerEvent> poin
                     MMI_HILOGI("Redispatch DOWN conflicts with real finger in same window, "
                         "deviceId:%{public}d pointerId:%{public}d windowId:%{public}d",
                         pointerEvent->GetDeviceId(), pointerEvent->GetPointerId(), realWindowId);
+                    auto& store = WIN_MGR->GetTouchRedispatchStore();
+                    store.DeactivateFinger(pointerEvent->GetZOrder(),
+                        pointerEvent->GetDeviceId(), pointerEvent->GetPointerId());
                     return RET_ERR;
                 }
             }
