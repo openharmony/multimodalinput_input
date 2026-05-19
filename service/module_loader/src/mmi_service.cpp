@@ -6339,8 +6339,40 @@ int32_t MMIService::RedispatchInputEventInner(std::shared_ptr<PointerEvent> poin
                 pointerItem.SetTargetWindowId(-1);
                 pointerEvent->UpdatePointerItem(pointerEvent->GetPointerId(), pointerItem);
             }
+            int32_t pointerAction = pointerEvent->GetPointerAction();
             TouchRedispatchStore::Guard guard(pointerEvent);
+            if (pointerAction != PointerEvent::POINTER_ACTION_DOWN &&
+                pointerAction != PointerEvent::POINTER_ACTION_HOVER_ENTER) {
+                auto& store = WIN_MGR->GetTouchRedispatchStore();
+                float zOrder = pointerEvent->GetZOrder();
+                int32_t deviceId = pointerEvent->GetDeviceId();
+                int32_t pointerId = pointerEvent->GetPointerId();
+                if (store.IsFingerActive(zOrder, deviceId, pointerId)) {
+                    int32_t savedWindowId = store.GetFingerWindowId(zOrder, deviceId, pointerId);
+                    if (savedWindowId >= 0) {
+                        pointerEvent->SetTargetWindowId(savedWindowId);
+                        if (pointerEvent->GetPointerItem(pointerId, pointerItem)) {
+                            pointerItem.SetTargetWindowId(savedWindowId);
+                            pointerEvent->UpdatePointerItem(pointerId, pointerItem);
+                        }
+                    }
+                }
+            }
             WIN_MGR->UpdateTargetPointer(pointerEvent);
+            if ((pointerAction == PointerEvent::POINTER_ACTION_DOWN ||
+                 pointerAction == PointerEvent::POINTER_ACTION_HOVER_ENTER)) {
+                int32_t realWindowId = WIN_MGR->GetRealFingerDownWindowId(
+                    pointerEvent->GetDeviceId(), pointerEvent->GetPointerId());
+                if (realWindowId >= 0 && realWindowId == pointerEvent->GetTargetWindowId()) {
+                    MMI_HILOGI("Redispatch DOWN conflicts with real finger in same window, "
+                        "deviceId:%{public}d pointerId:%{public}d windowId:%{public}d",
+                        pointerEvent->GetDeviceId(), pointerEvent->GetPointerId(), realWindowId);
+                    auto& store = WIN_MGR->GetTouchRedispatchStore();
+                    store.DeactivateFinger(pointerEvent->GetZOrder(),
+                        pointerEvent->GetDeviceId(), pointerEvent->GetPointerId());
+                    return RET_ERR;
+                }
+            }
             if (WIN_MGR->AbandonTouchRedispatch(pointerEvent)) {
                 return RET_ERR;
             }

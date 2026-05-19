@@ -193,6 +193,7 @@ public:
     virtual bool AbandonMouseRedispatch(const std::shared_ptr<PointerEvent>& pointerEvent) = 0;
     virtual MouseRedispatchStore& GetMouseRedispatchStore() = 0;
     virtual TouchRedispatchStore& GetTouchRedispatchStore() = 0;
+    virtual int32_t GetRealFingerDownWindowId(int32_t deviceId, int32_t pointerId) = 0;
 #ifdef OHOS_BUILD_ENABLE_ANCO
     virtual void InitializeAnco() = 0;
     virtual void SimulatePointerExt(std::shared_ptr<PointerEvent> pointerEvent) = 0;
