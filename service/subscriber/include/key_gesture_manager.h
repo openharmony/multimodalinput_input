@@ -57,6 +57,7 @@ private:
         }
 
         void ResetTimer();
+        void ClearData();
         void Trigger(std::shared_ptr<KeyEvent> keyEvent);
         void Run(std::shared_ptr<KeyEvent> keyEvent) const;
         void RunPending();
@@ -83,6 +84,7 @@ private:
             std::function<void(std::shared_ptr<KeyEvent>)> callback);
         bool RemoveHandler(int32_t id);
         virtual void Reset();
+        virtual void ClearData();
         bool IsActive() const;
         void MarkActive(bool active);
 
@@ -109,6 +111,7 @@ private:
         bool Intercept(std::shared_ptr<KeyEvent> KeyEvent) override;
         void Dump(std::ostringstream &output) const override;
         void Reset() override;
+        void ClearData() override;
 
     private:
         void RunPendingHandlers();
