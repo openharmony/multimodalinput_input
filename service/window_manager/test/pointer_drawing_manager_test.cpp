@@ -61,6 +61,8 @@ const std::string DEFAULT_ICON_PATH = IMAGE_POINTER_DEFAULT_PATH + "Default.svg"
 constexpr int32_t AECH_DEVELOPER_DEFINED_STYLE { 47 };
 constexpr int32_t AECH_DEVELOPER_DEFINED { 4 };
 constexpr int32_t DEFAULT_VALUE { -1 };
+constexpr uint64_t TEST_INVALID_DISPLAY_ID { 999 };
+constexpr uint64_t WAIT_TIME { 100 * 1000 };
 } // namespace
 
 class PointerDrawingManagerTest : public testing::Test {
@@ -3093,6 +3095,8 @@ HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_UpdateMouseLayer, Te
     pointerDrawingManager.hardwareCursorPointerManager_->isEnableState_ = true;
     pointerDrawingManager.lastMouseStyle_.id = 2;
     ASSERT_EQ(pointerDrawingManager.UpdateMouseLayer(physicalX, physicalY), RET_ERR);
+    // wait for render thread create done and running
+    usleep(WAIT_TIME);
 }
 
 /**
@@ -4406,6 +4410,28 @@ HWTEST_F(PointerDrawingManagerTest, CreatePointerWindowForScreenPointer_InitSucc
     
     int32_t result = pointerDrawingManager.CreatePointerWindowForScreenPointer(rsId, physicalX, physicalY);
     EXPECT_EQ(result, RET_OK);
+}
+
+/**
+ * @tc.name: PointerDrawingManagerTest_InitLayer_001
+ * @tc.desc: Test InitLayer when hard cursor enabled but no mouse after boot and inject mouse move
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerTest, PointerDrawingManagerTest_InitLayer_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerDrawingManager pointerDrawingManager;
+    pointerDrawingManager.hardwareCursorPointerManager_ = std::make_shared<HardwareCursorPointerManager>();
+    pointerDrawingManager.hardwareCursorPointerManager_->SetHdiServiceState(true);
+    pointerDrawingManager.hardwareCursorPointerManager_->isEnableState_ = true;
+    pointerDrawingManager.displayId_ = TEST_INVALID_DISPLAY_ID;
+    int32_t styleId = 0;
+    int32_t ret = pointerDrawingManager.InitLayer(MOUSE_ICON(styleId));
+    EXPECT_EQ(ret, RET_OK);
+    // wait for render thread create done and running
+    usleep(WAIT_TIME);
+    EXPECT_EQ(pointerDrawingManager.initEventHandlerFlag_.load(), true);
 }
 } // namespace MMI
 } // namespace OHOS

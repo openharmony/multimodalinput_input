@@ -315,6 +315,8 @@ private:
     bool InitRSUIContext(uint64_t screenId);
     void RsFlushImplicitTransaction();
     std::shared_ptr<Rosen::RSUIContext> GetRSUIContext();
+    void InitRsCallback();
+    void InitPointerThread();
     void DestroyPointerWindowOfHardCursor();
     void DestroyPointerWindowOfSoftCursor();
 private:
