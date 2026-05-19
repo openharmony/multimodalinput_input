@@ -64,6 +64,9 @@ std::shared_ptr<PointerEvent> TouchControllerImpl::CreatePointerEvent(const Poin
     pointerEvent->SetDeviceId(INVALID_DEVICE_ID);
     pointerEvent->SetTargetDisplayId(context.displayId);
     pointerEvent->SetActionTime(context.actionTime);
+    if (context.action == PointerEvent::POINTER_ACTION_DOWN && contacts.size() == 1) {
+        pointerEvent->SetActionStartTime(context.actionTime);
+    }
     pointerEvent->AddFlag(InputEvent::EVENT_FLAG_SIMULATE);
     pointerEvent->AddFlag(InputEvent::EVENT_FLAG_CONTROLLER);
     pointerEvent->RemoveAllPointerItems();
@@ -84,6 +87,8 @@ void TouchControllerImpl::AddPointerItems(const std::shared_ptr<PointerEvent> &p
         item.SetDisplayY(contact.displayY);
         item.SetDisplayXPos(contact.displayX);
         item.SetDisplayYPos(contact.displayY);
+        item.SetRawDisplayX(contact.displayX);
+        item.SetRawDisplayY(contact.displayY);
         item.SetToolType(TOUCH_TOOL_TYPE_FINGER);
         item.SetDeviceId(INVALID_DEVICE_ID);
         item.SetDownTime(contact.downTime);
