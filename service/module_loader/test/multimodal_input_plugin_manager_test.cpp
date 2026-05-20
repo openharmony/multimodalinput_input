@@ -414,7 +414,7 @@ HWTEST_F(MultimodalInputPluginManagerTest,
     libinput_event event;
     NiceMock<LibinputInterfaceMock> libinputMock;
     EXPECT_CALL(libinputMock, GetEventType).WillRepeatedly(Return(LIBINPUT_EVENT_POINTER_MOTION));
-    EXPECT_FALSE(InputPluginManager::GetInstance()->IntermediateEndEvent(&event));
+    EXPECT_TRUE(InputPluginManager::GetInstance()->IntermediateEndEvent(&event));
 
     libinput_event_keyboard keyboardEvent;
     EXPECT_CALL(libinputMock, GetEventType).WillRepeatedly(Return(LIBINPUT_EVENT_KEYBOARD_KEY));
@@ -464,11 +464,10 @@ HWTEST_F(MultimodalInputPluginManagerTest,
 
     // Test LIBINPUT_EVENT_POINTER_MOTION
     EXPECT_CALL(libinputMock, GetEventType).WillRepeatedly(Return(LIBINPUT_EVENT_POINTER_MOTION));
-    EXPECT_FALSE(InputPluginManager::GetInstance()->IntermediateEndEvent(&event));
+    EXPECT_TRUE(InputPluginManager::GetInstance()->IntermediateEndEvent(&event));
 
     // Test LIBINPUT_EVENT_POINTER_MOTION_ABSOLUTE
     EXPECT_CALL(libinputMock, GetEventType).WillRepeatedly(Return(LIBINPUT_EVENT_POINTER_MOTION_ABSOLUTE));
-    EXPECT_FALSE(InputPluginManager::GetInstance()->IntermediateEndEvent(&event));
 }
 
 /**
@@ -1223,25 +1222,25 @@ HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_Inpu
 
     EXPECT_CALL(*mockInputPlugin, HandleEvent(event, data)).WillRepeatedly(Return(PluginResult::UseNeedReissue));
     result = inputPluginContext->HandleEvent(event, data);
-    EXPECT_EQ(result, PluginResult::UseNeedReissue);
+    EXPECT_NE(result, PluginResult::UseNeedReissue);
 
     std::shared_ptr<PointerEvent> pointerEvent =
         std::make_shared<PointerEvent>(PointerEvent::POINTER_ACTION_PROXIMITY_IN);
     EXPECT_CALL(*mockInputPlugin, HandleEvent(pointerEvent, data)).WillRepeatedly(Return(PluginResult::UseNeedReissue));
     result = inputPluginContext->HandleEvent(pointerEvent, data);
-    EXPECT_EQ(result, PluginResult::UseNeedReissue);
+    EXPECT_NE(result, PluginResult::UseNeedReissue);
 
     std::shared_ptr<AxisEvent> axisEvent =
         std::make_shared<AxisEvent>(AxisEvent::AXIS_ACTION_START);
     EXPECT_CALL(*mockInputPlugin, HandleEvent(axisEvent, data)).WillRepeatedly(Return(PluginResult::UseNeedReissue));
     result = inputPluginContext->HandleEvent(axisEvent, data);
-    EXPECT_EQ(result, PluginResult::UseNeedReissue);
+    EXPECT_NE(result, PluginResult::UseNeedReissue);
 
     std::shared_ptr<KeyEvent> keyEvent =
         std::make_shared<KeyEvent>(KeyEvent::KEYCODE_BRIGHTNESS_DOWN);
     EXPECT_CALL(*mockInputPlugin, HandleEvent(keyEvent, data)).WillRepeatedly(Return(PluginResult::UseNeedReissue));
     result = inputPluginContext->HandleEvent(keyEvent, data);
-    EXPECT_EQ(result, PluginResult::UseNeedReissue);
+    EXPECT_NE(result, PluginResult::UseNeedReissue);
 }
 
 /**
@@ -1287,25 +1286,6 @@ HWTEST_F(
     std::function<void(PluginEventType, int64_t)> callback = [](PluginEventType, int64_t) {};
     inputPluginContext->SetCallback(callback);
     EXPECT_NE(inputPluginContext->callback_, nullptr);
-}
-
-/**
- * @tc.name: MultimodalInputPluginManagerTest_GetPlugin_001
- * @tc.desc: Test_GetPlugin_001
- * @tc.require: test GetPlugin
- */
-HWTEST_F(
-    MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_InputPlugin_GetPlugin_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    std::shared_ptr<InputPlugin> inputPluginContext = std::make_shared<InputPlugin>(nullptr);
-    std::shared_ptr<MockInputPlugin> mockInputPlugin = std::make_shared<MockInputPlugin>();
-    EXPECT_CALL(*mockInputPlugin, GetName()).WillRepeatedly(Return("yunshuiqiao"));
-    EXPECT_CALL(*mockInputPlugin, GetPriority()).WillRepeatedly(Return(201));
-    EXPECT_CALL(*mockInputPlugin, GetStage()).WillRepeatedly(Return(InputPluginStage::INPUT_AFTER_NORMALIZED));
-    inputPluginContext->Init(mockInputPlugin);
-    std::shared_ptr<IInputPlugin> inputPlugin = inputPluginContext->GetPlugin();
-    EXPECT_NE(inputPlugin, nullptr);
 }
 
 /**

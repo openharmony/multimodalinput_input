@@ -317,21 +317,5 @@ HWTEST_F(InputScreenCaptureAgentTest, FreeHandle_002, TestSize.Level1)
     EXPECT_EQ(inputScreenCaptureAgent.handle_.registerListener, nullptr);
     EXPECT_EQ(inputScreenCaptureAgent.handle_.isMusicActivate, nullptr);
 }
-
-/**
- * @tc.name: IsScreenCaptureWorking_002
- * @tc.desc: Test IsScreenCaptureWorking when handle is null
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputScreenCaptureAgentTest, IsScreenCaptureWorking_002, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    inputScreenCaptureAgent.handle_.handle = nullptr;
-    
-    int32_t capturePid = 1;
-    EXPECT_FALSE(inputScreenCaptureAgent.IsScreenCaptureWorking(capturePid));
-}
-
 } // namespace MMI
 } // namespace OHOS

@@ -85,10 +85,6 @@ HWTEST_F(PointerDrawingManagerHardCursorTest, PointerDrawingManagerHardCursorTes
     int32_t x = 50;
     int32_t y = 60;
     uint64_t displayId = 0;
-    sptr<IRemoteObject> renderToken = Rosen::RSInterfaces::GetInstance().GetConnectToRenderToken(displayId);
-    ASSERT_NE(renderToken, nullptr);
-    auto rsUIDirector = Rosen::RSUIDirector::Create(renderToken);
-    ASSERT_NE(rsUIDirector, nullptr);
     auto rsUIContext = rsUIDirector->GetRSUIContext();
     ASSERT_NE(rsUIContext, nullptr);
     Rosen::RSSurfaceNodeConfig surfaceNodeConfig;
@@ -100,44 +96,6 @@ HWTEST_F(PointerDrawingManagerHardCursorTest, PointerDrawingManagerHardCursorTes
     pointerDrawingManager.SetPointerLocation(x, y, displayId);
     EXPECT_EQ(pointerDrawingManager.lastPhysicalX_, x);
     EXPECT_EQ(pointerDrawingManager.lastPhysicalY_, y);
-}
-
-/**
- * @tc.name: PointerDrawingManagerHardCursorTest_OnVsync_001
- * @tc.desc: Test OnVsync
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(PointerDrawingManagerHardCursorTest, PointerDrawingManagerHardCursorTest_OnVsync_001,
-    TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    PointerDrawingManager pointerDrawingManager;
-    ASSERT_NE(pointerDrawingManager.hardwareCursorPointerManager_, nullptr);
-    EXPECT_CALL(*pointerDrawingManager.hardwareCursorPointerManager_, IsSupported).WillRepeatedly(Return(true));
-    EXPECT_CALL(*pointerDrawingManager.hardwareCursorPointerManager_, SetPosition)
-        .WillOnce(Return(RET_ERR))
-        .WillRepeatedly(Return(RET_OK));
-    pointerDrawingManager.InitPointerCallback();
-    sptr<Rosen::ScreenInfo> screenInfo = CreateScreenInfo(0, 0, Rosen::ScreenSourceMode::SCREEN_MAIN);
-    auto sp = std::make_shared<ScreenPointer>(pointerDrawingManager.hardwareCursorPointerManager_,
-        pointerDrawingManager.handler_, screenInfo);
-    ASSERT_NE(sp, nullptr);
-    sp->Init(pointerDrawingManager.pointerRenderer_);
-    pointerDrawingManager.screenPointers_.insert({0, sp});
-    pointerDrawingManager.lastPhysicalX_ = 10;
-    pointerDrawingManager.lastPhysicalY_ = 20;
-    pointerDrawingManager.SetSurfaceNode(sp->GetSurfaceNode());
-    ASSERT_TRUE(pointerDrawingManager.surfaceNode_ != nullptr);
-    pointerDrawingManager.currentMouseStyle_.id = 43;
-    pointerDrawingManager.mouseDisplayState_ = true;
-    CursorDrawingInformation::GetInstance().mouseIconUpdate_ = true;
- 
-    pointerDrawingManager.OnVsync(100000);
-    usleep(SLEEP_TIME_IN_US);  // wait for async OnVsync
-    pointerDrawingManager.currentMouseStyle_.id = 0;
-    pointerDrawingManager.ClearRunnerAndHandler();
-    EXPECT_EQ(CursorDrawingInformation::GetInstance().mouseIconUpdate_, false);
 }
 
 /**

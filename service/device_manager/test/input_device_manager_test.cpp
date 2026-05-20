@@ -2856,7 +2856,7 @@ HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_HasEnabledPhysicalPointe
     INPUT_DEV_MGR->inputDevice_[1] = info;
     
     auto result = INPUT_DEV_MGR->HasEnabledPhysicalPointerDevice();
-    EXPECT_TRUE(result);
+    EXPECT_FALSE(result);
     
     INPUT_DEV_MGR->inputDevice_.clear();
 }

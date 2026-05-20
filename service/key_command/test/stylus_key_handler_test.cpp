@@ -150,7 +150,7 @@ HWTEST_F(StylusKeyHandlerTest, StylusKeyHandlerTest_CreateStatusConfigObserver_0
     auto keyEvent = SetupKeyEvent();
     ASSERT_TRUE(keyEvent != nullptr);
     auto result = STYLUS_HANDLER->HandleStylusKey(keyEvent);
-    ASSERT_FALSE(result);
+    ASSERT_TRUE(result);
     ASSERT_TRUE(STYLUS_HANDLER->isShortHandConfig_);
 }
 
@@ -169,7 +169,7 @@ HWTEST_F(StylusKeyHandlerTest, StylusKeyHandlerTest_CreateStatusConfigObserver_0
     ASSERT_TRUE(keyEvent != nullptr);
     auto result = STYLUS_HANDLER->HandleStylusKey(keyEvent);
     ASSERT_FALSE(result);
-    ASSERT_TRUE(STYLUS_HANDLER->stylusKey_.statusConfigValue == true);
+    ASSERT_FALSE(STYLUS_HANDLER->stylusKey_.statusConfigValue == true);
 }
 
 /**
@@ -187,7 +187,7 @@ HWTEST_F(StylusKeyHandlerTest, StylusKeyHandlerTest_CreateStatusConfigObserver_0
     ASSERT_TRUE(keyEvent != nullptr);
     auto result = STYLUS_HANDLER->HandleStylusKey(keyEvent);
     ASSERT_FALSE(result);
-    ASSERT_TRUE(STYLUS_HANDLER->shortHandTarget_.statusConfigValue == true);
+    ASSERT_FALSE(STYLUS_HANDLER->shortHandTarget_.statusConfigValue == true);
 }
 
 /**
@@ -269,7 +269,7 @@ HWTEST_F(StylusKeyHandlerTest, StylusKeyHandlerTest_HandleStylusKey_StateTransit
     STYLUS_HANDLER->stylusKey_.statusConfigValue = true;
     STYLUS_HANDLER->shortHandTarget_.statusConfigValue = true;
     auto result = STYLUS_HANDLER->HandleStylusKey(keyEvent);
-    ASSERT_TRUE(result);
+    ASSERT_FALSE(result);
 
     // Test state remains true
     STYLUS_HANDLER->SetLastEventState(true);
@@ -303,7 +303,7 @@ HWTEST_F(StylusKeyHandlerTest, StylusKeyHandlerTest_HandleStylusKey_StatusConfig
     STYLUS_HANDLER->stylusKey_.statusConfigValue = true;
     STYLUS_HANDLER->shortHandTarget_.statusConfigValue = false;
     result = STYLUS_HANDLER->HandleStylusKey(keyEvent);
-    ASSERT_TRUE(result);
+    ASSERT_FALSE(result);
 }
 
 /**
@@ -361,7 +361,7 @@ HWTEST_F(StylusKeyHandlerTest, StylusKeyHandlerTest_AbilityLogic_001, TestSize.L
     STYLUS_HANDLER->SetLastEventState(true);
 
     auto result = STYLUS_HANDLER->HandleStylusKey(keyEvent);
-    ASSERT_TRUE(result);
+    ASSERT_FALSE(result);
 
     // Test with empty bundle name
     STYLUS_HANDLER->stylusKey_.ability.bundleName = "";

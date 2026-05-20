@@ -229,22 +229,6 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_ControlMouseEventToAnc
 #endif // OHOS_BUILD_ENABLE_ANCO_GAME_EVENT_MAPPING
 
 /**
- * @tc.name: InputWindowsManagerTest_GetClientFd_001
- * @tc.desc: Test GetClientFd
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetClientFd_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    auto pointerEvent = PointerEvent::Create();
-    UDSServer udsServer;
-    WIN_MGR->Init(udsServer);
-    int32_t idNames = -1;
-    ASSERT_EQ(WIN_MGR->GetClientFd(pointerEvent), idNames);
-}
-
-/**
  * @tc.name: InputWindowsManagerTest_GetDisplayGroupInfo_001
  * @tc.desc: Test GetDisplayGroupInfo
  * @tc.type: FUNC

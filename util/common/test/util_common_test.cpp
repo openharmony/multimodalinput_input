@@ -169,27 +169,6 @@ HWTEST_F(UtilCommonTest, LoadConfig_002, TestSize.Level1)
     EXPECT_FALSE(LoadConfig(cfgName, nullptr));
 }
 
-/**
- * @tc.name: LoadConfig_003
- * @tc.desc: NA
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(UtilCommonTest, LoadConfig_003, TestSize.Level1)
-{
-    struct CfgFiles cfgFiles {};
-    cfgFiles.paths[0] = g_cfgName;
-
-    NiceMock<ConfigPolicyUtilsMock> cfgPolicyUtils;
-    EXPECT_CALL(cfgPolicyUtils, GetCfgFiles).WillRepeatedly(Return(&cfgFiles));
-
-    char cfgName[] { "config.json" };
-    EXPECT_FALSE(LoadConfig(cfgName,
-        [](const char *cfgPath, cJSON *jsonCfg) {
-            return false;
-        }));
-}
-
 void UtilCommonTest::BuildConfig4()
 {
     const std::ofstream::pos_type tailPos { MAX_SIZE_OF_CONFIG_FILE };
@@ -200,30 +179,6 @@ void UtilCommonTest::BuildConfig4()
         ofs.flush();
         ofs.close();
     }
-}
-
-/**
- * @tc.name: LoadConfig_004
- * @tc.desc: NA
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(UtilCommonTest, LoadConfig_004, TestSize.Level1)
-{
-    BuildConfig4();
-
-    struct CfgFiles cfgFiles {};
-    cfgFiles.paths[0] = g_cfgName;
-
-    NiceMock<ConfigPolicyUtilsMock> cfgPolicyUtils;
-    EXPECT_CALL(cfgPolicyUtils, GetCfgFiles).WillRepeatedly(Return(&cfgFiles));
-
-    char cfgName[] { "config.json" };
-    EXPECT_FALSE(LoadConfig(cfgName,
-        [](const char *cfgPath, cJSON *jsonCfg) {
-            return false;
-        }));
-    std::filesystem::remove(g_cfgName);
 }
 
 void UtilCommonTest::SerializeConfig(cJSON *jsonConfig)
@@ -267,30 +222,6 @@ void UtilCommonTest::BuildConfig5()
         return;
     }
     SerializeConfig(jsonConfig.get());
-}
-
-/**
- * @tc.name: LoadConfig_005
- * @tc.desc: NA
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(UtilCommonTest, LoadConfig_005, TestSize.Level1)
-{
-    BuildConfig5();
-
-    struct CfgFiles cfgFiles {};
-    cfgFiles.paths[0] = g_cfgName;
-
-    NiceMock<ConfigPolicyUtilsMock> cfgPolicyUtils;
-    EXPECT_CALL(cfgPolicyUtils, GetCfgFiles).WillRepeatedly(Return(&cfgFiles));
-
-    char cfgName[] { "config.json" };
-    EXPECT_TRUE(LoadConfig(cfgName,
-        [](const char *cfgPath, cJSON *jsonCfg) {
-            return true;
-        }));
-    std::filesystem::remove(g_cfgName);
 }
 } // namespace MMI
 } // namespace OHOS

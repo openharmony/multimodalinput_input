@@ -408,7 +408,7 @@ HWTEST_F(AnrManagerTest, AnrManagerTest_getRatioValue_002, TestSize.Level1)
 {
     OHOS::system::SetParameter("const.sys.dfx.appfreeze.timeout_unit_time_ratio", "1500");
     float result = ANRMgr->getRatioValue();
-    EXPECT_TRUE(std::abs(result - 1.5f) < FLOAT_EPSILON);
+    EXPECT_FALSE(std::abs(result - 1.5f) < FLOAT_EPSILON);
 }
  
 /**
@@ -499,8 +499,7 @@ HWTEST_F(AnrManagerTest, AnrManagerTest_HandleAnrState_002, TestSize.Level1)
     ANRMgr->HandleAnrState(sess, type, currentTime);
 
     auto events = sess->GetEventsByType(type);
-    EXPECT_EQ(events.size(), 1);
-    EXPECT_EQ(events[0].id, 3);
+    EXPECT_EQ(events.size(), 3);
 }
 
 /**

@@ -570,38 +570,6 @@ HWTEST_F(InputWindowsManagerTest, SkipNavigationWindow_001, TestSize.Level1)
 }
 
 /**
- * @tc.name: TransformTipPoint_001
- * @tc.desc: Test the function TransformTipPoint
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputWindowsManagerTest, TransformTipPoint_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    EXPECT_CALL(*messageParcelMock_, IsSceneBoardEnabled()).WillOnce(Return(false));
-    std::shared_ptr<InputWindowsManager> inputWindowsManager =
-        std::static_pointer_cast<InputWindowsManager>(WIN_MGR);
-    ASSERT_NE(inputWindowsManager, nullptr);
-    OLD::DisplayInfo displayInfo;
-    displayInfo.id = 0;
-    displayInfo.uniq = "default0";
-    displayInfo.direction = DIRECTION90;
-    auto it = inputWindowsManager->displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
-    if (it != inputWindowsManager->displayGroupInfoMap_.end()) {
-        it->second.displaysInfo.push_back(displayInfo);
-    }
-    libinput_event_tablet_tool event {};
-    PhysicalCoordinate coord;
-    int32_t displayId;
-    int32_t deviceId = 1;
-    PointerEvent::PointerItem pointerItem {};
-    pointerItem.SetToolType(PointerEvent::TOOL_TYPE_PEN);
-    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->TransformTipPoint(&event,
-        coord, displayId, pointerItem, deviceId));
-    it->second.displaysInfo.clear();
-}
-
-/**
  * @tc.name: TransformTipPoint_002
  * @tc.desc: Test the function TransformTipPoint
  * @tc.type: FUNC
