@@ -156,7 +156,7 @@ bool ScreenPointer::Init(PointerRenderer &render, bool needDrawPointer)
         MMI_HILOGE("ScreenPointer InitCommonBuffer failed");
         return false;
     }
-    currentBuffer_ = GetCommonBuffer();
+    GetCommonBuffer();
     return true;
 }
 
@@ -201,13 +201,19 @@ bool ScreenPointer::InitCommonBuffer(const OHOS::BufferRequestConfig &bufferCfg)
 
 buffer_ptr_t ScreenPointer::GetDefaultBuffer()
 {
-    currentBuffer_ = defaultBuffer_;
+    {
+        std::unique_lock<std::shared_mutex> lock(bufferMutex_);
+        currentBuffer_ = defaultBuffer_;
+    }
     return defaultBuffer_;
 }
 
 buffer_ptr_t ScreenPointer::GetTransparentBuffer()
 {
-    currentBuffer_ = transparentBuffer_;
+    {
+        std::unique_lock<std::shared_mutex> lock(bufferMutex_);
+        currentBuffer_ = transparentBuffer_;
+    }
     return transparentBuffer_;
 }
 
@@ -222,7 +228,10 @@ buffer_ptr_t ScreenPointer::GetCommonBuffer()
     uint32_t newId = bufferId_.load(std::memory_order_relaxed) + 1;
     newId %= bufferSize;
     bufferId_.store(newId, std::memory_order_relaxed);
-    currentBuffer_ = commonBuffers_[newId];
+    {
+        std::unique_lock<std::shared_mutex> lock(bufferMutex_);
+        currentBuffer_ = commonBuffers_[newId];
+    }
     return commonBuffers_[newId];
 }
 
@@ -250,6 +259,7 @@ bool ScreenPointer::IsDefaultCfg(const RenderConfig &cfg)
 
 buffer_ptr_t ScreenPointer::GetCurrentBuffer()
 {
+    std::shared_lock<std::shared_mutex> lock(bufferMutex_);
     return currentBuffer_;
 }
 
