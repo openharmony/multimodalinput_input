@@ -53,6 +53,11 @@ void KeyGestureManager::Handler::ResetTimer()
     }
 }
 
+void KeyGestureManager::Handler::ClearData()
+{
+    keyEvent_ = nullptr;
+}
+
 void KeyGestureManager::Handler::Trigger(std::shared_ptr<KeyEvent> keyEvent)
 {
     MMI_HILOGI("[Handler] Handler(%{public}d) will run after %{public}dms", GetId(), GetLongPressTime());
@@ -122,6 +127,13 @@ void KeyGestureManager::KeyGesture::ResetTimers()
 {
     for (auto &handler : handlers_) {
         handler.ResetTimer();
+    }
+}
+
+void KeyGestureManager::KeyGesture::ClearData()
+{
+    for (auto &handler : handlers_) {
+        handler.ClearData();
     }
 }
 
@@ -288,6 +300,11 @@ void KeyGestureManager::LongPressSingleKey::Reset()
     KEY_MONITOR_MGR->ResetAll(keyCode_);
 #endif // OHOS_BUILD_ENABLE_KEY_PRESSED_HANDLER
     KeyGesture::Reset();
+}
+
+void KeyGestureManager::LongPressSingleKey::ClearData()
+{
+    KeyGesture::ClearData();
 }
 
 void KeyGestureManager::LongPressSingleKey::RunPendingHandlers()
@@ -498,6 +515,7 @@ void KeyGestureManager::ResetAll()
     for (auto &keyGesture : keyGestures_) {
         CHKPC(keyGesture);
         keyGesture->Reset();
+        keyGesture->ClearData();
     }
 }
 
