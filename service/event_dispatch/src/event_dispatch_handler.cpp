@@ -18,7 +18,6 @@
 #include "anr_manager.h"
 #include "app_debug_listener.h"
 #include "bytrace_adapter.h"
-#include "cursor_drawing_component.h"
 #include "dfx_hisysevent.h"
 #include "event_log_helper.h"
 #include "input_event_data_transformation.h"
@@ -28,7 +27,9 @@
 #include "key_event_hook_manager.h"
 #endif // OHOS_BUILD_ENABLE_KEY_HOOK
 #include "pointer_device_manager.h"
-
+#ifndef OHOS_BUILD_ENABLE_WATCH
+#include "transaction/rs_render_service_client.h"
+#endif // OHOS_BUILD_ENABLE_WATCH
 #ifdef OHOS_BUILD_ENABLE_DRAG_SECURITY
 #include "drag_security_manager.h"
 #endif // OHOS_BUILD_ENABLE_DRAG_SECURITY
@@ -45,6 +46,9 @@ constexpr int64_t ERROR_TIME {3000000};
 constexpr int32_t INTERVAL_TIME { 3000 }; // log time interval is 3 seconds.
 constexpr int32_t INTERVAL_DURATION { 10 };
 constexpr int32_t THREE_FINGERS { 3 };
+#ifndef OHOS_BUILD_ENABLE_WATCH
+static constexpr auto sendConsecutiveEventInterval = std::chrono::milliseconds(1000);
+#endif // OHOS_BUILD_ENABLE_WATCH
 } // namespace
 
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
@@ -274,6 +278,50 @@ void EventDispatchHandler::HandleMultiWindowPointerEvent(std::shared_ptr<Pointer
     }
 }
 
+#ifndef OHOS_BUILD_ENABLE_WATCH
+bool EventDispatchHandler::GetTouchOrPointerAction(int32_t pointerAction)
+{
+    if (pointerAction == TOUCH_CANCEL || pointerAction == TOUCH_DOWN ||
+        pointerAction == TOUCH_UP || pointerAction == TOUCH_BUTTON_DOWN ||
+        pointerAction == TOUCH_BUTTON_UP || pointerAction == TOUCH_PULL_DOWN ||
+        pointerAction == TOUCH_PULL_UP || pointerAction == AXIS_BEGIN ||
+        pointerAction == AXIS_END || pointerAction == POINTER_ACTION_PROXIMITY_IN ||
+        pointerAction == POINTER_ACTION_PROXIMITY_OUT) {
+        return true;
+    }
+    if (pointerAction == TOUCH_MOVE || pointerAction == TOUCH_PULL_MOVE) {
+        auto now = std::chrono::steady_clock::now();
+        if (now - sendMoveTime_.load() >= sendConsecutiveEventInterval) {
+            sendMoveTime_.store(now);
+            return true;
+        }
+        return false;
+    }
+    if (pointerAction == AXIS_UPDATE) {
+        auto now = std::chrono::steady_clock::now();
+        if (now - sendAxisUpdateTime_.load() >= sendConsecutiveEventInterval) {
+            sendAxisUpdateTime_.store(now);
+            return true;
+        }
+        return false;
+    }
+    return false;
+}
+
+void EventDispatchHandler::NotifyTouchEvent(int32_t pointAction, int32_t pointCnt, int32_t sourceType)
+{
+    if (!GetTouchOrPointerAction(pointAction)) {
+        return;
+    }
+    auto rsClient = Rosen::RSRenderServiceClient::CreateRenderServiceClient();
+    if (rsClient == nullptr) {
+        MMI_HILOGE("NotifyTouchEvent create rs client failed");
+        return;
+    }
+    rsClient->NotifyTouchEvent(pointAction, pointCnt, sourceType);
+}
+#endif // OHOS_BUILD_ENABLE_WATCH
+
 void EventDispatchHandler::NotifyPointerEventToRS(int32_t pointAction, const std::string& programName,
     uint32_t pid, int32_t pointCnt, int32_t sourceType)
 {
@@ -281,9 +329,7 @@ void EventDispatchHandler::NotifyPointerEventToRS(int32_t pointAction, const std
     (void)pid;
 #ifndef OHOS_BUILD_ENABLE_WATCH
     auto begin = std::chrono::high_resolution_clock::now();
-    if (POINTER_DEV_MGR.isInit) {
-        CursorDrawingComponent::GetInstance().NotifyPointerEventToRS(pointAction, pointCnt, sourceType);
-    }
+    NotifyTouchEvent(pointAction, pointCnt, sourceType);
     [[maybe_unused]] auto durationMS = std::chrono::duration_cast<std::chrono::milliseconds>(
         std::chrono::high_resolution_clock::now() - begin).count();
 #ifdef OHOS_BUILD_ENABLE_DFX_RADAR

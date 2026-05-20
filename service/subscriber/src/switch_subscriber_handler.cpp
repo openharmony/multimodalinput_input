@@ -209,7 +209,7 @@ void SwitchSubscriberHandler::SubmitWaitAndPublishEvent(const std::shared_ptr<Sw
     const char* taskName)
 {
     ffrt::submit(
-        [this, switchEvent, publishFunc] {
+        [switchEvent, publishFunc] {
             auto startTime = std::chrono::steady_clock::now();
             while (!isCesReady_.load(std::memory_order_acquire)) {
                 auto curTime = std::chrono::steady_clock::now();

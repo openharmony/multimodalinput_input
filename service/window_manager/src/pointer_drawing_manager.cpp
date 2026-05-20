@@ -3859,13 +3859,6 @@ bool PointerDrawingManager::GetHardCursorEnabled()
     return IsHardCursorEnabled();
 }
 
-#ifndef OHOS_BUILD_ENABLE_WATCH
-void PointerDrawingManager::NotifyPointerEventToRS(int32_t pointAction, int32_t pointCnt, int32_t sourceType)
-{
-    OHOS::Rosen::RSInterfaces::GetInstance().NotifyTouchEvent(pointAction, pointCnt, sourceType);
-}
-#endif // OHOS_BUILD_ENABLE_WATCH
-
 void PointerDrawingManager::RecordCursorIdAndImageAddress()
 {
     const auto id = lastMouseStyle_.id;
