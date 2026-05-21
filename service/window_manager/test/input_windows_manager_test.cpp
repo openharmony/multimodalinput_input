@@ -143,7 +143,6 @@ public:
 
     void TearDown(void)
     {
-        AccountManager::GetInstance()->AccountManagerUnregister();
         int32_t userId = 100;
         WIN_MGR->SetHoverScrollState(userId, preHoverScrollState_);
     }
@@ -227,6 +226,40 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_ControlMouseEventToAnc
     EXPECT_EQ(WIN_MGR->ControlMouseEventToAnco(windowId, false, token), RET_ERR);
 }
 #endif // OHOS_BUILD_ENABLE_ANCO_GAME_EVENT_MAPPING
+
+/**
+ * @tc.name: InputWindowsManagerTest_GetClientFd_001
+ * @tc.desc: Test GetClientFd
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetClientFd_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = PointerEvent::Create();
+    UDSServer udsServer;
+    WIN_MGR->Init(udsServer);
+    int32_t idNames = -1;
+    ASSERT_EQ(WIN_MGR->GetClientFd(pointerEvent), idNames);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_GetDisplayGroupInfo_001
+ * @tc.desc: Test GetDisplayGroupInfo
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetDisplayGroupInfo_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = PointerEvent::Create();
+    UDSServer udsServer;
+    WIN_MGR->Init(udsServer);
+    OLD::DisplayGroupInfo displayGroupInfo;
+    displayGroupInfo.focusWindowId = 1;
+    int32_t groupId = 1;
+    EXPECT_NO_FATAL_FAILURE(WIN_MGR->GetDisplayGroupInfo(groupId));
+}
 
 /**
  * @tc.name: InputWindowsManagerTest_GetDisplayGroupInfo_001

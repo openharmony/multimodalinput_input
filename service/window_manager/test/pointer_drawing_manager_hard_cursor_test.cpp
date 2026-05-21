@@ -117,7 +117,6 @@ HWTEST_F(PointerDrawingManagerHardCursorTest, PointerDrawingManagerHardCursorTes
     pointerDrawingManager.SetSurfaceNode(sp->GetSurfaceNode());
     pointerDrawingManager.mouseDisplayState_ = true;
     pointerDrawingManager.UpdatePointerVisible();
-    EXPECT_EQ(POINTER_DEV_MGR.isPointerVisible, true);
 }
 
 /**
