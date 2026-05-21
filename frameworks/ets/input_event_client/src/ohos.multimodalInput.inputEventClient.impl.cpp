@@ -598,19 +598,15 @@ public:
         CALL_DEBUG_ENTER;
         if (nativeImpl_ == nullptr) {
             MMI_HILOGE("Native implementation is null");
-            taihe::set_business_error(OHOS::MMI::TaiheErrorCode::INPUT_SERVICE_EXCEPTION, "Controller not initialized");
+            SetMouseControllerBusinessError(OHOS::MMI::TaiheErrorCode::INPUT_SERVICE_EXCEPTION,
+                                            MouseControllerOperation::MOVE_TO);
             return;
         }
 
         int32_t ret = nativeImpl_->MoveTo(displayId, displayX, displayY);
         if (ret != RET_OK) {
             MMI_HILOGE("MoveTo failed, ret=%{public}d", ret);
-            TaiheError_t codeMsg;
-            if (TaiheConverter::GetApiError(ret, codeMsg)) {
-                taihe::set_business_error(ret, codeMsg.msg);
-            } else {
-                taihe::set_business_error(ret, "MoveTo failed");
-            }
+            SetMouseControllerBusinessError(ret, MouseControllerOperation::MOVE_TO);
         }
     }
 
@@ -619,7 +615,8 @@ public:
         CALL_DEBUG_ENTER;
         if (nativeImpl_ == nullptr) {
             MMI_HILOGE("Native implementation is null");
-            taihe::set_business_error(OHOS::MMI::TaiheErrorCode::INPUT_SERVICE_EXCEPTION, "Controller not initialized");
+            SetMouseControllerBusinessError(OHOS::MMI::TaiheErrorCode::INPUT_SERVICE_EXCEPTION,
+                                            MouseControllerOperation::PRESS_BUTTON);
             return;
         }
 
@@ -635,12 +632,7 @@ public:
         int32_t ret = nativeImpl_->PressButton(nativeButton);
         if (ret != RET_OK) {
             MMI_HILOGE("PressButton failed, ret=%{public}d", ret);
-            TaiheError_t codeMsg;
-            if (TaiheConverter::GetApiError(ret, codeMsg)) {
-                taihe::set_business_error(ret, codeMsg.msg);
-            } else {
-                taihe::set_business_error(ret, "PressButton failed");
-            }
+            SetMouseControllerBusinessError(ret, MouseControllerOperation::PRESS_BUTTON);
         }
     }
 
@@ -649,7 +641,8 @@ public:
         CALL_DEBUG_ENTER;
         if (nativeImpl_ == nullptr) {
             MMI_HILOGE("Native implementation is null");
-            taihe::set_business_error(OHOS::MMI::TaiheErrorCode::INPUT_SERVICE_EXCEPTION, "Controller not initialized");
+            SetMouseControllerBusinessError(OHOS::MMI::TaiheErrorCode::INPUT_SERVICE_EXCEPTION,
+                                            MouseControllerOperation::RELEASE_BUTTON);
             return;
         }
 
@@ -665,12 +658,7 @@ public:
         int32_t ret = nativeImpl_->ReleaseButton(nativeButton);
         if (ret != RET_OK) {
             MMI_HILOGE("ReleaseButton failed, ret=%{public}d", ret);
-            TaiheError_t codeMsg;
-            if (TaiheConverter::GetApiError(ret, codeMsg)) {
-                taihe::set_business_error(ret, codeMsg.msg);
-            } else {
-                taihe::set_business_error(ret, "ReleaseButton failed");
-            }
+            SetMouseControllerBusinessError(ret, MouseControllerOperation::RELEASE_BUTTON);
         }
     }
 
@@ -679,7 +667,8 @@ public:
         CALL_DEBUG_ENTER;
         if (nativeImpl_ == nullptr) {
             MMI_HILOGE("Native implementation is null");
-            taihe::set_business_error(OHOS::MMI::TaiheErrorCode::INPUT_SERVICE_EXCEPTION, "Controller not initialized");
+            SetMouseControllerBusinessError(OHOS::MMI::TaiheErrorCode::INPUT_SERVICE_EXCEPTION,
+                                            MouseControllerOperation::BEGIN_AXIS);
             return;
         }
 
@@ -695,12 +684,7 @@ public:
         int32_t ret = nativeImpl_->BeginAxis(nativeAxis, value);
         if (ret != RET_OK) {
             MMI_HILOGE("BeginAxis failed, ret=%{public}d", ret);
-            TaiheError_t codeMsg;
-            if (TaiheConverter::GetApiError(ret, codeMsg)) {
-                taihe::set_business_error(ret, codeMsg.msg);
-            } else {
-                taihe::set_business_error(ret, "BeginAxis failed");
-            }
+            SetMouseControllerBusinessError(ret, MouseControllerOperation::BEGIN_AXIS);
         }
     }
 
@@ -709,7 +693,8 @@ public:
         CALL_DEBUG_ENTER;
         if (nativeImpl_ == nullptr) {
             MMI_HILOGE("Native implementation is null");
-            taihe::set_business_error(OHOS::MMI::TaiheErrorCode::INPUT_SERVICE_EXCEPTION, "Controller not initialized");
+            SetMouseControllerBusinessError(OHOS::MMI::TaiheErrorCode::INPUT_SERVICE_EXCEPTION,
+                                            MouseControllerOperation::UPDATE_AXIS);
             return;
         }
 
@@ -725,12 +710,7 @@ public:
         int32_t ret = nativeImpl_->UpdateAxis(nativeAxis, value);
         if (ret != RET_OK) {
             MMI_HILOGE("UpdateAxis failed, ret=%{public}d", ret);
-            TaiheError_t codeMsg;
-            if (TaiheConverter::GetApiError(ret, codeMsg)) {
-                taihe::set_business_error(ret, codeMsg.msg);
-            } else {
-                taihe::set_business_error(ret, "UpdateAxis failed");
-            }
+            SetMouseControllerBusinessError(ret, MouseControllerOperation::UPDATE_AXIS);
         }
     }
 
@@ -739,7 +719,8 @@ public:
         CALL_DEBUG_ENTER;
         if (nativeImpl_ == nullptr) {
             MMI_HILOGE("Native implementation is null");
-            taihe::set_business_error(OHOS::MMI::TaiheErrorCode::INPUT_SERVICE_EXCEPTION, "Controller not initialized");
+            SetMouseControllerBusinessError(OHOS::MMI::TaiheErrorCode::INPUT_SERVICE_EXCEPTION,
+                                            MouseControllerOperation::END_AXIS);
             return;
         }
 
@@ -755,12 +736,7 @@ public:
         int32_t ret = nativeImpl_->EndAxis(nativeAxis);
         if (ret != RET_OK) {
             MMI_HILOGE("EndAxis failed, ret=%{public}d", ret);
-            TaiheError_t codeMsg;
-            if (TaiheConverter::GetApiError(ret, codeMsg)) {
-                taihe::set_business_error(ret, codeMsg.msg);
-            } else {
-                taihe::set_business_error(ret, "EndAxis failed");
-            }
+            SetMouseControllerBusinessError(ret, MouseControllerOperation::END_AXIS);
         }
     }
 
@@ -772,13 +748,12 @@ private:
 {
     CALL_DEBUG_ENTER;
 
-    // 注意：新增接口不需要权限校验（不检查system api和INJECT_INPUT_EVENT权限）
-
-    // 创建Native实现
-    auto nativeImpl = InputManager::GetInstance()->CreateMouseController();
-    if (nativeImpl == nullptr) {
-        MMI_HILOGE("Failed to create native MouseControllerImpl");
-        taihe::set_business_error(OHOS::MMI::TaiheErrorCode::INPUT_SERVICE_EXCEPTION, "Input service exception");
+    // 创建Native实现，返回错误码
+    std::shared_ptr<OHOS::MMI::MouseControllerImpl> nativeImpl = nullptr;
+    int32_t ret = InputManager::GetInstance()->CreateMouseController(nativeImpl);
+    if (ret != RET_OK || nativeImpl == nullptr) {
+        MMI_HILOGE("Failed to create native MouseControllerImpl, ret=%{public}d", ret);
+        SetMouseControllerBusinessError(ret, MouseControllerOperation::CREATE);
         return make_holder<MouseControllerImpl,
                           ::ohos::multimodalInput::inputEventClient::MouseController>();
     }
@@ -798,6 +773,22 @@ enum class TouchControllerOperation {
     UP,
 };
 
+enum class MouseControllerOperation {
+    CREATE,
+    MOVE_TO,
+    PRESS_BUTTON,
+    RELEASE_BUTTON,
+    BEGIN_AXIS,
+    UPDATE_AXIS,
+    END_AXIS,
+};
+
+enum class KeyboardControllerOperation {
+    CREATE,
+    PRESS_KEY,
+    RELEASE_KEY,
+};
+
 std::string GetTouchControllerActionName(TouchControllerOperation operation)
 {
     switch (operation) {
@@ -813,7 +804,49 @@ std::string GetTouchControllerActionName(TouchControllerOperation operation)
     }
 }
 
-int32_t NormalizeTouchControllerErrorCode(int32_t errorCode)
+std::string GetMouseControllerActionName(MouseControllerOperation operation)
+{
+    switch (operation) {
+        case MouseControllerOperation::MOVE_TO:
+            return "move mouse";
+        case MouseControllerOperation::PRESS_BUTTON:
+            return "press button";
+        case MouseControllerOperation::RELEASE_BUTTON:
+            return "release button";
+        case MouseControllerOperation::BEGIN_AXIS:
+            return "begin axis";
+        case MouseControllerOperation::UPDATE_AXIS:
+            return "update axis";
+        case MouseControllerOperation::END_AXIS:
+            return "end axis";
+        case MouseControllerOperation::CREATE:
+        default:
+            return "create MouseController";
+    }
+}
+
+std::string GetKeyboardControllerActionName(KeyboardControllerOperation operation)
+{
+    switch (operation) {
+        case KeyboardControllerOperation::PRESS_KEY:
+            return "press key";
+        case KeyboardControllerOperation::RELEASE_KEY:
+            return "release key";
+        case KeyboardControllerOperation::CREATE:
+        default:
+            return "create KeyboardController";
+    }
+}
+
+const char* GetTouchControllerStateErrorMsg(TouchControllerOperation operation)
+{
+    if (operation == TouchControllerOperation::DOWN) {
+        return TOUCH_DOWN_STATE_ERROR_MSG;
+    }
+    return TOUCH_NOT_DOWN_STATE_ERROR_MSG;
+}
+
+int32_t NormalizeControllerErrorCode(int32_t errorCode)
 {
     if (errorCode == ERROR_NO_PERMISSION) {
         return OHOS::MMI::TaiheErrorCode::COMMON_PERMISSION_CHECK_ERROR;
@@ -826,7 +859,7 @@ int32_t NormalizeTouchControllerErrorCode(int32_t errorCode)
 
 void SetTouchControllerBusinessError(int32_t errorCode, TouchControllerOperation operation)
 {
-    errorCode = NormalizeTouchControllerErrorCode(errorCode);
+    errorCode = NormalizeControllerErrorCode(errorCode);
     if (errorCode == OHOS::MMI::TaiheErrorCode::COMMON_PERMISSION_CHECK_ERROR) {
         std::string msg = MakePermissionCheckErrMsg(GetTouchControllerActionName(operation), CONTROL_DEVICE_PERMISSION);
         taihe::set_business_error(errorCode, msg);
@@ -842,6 +875,33 @@ void SetTouchControllerBusinessError(int32_t errorCode, TouchControllerOperation
         return;
     }
     taihe::set_business_error(OHOS::MMI::TaiheErrorCode::INPUT_SERVICE_EXCEPTION, "Input service exception.");
+}
+
+void SetMouseControllerBusinessError(int32_t errorCode, MouseControllerOperation operation)
+{
+    errorCode = NormalizeControllerErrorCode(errorCode);
+    if (errorCode == OHOS::MMI::TaiheErrorCode::COMMON_PERMISSION_CHECK_ERROR) {
+        std::string msg = MakePermissionCheckErrMsg(GetMouseControllerActionName(operation), CONTROL_DEVICE_PERMISSION);
+        taihe::set_business_error(errorCode, msg);
+        return;
+    }
+    TaiheError_t codeMsg;
+    TaiheConverter::GetErrorCodeOrDefault(errorCode, codeMsg);
+    taihe::set_business_error(codeMsg.errorCode, codeMsg.msg);
+}
+
+void SetKeyboardControllerBusinessError(int32_t errorCode, KeyboardControllerOperation operation)
+{
+    errorCode = NormalizeControllerErrorCode(errorCode);
+    if (errorCode == OHOS::MMI::TaiheErrorCode::COMMON_PERMISSION_CHECK_ERROR) {
+        std::string msg = MakePermissionCheckErrMsg(GetKeyboardControllerActionName(operation),
+            CONTROL_DEVICE_PERMISSION);
+        taihe::set_business_error(errorCode, msg);
+        return;
+    }
+    TaiheError_t codeMsg;
+    TaiheConverter::GetErrorCodeOrDefault(errorCode, codeMsg);
+    taihe::set_business_error(codeMsg.errorCode, codeMsg.msg);
 }
 
 class TaiheTouchControllerImpl {
@@ -948,21 +1008,16 @@ public:
         CALL_DEBUG_ENTER;
         if (nativeImpl_ == nullptr) {
             MMI_HILOGE("Native implementation is null");
-            taihe::set_business_error(OHOS::MMI::TaiheErrorCode::INPUT_SERVICE_EXCEPTION, "Controller not initialized");
+            SetKeyboardControllerBusinessError(OHOS::MMI::TaiheErrorCode::INPUT_SERVICE_EXCEPTION,
+                                               KeyboardControllerOperation::PRESS_KEY);
             return;
         }
 
-        // 使用现有的KeyCode转换函数
         int32_t nativeKeyCode = TaiheKeyCodeConverter::GetKeyCodeByValue(keyCode);
         int32_t ret = nativeImpl_->PressKey(nativeKeyCode);
         if (ret != RET_OK) {
             MMI_HILOGE("PressKey failed, ret=%{public}d", ret);
-            TaiheError_t codeMsg;
-            if (TaiheConverter::GetApiError(ret, codeMsg)) {
-                taihe::set_business_error(ret, codeMsg.msg);
-            } else {
-                taihe::set_business_error(ret, "PressKey failed");
-            }
+            SetKeyboardControllerBusinessError(ret, KeyboardControllerOperation::PRESS_KEY);
         }
     }
 
@@ -971,21 +1026,16 @@ public:
         CALL_DEBUG_ENTER;
         if (nativeImpl_ == nullptr) {
             MMI_HILOGE("Native implementation is null");
-            taihe::set_business_error(OHOS::MMI::TaiheErrorCode::INPUT_SERVICE_EXCEPTION, "Controller not initialized");
+            SetKeyboardControllerBusinessError(OHOS::MMI::TaiheErrorCode::INPUT_SERVICE_EXCEPTION,
+                                               KeyboardControllerOperation::RELEASE_KEY);
             return;
         }
 
-        // 使用现有的KeyCode转换函数
         int32_t nativeKeyCode = TaiheKeyCodeConverter::GetKeyCodeByValue(keyCode);
         int32_t ret = nativeImpl_->ReleaseKey(nativeKeyCode);
         if (ret != RET_OK) {
             MMI_HILOGE("ReleaseKey failed, ret=%{public}d", ret);
-            TaiheError_t codeMsg;
-            if (TaiheConverter::GetApiError(ret, codeMsg)) {
-                taihe::set_business_error(ret, codeMsg.msg);
-            } else {
-                taihe::set_business_error(ret, "ReleaseKey failed");
-            }
+            SetKeyboardControllerBusinessError(ret, KeyboardControllerOperation::RELEASE_KEY);
         }
     }
 
@@ -997,13 +1047,12 @@ private:
 {
     CALL_DEBUG_ENTER;
 
-    // 注意：新增接口不需要权限校验（不检查system api和INJECT_INPUT_EVENT权限）
-
-    // 创建Native实现
-    auto nativeImpl = InputManager::GetInstance()->CreateKeyboardController();
-    if (nativeImpl == nullptr) {
-        MMI_HILOGE("Failed to create native KeyboardControllerImpl");
-        taihe::set_business_error(OHOS::MMI::TaiheErrorCode::INPUT_SERVICE_EXCEPTION, "Input service exception");
+    // 创建Native实现，返回错误码
+    std::shared_ptr<OHOS::MMI::KeyboardControllerImpl> nativeImpl = nullptr;
+    int32_t ret = InputManager::GetInstance()->CreateKeyboardController(nativeImpl);
+    if (ret != RET_OK || nativeImpl == nullptr) {
+        MMI_HILOGE("Failed to create native KeyboardControllerImpl, ret=%{public}d", ret);
+        SetKeyboardControllerBusinessError(ret, KeyboardControllerOperation::CREATE);
         return make_holder<KeyboardControllerImpl,
                           ::ohos::multimodalInput::inputEventClient::KeyboardController>();
     }

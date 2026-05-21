@@ -1101,16 +1101,16 @@ int32_t InputManager::RedispatchInputEvent(std::shared_ptr<PointerEvent> pointer
     return InputMgrImpl.RedispatchInputEvent(pointerEvent);
 }
 
-std::shared_ptr<MouseControllerImpl> InputManager::CreateMouseController()
+int32_t InputManager::CreateMouseController(std::shared_ptr<MouseControllerImpl> &controller)
 {
     CALL_DEBUG_ENTER;
-    return InputMgrImpl.CreateMouseController();
+    return InputMgrImpl.CreateMouseController(controller);
 }
 
-std::shared_ptr<KeyboardControllerImpl> InputManager::CreateKeyboardController()
+int32_t InputManager::CreateKeyboardController(std::shared_ptr<KeyboardControllerImpl> &controller)
 {
     CALL_DEBUG_ENTER;
-    return InputMgrImpl.CreateKeyboardController();
+    return InputMgrImpl.CreateKeyboardController(controller);
 }
 
 int32_t InputManager::CreateTouchController(std::shared_ptr<TouchControllerImpl> &controller)

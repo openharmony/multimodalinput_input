@@ -389,21 +389,25 @@ public:
 
     /**
      * @brief Creates a mouse controller for simulating mouse operations.
-     * Requires system app and INPUT_DEVICE_CONTROLLER permission.
-     * @return Shared pointer to MouseControllerImpl, nullptr on failure
+     * Requires CONTROL_DEVICE permission and PC device type.
+     * @param controller Shared pointer to MouseControllerImpl on success, nullptr on failure.
+     * @return RET_OK on success, error code otherwise (e.g., ERROR_NO_PERMISSION, CAPABILITY_NOT_SUPPORTED)
      * @since 26
      */
-    std::shared_ptr<class MouseControllerImpl> CreateMouseController();
+    int32_t CreateMouseController(std::shared_ptr<class MouseControllerImpl> &controller);
 
     /**
      * @brief Create keyboard controller
-     * @return Shared pointer to KeyboardControllerImpl, nullptr on failure
+     * Requires CONTROL_DEVICE permission and PC device type.
+     * @param controller Shared pointer to KeyboardControllerImpl on success, nullptr on failure.
+     * @return RET_OK on success, error code otherwise (e.g., ERROR_NO_PERMISSION, CAPABILITY_NOT_SUPPORTED)
      * @since 26
      */
-    std::shared_ptr<class KeyboardControllerImpl> CreateKeyboardController();
+    int32_t CreateKeyboardController(std::shared_ptr<class KeyboardControllerImpl> &controller);
 
     /**
      * @brief Create touch controller
+     * Requires CONTROL_DEVICE permission and PC device type.
      * @param controller Shared pointer to TouchControllerImpl on success, nullptr on failure.
      * @return RET_OK on success, error code otherwise.
      * @since 26
