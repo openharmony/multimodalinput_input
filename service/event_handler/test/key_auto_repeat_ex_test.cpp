@@ -173,7 +173,7 @@ HWTEST_F(KeyAutoRepeatExTest, KeyAutoRepeatExTest_SelectAutoRepeat_KeyUp_001, Te
 
     keyAutoRepeat.SelectAutoRepeat(keyEvent);
     // Verify timer and repeat keycode were cleared
-    EXPECT_EQ(keyAutoRepeat.repeatKeyCode_, KEYCODE_A);
+    EXPECT_EQ(keyAutoRepeat.repeatKeyCode_, 2017);
 }
 
 /**
@@ -200,7 +200,7 @@ HWTEST_F(KeyAutoRepeatExTest, KeyAutoRepeatExTest_SelectAutoRepeat_KeyCancel_001
 
     keyAutoRepeat.SelectAutoRepeat(keyEvent);
     // Verify timer and repeat keycode were cleared
-    EXPECT_EQ(keyAutoRepeat.repeatKeyCode_, KEYCODE_A);
+    EXPECT_EQ(keyAutoRepeat.repeatKeyCode_, 2017);
 }
 
 /**

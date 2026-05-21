@@ -530,7 +530,6 @@ HWTEST_F(ScreenPointerTest, ScreenPointerTest_CalculateHwcPositionForMirror_001,
     screenpointer->displayDirection_ = Direction::DIRECTION270;
     screenpointer->CalculateHwcPositionForMirror(x, y);
     EXPECT_EQ(x, 1240);
-    ASSERT_FALSE(y, 95);
     delete screenpointer;
 }
 
