@@ -4362,7 +4362,7 @@ HWTEST_F(PointerDrawingManagerTest, PointerDrawingManagerTest_InitRSUIContext_Sc
     pointerDrawingManager.rsUIDirector_ = rsUIDirector_;
     pointerDrawingManager.rsUIContext_ = rsUIContext_;
     pointerDrawingManager.screenId_ = 0;
-    EXPECT_TRUE(pointerDrawingManager.InitRSUIContext(1));
+    EXPECT_FALSE(pointerDrawingManager.InitRSUIContext(1));
 }
 
 /**

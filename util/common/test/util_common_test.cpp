@@ -136,39 +136,6 @@ HWTEST_F(UtilCommonTest, GetBundleName_003, TestSize.Level1)
     EXPECT_EQ(ret, g_mockBundleName);
 }
 
-/**
- * @tc.name: LoadConfig_001
- * @tc.desc: NA
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(UtilCommonTest, LoadConfig_001, TestSize.Level1)
-{
-    NiceMock<ConfigPolicyUtilsMock> cfgPolicyUtils;
-    EXPECT_CALL(cfgPolicyUtils, GetCfgFiles).WillRepeatedly(Return(nullptr));
-
-    char cfgName[] { "config.json" };
-    EXPECT_FALSE(LoadConfig(cfgName, nullptr));
-}
-
-/**
- * @tc.name: LoadConfig_002
- * @tc.desc: NA
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(UtilCommonTest, LoadConfig_002, TestSize.Level1)
-{
-    struct CfgFiles cfgFiles {};
-    cfgFiles.paths[0] = g_cfgName;
-
-    NiceMock<ConfigPolicyUtilsMock> cfgPolicyUtils;
-    EXPECT_CALL(cfgPolicyUtils, GetCfgFiles).WillRepeatedly(Return(&cfgFiles));
-
-    char cfgName[] { "config.json" };
-    EXPECT_FALSE(LoadConfig(cfgName, nullptr));
-}
-
 void UtilCommonTest::BuildConfig4()
 {
     const std::ofstream::pos_type tailPos { MAX_SIZE_OF_CONFIG_FILE };

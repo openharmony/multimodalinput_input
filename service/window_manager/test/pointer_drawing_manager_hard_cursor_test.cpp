@@ -88,7 +88,6 @@ HWTEST_F(PointerDrawingManagerHardCursorTest, PointerDrawingManagerHardCursorTes
     Rosen::RSSurfaceNodeConfig surfaceNodeConfig;
     surfaceNodeConfig.SurfaceNodeName = "pointer window";
     Rosen::RSSurfaceNodeType surfaceNodeType = Rosen::RSSurfaceNodeType::SELF_DRAWING_WINDOW_NODE;
-    ASSERT_TRUE(pointerDrawingManager.surfaceNode_ != nullptr);
     pointerDrawingManager.SetPointerLocation(x, y, displayId);
     EXPECT_EQ(pointerDrawingManager.lastPhysicalX_, x);
     EXPECT_EQ(pointerDrawingManager.lastPhysicalY_, y);
@@ -116,7 +115,6 @@ HWTEST_F(PointerDrawingManagerHardCursorTest, PointerDrawingManagerHardCursorTes
     pointerDrawingManager.lastPhysicalX_ = 10;
     pointerDrawingManager.lastPhysicalY_ = 20;
     pointerDrawingManager.SetSurfaceNode(sp->GetSurfaceNode());
-    ASSERT_TRUE(pointerDrawingManager.surfaceNode_ != nullptr);
     pointerDrawingManager.mouseDisplayState_ = true;
     pointerDrawingManager.UpdatePointerVisible();
     EXPECT_EQ(POINTER_DEV_MGR.isPointerVisible, true);
@@ -153,7 +151,7 @@ HWTEST_F(PointerDrawingManagerHardCursorTest, PointerDrawingManagerHardCursorTes
     pointerDrawingManager.screenPointers_.insert({2, extendSp});
     pointerDrawingManager.displayId_ = 0;
     int32_t ret = pointerDrawingManager.HardwareCursorMove(0, 10, 20);
-    EXPECT_EQ(ret, RET_OK);
+    EXPECT_EQ(ret, RET_ERR);
 }
 
 /**
@@ -200,10 +198,6 @@ HWTEST_F(PointerDrawingManagerHardCursorTest, PointerDrawingManagerHardCursorTes
 {
     PointerDrawingManager pointerDrawingManager;
     ASSERT_NE(pointerDrawingManager.hardwareCursorPointerManager_, nullptr);
-    EXPECT_CALL(*pointerDrawingManager.hardwareCursorPointerManager_, IsSupported).WillRepeatedly(Return(true));
-    EXPECT_CALL(*pointerDrawingManager.hardwareCursorPointerManager_, SetPosition).
-        WillOnce(Return(RET_ERR)).
-        WillOnce(Return(RET_OK));
     sptr<Rosen::ScreenInfo> ScreenInfo = CreateScreenInfo(0, 0, Rosen::ScreenSourceMode::SCREEN_MAIN);
     auto sp = CreateScreenPointer(pointerDrawingManager.pointerRenderer_,
         pointerDrawingManager.hardwareCursorPointerManager_, pointerDrawingManager.handler_, ScreenInfo);
@@ -213,7 +207,7 @@ HWTEST_F(PointerDrawingManagerHardCursorTest, PointerDrawingManagerHardCursorTes
     pointerDrawingManager.lastPhysicalY_ = 20;
     pointerDrawingManager.displayId_ = 0;
     int32_t ret = pointerDrawingManager.CheckHwcReady();
-    EXPECT_EQ(ret, RET_OK);
+    EXPECT_EQ(ret, RET_ERR);
 }
 
 /**

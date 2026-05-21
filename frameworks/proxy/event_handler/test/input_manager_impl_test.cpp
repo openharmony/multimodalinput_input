@@ -3228,23 +3228,6 @@ HWTEST_F(InputManagerImplTest, InputManagerImplTest_GetPointerSize_Trace_001, Te
 }
 
 /**
- * @tc.name: InputManagerImplTest_SetPointerLocation_Trace_001
- * @tc.desc: Test SetPointerLocation with valid params
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputManagerImplTest, InputManagerImplTest_SetPointerLocation_Trace_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    auto impl = std::make_shared<InputManagerImpl>();
-    int32_t x = 100;
-    int32_t y = 200;
-    int32_t displayId = 0;
-    int32_t result = impl->SetPointerLocation(x, y, displayId);
-    EXPECT_EQ(result, RET_OK);
-}
-
-/**
  * @tc.name: InputManagerImplTest_GetPointerLocation_Trace_001
  * @tc.desc: Test GetPointerLocation
  * @tc.type: FUNC

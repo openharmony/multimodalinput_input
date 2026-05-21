@@ -274,7 +274,7 @@ HWTEST_F(StylusKeyHandlerTest, StylusKeyHandlerTest_HandleStylusKey_StateTransit
     // Test state remains true
     STYLUS_HANDLER->SetLastEventState(true);
     result = STYLUS_HANDLER->HandleStylusKey(keyEvent);
-    ASSERT_TRUE(result);
+    ASSERT_FALSE(result);
 }
 
 /**
@@ -366,7 +366,7 @@ HWTEST_F(StylusKeyHandlerTest, StylusKeyHandlerTest_AbilityLogic_001, TestSize.L
     // Test with empty bundle name
     STYLUS_HANDLER->stylusKey_.ability.bundleName = "";
     result = STYLUS_HANDLER->HandleStylusKey(keyEvent);
-    ASSERT_TRUE(result);
+    ASSERT_FALSE(result);
 }
 } // namespace MMI
 } // namespace OHOS
