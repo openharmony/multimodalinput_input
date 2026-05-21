@@ -85,8 +85,6 @@ HWTEST_F(PointerDrawingManagerHardCursorTest, PointerDrawingManagerHardCursorTes
     int32_t x = 50;
     int32_t y = 60;
     uint64_t displayId = 0;
-    auto rsUIContext = rsUIDirector->GetRSUIContext();
-    ASSERT_NE(rsUIContext, nullptr);
     Rosen::RSSurfaceNodeConfig surfaceNodeConfig;
     surfaceNodeConfig.SurfaceNodeName = "pointer window";
     Rosen::RSSurfaceNodeType surfaceNodeType = Rosen::RSSurfaceNodeType::SELF_DRAWING_WINDOW_NODE;
