@@ -342,7 +342,7 @@ HWTEST_F(InputScreenCaptureAgentTest, IsScreenCaptureWorking_002, TestSize.Level
 HWTEST_F(InputScreenCaptureAgentTest, RegisterListener_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    ScreenCaptureCallback callback = [](int32_t) {};
+    ScreenCaptureCallback callback = [](int32_t, bool) {};
     ASSERT_NO_FATAL_FAILURE(inputScreenCaptureAgent.RegisterListener(callback));
 }
 
@@ -361,7 +361,7 @@ HWTEST_F(InputScreenCaptureAgentTest, RegisterListener_002, TestSize.Level1)
     }
     inputScreenCaptureAgent.handle_.registerListener = nullptr;
 
-    ScreenCaptureCallback callback = [](int32_t) {};
+    ScreenCaptureCallback callback = [](int32_t, bool) {};
     ASSERT_NO_FATAL_FAILURE(inputScreenCaptureAgent.RegisterListener(callback));
 }
 
