@@ -56,6 +56,35 @@ namespace {
 const std::string INJECT_INPUT_PERMISSION_NAME = "ohos.permission.INJECT_INPUT_EVENT";
 const std::string MODULE_NAME = "inputEventClient";
 
+// Controller operation enums
+enum class MouseControllerOperation {
+    CREATE,
+    MOVE_TO,
+    PRESS_BUTTON,
+    RELEASE_BUTTON,
+    BEGIN_AXIS,
+    UPDATE_AXIS,
+    END_AXIS,
+};
+ 
+enum class KeyboardControllerOperation {
+    CREATE,
+    PRESS_KEY,
+    RELEASE_KEY,
+};
+ 
+enum class TouchControllerOperation {
+    CREATE,
+    DOWN,
+    MOVE,
+    UP,
+};
+ 
+// Forward declarations for helper functions
+void SetMouseControllerBusinessError(int32_t errorCode, MouseControllerOperation operation);
+void SetKeyboardControllerBusinessError(int32_t errorCode, KeyboardControllerOperation operation);
+void SetTouchControllerBusinessError(int32_t errorCode, TouchControllerOperation operation);
+
 std::string MakePermissionCheckErrMsg(const std::string &moduleName,
     const std::string &permissionName)
 {
@@ -766,29 +795,6 @@ private:
 
 constexpr const char* CONTROL_DEVICE_PERMISSION = "ohos.permission.CONTROL_DEVICE";
 
-enum class TouchControllerOperation {
-    CREATE,
-    DOWN,
-    MOVE,
-    UP,
-};
-
-enum class MouseControllerOperation {
-    CREATE,
-    MOVE_TO,
-    PRESS_BUTTON,
-    RELEASE_BUTTON,
-    BEGIN_AXIS,
-    UPDATE_AXIS,
-    END_AXIS,
-};
-
-enum class KeyboardControllerOperation {
-    CREATE,
-    PRESS_KEY,
-    RELEASE_KEY,
-};
-
 std::string GetTouchControllerActionName(TouchControllerOperation operation)
 {
     switch (operation) {
@@ -836,14 +842,6 @@ std::string GetKeyboardControllerActionName(KeyboardControllerOperation operatio
         default:
             return "create KeyboardController";
     }
-}
-
-const char* GetTouchControllerStateErrorMsg(TouchControllerOperation operation)
-{
-    if (operation == TouchControllerOperation::DOWN) {
-        return TOUCH_DOWN_STATE_ERROR_MSG;
-    }
-    return TOUCH_NOT_DOWN_STATE_ERROR_MSG;
 }
 
 int32_t NormalizeControllerErrorCode(int32_t errorCode)
