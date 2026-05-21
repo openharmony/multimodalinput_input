@@ -134,7 +134,10 @@ ohos_unittest("TouchEventNormalizeTest") {
 
   cflags_cc = [ "-Wno-string-conversion" ]
 
-  include_dirs = [ "${mmi_path}/service/module_loader/include" ]
+  include_dirs = [
+    "${mmi_path}/common/event_integrity/include",
+    "${mmi_path}/service/module_loader/include",
+  ]
 
   sources = [
     "${mmi_path}/service/module_loader/src/input_service_context.cpp",
@@ -1042,6 +1045,7 @@ ohos_unittest("TouchGestureAdapterTest") {
   }
 
   include_dirs = [
+    "${mmi_path}/common/event_integrity/include",
     "${mmi_path}/service/module_loader/include",
     "${mmi_path}/service/touch_event_normalize/include",
     "${mmi_path}/service/mouse_event_normalize/include",
@@ -1109,6 +1113,7 @@ ohos_unittest("TouchGestureManagerTest") {
   }
 
   include_dirs = [
+    "${mmi_path}/common/event_integrity/include",
     "${mmi_path}/service/module_loader/include",
     "${mmi_path}/service/touch_event_normalize/include",
   ]
@@ -1271,6 +1276,7 @@ ohos_unittest("TouchpadTransformProcessorEXTest") {
   ]
 
   include_dirs = [
+    "${mmi_path}/common/event_integrity/include",
     "${mmi_path}/service/common/include",
     "${mmi_path}/service/common/setting_datashare/include",
   ]

@@ -101,6 +101,7 @@ ohos_unittest("MouseEventNormalizeTest") {
   module_out_path = module_output_path
 
   include_dirs = [
+    "${mmi_path}/common/event_integrity/include",
     "${mmi_path}/service/common/include",
     "${mmi_path}/test/facility/event_filter_mock/include"
   ]

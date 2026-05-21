@@ -22,6 +22,7 @@ ohos_fuzztest("StubHandleCursorStatsFuzzTest") {
   module_out_path = module_output_path
   fuzz_config_file = "${mmi_path}/test/fuzztest/stubhandlecursorstats_fuzzer"
   include_dirs = [
+    "${mmi_path}/common/event_integrity/include",
     "${mmi_path}/interfaces/util/common/include",
     "${mmi_path}/service/connect_manager/include",
     "${mmi_path}/service/filter/include/",

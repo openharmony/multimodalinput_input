@@ -21,6 +21,7 @@
 #include <string>
 #include <vector>
 
+#include "event_integrity.h"
 #include "i_input_event_handler.h"
 #include "i_input_event_collection_handler.h"
 #include "input_device.h"
@@ -80,6 +81,7 @@ private:
         int32_t priority_ { DEFUALT_INTERCEPTOR_PRIORITY };
         uint32_t deviceTags_ { CapabilityToTags(InputDeviceCapability::INPUT_DEV_CAP_MAX) };
         SessionPtr session_ { nullptr };
+        EventIntegrity eventIntegrity_;
     };
 
     class InterceptorCollection final : public IInputEventCollectionHandler, protected NoCopyable {
