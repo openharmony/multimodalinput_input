@@ -465,10 +465,20 @@ std::string InputDisplayBindHelper::GetInputDeviceById(int32_t id)
         return "";
     }
 
-    std::string inputEvent = inputNode;
-    size_t pos = inputEvent.find(INPUT);
-    if (pos != std::string::npos) {
-        inputEvent.replace(pos, INPUT.length(), EVENT);
+    std::string inputEvent;
+    std::string inputNodePath = std::string(DIRECTORY).append(SEPARATOR).append(inputNode);
+    if (fs::exists(inputNodePath) && fs::is_directory(inputNodePath)) {
+        for (const auto &entry : fs::directory_iterator(inputNodePath)) {
+            std::string dirName = fs::path(entry.path()).filename();
+            if (dirName.find(EVENT) == 0) {
+                inputEvent = dirName;
+                break;
+            }
+        }
+    }
+    if (inputEvent.empty()) {
+        MMI_HILOGE("No event directory found under %{public}s", inputNodePath.c_str());
+        return "";
     }
 
     std::string inputDeviceName;
