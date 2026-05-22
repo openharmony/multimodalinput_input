@@ -15,6 +15,7 @@
 
 #include "ani_common.h"
 #include "input_device.h"
+#include "mmi_api_metrics_histograms.h"
 #include "ohos.multimodalInput.inputDevice.impl.h"
 #include "ohos.multimodalInput.keyCode.impl.h"
 #include "taihe_event.h"
@@ -46,6 +47,7 @@ const std::string CHANGED_TYPE = "change";
 ::taihe::array<int32_t> GetDeviceIdsAsync()
 {
     CALL_DEBUG_ENTER;
+    MMI_HISTOGRAM_BOOLEAN("InputKit.inputDevice.getDeviceList.Call", true);
     std::vector<int32_t> _ids;
     auto callback = [&_ids] (std::vector<int32_t>& ids) { _ids = ids; };
     int32_t ret = InputManager_t::GetInstance()->GetDeviceIds(callback);
@@ -55,6 +57,7 @@ const std::string CHANGED_TYPE = "change";
             MMI_HILOGE("Error code %{public}d not found", ret);
         }
         taihe::set_business_error(ret, codeMsg.msg);
+        MMI_HISTOGRAM_ERROR("InputKit.inputDevice.getDeviceList.Error", ret);
         MMI_HILOGE("failed to get Device ids, code:%{public}d message: %{public}s", ret, codeMsg.msg.c_str());
         return ::taihe::array<int32_t>(nullptr, 0);
     }
@@ -69,6 +72,7 @@ const std::string CHANGED_TYPE = "change";
 InputDeviceData GetDeviceAsync(int32_t deviceId)
 {
     CALL_DEBUG_ENTER;
+    MMI_HISTOGRAM_BOOLEAN("InputKit.inputDevice.getDevice.Call", true);
     std::shared_ptr<InputDevice_t> _device = std::make_shared<InputDevice_t>();
     auto callback = [&_device](std::shared_ptr<InputDevice_t> device) {
         _device = device;
@@ -81,6 +85,7 @@ InputDeviceData GetDeviceAsync(int32_t deviceId)
             codeMsg.msg = "Unknown error";
         }
         taihe::set_business_error(ret, codeMsg.msg);
+        MMI_HISTOGRAM_ERROR("InputKit.inputDevice.getDevice.Error", ret);
         MMI_HILOGE("failed to get device, code:%{public}d message: %{public}s", ret, codeMsg.msg.c_str());
         std::shared_ptr<InputDevice> errDevice = nullptr;
         return TaiheInputDeviceUtils::ConverterInputDevice(errDevice);
@@ -88,9 +93,8 @@ InputDeviceData GetDeviceAsync(int32_t deviceId)
     return TaiheInputDeviceUtils::ConverterInputDevice(_device);
 }
 
-InputDeviceData GetDeviceInfoSync(int32_t deviceId)
+static InputDeviceData GetDeviceInfo(int32_t deviceId, std::function<void(int32_t)> histogramError)
 {
-    CALL_DEBUG_ENTER;
     std::shared_ptr<InputDevice_t> _device = std::make_shared<InputDevice_t>();
     auto callback = [&_device](std::shared_ptr<InputDevice_t> device) { _device = device; };
     int32_t ret = InputManager_t::GetInstance()->GetDevice(deviceId, callback);
@@ -99,27 +103,44 @@ InputDeviceData GetDeviceInfoSync(int32_t deviceId)
         if (!TaiheConverter::GetApiError(ret, codeMsg)) {
             MMI_HILOGE("Error code %{public}d not found", ret);
             taihe::set_business_error(COMMON_PARAMETER_ERROR, "Invalid input device id");
+            histogramError(COMMON_PARAMETER_ERROR);
             return TaiheInputDeviceUtils::ConverterInputDevice(_device);
         }
         taihe::set_business_error(ret, codeMsg.msg);
+        histogramError(ret);
         MMI_HILOGE("failed to get device info, code:%{public}d message: %{public}s", ret, codeMsg.msg.c_str());
         return TaiheInputDeviceUtils::ConverterInputDevice(_device);
     }
     return TaiheInputDeviceUtils::ConverterInputDevice(_device);
 }
 
+InputDeviceData GetDeviceInfoSync(int32_t deviceId)
+{
+    CALL_DEBUG_ENTER;
+    MMI_HISTOGRAM_BOOLEAN("InputKit.inputDevice.getDeviceInfoSync.Call", true);
+    auto histogramError = [](int32_t errorCode) {
+        MMI_HISTOGRAM_ERROR("InputKit.inputDevice.getDeviceInfoSync.Error", errorCode);
+    };
+    return GetDeviceInfo(deviceId, histogramError);
+}
+
 InputDeviceData GetDeviceInfoAsync(int32_t deviceId)
 {
     CALL_DEBUG_ENTER;
-    return GetDeviceInfoSync(deviceId);
+    MMI_HISTOGRAM_BOOLEAN("InputKit.inputDevice.getDeviceInfo.Call", true);
+    auto histogramError = [](int32_t errorCode) {
+        MMI_HISTOGRAM_ERROR("InputKit.inputDevice.getDeviceInfo.Error", errorCode);
+    };
+    return GetDeviceInfo(deviceId, histogramError);
 }
 
-::taihe::array<bool> SupportKeysSync(int32_t deviceId, taihe::array_view<TaiheKeyCode> keys)
+static ::taihe::array<bool> SupportKeys(int32_t deviceId, taihe::array_view<TaiheKeyCode> keys,
+    std::function<void(int32_t)> histogramError)
 {
-    CALL_DEBUG_ENTER;
     uint32_t size = keys.size();
     if (size < MIN_N_SIZE || size > MAX_N_SIZE) {
         taihe::set_business_error(COMMON_PARAMETER_ERROR, "size range error");
+        histogramError(COMMON_PARAMETER_ERROR);
         return ::taihe::array<bool>(nullptr, 0);
     }
     std::vector<bool> result {};
@@ -133,9 +154,11 @@ InputDeviceData GetDeviceInfoAsync(int32_t deviceId)
         TaiheError_t codeMsg;
         if (!TaiheConverter::GetApiError(ret, codeMsg)) {
             taihe::set_business_error(COMMON_PARAMETER_ERROR, "Parameter error.");
+            histogramError(COMMON_PARAMETER_ERROR);
             return ::taihe::array<bool>(nullptr, 0);
         }
         taihe::set_business_error(ret, codeMsg.msg);
+        histogramError(ret);
         MMI_HILOGE("failed to support keys sync, code:%{public}d message: %{public}s", ret, codeMsg.msg.c_str());
         return ::taihe::array<bool>(nullptr, 0);
     }
@@ -147,10 +170,24 @@ InputDeviceData GetDeviceInfoAsync(int32_t deviceId)
     return res;
 }
 
+::taihe::array<bool> SupportKeysSync(int32_t deviceId, taihe::array_view<TaiheKeyCode> keys)
+{
+    CALL_DEBUG_ENTER;
+    MMI_HISTOGRAM_BOOLEAN("InputKit.inputDevice.supportKeysSync.Call", true);
+    auto histogramError = [](int32_t errorCode) {
+        MMI_HISTOGRAM_ERROR("InputKit.inputDevice.supportKeysSync.Error", errorCode);
+    };
+    return SupportKeys(deviceId, keys, histogramError);
+}
+
 ::taihe::array<bool> SupportKeysAsync(int32_t deviceId, taihe::array_view<TaiheKeyCode> keys)
 {
     CALL_DEBUG_ENTER;
-    return SupportKeysSync(deviceId, keys);
+    MMI_HISTOGRAM_BOOLEAN("InputKit.inputDevice.supportKeys.Call", true);
+    auto histogramError = [](int32_t errorCode) {
+        MMI_HISTOGRAM_ERROR("InputKit.inputDevice.supportKeys.Error", errorCode);
+    };
+    return SupportKeys(deviceId, keys, histogramError);
 }
 
 void SetKeyboardRepeatDelayAsync(int32_t delay)
@@ -160,6 +197,7 @@ void SetKeyboardRepeatDelayAsync(int32_t delay)
         taihe::set_business_error(COMMON_USE_SYSAPI_ERROR, "Non system applications use system API");
         return;
     }
+    MMI_HISTOGRAM_BOOLEAN("InputKit.inputDevice.setKeyboardRepeatDelay.Call", true);
     if (delay < MIN_KEY_REPEAT_DELAY) {
         delay = MIN_KEY_REPEAT_DELAY;
     } else if (delay > MAX_KEY_REPEAT_DELAY) {
@@ -170,9 +208,11 @@ void SetKeyboardRepeatDelayAsync(int32_t delay)
         MMI_HILOGE("ret:%{public}d", ret);
         if (abs(ret) == COMMON_USE_SYSAPI_ERROR) {
             taihe::set_business_error(COMMON_USE_SYSAPI_ERROR, "Non system applications use system API");
+            MMI_HISTOGRAM_ERROR("InputKit.inputDevice.setKeyboardRepeatDelay.Error", COMMON_USE_SYSAPI_ERROR);
             return;
         }
         taihe::set_business_error(COMMON_PARAMETER_ERROR, "Parameter error");
+        MMI_HISTOGRAM_ERROR("InputKit.inputDevice.setKeyboardRepeatDelay.Error", COMMON_PARAMETER_ERROR);
         return;
     }
 }
@@ -185,15 +225,18 @@ int32_t GetKeyboardRepeatDelayAsync()
         taihe::set_business_error(COMMON_USE_SYSAPI_ERROR, "Non system applications use system API");
         return delay;
     }
+    MMI_HISTOGRAM_BOOLEAN("InputKit.inputDevice.getKeyboardRepeatDelay.Call", true);
     auto callback = [&delay] (int32_t tmpDelay) { delay = tmpDelay; };
     int32_t ret = InputManager_t::GetInstance()->GetKeyboardRepeatDelay(callback);
     if (ret != RET_OK) {
         MMI_HILOGE("ret:%{public}d,delay:%{public}d", ret, delay);
         if (abs(ret) == COMMON_USE_SYSAPI_ERROR) {
             taihe::set_business_error(COMMON_USE_SYSAPI_ERROR, "Non system applications use system API");
+            MMI_HISTOGRAM_ERROR("InputKit.inputDevice.getKeyboardRepeatDelay.Error", COMMON_USE_SYSAPI_ERROR);
             return delay;
         }
         taihe::set_business_error(COMMON_PARAMETER_ERROR, "Parameter error");
+        MMI_HISTOGRAM_ERROR("InputKit.inputDevice.getKeyboardRepeatDelay.Error", COMMON_PARAMETER_ERROR);
     }
     return delay;
 }
@@ -203,8 +246,10 @@ void SetKeyboardRepeatRateAsync(int32_t rate)
     CALL_DEBUG_ENTER;
     if (!TaiheInputDeviceUtils::IsSystemApp()) {
         taihe::set_business_error(COMMON_USE_SYSAPI_ERROR, "Non system applications use system API");
+        MMI_HISTOGRAM_ERROR("InputKit.inputDevice.setKeyboardRepeatRate.Error", COMMON_USE_SYSAPI_ERROR);
         return;
     }
+    MMI_HISTOGRAM_BOOLEAN("InputKit.inputDevice.setKeyboardRepeatRate.Call", true);
     if (rate < MIN_KEY_REPEAT_RATE) {
         rate = MIN_KEY_REPEAT_RATE;
     } else if (rate > MAX_KEY_REPEAT_RATE) {
@@ -215,9 +260,11 @@ void SetKeyboardRepeatRateAsync(int32_t rate)
         MMI_HILOGE("ret:%{public}d", ret);
         if (abs(ret) == COMMON_USE_SYSAPI_ERROR) {
             taihe::set_business_error(COMMON_USE_SYSAPI_ERROR, "Non system applications use system API");
+            MMI_HISTOGRAM_ERROR("InputKit.inputDevice.setKeyboardRepeatRate.Error", COMMON_USE_SYSAPI_ERROR);
             return;
         }
         taihe::set_business_error(COMMON_PARAMETER_ERROR, "Parameter error");
+        MMI_HISTOGRAM_ERROR("InputKit.inputDevice.setKeyboardRepeatRate.Error", COMMON_PARAMETER_ERROR);
     }
 }
 
@@ -227,17 +274,21 @@ int32_t GetKeyboardRepeatRateAsync()
     int32_t rate = -1;
     if (!TaiheInputDeviceUtils::IsSystemApp()) {
         taihe::set_business_error(COMMON_USE_SYSAPI_ERROR, "Non system applications use system API");
+        MMI_HISTOGRAM_ERROR("InputKit.inputDevice.getKeyboardRepeatRate.Error", COMMON_USE_SYSAPI_ERROR);
         return rate;
     }
+    MMI_HISTOGRAM_BOOLEAN("InputKit.inputDevice.getKeyboardRepeatRate.Call", true);
     auto callback = [&rate] (int32_t tmpRate) { rate = tmpRate; };
     int32_t ret = InputManager_t::GetInstance()->GetKeyboardRepeatRate(callback);
     if (ret != RET_OK) {
         MMI_HILOGE("ret:%{public}d, rate:%{public}d", ret, rate);
         if (abs(ret) == COMMON_USE_SYSAPI_ERROR) {
             taihe::set_business_error(COMMON_USE_SYSAPI_ERROR, "Non system applications use system API");
+            MMI_HISTOGRAM_ERROR("InputKit.inputDevice.getKeyboardRepeatRate.Error", COMMON_USE_SYSAPI_ERROR);
             return rate;
         }
         taihe::set_business_error(COMMON_PARAMETER_ERROR, "Parameter error");
+        MMI_HISTOGRAM_ERROR("InputKit.inputDevice.getKeyboardRepeatRate.Error", COMMON_PARAMETER_ERROR);
     }
     return rate;
 }
@@ -245,6 +296,7 @@ int32_t GetKeyboardRepeatRateAsync()
 int64_t GetIntervalSinceLastInputAsync()
 {
     CALL_DEBUG_ENTER;
+    MMI_HISTOGRAM_BOOLEAN("InputKit.inputDevice.getIntervalSinceLastInput.Call", true);
     int64_t timeInterval = 0;
     int32_t ret = InputManager_t::GetInstance()->GetIntervalSinceLastInput(timeInterval);
     if (ret != RET_OK) {
@@ -252,6 +304,7 @@ int64_t GetIntervalSinceLastInputAsync()
         if (!TaiheConverter::GetApiError(ret, codeMsg)) {
             MMI_HILOGE("Error code %{public}d not found", ret);
         }
+        MMI_HISTOGRAM_ERROR("InputKit.inputDevice.getIntervalSinceLastInput.Error", ret);
         taihe::set_business_error(ret, codeMsg.msg);
         MMI_HILOGE("failed to get interval since last input, code:%{public}d message: %{public}s",
             ret, codeMsg.msg.c_str());
@@ -262,12 +315,14 @@ int64_t GetIntervalSinceLastInputAsync()
 void SetFunctionKeyEnabledAsync(TaiheFunctionKey functionKey, bool enabled)
 {
     CALL_DEBUG_ENTER;
+    MMI_HISTOGRAM_BOOLEAN("InputKit.inputDevice.setFunctionKeyEnabled.Call", true);
     if (functionKey != OHOS::MMI::FunctionKey::FUNCTION_KEY_CAPSLOCK) {
         TaiheError_t codeMsg;
         if (!TaiheConverter::GetApiError(COMMON_PARAMETER_ERROR, codeMsg)) {
             MMI_HILOGE("Error code %{public}d not found", COMMON_PARAMETER_ERROR);
         }
         taihe::set_business_error(COMMON_PARAMETER_ERROR, codeMsg.msg);
+        MMI_HISTOGRAM_ERROR("InputKit.inputDevice.setFunctionKeyEnabled.Error", COMMON_PARAMETER_ERROR);
         MMI_HILOGE("First parameter value error");
         return;
     }
@@ -278,6 +333,7 @@ void SetFunctionKeyEnabledAsync(TaiheFunctionKey functionKey, bool enabled)
             MMI_HILOGE("Error code %{public}d not found", ret);
         }
         taihe::set_business_error(ret, codeMsg.msg);
+        MMI_HISTOGRAM_ERROR("InputKit.inputDevice.setFunctionKeyEnabled.Error", ret);
         MMI_HILOGE("failed to set functionKey state, code:%{public}d message: %{public}s", ret, codeMsg.msg.c_str());
     }
 }
@@ -285,14 +341,17 @@ void SetFunctionKeyEnabledAsync(TaiheFunctionKey functionKey, bool enabled)
 bool IsFunctionKeyEnabledAsync(TaiheFunctionKey functionKey)
 {
     CALL_DEBUG_ENTER;
+    MMI_HISTOGRAM_BOOLEAN("InputKit.inputDevice.isFunctionKeyEnabled.Call", true);
     if (functionKey != OHOS::MMI::FunctionKey::FUNCTION_KEY_CAPSLOCK) {
         TaiheError_t codeMsg;
         if (!TaiheConverter::GetApiError(COMMON_PARAMETER_ERROR, codeMsg)) {
             MMI_HILOGE("Error code %{public}d not found", COMMON_PARAMETER_ERROR);
             taihe::set_business_error(COMMON_PARAMETER_ERROR, "Parameter error. Unknown error!");
+            MMI_HISTOGRAM_ERROR("InputKit.inputDevice.isFunctionKeyEnabled.Error", COMMON_PARAMETER_ERROR);
             return false;
         }
         taihe::set_business_error(COMMON_PARAMETER_ERROR, codeMsg.msg);
+        MMI_HISTOGRAM_ERROR("InputKit.inputDevice.isFunctionKeyEnabled.Error", COMMON_PARAMETER_ERROR);
         MMI_HILOGE("First parameter value error: %{public}s", codeMsg.msg.c_str());
         return false;
     }
@@ -303,10 +362,12 @@ bool IsFunctionKeyEnabledAsync(TaiheFunctionKey functionKey)
         if (!TaiheConverter::GetApiError(ret, codeMsg)) {
             MMI_HILOGE("Error code %{public}d not found", ret);
             taihe::set_business_error(COMMON_PARAMETER_ERROR, "Parameter error.Unknown error!");
+            MMI_HISTOGRAM_ERROR("InputKit.inputDevice.isFunctionKeyEnabled.Error", COMMON_PARAMETER_ERROR);
             return resultState;
         }
         taihe::set_business_error(ret, codeMsg.msg);
         MMI_HILOGE("failed to get functionKey state, code:%{public}d message: %{public}s", ret, codeMsg.msg.c_str());
+        MMI_HISTOGRAM_ERROR("InputKit.inputDevice.isFunctionKeyEnabled.Error", ret);
         return resultState;
     }
     return resultState;
@@ -348,6 +409,7 @@ bool ANIPromiseVoidCallback(ani_env* env, ani_resolver deferred, int32_t errCode
 
 uintptr_t SetInputDeviceEnablePromise(int32_t deviceId, bool enabled)
 {
+    MMI_HISTOGRAM_BOOLEAN("InputKit.inputDevice.setInputDeviceEnabled.Call", true);
     if (deviceId < 0) {
         taihe::set_business_error(COMMON_PARAMETER_ERROR, "Parameter error.Invalid deviceId!");
         MMI_HILOGE("Invalid deviceId");
@@ -375,17 +437,20 @@ uintptr_t SetInputDeviceEnablePromise(int32_t deviceId, bool enabled)
     if (ret != RET_OK) {
         if (abs(ret) == ERROR_NOT_SYSAPI) {
             taihe::set_business_error(ERROR_NOT_SYSAPI, "Permission denied, non-system application called system api.");
+            MMI_HISTOGRAM_ERROR("InputKit.inputDevice.setInputDeviceEnabled.Error", ERROR_NOT_SYSAPI);
         } else if (ret == ERROR_NO_PERMISSION) {
             taihe::set_business_error(-ret, "Permission denied.");
+            MMI_HISTOGRAM_ERROR("InputKit.inputDevice.setInputDeviceEnabled.Error", ERROR_NO_PERMISSION);
         } else {
             taihe::set_business_error(COMMON_PARAMETER_ERROR, "Parameter error.Unknown error!");
+            MMI_HISTOGRAM_ERROR("InputKit.inputDevice.setInputDeviceEnabled.Error", COMMON_PARAMETER_ERROR);
         }
         return 0;
     }
     return reinterpret_cast<uintptr_t>(promise);
 }
 
-TaiheKeyboardType GetKeyboardTypeSync(int32_t deviceId)
+static TaiheKeyboardType GetKeyboardType(int32_t deviceId, std::function<void(int32_t)> histogramError)
 {
     CALL_DEBUG_ENTER;
     int32_t type = 0;
@@ -394,6 +459,7 @@ TaiheKeyboardType GetKeyboardTypeSync(int32_t deviceId)
     if (ret != RET_OK) {
         MMI_HILOGE("failed to get keyborad type,ret:%{public}d", ret);
         set_business_error(COMMON_PARAMETER_ERROR, "Invalid input device id");
+        histogramError(COMMON_PARAMETER_ERROR);
         return TaiheKeyboardType::key_t::UNKNOWN;
     }
     TaiheKeyboardType kType =
@@ -401,22 +467,37 @@ TaiheKeyboardType GetKeyboardTypeSync(int32_t deviceId)
     return kType;
 }
 
+TaiheKeyboardType GetKeyboardTypeSync(int32_t deviceId)
+{
+    MMI_HISTOGRAM_BOOLEAN("InputKit.inputDevice.getKeyboardTypeSync.Call", true);
+    auto histogramError = [](int32_t errorCode) {
+        MMI_HISTOGRAM_ERROR("InputKit.inputDevice.getKeyboardTypeSync.Error", errorCode);
+    };
+    return GetKeyboardType(deviceId, histogramError);
+}
+
 TaiheKeyboardType GetKeyboardTypeSyncWrapper(int32_t deviceId)
 {
     CALL_DEBUG_ENTER;
-    return GetKeyboardTypeSync(deviceId);
+    MMI_HISTOGRAM_BOOLEAN("InputKit.inputDevice.getKeyboardType.Call", true);
+    auto histogramError = [](int32_t errorCode) {
+        MMI_HISTOGRAM_ERROR("InputKit.inputDevice.getKeyboardType.Error", errorCode);
+    };
+    return GetKeyboardType(deviceId, histogramError);
 }
 
 void onKeyImpl(::taihe::callback_view<void(::ohos::multimodalInput::inputDevice::DeviceListener const& info)> f,
     uintptr_t opq)
 {
     CALL_DEBUG_ENTER;
+    MMI_HISTOGRAM_BOOLEAN("InputKit.inputDevice.on_change.Call", true);
     TaiheEvent::GetInstance()->RegisterListener(CHANGED_TYPE, std::forward<callbackTypes>(f), opq);
 }
 
 void offKeyImpl(::taihe::optional_view<uintptr_t> opq)
 {
     CALL_DEBUG_ENTER;
+    MMI_HISTOGRAM_BOOLEAN("InputKit.inputDevice.off_change.Call", true);
     if (opq.has_value()) {
         TaiheEvent::GetInstance()->UnregisterListener(CHANGED_TYPE, opq.value());
     } else {

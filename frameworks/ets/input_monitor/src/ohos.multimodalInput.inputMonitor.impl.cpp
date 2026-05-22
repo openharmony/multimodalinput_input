@@ -19,6 +19,7 @@
 #include "stdexcept"
 
 #include "ani_input_monitor_manager.h"
+#include "mmi_api_metrics_histograms.h"
 #include "mmi_log.h"
 
 #undef MMI_LOG_TAG
@@ -35,6 +36,7 @@ constexpr int32_t RECT_LIST_SIZE { 2 };
 using namespace OHOS::MMI;
 ::taihe::array<::ohos::multimodalInput::touchEvent::TouchEvent> QueryTouchEventsSync(int32_t count)
 {
+    MMI_HISTOGRAM_BOOLEAN("InputKit.inputMonitor.queryTouchEvents.Call", true);
     return ANI_INPUT_MONITOR_MGR.QueryTouchEvents(count);
 }
 
@@ -42,6 +44,7 @@ void onTouchImpl(
     ::taihe::callback_view<bool(::ohos::multimodalInput::touchEvent::TouchEvent const& touchEvent)> receiver,
     uintptr_t opq)
 {
+    MMI_HISTOGRAM_BOOLEAN("InputKit.inputMonitor.on_touch.Call", true);
     ConsumerParmType param;
     ANI_INPUT_MONITOR_MGR.AddMonitor(MONITORFUNTYPE::ON_TOUCH_BOOL, param, receiver, opq);
 }
@@ -49,6 +52,7 @@ void onTouchImpl(
 void onMouseImpl(::taihe::callback_view<void(::ohos::multimodalInput::mouseEvent::MouseEvent const& info)> receiver,
     uintptr_t opq)
 {
+    MMI_HISTOGRAM_BOOLEAN("InputKit.inputMonitor.on_mouse.Call", true);
     ConsumerParmType param;
     ANI_INPUT_MONITOR_MGR.AddMonitor(MONITORFUNTYPE::ON_MOUSE, param, receiver, opq);
 }
@@ -56,14 +60,17 @@ void onMouseImpl(::taihe::callback_view<void(::ohos::multimodalInput::mouseEvent
 void onMouseForDisplayRect(uintptr_t rect,
     ::taihe::callback_view<void(::ohos::multimodalInput::mouseEvent::MouseEvent const& info)> receiver, uintptr_t opq)
 {
+    MMI_HISTOGRAM_BOOLEAN("InputKit.inputMonitor.on_mouse.Call", true);
     ani_object aniArray = reinterpret_cast<ani_object>(rect);
     if (aniArray == nullptr) {
         taihe::set_business_error(COMMON_PARAMETER_ERROR, "inner error");
+        ANI_MONITOR_HISTOGRAM_ON_ERROR(MONITORFUNTYPE::ON_MOUSE_RECT, COMMON_PARAMETER_ERROR);
         return;
     }
     std::vector<Rect> rects;
     if (!TaiheMonitorConverter::ParseRects(aniArray, rects, RECT_LIST_SIZE)) {
         taihe::set_business_error(COMMON_PARAMETER_ERROR, "Hot Rect Area Parameter error");
+        ANI_MONITOR_HISTOGRAM_ON_ERROR(MONITORFUNTYPE::ON_MOUSE_RECT, COMMON_PARAMETER_ERROR);
         return;
     }
     ConsumerParmType param = rects;
@@ -73,6 +80,7 @@ void onMouseForDisplayRect(uintptr_t rect,
 void onPinchImpl(
     ::taihe::callback_view<void(::ohos::multimodalInput::gestureEvent::Pinch const& info)> receiver, uintptr_t opq)
 {
+    MMI_HISTOGRAM_BOOLEAN("InputKit.inputMonitor.on_pinch.Call", true);
     ConsumerParmType param;
     ANI_INPUT_MONITOR_MGR.AddMonitor(MONITORFUNTYPE::ON_PINCH, param, receiver, opq);
 }
@@ -81,8 +89,10 @@ void onPinchByNumber(int32_t fingers,
     ::taihe::callback_view<void(::ohos::multimodalInput::gestureEvent::Pinch const& info)> receiver,
     uintptr_t opq)
 {
+    MMI_HISTOGRAM_BOOLEAN("InputKit.inputMonitor.on_pinch.Call", true);
     if (fingers < 0) {
         taihe::set_business_error(COMMON_PARAMETER_ERROR, "fingers is invalid");
+        ANI_MONITOR_HISTOGRAM_ON_ERROR(MONITORFUNTYPE::ON_PINCH_FINGERS, COMMON_PARAMETER_ERROR);
         return;
     }
     ConsumerParmType param = fingers;
@@ -93,8 +103,10 @@ void onRotateByNumber(int32_t fingers,
     ::taihe::callback_view<void(::ohos::multimodalInput::gestureEvent::Rotate const& info)> receiver,
     uintptr_t opq)
 {
+    MMI_HISTOGRAM_BOOLEAN("InputKit.inputMonitor.on_rotate.Call", true);
     if (fingers < 0) {
         taihe::set_business_error(COMMON_PARAMETER_ERROR, "fingers is invalid");
+        ANI_MONITOR_HISTOGRAM_ON_ERROR(MONITORFUNTYPE::ON_ROTATE_FINGERS, COMMON_PARAMETER_ERROR);
         return;
     }
     ConsumerParmType param = fingers;
@@ -105,6 +117,7 @@ void onThreeFingersSwipeImpl(
     ::taihe::callback_view<void(::ohos::multimodalInput::gestureEvent::ThreeFingersSwipe const& info)> receiver,
     uintptr_t opq)
 {
+    MMI_HISTOGRAM_BOOLEAN("InputKit.inputMonitor.on_threeFingersSwipe.Call", true);
     ConsumerParmType param;
     ANI_INPUT_MONITOR_MGR.AddMonitor(MONITORFUNTYPE::ON_THREEFINGERSWIPE, param, receiver, opq);
 }
@@ -113,6 +126,7 @@ void onFourFingersSwipeImpl(
     ::taihe::callback_view<void(::ohos::multimodalInput::gestureEvent::FourFingersSwipe const& info)> receiver,
     uintptr_t opq)
 {
+    MMI_HISTOGRAM_BOOLEAN("InputKit.inputMonitor.on_fourFingersSwipe.Call", true);
     ConsumerParmType param;
     ANI_INPUT_MONITOR_MGR.AddMonitor(MONITORFUNTYPE::ON_FOURFINGERSWIPE, param, receiver, opq);
 }
@@ -121,6 +135,7 @@ void onThreeFingersTapImpl(
     ::taihe::callback_view<void(::ohos::multimodalInput::gestureEvent::ThreeFingersTap const& info)> receiver,
     uintptr_t opq)
 {
+    MMI_HISTOGRAM_BOOLEAN("InputKit.inputMonitor.on_threeFingersTap.Call", true);
     ConsumerParmType param;
     ANI_INPUT_MONITOR_MGR.AddMonitor(MONITORFUNTYPE::ON_THREEFINGERSTAP, param, receiver, opq);
 }
@@ -129,6 +144,7 @@ void onFingerprintImpl(
     ::taihe::callback_view<void(::ohos::multimodalInput::shortKey::FingerprintEvent const& info)> receiver,
     uintptr_t opq)
 {
+    MMI_HISTOGRAM_BOOLEAN("InputKit.inputMonitor.on_fingerprint.Call", true);
     ConsumerParmType param;
     ANI_INPUT_MONITOR_MGR.AddMonitor(MONITORFUNTYPE::ON_FINGERPRINT, param, receiver, opq);
 }
@@ -137,6 +153,7 @@ void onSwipeInwardImpl(
     ::taihe::callback_view<void(::ohos::multimodalInput::gestureEvent::SwipeInward const& info)> receiver,
     uintptr_t opq)
 {
+    MMI_HISTOGRAM_BOOLEAN("InputKit.inputMonitor.on_swipeInward.Call", true);
     ConsumerParmType param;
     ANI_INPUT_MONITOR_MGR.AddMonitor(MONITORFUNTYPE::ON_SWIPEINWARD, param, receiver, opq);
 }
@@ -145,8 +162,10 @@ void onTouchscreenSwipeByNumber(int32_t fingers,
     ::taihe::callback_view<void(::ohos::multimodalInput::gestureEvent::TouchGestureEvent const& info)> receiver,
     uintptr_t opq)
 {
+    MMI_HISTOGRAM_BOOLEAN("InputKit.inputMonitor.on_touchscreenSwipe.Call", true);
     if (fingers < THREE_FINGERS || fingers > FIVE_FINGERS) {
         taihe::set_business_error(COMMON_PARAMETER_ERROR, "fingers is invalid");
+        ANI_MONITOR_HISTOGRAM_ON_ERROR(MONITORFUNTYPE::ON_TOUCHSCREENSWIPE_FINGERS, COMMON_PARAMETER_ERROR);
         return;
     }
     ConsumerParmType param = fingers;
@@ -157,8 +176,10 @@ void onTouchscreenPinchImpl(int32_t fingers,
     ::taihe::callback_view<void(::ohos::multimodalInput::gestureEvent::TouchGestureEvent const& info)> receiver,
     uintptr_t opq)
 {
+    MMI_HISTOGRAM_BOOLEAN("InputKit.inputMonitor.on_touchscreenPinch.Call", true);
     if (fingers < FOUR_FINGERS || fingers > FIVE_FINGERS) {
         taihe::set_business_error(COMMON_PARAMETER_ERROR, "fingers is invalid");
+        ANI_MONITOR_HISTOGRAM_ON_ERROR(MONITORFUNTYPE::ON_TOUCHSCREENPINCH_FINGERS, COMMON_PARAMETER_ERROR);
         return;
     }
     ConsumerParmType param = fingers;
@@ -168,6 +189,7 @@ void onTouchscreenPinchImpl(int32_t fingers,
 void onKeyPressedImpl(::taihe::array_view<::ohos::multimodalInput::keyCode::KeyCode> keys,
     ::taihe::callback_view<void(::ohos::multimodalInput::keyEvent::KeyEvent const& info)> receiver, uintptr_t opq)
 {
+    MMI_HISTOGRAM_BOOLEAN("InputKit.inputMonitor.on_keyPressed.Call", true);
     std::vector<int32_t> inputkeys;
     if (keys.size() <= 0 || keys.size() > KEY_LIST_SIZE) {
         MMI_HILOGE("keys Parameter error");
@@ -178,6 +200,7 @@ void onKeyPressedImpl(::taihe::array_view<::ohos::multimodalInput::keyCode::KeyC
         auto keyCode = static_cast<int32_t>(*it);
         if (false == ANI_INPUT_MONITOR_MGR.CheckKeyCode(keyCode)) {
             taihe::set_business_error(PRE_KEY_NOT_SUPPORTED, "Event listening not supported for the key");
+            ANI_MONITOR_HISTOGRAM_ON_ERROR(MONITORFUNTYPE::ON_KEYPRESSED_KEYS, PRE_KEY_NOT_SUPPORTED);
             return;
         }
         inputkeys.push_back(keyCode);
@@ -187,23 +210,28 @@ void onKeyPressedImpl(::taihe::array_view<::ohos::multimodalInput::keyCode::KeyC
 
 void offTouchImpl(::taihe::optional_view<uintptr_t> receiver)
 {
+    MMI_HISTOGRAM_BOOLEAN("InputKit.inputMonitor.off_touch.Call", true);
     ANI_INPUT_MONITOR_MGR.RemoveMonitor(MONITORFUNTYPE::ON_TOUCH_BOOL, receiver);
 }
 
 void offMouseImpl(::taihe::optional_view<uintptr_t> receiver)
 {
+    MMI_HISTOGRAM_BOOLEAN("InputKit.inputMonitor.off_mouse.Call", true);
     ANI_INPUT_MONITOR_MGR.RemoveMonitor(MONITORFUNTYPE::ON_MOUSE, receiver);
 }
 
 void offPinchImpl(::taihe::optional_view<uintptr_t> receiver)
 {
+    MMI_HISTOGRAM_BOOLEAN("InputKit.inputMonitor.off_pinch.Call", true);
     ANI_INPUT_MONITOR_MGR.RemoveMonitor(MONITORFUNTYPE::ON_PINCH, receiver);
 }
 
 void offPinchByNumber(int32_t fingers, ::taihe::optional_view<uintptr_t> receiver)
 {
+    MMI_HISTOGRAM_BOOLEAN("InputKit.inputMonitor.off_pinch.Call", true);
     if (fingers < 0) {
         taihe::set_business_error(COMMON_PARAMETER_ERROR, "fingers is invalid");
+        ANI_MONITOR_HISTOGRAM_OFF_ERROR(MONITORFUNTYPE::ON_PINCH_FINGERS, COMMON_PARAMETER_ERROR);
         return;
     }
     ANI_INPUT_MONITOR_MGR.RemoveMonitor(MONITORFUNTYPE::ON_PINCH_FINGERS, receiver, fingers);
@@ -211,8 +239,10 @@ void offPinchByNumber(int32_t fingers, ::taihe::optional_view<uintptr_t> receive
 
 void offRotateByNumber(int32_t fingers, ::taihe::optional_view<uintptr_t> receiver)
 {
+    MMI_HISTOGRAM_BOOLEAN("InputKit.inputMonitor.off_rotate.Call", true);
     if (fingers < 0) {
         taihe::set_business_error(COMMON_PARAMETER_ERROR, "fingers is invalid");
+        ANI_MONITOR_HISTOGRAM_OFF_ERROR(MONITORFUNTYPE::ON_ROTATE_FINGERS, COMMON_PARAMETER_ERROR);
         return;
     }
     ANI_INPUT_MONITOR_MGR.RemoveMonitor(MONITORFUNTYPE::ON_ROTATE_FINGERS, receiver, fingers);
@@ -220,33 +250,40 @@ void offRotateByNumber(int32_t fingers, ::taihe::optional_view<uintptr_t> receiv
 
 void offThreeFingersSwipeImpl(::taihe::optional_view<uintptr_t> receiver)
 {
+    MMI_HISTOGRAM_BOOLEAN("InputKit.inputMonitor.off_threeFingersSwipe.Call", true);
     ANI_INPUT_MONITOR_MGR.RemoveMonitor(MONITORFUNTYPE::ON_THREEFINGERSWIPE, receiver);
 }
 
 void offFourFingersSwipeImpl(::taihe::optional_view<uintptr_t> receiver)
 {
+    MMI_HISTOGRAM_BOOLEAN("InputKit.inputMonitor.off_fourFingersSwipe.Call", true);
     ANI_INPUT_MONITOR_MGR.RemoveMonitor(MONITORFUNTYPE::ON_FOURFINGERSWIPE, receiver);
 }
 
 void offThreeFingersTapImpl(::taihe::optional_view<uintptr_t> receiver)
 {
+    MMI_HISTOGRAM_BOOLEAN("InputKit.inputMonitor.off_threeFingersTap.Call", true);
     ANI_INPUT_MONITOR_MGR.RemoveMonitor(MONITORFUNTYPE::ON_THREEFINGERSTAP, receiver);
 }
 
 void offFingerprintImpl(::taihe::optional_view<uintptr_t> receiver)
 {
+    MMI_HISTOGRAM_BOOLEAN("InputKit.inputMonitor.off_fingerprint.Call", true);
     ANI_INPUT_MONITOR_MGR.RemoveMonitor(MONITORFUNTYPE::ON_FINGERPRINT, receiver);
 }
 
 void offSwipeInwardImpl(::taihe::optional_view<uintptr_t> receiver)
 {
+    MMI_HISTOGRAM_BOOLEAN("InputKit.inputMonitor.off_swipeInward.Call", true);
     ANI_INPUT_MONITOR_MGR.RemoveMonitor(MONITORFUNTYPE::ON_SWIPEINWARD, receiver);
 }
 
 void offTouchscreenSwipeImpl(int32_t fingers, ::taihe::optional_view<uintptr_t> receiver)
 {
+    MMI_HISTOGRAM_BOOLEAN("InputKit.inputMonitor.off_touchscreenSwipe.Call", true);
     if (fingers < THREE_FINGERS || fingers > FIVE_FINGERS) {
         taihe::set_business_error(COMMON_PARAMETER_ERROR, "fingers is invalid");
+        ANI_MONITOR_HISTOGRAM_OFF_ERROR(MONITORFUNTYPE::ON_TOUCHSCREENSWIPE_FINGERS, COMMON_PARAMETER_ERROR);
         return;
     }
     ANI_INPUT_MONITOR_MGR.RemoveMonitor(MONITORFUNTYPE::ON_TOUCHSCREENSWIPE_FINGERS, receiver, fingers);
@@ -254,8 +291,10 @@ void offTouchscreenSwipeImpl(int32_t fingers, ::taihe::optional_view<uintptr_t> 
 
 void offTouchscreenPinchImpl(int32_t fingers, ::taihe::optional_view<uintptr_t> receiver)
 {
+    MMI_HISTOGRAM_BOOLEAN("InputKit.inputMonitor.off_touchscreenPinch.Call", true);
     if (fingers < FOUR_FINGERS || fingers > FIVE_FINGERS) {
         taihe::set_business_error(COMMON_PARAMETER_ERROR, "fingers is invalid");
+        ANI_MONITOR_HISTOGRAM_OFF_ERROR(MONITORFUNTYPE::ON_TOUCHSCREENPINCH_FINGERS, COMMON_PARAMETER_ERROR);
         return;
     }
     ANI_INPUT_MONITOR_MGR.RemoveMonitor(MONITORFUNTYPE::ON_TOUCHSCREENPINCH_FINGERS, receiver, fingers);
@@ -263,6 +302,7 @@ void offTouchscreenPinchImpl(int32_t fingers, ::taihe::optional_view<uintptr_t> 
 
 void offKeyPressedImpl(::taihe::optional_view<uintptr_t> receiver)
 {
+    MMI_HISTOGRAM_BOOLEAN("InputKit.inputMonitor.off_keyPressed.Call", true);
     ANI_INPUT_MONITOR_MGR.RemoveMonitor(MONITORFUNTYPE::ON_KEYPRESSED_KEYS, receiver);
 }
 }  // namespace

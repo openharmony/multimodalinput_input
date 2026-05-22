@@ -18,6 +18,7 @@
 #include "taihe/runtime.hpp"
 #include "stdexcept"
 
+#include "mmi_api_metrics_histograms.h"
 #include "mmi_log.h"
 #include "input_manager.h"
 
@@ -70,16 +71,19 @@ std::string HandleError(int32_t ret, int32_t &errorCode)
 void TransmitInfrared(int64_t infraredFrequency, ::taihe::array_view<int64_t> pattern)
 {
     CALL_DEBUG_ENTER;
+    MMI_HISTOGRAM_BOOLEAN("InputKit.infraredEmitter.transmitInfrared.Call", true);
     std::vector<int64_t> vecPattern;
     if (infraredFrequency <= 0) {
         taihe::set_business_error(COMMON_PARAMETER_ERROR,
             "Parameter error.value of infraredFrequency must be greater than 0");
+        MMI_HISTOGRAM_ERROR("InputKit.infraredEmitter.transmitInfrared.Error", COMMON_PARAMETER_ERROR);
         return;
     }
     for (auto it = pattern.begin(); it != pattern.end(); ++it) {
         if (*it <= 0) {
             taihe::set_business_error(COMMON_PARAMETER_ERROR,
                 "Parameter error.The element of pattern must be positive.");
+            MMI_HISTOGRAM_ERROR("InputKit.infraredEmitter.transmitInfrared.Error", COMMON_PARAMETER_ERROR);
             return;
         }
         vecPattern.push_back(*it);
@@ -96,6 +100,7 @@ void TransmitInfrared(int64_t infraredFrequency, ::taihe::array_view<int64_t> pa
         MMI_HILOGE("errMsg:%{public}s,ret:%{public}d, errCode=%{public}d", errMsg.c_str(), ret, errCode);
         if (errCode == COMMON_USE_SYSAPI_ERROR || errCode == COMMON_PERMISSION_CHECK_ERROR) {
             taihe::set_business_error(errCode, errMsg);
+            MMI_HISTOGRAM_ERROR("InputKit.infraredEmitter.transmitInfrared.Error", errCode);
             return;
         }
     }
@@ -104,6 +109,7 @@ void TransmitInfrared(int64_t infraredFrequency, ::taihe::array_view<int64_t> pa
 ::taihe::array<TaiheInfraredFrequency> GetInfraredFrequencies()
 {
     CALL_DEBUG_ENTER;
+    MMI_HISTOGRAM_BOOLEAN("InputKit.infraredEmitter.getInfraredFrequencies.Call", true);
     std::vector<OHOS::MMI::InfraredFrequency> frequencies;
     std::vector<TaiheInfraredFrequency> result;
     int32_t ret = OHOS::MMI::InputManager::GetInstance()->GetInfraredFrequencies(frequencies);
@@ -118,6 +124,7 @@ void TransmitInfrared(int64_t infraredFrequency, ::taihe::array_view<int64_t> pa
         auto errMsg = HandleError(ret, errCode);
         MMI_HILOGE("errMsg:%{public}s,ret:%{public}d, errCode=%{public}d", errMsg.c_str(), ret, errCode);
         taihe::set_business_error(errCode, errMsg);
+        MMI_HISTOGRAM_ERROR("InputKit.infraredEmitter.getInfraredFrequencies.Error", errCode);
         return ::taihe::array<TaiheInfraredFrequency>(result);
     }
 
@@ -130,6 +137,7 @@ void TransmitInfrared(int64_t infraredFrequency, ::taihe::array_view<int64_t> pa
 
 bool HasIrEmitterAsync()
 {
+    MMI_HISTOGRAM_BOOLEAN("InputKit.infraredEmitter.hasIrEmitter.Call", true);
     bool hasIrEmitter = false;
     int32_t ret = OHOS::MMI::InputManager::GetInstance()->HasIrEmitter(hasIrEmitter);
     if (ret != RET_OK) {
@@ -137,6 +145,7 @@ bool HasIrEmitterAsync()
         auto errMsg = HandleError(ret, errCode);
         MMI_HILOGE("errMsg:%{public}s,ret:%{public}d, errCode=%{public}d", errMsg.c_str(), ret, errCode);
         taihe::set_business_error(errCode, errMsg);
+        MMI_HISTOGRAM_ERROR("InputKit.infraredEmitter.hasIrEmitter.Error", errCode);
         return false;
     }
     return hasIrEmitter;

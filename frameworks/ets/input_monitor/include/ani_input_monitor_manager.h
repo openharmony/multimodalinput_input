@@ -23,6 +23,21 @@
 #include "ani_input_monitor_consumer.h"
 #include "nocopyable.h"
 
+#ifdef OHOS_BUILD_ENABLE_API_METRICS_HISTOGRAM
+#include "ani_input_monitor_histogram.h"
+
+#define ANI_MONITOR_HISTOGRAM_ON_ERROR(funType, errorCode)  \
+    ::OHOS::MMI::AniInputMonitorHistogram::HistogramOnError((funType), (errorCode))
+#define ANI_MONITOR_HISTOGRAM_OFF_ERROR(funType, errorCode) \
+    ::OHOS::MMI::AniInputMonitorHistogram::HistogramOffError((funType), (errorCode))
+
+#else // OHOS_BUILD_ENABLE_API_METRICS_HISTOGRAM
+
+#define ANI_MONITOR_HISTOGRAM_ON_ERROR(funType, errorCode)
+#define ANI_MONITOR_HISTOGRAM_OFF_ERROR(funType, errorCode)
+
+#endif // OHOS_BUILD_ENABLE_API_METRICS_HISTOGRAM
+
 namespace OHOS {
 namespace MMI {
 class AniInputMonitorManager final {
@@ -44,7 +59,7 @@ public:
 
     bool CheckKeyCode(const int32_t keycode);
     std::string MakePermissionCheckErrMsg(const std::string &moduleName, const std::string &permissionName);
-    void ThrowError(int32_t code);
+    void ThrowError(MONITORFUNTYPE funType, int32_t code);
     static bool IsSystemApp();
     static bool CheckPermission(const std::string &permissionCode);
 private:

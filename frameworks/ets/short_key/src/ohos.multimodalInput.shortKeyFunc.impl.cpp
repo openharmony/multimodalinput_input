@@ -15,6 +15,7 @@
 #include "ani_common.h"
 #include "define_multimodal.h"
 #include "input_manager.h"
+#include "mmi_api_metrics_histograms.h"
 #include "ohos.multimodalInput.shortKeyFunc.proj.hpp"
 #include "ohos.multimodalInput.shortKeyFunc.impl.hpp"
 #include "stdexcept"
@@ -31,14 +32,17 @@ constexpr int32_t MIN_DELAY { 0 };
 void SetKeyDownDurationAsync(::taihe::string_view businessKey, int32_t delay)
 {
     CALL_DEBUG_ENTER;
+    MMI_HISTOGRAM_BOOLEAN("InputKit.shortKey.setKeyDownDuration.Call", true);
     if (businessKey.empty()) {
         MMI_HILOGE("Invalid businessKey");
         taihe::set_business_error(COMMON_PARAMETER_ERROR, "businessKey is invalid");
+        MMI_HISTOGRAM_ERROR("InputKit.shortKey.setKeyDownDuration.Error", COMMON_PARAMETER_ERROR);
         return;
     }
     if (delay < MIN_DELAY || delay > MAX_DELAY) {
         MMI_HILOGE("Invalid delay");
         taihe::set_business_error(COMMON_PARAMETER_ERROR, "Delay is invalid");
+        MMI_HISTOGRAM_ERROR("InputKit.shortKey.setKeyDownDuration.Error", COMMON_PARAMETER_ERROR);
         return;
     }
     int32_t ret = InputManager::GetInstance()->SetKeyDownDuration(std::string(businessKey), delay);
@@ -46,14 +50,17 @@ void SetKeyDownDurationAsync(::taihe::string_view businessKey, int32_t delay)
     if (ret == COMMON_USE_SYSAPI_ERROR) {
         MMI_HILOGE("Non system applications use system API");
         taihe::set_business_error(COMMON_USE_SYSAPI_ERROR, "Non system applications use system API");
+        MMI_HISTOGRAM_ERROR("InputKit.shortKey.setKeyDownDuration.Error", COMMON_USE_SYSAPI_ERROR);
         return;
     } else if (ret == COMMON_PARAMETER_ERROR) {
         MMI_HILOGE("Invalid param");
         taihe::set_business_error(COMMON_PARAMETER_ERROR, "param is invalid");
+        MMI_HISTOGRAM_ERROR("InputKit.shortKey.setKeyDownDuration.Error", COMMON_PARAMETER_ERROR);
         return;
     } else if (ret != RET_OK) {
         MMI_HILOGE("Unknown error ret:%{public}d", ret);
         taihe::set_business_error(COMMON_PARAMETER_ERROR, "Parameter error.Unknown error!");
+        MMI_HISTOGRAM_ERROR("InputKit.shortKey.setKeyDownDuration.Error", COMMON_PARAMETER_ERROR);
         return;
     }
 }
