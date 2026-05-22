@@ -61,6 +61,9 @@ taihe_shared_library("Pointer") {
     "image_framework:image_taihe",
     "ipc:ipc_single",
   ]
+  if (input_feature_api_metrics_histogram) {
+    external_deps += [ "api_metrics:histogrammanager" ]
+  }
   sources += [
     "${mmi_path}/frameworks/ets/common/src/ani_common.cpp",
     "src/ani_constructor.cpp",

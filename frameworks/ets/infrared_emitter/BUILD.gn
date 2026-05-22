@@ -49,6 +49,9 @@ taihe_shared_library("InfraredEmitter") {
     "hilog:libhilog",
     "ipc:ipc_single",
   ]
+  if (input_feature_api_metrics_histogram) {
+    external_deps += [ "api_metrics:histogrammanager" ]
+  }
   sources += [
     "src/ani_constructor.cpp",
     "src/ohos.multimodalInput.infraredEmitter.impl.cpp",

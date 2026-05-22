@@ -27,6 +27,7 @@
 #include "input_event.h"
 #include "ipc_skeleton.h"
 #include "key_event.h"
+#include "mmi_api_metrics_histograms.h"
 #include "mmi_log.h"
 #include "oh_input_manager.h"
 #include "ohos.multimodalInput.inputEventClient.proj.hpp"
@@ -98,15 +99,17 @@ bool CheckPermission(const std::string &permissionCode)
     }
 }
 
-bool CheckInputEventClentPermission()
+bool CheckInputEventClentPermission(std::function<void(int32_t)> histogramError)
 {
     if (!IsSystemApp()) {
         taihe::set_business_error(COMMON_USE_SYSAPI_ERROR, "Non system applications use system API");
+        histogramError(COMMON_USE_SYSAPI_ERROR);
         return false;
     }
     if (!CheckPermission(INJECT_INPUT_PERMISSION_NAME)) {
         std::string errMsg = MakePermissionCheckErrMsg(MODULE_NAME, INJECT_INPUT_PERMISSION_NAME);
         taihe::set_business_error(COMMON_PERMISSION_CHECK_ERROR, errMsg);
+        histogramError(COMMON_PERMISSION_CHECK_ERROR);
         return false;
     }
     return  true;
@@ -160,15 +163,18 @@ static std::unordered_map<int32_t, int32_t> THMouseButton2Native = {
 
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
 void GetInjectionEventDataNative(Input_KeyEvent* keyEventNative,
-    ::ohos::multimodalInput::inputEventClient::KeyEvent const& thKeyEvent)
+    ::ohos::multimodalInput::inputEventClient::KeyEvent const& thKeyEvent,
+    std::function<void(int32_t)> histogramError)
 {
     if (thKeyEvent.keyCode < 0) {
         set_business_error(INPUT_PARAMETER_ERROR, "keyCode must be greater than or equal to 0");
+        histogramError(INPUT_PARAMETER_ERROR);
         return;
     }
     if (thKeyEvent.keyDownDuration < 0) {
         MMI_HILOGE("keyDownDuration:%{public}d is less 0, can not process", thKeyEvent.keyDownDuration);
         set_business_error(INPUT_PARAMETER_ERROR, "keyDownDuration must be greater than or equal to 0");
+        histogramError(INPUT_PARAMETER_ERROR);
         return;
     }
 
@@ -183,7 +189,8 @@ void GetInjectionEventDataNative(Input_KeyEvent* keyEventNative,
 }
 #else
 void GetInjectionEventData(std::shared_ptr<OHOS::MMI::KeyEvent> keyEventNative,
-    ::ohos::multimodalInput::inputEventClient::KeyEvent const& thKeyEvent)
+    ::ohos::multimodalInput::inputEventClient::KeyEvent const& thKeyEvent,
+    std::function<void(int32_t)> histogramError)
 {
     if (keyEventNative == nullptr) {
         MMI_HILOGE("keyEventNative is null");
@@ -192,11 +199,13 @@ void GetInjectionEventData(std::shared_ptr<OHOS::MMI::KeyEvent> keyEventNative,
     if (thKeyEvent.keyDownDuration < 0) {
         MMI_HILOGE("keyDownDuration value is invalid.value:%{public}d", thKeyEvent.keyDownDuration);
         set_business_error(INPUT_PARAMETER_ERROR, "Parameter error.");
+        histogramError(INPUT_PARAMETER_ERROR);
         return;
     }
     if (thKeyEvent.keyCode < 0) {
         MMI_HILOGE("keyCode value is invalid, can not process");
         set_business_error(INPUT_PARAMETER_ERROR, "Parameter error.");
+        histogramError(INPUT_PARAMETER_ERROR);
         return;
     }
     keyEventNative->SetRepeat(true);
@@ -216,31 +225,39 @@ void GetInjectionEventData(std::shared_ptr<OHOS::MMI::KeyEvent> keyEventNative,
 
 void InjectKeyEventSync(::ohos::multimodalInput::inputEventClient::KeyEventData const& keyEvent)
 {
-    if (!CheckInputEventClentPermission()) {
+    MMI_HISTOGRAM_BOOLEAN("InputKit.inputEventClient.injectKeyEvent.Call", true);
+    auto histogramError = [](int32_t errorCode) {
+        MMI_HISTOGRAM_ERROR("InputKit.inputEventClient.injectKeyEvent.Error", errorCode);
+    };
+    if (!CheckInputEventClentPermission(histogramError)) {
         return;
     }
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
     Input_KeyEvent* keyEventNative = OH_Input_CreateKeyEvent();
-    GetInjectionEventDataNative(keyEventNative, keyEvent.keyEvent);
+    GetInjectionEventDataNative(keyEventNative, keyEvent.keyEvent, histogramError);
     OH_Input_DestroyKeyEvent(&keyEventNative);
 #else
     auto newKeyEvent = OHOS::MMI::KeyEvent::Create();
-    GetInjectionEventData(newKeyEvent, keyEvent.keyEvent);
+    GetInjectionEventData(newKeyEvent, keyEvent.keyEvent, histogramError);
 #endif
 }
 
 void InjectEventSync(::ohos::multimodalInput::inputEventClient::KeyEventInfo const& keyEvent)
 {
-    if (!CheckInputEventClentPermission()) {
+    MMI_HISTOGRAM_BOOLEAN("InputKit.inputEventClient.injectEvent.Call", true);
+    auto histogramError = [](int32_t errorCode) {
+        MMI_HISTOGRAM_ERROR("InputKit.inputEventClient.injectEvent.Error", errorCode);
+    };
+    if (!CheckInputEventClentPermission(histogramError)) {
         return;
     }
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
     Input_KeyEvent* keyEventNative = OH_Input_CreateKeyEvent();
-    GetInjectionEventDataNative(keyEventNative, keyEvent.KeyEvent);
+    GetInjectionEventDataNative(keyEventNative, keyEvent.KeyEvent, histogramError);
     OH_Input_DestroyKeyEvent(&keyEventNative);
 #else
     auto lkeyEvent = OHOS::MMI::KeyEvent::Create();
-    GetInjectionEventData(lkeyEvent, keyEvent.KeyEvent);
+    GetInjectionEventData(lkeyEvent, keyEvent.KeyEvent, histogramError);
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
 }
 
@@ -378,7 +395,11 @@ void HandleMousePressedButtons(::ohos::multimodalInput::mouseEvent::MouseEvent m
 
 void InjectMouseEventSync(::ohos::multimodalInput::inputEventClient::MouseEventData const& mouseEvent)
 {
-    if (!CheckInputEventClentPermission()) {
+    MMI_HISTOGRAM_BOOLEAN("InputKit.inputEventClient.injectMouseEvent.Call", true);
+    auto histogramError = [](int32_t errorCode) {
+        MMI_HISTOGRAM_ERROR("InputKit.inputEventClient.injectMouseEvent.Error", errorCode);
+    };
+    if (!CheckInputEventClentPermission(histogramError)) {
         return;
     }
     auto pointerEvent = PointerEvent::Create();
@@ -533,7 +554,11 @@ bool HandleTouchPropertyInt32(::ohos::multimodalInput::touchEvent::TouchEvent to
 
 void InjectTouchEventSync(::ohos::multimodalInput::inputEventClient::TouchEventData const& touchEvent)
 {
-    if (!CheckInputEventClentPermission()) {
+    MMI_HISTOGRAM_BOOLEAN("InputKit.inputEventClient.injectTouchEvent.Call", true);
+    auto histogramError = [](int32_t errorCode) {
+        MMI_HISTOGRAM_ERROR("InputKit.inputEventClient.injectTouchEvent.Error", errorCode);
+    };
+    if (!CheckInputEventClentPermission(histogramError)) {
         return;
     }
     auto pointerEvent = PointerEvent::Create();
@@ -546,11 +571,13 @@ void InjectTouchEventSync(::ohos::multimodalInput::inputEventClient::TouchEventD
     if (action == RET_ERR) {
         MMI_HILOGE("touch action type invaild");
         set_business_error(INPUT_PARAMETER_ERROR, "Parameter error.");
+        MMI_HISTOGRAM_ERROR("InputKit.inputEventClient.injectTouchEvent.Error", INPUT_PARAMETER_ERROR);
         return;
     }
     if (!HandleTouchPropertyInt32(touchEvent.touchEvent, pointerEvent, item, action)) {
         MMI_HILOGE("touch property invaild");
         set_business_error(INPUT_PARAMETER_ERROR, "Parameter error.");
+        MMI_HISTOGRAM_ERROR("InputKit.inputEventClient.injectTouchEvent.Error", INPUT_PARAMETER_ERROR);
         return;
     }
     bool useGlobalCoordinate = touchEvent.useGlobalCoordinate.value_or(false);
@@ -561,6 +588,7 @@ void InjectTouchEventSync(::ohos::multimodalInput::inputEventClient::TouchEventD
             if (!item.IsValidGlobalXY()) {
                 MMI_HILOGE("globalX globalY is invalid");
                 ::taihe::set_business_error(INPUT_PARAMETER_ERROR, "Parameter error.globalX globalY is invalid");
+                MMI_HISTOGRAM_ERROR("InputKit.inputEventClient.injectTouchEvent.Error", INPUT_PARAMETER_ERROR);
                 return;
             }
         }
@@ -572,7 +600,11 @@ void InjectTouchEventSync(::ohos::multimodalInput::inputEventClient::TouchEventD
 
 void PermitInjectionSync(bool result)
 {
-    if (!CheckInputEventClentPermission()) {
+    MMI_HISTOGRAM_BOOLEAN("InputKit.inputEventClient.permitInjection.Call", true);
+    auto histogramError = [](int32_t errorCode) {
+        MMI_HISTOGRAM_ERROR("InputKit.inputEventClient.permitInjection.Error", errorCode);
+    };
+    if (!CheckInputEventClentPermission(histogramError)) {
         return;
     }
     InputManager::GetInstance()->Authorize(result);

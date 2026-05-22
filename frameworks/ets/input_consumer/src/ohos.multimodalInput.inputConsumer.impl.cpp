@@ -16,6 +16,7 @@
 #include "inputConsumer_keyOptions_impl.h"
 #include "inputConsumer_hotkeyOptions_impl.h"
 #include "inputConsumer_keyPressed_impl.h"
+#include "mmi_api_metrics_histograms.h"
 #include "permission_helper.h"
 #include "trigger_event_dispatcher.h"
 
@@ -146,22 +147,26 @@ std::atomic<size_t> g_baseId { 0 };
 
 KeyEventMonitorInfo::~KeyEventMonitorInfo() {}
 
-void HandleCommonErrors(int32_t ret)
+void HandleCommonErrors(int32_t ret, std::function<void(int32_t)> histogramError)
 {
     int32_t errorCode = std::abs(ret);
     if (errorCode == COMMON_USE_SYSAPI_ERROR) {
         MMI_HILOGE("Non system applications use system API");
         taihe::set_business_error(COMMON_USE_SYSAPI_ERROR, "Non system applications use system API");
+        histogramError(COMMON_USE_SYSAPI_ERROR);
     } else if (errorCode == COMMON_PERMISSION_CHECK_ERROR) {
         MMI_HILOGE("Shield api need ohos.permission.INPUT_CONTROL_DISPATCHING");
         taihe::set_business_error(COMMON_PERMISSION_CHECK_ERROR,
             "Shield api need ohos.permission.INPUT_CONTROL_DISPATCHING");
+        histogramError(COMMON_PERMISSION_CHECK_ERROR);
     } else if (errorCode == COMMON_PARAMETER_ERROR) {
         MMI_HILOGE("Parameter error");
         taihe::set_business_error(COMMON_PARAMETER_ERROR, "Parameter error");
+        histogramError(COMMON_PARAMETER_ERROR);
     } else if (errorCode != RET_OK) {
         MMI_HILOGE("Unknown error, errorCode:%{public}d", errorCode);
         taihe::set_business_error(COMMON_PARAMETER_ERROR, "Parameter error.unknown error");
+        histogramError(COMMON_PARAMETER_ERROR);
     }
 }
 
@@ -319,9 +324,11 @@ void SubscribeKeyMonitor(KeyPressedConfig const& options,
         if (subscriberId == -CAPABILITY_NOT_SUPPORTED) {
             MMI_HILOGE("Capability not supported");
             taihe::set_business_error(INPUT_DEVICE_NOT_SUPPORTED, "Capability not supported.");
+            MMI_HISTOGRAM_ERROR("InputKit.inputConsumer.on_keyPressed.Error", INPUT_DEVICE_NOT_SUPPORTED);
         } else if (subscriberId == -PARAM_INPUT_INVALID) {
             MMI_HILOGE("Input is invalid");
             taihe::set_business_error(COMMON_PARAMETER_ERROR, "Input is invalid");
+            MMI_HISTOGRAM_ERROR("InputKit.inputConsumer.on_keyPressed.Error", COMMON_PARAMETER_ERROR);
         } else {
             MMI_HILOGE("SubscribeKeyMonitor fail, error:%{public}d", subscriberId);
         }
@@ -349,9 +356,11 @@ void UnsubscribeKeyMonitor(taihe::optional_view<uintptr_t> opq)
         if (ret == -CAPABILITY_NOT_SUPPORTED) {
             MMI_HILOGE("Capability not supported");
             taihe::set_business_error(INPUT_DEVICE_NOT_SUPPORTED, "Capability not supported.");
+            MMI_HISTOGRAM_ERROR("InputKit.inputConsumer.off_keyPressed.Error", INPUT_DEVICE_NOT_SUPPORTED);
         } else if (ret == -PARAM_INPUT_INVALID) {
             MMI_HILOGE("Input is invalid");
             taihe::set_business_error(COMMON_PARAMETER_ERROR, "Input is invalid");
+            MMI_HISTOGRAM_ERROR("InputKit.inputConsumer.off_keyPressed.Error", COMMON_PARAMETER_ERROR);
         } else if (ret != RET_OK) {
             MMI_HILOGE("UnsubscribeKeyMonitor fail, error:%{public}d", ret);
         }
@@ -363,9 +372,11 @@ void UnsubscribeKeyMonitor(taihe::optional_view<uintptr_t> opq)
     if (ret == -CAPABILITY_NOT_SUPPORTED) {
         MMI_HILOGE("Capability not supported");
         taihe::set_business_error(INPUT_DEVICE_NOT_SUPPORTED, "Capability not supported.");
+        MMI_HISTOGRAM_ERROR("InputKit.inputConsumer.off_keyPressed.Error", INPUT_DEVICE_NOT_SUPPORTED);
     } else {
         MMI_HILOGE("Input is invalid");
         taihe::set_business_error(COMMON_PARAMETER_ERROR, "Input is invalid");
+        MMI_HISTOGRAM_ERROR("InputKit.inputConsumer.off_keyPressed.Error", COMMON_PARAMETER_ERROR);
     }
 }
 
@@ -377,6 +388,7 @@ void UnsubscribeKeyMonitors()
         if (ret == -CAPABILITY_NOT_SUPPORTED) {
             MMI_HILOGE("Capability not supported");
             taihe::set_business_error(INPUT_DEVICE_NOT_SUPPORTED, "Capability not supported.");
+            MMI_HISTOGRAM_ERROR("InputKit.inputConsumer.off_keyPressed.Error", INPUT_DEVICE_NOT_SUPPORTED);
         }
         return;
     }
@@ -558,13 +570,15 @@ int32_t AddEventHotkeyCallback(Callbacks &callbacks, std::shared_ptr<KeyEventMon
 }
 
 int32_t GetHotkeyEventInfo(HotkeyOptions const& hotkeyOptions,
-    std::shared_ptr<KeyEventMonitorInfo> event, std::shared_ptr<KeyOption> keyOption)
+    std::shared_ptr<KeyEventMonitorInfo> event, std::shared_ptr<KeyOption> keyOption,
+    std::function<void(int32_t)> histogramError)
 {
     CALL_DEBUG_ENTER;
     CHKPR(event, RET_ERR);
     CHKPR(keyOption, RET_ERR);
     if (hotkeyOptions.preKeys.empty()) {
         taihe::set_business_error(COMMON_PARAMETER_ERROR, "PreKeys not found");
+        histogramError(COMMON_PARAMETER_ERROR);
         return RET_ERR;
     }
     std::set<int32_t> preKeys;
@@ -576,6 +590,7 @@ int32_t GetHotkeyEventInfo(HotkeyOptions const& hotkeyOptions,
     if (preKeys.size() > PRE_KEYS_SIZE) {
         MMI_HILOGE("PreKeys size invalid");
         taihe::set_business_error(COMMON_PARAMETER_ERROR, "PreKeys size invalid");
+        histogramError(COMMON_PARAMETER_ERROR);
         return RET_ERR;
     }
     MMI_HILOGD("PreKeys size:%{public}zu", preKeys.size());
@@ -585,12 +600,14 @@ int32_t GetHotkeyEventInfo(HotkeyOptions const& hotkeyOptions,
     for (const auto &item : preKeys) {
         if (item < 0) {
             taihe::set_business_error(COMMON_PARAMETER_ERROR, "element of preKeys must be greater than or equal to 0");
+            histogramError(COMMON_PARAMETER_ERROR);
             return RET_ERR;
         }
         auto it = std::find(pressKeyCodes.begin(), pressKeyCodes.end(), item);
         if (it == pressKeyCodes.end()) {
             MMI_HILOGE("PreKeys is not expect");
             taihe::set_business_error(COMMON_PARAMETER_ERROR, "PreKey not expected");
+            histogramError(COMMON_PARAMETER_ERROR);
             return RET_ERR;
         }
         oss << item << ",";
@@ -600,12 +617,14 @@ int32_t GetHotkeyEventInfo(HotkeyOptions const& hotkeyOptions,
     if (hotkeyOptions.finalKey < 0) {
         MMI_HILOGE("FinalKey:%{private}d is less 0, can not process", hotkeyOptions.finalKey);
         taihe::set_business_error(COMMON_PARAMETER_ERROR, "FinalKey must be greater than or equal to 0");
+        histogramError(COMMON_PARAMETER_ERROR);
         return RET_ERR;
     }
     auto it = std::find(finalKeyCodes.begin(), finalKeyCodes.end(), hotkeyOptions.finalKey);
     if (it != finalKeyCodes.end()) {
         MMI_HILOGE("FinalKey is not expect");
         taihe::set_business_error(COMMON_PARAMETER_ERROR, "FinalKey is not expect");
+        histogramError(COMMON_PARAMETER_ERROR);
         return RET_ERR;
     }
     oss << hotkeyOptions.finalKey << ",";
@@ -642,7 +661,10 @@ void SubscribeHotkey(HotkeyOptions const& hotkeyOptions, callback_view<void(Hotk
     CHKPV(event);
     auto keyOption = std::make_shared<KeyOption>();
     CHKPV(keyOption);
-    if (GetHotkeyEventInfo(hotkeyOptions, event, keyOption) != RET_OK) {
+    auto histogramError = [](int32_t errorCode) {
+        MMI_HISTOGRAM_ERROR("InputKit.inputConsumer.on_hotkeyChange.Error", errorCode);
+    };
+    if (GetHotkeyEventInfo(hotkeyOptions, event, keyOption, histogramError) != RET_OK) {
         MMI_HILOGE("GetHotkeyEventInfo failed");
         return;
     }
@@ -654,16 +676,19 @@ void SubscribeHotkey(HotkeyOptions const& hotkeyOptions, callback_view<void(Hotk
         if (subscribeId == ERROR_UNSUPPORT) {
             MMI_HILOGE("SubscribeId invalid:%{public}d", subscribeId);
             taihe::set_business_error(INPUT_DEVICE_NOT_SUPPORTED, "Hotkey occupied by other");
+            MMI_HISTOGRAM_ERROR("InputKit.inputConsumer.on_hotkeyChange.Error", INPUT_DEVICE_NOT_SUPPORTED);
             return;
         }
         if (subscribeId == OCCUPIED_BY_SYSTEM) {
             MMI_HILOGE("SubscribeId invalid:%{public}d", subscribeId);
             taihe::set_business_error(INPUT_OCCUPIED_BY_SYSTEM, "Hotkey occupied by system");
+            MMI_HISTOGRAM_ERROR("InputKit.inputConsumer.on_hotkeyChange.Error", INPUT_OCCUPIED_BY_SYSTEM);
             return;
         }
         if (subscribeId == OCCUPIED_BY_OTHER) {
             MMI_HILOGE("SubscribeId invalid:%{public}d", subscribeId);
             taihe::set_business_error(INPUT_OCCUPIED_BY_OTHER, "Hotkey occupied by other");
+            MMI_HISTOGRAM_ERROR("InputKit.inputConsumer.on_hotkeyChange.Error", INPUT_OCCUPIED_BY_OTHER);
             return;
         }
         MMI_HILOGD("SubscribeId:%{public}d", subscribeId);
@@ -732,8 +757,11 @@ void UnsubscribeHotkey(HotkeyOptions const& hotkeyOptions, optional_view<uintptr
     CHKPV(event);
     auto keyOption = std::make_shared<KeyOption>();
     CHKPV(keyOption);
+    auto histogramError = [](int32_t errorCode) {
+        MMI_HISTOGRAM_ERROR("InputKit.inputConsumer.off_hotkeyChange.Error", errorCode);
+    };
     int32_t subscribeId = -1;
-    if (GetHotkeyEventInfo(hotkeyOptions, event, keyOption) != RET_OK) {
+    if (GetHotkeyEventInfo(hotkeyOptions, event, keyOption, histogramError) != RET_OK) {
         MMI_HILOGE("GetHotkeyEventInfo failed");
         return;
     }
@@ -804,7 +832,7 @@ int32_t AddEventKeyCallback(Callbacks &callbacks, std::shared_ptr<KeyEventMonito
 }
 
 int32_t GetEventInfoAPI9(KeyOptions const& keyOptions, std::shared_ptr<KeyEventMonitorInfo> event,
-    std::shared_ptr<KeyOption> keyOption)
+    std::shared_ptr<KeyOption> keyOption, std::function<void(int32_t)> histogramError)
 {
     CALL_DEBUG_ENTER;
     CHKPR(event, RET_ERR);
@@ -818,6 +846,7 @@ int32_t GetEventInfoAPI9(KeyOptions const& keyOptions, std::shared_ptr<KeyEventM
     if (preKeys.size() > PRE_KEYS_SIZE) {
         MMI_HILOGE("PreKeys size invalid");
         taihe::set_business_error(COMMON_PARAMETER_ERROR, "PreKeys size invalid");
+        histogramError(COMMON_PARAMETER_ERROR);
         return RET_ERR;
     }
     MMI_HILOGD("PreKeys size:%{public}zu", preKeys.size());
@@ -826,6 +855,7 @@ int32_t GetEventInfoAPI9(KeyOptions const& keyOptions, std::shared_ptr<KeyEventM
     for (const auto &item : preKeys) {
         if (item < 0) {
             taihe::set_business_error(COMMON_PARAMETER_ERROR, "element of preKeys must be greater than or equal to 0");
+            histogramError(COMMON_PARAMETER_ERROR);
             return RET_ERR;
         }
         subKeyNames += std::to_string(item);
@@ -836,6 +866,7 @@ int32_t GetEventInfoAPI9(KeyOptions const& keyOptions, std::shared_ptr<KeyEventM
     if (keyOptions.finalKey < 0) {
         MMI_HILOGE("finalKey:%{private}d is less 0, can not process", keyOptions.finalKey);
         taihe::set_business_error(COMMON_PARAMETER_ERROR, "finalKey must be greater than or equal to 0");
+        histogramError(COMMON_PARAMETER_ERROR);
         return RET_ERR;
     }
     subKeyNames += std::to_string(keyOptions.finalKey);
@@ -852,6 +883,7 @@ int32_t GetEventInfoAPI9(KeyOptions const& keyOptions, std::shared_ptr<KeyEventM
     if (keyOptions.finalKeyDownDuration < 0) {
         MMI_HILOGE("finalKeyDownDuration:%{public}d is less 0, can not process", keyOptions.finalKeyDownDuration);
         taihe::set_business_error(COMMON_PARAMETER_ERROR, "finalKeyDownDuration must be greater than or equal to 0");
+        histogramError(COMMON_PARAMETER_ERROR);
         return RET_ERR;
     }
     subKeyNames += std::to_string(keyOptions.finalKeyDownDuration);
@@ -1008,7 +1040,8 @@ void SubscribeKeyCommand(KeyOptions const& keyOptions,
     auto keyOption = std::make_shared<KeyOption>();
     CHKPV(keyOption);
     if (!PER_HELPER->VerifySystemApp()) {
-        HandleCommonErrors(COMMON_USE_SYSAPI_ERROR);
+        auto histogramError = [](int32_t errorCode) {};
+        HandleCommonErrors(COMMON_USE_SYSAPI_ERROR, histogramError);
         return;
     }
     if (GetEventInfoAPI26(keyOptions, event, keyOption) != RET_OK) {
@@ -1059,7 +1092,8 @@ void UnsubscribeKeyCommand(KeyOptions const& keyOptions, optional_view<uintptr_t
     CHKPV(keyOption);
     int32_t subscribeId = -1;
     if (!PER_HELPER->VerifySystemApp()) {
-        HandleCommonErrors(COMMON_USE_SYSAPI_ERROR);
+        auto histogramError = [](int32_t errorCode) {};
+        HandleCommonErrors(COMMON_USE_SYSAPI_ERROR, histogramError);
         return;
     }
     if (GetEventInfoAPI26(keyOptions, event, keyOption) != RET_OK) {
@@ -1082,11 +1116,14 @@ void SubscribeKey(KeyOptions const& keyOptions, callback_view<void(KeyOptions co
     CHKPV(event);
     auto keyOption = std::make_shared<KeyOption>();
     CHKPV(keyOption);
+    auto histogramError = [](int32_t errorCode) {
+        MMI_HISTOGRAM_ERROR("InputKit.inputConsumer.on_key.Error", errorCode);
+    };
     if (!PER_HELPER->VerifySystemApp()) {
-        HandleCommonErrors(COMMON_USE_SYSAPI_ERROR);
+        HandleCommonErrors(COMMON_USE_SYSAPI_ERROR, histogramError);
         return;
     }
-    if (GetEventInfoAPI9(keyOptions, event, keyOption) != RET_OK) {
+    if (GetEventInfoAPI9(keyOptions, event, keyOption, histogramError) != RET_OK) {
         MMI_HILOGE("GetEventInfoAPI9 failed");
         return;
     }
@@ -1124,12 +1161,15 @@ void UnsubscribeKey(KeyOptions const& keyOptions, optional_view<uintptr_t> opq)
     CHKPV(event);
     auto keyOption = std::make_shared<KeyOption>();
     CHKPV(keyOption);
+    auto histogramError = [](int32_t errorCode) {
+        MMI_HISTOGRAM_ERROR("InputKit.inputConsumer.off_key.Error", errorCode);
+    };
     int32_t subscribeId = -1;
     if (!PER_HELPER->VerifySystemApp()) {
-        HandleCommonErrors(COMMON_USE_SYSAPI_ERROR);
+        HandleCommonErrors(COMMON_USE_SYSAPI_ERROR, histogramError);
         return;
     }
-    if (GetEventInfoAPI9(keyOptions, event, keyOption) != RET_OK) {
+    if (GetEventInfoAPI9(keyOptions, event, keyOption, histogramError) != RET_OK) {
         MMI_HILOGE("GetEventInfoAPI9 failed");
         return;
     }
@@ -1143,11 +1183,13 @@ void UnsubscribeKey(KeyOptions const& keyOptions, optional_view<uintptr_t> opq)
 
 void onKeyImpl(KeyOptions const& keyOptions, callback_view<void(KeyOptions const&)> f, uintptr_t opq)
 {
+    MMI_HISTOGRAM_BOOLEAN("InputKit.inputConsumer.on_key.Call", true);
     SubscribeKey(keyOptions, f, opq);
 }
 
 void offKeyImpl(KeyOptions const& keyOptions, optional_view<uintptr_t> opq)
 {
+    MMI_HISTOGRAM_BOOLEAN("InputKit.inputConsumer.off_key.Call", true);
     UnsubscribeKey(keyOptions, opq);
 }
 
@@ -1165,22 +1207,26 @@ void offKeyCommandImpl(KeyOptions const& keyOptions, optional_view<uintptr_t> op
 
 void onHotkeyChangeImpl(HotkeyOptions const& hotkeyOptions, callback_view<void(HotkeyOptions const&)> f, uintptr_t opq)
 {
+    MMI_HISTOGRAM_BOOLEAN("InputKit.inputConsumer.on_hotkeyChange.Call", true);
     SubscribeHotkey(hotkeyOptions, f, opq);
 }
 
 void offHotkeyChangeImpl(HotkeyOptions const& hotkeyOptions, optional_view<uintptr_t> opq)
 {
+    MMI_HISTOGRAM_BOOLEAN("InputKit.inputConsumer.off_hotkeyChange.Call", true);
     UnsubscribeHotkey(hotkeyOptions, opq);
 }
 
 void onKeyPressedImpl(KeyPressedConfig const& options,
     callback_view<void(ohos::multimodalInput::keyEvent::KeyEvent const&)> f, uintptr_t opq)
 {
+    MMI_HISTOGRAM_BOOLEAN("InputKit.inputConsumer.on_keyPressed.Call", true);
     SubscribeKeyMonitor(options, f, opq);
 }
 
 void offKeyPressedImpl(optional_view<uintptr_t> opq)
 {
+    MMI_HISTOGRAM_BOOLEAN("InputKit.inputConsumer.off_keyPressed.Call", true);
     if (opq.has_value()) {
         MMI_HILOGI("[ETS] Unsubscribe key monitor");
         UnsubscribeKeyMonitor(opq);
@@ -1191,28 +1237,38 @@ void offKeyPressedImpl(optional_view<uintptr_t> opq)
 
 void SetShieldStatus(::ohos::multimodalInput::inputConsumer::ShieldMode shieldMode, bool isShield)
 {
+    MMI_HISTOGRAM_BOOLEAN("InputKit.inputConsumer.setShieldStatus.Call", true);
     OHOS::MMI::SHIELD_MODE mode = static_cast<OHOS::MMI::SHIELD_MODE>(shieldMode.get_value());
     if (mode < FACTORY_MODE || mode > OOBE_MODE) {
         MMI_HILOGE("Undefined shield mode");
         taihe::set_business_error(COMMON_PARAMETER_ERROR, "Shield mode does not exist");
+        MMI_HISTOGRAM_ERROR("InputKit.inputConsumer.setShieldStatus.Error", COMMON_PARAMETER_ERROR);
         return;
     }
     int32_t ret = InputManager::GetInstance()->SetShieldStatus(shieldMode, isShield);
-    HandleCommonErrors(ret);
+    auto histogramError = [](int32_t errorCode) {
+        MMI_HISTOGRAM_ERROR("InputKit.inputConsumer.setShieldStatus.Error", errorCode);
+    };
+    HandleCommonErrors(ret, histogramError);
 }
 
 bool GetShieldStatus(::ohos::multimodalInput::inputConsumer::ShieldMode shieldMode)
 {
+    MMI_HISTOGRAM_BOOLEAN("InputKit.inputConsumer.getShieldStatus.Call", true);
     bool isShield { false };
     OHOS::MMI::SHIELD_MODE mode = static_cast<OHOS::MMI::SHIELD_MODE>(shieldMode.get_value());
     if (mode < FACTORY_MODE || mode > OOBE_MODE) {
         MMI_HILOGE("Undefined shield mode");
         taihe::set_business_error(COMMON_PARAMETER_ERROR, "Shield mode does not exist");
+        MMI_HISTOGRAM_ERROR("InputKit.inputConsumer.getShieldStatus.Error", COMMON_PARAMETER_ERROR);
         return isShield;
     }
     auto ret = InputManager::GetInstance()->GetShieldStatus(shieldMode, isShield);
     if (ret != RET_OK) {
-        HandleCommonErrors(ret);
+        auto histogramError = [](int32_t errorCode) {
+            MMI_HISTOGRAM_ERROR("InputKit.inputConsumer.getShieldStatus.Error", errorCode);
+        };
+        HandleCommonErrors(ret, histogramError);
         return false;
     }
     return isShield;
@@ -1220,6 +1276,7 @@ bool GetShieldStatus(::ohos::multimodalInput::inputConsumer::ShieldMode shieldMo
 
 ::taihe::array<inputConsumer::HotkeyOptions> GetAllSystemHotkeysSync()
 {
+    MMI_HISTOGRAM_BOOLEAN("InputKit.inputConsumer.getAllSystemHotkeys.Call", true);
     std::vector<std::unique_ptr<KeyOption>> keyOptions;
     int32_t count = 0;
     std::vector<inputConsumer::HotkeyOptions> result;
@@ -1230,12 +1287,15 @@ bool GetShieldStatus(::ohos::multimodalInput::inputConsumer::ShieldMode shieldMo
             MMI_HILOGE("Non system applications use system API");
             taihe::set_business_error(COMMON_USE_SYSAPI_ERROR,
                 "Permission denied, non-system application called system api.");
+            MMI_HISTOGRAM_ERROR("InputKit.inputConsumer.getAllSystemHotkeys.Error", COMMON_USE_SYSAPI_ERROR);
         } else if (errorCode == COMMON_PERMISSION_CHECK_ERROR) {
             MMI_HILOGE("Shield api need ohos.permission.INPUT_CONTROL_DISPATCHING");
             taihe::set_business_error(COMMON_PERMISSION_CHECK_ERROR,
                 "Permission denied,forbidden by permission");
+            MMI_HISTOGRAM_ERROR("InputKit.inputConsumer.getAllSystemHotkeys.Error", COMMON_PERMISSION_CHECK_ERROR);
         } else {
             taihe::set_business_error(COMMON_PARAMETER_ERROR, "Parameter error.");
+            MMI_HISTOGRAM_ERROR("InputKit.inputConsumer.getAllSystemHotkeys.Error", COMMON_PARAMETER_ERROR);
         }
         return taihe::array<inputConsumer::HotkeyOptions>(result);
     }

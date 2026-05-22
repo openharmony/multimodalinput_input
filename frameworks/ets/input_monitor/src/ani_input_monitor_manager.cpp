@@ -22,6 +22,7 @@
 #include "ipc_skeleton.h"
 #include "define_multimodal.h"
 #include "input_manager.h"
+#include "mmi_api_metrics_histograms.h"
 #include "tokenid_kit.h"
 
 #undef MMI_LOG_TAG
@@ -70,12 +71,14 @@ TaiheTouchEventArray AniInputMonitorManager::QueryTouchEvents(int32_t count)
     if (ret < 0) {
         if (ret == ERROR_NO_PERMISSION) {
             taihe::set_business_error(-ret, "Permission denied.");
+            MMI_HISTOGRAM_ERROR("InputKit.inputMonitor.queryTouchEvents.Error", -ERROR_NO_PERMISSION);
             return result;
         }
         return result;
     }
     if (ret == ERROR_NOT_SYSAPI) {
         taihe::set_business_error(ret, "Permission denied, non-system application called system api.");
+        MMI_HISTOGRAM_ERROR("InputKit.inputMonitor.queryTouchEvents.Error", ERROR_NOT_SYSAPI);
         return result;
     }
     if (ret != 0) {
@@ -172,6 +175,7 @@ bool AniInputMonitorManager::AddMonitor(MONITORFUNTYPE funType,
     }
     if (!IsSystemApp()) {
         taihe::set_business_error(COMMON_USE_SYSAPI_ERROR, "Non system applications use system API");
+        ANI_MONITOR_HISTOGRAM_ON_ERROR(funType, COMMON_USE_SYSAPI_ERROR);
         return false;
     }
     std::shared_ptr<AniInputMonitorConsumer> consumer = AniInputMonitorConsumer::CreateAniInputMonitorConsumer(
@@ -183,7 +187,7 @@ bool AniInputMonitorManager::AddMonitor(MONITORFUNTYPE funType,
     int32_t retStart = consumer->Start();
     MMI_HILOGD("ani monitor startup retStart %{public}d", retStart);
     if (retStart < 0) {
-        ThrowError(retStart);
+        ThrowError(funType, retStart);
         return false;
     }
     std::lock_guard<std::mutex> guard(mutex_);
@@ -200,11 +204,13 @@ bool AniInputMonitorManager::RemoveMonitor(MONITORFUNTYPE funType, taihe::option
     }
     if (!IsSystemApp()) {
         taihe::set_business_error(COMMON_USE_SYSAPI_ERROR, "Non system applications use system API");
+        ANI_MONITOR_HISTOGRAM_OFF_ERROR(funType, COMMON_USE_SYSAPI_ERROR);
         return false;
     }
     if (!CheckPermission(HAP_MONITOR_PERMISSION_NAME)) {
         std::string errMsg = MakePermissionCheckErrMsg(MODULE_NAME, HAP_MONITOR_PERMISSION_NAME);
         taihe::set_business_error(COMMON_PERMISSION_CHECK_ERROR, errMsg);
+        ANI_MONITOR_HISTOGRAM_OFF_ERROR(funType, COMMON_PERMISSION_CHECK_ERROR);
         return false;
     }
     std::lock_guard guard(mutex_);
@@ -249,18 +255,22 @@ bool AniInputMonitorManager::CheckKeyCode(const int32_t keycode)
     return true;
 }
 
-void AniInputMonitorManager::ThrowError(int32_t code)
+void AniInputMonitorManager::ThrowError(MONITORFUNTYPE funType, int32_t code)
 {
     int32_t errorCode = -code;
     if (errorCode == MONITOR_REGISTER_EXCEED_MAX) {
         taihe::set_business_error(COMMON_PARAMETER_ERROR, "Maximum number of listeners exceeded for a single process");
+        ANI_MONITOR_HISTOGRAM_ON_ERROR(funType, COMMON_PARAMETER_ERROR);
     } else if (errorCode == COMMON_PERMISSION_CHECK_ERROR) {
         std::string errMsg = MakePermissionCheckErrMsg(MODULE_NAME, HAP_MONITOR_PERMISSION_NAME);
         taihe::set_business_error(COMMON_PERMISSION_CHECK_ERROR, errMsg);
+        ANI_MONITOR_HISTOGRAM_ON_ERROR(funType, COMMON_PERMISSION_CHECK_ERROR);
     } else if (errorCode == COMMON_USE_SYSAPI_ERROR) {
         taihe::set_business_error(COMMON_USE_SYSAPI_ERROR, "Non system applications use system API");
+        ANI_MONITOR_HISTOGRAM_ON_ERROR(funType, COMMON_USE_SYSAPI_ERROR);
     } else if (errorCode == COMMON_PARAMETER_ERROR) {
         taihe::set_business_error(COMMON_PARAMETER_ERROR, "Parameter error.");
+        ANI_MONITOR_HISTOGRAM_ON_ERROR(funType, COMMON_PARAMETER_ERROR);
     } else {
         MMI_HILOGE("Add monitor failed");
     }

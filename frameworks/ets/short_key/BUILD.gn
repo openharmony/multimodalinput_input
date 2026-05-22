@@ -71,6 +71,9 @@ taihe_shared_library("short_key_ani") {
     "hilog:libhilog",
     "ipc:ipc_single",
   ]
+  if (input_feature_api_metrics_histogram) {
+    external_deps += [ "api_metrics:histogrammanager" ]
+  }
   branch_protector_ret = "pac_ret"
   sanitize = {
     integer_overflow = true

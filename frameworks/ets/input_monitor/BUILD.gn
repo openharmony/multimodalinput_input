@@ -85,6 +85,10 @@ taihe_shared_library("InputMonitor") {
     "ipc:ipc_single",
     "libuv:uv",
   ]
+  if (input_feature_api_metrics_histogram) {
+    sources += [ "src/ani_input_monitor_histogram.cpp" ]
+    external_deps += [ "api_metrics:histogrammanager" ]
+  }
   branch_protector_ret = "pac_ret"
   sanitize = {
     integer_overflow = true
