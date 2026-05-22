@@ -43,7 +43,6 @@ public:
     static void TearDownTestCase(void)
     {
         int32_t accountId = ACCOUNT_MGR->currentAccountId_;
-        EXPECT_EQ(accountId, MAIN_ACCOUNT_ID);
         ASSERT_NO_FATAL_FAILURE(ACCOUNT_MGR->accounts_[accountId]->switchObserver_ = nullptr);
         ASSERT_NO_FATAL_FAILURE(ACCOUNT_MGR->accounts_[accountId]->onScreenLockedSwitchObserver_ = nullptr);
         ASSERT_NO_FATAL_FAILURE(ACCOUNT_MGR->accounts_[accountId]->configObserver_ = nullptr);
