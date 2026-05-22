@@ -262,24 +262,6 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetDisplayGroupInfo_00
 }
 
 /**
- * @tc.name: InputWindowsManagerTest_GetDisplayGroupInfo_001
- * @tc.desc: Test GetDisplayGroupInfo
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetDisplayGroupInfo_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    auto pointerEvent = PointerEvent::Create();
-    UDSServer udsServer;
-    WIN_MGR->Init(udsServer);
-    OLD::DisplayGroupInfo displayGroupInfo;
-    displayGroupInfo.focusWindowId = 1;
-    int32_t groupId = 1;
-    EXPECT_NO_FATAL_FAILURE(WIN_MGR->GetDisplayGroupInfo(groupId));
-}
-
-/**
  * @tc.name: InputWindowsManagerTest_UpdateTarget_003
  * @tc.desc: Test UpdateTarget
  * @tc.type: FUNC
