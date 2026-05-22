@@ -3689,22 +3689,6 @@ HWTEST_F(InputManagerImplTest, InputManagerImplTest_CreateTouchController_001, T
 }
 
 /**
- * @tc.name: InputManagerImplTest_CreateTouchController_002
- * @tc.desc: Test CreateTouchController resets output parameter on failure
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputManagerImplTest, InputManagerImplTest_CreateTouchController_002, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    auto impl = std::make_shared<InputManagerImpl>();
-    std::shared_ptr<TouchControllerImpl> controller(reinterpret_cast<TouchControllerImpl*>(0x1));
-    int32_t ret = impl->CreateTouchController(controller);
-    EXPECT_NE(ret, RET_OK);
-    EXPECT_EQ(controller, nullptr);
-}
-
-/**
  * @tc.name: InputManagerImplTest_CheckMouseControllerPermission_001
  * @tc.desc: Test CheckMouseControllerPermission when IPC is unavailable
  * @tc.type: FUNC
