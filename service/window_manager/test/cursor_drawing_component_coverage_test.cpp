@@ -850,23 +850,6 @@ HWTEST_F(CursorDrawingComponentCoverageTest, DrawNewDpiPointer_NotLoaded_001, Te
 }
 
 /**
- * @tc.name: NotifyPointerEventToRS_NotLoaded_001
- * @tc.desc: Test NotifyPointerEventToRS when library not loaded
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(CursorDrawingComponentCoverageTest, NotifyPointerEventToRS_NotLoaded_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-#ifndef OHOS_BUILD_ENABLE_WATCH
-    CursorDrawingComponent component;
-    auto *instance = &component;
-    instance->NotifyPointerEventToRS(1, 1, 0);
-
-#endif
-}
-
-/**
  * @tc.name: UpdatePointerItemCursorInfo_NotLoaded_001
  * @tc.desc: Test UpdatePointerItemCursorInfo when library not loaded
  * @tc.type: FUNC

@@ -17,6 +17,7 @@
 #define SCREEN_POINTER_H
 
 #include <atomic>
+#include <shared_mutex>
 
 #include "screen_info.h"
 
@@ -257,6 +258,7 @@ private:
     RenderConfig defaultCursorCfg_;
     buffer_ptr_t transparentBuffer_{nullptr};
     buffer_ptr_t defaultBuffer_{nullptr};
+    std::shared_mutex bufferMutex_;
     buffer_ptr_t currentBuffer_{nullptr};
     std::vector<buffer_ptr_t> commonBuffers_;
     std::atomic<uint32_t> bufferId_ {0};

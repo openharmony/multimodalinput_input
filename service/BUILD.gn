@@ -106,6 +106,11 @@ config("libmmi_server_config") {
     include_dirs += [ "infrared_emitter/include" ]
   }
 
+  if (ohos_indep_compiler_enable) {
+    include_dirs +=
+        [ "//foundation/graphic/graphic_2d/rosen/modules/render_service_base/include" ]
+  }
+
   if (input_ext_feature_keyboard_ext_flag) {
     ohos_prebuilt_etc("keyboard_ext_flag.json") {
       source = "${mmi_ext_path}/keyboard_ext_flag/etc/keyboard_ext_flag.json"
@@ -518,8 +523,6 @@ ohos_shared_library("libmmi-server") {
   external_deps = [
     "cJSON:cjson",
     "c_utils:utils",
-    "graphic_surface:surface",
-    "samgr:samgr_proxy",
   ]
 
   if (input_feature_pointer_drawing) {
@@ -557,7 +560,6 @@ ohos_shared_library("libmmi-server") {
 
   if (input_feature_touch_drawing) {
     external_deps += [
-      "graphic_2d:librender_service_client",
       "graphic_2d:window_animation",
     ]
   }
@@ -620,6 +622,11 @@ ohos_shared_library("libmmi-server") {
 
   if (hitrace_enabled) {
     external_deps += [ "hitrace:hitrace_meter" ]
+  }
+
+  if ((input_feature_touch_drawing || input_feature_pointer_drawing) &&
+      !ohos_indep_compiler_enable) {
+    external_deps += [ "graphic_2d:librender_service_proxy" ]
   }
 
   if (defined(use_rosen_drawing) && use_rosen_drawing) {
@@ -2261,11 +2268,14 @@ ohos_unittest("ModuleLoaderTest") {
   }
 
   sources = [
+    "module_loader/src/app_debug_listener.cpp",
     "module_loader/src/input_screen_capture_agent.cpp",
     "module_loader/test/multimodal_input_plugin_manager_test.cpp",
     "module_loader/test/multimodal_input_preferences_manager_test.cpp",
+    "module_loader/test/mmi_service_controller_test.cpp",
     "module_loader/test/uds_server_test.cpp",
     "module_loader/test/watchdog_task_test.cpp",
+    "module_loader/test/app_debug_listener_test.cpp",
     "module_loader/test/input_screen_capture_agent_test.cpp",
   ]
 
@@ -3134,8 +3144,6 @@ ohos_unittest("EventDispatchTest") {
     "common_event_service:cesfwk_innerkits",
     "data_share:datashare_consumer",
     "googletest:gtest_main",
-    "graphic_2d:2d_graphics",
-    "graphic_2d:librender_service_client",
     "hilog:libhilog",
     "hitrace:hitrace_meter",
     "hisysevent:libhisysevent",
@@ -3153,6 +3161,10 @@ ohos_unittest("EventDispatchTest") {
   ]
   if (security_component_enable) {
     external_deps += [ "security_component_manager:libsecurity_component_sdk" ]
+  }
+  if ((input_feature_touch_drawing || input_feature_pointer_drawing) &&
+      !ohos_indep_compiler_enable) {
+    external_deps += [ "graphic_2d:librender_service_proxy" ]
   }
 }
 

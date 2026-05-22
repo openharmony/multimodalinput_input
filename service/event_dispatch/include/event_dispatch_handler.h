@@ -29,6 +29,22 @@ class EventDispatchHandler final : public IInputEventHandler {
         uint32_t code { PointerEvent::BUTTON_NONE };
         int32_t value { PointerEvent::POINTER_ACTION_UNKNOWN };
     };
+    enum TouchStatus : uint32_t {
+        TOUCH_CANCEL = 1,
+        TOUCH_DOWN = 2,
+        TOUCH_MOVE = 3,
+        TOUCH_UP = 4,
+        AXIS_BEGIN = 5,
+        AXIS_UPDATE = 6,
+        AXIS_END = 7,
+        TOUCH_BUTTON_DOWN = 8,
+        TOUCH_BUTTON_UP = 9,
+        TOUCH_PULL_DOWN = 12,
+        TOUCH_PULL_MOVE = 13,
+        TOUCH_PULL_UP = 14,
+        POINTER_ACTION_PROXIMITY_IN = 35,
+        POINTER_ACTION_PROXIMITY_OUT = 36,
+    };
 public:
     EventDispatchHandler() = default;
     DISALLOW_COPY_AND_MOVE(EventDispatchHandler);
@@ -69,6 +85,10 @@ private:
     void EnsureMouseEventCycle(std::shared_ptr<PointerEvent> event);
     void CleanMouseEventCycle(std::shared_ptr<PointerEvent> event);
 #endif // OHOS_BUILD_ENABLE_POINTER
+#ifndef OHOS_BUILD_ENABLE_WATCH
+    bool GetTouchOrPointerAction(int32_t pointerAction);
+    void NotifyTouchEvent(int32_t pointAction, int32_t pointCnt, int32_t sourceType);
+#endif // OHOS_BUILD_ENABLE_WATCH
 
     int32_t eventTime_ { 0 };
     int32_t currentTime_ { 0 };
@@ -89,6 +109,10 @@ private:
     void FilterInvalidPointerItem(const std::shared_ptr<PointerEvent> pointEvent, int32_t fd);
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
     bool AcquireEnableMark(std::shared_ptr<PointerEvent> event);
+#ifndef OHOS_BUILD_ENABLE_WATCH
+    std::atomic<std::chrono::steady_clock::time_point> sendMoveTime_ = std::chrono::steady_clock::now();
+    std::atomic<std::chrono::steady_clock::time_point> sendAxisUpdateTime_ = std::chrono::steady_clock::now();
+#endif // OHOS_BUILD_ENABLE_WATCH
 };
 } // namespace MMI
 } // namespace OHOS

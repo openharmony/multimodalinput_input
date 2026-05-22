@@ -104,10 +104,6 @@ public:
 #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
     int32_t GetPointerSnapshot(void *pixelMapPtr);
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
-
-#ifndef OHOS_BUILD_ENABLE_WATCH
-    void NotifyPointerEventToRS(int32_t pointAction, int32_t pointCnt, int32_t sourceType);
-#endif // OHOS_BUILD_ENABLE_WATCH
     int32_t GetCurrentCursorInfo(bool& visible, PointerStyle& pointerStyle);
     int32_t GetUserDefinedCursorPixelMap(void *pixelMapPtr);
     void UpdatePointerItemCursorInfo(PointerEvent::PointerItem& pointerItem);

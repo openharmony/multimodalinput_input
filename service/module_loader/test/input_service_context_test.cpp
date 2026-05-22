@@ -16,6 +16,7 @@
 #include <gtest/gtest.h>
 
 #include "input_service_context.h"
+#include "delegate_interface.h"
 #include "mmi_log.h"
 
 #undef MMI_LOG_TAG
@@ -128,6 +129,90 @@ HWTEST_F(InputServiceContextTest, InputServiceContext_AttachDelegateInterface_00
     ASSERT_NO_FATAL_FAILURE(inputServiceContext_.AttachDelegateInterface(delegate));
     auto attachedDelegate = inputServiceContext_.GetDelegateInterface();
     EXPECT_EQ(attachedDelegate, nullptr);
+}
+
+/**
+ * @tc.name: InputServiceContext_GetDeviceManager_001
+ * @tc.desc: Test GetDeviceManager returns non-null
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputServiceContextTest, InputServiceContext_GetDeviceManager_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto deviceManager = inputServiceContext_.GetDeviceManager();
+    EXPECT_NE(deviceManager, nullptr);
+}
+
+/**
+ * @tc.name: InputServiceContext_GetKeyMapManager_001
+ * @tc.desc: Test GetKeyMapManager returns non-null
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputServiceContextTest, InputServiceContext_GetKeyMapManager_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto keyMapManager = inputServiceContext_.GetKeyMapManager();
+    EXPECT_NE(keyMapManager, nullptr);
+}
+
+/**
+ * @tc.name: InputServiceContext_GetPreferenceManager_001
+ * @tc.desc: Test GetPreferenceManager returns non-null
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputServiceContextTest, InputServiceContext_GetPreferenceManager_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto preferenceManager = inputServiceContext_.GetPreferenceManager();
+    EXPECT_NE(preferenceManager, nullptr);
+}
+
+/**
+ * @tc.name: InputServiceContext_GetSettingManager_001
+ * @tc.desc: Test GetSettingManager returns non-null
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputServiceContextTest, InputServiceContext_GetSettingManager_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto settingManager = inputServiceContext_.GetSettingManager();
+    EXPECT_NE(settingManager, nullptr);
+}
+
+/**
+ * @tc.name: InputServiceContext_GetDispatchHandler_001
+ * @tc.desc: Test GetDispatchHandler without Init returns null
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputServiceContextTest, InputServiceContext_GetDispatchHandler_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto dispatchHandler = inputServiceContext_.GetDispatchHandler();
+    EXPECT_EQ(dispatchHandler, nullptr);
+}
+
+/**
+ * @tc.name: InputServiceContext_AttachDelegateInterface_002
+ * @tc.desc: Test AttachDelegateInterface with valid delegate then GetDelegateInterface returns non-null
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputServiceContextTest, InputServiceContext_AttachDelegateInterface_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputServiceContext ctx;
+    std::shared_ptr<IDelegateInterface> delegate = std::make_shared<DelegateInterface>(
+        [](DTaskCallback cb) { return RET_ERR; },
+        [](DTaskCallback cb) { return RET_ERR; });
+    ASSERT_NO_FATAL_FAILURE(ctx.AttachDelegateInterface(delegate));
+    auto attachedDelegate = ctx.GetDelegateInterface();
+    EXPECT_NE(attachedDelegate, nullptr);
+    EXPECT_EQ(attachedDelegate.get(), delegate.get());
 }
 } // namespace MMI
 } // namespace OHOS

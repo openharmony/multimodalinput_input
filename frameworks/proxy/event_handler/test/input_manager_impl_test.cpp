@@ -21,9 +21,12 @@
 #include "input_manager_impl.h"
 #include "input_scene_board_judgement.h"
 #include "iremote_object.h"
+#include "keyboard_controller_impl.h"
+#include "mouse_controller_impl.h"
 #include "multimodal_event_handler.h"
 #include "multimodal_input_connect_manager.h"
 #include "net_packet.h"
+#include "touch_controller_impl.h"
 
 
 #undef MMI_LOG_TAG
@@ -3548,6 +3551,77 @@ HWTEST_F(InputManagerImplTest, InputManagerImplTest_SendWindowInfo_Trace_002, Te
     impl->windowGroupInfo_.displayId = 0;
     int32_t result = impl->SendWindowInfo();
     EXPECT_EQ(result, RET_OK);
+}
+/**
+ * @tc.name: InputManagerImplTest_CreateMouseController_001
+ * @tc.desc: Test CreateMouseController when IPC is unavailable
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerImplTest, InputManagerImplTest_CreateMouseController_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto impl = std::make_shared<InputManagerImpl>();
+    auto controller = impl->CreateMouseController();
+    EXPECT_EQ(controller, nullptr);
+}
+
+/**
+ * @tc.name: InputManagerImplTest_CreateKeyboardController_001
+ * @tc.desc: Test CreateKeyboardController when IPC is unavailable
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerImplTest, InputManagerImplTest_CreateKeyboardController_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto impl = std::make_shared<InputManagerImpl>();
+    auto controller = impl->CreateKeyboardController();
+    EXPECT_EQ(controller, nullptr);
+}
+
+/**
+ * @tc.name: InputManagerImplTest_CreateTouchController_001
+ * @tc.desc: Test CreateTouchController when permission check fails
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerImplTest, InputManagerImplTest_CreateTouchController_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto impl = std::make_shared<InputManagerImpl>();
+    std::shared_ptr<TouchControllerImpl> controller;
+    int32_t ret = impl->CreateTouchController(controller);
+    EXPECT_NE(ret, RET_OK);
+    EXPECT_EQ(controller, nullptr);
+}
+
+/**
+ * @tc.name: InputManagerImplTest_CheckMouseControllerPermission_001
+ * @tc.desc: Test CheckMouseControllerPermission when IPC is unavailable
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerImplTest, InputManagerImplTest_CheckMouseControllerPermission_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto impl = std::make_shared<InputManagerImpl>();
+    int32_t ret = impl->CheckMouseControllerPermission();
+    EXPECT_NE(ret, RET_OK);
+}
+
+/**
+ * @tc.name: InputManagerImplTest_CheckKeyboardControllerPermission_001
+ * @tc.desc: Test CheckKeyboardControllerPermission when IPC is unavailable
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerImplTest, InputManagerImplTest_CheckKeyboardControllerPermission_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto impl = std::make_shared<InputManagerImpl>();
+    int32_t ret = impl->CheckKeyboardControllerPermission();
+    EXPECT_NE(ret, RET_OK);
 }
 } // namespace MMI
 } // namespace OHOS

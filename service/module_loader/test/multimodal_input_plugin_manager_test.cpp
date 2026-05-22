@@ -2647,5 +2647,220 @@ HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_Plug
     config.mode_ = "invalid_mode";
     EXPECT_FALSE(config.IsValid());
 }
+
+/**
+ * @tc.name: MultimodalInputPluginManagerTest_ParsePluginConfig_002
+ * @tc.desc: Test ParsePluginConfig with valid input_plugins array
+ * @tc.require: test ParsePluginConfig
+ */
+HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_ParsePluginConfig_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputPluginManager* manager = InputPluginManager::GetInstance("/tmp");
+    cJSON* json = cJSON_CreateObject();
+    cJSON* plugins = cJSON_CreateArray();
+    cJSON* item = cJSON_CreateObject();
+    cJSON_AddStringToObject(item, "uuid", "parse-config-uuid");
+    cJSON_AddNumberToObject(item, "uid", 100);
+    cJSON_AddStringToObject(item, "name", "non_existent_plugin.so");
+    cJSON_AddStringToObject(item, "mode", "autorun");
+    cJSON_AddItemToArray(plugins, item);
+    cJSON_AddItemToObject(json, "input_plugins", plugins);
+
+    bool result = manager->ParsePluginConfig("test.json", json);
+    EXPECT_TRUE(result);
+
+    auto config = manager->FindPluginConfig("parse-config-uuid");
+    EXPECT_NE(config, nullptr);
+    EXPECT_EQ(config->uid_, 100);
+    cJSON_Delete(json);
+}
+
+/**
+ * @tc.name: MultimodalInputPluginManagerTest_ParsePluginItem_005
+ * @tc.desc: Test ParsePluginItem with missing name field
+ * @tc.require: test ParsePluginItem
+ */
+HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_ParsePluginItem_005, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputPluginManager* manager = InputPluginManager::GetInstance("/tmp");
+    cJSON* item = cJSON_CreateObject();
+    cJSON_AddStringToObject(item, "uuid", "test-uuid-no-name");
+    cJSON_AddNumberToObject(item, "uid", 100);
+    cJSON_AddStringToObject(item, "mode", "autorun");
+
+    bool result = manager->ParsePluginItem(item);
+    EXPECT_FALSE(result);
+    cJSON_Delete(item);
+}
+
+/**
+ * @tc.name: MultimodalInputPluginManagerTest_ParsePluginItem_006
+ * @tc.desc: Test ParsePluginItem with missing mode field
+ * @tc.require: test ParsePluginItem
+ */
+HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_ParsePluginItem_006, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputPluginManager* manager = InputPluginManager::GetInstance("/tmp");
+    cJSON* item = cJSON_CreateObject();
+    cJSON_AddStringToObject(item, "uuid", "test-uuid-no-mode");
+    cJSON_AddNumberToObject(item, "uid", 100);
+    cJSON_AddStringToObject(item, "name", "test_plugin");
+
+    bool result = manager->ParsePluginItem(item);
+    EXPECT_FALSE(result);
+    cJSON_Delete(item);
+}
+
+/**
+ * @tc.name: MultimodalInputPluginManagerTest_ReadStringField_004
+ * @tc.desc: Test ReadStringField success with valid string value
+ * @tc.require: test ReadStringField
+ */
+HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_ReadStringField_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputPluginManager* manager = InputPluginManager::GetInstance("/tmp");
+    cJSON* obj = cJSON_CreateObject();
+    cJSON_AddStringToObject(obj, "test_field", "hello");
+    std::string out;
+    bool result = manager->ReadStringField(obj, "test_field", out);
+    EXPECT_TRUE(result);
+    EXPECT_EQ(out, "hello");
+    cJSON_Delete(obj);
+}
+
+/**
+ * @tc.name: MultimodalInputPluginManagerTest_ReadNumberField_002
+ * @tc.desc: Test ReadNumberField with non-number type field
+ * @tc.require: test ReadNumberField
+ */
+HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_ReadNumberField_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputPluginManager* manager = InputPluginManager::GetInstance("/tmp");
+    cJSON* obj = cJSON_CreateObject();
+    cJSON_AddStringToObject(obj, "test_field", "not_a_number");
+    int32_t out = 0;
+    bool result = manager->ReadNumberField(obj, "test_field", out);
+    EXPECT_FALSE(result);
+    cJSON_Delete(obj);
+}
+
+/**
+ * @tc.name: MultimodalInputPluginManagerTest_ReadNumberField_003
+ * @tc.desc: Test ReadNumberField success with valid number
+ * @tc.require: test ReadNumberField
+ */
+HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_ReadNumberField_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputPluginManager* manager = InputPluginManager::GetInstance("/tmp");
+    cJSON* obj = cJSON_CreateObject();
+    cJSON_AddNumberToObject(obj, "test_field", 42);
+    int32_t out = 0;
+    bool result = manager->ReadNumberField(obj, "test_field", out);
+    EXPECT_TRUE(result);
+    EXPECT_EQ(out, 42);
+    cJSON_Delete(obj);
+}
+
+/**
+ * @tc.name: MultimodalInputPluginManagerTest_AddCallbackToPlugin_003
+ * @tc.desc: Test AddCallbackToPlugin with plugin having INPUT_BEFORE_LIBINPUT_ADAPTER_ON_EVENT stage
+ * @tc.require: test AddCallbackToPlugin
+ */
+HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_AddCallbackToPlugin_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputPluginManager* manager = InputPluginManager::GetInstance("/tmp");
+
+    std::shared_ptr<MockInputPluginContext> mockPlugin = std::make_shared<MockInputPluginContext>();
+    auto mockInputPlugin = std::make_shared<MockInputPlugin>();
+    EXPECT_CALL(*mockInputPlugin, GetStages()).WillRepeatedly(
+        Return(std::vector<InputPluginStage>{InputPluginStage::INPUT_BEFORE_LIBINPUT_ADAPTER_ON_EVENT}));
+    EXPECT_CALL(*mockPlugin, GetPlugin()).WillRepeatedly(Return(mockInputPlugin));
+    EXPECT_CALL(*mockPlugin, SetCallback(testing::_)).Times(1);
+
+    ASSERT_NO_FATAL_FAILURE(manager->AddCallbackToPlugin(mockPlugin));
+}
+
+/**
+ * @tc.name: MultimodalInputPluginManagerTest_DoHandleEvent_003
+ * @tc.desc: Test DoHandleEvent returns RET_DO when plugin returns UseNeedReissue
+ * @tc.require: test DoHandleEvent
+ */
+HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_DoHandleEvent_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputPluginManager* manager = InputPluginManager::GetInstance("/tmp");
+    manager->plugins_.clear();
+
+    std::shared_ptr<MockInputPluginContext> mockPlugin = std::make_shared<MockInputPluginContext>();
+    std::shared_ptr<IPluginData> data = std::make_shared<IPluginData>();
+    data->stage = InputPluginStage::INPUT_AFTER_FILTER;
+
+    std::shared_ptr<KeyEvent> keyEvent = std::make_shared<KeyEvent>(KeyEvent::KEYCODE_A);
+
+    EXPECT_CALL(*mockPlugin, HandleEvent(testing::An<std::shared_ptr<KeyEvent>>(), testing::_))
+        .WillRepeatedly(Return(PluginResult::UseNeedReissue));
+    manager->plugins_[InputPluginStage::INPUT_AFTER_FILTER] = { mockPlugin };
+
+    int32_t result = manager->DoHandleEvent(keyEvent, data, nullptr);
+    EXPECT_EQ(result, RET_DO);
+}
+
+/**
+ * @tc.name: MultimodalInputPluginManagerTest_DoHandleEvent_004
+ * @tc.desc: Test DoHandleEvent returns RET_DO when plugin returns UseNoNeedReissue
+ * @tc.require: test DoHandleEvent
+ */
+HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_DoHandleEvent_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputPluginManager* manager = InputPluginManager::GetInstance("/tmp");
+    manager->plugins_.clear();
+
+    std::shared_ptr<MockInputPluginContext> mockPlugin = std::make_shared<MockInputPluginContext>();
+    std::shared_ptr<IPluginData> data = std::make_shared<IPluginData>();
+    data->stage = InputPluginStage::INPUT_AFTER_FILTER;
+
+    std::shared_ptr<KeyEvent> keyEvent = std::make_shared<KeyEvent>(KeyEvent::KEYCODE_A);
+
+    EXPECT_CALL(*mockPlugin, HandleEvent(testing::An<std::shared_ptr<KeyEvent>>(), testing::_))
+        .WillRepeatedly(Return(PluginResult::UseNoNeedReissue));
+    manager->plugins_[InputPluginStage::INPUT_AFTER_FILTER] = { mockPlugin };
+
+    int32_t result = manager->DoHandleEvent(keyEvent, data, nullptr);
+    EXPECT_EQ(result, RET_DO);
+}
+
+/**
+ * @tc.name: MultimodalInputPluginManagerTest_DoHandleEvent_005
+ * @tc.desc: Test DoHandleEvent with iplugin parameter resumes from next plugin
+ * @tc.require: test DoHandleEvent
+ */
+HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_DoHandleEvent_005, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputPluginManager* manager = InputPluginManager::GetInstance("/tmp");
+    manager->plugins_.clear();
+
+    std::shared_ptr<MockInputPluginContext> mockPlugin1 = std::make_shared<MockInputPluginContext>();
+    std::shared_ptr<MockInputPluginContext> mockPlugin2 = std::make_shared<MockInputPluginContext>();
+    std::shared_ptr<IPluginData> data = std::make_shared<IPluginData>();
+    data->stage = InputPluginStage::INPUT_AFTER_FILTER;
+
+    std::shared_ptr<KeyEvent> keyEvent = std::make_shared<KeyEvent>(KeyEvent::KEYCODE_A);
+
+    EXPECT_CALL(*mockPlugin2, HandleEvent(testing::An<std::shared_ptr<KeyEvent>>(), testing::_))
+        .WillRepeatedly(Return(PluginResult::NotUse));
+    manager->plugins_[InputPluginStage::INPUT_AFTER_FILTER] = { mockPlugin1, mockPlugin2 };
+
+    int32_t result = manager->DoHandleEvent(keyEvent, data, mockPlugin1.get());
+    EXPECT_EQ(result, RET_NOTDO);
+}
 } // namespace MMI
 } // namespace OHOS
