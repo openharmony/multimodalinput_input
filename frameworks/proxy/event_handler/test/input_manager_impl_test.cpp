@@ -3103,7 +3103,7 @@ HWTEST_F(InputManagerImplTest, InputManagerImplTest_SendWindowInfo_Trace_001, Te
     window.pointerHotAreas.push_back(hotArea);
     impl->windowGroupInfo_.windowsInfo.push_back(window);
     int32_t result = impl->SendWindowInfo();
-    EXPECT_EQ(result,  RET_OK);
+    EXPECT_EQ(result, RET_OK);
 }
 
 /**
