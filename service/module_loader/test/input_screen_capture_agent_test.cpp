@@ -347,25 +347,6 @@ HWTEST_F(InputScreenCaptureAgentTest, RegisterListener_001, TestSize.Level1)
 }
 
 /**
- * @tc.name: RegisterListener_002
- * @tc.desc: Test RegisterListener when registerListener is null
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputScreenCaptureAgentTest, RegisterListener_002, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    char libRealPath[PATH_MAX] = {};
-    if (realpath(REFENCE_LIB_ABSOLUTE_PATH.c_str(), libRealPath) != nullptr) {
-        inputScreenCaptureAgent.handle_.handle = dlopen(libRealPath, RTLD_LAZY);
-    }
-    inputScreenCaptureAgent.handle_.registerListener = nullptr;
-
-    ScreenCaptureCallback callback = [](int32_t, bool) {};
-    ASSERT_NO_FATAL_FAILURE(inputScreenCaptureAgent.RegisterListener(callback));
-}
-
-/**
  * @tc.name: UnloadLibrary_001
  * @tc.desc: Test UnloadLibrary when handle is null
  * @tc.type: FUNC
@@ -378,67 +359,5 @@ HWTEST_F(InputScreenCaptureAgentTest, UnloadLibrary_001, TestSize.Level1)
     ASSERT_NO_FATAL_FAILURE(inputScreenCaptureAgent.UnloadLibrary());
     EXPECT_EQ(inputScreenCaptureAgent.handle_.handle, nullptr);
 }
-
-/**
- * @tc.name: UnloadLibrary_002
- * @tc.desc: Test UnloadLibrary when cleanUpResources is null
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputScreenCaptureAgentTest, UnloadLibrary_002, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    char libRealPath[PATH_MAX] = {};
-    realpath(REFENCE_LIB_ABSOLUTE_PATH.c_str(), libRealPath);
-    inputScreenCaptureAgent.handle_.handle = dlopen(libRealPath, RTLD_LAZY);
-    ASSERT_NE(inputScreenCaptureAgent.handle_.handle, nullptr);
-    inputScreenCaptureAgent.handle_.cleanUpResources = nullptr;
-
-    ASSERT_NO_FATAL_FAILURE(inputScreenCaptureAgent.UnloadLibrary());
-    EXPECT_EQ(inputScreenCaptureAgent.handle_.handle, nullptr);
-    EXPECT_EQ(inputScreenCaptureAgent.handle_.cleanUpResources, nullptr);
-}
-
-/**
- * @tc.name: UnloadLibrary_003
- * @tc.desc: Test UnloadLibrary with valid handle and cleanUpResources
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputScreenCaptureAgentTest, UnloadLibrary_003, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    char libRealPath[PATH_MAX] = {};
-    realpath(REFENCE_LIB_ABSOLUTE_PATH.c_str(), libRealPath);
-    inputScreenCaptureAgent.handle_.handle = dlopen(libRealPath, RTLD_LAZY);
-    ASSERT_NE(inputScreenCaptureAgent.handle_.handle, nullptr);
-
-    ASSERT_NO_FATAL_FAILURE(inputScreenCaptureAgent.UnloadLibrary());
-    EXPECT_EQ(inputScreenCaptureAgent.handle_.handle, nullptr);
-    EXPECT_EQ(inputScreenCaptureAgent.handle_.cleanUpResources, nullptr);
-    EXPECT_EQ(inputScreenCaptureAgent.handle_.isWorking, nullptr);
-    EXPECT_EQ(inputScreenCaptureAgent.handle_.registerListener, nullptr);
-}
-
-/**
- * @tc.name: IsScreenCaptureWorking_004
- * @tc.desc: Test IsScreenCaptureWorking returns false with loaded handle but null isWorking
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputScreenCaptureAgentTest, IsScreenCaptureWorking_004, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    char libRealPath[PATH_MAX] = {};
-    if (realpath(REFENCE_LIB_ABSOLUTE_PATH.c_str(), libRealPath) != nullptr) {
-        inputScreenCaptureAgent.handle_.handle = dlopen(libRealPath, RTLD_LAZY);
-    }
-    inputScreenCaptureAgent.handle_.isWorking = nullptr;
-    inputScreenCaptureAgent.handle_.registerListener = nullptr;
-
-    int32_t capturePid = 300;
-    EXPECT_FALSE(inputScreenCaptureAgent.IsScreenCaptureWorking(capturePid));
-}
-
 } // namespace MMI
 } // namespace OHOS

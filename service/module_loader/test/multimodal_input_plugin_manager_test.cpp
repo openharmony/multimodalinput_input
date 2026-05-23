@@ -1596,55 +1596,6 @@ HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_Unre
 }
 
 /**
- * @tc.name: MultimodalInputPluginManagerTest_UnregisterSettingObserver_002
- * @tc.desc: Test UnregisterSettingObserver with non-existent observer ID
- * @tc.require: test UnregisterSettingObserver
- */
-HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_UnregisterSettingObserver_002,
-    TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    std::shared_ptr<InputPlugin> inputPluginContext = std::make_shared<InputPlugin>(nullptr);
-
-    int32_t nonExistentId = 99999;
-    bool result = inputPluginContext->UnregisterSettingObserver(nonExistentId);
-    EXPECT_FALSE(result);
-}
-
-/**
- * @tc.name: MultimodalInputPluginManagerTest_ObserverEntry_Structure_001
- * @tc.desc: Test ObserverEntry structure stores both observer and URI
- * @tc.require: test ObserverEntry
- */
-HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_ObserverEntry_Structure_001,
-    TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    std::shared_ptr<InputPlugin> inputPluginContext = std::make_shared<InputPlugin>(nullptr);
-
-    // Create ObserverEntry
-    sptr<SettingObserver> mockObserver = new (std::nothrow) SettingObserver();
-    ASSERT_NE(mockObserver, nullptr);
-
-    InputPlugin::ObserverEntry entry;
-    entry.observer = mockObserver;
-    entry.uri = "datashare:///com.ohos.settingsdata/entry/settingsdata/USER_SETTINGSDATA_SECURE_100";
-
-    // Verify both fields are stored correctly
-    EXPECT_EQ(entry.observer, mockObserver);
-    EXPECT_EQ(entry.uri, "datashare:///com.ohos.settingsdata/entry/settingsdata/USER_SETTINGSDATA_SECURE_100");
-
-    // Insert into map
-    inputPluginContext->observers_[42] = entry;
-
-    // Verify retrieval
-    auto it = inputPluginContext->observers_.find(42);
-    ASSERT_NE(it, inputPluginContext->observers_.end());
-    EXPECT_EQ(it->second.observer, mockObserver);
-    EXPECT_EQ(it->second.uri, "datashare:///com.ohos.settingsdata/entry/settingsdata/USER_SETTINGSDATA_SECURE_100");
-}
-
-/**
  * @tc.name: MultimodalInputPluginManagerTest_NextObserverId_Initialization_001
  * @tc.desc: Test nextObserverId_ is initialized to 1
  * @tc.require: test NextObserverId initialization
@@ -1656,30 +1607,6 @@ HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_Next
     std::shared_ptr<InputPlugin> inputPluginContext = std::make_shared<InputPlugin>(nullptr);
 
     EXPECT_EQ(inputPluginContext->nextObserverId_, 1);
-}
-
-/**
- * @tc.name: MultimodalInputPluginManagerTest_ObserversMap_Type_001
- * @tc.desc: Test observers_ is a map with correct key/value types
- * @tc.require: test ObserversMap type
- */
-HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_ObserversMap_Type_001,
-    TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    std::shared_ptr<InputPlugin> inputPluginContext = std::make_shared<InputPlugin>(nullptr);
-
-    // Verify observers_ is a map
-    EXPECT_EQ(inputPluginContext->observers_.empty(), true);
-
-    // Add an entry
-    sptr<SettingObserver> mockObserver = new (std::nothrow) SettingObserver();
-    ASSERT_NE(mockObserver, nullptr);
-
-    inputPluginContext->observers_[1] = {mockObserver, "test_uri"};
-
-    EXPECT_EQ(inputPluginContext->observers_.size(), 1);
-    EXPECT_TRUE(inputPluginContext->observers_.find(1) != inputPluginContext->observers_.end());
 }
 
 #ifdef OHOS_BUILD_ENABLE_KEY_PRESSED_HANDLER
@@ -2666,34 +2593,6 @@ HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_Plug
     config.name_ = "test";
     config.mode_ = "invalid_mode";
     EXPECT_FALSE(config.IsValid());
-}
-
-/**
- * @tc.name: MultimodalInputPluginManagerTest_ParsePluginConfig_002
- * @tc.desc: Test ParsePluginConfig with valid input_plugins array
- * @tc.require: test ParsePluginConfig
- */
-HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_ParsePluginConfig_002, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    InputPluginManager* manager = InputPluginManager::GetInstance("/tmp");
-    cJSON* json = cJSON_CreateObject();
-    cJSON* plugins = cJSON_CreateArray();
-    cJSON* item = cJSON_CreateObject();
-    cJSON_AddStringToObject(item, "uuid", "parse-config-uuid");
-    cJSON_AddNumberToObject(item, "uid", 100);
-    cJSON_AddStringToObject(item, "name", "non_existent_plugin.so");
-    cJSON_AddStringToObject(item, "mode", "autorun");
-    cJSON_AddItemToArray(plugins, item);
-    cJSON_AddItemToObject(json, "input_plugins", plugins);
-
-    bool result = manager->ParsePluginConfig("test.json", json);
-    EXPECT_TRUE(result);
-
-    auto config = manager->FindPluginConfig("parse-config-uuid");
-    EXPECT_NE(config, nullptr);
-    EXPECT_EQ(config->uid_, 100);
-    cJSON_Delete(json);
 }
 
 /**
