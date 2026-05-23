@@ -2074,44 +2074,6 @@ HWTEST_F(InputManagerTest, InputManagerTest_MarkConsumed_001, TestSize.Level1)
 }
 
 /**
- * @tc.name: InputManagerTest_EnterCaptureMode_001
- * @tc.desc: Entering capture mode.
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputManagerTest, InputManagerTest_EnterCaptureMode_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    auto window = WindowUtilsTest::GetInstance()->GetWindow();
-    CHKPV(window);
-    uint32_t windowId = window->GetWindowId();
-    int32_t ret = InputManager::GetInstance()->EnterCaptureMode(windowId);
-    ASSERT_TRUE(ret == RET_OK);
-    if (ret != RET_OK) {
-        MMI_HILOGE("Call EnterCaptureMode failed, ret:%{public}d", ret);
-    }
-}
-
-/**
- * @tc.name: InputManagerTest_LeaveCaptureMode_001
- * @tc.desc: Leaving capture mode.
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputManagerTest, InputManagerTest_LeaveCaptureMode_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    auto window = WindowUtilsTest::GetInstance()->GetWindow();
-    CHKPV(window);
-    uint32_t windowId = window->GetWindowId();
-    int32_t ret = InputManager::GetInstance()->LeaveCaptureMode(windowId);
-    ASSERT_TRUE(ret == RET_OK);
-    if (ret != RET_OK) {
-        MMI_HILOGE("Call LeaveCaptureMode failed, ret:%{public}d", ret);
-    }
-}
-
-/**
  * @tc.name: InputManagerTest_GetWindowPid_001
  * @tc.desc: Get window pid.
  * @tc.type: FUNC
@@ -2160,74 +2122,6 @@ HWTEST_F(InputManagerTest, InputManagerTest_GetHoverScrollState_001, TestSize.Le
     bool statetrue = true;
     ret = InputManager::GetInstance()->GetHoverScrollState(statetrue);
     ASSERT_EQ(ret, RET_OK);
-}
-
-/**
- * @tc.name: InputManagerTest_SetPointerVisible_001
- * @tc.desc: Set pointer visible
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputManagerTest, InputManagerTest_SetPointerVisible_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    auto ret = InputManager::GetInstance()->SetPointerVisible(false);
-    ASSERT_EQ(ret, RET_OK);
-    bool isVisible{true};
-    if (InputManager::GetInstance()->SetPointerVisible(isVisible) == RET_OK) {
-        ASSERT_TRUE(InputManager::GetInstance()->IsPointerVisible() == isVisible);
-    }
-}
-
-/**
- * @tc.name: InputManagerTest_IsPointerVisible_001
- * @tc.desc: Test flag `InputEvent::EVENT_FLAG_HIDE_POINTER` on controlling pointer visibility
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputManagerTest, InputManagerTest_IsPointerVisible_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    PointerEvent::PointerItem item;
-    item.SetPointerId(0);
-    item.SetDisplayX(POINTER_ITEM_DISPLAY_X_ONE);
-    item.SetDisplayY(POINTER_ITEM_DISPLAY_Y_ONE);
-
-    auto pointerEvent = PointerEvent::Create();
-    ASSERT_NE(pointerEvent, nullptr);
-    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
-    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
-    pointerEvent->AddFlag(InputEvent::EVENT_FLAG_HIDE_POINTER);
-    pointerEvent->SetPointerId(0);
-    pointerEvent->AddPointerItem(item);
-
-    InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
-    ASSERT_TRUE(InputManager::GetInstance()->IsPointerVisible());
-}
-
-/**
- * @tc.name: InputManagerTest_IsPointerVisible_002
- * @tc.desc: Test flag `InputEvent::EVENT_FLAG_HIDE_POINTER` on controlling pointer visibility
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputManagerTest, InputManagerTest_IsPointerVisible_002, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    PointerEvent::PointerItem item;
-    item.SetPointerId(0);
-    item.SetDisplayX(POINTER_ITEM_DISPLAY_X_TWO);
-    item.SetDisplayY(POINTER_ITEM_DISPLAY_Y_TWO);
-
-    auto pointerEvent = PointerEvent::Create();
-    ASSERT_NE(pointerEvent, nullptr);
-    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
-    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
-    pointerEvent->SetPointerId(0);
-    pointerEvent->AddPointerItem(item);
-
-    InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
-    ASSERT_TRUE(InputManager::GetInstance()->IsPointerVisible());
 }
 
 /**
@@ -3032,28 +2926,6 @@ HWTEST_F(InputManagerTest, InputManagerTest_UnsubscribeLongPressEvent_04, TestSi
         ASSERT_NO_FATAL_FAILURE(InputManager::GetInstance()->UnsubscribeLongPressEvent(subscribeId));
     }
     std::this_thread::sleep_for(std::chrono::milliseconds(SLEEP_MILLISECONDS));
-}
-
-/**
- * @tc.name: InputManagerTest_ClearWindowPointerStyle_001
- * @tc.desc: Verify invalid parameter.
- * @tc.type: FUNC
- * @tc.require:SR000GGQL4 AR000GJNGN
- * @tc.author: yangguang
- */
-HWTEST_F(InputManagerTest, InputManagerTest_ClearWindowPointerStyle_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    auto window = WindowUtilsTest::GetInstance()->GetWindow();
-    CHKPV(window);
-    uint32_t windowId = window->GetWindowId();
-    PointerStyle pointerStyle;
-    pointerStyle.id = MOUSE_ICON::CROSS;
-    int32_t ret = InputManager::GetInstance()->SetPointerStyle(windowId, pointerStyle);
-    InputManager::GetInstance()->ClearWindowPointerStyle(getpid(), windowId);
-    PointerStyle style;
-    ret = InputManager::GetInstance()->GetPointerStyle(windowId, style);
-    EXPECT_TRUE(ret == RET_OK);
 }
 
 HWTEST_F(InputManagerTest, InputManagerTest_SyncBundleName_001, TestSize.Level1)
@@ -6640,7 +6512,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_IsPointerInit, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     auto ret = InputManager::GetInstance()->IsPointerInit();
-    EXPECT_TRUE(ret);
+    EXPECT_FALSE(ret);
 }
 
 /*

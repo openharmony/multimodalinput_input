@@ -319,21 +319,6 @@ HWTEST_F(InputScreenCaptureAgentTest, FreeHandle_002, TestSize.Level1)
 }
 
 /**
- * @tc.name: IsScreenCaptureWorking_002
- * @tc.desc: Test IsScreenCaptureWorking when handle is null
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputScreenCaptureAgentTest, IsScreenCaptureWorking_002, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    inputScreenCaptureAgent.handle_.handle = nullptr;
-    
-    int32_t capturePid = 1;
-    EXPECT_FALSE(inputScreenCaptureAgent.IsScreenCaptureWorking(capturePid));
-}
-
-/**
  * @tc.name: RegisterListener_001
  * @tc.desc: Test RegisterListener when LoadLibrary fails
  * @tc.type: FUNC

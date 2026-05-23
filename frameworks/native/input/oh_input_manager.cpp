@@ -349,6 +349,7 @@ int32_t OH_Input_InjectKeyEvent(const struct Input_KeyEvent* keyEvent)
         } else {
             MMI_HILOGE("code is less 0, can not process");
         }
+        MMI_HISTOGRAM_ERROR("InputKit.OH_Input_InjectKeyEvent.Error", INPUT_PARAMETER_ERROR);
         return INPUT_PARAMETER_ERROR;
     }
     CHKPR(g_keyEvent, INPUT_PARAMETER_ERROR);
@@ -619,6 +620,7 @@ int32_t OH_Input_InjectMouseEvent(const struct Input_MouseEvent* mouseEvent)
         true, PointerEvent::DISPLAY_COORDINATE);
     if ((result == INPUT_PERMISSION_DENIED) || (result == INPUT_OCCUPIED_BY_OTHER)) {
         MMI_HILOGE("Permission denied or occupied by other");
+        MMI_HISTOGRAM_ERROR("InputKit.OH_Input_InjectMouseEvent.Error", result);
         return result;
     }
     return INPUT_SUCCESS;
@@ -651,6 +653,7 @@ int32_t OH_Input_InjectMouseEventGlobal(const struct Input_MouseEvent* mouseEven
         return result;
     }
     if (!item.IsValidGlobalXY()) {
+        MMI_HISTOGRAM_ERROR("InputKit.OH_Input_InjectMouseEventGlobal.Error", INPUT_PARAMETER_ERROR);
         return INPUT_PARAMETER_ERROR;
     }
     g_mouseEvent->AddFlag(OHOS::MMI::InputEvent::EVENT_FLAG_SIMULATE);
@@ -659,6 +662,7 @@ int32_t OH_Input_InjectMouseEventGlobal(const struct Input_MouseEvent* mouseEven
         true, PointerEvent::GLOBAL_COORDINATE);
     if ((result == INPUT_PERMISSION_DENIED) || (result == INPUT_OCCUPIED_BY_OTHER)) {
         MMI_HILOGE("Permission denied or occupied by other");
+        MMI_HISTOGRAM_ERROR("InputKit.OH_Input_InjectMouseEventGlobal.Error", INPUT_PERMISSION_DENIED);
         return INPUT_PERMISSION_DENIED;
     }
     return INPUT_SUCCESS;
@@ -973,10 +977,12 @@ int32_t OH_Input_InjectTouchEvent(const struct Input_TouchEvent* touchEvent)
     OHOS::MMI::PointerEvent::PointerItem item;
     int32_t result = HandleTouchAction(touchEvent, item);
     if (result != 0) {
+        MMI_HISTOGRAM_ERROR("InputKit.OH_Input_InjectTouchEvent.Error", INPUT_PARAMETER_ERROR);
         return INPUT_PARAMETER_ERROR;
     }
     result = HandleTouchProperty(touchEvent, item, PointerEvent::DISPLAY_COORDINATE);
     if (result != 0) {
+        MMI_HISTOGRAM_ERROR("InputKit.OH_Input_InjectTouchEvent.Error", INPUT_PARAMETER_ERROR);
         return INPUT_PARAMETER_ERROR;
     }
     g_touchEvent->AddFlag(OHOS::MMI::InputEvent::EVENT_FLAG_SIMULATE);
@@ -1004,13 +1010,16 @@ int32_t OH_Input_InjectTouchEventGlobal(const struct Input_TouchEvent* touchEven
     OHOS::MMI::PointerEvent::PointerItem item;
     int32_t result = HandleTouchAction(touchEvent, item);
     if (result != 0) {
+        MMI_HISTOGRAM_ERROR("InputKit.OH_Input_InjectTouchEventGlobal.Error", INPUT_PARAMETER_ERROR);
         return INPUT_PARAMETER_ERROR;
     }
     result = HandleTouchProperty(touchEvent, item, PointerEvent::GLOBAL_COORDINATE);
     if (result != 0) {
+        MMI_HISTOGRAM_ERROR("InputKit.OH_Input_InjectTouchEventGlobal.Error", INPUT_PARAMETER_ERROR);
         return INPUT_PARAMETER_ERROR;
     }
     if (!item.IsValidGlobalXY()) {
+        MMI_HISTOGRAM_ERROR("InputKit.OH_Input_InjectTouchEventGlobal.Error", INPUT_PARAMETER_ERROR);
         return INPUT_PARAMETER_ERROR;
     }
     g_touchEvent->AddFlag(OHOS::MMI::InputEvent::EVENT_FLAG_SIMULATE);
@@ -1027,6 +1036,7 @@ int32_t OH_Input_InjectTouchEventGlobal(const struct Input_TouchEvent* touchEven
     }
     if ((result == INPUT_PERMISSION_DENIED) || (result == INPUT_OCCUPIED_BY_OTHER)) {
         MMI_HILOGE("Permission denied or occupied by other");
+        MMI_HISTOGRAM_ERROR("InputKit.OH_Input_InjectTouchEventGlobal.Error", INPUT_PERMISSION_DENIED);
         return INPUT_PERMISSION_DENIED;
     }
     return INPUT_SUCCESS;
@@ -1688,6 +1698,7 @@ Input_Result OH_Input_AddKeyEventMonitor(Input_KeyEventCallback callback)
     if (!OHOS::MMI::PermissionHelper::GetInstance()->VerifySystemApp()) {
         if (!IsScreenCaptureWorking()) {
             MMI_HILOGE("The screen capture is not working");
+            MMI_HISTOGRAM_ERROR("InputKit.OH_Input_AddKeyEventMonitor.Error", INPUT_PERMISSION_DENIED);
             return INPUT_PERMISSION_DENIED;
         }
     }
@@ -1697,6 +1708,7 @@ Input_Result OH_Input_AddKeyEventMonitor(Input_KeyEventCallback callback)
         int32_t ret = OHOS::Singleton<OHOS::MMI::InputManagerImpl>::GetInstance().AddMonitor(KeyEventMonitorCallback);
         retCode = NormalizeResult(ret);
         if (retCode != INPUT_SUCCESS) {
+            MMI_HISTOGRAM_ERROR("InputKit.OH_Input_AddKeyEventMonitor.Error", retCode);
             return retCode;
         }
         g_keyMonitorId = ret;
@@ -1956,11 +1968,13 @@ Input_Result OH_Input_AddMouseEventMonitor(Input_MouseEventCallback callback)
     if (!OHOS::MMI::PermissionHelper::GetInstance()->VerifySystemApp()) {
         if (!IsScreenCaptureWorking()) {
             MMI_HILOGE("The screen capture is not working");
+            MMI_HISTOGRAM_ERROR("InputKit.OH_Input_AddMouseEventMonitor.Error", INPUT_PERMISSION_DENIED);
             return INPUT_PERMISSION_DENIED;
         }
     }
     Input_Result ret = AddPointerEventMonitor();
     if (ret != INPUT_SUCCESS) {
+        MMI_HISTOGRAM_ERROR("InputKit.OH_Input_AddMouseEventMonitor.Error", ret);
         return ret;
     }
     std::lock_guard guard(g_mutex);
@@ -1976,11 +1990,13 @@ Input_Result OH_Input_AddTouchEventMonitor(Input_TouchEventCallback callback)
     if (!OHOS::MMI::PermissionHelper::GetInstance()->VerifySystemApp()) {
         if (!IsScreenCaptureWorking()) {
             MMI_HILOGE("The screen capture is not working");
+            MMI_HISTOGRAM_ERROR("InputKit.OH_Input_AddTouchEventMonitor.Error", INPUT_PERMISSION_DENIED);
             return INPUT_PERMISSION_DENIED;
         }
     }
     Input_Result ret = AddPointerEventMonitor();
     if (ret != INPUT_SUCCESS) {
+        MMI_HISTOGRAM_ERROR("InputKit.OH_Input_AddTouchEventMonitor.Error", ret);
         return ret;
     }
     std::lock_guard guard(g_mutex);
@@ -1996,11 +2012,13 @@ Input_Result OH_Input_AddAxisEventMonitorForAll(Input_AxisEventCallback callback
     if (!OHOS::MMI::PermissionHelper::GetInstance()->VerifySystemApp()) {
         if (!IsScreenCaptureWorking()) {
             MMI_HILOGE("The screen capture is not working");
+            MMI_HISTOGRAM_ERROR("InputKit.OH_Input_AddAxisEventMonitorForAll.Error", INPUT_PERMISSION_DENIED);
             return INPUT_PERMISSION_DENIED;
         }
     }
     Input_Result ret = AddPointerEventMonitor();
     if (ret != INPUT_SUCCESS) {
+        MMI_HISTOGRAM_ERROR("InputKit.OH_Input_AddAxisEventMonitorForAll.Error", ret);
         return ret;
     }
     std::lock_guard guard(g_mutex);
@@ -2016,11 +2034,13 @@ Input_Result OH_Input_AddAxisEventMonitor(InputEvent_AxisEventType axisEventType
     if (!OHOS::MMI::PermissionHelper::GetInstance()->VerifySystemApp()) {
         if (!IsScreenCaptureWorking()) {
             MMI_HILOGE("The screen capture is not working");
+            MMI_HISTOGRAM_ERROR("InputKit.OH_Input_AddAxisEventMonitor.Error", INPUT_PERMISSION_DENIED);
             return INPUT_PERMISSION_DENIED;
         }
     }
     Input_Result ret = AddPointerEventMonitor();
     if (ret != INPUT_SUCCESS) {
+        MMI_HISTOGRAM_ERROR("InputKit.OH_Input_AddAxisEventMonitor.Error", ret);
         return ret;
     }
     std::lock_guard guard(g_mutex);
@@ -2044,6 +2064,7 @@ Input_Result OH_Input_RemoveKeyEventMonitor(Input_KeyEventCallback callback)
     std::lock_guard guard(g_mutex);
     auto it = g_keyMonitorCallbacks.find(callback);
     if (it == g_keyMonitorCallbacks.end()) {
+        MMI_HISTOGRAM_ERROR("InputKit.OH_Input_RemoveKeyEventMonitor.Error", INPUT_PARAMETER_ERROR);
         return INPUT_PARAMETER_ERROR;
     }
     g_keyMonitorCallbacks.erase(it);
@@ -2051,6 +2072,7 @@ Input_Result OH_Input_RemoveKeyEventMonitor(Input_KeyEventCallback callback)
         int32_t ret = OHOS::Singleton<OHOS::MMI::InputManagerImpl>::GetInstance().RemoveMonitor(g_keyMonitorId);
         retCode = NormalizeResult(ret);
         if (retCode != INPUT_SUCCESS) {
+            MMI_HISTOGRAM_ERROR("InputKit.OH_Input_RemoveKeyEventMonitor.Error", retCode);
             return retCode;
         }
         g_keyMonitorId = INVALID_MONITOR_ID;
@@ -2090,10 +2112,13 @@ Input_Result OH_Input_RemoveMouseEventMonitor(Input_MouseEventCallback callback)
     auto it = g_mouseMonitorCallbacks.find(callback);
     if (it == g_mouseMonitorCallbacks.end()) {
         MMI_HILOGE("The callback has not been added");
+        MMI_HISTOGRAM_ERROR("InputKit.OH_Input_RemoveMouseEventMonitor.Error", INPUT_PARAMETER_ERROR);
         return INPUT_PARAMETER_ERROR;
     }
     g_mouseMonitorCallbacks.erase(it);
-    return RemovePointerEventMonitor();
+    auto result = RemovePointerEventMonitor();
+    MMI_HISTOGRAM_ERROR("InputKit.OH_Input_RemoveMouseEventMonitor.Error", result);
+    return result;
 }
 
 Input_Result OH_Input_RemoveTouchEventMonitor(Input_TouchEventCallback callback)
@@ -2105,10 +2130,13 @@ Input_Result OH_Input_RemoveTouchEventMonitor(Input_TouchEventCallback callback)
     auto it = g_touchMonitorCallbacks.find(callback);
     if (it == g_touchMonitorCallbacks.end()) {
         MMI_HILOGE("The callback has not been added.");
+        MMI_HISTOGRAM_ERROR("InputKit.OH_Input_RemoveTouchEventMonitor.Error", INPUT_PARAMETER_ERROR);
         return INPUT_PARAMETER_ERROR;
     }
     g_touchMonitorCallbacks.erase(it);
-    return RemovePointerEventMonitor();
+    auto result = RemovePointerEventMonitor();
+    MMI_HISTOGRAM_ERROR("InputKit.OH_Input_RemoveTouchEventMonitor.Error", result);
+    return result;
 }
 
 Input_Result OH_Input_RemoveAxisEventMonitorForAll(Input_AxisEventCallback callback)
@@ -2120,10 +2148,13 @@ Input_Result OH_Input_RemoveAxisEventMonitorForAll(Input_AxisEventCallback callb
     auto it = g_axisMonitorAllCallbacks.find(callback);
     if (it == g_axisMonitorAllCallbacks.end()) {
         MMI_HILOGE("The callback has not been added.");
+        MMI_HISTOGRAM_ERROR("InputKit.OH_Input_RemoveAxisEventMonitorForAll.Error", INPUT_PARAMETER_ERROR);
         return INPUT_PARAMETER_ERROR;
     }
     g_axisMonitorAllCallbacks.erase(it);
-    return RemovePointerEventMonitor();
+    auto result = RemovePointerEventMonitor();
+    MMI_HISTOGRAM_ERROR("InputKit.OH_Input_RemoveAxisEventMonitorForAll.Error", result);
+    return result;
 }
 
 Input_Result OH_Input_RemoveAxisEventMonitor(InputEvent_AxisEventType axisEventType, Input_AxisEventCallback callback)
@@ -2134,18 +2165,22 @@ Input_Result OH_Input_RemoveAxisEventMonitor(InputEvent_AxisEventType axisEventT
     std::lock_guard guard(g_mutex);
     if (g_axisMonitorCallbacks.find(axisEventType) == g_axisMonitorCallbacks.end()) {
         MMI_HILOGE("The axis event type has not been added");
+        MMI_HISTOGRAM_ERROR("InputKit.OH_Input_RemoveAxisEventMonitor.Error", INPUT_PARAMETER_ERROR);
         return INPUT_PARAMETER_ERROR;
     }
     auto it = g_axisMonitorCallbacks[axisEventType].find(callback);
     if (it == g_axisMonitorCallbacks[axisEventType].end()) {
         MMI_HILOGE("The callback has not been added");
+        MMI_HISTOGRAM_ERROR("InputKit.OH_Input_RemoveAxisEventMonitor.Error", INPUT_PARAMETER_ERROR);
         return INPUT_PARAMETER_ERROR;
     }
     g_axisMonitorCallbacks[axisEventType].erase(it);
     if (g_axisMonitorCallbacks[axisEventType].empty()) {
         g_axisMonitorCallbacks.erase(axisEventType);
     }
-    return RemovePointerEventMonitor();
+    auto result = RemovePointerEventMonitor();
+    MMI_HISTOGRAM_ERROR("InputKit.OH_Input_RemoveAxisEventMonitor.Error", result);
+    return result;
 }
 
 static void KeyEventInterceptorCallback(std::shared_ptr<OHOS::MMI::KeyEvent> event)
@@ -2177,6 +2212,7 @@ Input_Result OH_Input_AddKeyEventInterceptor(Input_KeyEventCallback callback, In
     std::lock_guard guard(g_mutex);
     if (g_keyInterceptorId != INVALID_INTERCEPTOR_ID) {
         MMI_HILOGE("Another key event interceptor has been added");
+        MMI_HISTOGRAM_ERROR("InputKit.OH_Input_AddKeyEventInterceptor.Error", INPUT_REPEAT_INTERCEPTOR);
         return INPUT_REPEAT_INTERCEPTOR;
     }
     CHKPR(g_keyInterceptor, INPUT_PARAMETER_ERROR);
@@ -2185,6 +2221,7 @@ Input_Result OH_Input_AddKeyEventInterceptor(Input_KeyEventCallback callback, In
     retCode = NormalizeResult(ret);
     if (retCode != INPUT_SUCCESS) {
         MMI_HILOGE("Add key event interceptor failed.");
+        MMI_HISTOGRAM_ERROR("InputKit.OH_Input_AddKeyEventInterceptor.Error", retCode);
         return retCode;
     }
     g_keyInterceptorId = ret;
@@ -2330,6 +2367,7 @@ Input_Result OH_Input_AddInputEventInterceptor(Input_InterceptorEventCallback *c
     std::lock_guard guard(g_mutex);
     if (g_pointerInterceptorId != INVALID_INTERCEPTOR_ID) {
         MMI_HILOGE("Another interceptor for input event has been added");
+        MMI_HISTOGRAM_ERROR("InputKit.OH_Input_AddInputEventInterceptor.Error", INPUT_REPEAT_INTERCEPTOR);
         return INPUT_REPEAT_INTERCEPTOR;
     }
     g_pointerInterceptor->SetCallback(PointerEventInterceptorCallback);
@@ -2337,6 +2375,7 @@ Input_Result OH_Input_AddInputEventInterceptor(Input_InterceptorEventCallback *c
     retCode = NormalizeResult(ret);
     if (retCode != INPUT_SUCCESS) {
         MMI_HILOGE("Add pointer event interceptor failed.");
+        MMI_HISTOGRAM_ERROR("InputKit.OH_Input_AddInputEventInterceptor.Error", retCode);
         return retCode;
     }
     g_pointerInterceptorId = ret;
@@ -2355,6 +2394,7 @@ Input_Result OH_Input_RemoveKeyEventInterceptor(void)
     retCode = NormalizeResult(ret);
     if (retCode != INPUT_SUCCESS) {
         MMI_HILOGE("Remove key event interceptor failed.");
+        MMI_HISTOGRAM_ERROR("InputKit.OH_Input_RemoveKeyEventInterceptor.Error", retCode);
         return retCode;
     }
     g_keyInterceptorCallback = nullptr;
@@ -2372,6 +2412,7 @@ Input_Result OH_Input_RemoveInputEventInterceptor(void)
     retCode = NormalizeResult(ret);
     if (retCode != INPUT_SUCCESS) {
         MMI_HILOGE("Remove pointer event interceptor failed.");
+        MMI_HISTOGRAM_ERROR("InputKit.OH_Input_RemoveInputEventInterceptor.Error", retCode);
         return retCode;
     }
     g_pointerInterceptorId = INVALID_INTERCEPTOR_ID;
@@ -2805,18 +2846,21 @@ Input_Result OH_Input_AddHotkeyMonitor(const Input_Hotkey* hotkey, Input_HotkeyC
             delete hotkeyInfo;
             hotkeyInfo = nullptr;
             MMI_HILOGE("SubscribeId invalid:%{public}d", subscribeId);
+            MMI_HISTOGRAM_ERROR("InputKit.OH_Input_AddHotkeyMonitor.Error", INPUT_DEVICE_NOT_SUPPORTED);
             return INPUT_DEVICE_NOT_SUPPORTED;
         }
         if (subscribeId == OCCUPIED_BY_SYSTEM) {
             delete hotkeyInfo;
             hotkeyInfo = nullptr;
             MMI_HILOGE("SubscribeId invalid:%{public}d", subscribeId);
+            MMI_HISTOGRAM_ERROR("InputKit.OH_Input_AddHotkeyMonitor.Error", INPUT_OCCUPIED_BY_SYSTEM);
             return INPUT_OCCUPIED_BY_SYSTEM;
         }
         if (subscribeId == OCCUPIED_BY_OTHER) {
             delete hotkeyInfo;
             hotkeyInfo = nullptr;
             MMI_HILOGE("SubscribeId invalid:%{public}d", subscribeId);
+            MMI_HISTOGRAM_ERROR("InputKit.OH_Input_AddHotkeyMonitor.Error", INPUT_OCCUPIED_BY_OTHER);
             return INPUT_OCCUPIED_BY_OTHER;
         }
         MMI_HILOGD("SubscribeId:%{public}d", subscribeId);
@@ -2828,6 +2872,7 @@ Input_Result OH_Input_AddHotkeyMonitor(const Input_Hotkey* hotkey, Input_HotkeyC
         delete hotkeyInfo;
         hotkeyInfo = nullptr;
         MMI_HILOGE("AddHotkeySubscribe fail");
+        MMI_HISTOGRAM_ERROR("InputKit.OH_Input_AddHotkeyMonitor.Error", INPUT_PARAMETER_ERROR);
         return INPUT_PARAMETER_ERROR;
     }
     return INPUT_SUCCESS;
@@ -2901,6 +2946,7 @@ Input_Result OH_Input_RemoveHotkeyMonitor(const Input_Hotkey *hotkey, Input_Hotk
         delete hotkeyInfo;
         hotkeyInfo = nullptr;
         MMI_HILOGE("MakeHotkeyInfo failed");
+        MMI_HISTOGRAM_ERROR("InputKit.OH_Input_RemoveHotkeyMonitor.Error", INPUT_PARAMETER_ERROR);
         return INPUT_PARAMETER_ERROR;
     }
     hotkeyInfo->callback = callback;
@@ -2909,6 +2955,7 @@ Input_Result OH_Input_RemoveHotkeyMonitor(const Input_Hotkey *hotkey, Input_Hotk
         delete hotkeyInfo;
         hotkeyInfo = nullptr;
         MMI_HILOGE("DelEventCallback failed");
+        MMI_HISTOGRAM_ERROR("InputKit.OH_Input_RemoveHotkeyMonitor.Error", INPUT_PARAMETER_ERROR);
         return INPUT_PARAMETER_ERROR;
     }
     MMI_HILOGD("SubscribeId:%{public}d", subscribeId);
@@ -2961,6 +3008,7 @@ Input_Result OH_Input_RegisterDeviceListener(Input_DeviceListener* listener)
     if (listener == nullptr || listener->deviceAddedCallback == nullptr ||
         listener->deviceRemovedCallback == nullptr) {
         MMI_HILOGE("listener or callback is nullptr");
+        MMI_HISTOGRAM_ERROR("InputKit.OH_Input_RegisterDeviceListener.Error", INPUT_PARAMETER_ERROR);
         return INPUT_PARAMETER_ERROR;
     }
     std::lock_guard guard(g_DeviceListerCallbackMutex);
@@ -2970,6 +3018,7 @@ Input_Result OH_Input_RegisterDeviceListener(Input_DeviceListener* listener)
         g_deviceListener->SetDeviceRemovedCallback(DeviceRemovedCallback);
         if (ret != RET_OK) {
             MMI_HILOGE("RegisterDevListener fail");
+            MMI_HISTOGRAM_ERROR("InputKit.OH_Input_RegisterDeviceListener.Error", INPUT_SERVICE_EXCEPTION);
             return INPUT_SERVICE_EXCEPTION;
         }
     }
@@ -2986,6 +3035,7 @@ Input_Result OH_Input_UnregisterDeviceListener(Input_DeviceListener* listener)
     auto it = g_ohDeviceListenerList.find(listener);
     if (it == g_ohDeviceListenerList.end()) {
         MMI_HILOGE("listener not found");
+        MMI_HISTOGRAM_ERROR("InputKit.OH_Input_UnregisterDeviceListener.Error", INPUT_PARAMETER_ERROR);
         return INPUT_PARAMETER_ERROR;
     }
     g_ohDeviceListenerList.erase(it);
@@ -2993,6 +3043,7 @@ Input_Result OH_Input_UnregisterDeviceListener(Input_DeviceListener* listener)
         int32_t ret = OHOS::MMI::InputManager::GetInstance()->UnregisterDevListener("change", g_deviceListener);
         if (ret != RET_OK) {
             MMI_HILOGE("UnregisterDevListener fail");
+            MMI_HISTOGRAM_ERROR("InputKit.OH_Input_UnregisterDeviceListener.Error", INPUT_SERVICE_EXCEPTION);
             return INPUT_SERVICE_EXCEPTION;
         }
     }
@@ -3011,6 +3062,7 @@ Input_Result OH_Input_UnregisterDeviceListeners()
     g_ohDeviceListenerList.clear();
     if (ret != RET_OK) {
         MMI_HILOGE("UnregisterDevListener fail");
+        MMI_HISTOGRAM_ERROR("InputKit.OH_Input_UnregisterDeviceListeners.Error", INPUT_SERVICE_EXCEPTION);
         return INPUT_SERVICE_EXCEPTION;
     }
     return INPUT_SUCCESS;
@@ -3233,9 +3285,11 @@ Input_Result OH_Input_RequestInjection(Input_InjectAuthorizeCallback callback)
     if (ret != RET_OK) {
         MMI_HILOGE("RequestInjection fail, error:%{public}d", ret);
         if (ret ==  OHOS::MMI::ERROR_DEVICE_NOT_SUPPORTED) {
+            MMI_HISTOGRAM_ERROR("InputKit.OH_Input_RequestInjection.Error", INPUT_DEVICE_NOT_SUPPORTED);
             return INPUT_DEVICE_NOT_SUPPORTED;
         }
         if (ret ==  OHOS::MMI::ERROR_OPERATION_FREQUENT) {
+            MMI_HISTOGRAM_ERROR("InputKit.OH_Input_RequestInjection.Error", INPUT_INJECTION_OPERATION_FREQUENT);
             return INPUT_INJECTION_OPERATION_FREQUENT;
         }
         return INPUT_SERVICE_EXCEPTION;
@@ -3244,12 +3298,15 @@ Input_Result OH_Input_RequestInjection(Input_InjectAuthorizeCallback callback)
     switch (recvStatus) {
         case AUTHORIZE_QUERY_STATE::OTHER_PID_IN_AUTHORIZATION_SELECTION:
         case AUTHORIZE_QUERY_STATE::CURRENT_PID_IN_AUTHORIZATION_SELECTION: {
+            MMI_HISTOGRAM_ERROR("InputKit.OH_Input_RequestInjection.Error", INPUT_INJECTION_AUTHORIZING);
             return INPUT_INJECTION_AUTHORIZING;
         }
         case AUTHORIZE_QUERY_STATE::OTHER_PID_AUTHORIZED: {
+            MMI_HISTOGRAM_ERROR("InputKit.OH_Input_RequestInjection.Error", INPUT_INJECTION_AUTHORIZED_OTHERS);
             return INPUT_INJECTION_AUTHORIZED_OTHERS;
         }
         case AUTHORIZE_QUERY_STATE::CURRENT_PID_AUTHORIZED: {
+            MMI_HISTOGRAM_ERROR("InputKit.OH_Input_RequestInjection.Error", INPUT_INJECTION_AUTHORIZED);
             return INPUT_INJECTION_AUTHORIZED;
         }
         case AUTHORIZE_QUERY_STATE::UNAUTHORIZED: {
@@ -3263,6 +3320,7 @@ Input_Result OH_Input_RequestInjection(Input_InjectAuthorizeCallback callback)
             return INPUT_SUCCESS;
         }
         default:
+            MMI_HISTOGRAM_ERROR("InputKit.OH_Input_RequestInjection.Error", INPUT_SERVICE_EXCEPTION);
             return INPUT_SERVICE_EXCEPTION;
         }
 }
@@ -3494,6 +3552,7 @@ Input_Result OH_Input_AddKeyEventHook(Input_KeyEventCallback callback)
     }
     if (g_keyEventHookId.load() != INVALID_INTERCEPTOR_ID) {
         MMI_HILOGE("Repeatedly set the hook function. A process can only have one key hook function.");
+        MMI_HISTOGRAM_ERROR("InputKit.OH_Input_AddKeyEventHook.Error", INPUT_REPEAT_INTERCEPTOR);
         return INPUT_REPEAT_INTERCEPTOR;
     }
     SetHookCallback(callback);
@@ -3505,6 +3564,7 @@ Input_Result OH_Input_AddKeyEventHook(Input_KeyEventCallback callback)
         MMI_HILOGE("AddKeyEventHook failed, errCode:%{public}d", errCode);
         g_keyEventHookId.store(INVALID_INTERCEPTOR_ID);
         SetHookCallback(nullptr);
+        MMI_HISTOGRAM_ERROR("InputKit.OH_Input_AddKeyEventHook.Error", errCode);
         return errCode;
     }
     g_keyEventHookId.store(hookId);
@@ -3517,6 +3577,7 @@ Input_Result OH_Input_AddKeyEventHook(Input_KeyEventCallback callback)
         MMI_HILOGE("SetHookIdUpdater failed, errCode:%{public}d", errCode);
         g_keyEventHookId.store(INVALID_INTERCEPTOR_ID);
         SetHookCallback(nullptr);
+        MMI_HISTOGRAM_ERROR("InputKit.OH_Input_AddKeyEventHook.Error", errCode);
         return errCode;
     }
     MMI_HILOGI("OH_Input_AddKeyEventHook success, hookId:%{public}d", g_keyEventHookId.load());
@@ -3536,6 +3597,7 @@ Input_Result OH_Input_RemoveKeyEventHook(Input_KeyEventCallback callback)
         ret != RET_OK) {
         auto errCode = NormalizeHookResult(ret);
         MMI_HILOGE("RemoveKeyEventHook failed, service exception, keyEventHookId:%{public}d", g_keyEventHookId.load());
+        MMI_HISTOGRAM_ERROR("InputKit.OH_Input_RemoveKeyEventHook.Error", errCode);
         return errCode;
     }
     MMI_HILOGI("OH_Input_RemoveKeyEventHook success, hookId:%{public}d", g_keyEventHookId.load());

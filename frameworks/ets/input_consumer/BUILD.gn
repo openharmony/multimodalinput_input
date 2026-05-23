@@ -61,6 +61,9 @@ taihe_shared_library("InputConsumer") {
     "icu:shared_icuuc",
     "ipc:ipc_single",
   ]
+  if (input_feature_api_metrics_histogram) {
+    external_deps += [ "api_metrics:histogrammanager" ]
+  }
   sources += [
     "${mmi_path}/frameworks/ets/common/src/ani_common.cpp",
     "${mmi_path}/frameworks/ets/key_code/src/ohos.multimodalInput.keyCode.impl.cpp",

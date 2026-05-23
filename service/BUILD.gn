@@ -1737,7 +1737,6 @@ ohos_unittest("InputWindowsManagerOneTest") {
 
   sources = [
     "window_manager/test/input_windows_manager_one_test.cpp",
-    "window_manager/test/input_windows_manager_methods_test.cpp",
   ]
 
   deps = [

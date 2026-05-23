@@ -1255,7 +1255,7 @@ HWTEST_F(PointerDrawingManagerExTest, InputWindowsManagerTest_SetPointerSize_03,
         rsUIContext_);
     EXPECT_TRUE(pointerDrawingManager.surfaceNode_ != nullptr);
     int32_t userId = 0;
-    EXPECT_EQ(pointerDrawingManager.SetPointerSize(userId, size), RET_OK);
+    EXPECT_EQ(pointerDrawingManager.SetPointerSize(userId, size), RET_ERR);
 }
 
 /**

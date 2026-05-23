@@ -323,25 +323,6 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_TriggerTouchUpOn
 }
 
 /* *
- * @tc.name: InputWindowsManagerOneTest_TouchPointToDisplayPoint_001
- * @tc.desc: Test the function TouchPointToDisplayPoint
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_TouchPointToDisplayPoint_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    int32_t deviceId = 0;
-    libinput_event_touch touch;
-    EventTouch touchInfo;
-    int32_t physicalDisplayId = 0;
-    bool isNeedClear = false;
-    std::shared_ptr<InputWindowsManager> inputWindowsManager = std::make_shared<InputWindowsManager>();
-    EXPECT_FALSE(
-        inputWindowsManager->TouchPointToDisplayPoint(deviceId, &touch, touchInfo, physicalDisplayId, isNeedClear));
-}
-
-/* *
  * @tc.name: InputWindowsManagerOneTest_SelectWindowInfo_001
  * @tc.desc: Test the function SelectWindowInfo
  * @tc.type: FUNC

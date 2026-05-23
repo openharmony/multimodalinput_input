@@ -91,7 +91,8 @@ static std::unordered_map<int32_t, int32_t> JSMouseButton2Native = {
 } // namespace
 
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
-static void GetInjectionEventDataNative(napi_env env, struct Input_KeyEvent* keyEventNative, napi_value keyHandle)
+static void GetInjectionEventDataNative(napi_env env, struct Input_KeyEvent* keyEventNative, napi_value keyHandle,
+    std::function<void(int32_t)> histogramError)
 {
     bool isPressed = false;
     if (GetNamedPropertyBool(env, keyHandle, "isPressed", isPressed) != RET_OK) {
@@ -104,6 +105,7 @@ static void GetInjectionEventDataNative(napi_env env, struct Input_KeyEvent* key
     if (keyDownDuration < 0) {
         MMI_HILOGE("keyDownDuration:%{public}d is less 0, can not process", keyDownDuration);
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "keyDownDuration must be greater than or equal to 0");
+        histogramError(COMMON_PARAMETER_ERROR);
     }
     int32_t keyCode = 0;
     if (GetNamedPropertyInt32(env, keyHandle, "keyCode", keyCode) != RET_OK) {
@@ -116,6 +118,7 @@ static void GetInjectionEventDataNative(napi_env env, struct Input_KeyEvent* key
             MMI_HILOGE("keyCode:%{private}d is less 0, can not process", keyCode);
         }
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "keyCode must be greater than or equal to 0");
+        histogramError(COMMON_PARAMETER_ERROR);
     }
     CHKPV(keyEventNative);
     auto keyAction = isPressed ? Input_KeyEventAction::KEY_ACTION_DOWN : Input_KeyEventAction::KEY_ACTION_UP;
@@ -125,10 +128,12 @@ static void GetInjectionEventDataNative(napi_env env, struct Input_KeyEvent* key
     Input_Result result = static_cast<Input_Result>(OH_Input_InjectKeyEvent(keyEventNative));
     if (result != INPUT_SUCCESS) {
         THROWERR_CUSTOM(env, result, "Error while injecting KeyEvent with native api");
+        histogramError(result);
     }
 }
 #else
-static void GetInjectionEventData(napi_env env, std::shared_ptr<KeyEvent> keyEvent, napi_value keyHandle)
+static void GetInjectionEventData(napi_env env, std::shared_ptr<KeyEvent> keyEvent, napi_value keyHandle,
+    std::function<void(int32_t)> histogramError)
 {
     CHKPV(keyEvent);
     keyEvent->SetRepeat(true);
@@ -148,6 +153,7 @@ static void GetInjectionEventData(napi_env env, std::shared_ptr<KeyEvent> keyEve
     if (keyDownDuration < 0) {
         MMI_HILOGE("keyDownDuration:%{public}d is less 0, can not process", keyDownDuration);
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "keyDownDuration must be greater than or equal to 0");
+        histogramError(COMMON_PARAMETER_ERROR);
     }
     int32_t keyCode = 0;
     if (GetNamedPropertyInt32(env, keyHandle, "keyCode", keyCode) != RET_OK) {
@@ -156,6 +162,7 @@ static void GetInjectionEventData(napi_env env, std::shared_ptr<KeyEvent> keyEve
     if (keyCode < 0) {
         MMI_HILOGE("keyCode:%{private}d is less 0, can not process", keyCode);
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "keyCode must be greater than or equal to 0");
+        histogramError(COMMON_PARAMETER_ERROR);
     }
     keyEvent->SetKeyCode(keyCode);
     auto keyAction = isPressed ? KeyEvent::KEY_ACTION_DOWN : KeyEvent::KEY_ACTION_UP;
@@ -181,6 +188,7 @@ static napi_value InjectEvent(napi_env env, napi_callback_info info)
     if (argc < 1) {
         MMI_HILOGE("Parameter number error");
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "parameter number error");
+        MMI_HISTOGRAM_ERROR("InputKit.inputEventClient.injectEvent.Error", COMMON_PARAMETER_ERROR);
         return nullptr;
     }
     napi_valuetype tmpType = napi_undefined;
@@ -188,6 +196,7 @@ static napi_value InjectEvent(napi_env env, napi_callback_info info)
     if (tmpType != napi_object) {
         MMI_HILOGE("KeyEvent is not napi_object");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "KeyEvent", "object");
+        MMI_HISTOGRAM_ERROR("InputKit.inputEventClient.injectEvent.Error", COMMON_PARAMETER_ERROR);
         return nullptr;
     }
     napi_value keyHandle = nullptr;
@@ -195,23 +204,28 @@ static napi_value InjectEvent(napi_env env, napi_callback_info info)
     if (keyHandle == nullptr) {
         MMI_HILOGE("KeyEvent is nullptr");
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "KeyEvent not found");
+        MMI_HISTOGRAM_ERROR("InputKit.inputEventClient.injectEvent.Error", COMMON_PARAMETER_ERROR);
         return nullptr;
     }
     CHKRP(napi_typeof(env, keyHandle, &tmpType), TYPEOF);
     if (tmpType != napi_object) {
         MMI_HILOGE("KeyEvent is not napi_object");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "KeyEvent", "object");
+        MMI_HISTOGRAM_ERROR("InputKit.inputEventClient.injectEvent.Error", COMMON_PARAMETER_ERROR);
         return nullptr;
     }
+    auto histogramError = [](int32_t errorCode) {
+        MMI_HISTOGRAM_ERROR("InputKit.inputEventClient.injectEvent.Error", errorCode);
+    };
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
     Input_KeyEvent* keyEventNative = OH_Input_CreateKeyEvent();
     CHKPP(keyEventNative);
-    GetInjectionEventDataNative(env, keyEventNative, keyHandle);
+    GetInjectionEventDataNative(env, keyEventNative, keyHandle, histogramError);
     OH_Input_DestroyKeyEvent(&keyEventNative);
 #else
     auto keyEvent = KeyEvent::Create();
     CHKPP(keyEvent);
-    GetInjectionEventData(env, keyEvent, keyHandle);
+    GetInjectionEventData(env, keyEvent, keyHandle, histogramError);
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
     CHKRP(napi_create_int32(env, 0, &result), CREATE_INT32);
     return result;
@@ -228,6 +242,7 @@ static napi_value InjectKeyEvent(napi_env env, napi_callback_info info)
     if (argc < 1) {
         MMI_HILOGE("Parameter number error");
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "parameter number error");
+        MMI_HISTOGRAM_ERROR("InputKit.inputEventClient.injectKeyEvent.Error", COMMON_PARAMETER_ERROR);
         return nullptr;
     }
     napi_valuetype tmpType = napi_undefined;
@@ -235,6 +250,7 @@ static napi_value InjectKeyEvent(napi_env env, napi_callback_info info)
     if (tmpType != napi_object) {
         MMI_HILOGE("KeyEvent is not napi_object");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "keyEvent", "object");
+        MMI_HISTOGRAM_ERROR("InputKit.inputEventClient.injectKeyEvent.Error", COMMON_PARAMETER_ERROR);
         return nullptr;
     }
     napi_value keyHandle = nullptr;
@@ -242,23 +258,28 @@ static napi_value InjectKeyEvent(napi_env env, napi_callback_info info)
     if (keyHandle == nullptr) {
         MMI_HILOGE("KeyEvent is nullptr");
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "keyEvent not found");
+        MMI_HISTOGRAM_ERROR("InputKit.inputEventClient.injectKeyEvent.Error", COMMON_PARAMETER_ERROR);
         return nullptr;
     }
     CHKRP(napi_typeof(env, keyHandle, &tmpType), TYPEOF);
     if (tmpType != napi_object) {
         MMI_HILOGE("KeyEvent is not napi_object");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "keyEvent", "object");
+        MMI_HISTOGRAM_ERROR("InputKit.inputEventClient.injectKeyEvent.Error", COMMON_PARAMETER_ERROR);
         return nullptr;
     }
+    auto histogramError = [](int32_t errorCode) {
+        MMI_HISTOGRAM_ERROR("InputKit.inputEventClient.injectKeyEvent.Error", errorCode);
+    };
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
     Input_KeyEvent* keyEventNative = OH_Input_CreateKeyEvent();
     CHKPP(keyEventNative);
-    GetInjectionEventDataNative(env, keyEventNative, keyHandle);
+    GetInjectionEventDataNative(env, keyEventNative, keyHandle, histogramError);
     OH_Input_DestroyKeyEvent(&keyEventNative);
 #else
     auto keyEvent = KeyEvent::Create();
     CHKPP(keyEvent);
-    GetInjectionEventData(env, keyEvent, keyHandle);
+    GetInjectionEventData(env, keyEvent, keyHandle, histogramError);
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
     CHKRP(napi_create_int32(env, 0, &result), CREATE_INT32);
     return result;
@@ -415,6 +436,7 @@ static napi_value InjectMouseEvent(napi_env env, napi_callback_info info)
     if (argc < 1) {
         MMI_HILOGE("Parameter number error");
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "parameter number error");
+        MMI_HISTOGRAM_ERROR("InputKit.inputEventClient.injectMouseEvent.Error", COMMON_PARAMETER_ERROR);
         return nullptr;
     }
     napi_valuetype tmpType = napi_undefined;
@@ -422,6 +444,7 @@ static napi_value InjectMouseEvent(napi_env env, napi_callback_info info)
     if (tmpType != napi_object) {
         MMI_HILOGE("MouseEvent is not napi_object");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "mouseEvent", "object");
+        MMI_HISTOGRAM_ERROR("InputKit.inputEventClient.injectMouseEvent.Error", COMMON_PARAMETER_ERROR);
         return nullptr;
     }
     napi_value mouseHandle = nullptr;
@@ -429,12 +452,14 @@ static napi_value InjectMouseEvent(napi_env env, napi_callback_info info)
     if (mouseHandle == nullptr) {
         MMI_HILOGE("MouseEvent is nullptr");
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "MouseEvent not found");
+        MMI_HISTOGRAM_ERROR("InputKit.inputEventClient.injectMouseEvent.Error", COMMON_PARAMETER_ERROR);
         return nullptr;
     }
     CHKRP(napi_typeof(env, mouseHandle, &tmpType), TYPEOF);
     if (tmpType != napi_object) {
         MMI_HILOGE("MouseEvent is not napi_object");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "mouseEvent", "object");
+        MMI_HISTOGRAM_ERROR("InputKit.inputEventClient.injectMouseEvent.Error", COMMON_PARAMETER_ERROR);
         return nullptr;
     }
     bool useGlobalCoordinate = false;
@@ -453,6 +478,7 @@ static napi_value InjectMouseEvent(napi_env env, napi_callback_info info)
             if (!item.IsValidGlobalXY()) {
                 MMI_HILOGE("globalX globalY is invalid");
                 THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "globalX globalY is invalid");
+                MMI_HISTOGRAM_ERROR("InputKit.inputEventClient.injectMouseEvent.Error", COMMON_PARAMETER_ERROR);
                 return nullptr;
             }
         }
@@ -655,6 +681,7 @@ static napi_value InjectTouchEvent(napi_env env, napi_callback_info info)
     if (argc < 1) {
         MMI_HILOGE("Parameter number error");
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "parameter number error");
+        MMI_HISTOGRAM_ERROR("InputKit.inputEventClient.injectTouchEvent.Error", COMMON_PARAMETER_ERROR);
         return nullptr;
     }
     napi_valuetype tmpType = napi_undefined;
@@ -662,6 +689,7 @@ static napi_value InjectTouchEvent(napi_env env, napi_callback_info info)
     if (tmpType != napi_object) {
         MMI_HILOGE("TouchEvent is not napi_object");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "touchEvent", "object");
+        MMI_HISTOGRAM_ERROR("InputKit.inputEventClient.injectTouchEvent.Error", COMMON_PARAMETER_ERROR);
         return nullptr;
     }
     napi_value touchHandle = nullptr;
@@ -669,12 +697,14 @@ static napi_value InjectTouchEvent(napi_env env, napi_callback_info info)
     if (touchHandle == nullptr) {
         MMI_HILOGE("TouchEvent is nullptr");
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "TouchEvent not found");
+        MMI_HISTOGRAM_ERROR("InputKit.inputEventClient.injectTouchEvent.Error", COMMON_PARAMETER_ERROR);
         return nullptr;
     }
     CHKRP(napi_typeof(env, touchHandle, &tmpType), TYPEOF);
     if (tmpType != napi_object) {
         MMI_HILOGE("TouchEvent is not napi_object");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "touchEvent", "object");
+        MMI_HISTOGRAM_ERROR("InputKit.inputEventClient.injectTouchEvent.Error", COMMON_PARAMETER_ERROR);
         return nullptr;
     }
     bool useGlobalCoordinate = false;
@@ -694,6 +724,7 @@ static napi_value InjectTouchEvent(napi_env env, napi_callback_info info)
             if (!item.IsValidGlobalXY()) {
                 MMI_HILOGE("globalX globalY is invalid");
                 THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "globalX globalY is invalid");
+                MMI_HISTOGRAM_ERROR("InputKit.inputEventClient.injectTouchEvent.Error", COMMON_PARAMETER_ERROR);
                 return nullptr;
             }
         }
@@ -861,12 +892,14 @@ static napi_value PermitInjection(napi_env env, napi_callback_info info)
     if (argc < 1) {
         MMI_HILOGE("Parameter number error");
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "parameter number error");
+        MMI_HISTOGRAM_ERROR("InputKit.inputEventClient.permitInjection.Error", COMMON_PARAMETER_ERROR);
         return nullptr;
     }
 
     bool bResult = false;
     if (!UtilNapi::TypeOf(env, argv[0], napi_boolean)) {
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "type", "boolean");
+        MMI_HISTOGRAM_ERROR("InputKit.inputEventClient.permitInjection.Error", COMMON_PARAMETER_ERROR);
         MMI_HILOGE("The first parameter is not boolean");
         return nullptr;
     }

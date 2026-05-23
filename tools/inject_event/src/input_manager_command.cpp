@@ -2189,6 +2189,9 @@ int32_t InputManagerCommand::DoubleKnuckleClickEvent(int32_t downX, int32_t down
     item.SetPressed(true);
     pointerEvent->SetPointerId(0);
     pointerEvent->AddPointerItem(item);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+    InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
 
     item2.SetPointerId(1);
     item2.SetToolType(PointerEvent::TOOL_TYPE_KNUCKLE);
@@ -2199,26 +2202,37 @@ int32_t InputManagerCommand::DoubleKnuckleClickEvent(int32_t downX, int32_t down
     item2.SetPressed(true);
     pointerEvent->SetPointerId(1);
     pointerEvent->AddPointerItem(item2);
-    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
-    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
     InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
 
+    auto upEvent0 = PointerEvent::Create();
+    CHKPR(upEvent0, ERROR_NULL_POINTER);
     item.SetPressed(false);
     item.SetDisplayY(downY);
     item.SetDisplayX(downX);
     item.SetRawDisplayY(downY);
     item.SetRawDisplayX(downX);
     item.SetToolType(PointerEvent::TOOL_TYPE_KNUCKLE);
+    upEvent0->AddPointerItem(item);
+    item2.SetPressed(true);
+    upEvent0->AddPointerItem(item2);
+    upEvent0->SetPointerId(0);
+    upEvent0->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
+    upEvent0->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+    InputManager::GetInstance()->SimulateInputEvent(upEvent0);
+
+    auto upEvent1 = PointerEvent::Create();
+    CHKPR(upEvent1, ERROR_NULL_POINTER);
     item2.SetPressed(false);
     item2.SetDisplayY(downY);
     item2.SetDisplayX(downX);
     item2.SetRawDisplayY(downY);
     item2.SetRawDisplayX(downX);
     item2.SetToolType(PointerEvent::TOOL_TYPE_KNUCKLE);
-    pointerEvent->UpdatePointerItem(0, item);
-    pointerEvent->UpdatePointerItem(1, item2);
-    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
-    InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
+    upEvent1->AddPointerItem(item2);
+    upEvent1->SetPointerId(1);
+    upEvent1->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
+    upEvent1->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+    InputManager::GetInstance()->SimulateInputEvent(upEvent1);
     return ERR_OK;
 }
 

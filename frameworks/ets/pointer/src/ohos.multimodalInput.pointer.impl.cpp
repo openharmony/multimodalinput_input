@@ -15,6 +15,7 @@
 
 #include "ohos.multimodalInput.pointer.impl.h"
 #include "mmi_log.h"
+#include "mmi_api_metrics_histograms.h"
 
 #include "accesstoken_kit.h"
 #include "ipc_skeleton.h"
@@ -129,13 +130,15 @@ TaihePointerStyle ConvertPointerStyle(int32_t pointerStyle)
     return iter->second;
 }
 
-void SetPointerStyleAsync(int32_t windowId, TaihePointerStyle pointerStyle)
+static void SetPointerStyle(int32_t windowId, TaihePointerStyle pointerStyle,
+    std::function<void(int32_t)> histogramError)
 {
     if (windowId < 0 && windowId != GLOBAL_WINDOW_ID) {
         MMI_HILOGE("Invalid windowid");
         taihe::set_business_error(COMMON_PARAMETER_ERROR, "Windowid is invalid");
- 	    return;
- 	}
+        histogramError(COMMON_PARAMETER_ERROR);
+        return;
+    }
     OHOS::MMI::PointerStyle style;
     style.id = pointerStyle;
     int32_t ret = OHOS::MMI::InputManager::GetInstance()->SetPointerStyle(windowId, style);
@@ -143,41 +146,62 @@ void SetPointerStyleAsync(int32_t windowId, TaihePointerStyle pointerStyle)
         MMI_HILOGE("The windowId is negative number and no system applications use system API");
         taihe::set_business_error(
             COMMON_USE_SYSAPI_ERROR, "windowId is negative number and no system applications use system API");
+        histogramError(COMMON_USE_SYSAPI_ERROR);
         return;
     }
     if (ret != RET_OK) {
         taihe::set_business_error(COMMON_PARAMETER_ERROR, "Parameter error.");
+        histogramError(COMMON_PARAMETER_ERROR);
     }
+}
+
+void SetPointerStyleAsync(int32_t windowId, TaihePointerStyle pointerStyle)
+{
+    CALL_DEBUG_ENTER;
+    MMI_HISTOGRAM_BOOLEAN("InputKit.pointer.setPointerStyle.Call", true);
+    auto histogramError = [](int32_t errorCode) {
+        MMI_HISTOGRAM_ERROR("InputKit.pointer.setPointerStyle.Error", errorCode);
+    };
+    SetPointerStyle(windowId, pointerStyle, histogramError);
 }
 
 void SetPointerVisibleSyncImpl(bool visible)
 {
+    CALL_DEBUG_ENTER;
+    MMI_HISTOGRAM_BOOLEAN("InputKit.pointer.setPointerVisibleSync.Call", true);
     int32_t ret = OHOS::MMI::InputManager::GetInstance()->SetPointerVisible(visible);
     if (ret == COMMON_PARAMETER_ERROR) {
         taihe::set_business_error(ret, "failed to get default SetPointerVisible!");
+        MMI_HISTOGRAM_ERROR("InputKit.pointer.setPointerVisibleSync.Error", COMMON_PARAMETER_ERROR);
         MMI_HILOGE("failed to get default SetPointerVisible!");
     } else if (ret != RET_OK) {
         MMI_HILOGE("SetPointerVisible failed");
         taihe::set_business_error(COMMON_PARAMETER_ERROR, "Parameter error.");
+        MMI_HISTOGRAM_ERROR("InputKit.pointer.setPointerVisibleSync.Error", COMMON_PARAMETER_ERROR);
     }
 }
 
 TaihePointerStyle GetPointerStyleSyncImpl(int32_t windowId)
 {
+    CALL_DEBUG_ENTER;
+    MMI_HISTOGRAM_BOOLEAN("InputKit.pointer.getPointerStyleSync.Call", true);
     OHOS::MMI::PointerStyle pointerStyle;
     if (windowId < 0 && windowId != OHOS::MMI::GLOBAL_WINDOW_ID) {
         MMI_HILOGE("Invalid windowId");
         taihe::set_business_error(COMMON_PARAMETER_ERROR, "windowId is invalid");
+        MMI_HISTOGRAM_ERROR("InputKit.pointer.getPointerStyleSync.Error", COMMON_PARAMETER_ERROR);
         return TaihePointerStyle::key_t::DEFAULT;
     }
     int32_t ret = OHOS::MMI::InputManager::GetInstance()->GetPointerStyle(windowId, pointerStyle);
     if (ret == COMMON_PARAMETER_ERROR) {
         taihe::set_business_error(ret, "failed to get default GetPointerStyle!");
+        MMI_HISTOGRAM_ERROR("InputKit.pointer.getPointerStyleSync.Error", COMMON_PARAMETER_ERROR);
         MMI_HILOGE("failed to get default GetPointerStyle!");
         return TaihePointerStyle::key_t::DEFAULT;
     } else if (ret != RET_OK) {
         MMI_HILOGE("GetPointerStyle failed");
         taihe::set_business_error(COMMON_PARAMETER_ERROR, "Parameter error.");
+        MMI_HISTOGRAM_ERROR("InputKit.pointer.getPointerStyleSync.Error", COMMON_PARAMETER_ERROR);
         return TaihePointerStyle::key_t::DEFAULT;
     }
     return ConvertPointerStyle(pointerStyle.id);
@@ -185,25 +209,32 @@ TaihePointerStyle GetPointerStyleSyncImpl(int32_t windowId)
 
 void SetPointerStyleSyncImpl(int32_t windowId, TaihePointerStyle pointerStyle)
 {
-    return SetPointerStyleAsync(windowId, pointerStyle);
+    CALL_DEBUG_ENTER;
+    MMI_HISTOGRAM_BOOLEAN("InputKit.pointer.setPointerStyleSync.Call", true);
+    auto histogramError = [](int32_t errorCode) {
+        MMI_HISTOGRAM_ERROR("InputKit.pointer.setPointerStyleSync.Error", errorCode);
+    };
+    SetPointerStyle(windowId, pointerStyle, histogramError);
 }
 
 void SetPointerVisibleAsync(bool visible)
 {
     CALL_DEBUG_ENTER;
+    MMI_HISTOGRAM_BOOLEAN("InputKit.pointer.setPointerVisible.Call", true);
     auto errorCode = InputManager::GetInstance()->SetPointerVisible(visible);
     if (errorCode == COMMON_PARAMETER_ERROR) {
         MMI_HILOGE("failed to SetPointerVisible!");
         taihe::set_business_error(COMMON_PARAMETER_ERROR, "failed to SetPointerVisible!");
+        MMI_HISTOGRAM_ERROR("InputKit.pointer.setPointerVisible.Error", COMMON_PARAMETER_ERROR);
     } else if (errorCode != RET_OK) {
         MMI_HILOGE("SetPointerVisible failed");
         taihe::set_business_error(COMMON_PARAMETER_ERROR, "Parameter error.");
+        MMI_HISTOGRAM_ERROR("InputKit.pointer.setPointerVisible.Error", COMMON_PARAMETER_ERROR);
     }
 }
 
-void SetPointerSpeedAsync(int32_t speed)
+static void SetPointerSpeed(int32_t speed, std::function<void(int32_t)> histogramError)
 {
-    CALL_DEBUG_ENTER;
     if (speed < MIN_SPEED) {
         speed = MIN_SPEED;
     } else if (speed > MAX_SPEED) {
@@ -212,6 +243,7 @@ void SetPointerSpeedAsync(int32_t speed)
     if (!TaihePointerUtils::IsSystemApp()) {
         taihe::set_business_error(COMMON_USE_SYSAPI_ERROR,
             "Permission denied, non-system application called system api.");
+        histogramError(COMMON_USE_SYSAPI_ERROR);
         return;
     }
     auto errorCode = InputManager::GetInstance()->SetPointerSpeed(speed);
@@ -220,21 +252,34 @@ void SetPointerSpeedAsync(int32_t speed)
     }
     if (errorCode == COMMON_PARAMETER_ERROR) {
         taihe::set_business_error(COMMON_PARAMETER_ERROR, "failed to SetPointerSpeed!");
+        histogramError(COMMON_PARAMETER_ERROR);
     } else if (errorCode == COMMON_USE_SYSAPI_ERROR) {
         taihe::set_business_error(COMMON_USE_SYSAPI_ERROR,
             "Permission denied, non-system application called system api.");
+        histogramError(COMMON_USE_SYSAPI_ERROR);
     } else if (errorCode != RET_OK) {
         taihe::set_business_error(COMMON_PARAMETER_ERROR, "Parameter error.");
+        histogramError(COMMON_PARAMETER_ERROR);
     }
 }
 
-int32_t GetPointerSpeedAsync()
+void SetPointerSpeedAsync(int32_t speed)
 {
     CALL_DEBUG_ENTER;
+    MMI_HISTOGRAM_BOOLEAN("InputKit.pointer.setPointerSpeed.Call", true);
+    auto histogramError = [](int32_t errorCode) {
+        MMI_HISTOGRAM_ERROR("InputKit.pointer.setPointerSpeed.Error", errorCode);
+    };
+    SetPointerSpeed(speed, histogramError);
+}
+
+static int32_t GetPointerSpeed(std::function<void(int32_t)> histogramError)
+{
     int32_t pointerSpeed = 0;
     if (!TaihePointerUtils::IsSystemApp()) {
         taihe::set_business_error(COMMON_USE_SYSAPI_ERROR,
             "Permission denied, non-system application called system api.");
+        histogramError(COMMON_USE_SYSAPI_ERROR);
         return pointerSpeed;
     }
     auto errorCode = InputManager::GetInstance()->GetPointerSpeed(pointerSpeed);
@@ -243,18 +288,32 @@ int32_t GetPointerSpeedAsync()
     }
     if (errorCode == COMMON_PARAMETER_ERROR) {
         taihe::set_business_error(COMMON_PARAMETER_ERROR, "failed to GetPointerSpeed!");
+        histogramError(COMMON_PARAMETER_ERROR);
     } else if (errorCode == COMMON_USE_SYSAPI_ERROR) {
         taihe::set_business_error(COMMON_USE_SYSAPI_ERROR,
             "Permission denied, non-system application called system api.");
+        histogramError(COMMON_USE_SYSAPI_ERROR);
     } else if (errorCode != RET_OK) {
         taihe::set_business_error(COMMON_PARAMETER_ERROR, "Parameter error.");
+        histogramError(COMMON_PARAMETER_ERROR);
     }
     return pointerSpeed;
+}
+
+int32_t GetPointerSpeedAsync()
+{
+    CALL_DEBUG_ENTER;
+    MMI_HISTOGRAM_BOOLEAN("InputKit.pointer.getPointerSpeed.Call", true);
+    auto histogramError = [](int32_t errorCode) {
+        MMI_HISTOGRAM_ERROR("InputKit.pointer.getPointerSpeed.Error", errorCode);
+    };
+    return GetPointerSpeed(histogramError);
 }
 
 bool IsPointerVisibleAsync()
 {
     CALL_DEBUG_ENTER;
+    MMI_HISTOGRAM_BOOLEAN("InputKit.pointer.isPointerVisible.Call", true);
     bool visible = InputManager::GetInstance()->IsPointerVisible();
     return visible;
 }
@@ -262,9 +321,11 @@ bool IsPointerVisibleAsync()
 TaihePointerStyle GetPointerStyleAsync(int32_t windowId)
 {
     CALL_DEBUG_ENTER;
+    MMI_HISTOGRAM_BOOLEAN("InputKit.pointer.getPointerStyle.Call", true);
     if (windowId < 0 && windowId != OHOS::MMI::GLOBAL_WINDOW_ID) {
         MMI_HILOGE("Invalid windowid");
         taihe::set_business_error(COMMON_PARAMETER_ERROR, "Windowid is invalid");
+        MMI_HISTOGRAM_ERROR("InputKit.pointer.getPointerStyle.Error", COMMON_PARAMETER_ERROR);
         return TaihePointerStyle::key_t::DEFAULT;
     }
     OHOS::MMI::PointerStyle pointerStyle;
@@ -273,10 +334,12 @@ TaihePointerStyle GetPointerStyleAsync(int32_t windowId)
         MMI_HILOGE("WindowId is negative number and no system applications use system API");
         taihe::set_business_error(COMMON_USE_SYSAPI_ERROR,
             "WindowId is negative number and no system applications use system API");
+        MMI_HISTOGRAM_ERROR("InputKit.pointer.getPointerStyle.Error", COMMON_USE_SYSAPI_ERROR);
         return TaihePointerStyle::key_t::DEFAULT;
     } else if (errorCode != RET_OK) {
         MMI_HILOGE("GetPointerStyle failed");
         taihe::set_business_error(COMMON_PARAMETER_ERROR, "Parameter error.");
+        MMI_HISTOGRAM_ERROR("InputKit.pointer.getPointerStyle.Error", COMMON_PARAMETER_ERROR);
         return TaihePointerStyle::key_t::DEFAULT;
     }
     return ConvertPointerStyle(pointerStyle.id);
@@ -285,14 +348,17 @@ TaihePointerStyle GetPointerStyleAsync(int32_t windowId)
 bool GetTouchpadDoubleTapAndDragStateAsync()
 {
     CALL_DEBUG_ENTER;
+    MMI_HISTOGRAM_BOOLEAN("InputKit.pointer.getTouchpadDoubleTapAndDragState.Call", true);
     bool switchFlag = true;
     auto errorCode = InputManager::GetInstance()->GetTouchpadDoubleTapAndDragState(switchFlag);
     if (errorCode == COMMON_USE_SYSAPI_ERROR) {
         MMI_HILOGE("Non system applications use system API");
         taihe::set_business_error(COMMON_USE_SYSAPI_ERROR, "Non system applications use system API");
+        MMI_HISTOGRAM_ERROR("InputKit.pointer.getTouchpadDoubleTapAndDragState.Error", COMMON_USE_SYSAPI_ERROR);
     } else if (errorCode != RET_OK) {
         MMI_HILOGE("GetTouchpadDoubleTapAndDragState failed");
         taihe::set_business_error(COMMON_PARAMETER_ERROR, "Parameter error.");
+        MMI_HISTOGRAM_ERROR("InputKit.pointer.getTouchpadDoubleTapAndDragState.Error", COMMON_PARAMETER_ERROR);
     }
     return switchFlag;
 }
@@ -300,13 +366,16 @@ bool GetTouchpadDoubleTapAndDragStateAsync()
 void SetTouchpadDoubleTapAndDragStateAsync(bool isOpen)
 {
     CALL_DEBUG_ENTER;
+    MMI_HISTOGRAM_BOOLEAN("InputKit.pointer.setTouchpadDoubleTapAndDragState.Call", true);
     auto errorCode = InputManager::GetInstance()->SetTouchpadDoubleTapAndDragState(isOpen);
     if (errorCode == COMMON_USE_SYSAPI_ERROR) {
         MMI_HILOGE("Non system applications use system API");
         taihe::set_business_error(COMMON_USE_SYSAPI_ERROR, "Non system applications use system API");
+        MMI_HISTOGRAM_ERROR("InputKit.pointer.setTouchpadDoubleTapAndDragState.Error", COMMON_USE_SYSAPI_ERROR);
     } else if (errorCode != RET_OK) {
         MMI_HILOGE("SetTouchpadDoubleTapAndDragState failed");
         taihe::set_business_error(COMMON_PARAMETER_ERROR, "Parameter error.");
+        MMI_HISTOGRAM_ERROR("InputKit.pointer.setTouchpadDoubleTapAndDragState.Error", COMMON_PARAMETER_ERROR);
     }
 }
 
@@ -314,9 +383,11 @@ void SetCustomCursorSyncImpl(int32_t windowId, uintptr_t pixelMap,
     ::taihe::optional_view<int32_t> focusX, ::taihe::optional_view<int32_t> focusY)
 {
     CALL_DEBUG_ENTER;
+    MMI_HISTOGRAM_BOOLEAN("InputKit.pointer.setCustomCursorSync.Call", true);
     if (windowId < 0) {
         MMI_HILOGE("Invalid windowsId");
         taihe::set_business_error(COMMON_PARAMETER_ERROR, "windowId is invalid");
+        MMI_HISTOGRAM_ERROR("InputKit.pointer.setCustomCursorSync.Error", COMMON_PARAMETER_ERROR);
         return;
     }
     ani_object object = reinterpret_cast<ani_object>(pixelMap);
@@ -324,6 +395,7 @@ void SetCustomCursorSyncImpl(int32_t windowId, uintptr_t pixelMap,
     if (newPixelMap == nullptr) {
         MMI_HILOGE("Get pixelMap failed");
         taihe::set_business_error(COMMON_PARAMETER_ERROR, "pixelMap is invalid");
+        MMI_HISTOGRAM_ERROR("InputKit.pointer.setCustomCursorSync.Error", COMMON_PARAMETER_ERROR);
         return;
     }
     CursorFocus cursorFocus;
@@ -332,19 +404,27 @@ void SetCustomCursorSyncImpl(int32_t windowId, uintptr_t pixelMap,
     if ((cursorFocus.x == INVALID_VALUE) || (cursorFocus.y == INVALID_VALUE)) {
         MMI_HILOGE("focusX or focusY is invalid");
         taihe::set_business_error(COMMON_PARAMETER_ERROR, "focusX or focusY is invalid");
+        MMI_HISTOGRAM_ERROR("InputKit.pointer.setCustomCursorSync.Error", COMMON_PARAMETER_ERROR);
         return;
     }
-    InputManager::GetInstance()->SetCustomCursor(windowId,
+    auto errorCode = InputManager::GetInstance()->SetCustomCursor(windowId,
         (void *)newPixelMap.get(), cursorFocus.x, cursorFocus.y);
+    if (errorCode == COMMON_USE_SYSAPI_ERROR) {
+        MMI_HISTOGRAM_ERROR("InputKit.pointer.setCustomCursorSync.Error", COMMON_USE_SYSAPI_ERROR);
+    } else if (errorCode != RET_OK) {
+        MMI_HISTOGRAM_ERROR("InputKit.pointer.setCustomCursorSync.Error", COMMON_PARAMETER_ERROR);
+    }
 }
 
 void SetCustomCursorPixelMapAsync(int32_t windowId, uintptr_t pixelMap,
     ::taihe::optional_view<int32_t> focusX, ::taihe::optional_view<int32_t> focusY)
 {
     CALL_DEBUG_ENTER;
+    MMI_HISTOGRAM_BOOLEAN("InputKit.pointer.setCustomCursor.Call", true);
     if (windowId < 0) {
         MMI_HILOGE("Invalid windowsId");
         taihe::set_business_error(COMMON_PARAMETER_ERROR, "windowId is invalid");
+        MMI_HISTOGRAM_ERROR("InputKit.pointer.setCustomCursor.Error", COMMON_PARAMETER_ERROR);
         return;
     }
     ani_object object = reinterpret_cast<ani_object>(pixelMap);
@@ -352,6 +432,7 @@ void SetCustomCursorPixelMapAsync(int32_t windowId, uintptr_t pixelMap,
     if (newPixelMap == nullptr) {
         MMI_HILOGE("Get pixelMap failed");
         taihe::set_business_error(COMMON_PARAMETER_ERROR, "pixelMap is invalid");
+        MMI_HISTOGRAM_ERROR("InputKit.pointer.setCustomCursor.Error", COMMON_PARAMETER_ERROR);
         return;
     }
     CursorFocus cursorFocus;
@@ -360,6 +441,7 @@ void SetCustomCursorPixelMapAsync(int32_t windowId, uintptr_t pixelMap,
     if ((cursorFocus.x == INVALID_VALUE) || (cursorFocus.y == INVALID_VALUE)) {
         MMI_HILOGE("focusX or focusY is invalid");
         taihe::set_business_error(COMMON_PARAMETER_ERROR, "focusX or focusY is invalid");
+        MMI_HISTOGRAM_ERROR("InputKit.pointer.setCustomCursor.Error", COMMON_PARAMETER_ERROR);
         return;
     }
     auto errorCode = InputManager::GetInstance()->SetCustomCursor(windowId,
@@ -367,9 +449,11 @@ void SetCustomCursorPixelMapAsync(int32_t windowId, uintptr_t pixelMap,
     if (errorCode == COMMON_USE_SYSAPI_ERROR) {
         MMI_HILOGE("SetCustomCursor is failed");
         taihe::set_business_error(COMMON_USE_SYSAPI_ERROR, "Non system applications use system API");
+        MMI_HISTOGRAM_ERROR("InputKit.pointer.setCustomCursor.Error", COMMON_USE_SYSAPI_ERROR);
     } else if (errorCode != RET_OK) {
         MMI_HILOGE("SetCustomCursor failed");
         taihe::set_business_error(COMMON_PARAMETER_ERROR, "Parameter error.");
+        MMI_HISTOGRAM_ERROR("InputKit.pointer.setCustomCursor.Error", COMMON_PARAMETER_ERROR);
     }
 }
 
@@ -377,15 +461,18 @@ void SetCustomCursorAsync(int32_t windowId, ::ohos::multimodalInput::pointer::Cu
     ::ohos::multimodalInput::pointer::CursorConfig const& config)
 {
     CALL_DEBUG_ENTER;
+    MMI_HISTOGRAM_BOOLEAN("InputKit.pointer.setCustomCursor.Call", true);
     if (windowId < 0) {
         MMI_HILOGE("Invalid windowsId");
         taihe::set_business_error(COMMON_PARAMETER_ERROR, "windowId is invalid");
+        MMI_HISTOGRAM_ERROR("InputKit.pointer.setCustomCursor.Error", COMMON_PARAMETER_ERROR);
         return;
     }
     auto newCursor = TaihePointerUtils::ConvertToCustomCursor(cursor);
     if (!CheckCustomCursor(newCursor)) {
         MMI_HILOGE("cursor is invalid");
         taihe::set_business_error(COMMON_PARAMETER_ERROR, "cursor is invalid");
+        MMI_HISTOGRAM_ERROR("InputKit.pointer.setCustomCursor.Error", COMMON_PARAMETER_ERROR);
         return;
     }
     auto options = TaihePointerUtils::ConvertToCursorConfig(config);
@@ -398,18 +485,24 @@ void SetCustomCursorAsync(int32_t windowId, ::ohos::multimodalInput::pointer::Cu
             return;
         }
         taihe::set_business_error(errorCode, codeMsg.msg);
+        MMI_HISTOGRAM_ERROR("InputKit.pointer.setCustomCursor.Error", errorCode);
     }
 }
 
 int32_t GetPointerSpeedSyncImpl()
 {
     CALL_DEBUG_ENTER;
-    return GetPointerSpeedAsync();
+    MMI_HISTOGRAM_BOOLEAN("InputKit.pointer.getPointerSpeedSync.Call", true);
+    auto histogramError = [](int32_t errorCode) {
+        MMI_HISTOGRAM_ERROR("InputKit.pointer.getPointerSpeedSync.Error", errorCode);
+    };
+    return GetPointerSpeed(histogramError);
 }
 
 ::ohos::multimodalInput::pointer::RightClickType GetTouchpadRightClickTypeAsync()
 {
     CALL_DEBUG_ENTER;
+    MMI_HISTOGRAM_BOOLEAN("InputKit.pointer.getTouchpadRightClickType.Call", true);
     int32_t type = 1;
     auto errorCode = InputManager::GetInstance()->GetTouchpadRightClickType(type);
     ohos::multimodalInput::pointer::RightClickType clickType =
@@ -417,11 +510,14 @@ int32_t GetPointerSpeedSyncImpl()
     if (errorCode == COMMON_USE_SYSAPI_ERROR) {
         MMI_HILOGE("Non system applications use system API");
         taihe::set_business_error(COMMON_USE_SYSAPI_ERROR, "Non system applications use system API");
+        MMI_HISTOGRAM_ERROR("InputKit.pointer.getTouchpadRightClickType.Error", COMMON_USE_SYSAPI_ERROR);
     } else if (errorCode != RET_OK) {
         MMI_HILOGE("GetTouchpadRightClickType failed");
         taihe::set_business_error(COMMON_PARAMETER_ERROR, "Parameter error.");
+        MMI_HISTOGRAM_ERROR("InputKit.pointer.getTouchpadRightClickType.Error", COMMON_PARAMETER_ERROR);
     } else if (!clickType.is_valid()) {
         taihe::set_business_error(COMMON_PARAMETER_ERROR, "Parameter error.Return value invalid");
+        MMI_HISTOGRAM_ERROR("InputKit.pointer.getTouchpadRightClickType.Error", COMMON_PARAMETER_ERROR);
     }
     return clickType;
 }
@@ -429,28 +525,34 @@ int32_t GetPointerSpeedSyncImpl()
 void SetTouchpadRightClickTypeAsync(::ohos::multimodalInput::pointer::RightClickType type)
 {
     CALL_DEBUG_ENTER;
+    MMI_HISTOGRAM_BOOLEAN("InputKit.pointer.setTouchpadRightClickType.Call", true);
     int32_t clickType = static_cast<int32_t>(type);
     auto errorCode = InputManager::GetInstance()->SetTouchpadRightClickType(clickType);
     if (errorCode == COMMON_USE_SYSAPI_ERROR) {
         MMI_HILOGE("Non system applications use system API");
         taihe::set_business_error(COMMON_USE_SYSAPI_ERROR, "Non system applications use system API");
+        MMI_HISTOGRAM_ERROR("InputKit.pointer.setTouchpadRightClickType.Error", COMMON_USE_SYSAPI_ERROR);
     } else if (errorCode != RET_OK) {
         MMI_HILOGE("SetTouchpadRightClickType failed");
         taihe::set_business_error(COMMON_PARAMETER_ERROR, "Parameter error.");
+        MMI_HISTOGRAM_ERROR("InputKit.pointer.setTouchpadRightClickType.Error", COMMON_PARAMETER_ERROR);
     }
 }
 
 bool GetTouchpadSwipeSwitchAsync()
 {
     CALL_DEBUG_ENTER;
+    MMI_HISTOGRAM_BOOLEAN("InputKit.pointer.getTouchpadSwipeSwitch.Call", true);
     bool switchFlag = true;
     auto errorCode = InputManager::GetInstance()->GetTouchpadSwipeSwitch(switchFlag);
     if (errorCode == COMMON_USE_SYSAPI_ERROR) {
         MMI_HILOGE("Non system applications use system API");
         taihe::set_business_error(COMMON_USE_SYSAPI_ERROR, "Non system applications use system API");
+        MMI_HISTOGRAM_ERROR("InputKit.pointer.getTouchpadSwipeSwitch.Error", COMMON_USE_SYSAPI_ERROR);
     } else if (errorCode != RET_OK) {
         MMI_HILOGE("GetTouchpadSwipeSwitch failed");
         taihe::set_business_error(COMMON_PARAMETER_ERROR, "Parameter error.");
+        MMI_HISTOGRAM_ERROR("InputKit.pointer.getTouchpadSwipeSwitch.Error", COMMON_PARAMETER_ERROR);
     }
     return switchFlag;
 }
@@ -458,27 +560,33 @@ bool GetTouchpadSwipeSwitchAsync()
 void SetTouchpadSwipeSwitchAsync(bool state)
 {
     CALL_DEBUG_ENTER;
+    MMI_HISTOGRAM_BOOLEAN("InputKit.pointer.setTouchpadSwipeSwitch.Call", true);
     auto errorCode = InputManager::GetInstance()->SetTouchpadSwipeSwitch(state);
     if (errorCode == COMMON_USE_SYSAPI_ERROR) {
         MMI_HILOGE("Non system applications use system API");
         taihe::set_business_error(COMMON_USE_SYSAPI_ERROR, "Non system applications use system API");
+        MMI_HISTOGRAM_ERROR("InputKit.pointer.setTouchpadSwipeSwitch.Error", COMMON_USE_SYSAPI_ERROR);
     } else if (errorCode != RET_OK) {
         MMI_HILOGE("SetTouchpadSwipeSwitch failed");
         taihe::set_business_error(COMMON_PARAMETER_ERROR, "Parameter error.");
+        MMI_HISTOGRAM_ERROR("InputKit.pointer.setTouchpadSwipeSwitch.Error", COMMON_PARAMETER_ERROR);
     }
 }
 
 bool GetTouchpadPinchSwitchAsync()
 {
     CALL_DEBUG_ENTER;
+    MMI_HISTOGRAM_BOOLEAN("InputKit.pointer.getTouchpadPinchSwitch.Call", true);
     bool switchFlag = true;
     auto errorCode = InputManager::GetInstance()->GetTouchpadPinchSwitch(switchFlag);
     if (errorCode == COMMON_USE_SYSAPI_ERROR) {
         MMI_HILOGE("Non system applications use system API");
         taihe::set_business_error(COMMON_USE_SYSAPI_ERROR, "Non system applications use system API");
+        MMI_HISTOGRAM_ERROR("InputKit.pointer.getTouchpadPinchSwitch.Error", COMMON_USE_SYSAPI_ERROR);
     } else if (errorCode != RET_OK) {
         MMI_HILOGE("GetTouchpadPinchSwitch failed");
         taihe::set_business_error(COMMON_PARAMETER_ERROR, "Parameter error.");
+        MMI_HISTOGRAM_ERROR("InputKit.pointer.getTouchpadPinchSwitch.Error", COMMON_PARAMETER_ERROR);
     }
     return switchFlag;
 }
@@ -486,27 +594,33 @@ bool GetTouchpadPinchSwitchAsync()
 void SetTouchpadPinchSwitchAsync(bool state)
 {
     CALL_DEBUG_ENTER;
+    MMI_HISTOGRAM_BOOLEAN("InputKit.pointer.setTouchpadPinchSwitch.Call", true);
     auto errorCode = InputManager::GetInstance()->SetTouchpadPinchSwitch(state);
     if (errorCode == COMMON_USE_SYSAPI_ERROR) {
         MMI_HILOGE("Non system applications use system API");
         taihe::set_business_error(COMMON_USE_SYSAPI_ERROR, "Non system applications use system API");
+        MMI_HISTOGRAM_ERROR("InputKit.pointer.setTouchpadPinchSwitch.Error", COMMON_USE_SYSAPI_ERROR);
     } else if (errorCode != RET_OK) {
         MMI_HILOGE("SetTouchpadPinchSwitch failed");
         taihe::set_business_error(COMMON_PARAMETER_ERROR, "Parameter error.");
+        MMI_HISTOGRAM_ERROR("InputKit.pointer.setTouchpadPinchSwitch.Error", COMMON_PARAMETER_ERROR);
     }
 }
 
 int32_t GetTouchpadPointerSpeedAsync()
 {
     CALL_DEBUG_ENTER;
+    MMI_HISTOGRAM_BOOLEAN("InputKit.pointer.getTouchpadPointerSpeed.Call", true);
     int32_t speed = 0;
     auto errorCode = InputManager::GetInstance()->GetTouchpadPointerSpeed(speed);
     if (errorCode == COMMON_USE_SYSAPI_ERROR) {
         MMI_HILOGE("Non system applications use system API");
         taihe::set_business_error(COMMON_USE_SYSAPI_ERROR, "Non system applications use system API");
+        MMI_HISTOGRAM_ERROR("InputKit.pointer.getTouchpadPointerSpeed.Error", COMMON_USE_SYSAPI_ERROR);
     } else if (errorCode != RET_OK) {
         MMI_HILOGE("GetTouchpadPointerSpeed failed");
         taihe::set_business_error(COMMON_PARAMETER_ERROR, "Parameter error.");
+        MMI_HISTOGRAM_ERROR("InputKit.pointer.getTouchpadPointerSpeed.Error", COMMON_PARAMETER_ERROR);
     }
     return speed;
 }
@@ -514,27 +628,33 @@ int32_t GetTouchpadPointerSpeedAsync()
 void SetTouchpadPointerSpeedAsync(int32_t speed)
 {
     CALL_DEBUG_ENTER;
+    MMI_HISTOGRAM_BOOLEAN("InputKit.pointer.setTouchpadPointerSpeed.Call", true);
     auto errorCode = InputManager::GetInstance()->SetTouchpadPointerSpeed(speed);
     if (errorCode == COMMON_USE_SYSAPI_ERROR) {
         MMI_HILOGE("Non system applications use system API");
         taihe::set_business_error(COMMON_USE_SYSAPI_ERROR, "Non system applications use system API");
+        MMI_HISTOGRAM_ERROR("InputKit.pointer.setTouchpadPointerSpeed.Error", COMMON_USE_SYSAPI_ERROR);
     } else if (errorCode != RET_OK) {
         MMI_HILOGE("SetTouchpadPointerSpeed failed");
         taihe::set_business_error(COMMON_PARAMETER_ERROR, "Parameter error.");
+        MMI_HISTOGRAM_ERROR("InputKit.pointer.setTouchpadPointerSpeed.Error", COMMON_PARAMETER_ERROR);
     }
 }
 
 bool GetTouchpadTapSwitchAsync()
 {
     CALL_DEBUG_ENTER;
+    MMI_HISTOGRAM_BOOLEAN("InputKit.pointer.getTouchpadTapSwitch.Call", true);
     bool switchFlag = true;
     auto errorCode = InputManager::GetInstance()->GetTouchpadTapSwitch(switchFlag);
     if (errorCode == COMMON_USE_SYSAPI_ERROR) {
         MMI_HILOGE("Non system applications use system API");
         taihe::set_business_error(COMMON_USE_SYSAPI_ERROR, "Non system applications use system API");
+        MMI_HISTOGRAM_ERROR("InputKit.pointer.getTouchpadTapSwitch.Error", COMMON_USE_SYSAPI_ERROR);
     } else if (errorCode != RET_OK) {
         MMI_HILOGE("GetTouchpadTapSwitch failed");
         taihe::set_business_error(COMMON_PARAMETER_ERROR, "Parameter error.");
+        MMI_HISTOGRAM_ERROR("InputKit.pointer.getTouchpadTapSwitch.Error", COMMON_PARAMETER_ERROR);
     }
     return switchFlag;
 }
@@ -542,27 +662,33 @@ bool GetTouchpadTapSwitchAsync()
 void SetTouchpadTapSwitchAsync(bool state)
 {
     CALL_DEBUG_ENTER;
+    MMI_HISTOGRAM_BOOLEAN("InputKit.pointer.setTouchpadTapSwitch.Call", true);
     auto errorCode = InputManager::GetInstance()->SetTouchpadTapSwitch(state);
     if (errorCode == COMMON_USE_SYSAPI_ERROR) {
         MMI_HILOGE("Non system applications use system API");
         taihe::set_business_error(COMMON_USE_SYSAPI_ERROR, "Non system applications use system API");
+        MMI_HISTOGRAM_ERROR("InputKit.pointer.setTouchpadTapSwitch.Error", COMMON_USE_SYSAPI_ERROR);
     } else if (errorCode != RET_OK) {
         MMI_HILOGE("SetTouchpadTapSwitch failed");
         taihe::set_business_error(COMMON_PARAMETER_ERROR, "Parameter error.");
+        MMI_HISTOGRAM_ERROR("InputKit.pointer.setTouchpadTapSwitch.Error", COMMON_PARAMETER_ERROR);
     }
 }
 
 bool GetTouchpadScrollDirectionAsync()
 {
     CALL_DEBUG_ENTER;
+    MMI_HISTOGRAM_BOOLEAN("InputKit.pointer.getTouchpadScrollDirection.Call", true);
     bool state = true;
     auto errorCode = InputManager::GetInstance()->GetTouchpadScrollDirection(state);
     if (errorCode == COMMON_USE_SYSAPI_ERROR) {
         MMI_HILOGE("Non system applications use system API");
         taihe::set_business_error(COMMON_USE_SYSAPI_ERROR, "Non system applications use system API");
+        MMI_HISTOGRAM_ERROR("InputKit.pointer.getTouchpadScrollDirection.Error", COMMON_USE_SYSAPI_ERROR);
     } else if (errorCode != RET_OK) {
         MMI_HILOGE("GetTouchpadScrollDirection failed");
         taihe::set_business_error(COMMON_PARAMETER_ERROR, "Parameter error.");
+        MMI_HISTOGRAM_ERROR("InputKit.pointer.getTouchpadScrollDirection.Error", COMMON_PARAMETER_ERROR);
     }
     return state;
 }
@@ -570,27 +696,33 @@ bool GetTouchpadScrollDirectionAsync()
 void SetTouchpadScrollDirectionAsync(bool state)
 {
     CALL_DEBUG_ENTER;
+    MMI_HISTOGRAM_BOOLEAN("InputKit.pointer.setTouchpadScrollDirection.Call", true);
     auto errorCode = InputManager::GetInstance()->SetTouchpadScrollDirection(state);
     if (errorCode == COMMON_USE_SYSAPI_ERROR) {
         MMI_HILOGE("Non system applications use system API");
         taihe::set_business_error(COMMON_USE_SYSAPI_ERROR, "Non system applications use system API");
+        MMI_HISTOGRAM_ERROR("InputKit.pointer.setTouchpadScrollDirection.Error", COMMON_USE_SYSAPI_ERROR);
     } else if (errorCode != RET_OK) {
         MMI_HILOGE("SetTouchpadScrollDirection failed");
         taihe::set_business_error(COMMON_PARAMETER_ERROR, "Parameter error.");
+        MMI_HISTOGRAM_ERROR("InputKit.pointer.setTouchpadScrollDirection.Error", COMMON_PARAMETER_ERROR);
     }
 }
 
 bool GetTouchpadScrollSwitchAsync()
 {
     CALL_DEBUG_ENTER;
+    MMI_HISTOGRAM_BOOLEAN("InputKit.pointer.getTouchpadScrollSwitch.Call", true);
     bool switchFlag = true;
     auto errorCode = InputManager::GetInstance()->GetTouchpadScrollSwitch(switchFlag);
     if (errorCode == COMMON_USE_SYSAPI_ERROR) {
         MMI_HILOGE("Non system applications use system API");
         taihe::set_business_error(COMMON_USE_SYSAPI_ERROR, "Non system applications use system API");
+        MMI_HISTOGRAM_ERROR("InputKit.pointer.getTouchpadScrollSwitch.Error", COMMON_USE_SYSAPI_ERROR);
     } else if (errorCode != RET_OK) {
         MMI_HILOGE("GetTouchpadScrollSwitch failed");
         taihe::set_business_error(COMMON_PARAMETER_ERROR, "Parameter error.");
+        MMI_HISTOGRAM_ERROR("InputKit.pointer.getTouchpadScrollSwitch.Error", COMMON_PARAMETER_ERROR);
     }
     return switchFlag;
 }
@@ -598,27 +730,33 @@ bool GetTouchpadScrollSwitchAsync()
 void SetTouchpadScrollSwitchAsync(bool state)
 {
     CALL_DEBUG_ENTER;
+    MMI_HISTOGRAM_BOOLEAN("InputKit.pointer.setTouchpadScrollSwitch.Call", true);
     auto errorCode = InputManager::GetInstance()->SetTouchpadScrollSwitch(state);
     if (errorCode == COMMON_USE_SYSAPI_ERROR) {
         MMI_HILOGE("Non system applications use system API");
         taihe::set_business_error(COMMON_USE_SYSAPI_ERROR, "Non system applications use system API");
+        MMI_HISTOGRAM_ERROR("InputKit.pointer.setTouchpadScrollSwitch.Error", COMMON_USE_SYSAPI_ERROR);
     } else if (errorCode != RET_OK) {
         MMI_HILOGE("SetTouchpadScrollSwitch failed");
         taihe::set_business_error(COMMON_PARAMETER_ERROR, "Parameter error.");
+        MMI_HISTOGRAM_ERROR("InputKit.pointer.setTouchpadScrollSwitch.Error", COMMON_PARAMETER_ERROR);
     }
 }
 
 int32_t GetMouseScrollRowsAsync()
 {
     CALL_DEBUG_ENTER;
+    MMI_HISTOGRAM_BOOLEAN("InputKit.pointer.getMouseScrollRows.Call", true);
     int32_t rows = 3;
     auto errorCode = InputManager::GetInstance()->GetMouseScrollRows(rows);
     if (errorCode == COMMON_USE_SYSAPI_ERROR) {
         MMI_HILOGE("Non system applications use system API");
         taihe::set_business_error(COMMON_USE_SYSAPI_ERROR, "Non system applications use system API");
+        MMI_HISTOGRAM_ERROR("InputKit.pointer.getMouseScrollRows.Error", COMMON_USE_SYSAPI_ERROR);
     } else if (errorCode != RET_OK) {
         MMI_HILOGE("GetMouseScrollRows failed");
         taihe::set_business_error(COMMON_PARAMETER_ERROR, "Parameter error.");
+        MMI_HISTOGRAM_ERROR("InputKit.pointer.getMouseScrollRows.Error", COMMON_PARAMETER_ERROR);
     }
     return rows;
 }
@@ -626,6 +764,7 @@ int32_t GetMouseScrollRowsAsync()
 void SetMouseScrollRowsAsync(int32_t rows)
 {
     CALL_DEBUG_ENTER;
+    MMI_HISTOGRAM_BOOLEAN("InputKit.pointer.setMouseScrollRows.Call", true);
     if (rows < MIN_ROWS) {
         rows = MIN_ROWS;
     } else if (rows > MAX_ROWS) {
@@ -635,23 +774,28 @@ void SetMouseScrollRowsAsync(int32_t rows)
     if (errorCode == COMMON_USE_SYSAPI_ERROR) {
         MMI_HILOGE("Non system applications use system API");
         taihe::set_business_error(COMMON_USE_SYSAPI_ERROR, "Non system applications use system API");
+        MMI_HISTOGRAM_ERROR("InputKit.pointer.setMouseScrollRows.Error", COMMON_USE_SYSAPI_ERROR);
     } else if (errorCode != RET_OK) {
         MMI_HILOGE("SetMouseScrollRows failed");
         taihe::set_business_error(COMMON_PARAMETER_ERROR, "Parameter error.");
+        MMI_HISTOGRAM_ERROR("InputKit.pointer.setMouseScrollRows.Error", COMMON_PARAMETER_ERROR);
     }
 }
 
 bool GetHoverScrollStateAsync()
 {
     CALL_DEBUG_ENTER;
+    MMI_HISTOGRAM_BOOLEAN("InputKit.pointer.getHoverScrollState.Call", true);
     bool state = false;
     auto errorCode = InputManager::GetInstance()->GetHoverScrollState(state);
     if (errorCode == COMMON_USE_SYSAPI_ERROR) {
         MMI_HILOGE("Non system applications use system API");
         taihe::set_business_error(COMMON_USE_SYSAPI_ERROR, "Non system applications use system API");
+        MMI_HISTOGRAM_ERROR("InputKit.pointer.getHoverScrollState.Error", COMMON_USE_SYSAPI_ERROR);
     } else if (errorCode != RET_OK) {
         MMI_HILOGE("GetHoverScrollState failed");
         taihe::set_business_error(COMMON_PARAMETER_ERROR, "Parameter error.");
+        MMI_HISTOGRAM_ERROR("InputKit.pointer.getHoverScrollState.Error", COMMON_PARAMETER_ERROR);
     }
     return state;
 }
@@ -659,19 +803,23 @@ bool GetHoverScrollStateAsync()
 void SetHoverScrollStateAsync(bool state)
 {
     CALL_DEBUG_ENTER;
+    MMI_HISTOGRAM_BOOLEAN("InputKit.pointer.setHoverScrollState.Call", true);
     auto errorCode = InputManager::GetInstance()->SetHoverScrollState(state);
     if (errorCode == COMMON_USE_SYSAPI_ERROR) {
         MMI_HILOGE("Non system applications use system API");
         taihe::set_business_error(COMMON_USE_SYSAPI_ERROR, "Non system applications use system API");
+        MMI_HISTOGRAM_ERROR("InputKit.pointer.setHoverScrollState.Error", COMMON_USE_SYSAPI_ERROR);
     } else if (errorCode != RET_OK) {
         MMI_HILOGE("SetHoverScrollState failed");
         taihe::set_business_error(COMMON_PARAMETER_ERROR, "Parameter error.");
+        MMI_HISTOGRAM_ERROR("InputKit.pointer.setHoverScrollState.Error", COMMON_PARAMETER_ERROR);
     }
 }
 
 ::ohos::multimodalInput::pointer::PrimaryButton GetMousePrimaryButtonAsync()
 {
     CALL_DEBUG_ENTER;
+    MMI_HISTOGRAM_BOOLEAN("InputKit.pointer.getMousePrimaryButton.Call", true);
     int32_t primaryButton = 0;
     auto errorCode = InputManager::GetInstance()->GetMousePrimaryButton(primaryButton);
     ohos::multimodalInput::pointer::PrimaryButton button =
@@ -679,11 +827,14 @@ void SetHoverScrollStateAsync(bool state)
     if (errorCode == COMMON_USE_SYSAPI_ERROR) {
         MMI_HILOGE("Non system applications use system API");
         taihe::set_business_error(COMMON_USE_SYSAPI_ERROR, "Non system applications use system API");
+        MMI_HISTOGRAM_ERROR("InputKit.pointer.getMousePrimaryButton.Error", COMMON_USE_SYSAPI_ERROR);
     } else if (errorCode != RET_OK) {
         MMI_HILOGE("GetMousePrimaryButton failed");
         taihe::set_business_error(COMMON_PARAMETER_ERROR, "Parameter error.");
+        MMI_HISTOGRAM_ERROR("InputKit.pointer.getMousePrimaryButton.Error", COMMON_PARAMETER_ERROR);
     } else if (!button.is_valid()) {
         taihe::set_business_error(COMMON_PARAMETER_ERROR, "Parameter error.Return value invalid");
+        MMI_HISTOGRAM_ERROR("InputKit.pointer.getMousePrimaryButton.Error", COMMON_PARAMETER_ERROR);
     }
     return button;
 }
@@ -691,40 +842,46 @@ void SetHoverScrollStateAsync(bool state)
 void SetMousePrimaryButtonAsync(::ohos::multimodalInput::pointer::PrimaryButton primary)
 {
     CALL_DEBUG_ENTER;
+    MMI_HISTOGRAM_BOOLEAN("InputKit.pointer.setMousePrimaryButton.Call", true);
     int32_t primaryButton = static_cast<int32_t>(primary);
     if (primaryButton < LEFT_BUTTON || primaryButton > RIGHT_BUTTON) {
         MMI_HILOGE("Undefined mouse primary button");
         taihe::set_business_error(COMMON_PARAMETER_ERROR, "Mouse primary button does not exist");
+        MMI_HISTOGRAM_ERROR("InputKit.pointer.setMousePrimaryButton.Error", COMMON_PARAMETER_ERROR);
         return;
     }
     auto errorCode = InputManager::GetInstance()->SetMousePrimaryButton(primaryButton);
     if (errorCode == COMMON_USE_SYSAPI_ERROR) {
         MMI_HILOGE("Non system applications use system API");
         taihe::set_business_error(COMMON_USE_SYSAPI_ERROR, "Non system applications use system API");
+        MMI_HISTOGRAM_ERROR("InputKit.pointer.setMousePrimaryButton.Error", COMMON_USE_SYSAPI_ERROR);
     } else if (errorCode != RET_OK) {
         MMI_HILOGE("SetMousePrimaryButton failed");
         taihe::set_business_error(COMMON_PARAMETER_ERROR, "Parameter error.");
+        MMI_HISTOGRAM_ERROR("InputKit.pointer.setMousePrimaryButton.Error", COMMON_PARAMETER_ERROR);
     }
 }
 
 int32_t GetPointerSizeAsync()
 {
     CALL_DEBUG_ENTER;
+    MMI_HISTOGRAM_BOOLEAN("InputKit.pointer.getPointerSize.Call", true);
     int32_t size = 1;
     auto errorCode = InputManager::GetInstance()->GetPointerSize(size);
     if (errorCode == COMMON_USE_SYSAPI_ERROR) {
         MMI_HILOGE("Non system applications use system API");
         taihe::set_business_error(COMMON_USE_SYSAPI_ERROR, "Non system applications use system API");
+        MMI_HISTOGRAM_ERROR("InputKit.pointer.getPointerSize.Error", COMMON_USE_SYSAPI_ERROR);
     } else if (errorCode != RET_OK) {
         MMI_HILOGE("GetPointerSize failed");
         taihe::set_business_error(COMMON_PARAMETER_ERROR, "Parameter error.");
+        MMI_HISTOGRAM_ERROR("InputKit.pointer.getPointerSize.Error", COMMON_PARAMETER_ERROR);
     }
     return size;
 }
 
-void SetPointerSizeSyncImpl(int32_t size)
+static void SetPointerSize(int32_t size, std::function<void(int32_t)> histogramError)
 {
-    CALL_DEBUG_ENTER;
     if (size < MIN_POINTER_SIZE) {
         size = MIN_POINTER_SIZE;
     } else if (size > MAX_POINTER_SIZE) {
@@ -734,28 +891,48 @@ void SetPointerSizeSyncImpl(int32_t size)
     if (errorCode == COMMON_USE_SYSAPI_ERROR) {
         MMI_HILOGE("Non system applications use system API");
         taihe::set_business_error(COMMON_USE_SYSAPI_ERROR, "Non system applications use system API");
+        histogramError(COMMON_USE_SYSAPI_ERROR);
     } else if (errorCode != RET_OK) {
         MMI_HILOGE("SetPointerSizeSync failed");
         taihe::set_business_error(COMMON_PARAMETER_ERROR, "Parameter error.");
+        histogramError(COMMON_PARAMETER_ERROR);
     }
+}
+
+void SetPointerSizeSyncImpl(int32_t size)
+{
+    CALL_DEBUG_ENTER;
+    MMI_HISTOGRAM_BOOLEAN("InputKit.pointer.setPointerSizeSync.Call", true);
+    auto histogramError = [](int32_t errorCode) {
+        MMI_HISTOGRAM_ERROR("InputKit.pointer.setPointerSizeSync.Error", errorCode);
+    };
+    SetPointerSize(size, histogramError);
 }
 
 void SetPointerSizeAsync(int32_t size)
 {
-    SetPointerSizeSyncImpl(size);
+    CALL_DEBUG_ENTER;
+    MMI_HISTOGRAM_BOOLEAN("InputKit.pointer.setPointerSize.Call", true);
+    auto histogramError = [](int32_t errorCode) {
+        MMI_HISTOGRAM_ERROR("InputKit.pointer.setPointerSize.Error", errorCode);
+    };
+    SetPointerSize(size, histogramError);
 }
 
 int32_t GetPointerColorAsync()
 {
     CALL_DEBUG_ENTER;
+    MMI_HISTOGRAM_BOOLEAN("InputKit.pointer.getPointerColor.Call", true);
     int32_t color = 1;
     auto errorCode = InputManager::GetInstance()->GetPointerColor(color);
     if (errorCode == COMMON_USE_SYSAPI_ERROR) {
         MMI_HILOGE("Non system applications use system API");
         taihe::set_business_error(COMMON_USE_SYSAPI_ERROR, "Non system applications use system API");
+        MMI_HISTOGRAM_ERROR("InputKit.pointer.getPointerColor.Error", COMMON_USE_SYSAPI_ERROR);
     } else if (errorCode != RET_OK) {
         MMI_HILOGE("GetPointerColor failed");
         taihe::set_business_error(COMMON_PARAMETER_ERROR, "Parameter error.");
+        MMI_HISTOGRAM_ERROR("InputKit.pointer.getPointerColor.Error", COMMON_PARAMETER_ERROR);
     }
     return color;
 }
@@ -763,38 +940,49 @@ int32_t GetPointerColorAsync()
 void SetPointerColorSyncImpl(int32_t color)
 {
     CALL_DEBUG_ENTER;
+    MMI_HISTOGRAM_BOOLEAN("InputKit.pointer.setPointerColorSync.Call", true);
     auto errorCode = InputManager::GetInstance()->SetPointerColor(color);
     if (errorCode == COMMON_USE_SYSAPI_ERROR) {
         MMI_HILOGE("Non system applications use system API");
         taihe::set_business_error(COMMON_USE_SYSAPI_ERROR, "Non system applications use system API");
+        MMI_HISTOGRAM_ERROR("InputKit.pointer.setPointerColorSync.Error", COMMON_USE_SYSAPI_ERROR);
     } else if (errorCode != RET_OK) {
         MMI_HILOGE("SetPointerColorSync failed");
         taihe::set_business_error(COMMON_PARAMETER_ERROR, "Parameter error.");
+        MMI_HISTOGRAM_ERROR("InputKit.pointer.setPointerColorSync.Error", COMMON_PARAMETER_ERROR);
     }
 }
 
 void SetPointerColorAsync(int32_t color)
 {
     CALL_DEBUG_ENTER;
+    MMI_HISTOGRAM_BOOLEAN("InputKit.pointer.setPointerColor.Call", true);
     auto errorCode = InputManager::GetInstance()->SetPointerColor(color);
     if (errorCode == COMMON_USE_SYSAPI_ERROR) {
         MMI_HILOGE("Non system applications use system API");
         taihe::set_business_error(COMMON_USE_SYSAPI_ERROR, "Non system applications use system API");
+        MMI_HISTOGRAM_ERROR("InputKit.pointer.setPointerColor.Error", COMMON_USE_SYSAPI_ERROR);
     } else if (errorCode != RET_OK) {
         MMI_HILOGE("SetPointerColor failed");
         taihe::set_business_error(COMMON_PARAMETER_ERROR, "Parameter error.");
+        MMI_HISTOGRAM_ERROR("InputKit.pointer.setPointerColor.Error", COMMON_PARAMETER_ERROR);
     }
 }
 
 void SetPointerSpeedSyncImpl(int32_t speed)
 {
     CALL_DEBUG_ENTER;
-    return SetPointerSpeedAsync(speed);
+    MMI_HISTOGRAM_BOOLEAN("InputKit.pointer.setPointerSpeedSync.Call", true);
+    auto histogramError = [](int32_t errorCode) {
+        MMI_HISTOGRAM_ERROR("InputKit.pointer.setPointerSpeedSync.Error", errorCode);
+    };
+    return SetPointerSpeed(speed, histogramError);
 }
 
 bool IsPointerVisibleSyncImpl()
 {
     CALL_DEBUG_ENTER;
+    MMI_HISTOGRAM_BOOLEAN("InputKit.pointer.isPointerVisibleSync.Call", true);
     bool visible = InputManager::GetInstance()->IsPointerVisible();
     return visible;
 }
@@ -802,6 +990,7 @@ bool IsPointerVisibleSyncImpl()
 int32_t GetPointerColorSyncImpl()
 {
     CALL_DEBUG_ENTER;
+    MMI_HISTOGRAM_BOOLEAN("InputKit.pointer.getPointerColorSync.Call", true);
     int32_t color = 1;
     auto errorCode = InputManager::GetInstance()->GetPointerColor(color);
     if (errorCode != RET_OK) {
@@ -811,6 +1000,7 @@ int32_t GetPointerColorSyncImpl()
             MMI_HILOGE("Error code %{public}d not found", errorCode);
         }
         taihe::set_business_error(errorCode, codeMsg.msg);
+        MMI_HISTOGRAM_ERROR("InputKit.pointer.getPointerColorSync.Error", errorCode);
     }
     return color;
 }
@@ -818,6 +1008,7 @@ int32_t GetPointerColorSyncImpl()
 int32_t GetPointerSizeSyncImpl()
 {
     CALL_DEBUG_ENTER;
+    MMI_HISTOGRAM_BOOLEAN("InputKit.pointer.getPointerSizeSync.Call", true);
     int32_t size = 1;
     auto errorCode = InputManager::GetInstance()->GetPointerSize(size);
     if (errorCode != RET_OK) {
@@ -827,6 +1018,7 @@ int32_t GetPointerSizeSyncImpl()
             MMI_HILOGE("Error code %{public}d not found", errorCode);
         }
         taihe::set_business_error(errorCode, codeMsg.msg);
+        MMI_HISTOGRAM_ERROR("InputKit.pointer.getPointerSizeSync.Error", errorCode);
     }
     return size;
 }
@@ -834,20 +1026,25 @@ int32_t GetPointerSizeSyncImpl()
 bool GetMouseScrollDirectionAsync()
 {
     CALL_DEBUG_ENTER;
+    MMI_HISTOGRAM_BOOLEAN("InputKit.pointer.getMouseScrollDirection.Call", true);
     bool state = true;
     auto errorCode = InputManager::GetInstance()->GetMouseScrollDirection(state);
     if (errorCode == COMMON_USE_SYSAPI_ERROR) {
         MMI_HILOGE("Non system applications use system API");
         taihe::set_business_error(COMMON_USE_SYSAPI_ERROR, "Non system applications use system API");
+        MMI_HISTOGRAM_ERROR("InputKit.pointer.getMouseScrollDirection.Error", COMMON_USE_SYSAPI_ERROR);
     } else if (errorCode == -COMMON_PERMISSION_CHECK_ERROR) {
         MMI_HILOGE("Permission denied");
         taihe::set_business_error(COMMON_PERMISSION_CHECK_ERROR, "Permission denied.");
+        MMI_HISTOGRAM_ERROR("InputKit.pointer.getMouseScrollDirection.Error", COMMON_PERMISSION_CHECK_ERROR);
     } else if (errorCode < RET_OK) {
         MMI_HILOGE("Input Service Exception");
         taihe::set_business_error(INPUT_SERVICE_EXCEPTION, "Input Service Exception.");
+        MMI_HISTOGRAM_ERROR("InputKit.pointer.getMouseScrollDirection.Error", INPUT_SERVICE_EXCEPTION);
     } else if (errorCode != RET_OK) {
         MMI_HILOGE("GetMouseScrollDirection failed");
         taihe::set_business_error(COMMON_PARAMETER_ERROR, "Parameter error.");
+        MMI_HISTOGRAM_ERROR("InputKit.pointer.getMouseScrollDirection.Error", COMMON_PARAMETER_ERROR);
     }
     return state;
 }
@@ -855,19 +1052,24 @@ bool GetMouseScrollDirectionAsync()
 void SetMouseScrollDirectionAsync(bool state)
 {
     CALL_DEBUG_ENTER;
+    MMI_HISTOGRAM_BOOLEAN("InputKit.pointer.setMouseScrollDirection.Call", true);
     auto errorCode = InputManager::GetInstance()->SetMouseScrollDirection(state);
     if (errorCode == COMMON_USE_SYSAPI_ERROR) {
         MMI_HILOGE("Non system applications use system API");
         taihe::set_business_error(COMMON_USE_SYSAPI_ERROR, "Non system applications use system API");
+        MMI_HISTOGRAM_ERROR("InputKit.pointer.setMouseScrollDirection.Error", COMMON_USE_SYSAPI_ERROR);
     } else if (errorCode == -COMMON_PERMISSION_CHECK_ERROR) {
         MMI_HILOGE("Permission denied");
         taihe::set_business_error(COMMON_PERMISSION_CHECK_ERROR, "Permission denied.");
+        MMI_HISTOGRAM_ERROR("InputKit.pointer.setMouseScrollDirection.Error", COMMON_PERMISSION_CHECK_ERROR);
     } else if (errorCode < RET_OK) {
         MMI_HILOGE("Input Service Exception");
         taihe::set_business_error(INPUT_SERVICE_EXCEPTION, "Input Service Exception.");
+        MMI_HISTOGRAM_ERROR("InputKit.pointer.setMouseScrollDirection.Error", INPUT_SERVICE_EXCEPTION);
     } else if (errorCode != RET_OK) {
         MMI_HILOGE("SetMouseScrollDirection failed");
         taihe::set_business_error(COMMON_PARAMETER_ERROR, "Parameter error.");
+        MMI_HISTOGRAM_ERROR("InputKit.pointer.setMouseScrollDirection.Error", COMMON_PARAMETER_ERROR);
     }
 }
 } // namespace
