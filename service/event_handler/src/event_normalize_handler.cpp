@@ -559,8 +559,9 @@ int32_t EventNormalizeHandler::HandleKeyboardEvent(libinput_event* event)
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
 void EventNormalizeHandler::UpdateKeyEventHandlerChain(const std::shared_ptr<KeyEvent> keyEvent)
 {
-    CALL_DEBUG_ENTER;
     CHKPV(keyEvent);
+    MMI_HILOGD("Handle event (KC:%{private}d, KA:%{public}d, KEYS:%{private}s)",
+        keyEvent->GetKeyCode(), keyEvent->GetKeyAction(), DumpVec(keyEvent->GetPressedKeys()).c_str());
     WIN_MGR->HandleKeyEventWindowId(keyEvent);
     currentHandleKeyCode_ = keyEvent->GetKeyCode();
 

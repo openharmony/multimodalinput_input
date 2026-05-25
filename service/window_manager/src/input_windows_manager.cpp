@@ -358,13 +358,11 @@ const std::vector<WindowInfo>& InputWindowsManager::GetWindowGroupInfoByDisplayI
         const auto& windoInfo = GetWindowInfoVector(groupId);
         return windoInfo;
     }
-    std::map<int32_t, WindowGroupInfo>& windowsPerDisplay =
-        const_cast<std::map<int32_t, WindowGroupInfo> &>(windowsPerDisplay_);
 
-    const auto& iter = windowsPerDisplayMap_.find(groupId);
-    windowsPerDisplay = (iter != windowsPerDisplayMap_.end()) ? iter->second : windowsPerDisplay_;
-    const auto& it = windowsPerDisplay.find(displayId);
-    if (it == windowsPerDisplay.end()) {
+    auto iter = windowsPerDisplayMap_.find(groupId);
+    auto windowsPerDisplay = (iter != windowsPerDisplayMap_.end() ? &iter->second : &windowsPerDisplay_);
+    auto it = windowsPerDisplay->find(displayId);
+    if (it == windowsPerDisplay->cend()) {
         MMI_HILOGD("GetWindowInfo displayId:%{public}d is null from windowGroupInfo_", displayId);
         const auto& windoInfo = GetWindowInfoVector(groupId);
         return windoInfo;
@@ -730,19 +728,18 @@ std::vector<std::pair<int32_t, TargetInfo>> InputWindowsManager::UpdateTarget(st
     }
     auto secSubWindows = GetPidAndUpdateTarget(keyEvent);
     for (const auto &item : secSubWindows) {
-        int32_t fd = INVALID_FD;
         int32_t agentPid = item.first;
         if (agentPid <= 0) {
             MMI_HILOG_DISPATCHE("Invalid agentPid:%{public}d", agentPid);
             continue;
         }
         CHKPC(udsServer_);
-        fd = udsServer_->GetClientFd(agentPid);
+        auto fd = udsServer_->GetClientFd(agentPid);
         if (fd < 0) {
             MMI_HILOG_DISPATCHE("The windowAgentPid:%{public}d matching fd:%{public}d is invalid", agentPid, fd);
             continue;
         }
-        secSubWindowTargets.emplace_back(std::make_pair(fd, item.second));
+        secSubWindowTargets.emplace_back(fd, item.second);
     }
     return secSubWindowTargets;
 }
@@ -870,7 +867,6 @@ int32_t InputWindowsManager::GetClientFd(std::shared_ptr<PointerEvent> pointerEv
 std::vector<std::pair<int32_t, TargetInfo>> InputWindowsManager::GetPidAndUpdateTarget(
     std::shared_ptr<KeyEvent> keyEvent)
 {
-    CALL_DEBUG_ENTER;
     std::vector<std::pair<int32_t, TargetInfo>> secSubWindows;
     if (keyEvent == nullptr) {
         MMI_HILOG_DISPATCHE("keyEvent is nullptr");
@@ -879,8 +875,8 @@ std::vector<std::pair<int32_t, TargetInfo>> InputWindowsManager::GetPidAndUpdate
     int32_t groupId = FindDisplayGroupId(keyEvent->GetTargetDisplayId());
     const int32_t focusWindowId = GetFocusWindowId(groupId);
     UpdateKeyEventDisplayId(keyEvent, focusWindowId, groupId);
-    WindowInfo* windowInfo = nullptr;
-    std::vector<WindowInfo> windowsInfo = GetWindowGroupInfoByDisplayId(keyEvent->GetTargetDisplayId());
+    const WindowInfo* windowInfo = nullptr;
+    const auto &windowsInfo = GetWindowGroupInfoByDisplayId(keyEvent->GetTargetDisplayId());
     bool isUIExtention = false;
     auto iter = windowsInfo.begin();
     for (; iter != windowsInfo.end(); ++iter) {
@@ -906,7 +902,7 @@ std::vector<std::pair<int32_t, TargetInfo>> InputWindowsManager::GetPidAndUpdate
     }
 #endif // OHOS_BUILD_ENABLE_ANCO
     TargetInfo targetInfo = { windowInfo->privacyMode, windowInfo->id, windowInfo->agentWindowId };
-    secSubWindows.emplace_back(std::make_pair(windowInfo->agentPid, targetInfo));
+    secSubWindows.emplace_back(windowInfo->agentPid, targetInfo);
     if (isUIExtention) {
         for (const auto &item : iter->uiExtentionWindowInfo) {
             if (item.privacyUIFlag) {
@@ -914,7 +910,7 @@ std::vector<std::pair<int32_t, TargetInfo>> InputWindowsManager::GetPidAndUpdate
                 targetInfo.privacyMode = item.privacyMode;
                 targetInfo.id = item.id;
                 targetInfo.agentWindowId = item.agentWindowId;
-                secSubWindows.emplace_back(std::make_pair(item.agentPid, targetInfo));
+                secSubWindows.emplace_back(item.agentPid, targetInfo);
             }
         }
     }
@@ -8375,7 +8371,6 @@ bool InputWindowsManager::IsKeyPressed(int32_t pressedKey, std::vector<KeyEvent:
 
 bool InputWindowsManager::IsOnTheWhitelist(std::shared_ptr<KeyEvent> keyEvent)
 {
-    CALL_DEBUG_ENTER;
     CHKPF(keyEvent);
     for (const auto &item : vecWhiteList_) {
         if (item.keyCode == keyEvent->GetKeyCode()) {
@@ -8508,13 +8503,12 @@ void InputWindowsManager::UpdateKeyEventDisplayId(std::shared_ptr<KeyEvent> keyE
 {
     CHKPV(keyEvent);
     bool hasFound = false;
-    std::map<int32_t, WindowGroupInfo> windowsPerDisplayTmp = windowsPerDisplay_;
+    auto windowsPerDisplayTmp = &windowsPerDisplay_;
     const auto iter = windowsPerDisplayMap_.find(groupId);
     if (iter != windowsPerDisplayMap_.end()) {
-        windowsPerDisplayTmp = iter->second;
+        windowsPerDisplayTmp = &iter->second;
     }
-    for (const auto &item : windowsPerDisplayTmp) {
-
+    for (const auto &item : *windowsPerDisplayTmp) {
         if (item.second.focusWindowId == focusWindowId) {
             keyEvent->SetTargetDisplayId(item.second.displayId);
             hasFound = true;

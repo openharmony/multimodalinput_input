@@ -1116,7 +1116,6 @@ int32_t InputDeviceManager::FindInputDeviceId(struct libinput_device *inputDevic
 struct libinput_device *InputDeviceManager::GetKeyboardDevice() const
 {
     // LCOV_EXCL_START
-    CALL_DEBUG_ENTER;
     std::vector<int32_t> keyCodes;
     keyCodes.push_back(KeyEvent::KEYCODE_Q);
     keyCodes.push_back(KeyEvent::KEYCODE_NUMPAD_1);

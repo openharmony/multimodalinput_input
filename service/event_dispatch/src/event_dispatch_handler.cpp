@@ -577,7 +577,6 @@ void EventDispatchHandler::DispatchPointerEventInner(std::shared_ptr<PointerEven
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
 int32_t EventDispatchHandler::DispatchKeyEventPid(UDSServer& udsServer, std::shared_ptr<KeyEvent> key)
 {
-    CALL_DEBUG_ENTER;
     CHKPR(key, PARAM_INPUT_INVALID);
     int32_t ret = RET_OK;
     // 1.Determine whether the key event is a focus type event or an operation type event,
@@ -597,7 +596,6 @@ int32_t EventDispatchHandler::DispatchKeyEventPid(UDSServer& udsServer, std::sha
 
 int32_t EventDispatchHandler::DispatchKeyEvent(int32_t fd, UDSServer& udsServer, std::shared_ptr<KeyEvent> key)
 {
-    CALL_DEBUG_ENTER;
     CHKPR(key, PARAM_INPUT_INVALID);
     currentTime_ = key->GetActionTime();
     if (fd < 0 && currentTime_ - eventTime_ > INTERVAL_TIME) {

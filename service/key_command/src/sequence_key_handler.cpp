@@ -77,7 +77,6 @@ bool SequenceKeyHandler::HandleSequences(const std::shared_ptr<KeyEvent> keyEven
     }
 
     if (filterSequences_.empty()) {
-        MMI_HILOGD("No sequences matched");
         keys_.clear();
         return false;
     }
@@ -148,12 +147,10 @@ bool SequenceKeyHandler::HandleSequence(Sequence& sequence, bool &isLaunchAbilit
     }
     for (size_t i = 0; i < keysSize; ++i) {
         if (keys_[i] != sequence.sequenceKeys[i]) {
-            MMI_HILOGD("KeyAction not matching");
             return false;
         }
         int64_t delay = sequence.sequenceKeys[i].delay;
         if (((i + 1) != keysSize) && (delay != 0) && (keys_[i].delay >= delay)) {
-            MMI_HILOGD("Delay is not matching");
             return false;
         }
     }

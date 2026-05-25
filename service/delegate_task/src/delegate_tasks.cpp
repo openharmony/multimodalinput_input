@@ -88,7 +88,6 @@ bool DelegateTasks::Init()
 
 void DelegateTasks::ProcessTasks()
 {
-    CALL_DEBUG_ENTER;
     std::vector<TaskPtr> tasks;
     PopPendingTaskList(tasks);
     size_t count = tasks.size();
@@ -108,12 +107,10 @@ void DelegateTasks::ProcessTasks()
     if (res == -1) {
         MMI_HILOGW("Read failed erron:%{public}d", errno);
     }
-    MMI_HILOGD("count:%{public}zu", count);
 }
 
 int32_t DelegateTasks::PostSyncTask(DTaskCallback callback)
 {
-    CALL_DEBUG_ENTER;
     CHKPR(callback, ERROR_NULL_POINTER);
     if (IsCallFromWorkerThread()) {
         return callback();

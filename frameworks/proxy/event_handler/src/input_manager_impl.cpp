@@ -619,7 +619,6 @@ void InputManagerImpl::OnKeyEventTask(std::shared_ptr<IInputEventConsumer> consu
 
 void InputManagerImpl::OnKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
 {
-    CALL_INFO_TRACE;
     CHK_PID_AND_TID();
     CHKPV(keyEvent);
     std::shared_ptr<AppExecFwk::EventHandler> eventHandler = nullptr;
@@ -655,7 +654,6 @@ void InputManagerImpl::OnKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
         inputConsumer->OnInputEvent(keyEvent);
         BytraceAdapter::StopConsumer();
         MarkLastProcessed(keyEvent->GetId());
-        MMI_HILOG_DISPATCHD("Key event report keyCode:%{private}d", keyEvent->GetKeyCode());
     }
     MMI_HILOG_DISPATCHD("Key event keyCode:%{private}d", keyEvent->GetKeyCode());
 }
@@ -732,7 +730,6 @@ void InputManagerImpl::OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent
 
 void InputManagerImpl::MarkLastDispatched(int32_t eventId)
 {
-    CALL_DEBUG_ENTER;
     ANRHDL->SetLastDispatchedEventId(eventId);
 }
 

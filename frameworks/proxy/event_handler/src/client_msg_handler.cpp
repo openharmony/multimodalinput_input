@@ -333,10 +333,9 @@ int32_t ClientMsgHandler::OnSubscribeKeyEventCallback(const UDSClient &client, N
     } else {
         MMI_HILOGD("Subscribe:%{public}d,Fd:%{public}d,KeyEvent:%{public}d,"
             "KeyCode:%{private}d,ActionTime:%{public}" PRId64 ",ActionStartTime:%{public}" PRId64 ","
-            "Action:%{public}d,KeyAction:%{public}d,EventType:%{public}d,Flag:%{public}u",
+            "KeyAction:%{public}d,Flag:%{public}u",
         subscribeId, fd, keyEvent->GetId(), keyEvent->GetKeyCode(), keyEvent->GetActionTime(),
-        keyEvent->GetActionStartTime(), keyEvent->GetAction(), keyEvent->GetKeyAction(),
-        keyEvent->GetEventType(), keyEvent->GetFlag());
+        keyEvent->GetActionStartTime(), keyEvent->GetKeyAction(), keyEvent->GetFlag());
     }
 
     BytraceAdapter::StartBytrace(keyEvent, BytraceAdapter::TRACE_START, BytraceAdapter::KEY_SUBSCRIBE_EVENT);
@@ -505,7 +504,6 @@ int32_t ClientMsgHandler::ReportPointerEvent(const UDSClient& client, NetPacket&
 
 void ClientMsgHandler::OnDispatchEventProcessed(int32_t eventId, int64_t actionTime)
 {
-    CALL_DEBUG_ENTER;
     ANRHDL->SetLastProcessedEventId(ANR_DISPATCH, eventId, actionTime);
 }
 

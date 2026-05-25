@@ -1266,7 +1266,7 @@ void DfxHisysevent::ReportFailHandleKey(std::string name, int32_t keyCode, int32
         "KEY_CODE", keyCode,
         "ERROR_CODE", errorCode);
     if (ret != 0) {
-        MMI_HILOGE("HiviewDFX Write failed, ret:%{public}d", ret);
+        MMI_HILOGE("HiviewDFX Write failed, name:KEY_EVENT_FAULT-%{private}s, ret:%{public}d", name.c_str(), ret);
     }
 }
 
