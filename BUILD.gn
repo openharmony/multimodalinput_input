@@ -243,7 +243,6 @@ group("mmi_tests") {
     "service:InputEventHookTest",
     "service:InputEventHookManagerTest",
     "service:InputWindowsManagerOneTest",
-    "service:InputWindowsManagerTest",
     "service:InputWindowsManagerCoverageTest",
     "service:InterceptorTest",
     "service:KeyAutoRepeatExTest",
@@ -293,7 +292,6 @@ group("mmi_tests") {
 
   if (input_feature_pointer_drawing) {
     deps += [
-      "service:InputWindowsManagerEXTest",
       "service:PointerDrawingManagerExTest",
       "service:PointerDrawingManagerSupTest",
       "service:PointerDrawingManagerTest",

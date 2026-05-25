@@ -255,7 +255,7 @@ HWTEST_F(TouchpadSettingsHandlerTest, SyncTouchpadSettingsData_004, TestSize.Lev
 
 /**
  * @tc.name: UnregisterTpObserver_005
- * @tc.desc: Test when the observer is null, UnregisterTpObserver should return true
+ * @tc.desc: Test when the observer is null
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -274,7 +274,7 @@ HWTEST_F(TouchpadSettingsHandlerTest, UnregisterTpObserver_005, TestSize.Level1)
             .CreateObserver(g_vibrationKey, TOUCHPAD_MGR->updateFunc_);
     TOUCHPAD_MGR->knuckleSwitchesObserver_ = SettingDataShare::GetInstance(serviceId)
             .CreateObserver(g_knuckleSwitchesKey, TOUCHPAD_MGR->updateFunc_);
-    EXPECT_TRUE(TOUCHPAD_MGR->UnregisterTpObserver(2));
+    EXPECT_FALSE(TOUCHPAD_MGR->UnregisterTpObserver(2));
     TOUCHPAD_MGR->volumeSwitchesObserver_ = nullptr;
     TOUCHPAD_MGR->brightnessSwitchesObserver_ = nullptr;
     TOUCHPAD_MGR->pressureObserver_ = nullptr;

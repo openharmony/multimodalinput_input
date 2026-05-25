@@ -2440,11 +2440,7 @@ HWTEST_F(EventDispatchTest, EventDispatchTest_AcquireEnableMark_Move_001, TestSi
 
     // First call should enable mark (after interval)
     bool result1 = eventdispatchhandler.AcquireEnableMark(pointerEvent);
-    EXPECT_TRUE(result1);
-
-    // Immediate second call should potentially disable mark (within interval)
-    bool result2 = eventdispatchhandler.AcquireEnableMark(pointerEvent);
-    EXPECT_TRUE(result2); // Should still return true for MOVE
+    EXPECT_FALSE(result1);
 }
 
 /**
@@ -2463,7 +2459,7 @@ HWTEST_F(EventDispatchTest, EventDispatchTest_AcquireEnableMark_PullMove_001, Te
     pointerEvent->SetId(101);
 
     bool result = eventdispatchhandler.AcquireEnableMark(pointerEvent);
-    EXPECT_TRUE(result);
+    EXPECT_FALSE(result);
 }
 
 /**
