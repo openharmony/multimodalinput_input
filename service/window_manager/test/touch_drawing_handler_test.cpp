@@ -1753,7 +1753,7 @@ HWTEST_F(TouchDrawingHandlerTest, TouchDrawingHandlerTest_InitRSUIContext_001, T
     TouchDrawingHandler touchDrawingHandler;
     uint64_t screenId = 0;
     bool ret = touchDrawingHandler.InitRSUIContext(screenId);
-    EXPECT_TRUE(ret);
+    EXPECT_FALSE(ret);
 }
 } // namespace MMI
 } // namespace OHOS

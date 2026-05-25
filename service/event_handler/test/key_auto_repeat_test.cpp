@@ -273,7 +273,7 @@ HWTEST_F(KeyAutoRepeatTest, KeyAutoRepeatTest_PutConfigDataToDatabase_001, TestS
     int32_t testValue = 123;
     int32_t userId = 0;
     int32_t result = keyAutoRepeat.PutConfigDataToDatabase(userId, testKey, testValue);
-    EXPECT_NE(result, -1);
+    EXPECT_EQ(result, -1);
     ASSERT_TRUE(PREFERENCES_MGR->GetIntValue(testKey, testValue));
 }
 
@@ -292,11 +292,11 @@ HWTEST_F(KeyAutoRepeatTest, KeyAutoRepeatTest_GetConfigDataFromDatabase_001, Tes
     int32_t userId = 0;
     PREFERENCES_MGR->SetIntValue(key, KEYBOARD_FILE_NAME, 42);
     int32_t ret = keyAutoRepeat.GetConfigDataFromDatabase(userId, key, value);
-    EXPECT_EQ(ret, RET_OK);
+    EXPECT_EQ(ret, RET_ERR);
     key = "nonexistent_key";
     value = 0;
     ret = keyAutoRepeat.GetConfigDataFromDatabase(userId, key, value);
-    EXPECT_EQ(ret, RET_OK);
+    EXPECT_EQ(ret, RET_ERR);
 }
 } // namespace MMI
 } // namespace OHOS

@@ -143,7 +143,6 @@ public:
 
     void TearDown(void)
     {
-        AccountManager::GetInstance()->AccountManagerUnregister();
         int32_t userId = 100;
         WIN_MGR->SetHoverScrollState(userId, preHoverScrollState_);
     }

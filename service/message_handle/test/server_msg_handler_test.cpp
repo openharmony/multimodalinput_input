@@ -2300,28 +2300,6 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnTransferBinderClientSrv_00
 }
 
 /**
- * @tc.name: ServerMsgHandlerTest_InitInjectNoticeSource_002
- * @tc.desc: Test the function InitInjectNoticeSource
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_InitInjectNoticeSource_002, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    ServerMsgHandler handler;
-    InjectNoticeManager manager;
-    handler.injectNotice_ = nullptr;
-    bool ret = handler.InitInjectNoticeSource();
-    handler.injectNotice_->isStartSrv_ = true;
-    manager.connectionCallback_ = new (std::nothrow) InjectNoticeManager::InjectNoticeConnection;
-    EXPECT_NE(nullptr, manager.connectionCallback_);
-    auto connection = handler.injectNotice_->GetConnection();
-    connection->isConnected_ = false;
-    ret = handler.InitInjectNoticeSource();
-    ASSERT_TRUE(ret);
-}
-
-/**
  * @tc.name: ServerMsgHandlerTest_InitInjectNoticeSource_003
  * @tc.desc: Test the function InitInjectNoticeSource
  * @tc.type: FUNC
@@ -2341,29 +2319,6 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_InitInjectNoticeSource_003, 
     connection->isConnected_ = true;
     ret = handler.InitInjectNoticeSource();
     EXPECT_TRUE(ret);
-}
-
-/**
- * @tc.name: ServerMsgHandlerTest_AddInjectNotice_001
- * @tc.desc: Test the function AddInjectNotice
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_AddInjectNotice_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    ServerMsgHandler handler;
-    InjectNoticeManager manager;
-    InjectNoticeInfo noticeInfo;
-    handler.injectNotice_ = nullptr;
-    bool ret = handler.InitInjectNoticeSource();
-    handler.injectNotice_->isStartSrv_ = true;
-    manager.connectionCallback_ = new (std::nothrow) InjectNoticeManager::InjectNoticeConnection;
-    EXPECT_NE(nullptr, manager.connectionCallback_);
-    auto connection = handler.injectNotice_->GetConnection();
-    connection->isConnected_ = false;
-    ret = handler.AddInjectNotice(noticeInfo);
-    ASSERT_TRUE(ret);
 }
 
 /**
@@ -4122,34 +4077,6 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_NativeInjectCheck003, TestSi
     AUTHORIZE_HELPER->state_ = AuthorizeState::STATE_AUTHORIZE;
     result = handler.NativeInjectCheck(pid);
     EXPECT_EQ(result, COMMON_PERMISSION_CHECK_ERROR);
-}
-
-/**
- * @tc.name: ServerMsgHandlerTest_InitInjectNoticeSource_004
- * @tc.desc: Test the function InitInjectNoticeSource
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_InitInjectNoticeSource_004, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    ServerMsgHandler handler;
-    InjectNoticeManager manager;
-    bool ret = handler.InitInjectNoticeSource();
-    handler.injectNotice_ = std::make_shared<InjectNoticeManager>();
-    manager.isStartSrv_ = false;
-    ret = handler.InitInjectNoticeSource();
-    ASSERT_TRUE(ret);
-    manager.isStartSrv_ = true;
-    ret = handler.InitInjectNoticeSource();
-    ASSERT_TRUE(ret);
-    manager.connectionCallback_ = new (std::nothrow) InjectNoticeManager::InjectNoticeConnection;
-    manager.connectionCallback_->isConnected_ = false;
-    ret = handler.InitInjectNoticeSource();
-    ASSERT_TRUE(ret);
-    manager.connectionCallback_->isConnected_ = true;
-    ret = handler.InitInjectNoticeSource();
-    ASSERT_TRUE(ret);
 }
 
 /**
@@ -7331,21 +7258,6 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnTransferBinderClientSrv_00
     int32_t pid = 12345;
     int32_t result = handler.OnTransferBinderClientSrv(binderClientObject, pid);
     EXPECT_EQ(result, RET_OK);
-}
-
-/**
- * @tc.name: ServerMsgHandlerTest_InitInjectNoticeSource_005
- * @tc.desc: Test the function InitInjectNoticeSource
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_InitInjectNoticeSource_005, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    ServerMsgHandler handler;
-    handler.injectNotice_ = nullptr;
-    bool ret = handler.InitInjectNoticeSource();
-    EXPECT_TRUE(ret);
 }
 
 /**

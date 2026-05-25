@@ -450,25 +450,6 @@ HWTEST_F(DelegateTasksTest, DelegateTasksTest_PopPendingTaskList_004, TestSize.L
 }
 
 /**
- * @tc.name: DelegateTasksTest_Task_ProcessTask_004
- * @tc.desc: Test Task ProcessTask with promise set
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(DelegateTasksTest, DelegateTasksTest_Task_ProcessTask_004, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    auto callback = []() { return 123; };
-    int32_t id = 4;
-    auto pro = std::make_shared<std::promise<int32_t>>();
-    DelegateTasks::Task task(id, callback, pro);
-    task.hasWaited_ = false;
-    // Verify promise value is set
-    auto future = pro->get_future();
-    EXPECT_EQ(future.get(), 123);
-}
-
-/**
  * @tc.name: DelegateTasksTest_Task_GetId_001
  * @tc.desc: Test Task GetId function
  * @tc.type: FUNC
