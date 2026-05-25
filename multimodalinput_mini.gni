@@ -62,7 +62,7 @@ declare_args() {
   input_feature_watch_cfg_source = false
   input_feature_upgrade_skia = false
   input_feature_mistouch_prevention = false
-  input_feature_input_event_hook = true
+  input_feature_input_event_hook = false
   input_feature_external_screen = true
   input_ext_feature_anco_game_event_mapping = false
   input_feature_drag_security = false
