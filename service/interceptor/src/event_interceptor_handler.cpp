@@ -326,6 +326,7 @@ bool EventInterceptorHandler::InterceptorCollection::HandleEvent(std::shared_ptr
         }
         if ((interceptor.eventType_ & HANDLE_EVENT_TYPE_POINTER) == HANDLE_EVENT_TYPE_POINTER) {
             if (!interceptor.eventIntegrity_.IsCompleteEvent(pointerEvent)) {
+                MMI_HILOGW("Do not intercept incomplete pointer events");
                 continue;
             }
             interceptor.SendToClient(pointerEvent);
