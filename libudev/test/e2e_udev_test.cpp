@@ -102,7 +102,6 @@ public:
 HWTEST_F(E2eUdevTest, TestUdevPropsDefault, TestSize.Level1)
 {
     ASSERT_NO_FATAL_FAILURE(testDevice_.Init());
-
     auto res = inputManager_->GetDevice(listener_->deviceId_, [](std::shared_ptr<OHOS::MMI::InputDevice> dev) {
         EXPECT_EQ(dev->GetName(), TestDevice::TEST_NAME);
         EXPECT_EQ(dev->GetBus(), TestDevice::TEST_BUS);
@@ -110,6 +109,7 @@ HWTEST_F(E2eUdevTest, TestUdevPropsDefault, TestSize.Level1)
         EXPECT_EQ(dev->GetProduct(), TestDevice::TEST_PRODUCT);
         EXPECT_EQ(dev->GetCapabilities(), 1ULL << OHOS::MMI::INPUT_DEV_CAP_POINTER);
     });
+    EXPECT_NE(res, 0);
 }
 
 HWTEST_F(E2eUdevTest, TestUdevPropsKey, TestSize.Level1)

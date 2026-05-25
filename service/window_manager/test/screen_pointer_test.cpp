@@ -592,7 +592,7 @@ HWTEST_F(ScreenPointerTest, ScreenPointerTest_GetCommonBuffer_001, TestSize.Leve
     ASSERT_NE(screenpointer, nullptr);
     PointerRenderer renderer;
     ASSERT_FALSE(screenpointer->Init(renderer));
- 	screenpointer->GetCommonBuffer();
+    screenpointer->GetCommonBuffer();
     delete screenpointer;
 }
 
@@ -613,9 +613,9 @@ HWTEST_F(ScreenPointerTest, ScreenPointerTest_GetCurrentBuffer_001, TestSize.Lev
     ASSERT_NE(screenpointer, nullptr);
     PointerRenderer renderer;
     ASSERT_FALSE(screenpointer->Init(renderer));
- 	screenpointer->GetCurrentBuffer();
- 	screenpointer->GetTransparentBuffer();
- 	screenpointer->GetCurrentBuffer();
+    screenpointer->GetCurrentBuffer();
+    screenpointer->GetTransparentBuffer();
+    screenpointer->GetCurrentBuffer();
     delete screenpointer;
 }
 
@@ -678,7 +678,7 @@ HWTEST_F(ScreenPointerTest, ScreenPointerTest_RequestBuffer_002, TestSize.Level1
     }
     bool isCommoBuffer;
     screenpointer->IsDefaultCfg(defaultCursorCfg);
- 	screenpointer->RequestBuffer(defaultCursorCfg, isCommoBuffer);
+    screenpointer->RequestBuffer(defaultCursorCfg, isCommoBuffer);
     delete screenpointer;
 }
 
