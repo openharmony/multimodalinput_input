@@ -1665,43 +1665,11 @@ static void KeyEventHookCallback(std::shared_ptr<OHOS::MMI::KeyEvent> event)
     OH_Input_DestroyKeyEvent(&keyEvent);
 }
 
-static bool IsScreenCaptureWorking()
-{
-    CALL_DEBUG_ENTER;
-#ifdef PLAYER_FRAMEWORK_EXISTS
-    int32_t pid = OHOS::IPCSkeleton::GetCallingPid();
-    auto* monitor = OHOS::Media::ScreenCaptureMonitor::GetInstance();
-    if (monitor == nullptr) {
-        MMI_HILOGE("ScreenCaptureMonitor instance is null, capture not active");
-        return false;
-    }
-    std::list<int32_t> pidList = monitor->IsScreenCaptureWorking();
-    for (const auto &capturePid : pidList) {
-        MMI_HILOGI("Current screen capture work pid %{public}d ", capturePid);
-        if (capturePid == pid) {
-            return true;
-        } else {
-            MMI_HILOGE("Calling pid is:%{public}d, but screen capture pid is:%{public}d", pid, capturePid);
-        }
-    }
-    return false;
-#else
-    return false;
-#endif // PLAYER_FRAMEWORK_EXISTS
-}
-
 Input_Result OH_Input_AddKeyEventMonitor(Input_KeyEventCallback callback)
 {
     CALL_DEBUG_ENTER;
     MMI_HISTOGRAM_BOOLEAN("InputKit.OH_Input_AddKeyEventMonitor.Call", true);
     CHKPR(callback, INPUT_PARAMETER_ERROR);
-    if (!OHOS::MMI::PermissionHelper::GetInstance()->VerifySystemApp()) {
-        if (!IsScreenCaptureWorking()) {
-            MMI_HILOGE("The screen capture is not working");
-            MMI_HISTOGRAM_ERROR("InputKit.OH_Input_AddKeyEventMonitor.Error", INPUT_PERMISSION_DENIED);
-            return INPUT_PERMISSION_DENIED;
-        }
-    }
     Input_Result retCode = INPUT_SUCCESS;
     std::lock_guard guard(g_mutex);
     if (g_keyMonitorId == INVALID_MONITOR_ID) {
@@ -1965,13 +1933,6 @@ Input_Result OH_Input_AddMouseEventMonitor(Input_MouseEventCallback callback)
     CALL_DEBUG_ENTER;
     MMI_HISTOGRAM_BOOLEAN("InputKit.OH_Input_AddMouseEventMonitor.Call", true);
     CHKPR(callback, INPUT_PARAMETER_ERROR);
-    if (!OHOS::MMI::PermissionHelper::GetInstance()->VerifySystemApp()) {
-        if (!IsScreenCaptureWorking()) {
-            MMI_HILOGE("The screen capture is not working");
-            MMI_HISTOGRAM_ERROR("InputKit.OH_Input_AddMouseEventMonitor.Error", INPUT_PERMISSION_DENIED);
-            return INPUT_PERMISSION_DENIED;
-        }
-    }
     Input_Result ret = AddPointerEventMonitor();
     if (ret != INPUT_SUCCESS) {
         MMI_HISTOGRAM_ERROR("InputKit.OH_Input_AddMouseEventMonitor.Error", ret);
@@ -1987,13 +1948,6 @@ Input_Result OH_Input_AddTouchEventMonitor(Input_TouchEventCallback callback)
     CALL_DEBUG_ENTER;
     MMI_HISTOGRAM_BOOLEAN("InputKit.OH_Input_AddTouchEventMonitor.Call", true);
     CHKPR(callback, INPUT_PARAMETER_ERROR);
-    if (!OHOS::MMI::PermissionHelper::GetInstance()->VerifySystemApp()) {
-        if (!IsScreenCaptureWorking()) {
-            MMI_HILOGE("The screen capture is not working");
-            MMI_HISTOGRAM_ERROR("InputKit.OH_Input_AddTouchEventMonitor.Error", INPUT_PERMISSION_DENIED);
-            return INPUT_PERMISSION_DENIED;
-        }
-    }
     Input_Result ret = AddPointerEventMonitor();
     if (ret != INPUT_SUCCESS) {
         MMI_HISTOGRAM_ERROR("InputKit.OH_Input_AddTouchEventMonitor.Error", ret);
@@ -2009,13 +1963,6 @@ Input_Result OH_Input_AddAxisEventMonitorForAll(Input_AxisEventCallback callback
     CALL_DEBUG_ENTER;
     MMI_HISTOGRAM_BOOLEAN("InputKit.OH_Input_AddAxisEventMonitorForAll.Call", true);
     CHKPR(callback, INPUT_PARAMETER_ERROR);
-    if (!OHOS::MMI::PermissionHelper::GetInstance()->VerifySystemApp()) {
-        if (!IsScreenCaptureWorking()) {
-            MMI_HILOGE("The screen capture is not working");
-            MMI_HISTOGRAM_ERROR("InputKit.OH_Input_AddAxisEventMonitorForAll.Error", INPUT_PERMISSION_DENIED);
-            return INPUT_PERMISSION_DENIED;
-        }
-    }
     Input_Result ret = AddPointerEventMonitor();
     if (ret != INPUT_SUCCESS) {
         MMI_HISTOGRAM_ERROR("InputKit.OH_Input_AddAxisEventMonitorForAll.Error", ret);
@@ -2031,13 +1978,6 @@ Input_Result OH_Input_AddAxisEventMonitor(InputEvent_AxisEventType axisEventType
     CALL_DEBUG_ENTER;
     MMI_HISTOGRAM_BOOLEAN("InputKit.OH_Input_AddAxisEventMonitor.Call", true);
     CHKPR(callback, INPUT_PARAMETER_ERROR);
-    if (!OHOS::MMI::PermissionHelper::GetInstance()->VerifySystemApp()) {
-        if (!IsScreenCaptureWorking()) {
-            MMI_HILOGE("The screen capture is not working");
-            MMI_HISTOGRAM_ERROR("InputKit.OH_Input_AddAxisEventMonitor.Error", INPUT_PERMISSION_DENIED);
-            return INPUT_PERMISSION_DENIED;
-        }
-    }
     Input_Result ret = AddPointerEventMonitor();
     if (ret != INPUT_SUCCESS) {
         MMI_HISTOGRAM_ERROR("InputKit.OH_Input_AddAxisEventMonitor.Error", ret);
