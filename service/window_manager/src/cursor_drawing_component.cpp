@@ -168,7 +168,7 @@ bool CursorDrawingComponent::LoadLibrary()
 
 bool CursorDrawingComponent::ResetUnloadTimer(int32_t unloadTime, int32_t checkInterval)
 {
-    if (timerId_ > 0) {
+    if (timerId_ > DEFAULT_VALUE) {
         TimerMgr->RemoveTimer(timerId_);
     }
     if (unloadTime == -1) {
