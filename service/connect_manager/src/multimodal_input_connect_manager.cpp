@@ -34,6 +34,7 @@ namespace OHOS {
 namespace MMI {
 namespace {
 std::shared_ptr<MultimodalInputConnectManager> g_instance = nullptr;
+constexpr const char* POWER_MANAGER_PROCESS = "power_manager";
 } // namespace
 
 std::shared_ptr<MultimodalInputConnectManager> MultimodalInputConnectManager::GetInstance()
@@ -467,9 +468,15 @@ int32_t MultimodalInputConnectManager::MarkEventConsumed(int32_t eventId)
 int32_t MultimodalInputConnectManager::SubscribeKeyEvent(int32_t subscribeId, const std::shared_ptr<KeyOption> option)
 {
     CHKPR(option, ERR_INVALID_VALUE);
+    const std::string programName(GetProgramName());
+    bool isPowerManager = (programName == POWER_MANAGER_PROCESS);
+    if (!isPowerManager) {
+        std::lock_guard<std::mutex> guard(lock_);
+        CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+        return multimodalInputConnectService_->SubscribeKeyEvent(subscribeId, *option);
+    }
     constexpr int32_t MAX_RETRY_COUNT = 5;
     constexpr int32_t RETRY_INTERVAL_MS = 1000;
-
     for (int32_t retryIndex = 0; retryIndex <= MAX_RETRY_COUNT; ++retryIndex) {
         int32_t ret = RET_ERR;
         {
@@ -478,21 +485,16 @@ int32_t MultimodalInputConnectManager::SubscribeKeyEvent(int32_t subscribeId, co
             ret = multimodalInputConnectService_->SubscribeKeyEvent(subscribeId, *option);
         }
         if (ret == RET_OK) {
-            return ret;
-        }
-        if (ret != ETASKS_WAIT_TIMEOUT &&
-            ret != ETASKS_WAIT_DEFERRED &&
-            ret != static_cast<int32_t>(MMISERVICE_NOT_RUNNING)) {
-            MMI_HILOGE("SubscribeKeyEvent failed with non-retryable error:%{public}d", ret);
+            MMI_HILOGI("SubscribeKeyEvent success for power manager on attempt %{public}d", retryIndex);
             return ret;
         }
         if (retryIndex < MAX_RETRY_COUNT) {
-            MMI_HILOGW("SubscribeKeyEvent retry (%{public}d/%{public}d), "
-                "last error:%{public}d, wait %{public}dms",
+            MMI_HILOGW("SubscribeKeyEvent retry for power manager (%{public}d/%{public}d), "
+                "error:%{public}d, wait %{public}dms",
                 retryIndex + 1, MAX_RETRY_COUNT, ret, RETRY_INTERVAL_MS);
             std::this_thread::sleep_for(std::chrono::milliseconds(RETRY_INTERVAL_MS));
         } else {
-            MMI_HILOGE("SubscribeKeyEvent failed after %{public}d retries, "
+            MMI_HILOGE("SubscribeKeyEvent failed after %{public}d retries for power manager, "
                 "final error:%{public}d", MAX_RETRY_COUNT, ret);
             return ret;
         }
