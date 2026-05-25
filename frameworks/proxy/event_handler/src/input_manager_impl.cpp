@@ -3579,32 +3579,44 @@ int32_t InputManagerImpl::CheckTouchControllerPermission()
 #endif // OHOS_BUILD_ENABLE_CONTROLLER_INJECT
 }
 
-std::shared_ptr<MouseControllerImpl> InputManagerImpl::CreateMouseController()
+int32_t InputManagerImpl::CreateMouseController(std::shared_ptr<MouseControllerImpl> &controller)
 {
     CALL_DEBUG_ENTER;
+    controller = nullptr;
     // Call server-side for permission check and validation
     int32_t ret = MULTIMODAL_INPUT_CONNECT_MGR->CreateMouseController();
     if (ret != RET_OK) {
         MMI_HILOGE("Server-side CreateMouseController failed, ret=%{public}d", ret);
-        return nullptr;
+        return ret;
     }
 
     // Create and return client-side instance
-    return std::make_shared<MouseControllerImpl>();
+    controller = std::make_shared<MouseControllerImpl>();
+    if (controller == nullptr) {
+        MMI_HILOGE("Create MouseControllerImpl failed");
+        return ERROR_NULL_POINTER;
+    }
+    return RET_OK;
 }
 
-std::shared_ptr<KeyboardControllerImpl> InputManagerImpl::CreateKeyboardController()
+int32_t InputManagerImpl::CreateKeyboardController(std::shared_ptr<KeyboardControllerImpl> &controller)
 {
     CALL_DEBUG_ENTER;
+    controller = nullptr;
     // Call server-side for permission check and validation
     int32_t ret = MULTIMODAL_INPUT_CONNECT_MGR->CreateKeyboardController();
     if (ret != RET_OK) {
         MMI_HILOGE("Server-side CreateKeyboardController failed, ret=%{public}d", ret);
-        return nullptr;
+        return ret;
     }
 
     // Create and return client-side instance
-    return std::make_shared<KeyboardControllerImpl>();
+    controller = std::make_shared<KeyboardControllerImpl>();
+    if (controller == nullptr) {
+        MMI_HILOGE("Create KeyboardControllerImpl failed");
+        return ERROR_NULL_POINTER;
+    }
+    return RET_OK;
 }
 
 int32_t InputManagerImpl::CreateTouchController(std::shared_ptr<TouchControllerImpl> &controller)

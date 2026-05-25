@@ -54,9 +54,12 @@ JsMouseController::JsMouseController()
 {
     MMI_HILOGD("Creating JsMouseController");
     // Create the core implementation instance via InputManager
-    impl_ = InputManager::GetInstance()->CreateMouseController();
-    if (impl_ == nullptr) {
-        MMI_HILOGE("Failed to create MouseControllerImpl");
+    std::shared_ptr<OHOS::MMI::MouseControllerImpl> controller;
+    int32_t ret = InputManager::GetInstance()->CreateMouseController(controller);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Failed to create MouseControllerImpl, ret=%{public}d", ret);
+    } else {
+        impl_ = controller;
     }
 }
 

@@ -288,8 +288,8 @@ public:
     int32_t ControlMouseEventToAnco(int32_t windowId, bool enable);
 #endif // OHOS_BUILD_ENABLE_ANCO_GAME_EVENT_MAPPING
 
-    std::shared_ptr<class MouseControllerImpl> CreateMouseController();
-    std::shared_ptr<class KeyboardControllerImpl> CreateKeyboardController();
+    int32_t CreateMouseController(std::shared_ptr<class MouseControllerImpl> &controller);
+    int32_t CreateKeyboardController(std::shared_ptr<class KeyboardControllerImpl> &controller);
     int32_t CreateTouchController(std::shared_ptr<class TouchControllerImpl> &controller);
 
 private:

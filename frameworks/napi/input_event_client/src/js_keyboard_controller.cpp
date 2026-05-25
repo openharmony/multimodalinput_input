@@ -29,9 +29,12 @@ JsKeyboardController::JsKeyboardController()
 {
     MMI_HILOGD("Creating JsKeyboardController");
     // Create the core implementation instance via InputManager
-    impl_ = InputManager::GetInstance()->CreateKeyboardController();
-    if (impl_ == nullptr) {
-        MMI_HILOGE("Failed to create KeyboardControllerImpl");
+    std::shared_ptr<OHOS::MMI::KeyboardControllerImpl> controller;
+    int32_t ret = InputManager::GetInstance()->CreateKeyboardController(controller);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Failed to create KeyboardControllerImpl, ret=%{public}d", ret);
+    } else {
+        impl_ = controller;
     }
 }
 
