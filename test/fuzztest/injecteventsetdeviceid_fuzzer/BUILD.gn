@@ -22,6 +22,7 @@ ohos_fuzztest("InjecteventSetDeviceIdFuzzTest") {
   module_out_path = module_output_path
   fuzz_config_file = "${mmi_path}/test/fuzztest/injecteventsetdeviceid_fuzzer"
   include_dirs = [
+    "${mmi_path}/common/event_integrity/include",
     "${mmi_path}/service/app_state_manager/include",
     "${mmi_path}/service/device_config/include",
     "${mmi_path}/service/device_manager/include",

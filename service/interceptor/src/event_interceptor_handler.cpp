@@ -299,7 +299,7 @@ bool EventInterceptorHandler::InterceptorCollection::HandleEvent(std::shared_ptr
     CHKPF(inputDevice);
     uint32_t capPointer = CapabilityToTags(InputDeviceCapability::INPUT_DEV_CAP_POINTER);
     uint32_t capTouch = CapabilityToTags(InputDeviceCapability::INPUT_DEV_CAP_TOUCH);
-    for (const auto &interceptor : interceptors_) {
+    for (auto &interceptor : interceptors_) {
         MMI_HILOGD("The eventType:%{public}d, deviceTags:%{public}d",
             interceptor.eventType_, interceptor.deviceTags_);
         if (((capPointer | capTouch) & interceptor.deviceTags_) == 0) {
@@ -325,6 +325,10 @@ bool EventInterceptorHandler::InterceptorCollection::HandleEvent(std::shared_ptr
             }
         }
         if ((interceptor.eventType_ & HANDLE_EVENT_TYPE_POINTER) == HANDLE_EVENT_TYPE_POINTER) {
+            if (!interceptor.eventIntegrity_.IsCompleteEvent(pointerEvent)) {
+                MMI_HILOGW("Do not intercept incomplete pointer events");
+                continue;
+            }
             interceptor.SendToClient(pointerEvent);
             if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_PULL_UP ||
                 pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_BUTTON_UP) {

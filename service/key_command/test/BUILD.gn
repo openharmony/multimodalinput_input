@@ -20,6 +20,7 @@ ohos_unittest("KeyCommandTest") {
   module_out_path = module_output_path
 
   include_dirs = [
+    "${mmi_path}/common/event_integrity/include",
     "${mmi_path}/service/subscriber/include",
     "${mmi_path}/test/unittest/common/include",
     "${mmi_path}/service/product_property_config/include",

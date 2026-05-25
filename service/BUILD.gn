@@ -352,6 +352,7 @@ ohos_shared_library("libmmi-server") {
   version_script = "libmmi-server-map"
   include_dirs = [
     "delegate_task/include",
+    "${mmi_path}/common/event_integrity/include",
     "${mmi_path}/frameworks/proxy/events/include",
     "window_manager/include",
     "${mmi_path}/util/json_parser/include",
@@ -447,7 +448,10 @@ ohos_shared_library("libmmi-server") {
     ]
   }
   if (input_feature_interceptor) {
-    sources += [ "interceptor/src/event_interceptor_handler.cpp" ]
+    sources += [
+      "${mmi_path}/common/event_integrity/src/event_integrity.cpp",
+      "interceptor/src/event_interceptor_handler.cpp"
+    ]
     if (input_feature_keyboard) {
       sources += [ "interceptor/src/local_hotkey_handler.cpp" ]
     }
@@ -886,6 +890,7 @@ ohos_unittest("KeyShortcutManagerTest") {
   module_out_path = module_output_path
 
   include_dirs = [
+    "${mmi_path}/common/event_integrity/include",
     "${mmi_path}/interfaces/native/innerkits/proxy/include",
     "${mmi_path}/service/app_state_manager/include",
     "${mmi_path}/service/connect_manager/include",
@@ -1581,6 +1586,7 @@ ohos_unittest("InputWindowsManagerTest") {
 
   include_dirs = [
     "hardware_cursor_pointer_manager/include",
+    "${mmi_path}/common/event_integrity/include",
     "${mmi_path}/service/event_handler/include",
   ]
 
@@ -1702,6 +1708,7 @@ ohos_unittest("InputWindowsManagerOneTest") {
 
   include_dirs = [
     "${mmi_path}/common/anco/comm/include",
+    "${mmi_path}/common/event_integrity/include",
     "${mmi_path}/interfaces/native/innerkits/proxy/include",
     "${mmi_path}/service/connect_manager/include",
     "${mmi_path}/service/delegate_task/include",
@@ -1781,6 +1788,7 @@ ohos_unittest("InputWindowsManagerEXTest") {
     "window_manager/test",
     "${mmi_path}/libudev/include",
     "${mmi_path}/common/anco/comm/include",
+    "${mmi_path}/common/event_integrity/include",
     "${mmi_path}/service/hardware_cursor_pointer_manager/include",
     "${mmi_path}/service/drag_security/include",
     "${mmi_path}/service/triple_finger_snapshot/include",
@@ -2036,6 +2044,7 @@ ohos_unittest("SubscriberTest") {
   module_out_path = module_output_path
 
   include_dirs = [
+    "${mmi_path}/common/event_integrity/include",
     "${mmi_path}/service/subscriber/include",
     "${mmi_service_path}/device_state_manager/include",
     "${mmi_path}/service/common/include",
@@ -2193,7 +2202,10 @@ ohos_unittest("NapProcessTest") {
 ohos_unittest("MonitorTest") {
   module_out_path = module_output_path
 
-  include_dirs = [ "${mmi_path}/service/common/include" ]
+  include_dirs = [
+    "${mmi_path}/common/event_integrity/include",
+    "${mmi_path}/service/common/include",
+  ]
 
   configs = [
     "${mmi_path}:coverage_flags",
@@ -2239,6 +2251,7 @@ ohos_unittest("ModuleLoaderTest") {
   module_out_path = module_output_path
 
   include_dirs = [
+    "${mmi_path}/common/event_integrity/include",
     "${mmi_path}/service/module_loader/include",
     "${mmi_path}/test/facility/libinput_interface/include",
     "${mmi_path}/util/common/include",
@@ -2564,6 +2577,7 @@ ohos_unittest("LongPressSubscribeHandlerTest") {
     "${mmi_path}/frameworks/proxy/event_handler/include",
     "${mmi_path}/util/napi/include",
     "${mmi_path}/common/anco/comm/include",
+    "${mmi_path}/common/event_integrity/include",
     "${mmi_path}/test/unittest/common/include",
     "joystick/include",
     "${mmi_path}/service/event_hook/include",
@@ -2741,6 +2755,7 @@ ohos_unittest("InterceptorTest") {
   ]
 
   include_dirs = [
+    "${mmi_path}/common/event_integrity/include",
     "${mmi_path}/service/common/include",
     "${mmi_path}/service/common/setting_datashare/include",
   ]
@@ -2854,6 +2869,8 @@ ohos_unittest("EventHandlerTest") {
 
   cflags_cc = [ "-Wno-string-conversion" ]
 
+  include_dirs = [ "${mmi_path}/common/event_integrity/include" ]
+
   sources = [
     "event_handler/test/anr_manager_test.cpp",
     "event_handler/test/event_normalize_handler_test.cpp",
@@ -2918,6 +2935,7 @@ ohos_unittest("InputEventHandlerTest") {
 
   include_dirs = [
     "${mmi_path}/common/anco/comm/include",
+    "${mmi_path}/common/event_integrity/include",
     "${mmi_path}/interfaces/native/innerkits/proxy/include",
     "${mmi_path}/service/connect_manager/include",
     "${mmi_path}/service/delegate_task/include",
@@ -3033,6 +3051,8 @@ ohos_unittest("EventHandlerEXTest") {
     "-Dprotected=public",
   ]
 
+  include_dirs = [ "${mmi_path}/common/event_integrity/include" ]
+
   sources = [
     "event_handler/src/event_normalize_handler.cpp",
     "event_handler/test/event_normalize_handler_ex_test.cpp",
@@ -3098,6 +3118,7 @@ ohos_unittest("EventDispatchTest") {
   }
 
   include_dirs = [
+    "${mmi_path}/common/event_integrity/include",
     "${mmi_path}/service/connect_manager/include",
     "${mmi_path}/service/delegate_task/include",
     "${mmi_path}/service/device_config/include",
@@ -3202,7 +3223,10 @@ ohos_unittest("LibinputAdapterTest") {
 ohos_unittest("ServerMsgHandlerTest") {
   module_out_path = module_output_path
 
-  include_dirs = [ "${mmi_path}/service/common/include" ]
+  include_dirs = [
+    "${mmi_path}/common/event_integrity/include",
+    "${mmi_path}/service/common/include",
+  ]
 
   configs = [
     "${mmi_path}:coverage_flags",
@@ -3464,6 +3488,7 @@ ohos_unittest("DeviceManagerExTest") {
     "subscriber/include",
     "touch_event_normalize/include",
     "window_manager/include",
+    "${mmi_path}/common/event_integrity/include",
     "${mmi_path}/interfaces/native/innerkits/proxy/include",
     "${mmi_path}/util/json_parser/include",
     "${mmi_path}/service/event_hook/include",
@@ -3668,6 +3693,7 @@ ohos_unittest("EventDumpTest") {
   module_out_path = module_output_path
 
   include_dirs = [
+    "${mmi_path}/common/event_integrity/include",
     "${mmi_path}/test/unittest/common/include",
     "${mmi_service_path}/product_property_config/include",
     "${mmi_service_path}/custom_config_parser/include",
@@ -3822,6 +3848,7 @@ ohos_unittest("KeymapMgrTest") {
   ]
 
   include_dirs = [
+    "${mmi_path}/common/event_integrity/include",
     "${mmi_path}/service/key_command/include",
     "${mmi_path}/test/facility/libinput_interface/include",
     "${mmi_path}/libudev/include",
@@ -4188,6 +4215,7 @@ ohos_unittest("KeyEventHookManagerTest") {
 
   include_dirs = [
     "${mmi_path}/common/anco/comm/include",
+    "${mmi_path}/common/event_integrity/include",
     "${mmi_path}/interfaces/native/innerkits/proxy/include",
     "${mmi_path}/service/connect_manager/include",
     "${mmi_path}/service/delegate_task/include",
@@ -4320,6 +4348,7 @@ ohos_unittest("InputEventHookManagerTest") {
 
   include_dirs = [
     "${mmi_path}/common/anco/comm/include",
+    "${mmi_path}/common/event_integrity/include",
     "${mmi_path}/interfaces/native/innerkits/proxy/include",
     "${mmi_path}/service/connect_manager/include",
     "${mmi_path}/service/delegate_task/include",
@@ -4408,6 +4437,7 @@ ohos_unittest("KeyLoopClosureCheckerTest") {
 
   include_dirs = [
     "${mmi_path}/common/anco/comm/include",
+    "${mmi_path}/common/event_integrity/include",
     "${mmi_path}/interfaces/native/innerkits/proxy/include",
     "${mmi_path}/service/connect_manager/include",
     "${mmi_path}/service/delegate_task/include",
@@ -4496,6 +4526,7 @@ ohos_unittest("PointerLoopClosureCheckerTest") {
 
   include_dirs = [
     "${mmi_path}/common/anco/comm/include",
+    "${mmi_path}/common/event_integrity/include",
     "${mmi_path}/interfaces/native/innerkits/proxy/include",
     "${mmi_path}/service/connect_manager/include",
     "${mmi_path}/service/delegate_task/include",
@@ -4583,6 +4614,7 @@ ohos_unittest("PointerEventHookTest") {
 
   include_dirs = [
     "${mmi_path}/common/anco/comm/include",
+    "${mmi_path}/common/event_integrity/include",
     "${mmi_path}/interfaces/native/innerkits/proxy/include",
     "${mmi_path}/service/connect_manager/include",
     "${mmi_path}/service/delegate_task/include",
@@ -4675,6 +4707,7 @@ ohos_unittest("KeyEventHookTest") {
 
   include_dirs = [
     "${mmi_path}/common/anco/comm/include",
+    "${mmi_path}/common/event_integrity/include",
     "${mmi_path}/interfaces/native/innerkits/proxy/include",
     "${mmi_path}/service/connect_manager/include",
     "${mmi_path}/service/delegate_task/include",
@@ -4768,6 +4801,7 @@ ohos_unittest("InputEventHookTest") {
 
   include_dirs = [
     "${mmi_path}/common/anco/comm/include",
+    "${mmi_path}/common/event_integrity/include",
     "${mmi_path}/interfaces/native/innerkits/proxy/include",
     "${mmi_path}/service/connect_manager/include",
     "${mmi_path}/service/delegate_task/include",
