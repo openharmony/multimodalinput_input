@@ -578,6 +578,8 @@ static void HandleTouchAttribute(napi_env env, std::shared_ptr<PointerEvent> poi
     pointerItem.SetDisplayY(screenY);
     pointerItem.SetDisplayXPos(screenX);
     pointerItem.SetDisplayYPos(screenY);
+    pointerItem.SetRawDisplayX(screenX);
+    pointerItem.SetRawDisplayY(screenY);
     pointerItem.SetPointerId(pointerId);
     pointerItem.SetToolType(toolType);
     pointerItem.SetPressure(pressure);

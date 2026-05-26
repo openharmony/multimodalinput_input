@@ -940,6 +940,8 @@ static int32_t HandleTouchProperty(const struct Input_TouchEvent* touchEvent,
     item.SetDisplayY(screenY);
     item.SetDisplayXPos(screenX);
     item.SetDisplayYPos(screenY);
+    item.SetRawDisplayX(screenX);
+    item.SetRawDisplayY(screenY);
     int32_t globalX = touchEvent->globalX;
     int32_t globalY = touchEvent->globalY;
     if (globalX != INT32_MAX && globalY != INT32_MAX) {

@@ -504,6 +504,8 @@ void HandleTouchAttribute(std::shared_ptr<PointerEvent> pointerEvent, PointerEve
     item.SetDisplayY(screenY);
     item.SetDisplayXPos(screenX);
     item.SetDisplayYPos(screenY);
+    item.SetRawDisplayX(screenX);
+    item.SetRawDisplayY(screenY);
     item.SetPointerId(pointerId);
     item.SetToolType(toolType);
     item.SetPressure(pressure);
