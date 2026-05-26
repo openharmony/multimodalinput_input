@@ -106,11 +106,6 @@ config("libmmi_server_config") {
     include_dirs += [ "infrared_emitter/include" ]
   }
 
-  if (ohos_indep_compiler_enable) {
-    include_dirs +=
-        [ "//foundation/graphic/graphic_2d/rosen/modules/render_service_base/include" ]
-  }
-
   if (input_ext_feature_keyboard_ext_flag) {
     ohos_prebuilt_etc("keyboard_ext_flag.json") {
       source = "${mmi_ext_path}/keyboard_ext_flag/etc/keyboard_ext_flag.json"
@@ -628,8 +623,7 @@ ohos_shared_library("libmmi-server") {
     external_deps += [ "hitrace:hitrace_meter" ]
   }
 
-  if ((input_feature_touch_drawing || input_feature_pointer_drawing) &&
-      !ohos_indep_compiler_enable) {
+  if (input_feature_touch_drawing || input_feature_pointer_drawing) {
     external_deps += [ "graphic_2d:librender_service_proxy" ]
   }
 
@@ -3183,8 +3177,7 @@ ohos_unittest("EventDispatchTest") {
   if (security_component_enable) {
     external_deps += [ "security_component_manager:libsecurity_component_sdk" ]
   }
-  if ((input_feature_touch_drawing || input_feature_pointer_drawing) &&
-      !ohos_indep_compiler_enable) {
+  if (input_feature_touch_drawing || input_feature_pointer_drawing) {
     external_deps += [ "graphic_2d:librender_service_proxy" ]
   }
 }
