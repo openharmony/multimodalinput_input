@@ -161,6 +161,8 @@ constexpr int32_t UID_TRANSFORM_DIVISOR { 200000 };
 const std::string PRODUCT_DEVICE_TYPE = system::GetParameter("const.product.devicetype", "unknown");
 const std::string PRODUCT_TYPE_PC = "2in1";
 const int32_t ERROR_WINDOW_ID_PERMISSION_DENIED = 26500001;
+const std::string SCENEBOARD_NAME { "com.ohos.sceneboard" };
+const std::string FOUNDATION_NAME { "foundation" };
 constexpr int32_t MAX_DEVICE_NUM { 10 };
 constexpr int32_t PENGLAI_UID { 7655 };
 constexpr int32_t GAME_UID { 7011 };
@@ -6459,6 +6461,26 @@ ErrCode MMIService::RedispatchInputEvent(const PointerEvent &pointerEvent)
 ErrCode MMIService::UpdateUIExtensionInfo(const std::vector<UIExtensionInfo> &uiExtensionInfos)
 {
     CALL_DEBUG_ENTER;
+    if (!IsRunning()) {
+        MMI_HILOGE("Service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
+
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
+
+    uint32_t tokenId = IPCSkeleton::GetCallingTokenID();
+    int32_t pid = IPCSkeleton::GetCallingPid();
+    std::string processName = GetProcessName(tokenId, pid);
+    static const std::vector<std::string> programWhitelist = { SCENEBOARD_NAME, FOUNDATION_NAME };
+    if (std::find(programWhitelist.begin(), programWhitelist.end(), processName) == programWhitelist.end()) {
+        MMI_HILOGE("Invalid Caller, tokenId=%{public}u, pid=%{public}d, processName=%{public}s",
+            tokenId, pid, processName.c_str());
+        return ERROR_NO_PERMISSION;
+    }
+
     int32_t ret = delegateTasks_.PostSyncTask([&uiExtensionInfos] {
         WIN_MGR->UpdateUIExtensionInfo(uiExtensionInfos);
         return RET_OK;

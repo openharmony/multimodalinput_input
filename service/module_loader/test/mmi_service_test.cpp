@@ -5349,5 +5349,37 @@ HWTEST_F(MMIServerTest, MMIService_SetDisplayBind_ServiceNotRunning_004, TestSiz
     ErrCode ret = mmiService.SetDisplayBind(deviceId, displayId, msg);
     EXPECT_NE(ret, RET_OK);
 }
+
+/**
+ * @tc.name: MMIService_UpdateUIExtensionInfo_ServiceNotRunning_001
+ * @tc.desc: Test UpdateUIExtensionInfo when service is not running
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIServerTest, MMIService_UpdateUIExtensionInfo_ServiceNotRunning_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MMIService mmiService;
+    mmiService.state_ = ServiceRunningState::STATE_EXIT;
+    std::vector<UIExtensionInfo> uiExtensionInfos;
+    ErrCode ret = mmiService.UpdateUIExtensionInfo(uiExtensionInfos);
+    EXPECT_EQ(ret, MMISERVICE_NOT_RUNNING);
+}
+
+/**
+ * @tc.name: MMIService_UpdateUIExtensionInfo_NoPermission_002
+ * @tc.desc: Test UpdateUIExtensionInfo when caller has no permission
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIServerTest, MMIService_UpdateUIExtensionInfo_NoPermission_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MMIService mmiService;
+    mmiService.state_ = ServiceRunningState::STATE_RUNNING;
+    std::vector<UIExtensionInfo> uiExtensionInfos;
+    ErrCode ret = mmiService.UpdateUIExtensionInfo(uiExtensionInfos);
+    EXPECT_EQ(ret, ERROR_NO_PERMISSION);
+}
 } // namespace MMI
 } // namespace OHOS
