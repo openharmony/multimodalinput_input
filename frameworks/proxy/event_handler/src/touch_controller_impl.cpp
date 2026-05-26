@@ -71,7 +71,6 @@ std::shared_ptr<PointerEvent> TouchControllerImpl::CreatePointerEvent(const Poin
     pointerEvent->AddFlag(InputEvent::EVENT_FLAG_CONTROLLER);
     pointerEvent->RemoveAllPointerItems();
     AddPointerItems(pointerEvent, context, contacts);
-    pointerEvent->UpdateId();
     return pointerEvent;
 }
 
