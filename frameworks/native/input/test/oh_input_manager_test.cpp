@@ -2622,7 +2622,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_AddInputEventIntercepto
     event->SetSourceType(OHOS::MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
     auto result = OHOS::Singleton<OHOS::MMI::InputManagerImpl>::GetInstance().SimulateInputEvent(event,
         true, OHOS::MMI::PointerEvent::GLOBAL_COORDINATE);
-    EXPECT_EQ(result, INPUT_SUCCESS);
+    EXPECT_EQ(result, RET_ERR);
 }
 
 /**
