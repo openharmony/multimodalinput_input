@@ -34,7 +34,7 @@ namespace OHOS {
 namespace MMI {
 namespace {
 std::shared_ptr<MultimodalInputConnectManager> g_instance = nullptr;
-constexpr const char* POWER_MANAGER_PROCESS = "power_manager";
+constexpr const char* POWER_MANAGER_PROCESS = "powermgr";
 } // namespace
 
 std::shared_ptr<MultimodalInputConnectManager> MultimodalInputConnectManager::GetInstance()
