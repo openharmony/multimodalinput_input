@@ -37,16 +37,6 @@ constexpr int DELAY_CHECK_CES_STATUS = 100;
 
 namespace OHOS {
 namespace MMI {
-SwitchSubscriberHandler::SwitchSubscriberHandler()
-{
-    switchSubscriberSystemAbility_ = new SwitchSubscriberSystemAbility();
-    SubSwitchSubscriberSystemAbility();
-}
-
-SwitchSubscriberHandler::~SwitchSubscriberHandler()
-{
-    UnSubSwitchSubscriberSystemAbility();
-}
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
 void SwitchSubscriberHandler::HandleKeyEvent(const std::shared_ptr<KeyEvent> keyEvent)
 {
@@ -224,75 +214,6 @@ void SwitchSubscriberHandler::SubmitWaitAndPublishEvent(const std::shared_ptr<Sw
             publishFunc(switchEvent);
         },
         ffrt::task_attr().name(taskName));
-}
-
-void SwitchSubscriberHandler::SwitchSubscriberSystemAbility::OnAddSystemAbility(int32_t systemAbilityId,
-    const std::string &deviceId)
-{
-    MMI_HILOGI("systemAbilityId:%{public}d", systemAbilityId);
-    switch (systemAbilityId) {
-        case COMMON_EVENT_SERVICE_ID: {
-            auto switchSubscriberHandler = InputHandler->GetSwitchSubscriberHandler();
-            if (switchSubscriberHandler != nullptr) {
-                SwitchSubscriberHandler::isCesReady_.store(true, std::memory_order_release);
-                MMI_HILOGI("isCesReady_ set true");
-            } else {
-                MMI_HILOGE("switchSubscriberHandler is null");
-            }
-            break;
-        }
-        default: {
-            MMI_HILOGW("unhandled sysabilityId:%{public}d", systemAbilityId);
-            break;
-        }
-    }
-    return;
-}
-
-void SwitchSubscriberHandler::SwitchSubscriberSystemAbility::OnRemoveSystemAbility(int32_t systemAbilityId,
-    const std::string &deviceId)
-{
-    MMI_HILOGI("systemAbilityId:%{public}d", systemAbilityId);
-    switch (systemAbilityId) {
-        case COMMON_EVENT_SERVICE_ID: {
-            SwitchSubscriberHandler::isCesReady_.store(false, std::memory_order_release);
-            MMI_HILOGI("isCesReady_ set false");
-            break;
-        }
-        default: {
-            MMI_HILOGW("unhandled sysabilityId:%{public}d", systemAbilityId);
-            break;
-        }
-    }
-    return;
-}
-
-void SwitchSubscriberHandler::SubSwitchSubscriberSystemAbility()
-{
-    sptr<ISystemAbilityManager> samgrProxy = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
-    if (samgrProxy == nullptr) {
-        MMI_HILOGE("failed to get samgrProxy");
-        return;
-    }
-    int32_t ret = samgrProxy->SubscribeSystemAbility(COMMON_EVENT_SERVICE_ID, switchSubscriberSystemAbility_);
-    if (ret != ERR_OK) {
-        MMI_HILOGI("subscribe %{public}d: switch subscriber handler failed! ret: %{public}d",
-            COMMON_EVENT_SERVICE_ID, ret);
-    }
-}
-
-void SwitchSubscriberHandler::UnSubSwitchSubscriberSystemAbility()
-{
-    sptr<ISystemAbilityManager> samgrProxy = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
-    if (!samgrProxy) {
-        MMI_HILOGE("failed to get samgrProxy");
-        return;
-    }
-    int32_t ret = samgrProxy->UnSubscribeSystemAbility(COMMON_EVENT_SERVICE_ID, switchSubscriberSystemAbility_);
-    if (ret != ERR_OK) {
-        MMI_HILOGI("unSubscribe %{public}d: switch subscriber handler failed! ret: %{public}d",
-            COMMON_EVENT_SERVICE_ID, ret);
-    }
 }
 #endif // OHOS_BUILD_ENABLE_SWITCH
 
