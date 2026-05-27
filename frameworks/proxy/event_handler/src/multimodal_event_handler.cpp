@@ -254,7 +254,7 @@ int32_t MultimodalEventHandler::InjectPointerEvent(std::shared_ptr<PointerEvent>
     int32_t ret = MULTIMODAL_INPUT_CONNECT_MGR->InjectPointerEvent(pointerEvent, isNativeInject, useCoordinate);
     if (ret != 0) {
         MMI_HILOGE("Send to server failed, ret:%{public}d", ret);
-        return RET_ERR;
+        return ret;
     }
     return RET_OK;
 }
