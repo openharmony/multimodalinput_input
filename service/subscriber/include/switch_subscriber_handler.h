@@ -27,9 +27,9 @@ namespace OHOS {
 namespace MMI {
 class SwitchSubscriberHandler final : public IInputEventHandler {
 public:
-    SwitchSubscriberHandler();
+    SwitchSubscriberHandler() = default;
     DISALLOW_COPY_AND_MOVE(SwitchSubscriberHandler);
-    ~SwitchSubscriberHandler();
+    ~SwitchSubscriberHandler() = default;
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     void HandleKeyEvent(const std::shared_ptr<KeyEvent> keyEvent) override;
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
@@ -68,15 +68,6 @@ private:
     };
     void InsertSubScriber(std::shared_ptr<Subscriber> subs);
 
-    class SwitchSubscriberSystemAbility : public SystemAbilityStatusChangeStub {
-        public:
-            void OnAddSystemAbility(int32_t systemAbilityId, const std::string &deviceId) override;
-            void OnRemoveSystemAbility(int32_t systemAbilityId, const std::string &deviceId) override;
-    };
-
-    void SubSwitchSubscriberSystemAbility();
-    void UnSubSwitchSubscriberSystemAbility();
-
 private:
     bool OnSubscribeSwitchEvent(std::shared_ptr<SwitchEvent> keyEvent);
     void NotifySubscriber(std::shared_ptr<SwitchEvent> keyEvent,
@@ -92,7 +83,8 @@ private:
     std::atomic<int32_t> lidState_ { 0 };
     std::atomic<int32_t> tabletStandState_ { 0 };
     std::atomic<int32_t> switchEventType_ {0};
-    static inline sptr<SwitchSubscriberSystemAbility> switchSubscriberSystemAbility_ = nullptr;
+
+public:
     static inline std::atomic<bool> isCesReady_ { false };
 };
 } // namespace MMI

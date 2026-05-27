@@ -2630,6 +2630,7 @@ void MMIService::OnAddSystemAbility(int32_t systemAbilityId, const std::string &
         DEVICE_MONITOR->InitCommonEventSubscriber();
         ACCOUNT_MGR->GetCurrentAccountSetting();
         DISPLAY_MONITOR->InitCommonEventSubscriber();
+        SwitchSubscriberHandler::isCesReady_.store(true, std::memory_order_release);
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
         libinputAdapter_.RegisterBootStatusReceiver();
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
