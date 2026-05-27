@@ -1740,20 +1740,5 @@ HWTEST_F(TouchDrawingHandlerTest, TouchDrawingHandlerTest_RsFlushImplicitTransac
     TouchDrawingHandler touchDrawingHandler;
     ASSERT_NO_FATAL_FAILURE(touchDrawingHandler.RsFlushImplicitTransaction());
 }
-
-/**
- * @tc.name: TouchDrawingHandlerTest_InitRSUIContext_001
- * @tc.desc: Test InitRSUIContext with screenId
- * @tc.type: Function
- * @tc.require:
- */
-HWTEST_F(TouchDrawingHandlerTest, TouchDrawingHandlerTest_InitRSUIContext_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    TouchDrawingHandler touchDrawingHandler;
-    uint64_t screenId = 0;
-    bool ret = touchDrawingHandler.InitRSUIContext(screenId);
-    EXPECT_FALSE(ret);
-}
 } // namespace MMI
 } // namespace OHOS

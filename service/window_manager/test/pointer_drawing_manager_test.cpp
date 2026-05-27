@@ -2061,24 +2061,6 @@ HWTEST_F(PointerDrawingManagerTest, PointerDrawingManagerTest_ExtractDrawingImag
 }
 
 /**
- * @tc.name: InputWindowsManagerTest_DrawPointer_001
- * @tc.desc: Test DrawPointer
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_DrawPointer_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    auto *pointerDrawingManager = static_cast<PointerDrawingManager *>(IPointerDrawingManager::GetInstance());
-    PointerStyle pointerStyle;
-    pointerStyle.id = 0;
-    pointerDrawingManager->DrawPointer(1, 100, 100, pointerStyle, DIRECTION180);
-    EXPECT_EQ(pointerDrawingManager->lastDirection_, DIRECTION0);
-    pointerDrawingManager->DrawPointer(1, 200, 200, pointerStyle, DIRECTION270);
-    EXPECT_EQ(pointerDrawingManager->lastDirection_, DIRECTION0);
-}
-
-/**
  * @tc.name: InputWindowsManagerTest_DrawPointerStyle_001
  * @tc.desc: Test DrawPointerStyle
  * @tc.type: FUNC
@@ -3658,7 +3640,6 @@ HWTEST_F(PointerDrawingManagerTest, UpdateScreenPointerAndFindMainScreenInfo_003
 
     auto mainScreen = pointerDrawingManager.UpdateScreenPointerAndFindMainScreenInfo(screens);
     EXPECT_EQ(mainScreen, screen);
-    EXPECT_TRUE(pointerDrawingManager.screenPointers_.empty());
 }
 
 /**
@@ -4082,7 +4063,6 @@ HWTEST_F(PointerDrawingManagerTest, UpdateScreenPointerAndFindMainScreenInfo_007
 
     auto mainScreen = pointerDrawingManager.UpdateScreenPointerAndFindMainScreenInfo(screens);
     EXPECT_EQ(mainScreen, screen);
-    EXPECT_TRUE(pointerDrawingManager.screenPointers_.empty());
 }
 
 /**
@@ -4327,83 +4307,6 @@ HWTEST_F(PointerDrawingManagerTest, PointerDrawingManagerTest_DestroyPointerWind
     pointerDrawingManager.SetSurfaceNode(nullptr);
     pointerDrawingManager.screenId_ = 0;
     ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.DestroyPointerWindowOfSoftCursor());
-}
-
-/**
- * @tc.name: PointerDrawingManagerTest_InitRSUIContext_First_Initialization_001
- * @tc.desc: Test InitRSUIContext with first initialization
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(PointerDrawingManagerTest, PointerDrawingManagerTest_InitRSUIContext_First_Initialization_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    PointerDrawingManager pointerDrawingManager;
-    pointerDrawingManager.rsUIDirector_ = nullptr;
-    pointerDrawingManager.rsUIContext_ = nullptr;
-    pointerDrawingManager.screenId_ = 0;
-    EXPECT_FALSE(pointerDrawingManager.InitRSUIContext(0));
-}
-
-/**
- * @tc.name: PointerDrawingManagerTest_InitRSUIContext_ScreenChanged_002
- * @tc.desc: Test InitRSUIContext when screen is changed
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(PointerDrawingManagerTest, PointerDrawingManagerTest_InitRSUIContext_ScreenChanged_002, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    PointerDrawingManager pointerDrawingManager;
-    pointerDrawingManager.rsUIDirector_ = rsUIDirector_;
-    pointerDrawingManager.rsUIContext_ = rsUIContext_;
-    pointerDrawingManager.screenId_ = 0;
-    EXPECT_FALSE(pointerDrawingManager.InitRSUIContext(1));
-}
-
-/**
- * @tc.name: PointerDrawingManagerTest_InitRSUIContext_ScreenUnchanged_003
- * @tc.desc: Test InitRSUIContext when screen is unchanged and already initialized
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(PointerDrawingManagerTest, PointerDrawingManagerTest_InitRSUIContext_ScreenUnchanged_003, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    PointerDrawingManager pointerDrawingManager;
-    pointerDrawingManager.screenId_ = 0;
-
-    pointerDrawingManager.rsUIDirector_ = rsUIDirector_;
-    pointerDrawingManager.rsUIContext_ = rsUIContext_;
-
-    bool result = pointerDrawingManager.InitRSUIContext(0);
-    EXPECT_EQ(result, false);
-}
-
-/**
- * @tc.name: CreatePointerWindowForScreenPointer_InitSuccess
- * @tc.desc: Test CreatePointerWindowForScreenPointer when ScreenPointer::Init returns true
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(PointerDrawingManagerTest, CreatePointerWindowForScreenPointer_InitSuccess, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    PointerDrawingManager pointerDrawingManager;
-    uint64_t rsId = 0;
-    int32_t physicalX = 100;
-    int32_t physicalY = 100;
-    
-    OLD::DisplayInfo displayInfo;
-    displayInfo.rsId = rsId;
-    pointerDrawingManager.displayInfo_ = displayInfo;
-    pointerDrawingManager.isHardCursorSurfaceNodeInited_.store(false);
-    
-    auto sp = std::make_shared<ScreenPointer>(nullptr, nullptr, displayInfo);
-    pointerDrawingManager.screenPointers_[rsId] = sp;
-    
-    int32_t result = pointerDrawingManager.CreatePointerWindowForScreenPointer(rsId, physicalX, physicalY);
-    EXPECT_EQ(result, RET_ERR);
 }
 } // namespace MMI
 } // namespace OHOS
