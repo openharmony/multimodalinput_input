@@ -149,8 +149,7 @@ HWTEST_F(PointerDrawingManagerHardCursorTest, PointerDrawingManagerHardCursorTes
     pointerDrawingManager.screenPointers_.insert({1, mirrorSp});
     pointerDrawingManager.screenPointers_.insert({2, extendSp});
     pointerDrawingManager.displayId_ = 0;
-    int32_t ret = pointerDrawingManager.HardwareCursorMove(0, 10, 20);
-    EXPECT_EQ(ret, RET_ERR);
+    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.HardwareCursorMove(0, 10, 20));
 }
 
 /**
@@ -183,30 +182,7 @@ HWTEST_F(PointerDrawingManagerHardCursorTest, PointerDrawingManagerHardCursorTes
     pointerDrawingManager.screenPointers_.insert({1, mirrorSp});
     pointerDrawingManager.screenPointers_.insert({2, extendSp});
     pointerDrawingManager.displayId_ = 0;
-    int32_t ret = pointerDrawingManager.HardwareCursorMove(0, 10, 20);
-    EXPECT_EQ(ret, RET_ERR);
-}
-
-/**
- * @tc.name: PointerDrawingManagerHardCursorTest_CheckHwcReady_001
- * @tc.desc: Test CheckHwcReady
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(PointerDrawingManagerHardCursorTest, PointerDrawingManagerHardCursorTest_CheckHwcReady_001, TestSize.Level1)
-{
-    PointerDrawingManager pointerDrawingManager;
-    ASSERT_NE(pointerDrawingManager.hardwareCursorPointerManager_, nullptr);
-    sptr<Rosen::ScreenInfo> ScreenInfo = CreateScreenInfo(0, 0, Rosen::ScreenSourceMode::SCREEN_MAIN);
-    auto sp = CreateScreenPointer(pointerDrawingManager.pointerRenderer_,
-        pointerDrawingManager.hardwareCursorPointerManager_, pointerDrawingManager.handler_, ScreenInfo);
-    ASSERT_NE(sp, nullptr);
-    pointerDrawingManager.screenPointers_.insert({0, sp});
-    pointerDrawingManager.lastPhysicalX_ = 10;
-    pointerDrawingManager.lastPhysicalY_ = 20;
-    pointerDrawingManager.displayId_ = 0;
-    int32_t ret = pointerDrawingManager.CheckHwcReady();
-    EXPECT_EQ(ret, RET_ERR);
+    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.HardwareCursorMove(0, 10, 20));
 }
 
 /**

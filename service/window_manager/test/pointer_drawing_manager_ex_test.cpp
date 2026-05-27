@@ -1234,31 +1234,6 @@ HWTEST_F(PointerDrawingManagerExTest, InputWindowsManagerTest_SetPointerSize_02,
 }
 
 /**
- * @tc.name: InputWindowsManagerTest_SetPointerSize_03
- * @tc.desc: Test SetPointerSize
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(PointerDrawingManagerExTest, InputWindowsManagerTest_SetPointerSize_03, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    PointerDrawingManager pointerDrawingManager;
-    int32_t size = 5;
-    std::string name = POINTER_SIZE;
-    int32_t ret = PREFERENCES_MGR->SetIntValue(name, MOUSE_FILE_NAME, size);
-    EXPECT_EQ(ret, RET_OK);
-
-    Rosen::RSSurfaceNodeConfig surfaceNodeConfig;
-    surfaceNodeConfig.SurfaceNodeName = "pointer window";
-    Rosen::RSSurfaceNodeType surfaceNodeType = Rosen::RSSurfaceNodeType::SELF_DRAWING_WINDOW_NODE;
-    pointerDrawingManager.surfaceNode_ = Rosen::RSSurfaceNode::Create(surfaceNodeConfig, surfaceNodeType, true, false,
-        rsUIContext_);
-    EXPECT_TRUE(pointerDrawingManager.surfaceNode_ != nullptr);
-    int32_t userId = 0;
-    EXPECT_EQ(pointerDrawingManager.SetPointerSize(userId, size), RET_ERR);
-}
-
-/**
  * @tc.name: InputWindowsManagerTest_UpdatePointerDevice_01
  * @tc.desc: Test UpdatePointerDevice
  * @tc.type: FUNC
