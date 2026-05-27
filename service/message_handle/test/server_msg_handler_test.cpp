@@ -7356,5 +7356,239 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_IsApplicationType_003, TestS
     auto result = handler.IsApplicationType(0);
     EXPECT_FALSE(result);
 }
+
+/**
+ * @tc.name: ServerMsgHandlerTest_UpdateMouseLocation_001
+ * @tc.desc: Test the function UpdateMouseLocation with null pointerEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_UpdateMouseLocation_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ServerMsgHandler handler;
+    std::shared_ptr<PointerEvent> pointerEvent = nullptr;
+    ASSERT_NO_FATAL_FAILURE(handler.UpdateMouseLocation(pointerEvent));
+}
+
+/**
+ * @tc.name: ServerMsgHandlerTest_UpdateMouseLocation_002
+ * @tc.desc: Test the function UpdateMouseLocation with RAW_POINTER_MOVEMENT flag
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_UpdateMouseLocation_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ServerMsgHandler handler;
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->AddFlag(InputEvent::EVENT_FLAG_RAW_POINTER_MOVEMENT);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
+    int32_t pointerId = 0;
+    PointerEvent::PointerItem item;
+    item.SetPointerId(pointerId);
+    pointerEvent->AddPointerItem(item);
+    pointerEvent->SetPointerId(0);
+    ASSERT_NO_FATAL_FAILURE(handler.UpdateMouseLocation(pointerEvent));
+}
+
+/**
+ * @tc.name: ServerMsgHandlerTest_UpdateMouseLocation_003
+ * @tc.desc: Test the function UpdateMouseLocation with non-mouse source type
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_UpdateMouseLocation_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ServerMsgHandler handler;
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
+    int32_t pointerId = 0;
+    PointerEvent::PointerItem item;
+    item.SetPointerId(pointerId);
+    pointerEvent->AddPointerItem(item);
+    pointerEvent->SetPointerId(0);
+    ASSERT_NO_FATAL_FAILURE(handler.UpdateMouseLocation(pointerEvent));
+}
+
+/**
+ * @tc.name: ServerMsgHandlerTest_UpdateMouseLocation_004
+ * @tc.desc: Test the function UpdateMouseLocation with non-MOVE action
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_UpdateMouseLocation_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ServerMsgHandler handler;
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
+    int32_t pointerId = 0;
+    PointerEvent::PointerItem item;
+    item.SetPointerId(pointerId);
+    pointerEvent->AddPointerItem(item);
+    pointerEvent->SetPointerId(0);
+    ASSERT_NO_FATAL_FAILURE(handler.UpdateMouseLocation(pointerEvent));
+}
+
+/**
+ * @tc.name: ServerMsgHandlerTest_UpdateMouseLocation_005
+ * @tc.desc: Test the function UpdateMouseLocation with empty pointer items
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_UpdateMouseLocation_005, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ServerMsgHandler handler;
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
+    pointerEvent->SetPointerId(0);
+    ASSERT_NO_FATAL_FAILURE(handler.UpdateMouseLocation(pointerEvent));
+}
+
+/**
+ * @tc.name: ServerMsgHandlerTest_UpdateMouseLocation_006
+ * @tc.desc: Test the function UpdateMouseLocation with valid pointerEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_UpdateMouseLocation_006, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto winMgr = std::static_pointer_cast<InputWindowsManager>(WIN_MGR);
+    ASSERT_NE(winMgr, nullptr);
+    ServerMsgHandler handler;
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
+    int32_t pointerId = 0;
+    PointerEvent::PointerItem item;
+    item.SetPointerId(pointerId);
+    item.SetDisplayXPos(100.0);
+    item.SetDisplayYPos(200.0);
+    pointerEvent->AddPointerItem(item);
+    pointerEvent->SetPointerId(0);
+    ASSERT_NO_FATAL_FAILURE(handler.UpdateMouseLocation(pointerEvent));
+}
+
+/**
+ * @tc.name: ServerMsgHandlerTest_UpdateMouseLocation_007
+ * @tc.desc: Test the function UpdateMouseLocation with pointerId mismatch
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_UpdateMouseLocation_007, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ServerMsgHandler handler;
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
+    PointerEvent::PointerItem item;
+    item.SetPointerId(1);
+    pointerEvent->AddPointerItem(item);
+    pointerEvent->SetPointerId(0);
+    ASSERT_NO_FATAL_FAILURE(handler.UpdateMouseLocation(pointerEvent));
+}
+
+/**
+ * @tc.name: ServerMsgHandlerTest_UpdateMouseLocation_008
+ * @tc.desc: Test the function UpdateMouseLocation with SOURCE_TYPE_JOYSTICK
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_UpdateMouseLocation_008, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ServerMsgHandler handler;
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_JOYSTICK);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
+    int32_t pointerId = 0;
+    PointerEvent::PointerItem item;
+    item.SetPointerId(pointerId);
+    pointerEvent->AddPointerItem(item);
+    pointerEvent->SetPointerId(0);
+    ASSERT_NO_FATAL_FAILURE(handler.UpdateMouseLocation(pointerEvent));
+}
+
+/**
+ * @tc.name: ServerMsgHandlerTest_UpdateMouseLocation_009
+ * @tc.desc: Test the function UpdateMouseLocation with SOURCE_TYPE_TOUCHPAD
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_UpdateMouseLocation_009, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ServerMsgHandler handler;
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHPAD);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
+    int32_t pointerId = 0;
+    PointerEvent::PointerItem item;
+    item.SetPointerId(pointerId);
+    pointerEvent->AddPointerItem(item);
+    pointerEvent->SetPointerId(0);
+    ASSERT_NO_FATAL_FAILURE(handler.UpdateMouseLocation(pointerEvent));
+}
+
+/**
+ * @tc.name: ServerMsgHandlerTest_UpdateMouseLocation_010
+ * @tc.desc: Test the function UpdateMouseLocation with POINTER_ACTION_UP
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_UpdateMouseLocation_010, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ServerMsgHandler handler;
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
+    int32_t pointerId = 0;
+    PointerEvent::PointerItem item;
+    item.SetPointerId(pointerId);
+    pointerEvent->AddPointerItem(item);
+    pointerEvent->SetPointerId(0);
+    ASSERT_NO_FATAL_FAILURE(handler.UpdateMouseLocation(pointerEvent));
+}
+
+/**
+ * @tc.name: ServerMsgHandlerTest_UpdateMouseLocation_011
+ * @tc.desc: Test the function UpdateMouseLocation with POINTER_ACTION_BUTTON_DOWN
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_UpdateMouseLocation_011, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ServerMsgHandler handler;
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_DOWN);
+    int32_t pointerId = 0;
+    PointerEvent::PointerItem item;
+    item.SetPointerId(pointerId);
+    pointerEvent->AddPointerItem(item);
+    pointerEvent->SetPointerId(0);
+    ASSERT_NO_FATAL_FAILURE(handler.UpdateMouseLocation(pointerEvent));
+}
 } // namespace MMI
 } // namespace OHOS

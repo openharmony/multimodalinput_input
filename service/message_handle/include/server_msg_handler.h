@@ -179,6 +179,7 @@ private:
     float ScreenFactor(const int32_t diagonalInch);
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
+    void UpdateMouseLocation(std::shared_ptr<PointerEvent> pointerEvent);
     void UpdatePointerEvent(std::shared_ptr<PointerEvent> pointerEvent);
     void UpdateOthersTouchEvent(std::shared_ptr<PointerEvent> pointerEvent,
         int32_t displayId, const std::map<InjectionTouch, int32_t>& targetWindowIdMap, int32_t useCoordinate);
