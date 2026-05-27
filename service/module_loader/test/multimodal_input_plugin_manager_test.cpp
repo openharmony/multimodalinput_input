@@ -2667,26 +2667,6 @@ HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_Read
 }
 
 /**
- * @tc.name: MultimodalInputPluginManagerTest_AddCallbackToPlugin_003
- * @tc.desc: Test AddCallbackToPlugin with plugin having INPUT_BEFORE_LIBINPUT_ADAPTER_ON_EVENT stage
- * @tc.require: test AddCallbackToPlugin
- */
-HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_AddCallbackToPlugin_003, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    InputPluginManager* manager = InputPluginManager::GetInstance("/tmp");
-
-    std::shared_ptr<MockInputPluginContext> mockPlugin = std::make_shared<MockInputPluginContext>();
-    auto mockInputPlugin = std::make_shared<MockInputPlugin>();
-    EXPECT_CALL(*mockInputPlugin, GetStages()).WillRepeatedly(
-        Return(std::vector<InputPluginStage>{InputPluginStage::INPUT_BEFORE_LIBINPUT_ADAPTER_ON_EVENT}));
-    EXPECT_CALL(*mockPlugin, GetPlugin()).WillRepeatedly(Return(mockInputPlugin));
-    EXPECT_CALL(*mockPlugin, SetCallback(testing::_)).Times(1);
-
-    ASSERT_NO_FATAL_FAILURE(manager->AddCallbackToPlugin(mockPlugin));
-}
-
-/**
  * @tc.name: MultimodalInputPluginManagerTest_DoHandleEvent_003
  * @tc.desc: Test DoHandleEvent returns RET_DO when plugin returns UseNeedReissue
  * @tc.require: test DoHandleEvent

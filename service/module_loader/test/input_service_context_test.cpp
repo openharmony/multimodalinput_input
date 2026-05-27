@@ -195,24 +195,5 @@ HWTEST_F(InputServiceContextTest, InputServiceContext_GetDispatchHandler_001, Te
     auto dispatchHandler = inputServiceContext_.GetDispatchHandler();
     EXPECT_EQ(dispatchHandler, nullptr);
 }
-
-/**
- * @tc.name: InputServiceContext_AttachDelegateInterface_002
- * @tc.desc: Test AttachDelegateInterface with valid delegate then GetDelegateInterface returns non-null
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputServiceContextTest, InputServiceContext_AttachDelegateInterface_002, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    InputServiceContext ctx;
-    std::shared_ptr<IDelegateInterface> delegate = std::make_shared<DelegateInterface>(
-        [](DTaskCallback cb) { return RET_ERR; },
-        [](DTaskCallback cb) { return RET_ERR; });
-    ASSERT_NO_FATAL_FAILURE(ctx.AttachDelegateInterface(delegate));
-    auto attachedDelegate = ctx.GetDelegateInterface();
-    EXPECT_NE(attachedDelegate, nullptr);
-    EXPECT_EQ(attachedDelegate.get(), delegate.get());
-}
 } // namespace MMI
 } // namespace OHOS

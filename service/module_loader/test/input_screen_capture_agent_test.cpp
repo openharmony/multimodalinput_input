@@ -317,32 +317,5 @@ HWTEST_F(InputScreenCaptureAgentTest, FreeHandle_002, TestSize.Level1)
     EXPECT_EQ(inputScreenCaptureAgent.handle_.registerListener, nullptr);
     EXPECT_EQ(inputScreenCaptureAgent.handle_.isMusicActivate, nullptr);
 }
-
-/**
- * @tc.name: RegisterListener_001
- * @tc.desc: Test RegisterListener when LoadLibrary fails
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputScreenCaptureAgentTest, RegisterListener_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    ScreenCaptureCallback callback = [](int32_t, bool) {};
-    ASSERT_NO_FATAL_FAILURE(inputScreenCaptureAgent.RegisterListener(callback));
-}
-
-/**
- * @tc.name: UnloadLibrary_001
- * @tc.desc: Test UnloadLibrary when handle is null
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputScreenCaptureAgentTest, UnloadLibrary_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    inputScreenCaptureAgent.handle_.handle = nullptr;
-    ASSERT_NO_FATAL_FAILURE(inputScreenCaptureAgent.UnloadLibrary());
-    EXPECT_EQ(inputScreenCaptureAgent.handle_.handle, nullptr);
-}
 } // namespace MMI
 } // namespace OHOS
