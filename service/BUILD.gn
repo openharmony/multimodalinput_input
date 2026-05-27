@@ -2229,6 +2229,55 @@ ohos_unittest("MonitorTest") {
   ]
 }
 
+ohos_unittest("Event_Monitor_HandlerNewTest") {
+  module_out_path = module_output_path
+
+  include_dirs = [
+    "${mmi_path}/service/monitor/include",
+    "${mmi_path}/service/common/include",
+    "${mmi_path}/service/setting_manager/include",
+    "${mmi_path}/service/nap_process/include",
+    "${mmi_path}/frameworks/proxy/event_handler/include",
+    "${mmi_path}/interfaces/native/innerkits/event/include",
+    "${mmi_path}/interfaces/native/innerkits/proxy/include",
+  ]
+
+  configs = [
+    "${mmi_path}:coverage_flags",
+    ":libmmi_server_config",
+    "${mmi_path}/service/filter:mmi_event_filter_config",
+  ]
+
+  cflags = [
+    "-Dprivate=public",
+    "-Dprotected=public",
+  ]
+
+  sources = [
+    "monitor/test/event_monitor_handler_newtest.cpp",
+  ]
+
+  deps = [
+    "${mmi_path}/service:libmmi-server",
+    "${mmi_path}/util:libmmi-util",
+    "${mmi_path}/frameworks/proxy:libmmi-common",
+  ]
+
+  external_deps = [
+    "cJSON:cjson",
+    "c_utils:utils",
+    "googletest:gmock_main",
+    "googletest:gtest_main",
+    "hilog:libhilog",
+    "image_framework:image_native",
+    "init:libbegetutil",
+    "ipc:ipc_core",
+    "libinput:libinput-third-mmi",
+    "preferences:native_preferences",
+    "samgr:samgr_proxy",
+  ]
+}
+
 ohos_unittest("ModuleLoaderTest") {
   module_out_path = module_output_path
 
