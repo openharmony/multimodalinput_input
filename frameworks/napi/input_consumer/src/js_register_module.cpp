@@ -473,7 +473,6 @@ static bool IsMatchKeyAction(bool isFinalKeydown, int32_t keyAction)
 
 static bool MatchCombinationKeys(sptr<KeyEventMonitorInfo> monitorInfo, std::shared_ptr<KeyEvent> keyEvent)
 {
-    CALL_DEBUG_ENTER;
     CHKPF(monitorInfo);
     CHKPF(keyEvent);
     auto keyOption = monitorInfo->keyOption;
@@ -482,7 +481,6 @@ static bool MatchCombinationKeys(sptr<KeyEventMonitorInfo> monitorInfo, std::sha
     int32_t infoFinalKey = keyOption->GetFinalKey();
     int32_t keyEventFinalKey = keyEvent->GetKeyCode();
     bool isFinalKeydown = keyOption->IsFinalKeyDown();
-    MMI_HILOGD("InfoFinalKey:%{private}d,keyEventFinalKey:%{private}d", infoFinalKey, keyEventFinalKey);
     if (infoFinalKey != keyEventFinalKey || items.size() > PRE_KEYS_SIZE ||
         !IsMatchKeyAction(isFinalKeydown, keyEvent->GetKeyAction())) {
         MMI_HILOGD("key Param invalid");
@@ -507,7 +505,7 @@ static bool MatchCombinationKeys(sptr<KeyEventMonitorInfo> monitorInfo, std::sha
         }
         count++;
     }
-    MMI_HILOGD("kevEventSize:%{public}d, infoSize:%{public}d", count, infoSize);
+
     std::optional<KeyEvent::KeyItem> keyItem = keyEvent->GetKeyItem();
     if (!keyItem) {
         MMI_HILOGE("The keyItem is nullopt");
@@ -533,7 +531,6 @@ static void SubKeyEventCallback(std::shared_ptr<KeyEvent> keyEvent, const std::s
         auto iter = callbacks.find(keyOptionKey);
         if (iter != callbacks.end()) {
             auto &list = iter->second;
-            MMI_HILOGD("list size:%{public}zu", list.size());
             for (auto monitorInfo : list) {
                 if (MatchCombinationKeys(monitorInfo, keyEvent)) {
                     info.push_back(monitorInfo);

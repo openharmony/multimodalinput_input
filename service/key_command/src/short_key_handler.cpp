@@ -118,7 +118,6 @@ bool ShortKeyHandler::MatchShortcutKey(std::shared_ptr<KeyEvent> keyEvent, Short
         return false;
     }
     if (!IsKeyMatch(shortcutKey, keyEvent)) {
-        MMI_HILOGD("Not key matched, next");
         return false;
     }
     int32_t delay = GetKeyDownDurationFromXml(shortcutKey.businessId);
@@ -142,11 +141,8 @@ bool ShortKeyHandler::MatchShortcutKey(std::shared_ptr<KeyEvent> keyEvent, Short
 
 bool ShortKeyHandler::IsKeyMatch(const ShortcutKey &shortcutKey, const std::shared_ptr<KeyEvent> &key)
 {
-    CALL_DEBUG_ENTER;
     CHKPF(key);
     if ((key->GetKeyCode() != shortcutKey.finalKey) || (shortcutKey.triggerType != key->GetKeyAction())) {
-        DfxHisysevent::ReportFailHandleKey("IsKeyMatch", key->GetKeyCode(),
-            DfxHisysevent::KEY_ERROR_CODE::INVALID_PARAMETER);
         return false;
     }
     if ((shortcutKey.preKeys.size() + 1) != key->GetKeyItems().size()) {
@@ -161,7 +157,6 @@ bool ShortKeyHandler::IsKeyMatch(const ShortcutKey &shortcutKey, const std::shar
             return false;
         }
     }
-    MMI_HILOGD("Leave, key matched");
     return true;
 }
 

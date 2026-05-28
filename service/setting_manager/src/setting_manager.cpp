@@ -421,7 +421,6 @@ template <typename T>
 bool SettingManager::GetValueInner(int32_t userId, const std::string &settingKey, const std::string &field, T &value)
 {
     if (!IsParamsValid(userId, settingKey, field)) {
-        MMI_HILOGE("Invalid param");
         return false;
     }
     if (flushFlag_.load() || !databaseReadyFlag_.load()) {

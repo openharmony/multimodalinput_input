@@ -94,7 +94,6 @@ void EventPreMonitorHandler::RemoveInputHandler(SessionPtr sess, int32_t handler
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
 bool EventPreMonitorHandler::OnHandleEvent(std::shared_ptr<KeyEvent> keyEvent)
 {
-    MMI_HILOGD("Handle KeyEvent");
     CHKPF(keyEvent);
     auto keyHandler = InputHandler->GetEventNormalizeHandler();
     CHKPF(keyHandler);
@@ -215,7 +214,6 @@ void EventPreMonitorHandler::MonitorCollection::RemoveMonitor(SessionPtr sess, i
 bool EventPreMonitorHandler::MonitorCollection::HandleEvent(std::shared_ptr<KeyEvent> keyEvent)
 {
     CHKPF(keyEvent);
-    MMI_HILOGD("Handle KeyEvent");
     NetPacket pkt(MmiMessageId::ON_PRE_KEY_EVENT);
     if (pkt.ChkRWError()) {
         MMI_HILOGE("Packet write key event failed");
@@ -225,7 +223,7 @@ bool EventPreMonitorHandler::MonitorCollection::HandleEvent(std::shared_ptr<KeyE
         auto &sessionHandlers = iter->second;
         for (auto it = sessionHandlers.begin(); it != sessionHandlers.end(); it++) {
             CHKPC(*it);
-            auto keys = (*it)->keys_;
+            const auto &keys = (*it)->keys_;
             auto keyIter = std::find(keys.begin(), keys.end(), keyEvent->GetKeyCode());
             if (keyIter != keys.end()) {
                 (*it)->SendToClient(keyEvent, pkt, (*it)->handlerId_);

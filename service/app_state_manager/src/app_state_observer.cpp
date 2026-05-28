@@ -73,10 +73,8 @@ int32_t ApplicationStateObserver::GetForegroundApplicationInfo(std::vector<AppEx
 
 std::vector<AppExecFwk::AppStateData> AppObserverManager::GetForegroundAppData()
 {
-    CALL_DEBUG_ENTER;
     BytraceAdapter::StartForegroundAppData("GetForegroundAppData", foregroundAppData_.size());
     std::lock_guard<std::mutex> guard(mutex_);
-    MMI_HILOGD("The foregroundAppData_.size():%{public}zu", foregroundAppData_.size());
     BytraceAdapter::StopForegroundAppData();
     return foregroundAppData_;
 }

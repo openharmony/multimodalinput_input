@@ -205,6 +205,7 @@ ohos_unittest("GestureTransformTest") {
   }
 
   include_dirs = [
+    "${mmi_path}/common/event_integrity/include",
     "${mmi_path}/interfaces/native/innerkits/common/include",
     "${mmi_path}/interfaces/native/innerkits/proxy/include",
     "${mmi_path}/service/app_state_manager/include",
@@ -721,6 +722,7 @@ ohos_unittest("TouchpadGestureTest") {
   ]
 
   include_dirs = [
+    "${mmi_path}/common/event_integrity/include",
     "${mmi_path}/interfaces/native/innerkits/common/include",
     "${mmi_path}/interfaces/native/innerkits/proxy/include",
     "${mmi_path}/service/account_manager/include",

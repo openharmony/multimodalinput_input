@@ -521,7 +521,6 @@ void KeyEventNormalize::UpdateSimulatedEventModifierState(const std::shared_ptr<
     std::vector<struct libinput_device*> input_devices;
     INPUT_DEV_MGR->GetMultiKeyboardDevice(input_devices);
     if (input_devices.empty()) {
-        MMI_HILOGW("No keyboard device is currently available");
         return;
     }
 
@@ -642,7 +641,6 @@ bool KeyEventNormalize::CheckSimulatedModifierKeyEvent(const std::shared_ptr<Key
     UpdateSimulatedEventModifierState(keyEvent);
     auto it = g_ModifierKeys.find(keyEvent->GetKeyCode());
     if (it == g_ModifierKeys.end()) {
-        MMI_HILOGW("The key event is not modifier key");
         return false;
     }
 

@@ -493,7 +493,6 @@ void KeyGestureManager::RemoveKeyGesture(int32_t id)
 
 bool KeyGestureManager::Intercept(std::shared_ptr<KeyEvent> keyEvent)
 {
-    CALL_INFO_TRACE;
     CHKPF(keyEvent);
     for (auto iter = keyGestures_.begin(); iter != keyGestures_.end(); ++iter) {
         CHKPC(*iter);

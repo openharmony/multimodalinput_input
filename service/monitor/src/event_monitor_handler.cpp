@@ -185,7 +185,6 @@ void EventMonitorHandler::MarkConsumed(int32_t eventId, SessionPtr session)
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
 bool EventMonitorHandler::OnHandleEvent(std::shared_ptr<KeyEvent> keyEvent)
 {
-    MMI_HILOGD("Handle KeyEvent");
     CHKPF(keyEvent);
     auto keyHandler = InputHandler->GetEventNormalizeHandler();
     CHKPF(keyHandler);
