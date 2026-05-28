@@ -428,6 +428,7 @@ int32_t ServerMsgHandler::OnInjectPointerEventExt(int32_t userId,
             }
             UpdatePointerEvent(pointerEvent);
             WIN_MGR->ProcessInjectEventGlobalXY(pointerEvent, useCoordinate);
+            UpdateMouseLocation(pointerEvent);
             inputEventNormalizeHandler->HandlePointerEvent(pointerEvent);
             CHKPR(pointerEvent, ERROR_NULL_POINTER);
             if (pointerEvent->HasFlag(InputEvent::EVENT_FLAG_ACCESSIBILITY)) {
@@ -642,6 +643,28 @@ void ServerMsgHandler::CalculateOffset(Direction direction, Offset &offset)
 #endif // OHOS_BUILD_ENABLE_POINTER
 
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
+void ServerMsgHandler::UpdateMouseLocation(std::shared_ptr<PointerEvent> pointerEvent)
+{
+    CHKPV(pointerEvent);
+    if (pointerEvent->HasFlag(InputEvent::EVENT_FLAG_RAW_POINTER_MOVEMENT) ||
+        pointerEvent->GetSourceType() != PointerEvent::SOURCE_TYPE_MOUSE ||
+        pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_MOVE) {
+        return;
+    }
+
+    PointerEvent::PointerItem item;
+    if (!pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), item)) {
+        MMI_HILOGE("Pointer event is corrupted");
+        return;
+    }
+
+    double displayX = item.GetDisplayXPos();
+    double displayY = item.GetDisplayYPos();
+    CursorPosition cursorPos = WIN_MGR->GetCursorPos();
+    int32_t displayId = cursorPos.displayId;
+    WIN_MGR->UpdateAndAdjustMouseLocation(displayId, displayX, displayY);
+}
+
 void ServerMsgHandler::UpdatePointerEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
     if ((!pointerEvent->HasFlag(InputEvent::EVENT_FLAG_RAW_POINTER_MOVEMENT) ||
