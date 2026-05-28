@@ -27,6 +27,8 @@
 #include "multimodal_event_handler.h"
 #include "system_info.h"
 #include "error_multimodal.h"
+#include "mouse_controller_impl.h"
+#include "keyboard_controller_impl.h"
 
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "InputManagerTest"
@@ -6627,6 +6629,34 @@ HWTEST_F(InputManagerTest, InputManagerTest_MouseScrollDirection_002, TestSize.L
     ASSERT_EQ(result, RET_OK);
     result = InputManager::GetInstance()->GetMouseScrollDirection(state);
     ASSERT_EQ(result, RET_OK);
+}
+
+/**
+ * @tc.name: InputManagerTest_CreateMouseController_001
+ * @tc.desc: Test CreateMouseController interface
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_CreateMouseController_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<MouseControllerImpl> controller;
+    int32_t ret = InputManager::GetInstance()->CreateMouseController(controller);
+    EXPECT_TRUE(ret == ERROR_NO_PERMISSION || ret == CAPABILITY_NOT_SUPPORTED);
+}
+
+/**
+ * @tc.name: InputManagerTest_CreateKeyboardController_001
+ * @tc.desc: Test CreateKeyboardController interface
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_CreateKeyboardController_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<KeyboardControllerImpl> controller;
+    int32_t ret = InputManager::GetInstance()->CreateKeyboardController(controller);
+    EXPECT_TRUE(ret == ERROR_NO_PERMISSION || ret == CAPABILITY_NOT_SUPPORTED);
 }
 } // namespace MMI
 } // namespace OHOS
