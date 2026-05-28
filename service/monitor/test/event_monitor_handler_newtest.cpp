@@ -55,7 +55,8 @@ public:
  * @tc.desc: Test AddInputHandler with key event and callback
  * @tc.type: FUNC
  */
-HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_AddInputHandler_Key_001, TestSize.Level1)
+HWTEST_F(EventMonitorHandlerNewTest,
+    EventMonitorHandlerNewTest_AddInputHandler_Key_001, TestSize.Level1)
 {
     EventMonitorHandler eventMonitorHandler;
     InputHandlerType handlerType = InputHandlerType::MONITOR;
@@ -73,7 +74,8 @@ HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_AddInputHandler_
  * @tc.desc: Test AddInputHandler with invalid event type
  * @tc.type: FUNC
  */
-HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_AddInputHandler_Key_002, TestSize.Level1)
+HWTEST_F(EventMonitorHandlerNewTest,
+    EventMonitorHandlerNewTest_AddInputHandler_Key_002, TestSize.Level1)
 {
     EventMonitorHandler eventMonitorHandler;
     InputHandlerType handlerType = InputHandlerType::MONITOR;
@@ -91,7 +93,8 @@ HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_AddInputHandler_
  * @tc.desc: Test AddInputHandler with key event and session
  * @tc.type: FUNC
  */
-HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_AddInputHandler_Key_003, TestSize.Level1)
+HWTEST_F(EventMonitorHandlerNewTest,
+    EventMonitorHandlerNewTest_AddInputHandler_Key_003, TestSize.Level1)
 {
     EventMonitorHandler eventMonitorHandler;
     InputHandlerType handlerType = InputHandlerType::MONITOR;
@@ -109,7 +112,8 @@ HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_AddInputHandler_
  * @tc.desc: Test AddInputHandler with key event and invalid session
  * @tc.type: FUNC
  */
-HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_AddInputHandler_Key_004, TestSize.Level1)
+HWTEST_F(EventMonitorHandlerNewTest,
+    EventMonitorHandlerNewTest_AddInputHandler_Key_004, TestSize.Level1)
 {
     EventMonitorHandler eventMonitorHandler;
     InputHandlerType handlerType = InputHandlerType::MONITOR;
@@ -127,7 +131,8 @@ HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_AddInputHandler_
  * @tc.desc: Test AddInputHandler with pointer event and callback
  * @tc.type: FUNC
  */
-HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_AddInputHandler_Pointer_001, TestSize.Level1)
+HWTEST_F(EventMonitorHandlerNewTest,
+    EventMonitorHandlerNewTest_AddInputHandler_Pointer_001, TestSize.Level1)
 {
     EventMonitorHandler eventMonitorHandler;
     InputHandlerType handlerType = InputHandlerType::MONITOR;
@@ -145,7 +150,8 @@ HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_AddInputHandler_
  * @tc.desc: Test AddInputHandler with pointer event and session
  * @tc.type: FUNC
  */
-HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_AddInputHandler_Pointer_002, TestSize.Level1)
+HWTEST_F(EventMonitorHandlerNewTest,
+    EventMonitorHandlerNewTest_AddInputHandler_Pointer_002, TestSize.Level1)
 {
     EventMonitorHandler eventMonitorHandler;
     InputHandlerType handlerType = InputHandlerType::MONITOR;
@@ -163,7 +169,8 @@ HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_AddInputHandler_
  * @tc.desc: Test AddInputHandler with touch event and callback
  * @tc.type: FUNC
  */
-HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_AddInputHandler_Touch_001, TestSize.Level1)
+HWTEST_F(EventMonitorHandlerNewTest,
+    EventMonitorHandlerNewTest_AddInputHandler_Touch_001, TestSize.Level1)
 {
     EventMonitorHandler eventMonitorHandler;
     InputHandlerType handlerType = InputHandlerType::MONITOR;
@@ -181,7 +188,8 @@ HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_AddInputHandler_
  * @tc.desc: Test AddInputHandler with actions vector and session
  * @tc.type: FUNC
  */
-HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_AddInputHandler_Actions_001, TestSize.Level1)
+HWTEST_F(EventMonitorHandlerNewTest,
+    EventMonitorHandlerNewTest_AddInputHandler_Actions_001, TestSize.Level1)
 {
     EventMonitorHandler eventMonitorHandler;
     InputHandlerType handlerType = InputHandlerType::MONITOR;
@@ -197,7 +205,8 @@ HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_AddInputHandler_
  * @tc.desc: Test AddInputHandler with actions vector and invalid session
  * @tc.type: FUNC
  */
-HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_AddInputHandler_Actions_002, TestSize.Level1)
+HWTEST_F(EventMonitorHandlerNewTest,
+    EventMonitorHandlerNewTest_AddInputHandler_Actions_002, TestSize.Level1)
 {
     EventMonitorHandler eventMonitorHandler;
     InputHandlerType handlerType = InputHandlerType::MONITOR;
@@ -213,7 +222,8 @@ HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_AddInputHandler_
  * @tc.desc: Test RemoveInputHandler with key event and callback
  * @tc.type: FUNC
  */
-HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_RemoveInputHandler_Key_001, TestSize.Level1)
+HWTEST_F(EventMonitorHandlerNewTest,
+    EventMonitorHandlerNewTest_RemoveInputHandler_Key_001, TestSize.Level1)
 {
     EventMonitorHandler eventMonitorHandler;
     InputHandlerType handlerType = InputHandlerType::MONITOR;
@@ -225,7 +235,8 @@ HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_RemoveInputHandl
     // First add a handler
     eventMonitorHandler.AddInputHandler(handlerType, eventType, callback, gestureType, fingers);
     // Then remove it - should not crash
-    ASSERT_NO_FATAL_FAILURE(eventMonitorHandler.RemoveInputHandler(handlerType, eventType, callback, gestureType, fingers));
+    ASSERT_NO_FATAL_FAILURE(eventMonitorHandler.RemoveInputHandler(
+        handlerType, eventType, callback, gestureType, fingers));
 }
 
 /**
@@ -233,7 +244,8 @@ HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_RemoveInputHandl
  * @tc.desc: Test RemoveInputHandler with key event and session
  * @tc.type: FUNC
  */
-HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_RemoveInputHandler_Key_002, TestSize.Level1)
+HWTEST_F(EventMonitorHandlerNewTest,
+    EventMonitorHandlerNewTest_RemoveInputHandler_Key_002, TestSize.Level1)
 {
     EventMonitorHandler eventMonitorHandler;
     InputHandlerType handlerType = InputHandlerType::MONITOR;
@@ -245,7 +257,8 @@ HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_RemoveInputHandl
     // First add a handler
     eventMonitorHandler.AddInputHandler(handlerType, eventType, session, gestureType, fingers);
     // Then remove it - should not crash
-    ASSERT_NO_FATAL_FAILURE(eventMonitorHandler.RemoveInputHandler(handlerType, eventType, session, gestureType, fingers));
+    ASSERT_NO_FATAL_FAILURE(eventMonitorHandler.RemoveInputHandler(
+        handlerType, eventType, session, gestureType, fingers));
 }
 
 /**
@@ -253,7 +266,8 @@ HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_RemoveInputHandl
  * @tc.desc: Test RemoveInputHandler with actions vector and session
  * @tc.type: FUNC
  */
-HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_RemoveInputHandler_Actions_001, TestSize.Level1)
+HWTEST_F(EventMonitorHandlerNewTest,
+    EventMonitorHandlerNewTest_RemoveInputHandler_Actions_001, TestSize.Level1)
 {
     EventMonitorHandler eventMonitorHandler;
     InputHandlerType handlerType = InputHandlerType::MONITOR;
@@ -271,7 +285,8 @@ HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_RemoveInputHandl
  * @tc.desc: Test MarkConsumed with valid event and session
  * @tc.type: FUNC
  */
-HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_MarkConsumed_001, TestSize.Level1)
+HWTEST_F(EventMonitorHandlerNewTest,
+    EventMonitorHandlerNewTest_MarkConsumed_001, TestSize.Level1)
 {
     EventMonitorHandler eventMonitorHandler;
     int32_t eventId = 100;
@@ -279,7 +294,8 @@ HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_MarkConsumed_001
     
     // First add a handler for this session
     auto callback = std::make_shared<MockInputEventConsumer>();
-    eventMonitorHandler.AddInputHandler(InputHandlerType::MONITOR, HANDLE_EVENT_TYPE_KEY, session, TOUCH_GESTURE_TYPE_NONE, 0);
+    eventMonitorHandler.AddInputHandler(InputHandlerType::MONITOR,
+        HANDLE_EVENT_TYPE_KEY, session, TOUCH_GESTURE_TYPE_NONE, 0);
     
     // Mark consumed - should not crash
     ASSERT_NO_FATAL_FAILURE(eventMonitorHandler.MarkConsumed(eventId, session));
@@ -290,7 +306,8 @@ HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_MarkConsumed_001
  * @tc.desc: Test MarkConsumed with invalid session
  * @tc.type: FUNC
  */
-HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_MarkConsumed_002, TestSize.Level1)
+HWTEST_F(EventMonitorHandlerNewTest,
+    EventMonitorHandlerNewTest_MarkConsumed_002, TestSize.Level1)
 {
     EventMonitorHandler eventMonitorHandler;
     int32_t eventId = 100;
@@ -305,7 +322,8 @@ HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_MarkConsumed_002
  * @tc.desc: Test CheckHasInputHandler with no handlers
  * @tc.type: FUNC
  */
-HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_CheckHasInputHandler_001, TestSize.Level1)
+HWTEST_F(EventMonitorHandlerNewTest,
+    EventMonitorHandlerNewTest_CheckHasInputHandler_001, TestSize.Level1)
 {
     EventMonitorHandler eventMonitorHandler;
     HandleEventType eventType = HANDLE_EVENT_TYPE_KEY;
@@ -319,7 +337,8 @@ HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_CheckHasInputHan
  * @tc.desc: Test CheckHasInputHandler with registered handler
  * @tc.type: FUNC
  */
-HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_CheckHasInputHandler_002, TestSize.Level1)
+HWTEST_F(EventMonitorHandlerNewTest,
+    EventMonitorHandlerNewTest_CheckHasInputHandler_002, TestSize.Level1)
 {
     EventMonitorHandler eventMonitorHandler;
     HandleEventType eventType = HANDLE_EVENT_TYPE_KEY;
@@ -338,7 +357,8 @@ HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_CheckHasInputHan
  * @tc.desc: Test Dump function
  * @tc.type: FUNC
  */
-HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_Dump_001, TestSize.Level1)
+HWTEST_F(EventMonitorHandlerNewTest,
+    EventMonitorHandlerNewTest_Dump_001, TestSize.Level1)
 {
     EventMonitorHandler eventMonitorHandler;
     int32_t fd = 1; // stdout
@@ -353,7 +373,8 @@ HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_Dump_001, TestSi
  * @tc.desc: Test GetMonitorCollection function
  * @tc.type: FUNC
  */
-HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_GetMonitorCollection_001, TestSize.Level1)
+HWTEST_F(EventMonitorHandlerNewTest,
+    EventMonitorHandlerNewTest_GetMonitorCollection_001, TestSize.Level1)
 {
     EventMonitorHandler eventMonitorHandler;
     
@@ -366,7 +387,8 @@ HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_GetMonitorCollec
  * @tc.desc: Test OnHandleEvent with key event having no monitor flag
  * @tc.type: FUNC
  */
-HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_OnHandleEvent_Key_001, TestSize.Level1)
+HWTEST_F(EventMonitorHandlerNewTest,
+    EventMonitorHandlerNewTest_OnHandleEvent_Key_001, TestSize.Level1)
 {
     EventMonitorHandler eventMonitorHandler;
     auto keyEvent = KeyEvent::Create();
@@ -382,7 +404,8 @@ HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_OnHandleEvent_Ke
  * @tc.desc: Test OnHandleEvent with key event without monitor flag
  * @tc.type: FUNC
  */
-HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_OnHandleEvent_Key_002, TestSize.Level1)
+HWTEST_F(EventMonitorHandlerNewTest,
+    EventMonitorHandlerNewTest_OnHandleEvent_Key_002, TestSize.Level1)
 {
     EventMonitorHandler eventMonitorHandler;
     auto keyEvent = KeyEvent::Create();
@@ -399,7 +422,8 @@ HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_OnHandleEvent_Ke
  * @tc.desc: Test OnHandleEvent with pointer event having no monitor flag
  * @tc.type: FUNC
  */
-HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_OnHandleEvent_Pointer_001, TestSize.Level1)
+HWTEST_F(EventMonitorHandlerNewTest,
+    EventMonitorHandlerNewTest_OnHandleEvent_Pointer_001, TestSize.Level1)
 {
     EventMonitorHandler eventMonitorHandler;
     auto pointerEvent = PointerEvent::Create();
@@ -415,7 +439,8 @@ HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_OnHandleEvent_Po
  * @tc.desc: Test OnHandleEvent with pointer event without monitor flag
  * @tc.type: FUNC
  */
-HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_OnHandleEvent_Pointer_002, TestSize.Level1)
+HWTEST_F(EventMonitorHandlerNewTest,
+    EventMonitorHandlerNewTest_OnHandleEvent_Pointer_002, TestSize.Level1)
 {
     EventMonitorHandler eventMonitorHandler;
     auto pointerEvent = PointerEvent::Create();
@@ -433,7 +458,8 @@ HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_OnHandleEvent_Po
  * @tc.desc: Test InitSessionLostCallback idempotency
  * @tc.type: FUNC
  */
-HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_InitSessionLostCallback_001, TestSize.Level1)
+HWTEST_F(EventMonitorHandlerNewTest,
+    EventMonitorHandlerNewTest_InitSessionLostCallback_001, TestSize.Level1)
 {
     EventMonitorHandler eventMonitorHandler;
     
@@ -451,7 +477,8 @@ HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_InitSessionLostC
  * @tc.desc: Test OnSessionLost with valid session
  * @tc.type: FUNC
  */
-HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_OnSessionLost_001, TestSize.Level1)
+HWTEST_F(EventMonitorHandlerNewTest,
+    EventMonitorHandlerNewTest_OnSessionLost_001, TestSize.Level1)
 {
     EventMonitorHandler eventMonitorHandler;
     SessionPtr session = std::make_shared<UDSSession>(PROGRAM_NAME, g_moduleType, g_writeFd, UID_ROOT, g_pid);
@@ -465,7 +492,8 @@ HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_OnSessionLost_00
  * @tc.desc: Test OnSessionLost with null session
  * @tc.type: FUNC
  */
-HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_OnSessionLost_002, TestSize.Level1)
+HWTEST_F(EventMonitorHandlerNewTest,
+    EventMonitorHandlerNewTest_OnSessionLost_002, TestSize.Level1)
 {
     EventMonitorHandler eventMonitorHandler;
     SessionPtr session = nullptr;
@@ -480,7 +508,8 @@ HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_OnSessionLost_00
  * @tc.desc: Test HandleKeyEvent with null event
  * @tc.type: FUNC
  */
-HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_HandleKeyEvent_001, TestSize.Level1)
+HWTEST_F(EventMonitorHandlerNewTest,
+    EventMonitorHandlerNewTest_HandleKeyEvent_001, TestSize.Level1)
 {
     EventMonitorHandler eventMonitorHandler;
     std::shared_ptr<KeyEvent> keyEvent = nullptr;
@@ -494,7 +523,8 @@ HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_HandleKeyEvent_0
  * @tc.desc: Test HandleKeyEvent with valid event
  * @tc.type: FUNC
  */
-HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_HandleKeyEvent_002, TestSize.Level1)
+HWTEST_F(EventMonitorHandlerNewTest,
+    EventMonitorHandlerNewTest_HandleKeyEvent_002, TestSize.Level1)
 {
     EventMonitorHandler eventMonitorHandler;
     auto keyEvent = KeyEvent::Create();
@@ -511,7 +541,8 @@ HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_HandleKeyEvent_0
  * @tc.desc: Test HandlePointerEvent with null event
  * @tc.type: FUNC
  */
-HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_HandlePointerEvent_001, TestSize.Level1)
+HWTEST_F(EventMonitorHandlerNewTest,
+    EventMonitorHandlerNewTest_HandlePointerEvent_001, TestSize.Level1)
 {
     EventMonitorHandler eventMonitorHandler;
     std::shared_ptr<PointerEvent> pointerEvent = nullptr;
@@ -525,7 +556,8 @@ HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_HandlePointerEve
  * @tc.desc: Test HandlePointerEvent with valid event
  * @tc.type: FUNC
  */
-HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_HandlePointerEvent_002, TestSize.Level1)
+HWTEST_F(EventMonitorHandlerNewTest,
+    EventMonitorHandlerNewTest_HandlePointerEvent_002, TestSize.Level1)
 {
     EventMonitorHandler eventMonitorHandler;
     auto pointerEvent = PointerEvent::Create();
@@ -543,7 +575,8 @@ HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_HandlePointerEve
  * @tc.desc: Test HandleTouchEvent with null event
  * @tc.type: FUNC
  */
-HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_HandleTouchEvent_001, TestSize.Level1)
+HWTEST_F(EventMonitorHandlerNewTest,
+    EventMonitorHandlerNewTest_HandleTouchEvent_001, TestSize.Level1)
 {
     EventMonitorHandler eventMonitorHandler;
     std::shared_ptr<PointerEvent> pointerEvent = nullptr;
@@ -557,7 +590,8 @@ HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_HandleTouchEvent
  * @tc.desc: Test HandleTouchEvent with valid touch event
  * @tc.type: FUNC
  */
-HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_HandleTouchEvent_002, TestSize.Level1)
+HWTEST_F(EventMonitorHandlerNewTest,
+    EventMonitorHandlerNewTest_HandleTouchEvent_002, TestSize.Level1)
 {
     EventMonitorHandler eventMonitorHandler;
     auto pointerEvent = PointerEvent::Create();
@@ -573,7 +607,8 @@ HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_HandleTouchEvent
  * @tc.desc: Test HandleTouchEvent with knuckle event
  * @tc.type: FUNC
  */
-HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_HandleTouchEvent_003, TestSize.Level1)
+HWTEST_F(EventMonitorHandlerNewTest,
+    EventMonitorHandlerNewTest_HandleTouchEvent_003, TestSize.Level1)
 {
     EventMonitorHandler eventMonitorHandler;
     auto pointerEvent = PointerEvent::Create();
@@ -596,7 +631,8 @@ HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_HandleTouchEvent
  * @tc.desc: Test ProcessScreenCapture when PLAYER_FRAMEWORK_EXISTS is not defined
  * @tc.type: FUNC
  */
-HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_ProcessScreenCapture_001, TestSize.Level1)
+HWTEST_F(EventMonitorHandlerNewTest,
+    EventMonitorHandlerNewTest_ProcessScreenCapture_001, TestSize.Level1)
 {
     EventMonitorHandler eventMonitorHandler;
     
@@ -610,7 +646,8 @@ HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_ProcessScreenCap
  * @tc.desc: Test AddInputHandler with nullptr callback returns error
  * @tc.type: FUNC
  */
-HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_AddInputHandler_NullCallback_001, TestSize.Level1)
+HWTEST_F(EventMonitorHandlerNewTest,
+    EventMonitorHandlerNewTest_AddInputHandler_NullCallback_001, TestSize.Level1)
 {
     EventMonitorHandler eventMonitorHandler;
     InputHandlerType handlerType = InputHandlerType::MONITOR;
@@ -628,7 +665,8 @@ HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_AddInputHandler_
  * @tc.desc: Test AddInputHandler with KEY|POINTER combined event type
  * @tc.type: FUNC
  */
-HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_AddInputHandler_CombinedEvent_001, TestSize.Level1)
+HWTEST_F(EventMonitorHandlerNewTest,
+    EventMonitorHandlerNewTest_AddInputHandler_CombinedEvent_001, TestSize.Level1)
 {
     EventMonitorHandler eventMonitorHandler;
     InputHandlerType handlerType = InputHandlerType::MONITOR;
@@ -651,7 +689,8 @@ HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_AddInputHandler_
  * @tc.desc: Test AddInputHandler with HANDLE_EVENT_TYPE_ALL
  * @tc.type: FUNC
  */
-HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_AddInputHandler_AllEvents_001, TestSize.Level1)
+HWTEST_F(EventMonitorHandlerNewTest,
+    EventMonitorHandlerNewTest_AddInputHandler_AllEvents_001, TestSize.Level1)
 {
     EventMonitorHandler eventMonitorHandler;
     InputHandlerType handlerType = InputHandlerType::MONITOR;
@@ -669,7 +708,8 @@ HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_AddInputHandler_
  * @tc.desc: Test AddInputHandler with INTERCEPTOR handler type
  * @tc.type: FUNC
  */
-HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_AddInputHandler_Interceptor_001, TestSize.Level1)
+HWTEST_F(EventMonitorHandlerNewTest,
+    EventMonitorHandlerNewTest_AddInputHandler_Interceptor_001, TestSize.Level1)
 {
     EventMonitorHandler eventMonitorHandler;
     InputHandlerType handlerType = InputHandlerType::INTERCEPTOR;
@@ -687,7 +727,8 @@ HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_AddInputHandler_
  * @tc.desc: Test adding multiple callbacks for different event types
  * @tc.type: FUNC
  */
-HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_AddInputHandler_MultipleCallbacks_001, TestSize.Level1)
+HWTEST_F(EventMonitorHandlerNewTest,
+    EventMonitorHandlerNewTest_AddInputHandler_MultipleCallbacks_001, TestSize.Level1)
 {
     EventMonitorHandler eventMonitorHandler;
     SessionPtr session1 = std::make_shared<UDSSession>(PROGRAM_NAME, g_moduleType, g_writeFd, UID_ROOT, g_pid);
@@ -710,7 +751,8 @@ HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_AddInputHandler_
  * @tc.desc: Test adding same callback with different event types
  * @tc.type: FUNC
  */
-HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_AddInputHandler_SameCallbackDifferentType_001, TestSize.Level1)
+HWTEST_F(EventMonitorHandlerNewTest,
+    EventMonitorHandlerNewTest_AddInputHandler_SameCallbackDifferentType_001, TestSize.Level1)
 {
     EventMonitorHandler eventMonitorHandler;
     SessionPtr session1 = std::make_shared<UDSSession>(PROGRAM_NAME, g_moduleType, g_writeFd, UID_ROOT, g_pid);
@@ -733,7 +775,8 @@ HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_AddInputHandler_
  * @tc.desc: Test RemoveInputHandler with non-existent handler - no crash
  * @tc.type: FUNC
  */
-HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_RemoveInputHandler_NonExistent_001, TestSize.Level1)
+HWTEST_F(EventMonitorHandlerNewTest,
+    EventMonitorHandlerNewTest_RemoveInputHandler_NonExistent_001, TestSize.Level1)
 {
     EventMonitorHandler eventMonitorHandler;
     auto callback = std::make_shared<MockInputEventConsumer>();
@@ -747,7 +790,8 @@ HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_RemoveInputHandl
  * @tc.desc: Test RemoveInputHandler with null callback - no crash
  * @tc.type: FUNC
  */
-HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_RemoveInputHandler_NullCallback_001, TestSize.Level1)
+HWTEST_F(EventMonitorHandlerNewTest,
+    EventMonitorHandlerNewTest_RemoveInputHandler_NullCallback_001, TestSize.Level1)
 {
     EventMonitorHandler eventMonitorHandler;
     std::shared_ptr<IInputEventHandler::IInputEventConsumer> callback = nullptr;
@@ -761,7 +805,8 @@ HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_RemoveInputHandl
  * @tc.desc: Test RemoveInputHandler with non-existent session - no crash
  * @tc.type: FUNC
  */
-HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_RemoveInputHandler_NonExistentSession_001, TestSize.Level1)
+HWTEST_F(EventMonitorHandlerNewTest,
+    EventMonitorHandlerNewTest_RemoveInputHandler_NonExistentSession_001, TestSize.Level1)
 {
     EventMonitorHandler eventMonitorHandler;
     SessionPtr session = std::make_shared<UDSSession>(PROGRAM_NAME, g_moduleType, g_writeFd, UID_ROOT, g_pid);
@@ -775,7 +820,8 @@ HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_RemoveInputHandl
  * @tc.desc: Test RemoveInputHandler with non-existent actions handler
  * @tc.type: FUNC
  */
-HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_RemoveInputHandler_NonExistentActions_001, TestSize.Level1)
+HWTEST_F(EventMonitorHandlerNewTest,
+    EventMonitorHandlerNewTest_RemoveInputHandler_NonExistentActions_001, TestSize.Level1)
 {
     EventMonitorHandler eventMonitorHandler;
     std::vector<int32_t> actionsType = {PointerEvent::POINTER_ACTION_DOWN};
@@ -789,7 +835,8 @@ HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_RemoveInputHandl
  * @tc.desc: Test removal and verify CheckHasInputHandler returns false
  * @tc.type: FUNC
  */
-HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_RemoveInputHandler_VerifyRemoval_001, TestSize.Level1)
+HWTEST_F(EventMonitorHandlerNewTest,
+    EventMonitorHandlerNewTest_RemoveInputHandler_VerifyRemoval_001, TestSize.Level1)
 {
     EventMonitorHandler eventMonitorHandler;
     SessionPtr session = std::make_shared<UDSSession>(PROGRAM_NAME, g_moduleType, g_writeFd, UID_ROOT, g_pid);
@@ -808,7 +855,8 @@ HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_RemoveInputHandl
  * @tc.desc: Test AddInputHandler with three finger swipe gesture
  * @tc.type: FUNC
  */
-HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_AddInputHandler_GestureSwipe_001, TestSize.Level1)
+HWTEST_F(EventMonitorHandlerNewTest,
+    EventMonitorHandlerNewTest_AddInputHandler_GestureSwipe_001, TestSize.Level1)
 {
     EventMonitorHandler eventMonitorHandler;
     auto callback = std::make_shared<MockInputEventConsumer>();
@@ -823,7 +871,8 @@ HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_AddInputHandler_
  * @tc.desc: Test AddInputHandler with pinch gesture
  * @tc.type: FUNC
  */
-HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_AddInputHandler_GesturePinch_001, TestSize.Level1)
+HWTEST_F(EventMonitorHandlerNewTest,
+    EventMonitorHandlerNewTest_AddInputHandler_GesturePinch_001, TestSize.Level1)
 {
     EventMonitorHandler eventMonitorHandler;
     auto callback = std::make_shared<MockInputEventConsumer>();
@@ -838,7 +887,8 @@ HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_AddInputHandler_
  * @tc.desc: Test AddInputHandler with rotate gesture
  * @tc.type: FUNC
  */
-HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_AddInputHandler_GestureRotate_001, TestSize.Level1)
+HWTEST_F(EventMonitorHandlerNewTest,
+    EventMonitorHandlerNewTest_AddInputHandler_GestureRotate_001, TestSize.Level1)
 {
     EventMonitorHandler eventMonitorHandler;
     auto callback = std::make_shared<MockInputEventConsumer>();
@@ -853,7 +903,8 @@ HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_AddInputHandler_
  * @tc.desc: Test AddInputHandler with four finger swipe gesture
  * @tc.type: FUNC
  */
-HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_AddInputHandler_GestureFourSwipe_001, TestSize.Level1)
+HWTEST_F(EventMonitorHandlerNewTest,
+    EventMonitorHandlerNewTest_AddInputHandler_GestureFourSwipe_001, TestSize.Level1)
 {
     EventMonitorHandler eventMonitorHandler;
     auto callback = std::make_shared<MockInputEventConsumer>();
@@ -868,7 +919,8 @@ HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_AddInputHandler_
  * @tc.desc: Test AddInputHandler with three finger tap gesture
  * @tc.type: FUNC
  */
-HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_AddInputHandler_GestureThreeTap_001, TestSize.Level1)
+HWTEST_F(EventMonitorHandlerNewTest,
+    EventMonitorHandlerNewTest_AddInputHandler_GestureThreeTap_001, TestSize.Level1)
 {
     EventMonitorHandler eventMonitorHandler;
     auto callback = std::make_shared<MockInputEventConsumer>();
@@ -883,7 +935,8 @@ HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_AddInputHandler_
  * @tc.desc: Test CheckHasInputHandler returns correct results for different types
  * @tc.type: FUNC
  */
-HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_CheckHasInputHandler_MultipleTypes_001, TestSize.Level1)
+HWTEST_F(EventMonitorHandlerNewTest,
+    EventMonitorHandlerNewTest_CheckHasInputHandler_MultipleTypes_001, TestSize.Level1)
 {
     EventMonitorHandler eventMonitorHandler;
     auto callback = std::make_shared<MockInputEventConsumer>();
@@ -901,7 +954,8 @@ HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_CheckHasInputHan
  * @tc.desc: Test CheckHasInputHandler with HANDLE_EVENT_TYPE_NONE
  * @tc.type: FUNC
  */
-HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_CheckHasInputHandler_NoneType_001, TestSize.Level1)
+HWTEST_F(EventMonitorHandlerNewTest,
+    EventMonitorHandlerNewTest_CheckHasInputHandler_NoneType_001, TestSize.Level1)
 {
     EventMonitorHandler eventMonitorHandler;
 
@@ -914,7 +968,8 @@ HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_CheckHasInputHan
  * @tc.desc: Test MarkConsumed with non-existent event ID
  * @tc.type: FUNC
  */
-HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_MarkConsumed_NonExistentEvent_001, TestSize.Level1)
+HWTEST_F(EventMonitorHandlerNewTest,
+    EventMonitorHandlerNewTest_MarkConsumed_NonExistentEvent_001, TestSize.Level1)
 {
     EventMonitorHandler eventMonitorHandler;
     int32_t eventId = 99999;
@@ -931,7 +986,8 @@ HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_MarkConsumed_Non
  * @tc.desc: Test MarkConsumed twice with same event - no crash
  * @tc.type: FUNC
  */
-HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_MarkConsumed_DoubleMark_001, TestSize.Level1)
+HWTEST_F(EventMonitorHandlerNewTest,
+    EventMonitorHandlerNewTest_MarkConsumed_DoubleMark_001, TestSize.Level1)
 {
     EventMonitorHandler eventMonitorHandler;
     int32_t eventId = 200;
@@ -949,7 +1005,8 @@ HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_MarkConsumed_Dou
  * @tc.desc: Test OnHandleEvent with key event when no handlers registered
  * @tc.type: FUNC
  */
-HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_OnHandleEvent_Key_WithHandler_001, TestSize.Level1)
+HWTEST_F(EventMonitorHandlerNewTest,
+    EventMonitorHandlerNewTest_OnHandleEvent_Key_WithHandler_001, TestSize.Level1)
 {
     EventMonitorHandler eventMonitorHandler;
     auto keyEvent = KeyEvent::Create();
@@ -964,7 +1021,8 @@ HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_OnHandleEvent_Ke
  * @tc.desc: Test OnHandleEvent with pointer event from mouse source
  * @tc.type: FUNC
  */
-HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_OnHandleEvent_Pointer_MouseSource_001, TestSize.Level1)
+HWTEST_F(EventMonitorHandlerNewTest,
+    EventMonitorHandlerNewTest_OnHandleEvent_Pointer_MouseSource_001, TestSize.Level1)
 {
     EventMonitorHandler eventMonitorHandler;
     auto pointerEvent = PointerEvent::Create();
@@ -980,7 +1038,8 @@ HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_OnHandleEvent_Po
  * @tc.desc: Test HandlePointerEvent with touchpad source
  * @tc.type: FUNC
  */
-HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_HandlePointerEvent_Touchpad_001, TestSize.Level1)
+HWTEST_F(EventMonitorHandlerNewTest,
+    EventMonitorHandlerNewTest_HandlePointerEvent_Touchpad_001, TestSize.Level1)
 {
     EventMonitorHandler eventMonitorHandler;
     auto pointerEvent = PointerEvent::Create();
@@ -995,7 +1054,8 @@ HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_HandlePointerEve
  * @tc.desc: Test HandleTouchEvent with finger tool type
  * @tc.type: FUNC
  */
-HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_HandleTouchEvent_Finger_001, TestSize.Level1)
+HWTEST_F(EventMonitorHandlerNewTest,
+    EventMonitorHandlerNewTest_HandleTouchEvent_Finger_001, TestSize.Level1)
 {
     EventMonitorHandler eventMonitorHandler;
     auto pointerEvent = PointerEvent::Create();
@@ -1016,7 +1076,8 @@ HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_HandleTouchEvent
  * @tc.desc: Test HandleTouchEvent with pen tool type
  * @tc.type: FUNC
  */
-HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_HandleTouchEvent_Pen_001, TestSize.Level1)
+HWTEST_F(EventMonitorHandlerNewTest,
+    EventMonitorHandlerNewTest_HandleTouchEvent_Pen_001, TestSize.Level1)
 {
     EventMonitorHandler eventMonitorHandler;
     auto pointerEvent = PointerEvent::Create();
@@ -1037,7 +1098,8 @@ HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_HandleTouchEvent
  * @tc.desc: Test AddInputHandler with empty actions vector
  * @tc.type: FUNC
  */
-HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_AddInputHandler_ActionsEmpty_001, TestSize.Level1)
+HWTEST_F(EventMonitorHandlerNewTest,
+    EventMonitorHandlerNewTest_AddInputHandler_ActionsEmpty_001, TestSize.Level1)
 {
     EventMonitorHandler eventMonitorHandler;
     InputHandlerType handlerType = InputHandlerType::MONITOR;
@@ -1053,7 +1115,8 @@ HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_AddInputHandler_
  * @tc.desc: Test AddInputHandler with single action
  * @tc.type: FUNC
  */
-HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_AddInputHandler_ActionsSingle_001, TestSize.Level1)
+HWTEST_F(EventMonitorHandlerNewTest,
+    EventMonitorHandlerNewTest_AddInputHandler_ActionsSingle_001, TestSize.Level1)
 {
     EventMonitorHandler eventMonitorHandler;
     InputHandlerType handlerType = InputHandlerType::MONITOR;
@@ -1069,7 +1132,8 @@ HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_AddInputHandler_
  * @tc.desc: Test AddInputHandler with many different actions
  * @tc.type: FUNC
  */
-HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_AddInputHandler_ActionsMany_001, TestSize.Level1)
+HWTEST_F(EventMonitorHandlerNewTest,
+    EventMonitorHandlerNewTest_AddInputHandler_ActionsMany_001, TestSize.Level1)
 {
     EventMonitorHandler eventMonitorHandler;
     InputHandlerType handlerType = InputHandlerType::MONITOR;
@@ -1090,7 +1154,8 @@ HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_AddInputHandler_
  * @tc.desc: Test Dump with multiple args
  * @tc.type: FUNC
  */
-HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_Dump_WithArgs_001, TestSize.Level1)
+HWTEST_F(EventMonitorHandlerNewTest,
+    EventMonitorHandlerNewTest_Dump_WithArgs_001, TestSize.Level1)
 {
     EventMonitorHandler eventMonitorHandler;
     int32_t fd = 1;
@@ -1104,7 +1169,8 @@ HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_Dump_WithArgs_00
  * @tc.desc: Test Dump with negative fd
  * @tc.type: FUNC
  */
-HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_Dump_WithNegativeFd_001, TestSize.Level1)
+HWTEST_F(EventMonitorHandlerNewTest,
+    EventMonitorHandlerNewTest_Dump_WithNegativeFd_001, TestSize.Level1)
 {
     EventMonitorHandler eventMonitorHandler;
     int32_t fd = -1;
@@ -1118,7 +1184,8 @@ HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_Dump_WithNegativ
  * @tc.desc: Test GetMonitorCollection after adding handlers
  * @tc.type: FUNC
  */
-HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_GetMonitorCollection_AfterAdd_001, TestSize.Level1)
+HWTEST_F(EventMonitorHandlerNewTest,
+    EventMonitorHandlerNewTest_GetMonitorCollection_AfterAdd_001, TestSize.Level1)
 {
     EventMonitorHandler eventMonitorHandler;
     auto callback = std::make_shared<MockInputEventConsumer>();
@@ -1135,7 +1202,8 @@ HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_GetMonitorCollec
  * @tc.desc: Test OnSessionLost with session that was registered
  * @tc.type: FUNC
  */
-HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_OnSessionLost_WithHandler_001, TestSize.Level1)
+HWTEST_F(EventMonitorHandlerNewTest,
+    EventMonitorHandlerNewTest_OnSessionLost_WithHandler_001, TestSize.Level1)
 {
     EventMonitorHandler eventMonitorHandler;
     SessionPtr session = std::make_shared<UDSSession>(PROGRAM_NAME, g_moduleType, g_writeFd, UID_ROOT, g_pid);
@@ -1151,7 +1219,8 @@ HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_OnSessionLost_Wi
  * @tc.desc: Test OnSessionLost with multiple registered sessions
  * @tc.type: FUNC
  */
-HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_OnSessionLost_MultipleSessions_001, TestSize.Level1)
+HWTEST_F(EventMonitorHandlerNewTest,
+    EventMonitorHandlerNewTest_OnSessionLost_MultipleSessions_001, TestSize.Level1)
 {
     EventMonitorHandler eventMonitorHandler;
     SessionPtr session1 = std::make_shared<UDSSession>(PROGRAM_NAME, g_moduleType, g_writeFd, UID_ROOT, g_pid);
@@ -1171,7 +1240,8 @@ HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_OnSessionLost_Mu
  * @tc.desc: Test HandleKeyEvent with registered monitor
  * @tc.type: FUNC
  */
-HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_HandleKeyEvent_WithMonitor_001, TestSize.Level1)
+HWTEST_F(EventMonitorHandlerNewTest,
+    EventMonitorHandlerNewTest_HandleKeyEvent_WithMonitor_001, TestSize.Level1)
 {
     EventMonitorHandler eventMonitorHandler;
     auto keyEvent = KeyEvent::Create();
@@ -1185,7 +1255,8 @@ HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_HandleKeyEvent_W
  * @tc.desc: Test AddInputHandler with session and gesture type
  * @tc.type: FUNC
  */
-HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_AddInputHandler_SessionWithGesture_001, TestSize.Level1)
+HWTEST_F(EventMonitorHandlerNewTest,
+    EventMonitorHandlerNewTest_AddInputHandler_SessionWithGesture_001, TestSize.Level1)
 {
     EventMonitorHandler eventMonitorHandler;
     SessionPtr session = std::make_shared<UDSSession>(PROGRAM_NAME, g_moduleType, g_writeFd, UID_ROOT, g_pid);
@@ -1200,7 +1271,8 @@ HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_AddInputHandler_
  * @tc.desc: Test AddInputHandler with various invalid inputs
  * @tc.type: FUNC
  */
-HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_AddInputHandler_SessionInvalidNoCrash_001, TestSize.Level1)
+HWTEST_F(EventMonitorHandlerNewTest,
+    EventMonitorHandlerNewTest_AddInputHandler_SessionInvalidNoCrash_001, TestSize.Level1)
 {
     EventMonitorHandler eventMonitorHandler;
     SessionPtr session = nullptr;
@@ -1220,7 +1292,8 @@ HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_AddInputHandler_
  * @tc.desc: Test ProcessScreenCapture start/stop cycle
  * @tc.type: FUNC
  */
-HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_ProcessScreenCapture_WithHandler_001, TestSize.Level1)
+HWTEST_F(EventMonitorHandlerNewTest,
+    EventMonitorHandlerNewTest_ProcessScreenCapture_WithHandler_001, TestSize.Level1)
 {
     EventMonitorHandler eventMonitorHandler;
 
@@ -1233,7 +1306,8 @@ HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_ProcessScreenCap
  * @tc.desc: Test AddInputHandler with session for multiple event types
  * @tc.type: FUNC
  */
-HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_AddInputHandler_SessionWithMultipleEventTypes_001, TestSize.Level1)
+HWTEST_F(EventMonitorHandlerNewTest,
+    EventMonitorHandlerNewTest_AddInputHandler_SessionWithMultipleEventTypes_001, TestSize.Level1)
 {
     EventMonitorHandler eventMonitorHandler;
     SessionPtr session = std::make_shared<UDSSession>(PROGRAM_NAME, g_moduleType, g_writeFd, UID_ROOT, g_pid);
@@ -1251,7 +1325,8 @@ HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_AddInputHandler_
  * @tc.desc: Test add, remove, and re-add the same handler
  * @tc.type: FUNC
  */
-HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_RemoveInputHandler_AddRemoveReAdd_001, TestSize.Level1)
+HWTEST_F(EventMonitorHandlerNewTest,
+    EventMonitorHandlerNewTest_RemoveInputHandler_AddRemoveReAdd_001, TestSize.Level1)
 {
     EventMonitorHandler eventMonitorHandler;
     auto callback = std::make_shared<MockInputEventConsumer>();
@@ -1273,7 +1348,8 @@ HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_RemoveInputHandl
  * @tc.desc: Test HandleKeyEvent with null key event
  * @tc.type: FUNC
  */
-HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_HandleKeyEvent_NullEvent_001, TestSize.Level1)
+HWTEST_F(EventMonitorHandlerNewTest,
+    EventMonitorHandlerNewTest_HandleKeyEvent_NullEvent_001, TestSize.Level1)
 {
     EventMonitorHandler eventMonitorHandler;
     std::shared_ptr<KeyEvent> keyEvent = nullptr;
@@ -1286,7 +1362,8 @@ HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_HandleKeyEvent_N
  * @tc.desc: Test HandleKeyEvent with created event and key code
  * @tc.type: FUNC
  */
-HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_HandleKeyEvent_CreatedEvent_001, TestSize.Level1)
+HWTEST_F(EventMonitorHandlerNewTest,
+    EventMonitorHandlerNewTest_HandleKeyEvent_CreatedEvent_001, TestSize.Level1)
 {
     EventMonitorHandler eventMonitorHandler;
     auto keyEvent = KeyEvent::Create();
@@ -1302,7 +1379,8 @@ HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_HandleKeyEvent_C
  * @tc.desc: Test HandlePointerEvent with null pointer event
  * @tc.type: FUNC
  */
-HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_HandlePointerEvent_NullEvent_001, TestSize.Level1)
+HWTEST_F(EventMonitorHandlerNewTest,
+    EventMonitorHandlerNewTest_HandlePointerEvent_NullEvent_001, TestSize.Level1)
 {
     EventMonitorHandler eventMonitorHandler;
     std::shared_ptr<PointerEvent> pointerEvent = nullptr;
@@ -1315,7 +1393,8 @@ HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_HandlePointerEve
  * @tc.desc: Test HandleTouchEvent with null pointer event
  * @tc.type: FUNC
  */
-HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_HandleTouchEvent_NullEvent_001, TestSize.Level1)
+HWTEST_F(EventMonitorHandlerNewTest,
+    EventMonitorHandlerNewTest_HandleTouchEvent_NullEvent_001, TestSize.Level1)
 {
     EventMonitorHandler eventMonitorHandler;
     std::shared_ptr<PointerEvent> pointerEvent = nullptr;
@@ -1328,7 +1407,8 @@ HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_HandleTouchEvent
  * @tc.desc: Test HandleTouchEvent with touch gesture action (Swipe)
  * @tc.type: FUNC
  */
-HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_HandleTouchEvent_TouchGestureAction_001, TestSize.Level1)
+HWTEST_F(EventMonitorHandlerNewTest,
+    EventMonitorHandlerNewTest_HandleTouchEvent_TouchGestureAction_001, TestSize.Level1)
 {
     EventMonitorHandler eventMonitorHandler;
     auto pointerEvent = PointerEvent::Create();
@@ -1344,7 +1424,8 @@ HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_HandleTouchEvent
  * @tc.desc: Test MarkConsumed without adding a session
  * @tc.type: FUNC
  */
-HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_MarkConsumed_NoSession_001, TestSize.Level1)
+HWTEST_F(EventMonitorHandlerNewTest,
+    EventMonitorHandlerNewTest_MarkConsumed_NoSession_001, TestSize.Level1)
 {
     EventMonitorHandler eventMonitorHandler;
     int32_t eventId = 300;
@@ -1358,7 +1439,8 @@ HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_MarkConsumed_NoS
  * @tc.desc: Test OnHandleEvent pointer without monitors
  * @tc.type: FUNC
  */
-HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_OnHandleEvent_Pointer_NoMonitors_001, TestSize.Level1)
+HWTEST_F(EventMonitorHandlerNewTest,
+    EventMonitorHandlerNewTest_OnHandleEvent_Pointer_NoMonitors_001, TestSize.Level1)
 {
     EventMonitorHandler eventMonitorHandler;
     auto pointerEvent = PointerEvent::Create();
@@ -1375,7 +1457,8 @@ HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_OnHandleEvent_Po
  * @tc.desc: Test OnHandleEvent pointer with no monitor flag set
  * @tc.type: FUNC
  */
-HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_OnHandleEvent_Pointer_NoMonitorFlag_001, TestSize.Level1)
+HWTEST_F(EventMonitorHandlerNewTest,
+    EventMonitorHandlerNewTest_OnHandleEvent_Pointer_NoMonitorFlag_001, TestSize.Level1)
 {
     EventMonitorHandler eventMonitorHandler;
     auto pointerEvent = PointerEvent::Create();
@@ -1391,7 +1474,8 @@ HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_OnHandleEvent_Po
  * @tc.desc: Test CheckHasInputHandler after removing all handlers
  * @tc.type: FUNC
  */
-HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_CheckHasInputHandler_AfterRemoveAll_001, TestSize.Level1)
+HWTEST_F(EventMonitorHandlerNewTest,
+    EventMonitorHandlerNewTest_CheckHasInputHandler_AfterRemoveAll_001, TestSize.Level1)
 {
     EventMonitorHandler eventMonitorHandler;
     SessionPtr session1 = std::make_shared<UDSSession>(PROGRAM_NAME, g_moduleType, g_writeFd, UID_ROOT, g_pid);
@@ -1415,7 +1499,8 @@ HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_CheckHasInputHan
  * @tc.desc: Test CheckHasInputHandler after removing only one of two handlers
  * @tc.type: FUNC
  */
-HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_CheckHasInputHandler_AfterPartialRemove_001, TestSize.Level1)
+HWTEST_F(EventMonitorHandlerNewTest,
+    EventMonitorHandlerNewTest_CheckHasInputHandler_AfterPartialRemove_001, TestSize.Level1)
 {
     EventMonitorHandler eventMonitorHandler;
     SessionPtr session1 = std::make_shared<UDSSession>(PROGRAM_NAME, g_moduleType, g_writeFd, UID_ROOT, g_pid);
@@ -1438,7 +1523,8 @@ HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_CheckHasInputHan
  * @tc.desc: Test AddInputHandler duplicate with same session
  * @tc.type: FUNC
  */
-HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_AddInputHandler_DuplicateSession_001, TestSize.Level1)
+HWTEST_F(EventMonitorHandlerNewTest,
+    EventMonitorHandlerNewTest_AddInputHandler_DuplicateSession_001, TestSize.Level1)
 {
     EventMonitorHandler eventMonitorHandler;
     SessionPtr session = std::make_shared<UDSSession>(PROGRAM_NAME, g_moduleType, g_writeFd, UID_ROOT, g_pid);
@@ -1457,7 +1543,8 @@ HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_AddInputHandler_
  * @tc.desc: Test OnHandleEvent key without monitor flag
  * @tc.type: FUNC
  */
-HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_OnHandleEvent_Key_NoHandler_001, TestSize.Level1)
+HWTEST_F(EventMonitorHandlerNewTest,
+    EventMonitorHandlerNewTest_OnHandleEvent_Key_NoHandler_001, TestSize.Level1)
 {
     EventMonitorHandler eventMonitorHandler;
     auto keyEvent = KeyEvent::Create();
@@ -1473,7 +1560,8 @@ HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_OnHandleEvent_Ke
  * @tc.desc: Test HandlePointerEvent with mouse source type
  * @tc.type: FUNC
  */
-HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_HandlePointerEvent_MouseSource_001, TestSize.Level1)
+HWTEST_F(EventMonitorHandlerNewTest,
+    EventMonitorHandlerNewTest_HandlePointerEvent_MouseSource_001, TestSize.Level1)
 {
     EventMonitorHandler eventMonitorHandler;
     auto pointerEvent = PointerEvent::Create();
@@ -1488,7 +1576,8 @@ HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_HandlePointerEve
  * @tc.desc: Test removing then adding with different event type
  * @tc.type: FUNC
  */
-HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_AddInputHandler_RemoveThenAddDifferentType_001, TestSize.Level1)
+HWTEST_F(EventMonitorHandlerNewTest,
+    EventMonitorHandlerNewTest_AddInputHandler_RemoveThenAddDifferentType_001, TestSize.Level1)
 {
     EventMonitorHandler eventMonitorHandler;
     auto callback = std::make_shared<MockInputEventConsumer>();
@@ -1508,7 +1597,8 @@ HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_AddInputHandler_
  * @tc.desc: Test adding many handlers to verify no crash at limit
  * @tc.type: FUNC
  */
-HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_AddInputHandler_MaxSessions_001, TestSize.Level1)
+HWTEST_F(EventMonitorHandlerNewTest,
+    EventMonitorHandlerNewTest_AddInputHandler_MaxSessions_001, TestSize.Level1)
 {
     EventMonitorHandler eventMonitorHandler;
 
@@ -1527,7 +1617,8 @@ HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_AddInputHandler_
  * @tc.desc: Test AddInputHandler with HANDLE_EVENT_TYPE_MOUSE
  * @tc.type: FUNC
  */
-HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_AddInputHandler_MouseType_001, TestSize.Level1)
+HWTEST_F(EventMonitorHandlerNewTest,
+    EventMonitorHandlerNewTest_AddInputHandler_MouseType_001, TestSize.Level1)
 {
     EventMonitorHandler eventMonitorHandler;
     auto callback = std::make_shared<MockInputEventConsumer>();
@@ -1542,7 +1633,8 @@ HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_AddInputHandler_
  * @tc.desc: Test AddInputHandler with HANDLE_EVENT_TYPE_TOUCH_GESTURE
  * @tc.type: FUNC
  */
-HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_AddInputHandler_TouchGestureType_001, TestSize.Level1)
+HWTEST_F(EventMonitorHandlerNewTest,
+    EventMonitorHandlerNewTest_AddInputHandler_TouchGestureType_001, TestSize.Level1)
 {
     EventMonitorHandler eventMonitorHandler;
     auto callback = std::make_shared<MockInputEventConsumer>();
@@ -1557,7 +1649,8 @@ HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_AddInputHandler_
  * @tc.desc: Test AddInputHandler with HANDLE_EVENT_TYPE_SWIPEINWARD
  * @tc.type: FUNC
  */
-HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_AddInputHandler_SwipeInward_001, TestSize.Level1)
+HWTEST_F(EventMonitorHandlerNewTest,
+    EventMonitorHandlerNewTest_AddInputHandler_SwipeInward_001, TestSize.Level1)
 {
     EventMonitorHandler eventMonitorHandler;
     auto callback = std::make_shared<MockInputEventConsumer>();
@@ -1572,7 +1665,8 @@ HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_AddInputHandler_
  * @tc.desc: Test AddInputHandler with HANDLE_EVENT_TYPE_THREEFINGERSSWIP
  * @tc.type: FUNC
  */
-HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_AddInputHandler_ThreeFingerSwipeType_001, TestSize.Level1)
+HWTEST_F(EventMonitorHandlerNewTest,
+    EventMonitorHandlerNewTest_AddInputHandler_ThreeFingerSwipeType_001, TestSize.Level1)
 {
     EventMonitorHandler eventMonitorHandler;
     auto callback = std::make_shared<MockInputEventConsumer>();
@@ -1587,7 +1681,8 @@ HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_AddInputHandler_
  * @tc.desc: Test AddInputHandler with HANDLE_EVENT_TYPE_FOURFINGERSSWIP
  * @tc.type: FUNC
  */
-HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_AddInputHandler_FourFingerSwipeType_001, TestSize.Level1)
+HWTEST_F(EventMonitorHandlerNewTest,
+    EventMonitorHandlerNewTest_AddInputHandler_FourFingerSwipeType_001, TestSize.Level1)
 {
     EventMonitorHandler eventMonitorHandler;
     auto callback = std::make_shared<MockInputEventConsumer>();
@@ -1602,7 +1697,8 @@ HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_AddInputHandler_
  * @tc.desc: Test AddInputHandler with HANDLE_EVENT_TYPE_ROTATE
  * @tc.type: FUNC
  */
-HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_AddInputHandler_RotateType_001, TestSize.Level1)
+HWTEST_F(EventMonitorHandlerNewTest,
+    EventMonitorHandlerNewTest_AddInputHandler_RotateType_001, TestSize.Level1)
 {
     EventMonitorHandler eventMonitorHandler;
     auto callback = std::make_shared<MockInputEventConsumer>();
@@ -1617,7 +1713,8 @@ HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_AddInputHandler_
  * @tc.desc: Test AddInputHandler with HANDLE_EVENT_TYPE_PINCH
  * @tc.type: FUNC
  */
-HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_AddInputHandler_PinchType_001, TestSize.Level1)
+HWTEST_F(EventMonitorHandlerNewTest,
+    EventMonitorHandlerNewTest_AddInputHandler_PinchType_001, TestSize.Level1)
 {
     EventMonitorHandler eventMonitorHandler;
     auto callback = std::make_shared<MockInputEventConsumer>();
@@ -1632,7 +1729,8 @@ HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_AddInputHandler_
  * @tc.desc: Test AddInputHandler with HANDLE_EVENT_TYPE_THREEFINGERSTAP
  * @tc.type: FUNC
  */
-HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_AddInputHandler_ThreeFingerTapType_001, TestSize.Level1)
+HWTEST_F(EventMonitorHandlerNewTest,
+    EventMonitorHandlerNewTest_AddInputHandler_ThreeFingerTapType_001, TestSize.Level1)
 {
     EventMonitorHandler eventMonitorHandler;
     auto callback = std::make_shared<MockInputEventConsumer>();
@@ -1647,7 +1745,8 @@ HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_AddInputHandler_
  * @tc.desc: Test RemoveInputHandler with non-MONITOR handler type
  * @tc.type: FUNC
  */
-HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_RemoveInputHandler_WrongHandlerType_001, TestSize.Level1)
+HWTEST_F(EventMonitorHandlerNewTest,
+    EventMonitorHandlerNewTest_RemoveInputHandler_WrongHandlerType_001, TestSize.Level1)
 {
     EventMonitorHandler eventMonitorHandler;
     auto callback = std::make_shared<MockInputEventConsumer>();
@@ -1664,7 +1763,8 @@ HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_RemoveInputHandl
  * @tc.desc: Test RemoveInputHandler with different callback should not affect original
  * @tc.type: FUNC
  */
-HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_RemoveInputHandler_DifferentCallback_001, TestSize.Level1)
+HWTEST_F(EventMonitorHandlerNewTest,
+    EventMonitorHandlerNewTest_RemoveInputHandler_DifferentCallback_001, TestSize.Level1)
 {
     EventMonitorHandler eventMonitorHandler;
     auto callback1 = std::make_shared<MockInputEventConsumer>();
@@ -1684,7 +1784,8 @@ HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_RemoveInputHandl
  * @tc.desc: Test HandleKeyEvent with function key
  * @tc.type: FUNC
  */
-HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_HandleKeyEvent_FunctionKey_001, TestSize.Level1)
+HWTEST_F(EventMonitorHandlerNewTest,
+    EventMonitorHandlerNewTest_HandleKeyEvent_FunctionKey_001, TestSize.Level1)
 {
     EventMonitorHandler eventMonitorHandler;
     auto keyEvent = KeyEvent::Create();
@@ -1700,7 +1801,8 @@ HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_HandleKeyEvent_F
  * @tc.desc: Test HandlePointerEvent with touch gesture action
  * @tc.type: FUNC
  */
-HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_HandlePointerEvent_TouchGesture_001, TestSize.Level1)
+HWTEST_F(EventMonitorHandlerNewTest,
+    EventMonitorHandlerNewTest_HandlePointerEvent_TouchGesture_001, TestSize.Level1)
 {
     EventMonitorHandler eventMonitorHandler;
     auto pointerEvent = PointerEvent::Create();
@@ -1716,7 +1818,8 @@ HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_HandlePointerEve
  * @tc.desc: Test HandleTouchEvent with SWIPE_UPDATE action
  * @tc.type: FUNC
  */
-HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_HandleTouchEvent_SwipeUpdate_001, TestSize.Level1)
+HWTEST_F(EventMonitorHandlerNewTest,
+    EventMonitorHandlerNewTest_HandleTouchEvent_SwipeUpdate_001, TestSize.Level1)
 {
     EventMonitorHandler eventMonitorHandler;
     auto pointerEvent = PointerEvent::Create();
@@ -1732,7 +1835,8 @@ HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_HandleTouchEvent
  * @tc.desc: Test HandleTouchEvent with SWIPE_END action
  * @tc.type: FUNC
  */
-HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_HandleTouchEvent_SwipeEnd_001, TestSize.Level1)
+HWTEST_F(EventMonitorHandlerNewTest,
+    EventMonitorHandlerNewTest_HandleTouchEvent_SwipeEnd_001, TestSize.Level1)
 {
     EventMonitorHandler eventMonitorHandler;
     auto pointerEvent = PointerEvent::Create();
@@ -1748,7 +1852,8 @@ HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_HandleTouchEvent
  * @tc.desc: Test HandleTouchEvent with multiple pointer items
  * @tc.type: FUNC
  */
-HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_HandleTouchEvent_MultiplePointers_001, TestSize.Level1)
+HWTEST_F(EventMonitorHandlerNewTest,
+    EventMonitorHandlerNewTest_HandleTouchEvent_MultiplePointers_001, TestSize.Level1)
 {
     EventMonitorHandler eventMonitorHandler;
     auto pointerEvent = PointerEvent::Create();
@@ -1774,7 +1879,8 @@ HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_HandleTouchEvent
  * @tc.desc: Test OnHandleEvent key without NO_MONITOR flag
  * @tc.type: FUNC
  */
-HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_OnHandleEvent_Key_ForceMonitor_001, TestSize.Level1)
+HWTEST_F(EventMonitorHandlerNewTest,
+    EventMonitorHandlerNewTest_OnHandleEvent_Key_ForceMonitor_001, TestSize.Level1)
 {
     EventMonitorHandler eventMonitorHandler;
     auto keyEvent = KeyEvent::Create();
@@ -1790,7 +1896,8 @@ HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_OnHandleEvent_Ke
  * @tc.desc: Test OnHandleEvent pointer without NO_MONITOR flag
  * @tc.type: FUNC
  */
-HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_OnHandleEvent_Pointer_ForceMonitor_001, TestSize.Level1)
+HWTEST_F(EventMonitorHandlerNewTest,
+    EventMonitorHandlerNewTest_OnHandleEvent_Pointer_ForceMonitor_001, TestSize.Level1)
 {
     EventMonitorHandler eventMonitorHandler;
     auto pointerEvent = PointerEvent::Create();
@@ -1807,7 +1914,8 @@ HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_OnHandleEvent_Po
  * @tc.desc: Test CheckHasInputHandler with combined type after adding
  * @tc.type: FUNC
  */
-HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_CheckHasInputHandler_CombinedType_001, TestSize.Level1)
+HWTEST_F(EventMonitorHandlerNewTest,
+    EventMonitorHandlerNewTest_CheckHasInputHandler_CombinedType_001, TestSize.Level1)
 {
     EventMonitorHandler eventMonitorHandler;
     auto callback = std::make_shared<MockInputEventConsumer>();
@@ -1825,7 +1933,8 @@ HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_CheckHasInputHan
  * @tc.desc: Test AddInputHandler with different handler types
  * @tc.type: FUNC
  */
-HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_AddInputHandler_DifferentHandlerTypes_001, TestSize.Level1)
+HWTEST_F(EventMonitorHandlerNewTest,
+    EventMonitorHandlerNewTest_AddInputHandler_DifferentHandlerTypes_001, TestSize.Level1)
 {
     EventMonitorHandler eventMonitorHandler;
     auto callback = std::make_shared<MockInputEventConsumer>();
@@ -1844,7 +1953,8 @@ HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_AddInputHandler_
  * @tc.desc: Test RemoveInputHandler with actions that exist
  * @tc.type: FUNC
  */
-HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_AddInputHandler_RemoveActions_001, TestSize.Level1)
+HWTEST_F(EventMonitorHandlerNewTest,
+    EventMonitorHandlerNewTest_AddInputHandler_RemoveActions_001, TestSize.Level1)
 {
     EventMonitorHandler eventMonitorHandler;
     std::vector<int32_t> actionsType = {PointerEvent::POINTER_ACTION_DOWN};
@@ -1860,7 +1970,8 @@ HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_AddInputHandler_
  * @tc.desc: Test AddInputHandler with same session update event type
  * @tc.type: FUNC
  */
-HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_AddInputHandler_UpdateEventType_001, TestSize.Level1)
+HWTEST_F(EventMonitorHandlerNewTest,
+    EventMonitorHandlerNewTest_AddInputHandler_UpdateEventType_001, TestSize.Level1)
 {
     EventMonitorHandler eventMonitorHandler;
     auto callback = std::make_shared<MockInputEventConsumer>();
@@ -1879,7 +1990,8 @@ HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_AddInputHandler_
  * @tc.desc: Test HandleTouchEvent with mouse source type (should be no-op)
  * @tc.type: FUNC
  */
-HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_HandleTouchEvent_MouseSource_001, TestSize.Level1)
+HWTEST_F(EventMonitorHandlerNewTest,
+    EventMonitorHandlerNewTest_HandleTouchEvent_MouseSource_001, TestSize.Level1)
 {
     EventMonitorHandler eventMonitorHandler;
     auto pointerEvent = PointerEvent::Create();
@@ -1894,7 +2006,8 @@ HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_HandleTouchEvent
  * @tc.desc: Test HandleKeyEvent with escape key
  * @tc.type: FUNC
  */
-HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_HandleKeyEvent_EscapeKey_001, TestSize.Level1)
+HWTEST_F(EventMonitorHandlerNewTest,
+    EventMonitorHandlerNewTest_HandleKeyEvent_EscapeKey_001, TestSize.Level1)
 {
     EventMonitorHandler eventMonitorHandler;
     auto keyEvent = KeyEvent::Create();
@@ -1910,7 +2023,8 @@ HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_HandleKeyEvent_E
  * @tc.desc: Test HandlePointerEvent with joystick source type
  * @tc.type: FUNC
  */
-HWTEST_F(EventMonitorHandlerNewTest, EventMonitorHandlerNewTest_HandlePointerEvent_JoystickSource_001, TestSize.Level1)
+HWTEST_F(EventMonitorHandlerNewTest,
+    EventMonitorHandlerNewTest_HandlePointerEvent_JoystickSource_001, TestSize.Level1)
 {
     EventMonitorHandler eventMonitorHandler;
     auto pointerEvent = PointerEvent::Create();
