@@ -2930,9 +2930,6 @@ int32_t PointerDrawingManager::GetHardwareCursorStats(int32_t pid, uint32_t &fra
 
 void PointerDrawingManager::SubscribeScreenModeChange(uint64_t tid)
 {
-    if (!GetHardCursorEnabled()) {
-        return;
-    }
     workerThreadId_.store(tid);
     std::vector<sptr<OHOS::Rosen::ScreenInfo>> screenInfos;
     if (!screenInfos.empty()) {
@@ -2940,9 +2937,7 @@ void PointerDrawingManager::SubscribeScreenModeChange(uint64_t tid)
     }
 
     auto callback = [this](const std::vector<sptr<OHOS::Rosen::ScreenInfo>> &screens) {
-        if (GetHardCursorEnabled()) {
-            this->OnScreenModeChange(screens);
-        }
+        this->OnScreenModeChange(screens);
     };
     if (screenModeChangeListener_ != nullptr) {
         OHOS::Rosen::ScreenManagerLite::GetInstance().
@@ -2978,9 +2973,6 @@ void PointerDrawingManager::UnsubscribeScreenModeChange()
 
 void PointerDrawingManager::RegisterDisplayStatusReceiver()
 {
-    if (!GetHardCursorEnabled()) {
-        return;
-    }
     if (initDisplayStatusReceiverFlag_) {
         MMI_HILOGE("Display status receiver has subscribed");
         return;
@@ -3258,11 +3250,30 @@ void PointerDrawingManager::OnScreenModeChange(const std::vector<sptr<OHOS::Rose
             MMI_HILOGE("skip ScreenModeChange callback");
             return RET_OK;
         }
+        this->SetMainScreenTargetDevice(screens);
+
+        bool isHardCursorEnabled = this->GetHardCursorEnabled();
+        if (!isHardCursorEnabled) {
+            return RET_OK;
+        }
+
         auto mainScreen = this->UpdateScreenPointerAndFindMainScreenInfo(screens);
         this->UpdateScreenScalesAndPadding(mainScreen);
         this->UpdatePointerVisible();
         return RET_OK;
     });
+}
+
+void PointerDrawingManager::SetMainScreenTargetDevice(const std::vector<sptr<OHOS::Rosen::ScreenInfo>> &screens)
+{
+    for (const auto &screen : screens) {
+        if (screen == nullptr || screen->GetSourceMode() != OHOS::Rosen::ScreenSourceMode::SCREEN_MAIN) {
+            continue;
+        }
+        hardwareCursorPointerManager_->SetTargetDevice(static_cast<uint32_t>(screen->GetRsId()));
+        MMI_HILOGI("SetTargetDevice rsId=%{public}" PRIu64, screen->GetRsId());
+        break;
+    }
 }
 
 Direction PointerDrawingManager::CalculateRenderDirection(bool isHard)

@@ -259,6 +259,7 @@ private:
     sptr<OHOS::Rosen::ScreenInfo> UpdateScreenPointerAndFindMainScreenInfo(
         const std::vector<sptr<OHOS::Rosen::ScreenInfo>> &screens);
     void UpdateScreenScalesAndPadding(const sptr<OHOS::Rosen::ScreenInfo> &mainScreen);
+    void SetMainScreenTargetDevice(const std::vector<sptr<OHOS::Rosen::ScreenInfo>> &screens);
     void PostTaskRSLocation(int32_t physicalX, int32_t physicalY, std::shared_ptr<Rosen::RSSurfaceNode> surfaceNode);
     int32_t InitVsync(MOUSE_ICON mouseStyle);
     void DumpScreenInfo(std::ostringstream& oss);

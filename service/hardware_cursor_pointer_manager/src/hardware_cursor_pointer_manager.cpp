@@ -31,14 +31,9 @@ constexpr int32_t GET_POWER_INTERFACE_TIMER_SPAN_S { 5 };
 
 void HardwareCursorPointerManager::SetTargetDevice(uint32_t devId)
 {
-    if (static_cast<int32_t>(devId) < 0) {
-        MMI_HILOGE("SetTargetDevice devId %{public}d is invalid", static_cast<int32_t>(devId));
-        return;
-    }
-
     if (devId != devId_) {
+        MMI_HILOGI("SetTargetDevice devId_ changed:{%{public}u,%{public}u}", devId_, devId);
         devId_ = devId;
-        MMI_HILOGI("SetTargetDevice devId_ changed");
         isEnableState_ = false;
         isDeviceChange_ = false;
     }
