@@ -1043,6 +1043,38 @@ int32_t InputWindowsManager::SetDisplayBind(int32_t deviceId, int32_t displayId,
     return bindInfo_.SetDisplayBind(deviceId, displayId, msg);
 }
 
+int32_t InputWindowsManager::BindDeviceToDisplayGroupByDisplay(int32_t deviceId, int32_t displayId, std::string &msg)
+{
+    CALL_DEBUG_ENTER;
+    MMI_HILOGI("BindDeviceToDisplayGroupByDisplay deviceId:%{public}d, displayId:%{public}d", deviceId, displayId);
+    int32_t resolvedGroupId = -1;
+    for (const auto &[groupId, groupInfo] : displayGroupInfoMap_) {
+        for (const auto &displayInfo : groupInfo.displaysInfo) {
+            if (displayInfo.id == displayId) {
+                resolvedGroupId = groupId;
+                break;
+            }
+        }
+        if (resolvedGroupId != -1) {
+            break;
+        }
+    }
+    if (resolvedGroupId == -1) {
+        msg = "Display ID " + std::to_string(displayId) + " not found in any display group";
+        MMI_HILOGE("BindDeviceToDisplayGroupByDisplay failed: %{public}s", msg.c_str());
+        return RET_ERR;
+    }
+    MMI_HILOGI("Resolved displayId:%{public}d to groupId:%{public}d", displayId, resolvedGroupId);
+    return bindInfo_.AddRuntimeBinding(deviceId, displayId, resolvedGroupId);
+}
+
+int32_t InputWindowsManager::UnbindDeviceFromDisplayGroup(int32_t deviceId, std::string &msg)
+{
+    CALL_DEBUG_ENTER;
+    MMI_HILOGI("UnbindDeviceFromDisplayGroup deviceId:%{public}d", deviceId);
+    return bindInfo_.RemoveRuntimeBinding(deviceId);
+}
+
 void InputWindowsManager::UpdateCaptureMode(const OLD::DisplayGroupInfo &displayGroupInfo)
 {
     auto &WindowInfo = GetWindowInfoVector(displayGroupInfo.groupId);

@@ -17,7 +17,9 @@
 #define INPUT_DISPLAY_BIND_HELPER_H
 
 #include <list>
+#include <optional>
 #include <set>
+#include <unordered_map>
 
 #include "window_info.h"
 
@@ -70,6 +72,12 @@ private:
     BindInfo GetUnbindDisplay();
     std::list<BindInfo> infos_;
 };
+struct RuntimeDeviceBinding {
+    int32_t deviceId;
+    int32_t displayId;
+    int32_t groupId;
+};
+
 class InputDisplayBindHelper {
 public:
     InputDisplayBindHelper(const std::string bindCfgFile);
@@ -93,10 +101,19 @@ public:
     std::string GetInputNode(const std::string &inputNodeName);
     bool GetRsIdByInputNodeNameCfg(const std::string &nodeName, int32_t &cfgRsId) const;
 
+    int32_t AddRuntimeBinding(int32_t deviceId, int32_t displayId, int32_t groupId);
+    int32_t RemoveRuntimeBinding(int32_t deviceId);
+    std::optional<RuntimeDeviceBinding> GetRuntimeBinding(int32_t deviceId) const;
+    void ClearRuntimeBindingsByDevice(int32_t deviceId);
+    void ClearRuntimeBindingsByDisplay(int32_t displayId);
+    void ClearRuntimeBindingsByGroup(int32_t groupId);
+    void ClearAllRuntimeBindings();
+
 private:
     const std::string fileName_;
     std::shared_ptr<BindInfos> infos_;
     std::shared_ptr<BindInfos> configFileInfos_;
+    std::unordered_map<int32_t, RuntimeDeviceBinding> runtimeBindings_;
 };
 } // namespace MMI
 } // namespace OHOS

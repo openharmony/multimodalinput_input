@@ -92,6 +92,8 @@ public:
     virtual bool GetMouseIsCaptureMode() const = 0;
     virtual int32_t GetDisplayBindInfo(DisplayBindInfos &infos) = 0;
     virtual int32_t SetDisplayBind(int32_t deviceId, int32_t displayId, std::string &msg) = 0;
+    virtual int32_t BindDeviceToDisplayGroupByDisplay(int32_t deviceId, int32_t displayId, std::string &msg) = 0;
+    virtual int32_t UnbindDeviceFromDisplayGroup(int32_t deviceId, std::string &msg) = 0;
     virtual int32_t AppendExtraData(const ExtraData& extraData) = 0;
     virtual bool IsWindowVisible(int32_t pid) = 0;
     virtual ExtraData GetExtraData() const = 0;

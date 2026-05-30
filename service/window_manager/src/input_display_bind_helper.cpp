@@ -754,5 +754,66 @@ std::string InputDisplayBindHelper::Dumps() const
     oss << *infos_;
     return oss.str();
 }
+
+int32_t InputDisplayBindHelper::AddRuntimeBinding(int32_t deviceId, int32_t displayId, int32_t groupId)
+{
+    MMI_HILOGI("AddRuntimeBinding deviceId:%{public}d, displayId:%{public}d, groupId:%{public}d",
+        deviceId, displayId, groupId);
+    RuntimeDeviceBinding binding = { deviceId, displayId, groupId };
+    runtimeBindings_[deviceId] = binding;
+    return RET_OK;
+}
+
+int32_t InputDisplayBindHelper::RemoveRuntimeBinding(int32_t deviceId)
+{
+    MMI_HILOGI("RemoveRuntimeBinding deviceId:%{public}d", deviceId);
+    runtimeBindings_.erase(deviceId);
+    return RET_OK;
+}
+
+std::optional<RuntimeDeviceBinding> InputDisplayBindHelper::GetRuntimeBinding(int32_t deviceId) const
+{
+    auto it = runtimeBindings_.find(deviceId);
+    if (it != runtimeBindings_.end()) {
+        return it->second;
+    }
+    return std::nullopt;
+}
+
+void InputDisplayBindHelper::ClearRuntimeBindingsByDevice(int32_t deviceId)
+{
+    MMI_HILOGI("ClearRuntimeBindingsByDevice deviceId:%{public}d", deviceId);
+    runtimeBindings_.erase(deviceId);
+}
+
+void InputDisplayBindHelper::ClearRuntimeBindingsByDisplay(int32_t displayId)
+{
+    MMI_HILOGI("ClearRuntimeBindingsByDisplay displayId:%{public}d", displayId);
+    for (auto it = runtimeBindings_.begin(); it != runtimeBindings_.end();) {
+        if (it->second.displayId == displayId) {
+            it = runtimeBindings_.erase(it);
+        } else {
+            ++it;
+        }
+    }
+}
+
+void InputDisplayBindHelper::ClearRuntimeBindingsByGroup(int32_t groupId)
+{
+    MMI_HILOGI("ClearRuntimeBindingsByGroup groupId:%{public}d", groupId);
+    for (auto it = runtimeBindings_.begin(); it != runtimeBindings_.end();) {
+        if (it->second.groupId == groupId) {
+            it = runtimeBindings_.erase(it);
+        } else {
+            ++it;
+        }
+    }
+}
+
+void InputDisplayBindHelper::ClearAllRuntimeBindings()
+{
+    MMI_HILOGI("ClearAllRuntimeBindings");
+    runtimeBindings_.clear();
+}
 } // namespace MMI
 } // namespace OHOS

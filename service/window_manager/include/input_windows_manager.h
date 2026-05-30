@@ -83,6 +83,8 @@ public:
         const std::string devStatus);
     int32_t GetDisplayBindInfo(DisplayBindInfos &infos);
     int32_t SetDisplayBind(int32_t deviceId, int32_t displayId, std::string &msg);
+    int32_t BindDeviceToDisplayGroupByDisplay(int32_t deviceId, int32_t displayId, std::string &msg);
+    int32_t UnbindDeviceFromDisplayGroup(int32_t deviceId, std::string &msg);
     int32_t AppendExtraData(const ExtraData& extraData);
     bool IsWindowVisible(int32_t pid);
     void ClearExtraData();

@@ -17008,5 +17008,230 @@ HWTEST_F(InputWindowsManagerTest, MultiGroupAudit_GetDisplayModeFallback_001, Te
         << "AUDIT: displayModeMap_ should not have group 1 entry by default - "
         << "GetDisplayMode is not group-aware; TASK-7 must fix this";
 }
+
+/**
+ * @tc.name: BindDeviceToDisplayGroupByDisplay_ValidDisplay_001
+ * @tc.desc: Valid display resolves to the correct group and creates a runtime binding
+ * @tc.type: FUNC
+ * @tc.require: AC-1.1
+ */
+HWTEST_F(InputWindowsManagerTest, BindDeviceToDisplayGroupByDisplay_ValidDisplay_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto mgr = std::make_shared<InputWindowsManager>();
+    ASSERT_NE(mgr, nullptr);
+
+    // Set up two display groups
+    OLD::DisplayGroupInfo mainGroup;
+    mainGroup.groupId = 0;
+    mainGroup.type = GroupType::GROUP_DEFAULT;
+    mainGroup.focusWindowId = -1;
+    OLD::DisplayInfo mainDisplay = { .id = 1 };
+    mainDisplay.x = 0;
+    mainDisplay.y = 0;
+    mainDisplay.width = 1920;
+    mainDisplay.height = 1080;
+    mainDisplay.dpi = 240;
+    mainDisplay.name = "main";
+    mainDisplay.uniq = "default0";
+    mainDisplay.direction = DIRECTION0;
+    mainGroup.displaysInfo.push_back(mainDisplay);
+    mgr->UpdateDisplayInfo(mainGroup);
+
+    OLD::DisplayGroupInfo secGroup;
+    secGroup.groupId = 1;
+    secGroup.type = GroupType::GROUP_SPECIAL;
+    secGroup.focusWindowId = -1;
+    OLD::DisplayInfo secDisplay = { .id = 2 };
+    secDisplay.x = 0;
+    secDisplay.y = 0;
+    secDisplay.width = 1280;
+    secDisplay.height = 720;
+    secDisplay.dpi = 160;
+    secDisplay.name = "secondary";
+    secDisplay.uniq = "secondary0";
+    secDisplay.direction = DIRECTION0;
+    secGroup.displaysInfo.push_back(secDisplay);
+    mgr->UpdateDisplayInfo(secGroup);
+
+    // Bind device 10 to displayId 2 (which is in groupId 1)
+    std::string msg;
+    int32_t ret = mgr->BindDeviceToDisplayGroupByDisplay(10, 2, msg);
+    EXPECT_EQ(ret, RET_OK) << "Bind should succeed, msg: " << msg;
+
+    // Verify the binding was stored correctly
+    auto binding = mgr->bindInfo_.GetRuntimeBinding(10);
+    ASSERT_TRUE(binding.has_value());
+    EXPECT_EQ(binding->deviceId, 10);
+    EXPECT_EQ(binding->displayId, 2);
+    EXPECT_EQ(binding->groupId, 1)
+        << "Display 2 is in group 1, so groupId should be 1";
+}
+
+/**
+ * @tc.name: BindDeviceToDisplayGroupByDisplay_InvalidDisplay_001
+ * @tc.desc: Invalid display returns RET_ERR with descriptive msg
+ * @tc.type: FUNC
+ * @tc.require: AC-1.1
+ */
+HWTEST_F(InputWindowsManagerTest, BindDeviceToDisplayGroupByDisplay_InvalidDisplay_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto mgr = std::make_shared<InputWindowsManager>();
+    ASSERT_NE(mgr, nullptr);
+
+    // Set up one display group
+    OLD::DisplayGroupInfo mainGroup;
+    mainGroup.groupId = 0;
+    mainGroup.type = GroupType::GROUP_DEFAULT;
+    mainGroup.focusWindowId = -1;
+    OLD::DisplayInfo mainDisplay = { .id = 1 };
+    mainDisplay.x = 0;
+    mainDisplay.y = 0;
+    mainDisplay.width = 1920;
+    mainDisplay.height = 1080;
+    mainDisplay.dpi = 240;
+    mainDisplay.name = "main";
+    mainDisplay.uniq = "default0";
+    mainDisplay.direction = DIRECTION0;
+    mainGroup.displaysInfo.push_back(mainDisplay);
+    mgr->UpdateDisplayInfo(mainGroup);
+
+    // Try to bind to displayId 999 which does not exist
+    std::string msg;
+    int32_t ret = mgr->BindDeviceToDisplayGroupByDisplay(10, 999, msg);
+    EXPECT_EQ(ret, RET_ERR);
+    EXPECT_FALSE(msg.empty()) << "Error message should describe the problem";
+
+    // Verify no binding was created
+    auto binding = mgr->bindInfo_.GetRuntimeBinding(10);
+    EXPECT_FALSE(binding.has_value());
+}
+
+/**
+ * @tc.name: UnbindDeviceFromDisplayGroup_Basic_001
+ * @tc.desc: Unbind removes the runtime binding; missing binding is a no-op
+ * @tc.type: FUNC
+ * @tc.require: AC-1.4
+ */
+HWTEST_F(InputWindowsManagerTest, UnbindDeviceFromDisplayGroup_Basic_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto mgr = std::make_shared<InputWindowsManager>();
+    ASSERT_NE(mgr, nullptr);
+
+    // Set up display group
+    OLD::DisplayGroupInfo mainGroup;
+    mainGroup.groupId = 0;
+    mainGroup.type = GroupType::GROUP_DEFAULT;
+    mainGroup.focusWindowId = -1;
+    OLD::DisplayInfo mainDisplay = { .id = 1 };
+    mainDisplay.x = 0;
+    mainDisplay.y = 0;
+    mainDisplay.width = 1920;
+    mainDisplay.height = 1080;
+    mainDisplay.dpi = 240;
+    mainDisplay.name = "main";
+    mainDisplay.uniq = "default0";
+    mainDisplay.direction = DIRECTION0;
+    mainGroup.displaysInfo.push_back(mainDisplay);
+    mgr->UpdateDisplayInfo(mainGroup);
+
+    // Bind and then unbind
+    std::string msg;
+    mgr->BindDeviceToDisplayGroupByDisplay(10, 1, msg);
+    int32_t ret = mgr->UnbindDeviceFromDisplayGroup(10, msg);
+    EXPECT_EQ(ret, RET_OK);
+
+    auto binding = mgr->bindInfo_.GetRuntimeBinding(10);
+    EXPECT_FALSE(binding.has_value()) << "Binding should be removed after unbind";
+
+    // Unbind a device that was never bound - should still be RET_OK (no-op)
+    ret = mgr->UnbindDeviceFromDisplayGroup(999, msg);
+    EXPECT_EQ(ret, RET_OK) << "Unbinding a non-existent binding should be a no-op";
+}
+
+/**
+ * @tc.name: BindDeviceToDisplayGroupByDisplay_Rebind_001
+ * @tc.desc: Rebinding a device to a different display overwrites the old binding
+ *           and old group derived state is not reused
+ * @tc.type: FUNC
+ * @tc.require: AC-1.3
+ */
+HWTEST_F(InputWindowsManagerTest, BindDeviceToDisplayGroupByDisplay_Rebind_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto mgr = std::make_shared<InputWindowsManager>();
+    ASSERT_NE(mgr, nullptr);
+
+    // Set up two display groups
+    OLD::DisplayGroupInfo mainGroup;
+    mainGroup.groupId = 0;
+    mainGroup.type = GroupType::GROUP_DEFAULT;
+    mainGroup.focusWindowId = -1;
+    OLD::DisplayInfo mainDisplay = { .id = 1 };
+    mainDisplay.x = 0;
+    mainDisplay.y = 0;
+    mainDisplay.width = 1920;
+    mainDisplay.height = 1080;
+    mainDisplay.dpi = 240;
+    mainDisplay.name = "main";
+    mainDisplay.uniq = "default0";
+    mainDisplay.direction = DIRECTION0;
+    mainGroup.displaysInfo.push_back(mainDisplay);
+    mgr->UpdateDisplayInfo(mainGroup);
+
+    OLD::DisplayGroupInfo secGroup;
+    secGroup.groupId = 1;
+    secGroup.type = GroupType::GROUP_SPECIAL;
+    secGroup.focusWindowId = -1;
+    OLD::DisplayInfo secDisplay = { .id = 2 };
+    secDisplay.x = 0;
+    secDisplay.y = 0;
+    secDisplay.width = 1280;
+    secDisplay.height = 720;
+    secDisplay.dpi = 160;
+    secDisplay.name = "secondary";
+    secDisplay.uniq = "secondary0";
+    secDisplay.direction = DIRECTION0;
+    secGroup.displaysInfo.push_back(secDisplay);
+    mgr->UpdateDisplayInfo(secGroup);
+
+    // First bind to display 1 (group 0)
+    std::string msg;
+    int32_t ret = mgr->BindDeviceToDisplayGroupByDisplay(10, 1, msg);
+    EXPECT_EQ(ret, RET_OK);
+    auto binding = mgr->bindInfo_.GetRuntimeBinding(10);
+    ASSERT_TRUE(binding.has_value());
+    EXPECT_EQ(binding->groupId, 0);
+
+    // Rebind to display 2 (group 1) - should overwrite
+    ret = mgr->BindDeviceToDisplayGroupByDisplay(10, 2, msg);
+    EXPECT_EQ(ret, RET_OK);
+    binding = mgr->bindInfo_.GetRuntimeBinding(10);
+    ASSERT_TRUE(binding.has_value());
+    EXPECT_EQ(binding->displayId, 2);
+    EXPECT_EQ(binding->groupId, 1)
+        << "Old group 0 binding should be fully replaced by group 1";
+}
+
+/**
+ * @tc.name: BindDeviceToDisplayGroupByDisplay_EmptyDisplayMap_001
+ * @tc.desc: When displayGroupInfoMap_ is empty, bind returns RET_ERR
+ * @tc.type: FUNC
+ * @tc.require: AC-1.1
+ */
+HWTEST_F(InputWindowsManagerTest, BindDeviceToDisplayGroupByDisplay_EmptyDisplayMap_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto mgr = std::make_shared<InputWindowsManager>();
+    ASSERT_NE(mgr, nullptr);
+
+    // No display groups registered
+    std::string msg;
+    int32_t ret = mgr->BindDeviceToDisplayGroupByDisplay(10, 1, msg);
+    EXPECT_EQ(ret, RET_ERR);
+    EXPECT_FALSE(msg.empty());
+}
 } // namespace MMI
 } // namespace OHOS

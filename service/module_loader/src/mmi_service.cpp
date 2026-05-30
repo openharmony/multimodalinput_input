@@ -3281,7 +3281,7 @@ ErrCode MMIService::BindDeviceToDisplayGroupByDisplay(int32_t deviceId, int32_t 
     }
 
     MMI_HILOGI("BindDeviceToDisplayGroupByDisplay: deviceId:%{public}d, displayId:%{public}d", deviceId, displayId);
-    return RET_OK;
+    return WIN_MGR->BindDeviceToDisplayGroupByDisplay(deviceId, displayId, msg);
 }
 
 ErrCode MMIService::UnbindDeviceFromDisplayGroup(int32_t deviceId, std::string &msg)
@@ -3299,7 +3299,7 @@ ErrCode MMIService::UnbindDeviceFromDisplayGroup(int32_t deviceId, std::string &
     }
 
     MMI_HILOGI("UnbindDeviceFromDisplayGroup: deviceId:%{public}d", deviceId);
-    return RET_OK;
+    return WIN_MGR->UnbindDeviceFromDisplayGroup(deviceId, msg);
 }
 
 ErrCode MMIService::GetFunctionKeyState(int32_t funcKey, bool &state)
