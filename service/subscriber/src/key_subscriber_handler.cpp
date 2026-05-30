@@ -467,6 +467,12 @@ void KeySubscriberHandler::ResetSkipPowerKeyUpFlag()
     needSkipPowerKeyUp_ = false;
 }
 
+void KeySubscriberHandler::ResetCallEndKeyUpFlag()
+{
+    MMI_HILOGI("Reset CallEndKeyUp when hang up.");
+    callEndKeyUp_ = false;
+}
+
 bool KeySubscriberHandler::IsFunctionKey(const std::shared_ptr<KeyEvent> keyEvent)
 {
     MMI_HILOGD("Is Funciton Key In");
