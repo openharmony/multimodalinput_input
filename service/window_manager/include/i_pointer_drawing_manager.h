@@ -32,7 +32,7 @@ public:
         const PointerStyle pointerStyle, Direction direction) {}
     virtual void UpdateDisplayInfo(const OLD::DisplayInfo& displayInfo) {}
     virtual void UpdateBindDisplayId(uint64_t rsId) {}
-    virtual void OnDisplayInfo(const OLD::DisplayGroupInfo& displayGroupInfo) {}
+    virtual void OnDisplayInfo(const OLD::DisplayGroupInfo& displayGroupInfo, bool isDisplayChanged = false) {}
     virtual void OnWindowInfo(const WinInfo &info) {}
     virtual bool Init()
     {

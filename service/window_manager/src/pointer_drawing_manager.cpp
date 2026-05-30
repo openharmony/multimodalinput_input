@@ -2528,19 +2528,25 @@ int32_t PointerDrawingManager::GetCursorSurfaceId(uint64_t &surfaceId)
     return RET_OK;
 }
 
-void PointerDrawingManager::OnDisplayInfo(const OLD::DisplayGroupInfo &displayGroupInfo)
+void PointerDrawingManager::OnDisplayInfo(const OLD::DisplayGroupInfo &displayGroupInfo, bool isDisplayChanged)
 {
     CALL_DEBUG_ENTER;
     if (displayGroupInfo.groupId != DEFAULT_GROUP_ID) {
         MMI_HILOGD("groupId:%{public}d", displayGroupInfo.groupId);
         return;
     }
-    for (const auto& item : displayGroupInfo.displaysInfo) {
-        if (item.rsId == displayInfo_.rsId &&
-            item.displaySourceMode == displayInfo_.displaySourceMode) {
-            UpdateDisplayInfo(item);
-            DrawManager();
-            return;
+    // When the screen changes, the cursor needs to be displayed in the center of the main screen by calling
+    // 'DrawScreenCenterPointer', so it is necessary to replace the information of the current cursor on the screen
+    // with the main screen information. Otherwise, only the information on the screen where the cursor is located
+    // needs to be updated.
+    if (!isDisplayChanged) {
+        for (const auto& item : displayGroupInfo.displaysInfo) {
+            if (item.rsId == displayInfo_.rsId &&
+                item.displaySourceMode == displayInfo_.displaySourceMode) {
+                UpdateDisplayInfo(item);
+                DrawManager();
+                return;
+            }
         }
     }
     if (displayGroupInfo.displaysInfo.empty()) {

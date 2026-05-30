@@ -194,7 +194,7 @@ void PointerDrawingManager::UpdatePointerDevice(bool hasPointerDevice, bool isPo
 void PointerDrawingManager::DrawPointer(uint64_t rsId, int32_t physicalX, int32_t physicalY,
     const PointerStyle pointerStyle, Direction direction) {}
 void PointerDrawingManager::UpdateDisplayInfo(const OLD::DisplayInfo& displayInfo) {}
-void PointerDrawingManager::OnDisplayInfo(const OLD::DisplayGroupInfo& displayGroupInfo) {}
+void PointerDrawingManager::OnDisplayInfo(const OLD::DisplayGroupInfo& displayGroupInfo, bool isDisplayChanged) {}
 void PointerDrawingManager::OnWindowInfo(const WinInfo &info) {}
 bool PointerDrawingManager::Init()
 {

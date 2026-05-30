@@ -2117,5 +2117,61 @@ HWTEST_F(CursorDrawingComponentTest, CursorDrawingComponentTest_GetInstance_002,
     CursorDrawingComponent* instance2 = &CursorDrawingComponent::GetInstance();
     EXPECT_EQ(instance1, instance2);
 }
+
+/**
+ * @tc.name: CursorDrawingComponentTest_OnDisplayInfo_002
+ * @tc.desc: Test OnDisplayInfo with isDisplayChanged parameter
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(CursorDrawingComponentTest, CursorDrawingComponentTest_OnDisplayInfo_002, TestSize.Level1)
+{
+    OLD::DisplayGroupInfo displayGroupInfo;
+    displayGroupInfo.focusWindowId = 0;
+
+    OLD::DisplayInfo displayInfo;
+    displayInfo.id = 0;
+    displayInfo.x = 1;
+    displayInfo.y = 1;
+    displayInfo.width = 2;
+    displayInfo.height = 2;
+    displayInfo.dpi = 240;
+    displayInfo.name = "pp";
+    displayInfo.uniq = "pp";
+    displayInfo.direction = DIRECTION0;
+    displayInfo.displayMode = DisplayMode::FULL;
+    displayGroupInfo.displaysInfo.push_back(displayInfo);
+
+    bool isDisplayChanged = true;
+    EXPECT_NO_FATAL_FAILURE(instance_->OnDisplayInfo(displayGroupInfo, isDisplayChanged));
+}
+
+/**
+ * @tc.name: CursorDrawingComponentTest_OnDisplayInfo_003
+ * @tc.desc: Test OnDisplayInfo with isDisplayChanged=false
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(CursorDrawingComponentTest, CursorDrawingComponentTest_OnDisplayInfo_003, TestSize.Level1)
+{
+    OLD::DisplayGroupInfo displayGroupInfo;
+    displayGroupInfo.focusWindowId = 0;
+
+    OLD::DisplayInfo displayInfo;
+    displayInfo.id = 0;
+    displayInfo.x = 1;
+    displayInfo.y = 1;
+    displayInfo.width = 2;
+    displayInfo.height = 2;
+    displayInfo.dpi = 240;
+    displayInfo.name = "pp";
+    displayInfo.uniq = "pp";
+    displayInfo.direction = DIRECTION0;
+    displayInfo.displayMode = DisplayMode::FULL;
+    displayGroupInfo.displaysInfo.push_back(displayInfo);
+
+    bool isDisplayChanged = false;
+    EXPECT_NO_FATAL_FAILURE(instance_->OnDisplayInfo(displayGroupInfo, isDisplayChanged));
+}
 } // namespace MMI
 } // namespace OHOS

@@ -233,10 +233,10 @@ void CursorDrawingComponent::UpdateBindDisplayId(uint64_t rsId)
     pointerInstance_->UpdateBindDisplayId(rsId);
 }
 
-void CursorDrawingComponent::OnDisplayInfo(const OLD::DisplayGroupInfo &displayGroupInfo)
+void CursorDrawingComponent::OnDisplayInfo(const OLD::DisplayGroupInfo &displayGroupInfo, bool isDisplayChanged)
 {
     CHK_IS_LOADV(isLoaded_, pointerInstance_)
-    pointerInstance_->OnDisplayInfo(displayGroupInfo);
+    pointerInstance_->OnDisplayInfo(displayGroupInfo, isDisplayChanged);
 }
 
 void CursorDrawingComponent::OnWindowInfo(const WinInfo &info)
