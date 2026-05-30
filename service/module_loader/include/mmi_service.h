@@ -392,6 +392,8 @@ private:
     void RegisterForDisplayManagerService(int32_t systemAbilityId);
 #endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
     int32_t CheckSetDisplayBindPermission(int32_t deviceId);
+    int32_t CheckBindDevicePermission();
+    bool IsHidStandardDevice(int32_t deviceId) const;
 
     std::atomic<ServiceRunningState> state_ = ServiceRunningState::STATE_NOT_START;
     int32_t mmiFd_ { -1 };
