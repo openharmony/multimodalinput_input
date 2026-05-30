@@ -469,7 +469,8 @@ int32_t MultimodalInputConnectManager::SubscribeKeyEvent(int32_t subscribeId, co
 {
     CHKPR(option, ERR_INVALID_VALUE);
     const std::string programName(GetProgramName());
-    bool isPowerManager = (programName == POWER_MANAGER_PROCESS);
+    bool isPowerManager = (programName == POWER_MANAGER_PROCESS &&
+        option->GetFinalKey() == KeyEvent::KEYCODE_POWER);
     if (!isPowerManager) {
         std::lock_guard<std::mutex> guard(lock_);
         CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
