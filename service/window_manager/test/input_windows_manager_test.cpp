@@ -19474,5 +19474,377 @@ HWTEST_F(InputWindowsManagerTest, LifecycleCleanup_CleanupGroupState_001, TestSi
     mgr.CleanupGroupState(0);
     // Main group is always valid; no crash or assertion error expected
 }
+/**
+ * @tc.name: SoftCursorRS_GetCursorPos_GroupAware_001
+ * @tc.desc: GetCursorPos with a non-default groupId reads from that group's cursor position,
+ *           not the main group. Verifies AC-4.1 cursor isolation.
+ * @tc.type: FUNC
+ * @tc.require: AC-4.1
+ */
+HWTEST_F(InputWindowsManagerTest, SoftCursorRS_GetCursorPos_GroupAware_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager mgr;
+
+    constexpr int32_t BOUND_GROUP = 5;
+    constexpr int32_t BOUND_DISPLAY_ID = 20;
+    constexpr int32_t MAIN_DISPLAY_ID = 1;
+
+    // Set up main group with a display
+    OLD::DisplayInfo mainDisplay;
+    mainDisplay.id = MAIN_DISPLAY_ID;
+    mainDisplay.width = 1920;
+    mainDisplay.height = 1080;
+    mainDisplay.validWidth = 1920;
+    mainDisplay.validHeight = 1080;
+    auto mainIt = mgr.displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
+    if (mainIt != mgr.displayGroupInfoMap_.end()) {
+        mainIt->second.displaysInfo.push_back(mainDisplay);
+    }
+
+    // Set up bound group with its own display
+    OLD::DisplayGroupInfo boundGroupInfo;
+    boundGroupInfo.groupId = BOUND_GROUP;
+    OLD::DisplayInfo boundDisplay;
+    boundDisplay.id = BOUND_DISPLAY_ID;
+    boundDisplay.width = 3840;
+    boundDisplay.height = 2160;
+    boundDisplay.validWidth = 3840;
+    boundDisplay.validHeight = 2160;
+    boundGroupInfo.displaysInfo.push_back(boundDisplay);
+    mgr.displayGroupInfoMap_[BOUND_GROUP] = boundGroupInfo;
+
+    // Ensure group state for bound group
+    mgr.EnsureGroupState(BOUND_GROUP);
+
+    // Set cursor position for main group
+    mgr.cursorPosMap_[DEFAULT_GROUP_ID].displayId = MAIN_DISPLAY_ID;
+    mgr.cursorPosMap_[DEFAULT_GROUP_ID].cursorPos.x = 100;
+    mgr.cursorPosMap_[DEFAULT_GROUP_ID].cursorPos.y = 200;
+
+    // Set cursor position for bound group
+    mgr.cursorPosMap_[BOUND_GROUP].displayId = BOUND_DISPLAY_ID;
+    mgr.cursorPosMap_[BOUND_GROUP].cursorPos.x = 500;
+    mgr.cursorPosMap_[BOUND_GROUP].cursorPos.y = 600;
+
+    // GetCursorPos with default should return main group cursor
+    CursorPosition mainCursor = mgr.GetCursorPos();
+    EXPECT_EQ(mainCursor.displayId, MAIN_DISPLAY_ID)
+        << "Default GetCursorPos should return main group display";
+    EXPECT_EQ(mainCursor.cursorPos.x, 100);
+    EXPECT_EQ(mainCursor.cursorPos.y, 200);
+
+    // GetCursorPos with bound group should return bound group cursor
+    CursorPosition boundCursor = mgr.GetCursorPos(BOUND_GROUP);
+    EXPECT_EQ(boundCursor.displayId, BOUND_DISPLAY_ID)
+        << "GetCursorPos(boundGroup) should return bound group display";
+    EXPECT_EQ(boundCursor.cursorPos.x, 500);
+    EXPECT_EQ(boundCursor.cursorPos.y, 600);
+
+    // Verify they are independent - modifying one does not affect the other
+    mgr.cursorPosMap_[DEFAULT_GROUP_ID].cursorPos.x = 999;
+    CursorPosition boundAfter = mgr.GetCursorPos(BOUND_GROUP);
+    EXPECT_EQ(boundAfter.cursorPos.x, 500)
+        << "Modifying main group cursor must not affect bound group";
+}
+
+/**
+ * @tc.name: SoftCursorRS_ResetCursorPos_GroupAware_001
+ * @tc.desc: ResetCursorPos with a non-default groupId resets that group's cursor to the
+ *           center of the group's display, not the main display. Verifies AC-4.1.
+ * @tc.type: FUNC
+ * @tc.require: AC-4.1
+ */
+HWTEST_F(InputWindowsManagerTest, SoftCursorRS_ResetCursorPos_GroupAware_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager mgr;
+
+    constexpr int32_t BOUND_GROUP = 6;
+    constexpr int32_t BOUND_DISPLAY_ID = 30;
+    constexpr int32_t MAIN_DISPLAY_ID = 2;
+
+    // Set up main group with a display
+    OLD::DisplayInfo mainDisplay;
+    mainDisplay.id = MAIN_DISPLAY_ID;
+    mainDisplay.width = 800;
+    mainDisplay.height = 600;
+    mainDisplay.validWidth = 800;
+    mainDisplay.validHeight = 600;
+    auto mainIt = mgr.displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
+    if (mainIt != mgr.displayGroupInfoMap_.end()) {
+        mainIt->second.displaysInfo.push_back(mainDisplay);
+    }
+
+    // Set up bound group with a different-sized display
+    OLD::DisplayGroupInfo boundGroupInfo;
+    boundGroupInfo.groupId = BOUND_GROUP;
+    OLD::DisplayInfo boundDisplay;
+    boundDisplay.id = BOUND_DISPLAY_ID;
+    boundDisplay.width = 1280;
+    boundDisplay.height = 720;
+    boundDisplay.validWidth = 1280;
+    boundDisplay.validHeight = 720;
+    boundGroupInfo.displaysInfo.push_back(boundDisplay);
+    mgr.displayGroupInfoMap_[BOUND_GROUP] = boundGroupInfo;
+
+    // Ensure group state for bound group
+    mgr.EnsureGroupState(BOUND_GROUP);
+
+    // Set both cursors to non-center positions
+    mgr.cursorPosMap_[DEFAULT_GROUP_ID].displayId = MAIN_DISPLAY_ID;
+    mgr.cursorPosMap_[DEFAULT_GROUP_ID].cursorPos.x = 10;
+    mgr.cursorPosMap_[DEFAULT_GROUP_ID].cursorPos.y = 10;
+    mgr.cursorPosMap_[BOUND_GROUP].displayId = BOUND_DISPLAY_ID;
+    mgr.cursorPosMap_[BOUND_GROUP].cursorPos.x = 10;
+    mgr.cursorPosMap_[BOUND_GROUP].cursorPos.y = 10;
+
+    // ResetCursorPos for bound group should reset to center of bound display
+    CursorPosition boundReset = mgr.ResetCursorPos(BOUND_GROUP);
+    EXPECT_EQ(boundReset.displayId, BOUND_DISPLAY_ID)
+        << "Reset should use bound group's display";
+    EXPECT_EQ(boundReset.cursorPos.x, 1280 * HALF_RATIO)
+        << "Cursor X should be center of bound display";
+    EXPECT_EQ(boundReset.cursorPos.y, 720 * HALF_RATIO)
+        << "Cursor Y should be center of bound display";
+
+    // Main group cursor should not have been affected
+    CursorPosition mainCursor = mgr.GetCursorPos();
+    EXPECT_EQ(mainCursor.displayId, MAIN_DISPLAY_ID)
+        << "Main group display should not be affected by bound group reset";
+    EXPECT_EQ(mainCursor.cursorPos.x, 10)
+        << "Main group cursor X should be unchanged";
+    EXPECT_EQ(mainCursor.cursorPos.y, 10)
+        << "Main group cursor Y should be unchanged";
+}
+
+/**
+ * @tc.name: SoftCursorRS_TwoGroupsIndependentCursorState_001
+ * @tc.desc: Two display groups keep completely independent cursor position and display state.
+ *           Updates to one group never leak to the other. Verifies AC-4.3.
+ * @tc.type: FUNC
+ * @tc.require: AC-4.3
+ */
+HWTEST_F(InputWindowsManagerTest, SoftCursorRS_TwoGroupsIndependentCursorState_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager mgr;
+
+    constexpr int32_t GROUP_A = 0;  // main group
+    constexpr int32_t GROUP_B = 4;
+    constexpr int32_t DISPLAY_A = 1;
+    constexpr int32_t DISPLAY_B = 15;
+
+    // Set up main group display
+    OLD::DisplayInfo displayA;
+    displayA.id = DISPLAY_A;
+    displayA.width = 1920;
+    displayA.height = 1080;
+    displayA.validWidth = 1920;
+    displayA.validHeight = 1080;
+    displayA.direction = Direction::DIRECTION0;
+    displayA.displayDirection = Direction::DIRECTION0;
+    auto mainIt = mgr.displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
+    if (mainIt != mgr.displayGroupInfoMap_.end()) {
+        mainIt->second.displaysInfo.push_back(displayA);
+    }
+
+    // Set up group B display
+    OLD::DisplayGroupInfo groupBInfo;
+    groupBInfo.groupId = GROUP_B;
+    OLD::DisplayInfo displayB;
+    displayB.id = DISPLAY_B;
+    displayB.width = 2560;
+    displayB.height = 1440;
+    displayB.validWidth = 2560;
+    displayB.validHeight = 1440;
+    displayB.direction = Direction::DIRECTION90;
+    displayB.displayDirection = Direction::DIRECTION90;
+    groupBInfo.displaysInfo.push_back(displayB);
+    mgr.displayGroupInfoMap_[GROUP_B] = groupBInfo;
+
+    // Ensure group state
+    mgr.EnsureGroupState(GROUP_B);
+
+    // Set independent cursor positions
+    mgr.cursorPosMap_[GROUP_A].displayId = DISPLAY_A;
+    mgr.cursorPosMap_[GROUP_A].cursorPos.x = 100;
+    mgr.cursorPosMap_[GROUP_A].cursorPos.y = 200;
+    mgr.cursorPosMap_[GROUP_A].direction = Direction::DIRECTION0;
+    mgr.cursorPosMap_[GROUP_A].displayDirection = Direction::DIRECTION0;
+
+    mgr.cursorPosMap_[GROUP_B].displayId = DISPLAY_B;
+    mgr.cursorPosMap_[GROUP_B].cursorPos.x = 300;
+    mgr.cursorPosMap_[GROUP_B].cursorPos.y = 400;
+    mgr.cursorPosMap_[GROUP_B].direction = Direction::DIRECTION90;
+    mgr.cursorPosMap_[GROUP_B].displayDirection = Direction::DIRECTION90;
+
+    // Verify isolation: each group reads its own state
+    CursorPosition posA = mgr.GetCursorPos(GROUP_A);
+    CursorPosition posB = mgr.GetCursorPos(GROUP_B);
+
+    EXPECT_EQ(posA.displayId, DISPLAY_A);
+    EXPECT_EQ(posA.cursorPos.x, 100);
+    EXPECT_EQ(posA.cursorPos.y, 200);
+    EXPECT_EQ(posA.direction, Direction::DIRECTION0);
+
+    EXPECT_EQ(posB.displayId, DISPLAY_B);
+    EXPECT_EQ(posB.cursorPos.x, 300);
+    EXPECT_EQ(posB.cursorPos.y, 400);
+    EXPECT_EQ(posB.direction, Direction::DIRECTION90);
+
+    // Now update group A position - group B must not change
+    mgr.cursorPosMap_[GROUP_A].cursorPos.x = 999;
+    mgr.cursorPosMap_[GROUP_A].cursorPos.y = 888;
+    mgr.cursorPosMap_[GROUP_A].direction = Direction::DIRECTION270;
+
+    CursorPosition posB_after = mgr.GetCursorPos(GROUP_B);
+    EXPECT_EQ(posB_after.cursorPos.x, 300)
+        << "Group B cursor X must not change when group A is updated";
+    EXPECT_EQ(posB_after.cursorPos.y, 400)
+        << "Group B cursor Y must not change when group A is updated";
+    EXPECT_EQ(posB_after.direction, Direction::DIRECTION90)
+        << "Group B direction must not change when group A is updated";
+    EXPECT_EQ(posB_after.displayId, DISPLAY_B)
+        << "Group B displayId must not change when group A is updated";
+}
+
+/**
+ * @tc.name: SoftCursorRS_BoundMouseUsesGroupDisplay_001
+ * @tc.desc: When a mouse is bound to a non-default group, GetCursorPos returns that
+ *           group's display state, not the default display. Bound non-default mouse
+ *           does NOT read cursor state from the default display. Verifies AC-4.1/AC-4.3.
+ * @tc.type: FUNC
+ * @tc.require: AC-4.1, AC-4.3
+ */
+HWTEST_F(InputWindowsManagerTest, SoftCursorRS_BoundMouseUsesGroupDisplay_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager mgr;
+
+    constexpr int32_t MOUSE_DEVICE = 77;
+    constexpr int32_t BOUND_GROUP = 3;
+    constexpr int32_t BOUND_DISPLAY_ID = 10;
+    constexpr int32_t MAIN_DISPLAY_ID = 1;
+
+    // Set up main group
+    OLD::DisplayInfo mainDisplay;
+    mainDisplay.id = MAIN_DISPLAY_ID;
+    mainDisplay.width = 1920;
+    mainDisplay.height = 1080;
+    mainDisplay.validWidth = 1920;
+    mainDisplay.validHeight = 1080;
+    auto mainIt = mgr.displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
+    if (mainIt != mgr.displayGroupInfoMap_.end()) {
+        mainIt->second.displaysInfo.push_back(mainDisplay);
+    }
+
+    // Set up bound group
+    OLD::DisplayGroupInfo boundGroupInfo;
+    boundGroupInfo.groupId = BOUND_GROUP;
+    OLD::DisplayInfo boundDisplay;
+    boundDisplay.id = BOUND_DISPLAY_ID;
+    boundDisplay.width = 3840;
+    boundDisplay.height = 2160;
+    boundDisplay.validWidth = 3840;
+    boundDisplay.validHeight = 2160;
+    boundDisplay.rsId = 0xABCD;
+    boundGroupInfo.displaysInfo.push_back(boundDisplay);
+    mgr.displayGroupInfoMap_[BOUND_GROUP] = boundGroupInfo;
+
+    // Create runtime binding
+    mgr.bindInfo_.AddRuntimeBinding(MOUSE_DEVICE, BOUND_DISPLAY_ID, BOUND_GROUP);
+    mgr.EnsureGroupState(BOUND_GROUP);
+
+    // Resolve group for the bound mouse
+    int32_t resolvedGroup = mgr.ResolveGroupIdForDevice(MOUSE_DEVICE);
+    ASSERT_EQ(resolvedGroup, BOUND_GROUP)
+        << "Bound mouse should resolve to bound group";
+
+    // Set cursor state for each group independently
+    mgr.cursorPosMap_[DEFAULT_GROUP_ID].displayId = MAIN_DISPLAY_ID;
+    mgr.cursorPosMap_[DEFAULT_GROUP_ID].cursorPos.x = 50;
+    mgr.cursorPosMap_[DEFAULT_GROUP_ID].cursorPos.y = 60;
+
+    mgr.cursorPosMap_[BOUND_GROUP].displayId = BOUND_DISPLAY_ID;
+    mgr.cursorPosMap_[BOUND_GROUP].cursorPos.x = 700;
+    mgr.cursorPosMap_[BOUND_GROUP].cursorPos.y = 800;
+
+    // GetCursorPos with the resolved group should return the bound display's state
+    CursorPosition boundCursor = mgr.GetCursorPos(resolvedGroup);
+    EXPECT_EQ(boundCursor.displayId, BOUND_DISPLAY_ID)
+        << "Bound mouse cursor must use bound display, not default";
+    EXPECT_EQ(boundCursor.cursorPos.x, 700);
+    EXPECT_EQ(boundCursor.cursorPos.y, 800);
+
+    // GetCursorPos without group (default) must NOT return bound display state
+    CursorPosition defaultCursor = mgr.GetCursorPos();
+    EXPECT_EQ(defaultCursor.displayId, MAIN_DISPLAY_ID)
+        << "Default GetCursorPos must not return bound display";
+    EXPECT_NE(defaultCursor.cursorPos.x, 700)
+        << "Default cursor must not have bound group's X position";
+}
+
+/**
+ * @tc.name: SoftCursorRS_ResetCursorPosIndependent_001
+ * @tc.desc: ResetCursorPos for two different groups resets each to its own display center
+ *           independently. Verifies two groups keep independent cursor position/display state.
+ * @tc.type: FUNC
+ * @tc.require: AC-4.3
+ */
+HWTEST_F(InputWindowsManagerTest, SoftCursorRS_ResetCursorPosIndependent_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager mgr;
+
+    constexpr int32_t GROUP_B = 8;
+    constexpr int32_t DISPLAY_MAIN = 1;
+    constexpr int32_t DISPLAY_B = 25;
+
+    // Set up main group display (800x600)
+    OLD::DisplayInfo mainDisplay;
+    mainDisplay.id = DISPLAY_MAIN;
+    mainDisplay.width = 800;
+    mainDisplay.height = 600;
+    mainDisplay.validWidth = 800;
+    mainDisplay.validHeight = 600;
+    auto mainIt = mgr.displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
+    if (mainIt != mgr.displayGroupInfoMap_.end()) {
+        mainIt->second.displaysInfo.push_back(mainDisplay);
+    }
+
+    // Set up group B display (1024x768)
+    OLD::DisplayGroupInfo groupBInfo;
+    groupBInfo.groupId = GROUP_B;
+    OLD::DisplayInfo displayB;
+    displayB.id = DISPLAY_B;
+    displayB.width = 1024;
+    displayB.height = 768;
+    displayB.validWidth = 1024;
+    displayB.validHeight = 768;
+    groupBInfo.displaysInfo.push_back(displayB);
+    mgr.displayGroupInfoMap_[GROUP_B] = groupBInfo;
+    mgr.EnsureGroupState(GROUP_B);
+
+    // Reset both groups
+    CursorPosition resetMain = mgr.ResetCursorPos(DEFAULT_GROUP_ID);
+    CursorPosition resetB = mgr.ResetCursorPos(GROUP_B);
+
+    // Main should reset to center of 800x600
+    EXPECT_EQ(resetMain.displayId, DISPLAY_MAIN);
+    EXPECT_EQ(resetMain.cursorPos.x, 800 * HALF_RATIO);
+    EXPECT_EQ(resetMain.cursorPos.y, 600 * HALF_RATIO);
+
+    // Group B should reset to center of 1024x768
+    EXPECT_EQ(resetB.displayId, DISPLAY_B);
+    EXPECT_EQ(resetB.cursorPos.x, 1024 * HALF_RATIO);
+    EXPECT_EQ(resetB.cursorPos.y, 768 * HALF_RATIO);
+
+    // Verify they are different (different display sizes)
+    EXPECT_NE(resetMain.cursorPos.x, resetB.cursorPos.x)
+        << "Different display sizes must produce different center positions";
+    EXPECT_NE(resetMain.displayId, resetB.displayId)
+        << "Each group must reset to its own display";
+}
 } // namespace MMI
 } // namespace OHOS

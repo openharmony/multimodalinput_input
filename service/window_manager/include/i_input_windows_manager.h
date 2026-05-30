@@ -122,8 +122,8 @@ public:
 
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     virtual MouseLocation GetMouseInfo(int32_t groupId = DEFAULT_GROUP_ID) = 0;
-    virtual CursorPosition GetCursorPos() = 0;
-    virtual CursorPosition ResetCursorPos() = 0;
+    virtual CursorPosition GetCursorPos(int32_t groupId = DEFAULT_GROUP_ID) = 0;
+    virtual CursorPosition ResetCursorPos(int32_t groupId = DEFAULT_GROUP_ID) = 0;
     virtual void UpdateAndAdjustMouseLocation(int32_t& displayId, double& x, double& y, bool isRealData = true) = 0;
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 #ifdef OHOS_BUILD_ENABLE_POINTER

@@ -1639,7 +1639,7 @@ void InputWindowsManager::ResetPointerPosition(const OLD::DisplayGroupInfo &disp
     if (displayGroupInfo.displaysInfo.empty()) {
         return;
     }
-    CursorPosition oldPtrPos = GetCursorPos();
+    CursorPosition oldPtrPos = GetCursorPos(displayGroupInfo.groupId);
     CursorPosition cursorPos;
     for (auto &currentDisplay : displayGroupInfo.displaysInfo) {
         if ((currentDisplay.displaySourceMode == OHOS::MMI::DisplaySourceMode::SCREEN_MAIN)) {
@@ -2519,7 +2519,7 @@ void InputWindowsManager::PointerDrawingManagerOnDisplayInfo(const OLD::DisplayG
     auto lastPointerEventCopy = GetLastPointerEvent();
     CHKPV(lastPointerEventCopy);
     if (INPUT_DEV_MGR->HasPointerDeviceIncludingVirtual()) {
-        MouseLocation mouseLocation = GetMouseInfo();
+        MouseLocation mouseLocation = GetMouseInfo(groupId);
         int32_t displayId = MouseEventHdr->GetDisplayId();
         displayId = displayId < 0 ? newId : displayId;
         auto displayInfo = GetPhysicalDisplay(displayId);
@@ -7855,12 +7855,12 @@ MouseLocation InputWindowsManager::GetMouseInfo(int32_t groupId)
     return curMouseLocation;
 }
 
-CursorPosition InputWindowsManager::GetCursorPos()
+CursorPosition InputWindowsManager::GetCursorPos(int32_t groupId)
 {
     CALL_DEBUG_ENTER;
-    auto &displaysInfoVector = GetDisplayInfoVector(MAIN_GROUPID);
+    auto &displaysInfoVector = GetDisplayInfoVector(groupId);
     CursorPosition cursorPos;
-    const auto iter = cursorPosMap_.find(MAIN_GROUPID);
+    const auto iter = cursorPosMap_.find(groupId);
     if (iter != cursorPosMap_.end()) {
         cursorPos = iter->second;
     }
@@ -7869,7 +7869,7 @@ CursorPosition InputWindowsManager::GetCursorPos()
 #ifdef OHOS_BUILD_ENABLE_EXTERNAL_SCREEN
         (void)GetMainScreenDisplayInfo(displaysInfoVector, displayInfo);
 #endif // OHOS_BUILD_ENABLE_EXTERNAL_SCREEN
-        const auto iter = cursorPosMap_.find(MAIN_GROUPID);
+        const auto iter = cursorPosMap_.find(groupId);
         if (iter != cursorPosMap_.end()) {
             int32_t validW = displayInfo.validWidth;
             int32_t validH = displayInfo.validHeight;
@@ -7877,21 +7877,21 @@ CursorPosition InputWindowsManager::GetCursorPos()
             if (direction == DIRECTION90 || direction == DIRECTION270) {
                 std::swap(validW, validH);
             }
-            cursorPosMap_[MAIN_GROUPID].displayId = displayInfo.id;
-            cursorPosMap_[MAIN_GROUPID].cursorPos.x = validW * HALF_RATIO;
-            cursorPosMap_[MAIN_GROUPID].cursorPos.y = validH * HALF_RATIO;
-            cursorPosMap_[MAIN_GROUPID].direction = displayInfo.direction;
-            cursorPosMap_[MAIN_GROUPID].displayDirection = displayInfo.displayDirection;
-            cursorPos = cursorPosMap_[MAIN_GROUPID];
+            cursorPosMap_[groupId].displayId = displayInfo.id;
+            cursorPosMap_[groupId].cursorPos.x = validW * HALF_RATIO;
+            cursorPosMap_[groupId].cursorPos.y = validH * HALF_RATIO;
+            cursorPosMap_[groupId].direction = displayInfo.direction;
+            cursorPosMap_[groupId].displayDirection = displayInfo.displayDirection;
+            cursorPos = cursorPosMap_[groupId];
         }
     }
     return cursorPos;
 }
 
-CursorPosition InputWindowsManager::ResetCursorPos()
+CursorPosition InputWindowsManager::ResetCursorPos(int32_t groupId)
 {
     CALL_DEBUG_ENTER;
-    auto &displaysInfoVector = GetDisplayInfoVector(MAIN_GROUPID);
+    auto &displaysInfoVector = GetDisplayInfoVector(groupId);
     if (!displaysInfoVector.empty()) {
         OLD::DisplayInfo displayInfo = displaysInfoVector[0];
 #ifdef OHOS_BUILD_ENABLE_EXTERNAL_SCREEN
@@ -7909,29 +7909,29 @@ CursorPosition InputWindowsManager::ResetCursorPos()
         if (displayDirection == DIRECTION90 || displayDirection == DIRECTION270) {
             std::swap(x, y);
         }
-        const auto iter = cursorPosMap_.find(MAIN_GROUPID);
+        const auto iter = cursorPosMap_.find(groupId);
         if (iter != cursorPosMap_.end()) {
-            cursorPosMap_[MAIN_GROUPID].displayId = displayInfo.id;
-            cursorPosMap_[MAIN_GROUPID].cursorPos.x = x;
-            cursorPosMap_[MAIN_GROUPID].cursorPos.y = y;
-            cursorPosMap_[MAIN_GROUPID].direction = displayInfo.direction;
-            cursorPosMap_[MAIN_GROUPID].displayDirection = displayInfo.displayDirection;
+            cursorPosMap_[groupId].displayId = displayInfo.id;
+            cursorPosMap_[groupId].cursorPos.x = x;
+            cursorPosMap_[groupId].cursorPos.y = y;
+            cursorPosMap_[groupId].direction = displayInfo.direction;
+            cursorPosMap_[groupId].displayDirection = displayInfo.displayDirection;
         }
     } else {
-        const auto iter = cursorPosMap_.find(MAIN_GROUPID);
+        const auto iter = cursorPosMap_.find(groupId);
         if (iter != cursorPosMap_.end()) {
-            cursorPosMap_[MAIN_GROUPID].displayId = -1;
-            cursorPosMap_[MAIN_GROUPID].cursorPos.x = 0;
-            cursorPosMap_[MAIN_GROUPID].cursorPos.y = 0;
+            cursorPosMap_[groupId].displayId = -1;
+            cursorPosMap_[groupId].cursorPos.x = 0;
+            cursorPosMap_[groupId].cursorPos.y = 0;
         }
     }
     CursorPosition cursorPos;
-    const auto iter = cursorPosMap_.find(MAIN_GROUPID);
+    const auto iter = cursorPosMap_.find(groupId);
     if (iter != cursorPosMap_.end()) {
         cursorPos = iter->second;
     }
-    MMI_HILOGI("ResetCursorPos cursorPosMap_[mainGroupId].displayId:%{public}d",
-        cursorPos.displayId);
+    MMI_HILOGI("ResetCursorPos cursorPosMap_[groupId:%{public}d].displayId:%{public}d",
+        groupId, cursorPos.displayId);
     return cursorPos;
 }
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH

@@ -151,8 +151,8 @@ public:
 
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     MouseLocation GetMouseInfo(int32_t groupId = DEFAULT_GROUP_ID);
-    CursorPosition GetCursorPos();
-    CursorPosition ResetCursorPos();
+    CursorPosition GetCursorPos(int32_t groupId = DEFAULT_GROUP_ID) override;
+    CursorPosition ResetCursorPos(int32_t groupId = DEFAULT_GROUP_ID) override;
     void UpdateAndAdjustMouseLocation(int32_t& displayId, double& x, double& y, bool isRealData = true);
     std::shared_ptr<PointerEvent> CreatePointerByLastPointer(int32_t pointerAction);
     void EnterMouseCaptureMode(const OLD::DisplayGroupInfo &displayGroupInfo);

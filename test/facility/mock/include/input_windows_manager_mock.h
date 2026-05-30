@@ -81,8 +81,8 @@ public:
 
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     MOCK_METHOD(MouseLocation, GetMouseInfo, ());
-    MOCK_METHOD(CursorPosition, GetCursorPos, ());
-    MOCK_METHOD(CursorPosition, ResetCursorPos, ());
+    MOCK_METHOD(CursorPosition, GetCursorPos, (int32_t));
+    MOCK_METHOD(CursorPosition, ResetCursorPos, (int32_t));
     void UpdateAndAdjustMouseLocation(int32_t&, double&, double&, bool) override {}
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 
