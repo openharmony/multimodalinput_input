@@ -17,9 +17,9 @@ import("../../multimodalinput_mini.gni")
 
 ohos_source_set("input-manager") {
   sources = [
+    "src/input_enable_key_status_command.cpp",
     "src/input_manager_command.cpp",
     "src/input_sendevent_command.cpp",
-    "src/input_enable_key_status_command.cpp",
   ]
   if (input_feature_event_recorder) {
     sources += [
@@ -38,13 +38,13 @@ ohos_source_set("input-manager") {
   }
   include_dirs = [
     "include",
-    "${mmi_path}/util/common/include",
-    "${mmi_path}/frameworks/proxy/events/include",
     "${mmi_path}/frameworks/proxy/event_handler/include",
+    "${mmi_path}/frameworks/proxy/events/include",
     "${mmi_path}/frameworks/proxy/module_loader/include",
-    "${mmi_path}/service/event_handler/include",
     "${mmi_path}/service/custom_config_parser/include",
+    "${mmi_path}/service/event_handler/include",
     "${mmi_path}/service/product_property_config/include",
+    "${mmi_path}/util/common/include",
     "${mmi_path}/util/json_parser/include",
   ]
 
@@ -62,6 +62,7 @@ ohos_source_set("input-manager") {
     "init:libbegetutil",
     "ipc:ipc_core",
   ]
+  part_name = "input"
   subsystem_name = "multimodalinput"
   part_name = "input"
 }
@@ -81,8 +82,8 @@ ohos_executable("uinput") {
     debug = false
   }
   deps = [
-    "${mmi_path}/tools/inject_event:input-manager",
     "${mmi_path}/service/custom_config_parser:mmi_custom_config_parser",
+    "${mmi_path}/tools/inject_event:input-manager",
     ]
   external_deps = [
     "c_utils:utils",
@@ -100,13 +101,13 @@ ohos_unittest("InjectEventTest") {
     "include",
     "${mmi_path}/service/custom_config_parser/include",
     "${mmi_path}/service/product_property_config/include",
-    "${mmi_path}/util/json_parser/include"
-    ]
+    "${mmi_path}/util/json_parser/include",
+  ]
 
   sources = [
     "test/inject_event_test.cpp",
-    "test/input_sendevent_command_test.cpp",
     "test/input_enable_key_status_command_test.cpp",
+    "test/input_sendevent_command_test.cpp",
   ]
   if (input_feature_event_recorder) {
     sources += [
@@ -120,9 +121,9 @@ ohos_unittest("InjectEventTest") {
 
   deps = [
     "${mmi_path}/frameworks/proxy:libmmi-client",
+    "${mmi_path}/service/custom_config_parser:mmi_custom_config_parser",
     "${mmi_path}/tools/inject_event:input-manager",
     "${mmi_path}/util:libmmi-util",
-    "${mmi_path}/service/custom_config_parser:mmi_custom_config_parser",
   ]
 
   if (input_feature_event_recorder) {
@@ -145,8 +146,8 @@ ohos_unittest("QueryMouseInfoCommandTest") {
   include_dirs = [ "include" ]
 
   sources = [
-    "test/query_mouse_info_command_test.cpp",
     "test/mock.cpp",
+    "test/query_mouse_info_command_test.cpp",
   ]
 
   deps = [

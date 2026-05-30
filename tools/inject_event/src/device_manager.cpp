@@ -18,11 +18,10 @@
 #include <algorithm>
 #include <charconv>
 #include <cstring>
-#include <iostream>
-#include <iomanip>
-#include <map>
-
 #include <dirent.h>
+#include <iomanip>
+#include <iostream>
+#include <map>
 
 namespace OHOS {
 namespace MMI {
@@ -53,11 +52,6 @@ int32_t DeviceManager::ExtractEventNumber(const std::string& fileName)
         return eventNum;
     }
     return INVALID_DEVICE_ID;
-}
-
-std::string DeviceManager::BuildDevicePath(const std::string& fileName) const
-{
-    return std::string(INPUT_DEVICE_DIR) + "/" + fileName;
 }
 
 std::vector<InputDevice> DeviceManager::DiscoverDevices()
@@ -105,6 +99,11 @@ void DeviceManager::PrintDeviceList()
                   << std::setw(PATH_WIDTH) << device.GetPath() << " | "
                   << device.GetName() << std::endl;
     }
+}
+
+std::string DeviceManager::BuildDevicePath(const std::string& fileName) const
+{
+    return std::string(INPUT_DEVICE_DIR) + "/" + fileName;
 }
 } // namespace MMI
 } // namespace OHOS

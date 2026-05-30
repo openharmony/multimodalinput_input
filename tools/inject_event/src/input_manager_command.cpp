@@ -15,20 +15,17 @@
 
 #include "input_manager_command.h"
 
-#include <getopt.h>
-
 #include <fcntl.h>
-
+#include <getopt.h>
 #include <iostream>
-
-#include "string_ex.h"
 
 #include "event_log_helper.h"
 #include "hos_key_event.h"
 #include "input_manager.h"
+#include "pixel_map.h"
 #include "product_name_definition.h"
 #include "product_type_parser.h"
-#include "pixel_map.h"
+#include "string_ex.h"
 
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "InputManagerCommand"
