@@ -16583,5 +16583,430 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetRealFingerDownWindo
     EXPECT_EQ(inputWindowsManager->GetRealFingerDownWindowId(deviceId, otherPointerId), -1);
     EXPECT_EQ(inputWindowsManager->GetRealFingerDownWindowId(otherDeviceId, otherPointerId), -1);
 }
+/**
+ * @tc.name: MultiGroupAudit_KeyFocusFallback_001
+ * @tc.desc: TASK-0 audit: When a secondary display group (groupId=1) has its own focus
+ *           window, GetFocusWindowId(1) must return the secondary group's focus, not the
+ *           main group's focus. Currently the code falls back to MAIN_GROUPID when the
+ *           requested groupId is not found in displayGroupInfoMap_, so this test documents
+ *           that multi-group keyboard focus routing does not yet work correctly.
+ * @tc.type: FUNC
+ * @tc.require: AC-5.4
+ */
+HWTEST_F(InputWindowsManagerTest, MultiGroupAudit_KeyFocusFallback_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto mgr = std::make_shared<InputWindowsManager>();
+    ASSERT_NE(mgr, nullptr);
+
+    // Register main group (groupId=0) with focusWindowId=10
+    OLD::DisplayGroupInfo mainGroup;
+    mainGroup.groupId = 0;
+    mainGroup.type = GroupType::GROUP_DEFAULT;
+    mainGroup.focusWindowId = 10;
+    OLD::DisplayInfo mainDisplay = { .id = 1 };
+    mainDisplay.x = 0;
+    mainDisplay.y = 0;
+    mainDisplay.width = 1920;
+    mainDisplay.height = 1080;
+    mainDisplay.dpi = 240;
+    mainDisplay.name = "main";
+    mainDisplay.uniq = "default0";
+    mainDisplay.direction = DIRECTION0;
+    mainGroup.displaysInfo.push_back(mainDisplay);
+    WindowInfo mainWin;
+    mainWin.id = 10;
+    mainWin.pid = 100;
+    mainWin.uid = 1;
+    mainWin.area = {0, 0, 1920, 1080};
+    mainWin.defaultHotAreas = {mainWin.area};
+    mainWin.pointerHotAreas = {mainWin.area};
+    mainWin.agentWindowId = 10;
+    mainWin.flags = 0;
+    mainWin.transform = {1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f};
+    mainGroup.windowsInfo.push_back(mainWin);
+    mgr->UpdateDisplayInfo(mainGroup);
+
+    // Register secondary group (groupId=1) with focusWindowId=20
+    OLD::DisplayGroupInfo secGroup;
+    secGroup.groupId = 1;
+    secGroup.type = GroupType::GROUP_SPECIAL;
+    secGroup.focusWindowId = 20;
+    OLD::DisplayInfo secDisplay = { .id = 2 };
+    secDisplay.x = 0;
+    secDisplay.y = 0;
+    secDisplay.width = 1280;
+    secDisplay.height = 720;
+    secDisplay.dpi = 160;
+    secDisplay.name = "secondary";
+    secDisplay.uniq = "secondary0";
+    secDisplay.direction = DIRECTION0;
+    secGroup.displaysInfo.push_back(secDisplay);
+    WindowInfo secWin;
+    secWin.id = 20;
+    secWin.pid = 200;
+    secWin.uid = 2;
+    secWin.area = {0, 0, 1280, 720};
+    secWin.defaultHotAreas = {secWin.area};
+    secWin.pointerHotAreas = {secWin.area};
+    secWin.agentWindowId = 20;
+    secWin.flags = 0;
+    secWin.transform = {1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f};
+    secGroup.windowsInfo.push_back(secWin);
+    mgr->UpdateDisplayInfo(secGroup);
+
+    // AUDIT ASSERTION: GetFocusWindowId for group 1 must return 20 (the secondary
+    // group's own focus), not 10 (the main group's focus).
+    // This test is expected to FAIL until TASK-4 (keyboard group routing) is implemented.
+    int32_t focusInSecGroup = mgr->GetFocusWindowId(1);
+    EXPECT_EQ(focusInSecGroup, 20)
+        << "AUDIT: GetFocusWindowId(1) returned " << focusInSecGroup
+        << " instead of 20; multi-group keyboard focus routing not yet implemented";
+}
+
+/**
+ * @tc.name: MultiGroupAudit_MouseCaptureFallback_001
+ * @tc.desc: TASK-0 audit: SetMouseCaptureMode and GetMouseIsCaptureMode currently
+ *           hardcode MAIN_GROUPID. When a mouse capture is set for a window on a
+ *           secondary group, the capture state should be stored per-group, but
+ *           currently it's always stored under MAIN_GROUPID. This test verifies
+ *           that the current implementation does NOT isolate capture mode per group.
+ * @tc.type: FUNC
+ * @tc.require: AC-5.4
+ */
+HWTEST_F(InputWindowsManagerTest, MultiGroupAudit_MouseCaptureFallback_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto mgr = std::make_shared<InputWindowsManager>();
+    ASSERT_NE(mgr, nullptr);
+
+    // Set capture mode for window 50 on main group
+    mgr->SetMouseCaptureMode(50, true);
+    EXPECT_TRUE(mgr->GetMouseIsCaptureMode());
+
+    // AUDIT ASSERTION: captureModeInfoMap_ should store per-group capture state.
+    // Currently only MAIN_GROUPID (0) is used. When a secondary group exists, the
+    // capture mode should be queryable per group, but there is no API for that yet.
+    // Verify the hardcoded behavior: captureModeInfoMap_[0] holds the state.
+    auto itr = mgr->captureModeInfoMap_.find(0);
+    ASSERT_NE(itr, mgr->captureModeInfoMap_.end());
+    EXPECT_EQ(itr->second.windowId, 50);
+    EXPECT_TRUE(itr->second.isCaptureMode);
+
+    // Verify that no secondary group (1) entry exists - proving capture is not group-aware
+    // This test documents the current limitation: TASK-5/TASK-7 must add per-group capture.
+    auto itr1 = mgr->captureModeInfoMap_.find(1);
+    EXPECT_EQ(itr1, mgr->captureModeInfoMap_.end())
+        << "AUDIT: captureModeInfoMap_ has entry for group 1, which is unexpected "
+        << "under current single-group capture implementation";
+}
+
+/**
+ * @tc.name: MultiGroupAudit_CursorResetFallback_001
+ * @tc.desc: TASK-0 audit: ResetCursorPos and GetCursorPos hardcode MAIN_GROUPID for
+ *           all cursor position reads/writes. When a secondary group has its own display,
+ *           cursor position should be tracked per-group. This test verifies that cursor
+ *           state is NOT group-isolated currently.
+ * @tc.type: FUNC
+ * @tc.require: AC-5.4
+ */
+HWTEST_F(InputWindowsManagerTest, MultiGroupAudit_CursorResetFallback_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto mgr = std::make_shared<InputWindowsManager>();
+    ASSERT_NE(mgr, nullptr);
+
+    // Register main group with a valid display
+    OLD::DisplayGroupInfo mainGroup;
+    mainGroup.groupId = 0;
+    mainGroup.type = GroupType::GROUP_DEFAULT;
+    mainGroup.focusWindowId = -1;
+    OLD::DisplayInfo mainDisplay = { .id = 1 };
+    mainDisplay.x = 0;
+    mainDisplay.y = 0;
+    mainDisplay.width = 1920;
+    mainDisplay.height = 1080;
+    mainDisplay.validWidth = 1920;
+    mainDisplay.validHeight = 1080;
+    mainDisplay.dpi = 240;
+    mainDisplay.name = "main";
+    mainDisplay.uniq = "default0";
+    mainDisplay.direction = DIRECTION0;
+    mainGroup.displaysInfo.push_back(mainDisplay);
+    mgr->UpdateDisplayInfo(mainGroup);
+
+    // Register secondary group with its own display
+    OLD::DisplayGroupInfo secGroup;
+    secGroup.groupId = 1;
+    secGroup.type = GroupType::GROUP_SPECIAL;
+    secGroup.focusWindowId = -1;
+    OLD::DisplayInfo secDisplay = { .id = 2 };
+    secDisplay.x = 0;
+    secDisplay.y = 0;
+    secDisplay.width = 1280;
+    secDisplay.height = 720;
+    secDisplay.validWidth = 1280;
+    secDisplay.validHeight = 720;
+    secDisplay.dpi = 160;
+    secDisplay.name = "secondary";
+    secDisplay.uniq = "secondary0";
+    secDisplay.direction = DIRECTION0;
+    secGroup.displaysInfo.push_back(secDisplay);
+    mgr->UpdateDisplayInfo(secGroup);
+
+    // ResetCursorPos resets cursor on MAIN_GROUPID only
+    CursorPosition pos = mgr->ResetCursorPos();
+    EXPECT_EQ(pos.displayId, 1)
+        << "AUDIT: ResetCursorPos returns cursor on main display (id=1)";
+
+    // AUDIT ASSERTION: cursorPosMap_ should have an entry for group 1 with its own
+    // display's center coordinates. Currently it does not because ResetCursorPos
+    // only writes to cursorPosMap_[MAIN_GROUPID].
+    // This test is expected to FAIL until TASK-9/TASK-10 implement per-group cursor.
+    auto itr = mgr->cursorPosMap_.find(1);
+    EXPECT_NE(itr, mgr->cursorPosMap_.end())
+        << "AUDIT: cursorPosMap_ has no entry for group 1 - cursor state is not "
+        << "group-isolated; TASK-9/TASK-10 must fix this";
+}
+
+/**
+ * @tc.name: MultiGroupAudit_MouseLocationFallback_001
+ * @tc.desc: TASK-0 audit: GetMouseInfo hardcodes MAIN_GROUPID for mouse location
+ *           lookup. When a secondary group exists, mouse location should be tracked
+ *           per-group, but currently only MAIN_GROUPID is consulted. This test
+ *           documents the limitation.
+ * @tc.type: FUNC
+ * @tc.require: AC-5.4
+ */
+HWTEST_F(InputWindowsManagerTest, MultiGroupAudit_MouseLocationFallback_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto mgr = std::make_shared<InputWindowsManager>();
+    ASSERT_NE(mgr, nullptr);
+
+    // Register main group with display
+    OLD::DisplayGroupInfo mainGroup;
+    mainGroup.groupId = 0;
+    mainGroup.type = GroupType::GROUP_DEFAULT;
+    mainGroup.focusWindowId = -1;
+    OLD::DisplayInfo mainDisplay = { .id = 1 };
+    mainDisplay.x = 0;
+    mainDisplay.y = 0;
+    mainDisplay.width = 1920;
+    mainDisplay.height = 1080;
+    mainDisplay.validWidth = 1920;
+    mainDisplay.validHeight = 1080;
+    mainDisplay.dpi = 240;
+    mainDisplay.name = "main";
+    mainDisplay.uniq = "default0";
+    mainDisplay.direction = DIRECTION0;
+    mainGroup.displaysInfo.push_back(mainDisplay);
+    mgr->UpdateDisplayInfo(mainGroup);
+
+    // Register secondary group with different display
+    OLD::DisplayGroupInfo secGroup;
+    secGroup.groupId = 1;
+    secGroup.type = GroupType::GROUP_SPECIAL;
+    secGroup.focusWindowId = -1;
+    OLD::DisplayInfo secDisplay = { .id = 2 };
+    secDisplay.x = 0;
+    secDisplay.y = 0;
+    secDisplay.width = 1280;
+    secDisplay.height = 720;
+    secDisplay.validWidth = 1280;
+    secDisplay.validHeight = 720;
+    secDisplay.dpi = 160;
+    secDisplay.name = "secondary";
+    secDisplay.uniq = "secondary0";
+    secDisplay.direction = DIRECTION0;
+    secGroup.displaysInfo.push_back(secDisplay);
+    mgr->UpdateDisplayInfo(secGroup);
+
+    // AUDIT ASSERTION: mouseLocationMap_ should have an entry for group 1 after
+    // secondary group is registered. Currently GetMouseInfo() only reads from
+    // mouseLocationMap_[MAIN_GROUPID], so there is no per-group mouse location.
+    // This test is expected to FAIL until TASK-5 implements per-group mouse routing.
+    auto itr = mgr->mouseLocationMap_.find(1);
+    EXPECT_NE(itr, mgr->mouseLocationMap_.end())
+        << "AUDIT: mouseLocationMap_ has no entry for group 1 - mouse location is not "
+        << "group-isolated; TASK-5 must fix this";
+}
+
+/**
+ * @tc.name: MultiGroupAudit_GetDisplayIdNegativeFallback_001
+ * @tc.desc: TASK-0 audit: GetDisplayId with a negative displayId (targetDisplayId=-1)
+ *           calls FindDisplayGroupId(-1) which returns DEFAULT_GROUP_ID and then falls
+ *           back to MAIN_GROUPID's first display. When a secondary group's device sends
+ *           an event with displayId=-1, GetDisplayId should resolve to the secondary
+ *           group's display, not the main group's. This test documents the current
+ *           fallback behavior.
+ * @tc.type: FUNC
+ * @tc.require: AC-5.4
+ */
+HWTEST_F(InputWindowsManagerTest, MultiGroupAudit_GetDisplayIdNegativeFallback_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto mgr = std::make_shared<InputWindowsManager>();
+    ASSERT_NE(mgr, nullptr);
+
+    // Register main group with display id=1
+    OLD::DisplayGroupInfo mainGroup;
+    mainGroup.groupId = 0;
+    mainGroup.type = GroupType::GROUP_DEFAULT;
+    mainGroup.focusWindowId = 10;
+    OLD::DisplayInfo mainDisplay = { .id = 1 };
+    mainDisplay.x = 0;
+    mainDisplay.y = 0;
+    mainDisplay.width = 1920;
+    mainDisplay.height = 1080;
+    mainDisplay.dpi = 240;
+    mainDisplay.name = "main";
+    mainDisplay.uniq = "default0";
+    mainDisplay.direction = DIRECTION0;
+    mainGroup.displaysInfo.push_back(mainDisplay);
+    WindowInfo mainWin;
+    mainWin.id = 10;
+    mainWin.pid = 100;
+    mainWin.uid = 1;
+    mainWin.area = {0, 0, 1920, 1080};
+    mainWin.defaultHotAreas = {mainWin.area};
+    mainWin.pointerHotAreas = {mainWin.area};
+    mainWin.agentWindowId = 10;
+    mainWin.flags = 0;
+    mainWin.transform = {1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f};
+    mainGroup.windowsInfo.push_back(mainWin);
+    mgr->UpdateDisplayInfo(mainGroup);
+
+    // Register secondary group with display id=2
+    OLD::DisplayGroupInfo secGroup;
+    secGroup.groupId = 1;
+    secGroup.type = GroupType::GROUP_SPECIAL;
+    secGroup.focusWindowId = 20;
+    OLD::DisplayInfo secDisplay = { .id = 2 };
+    secDisplay.x = 0;
+    secDisplay.y = 0;
+    secDisplay.width = 1280;
+    secDisplay.height = 720;
+    secDisplay.dpi = 160;
+    secDisplay.name = "secondary";
+    secDisplay.uniq = "secondary0";
+    secDisplay.direction = DIRECTION0;
+    secGroup.displaysInfo.push_back(secDisplay);
+    WindowInfo secWin;
+    secWin.id = 20;
+    secWin.pid = 200;
+    secWin.uid = 2;
+    secWin.area = {0, 0, 1280, 720};
+    secWin.defaultHotAreas = {secWin.area};
+    secWin.pointerHotAreas = {secWin.area};
+    secWin.agentWindowId = 20;
+    secWin.flags = 0;
+    secWin.transform = {1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f};
+    secGroup.windowsInfo.push_back(secWin);
+    mgr->UpdateDisplayInfo(secGroup);
+
+    // Create an input event with targetDisplayId=-1 (unresolved)
+    std::shared_ptr<InputEvent> inputEvent = InputEvent::Create();
+    ASSERT_NE(inputEvent, nullptr);
+    inputEvent->SetTargetDisplayId(-1);
+
+    // AUDIT ASSERTION: GetDisplayId with displayId=-1 currently always resolves to
+    // MAIN_GROUPID's first display (id=1). When the event originates from a device
+    // bound to group 1, it should resolve to display id=2 instead.
+    // This test documents the current fallback-to-main behavior.
+    int32_t resolvedId = mgr->GetDisplayId(inputEvent);
+    // Current behavior: resolves to main group's display (1)
+    // Expected after TASK-4/5/6: should resolve based on device binding
+    EXPECT_EQ(resolvedId, 1)
+        << "AUDIT: GetDisplayId(-1) resolved to " << resolvedId
+        << "; currently always falls back to main group display";
+    // The following assertion will FAIL because there is no device-to-group binding
+    // mechanism yet. Once TASK-3 is implemented, events from devices bound to group 1
+    // should resolve to display id=2. Uncomment when ready:
+    // EXPECT_EQ(resolvedId, 2) << "GetDisplayId should resolve to secondary group display";
+}
+
+/**
+ * @tc.name: MultiGroupAudit_GetDisplayInfoVectorFallback_001
+ * @tc.desc: TASK-0 audit: GetDisplayInfoVector falls back to MAIN_GROUPID when the
+ *           requested groupId is not in displayGroupInfoMap_. When groupId=1 is
+ *           registered, GetDisplayInfoVector(1) should return group 1's displays.
+ *           This test verifies the fallback chain.
+ * @tc.type: FUNC
+ * @tc.require: AC-5.4
+ */
+HWTEST_F(InputWindowsManagerTest, MultiGroupAudit_GetDisplayInfoVectorFallback_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto mgr = std::make_shared<InputWindowsManager>();
+    ASSERT_NE(mgr, nullptr);
+
+    // Register main group
+    OLD::DisplayGroupInfo mainGroup;
+    mainGroup.groupId = 0;
+    mainGroup.type = GroupType::GROUP_DEFAULT;
+    mainGroup.focusWindowId = -1;
+    OLD::DisplayInfo mainDisplay = { .id = 1 };
+    mainDisplay.x = 0;
+    mainDisplay.y = 0;
+    mainDisplay.width = 1920;
+    mainDisplay.height = 1080;
+    mainDisplay.dpi = 240;
+    mainDisplay.name = "main";
+    mainDisplay.uniq = "default0";
+    mainDisplay.direction = DIRECTION0;
+    mainGroup.displaysInfo.push_back(mainDisplay);
+    mgr->UpdateDisplayInfo(mainGroup);
+
+    // Register secondary group
+    OLD::DisplayGroupInfo secGroup;
+    secGroup.groupId = 1;
+    secGroup.type = GroupType::GROUP_SPECIAL;
+    secGroup.focusWindowId = -1;
+    OLD::DisplayInfo secDisplay = { .id = 2 };
+    secDisplay.x = 0;
+    secDisplay.y = 0;
+    secDisplay.width = 1280;
+    secDisplay.height = 720;
+    secDisplay.dpi = 160;
+    secDisplay.name = "secondary";
+    secDisplay.uniq = "secondary0";
+    secDisplay.direction = DIRECTION0;
+    secGroup.displaysInfo.push_back(secDisplay);
+    mgr->UpdateDisplayInfo(secGroup);
+
+    // GetDisplayInfoVector(1) should return the secondary display
+    const auto& secDisplays = mgr->GetDisplayInfoVector(1);
+    ASSERT_FALSE(secDisplays.empty());
+    EXPECT_EQ(secDisplays[0].id, 2)
+        << "AUDIT: GetDisplayInfoVector(1) should return secondary group displays";
+
+    // GetDisplayInfoVector for a non-existent group (99) should fallback to main
+    const auto& fallbackDisplays = mgr->GetDisplayInfoVector(99);
+    ASSERT_FALSE(fallbackDisplays.empty());
+    EXPECT_EQ(fallbackDisplays[0].id, 1)
+        << "AUDIT: GetDisplayInfoVector(99) falls back to MAIN_GROUPID";
+}
+
+/**
+ * @tc.name: MultiGroupAudit_GetDisplayModeFallback_001
+ * @tc.desc: TASK-0 audit: GetDisplayMode hardcodes MAIN_GROUPID lookup in
+ *           displayModeMap_. Display mode should be queryable per group.
+ * @tc.type: FUNC
+ * @tc.require: AC-5.4
+ */
+HWTEST_F(InputWindowsManagerTest, MultiGroupAudit_GetDisplayModeFallback_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto mgr = std::make_shared<InputWindowsManager>();
+    ASSERT_NE(mgr, nullptr);
+
+    // GetDisplayMode only looks at displayModeMap_[MAIN_GROUPID]
+    // Verify that displayModeMap_ has no entry for group 1
+    auto itr = mgr->displayModeMap_.find(1);
+    EXPECT_EQ(itr, mgr->displayModeMap_.end())
+        << "AUDIT: displayModeMap_ should not have group 1 entry by default - "
+        << "GetDisplayMode is not group-aware; TASK-7 must fix this";
+}
 } // namespace MMI
 } // namespace OHOS
