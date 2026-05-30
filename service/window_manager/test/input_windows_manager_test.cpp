@@ -16693,12 +16693,14 @@ HWTEST_F(InputWindowsManagerTest, MultiGroupAudit_MouseCaptureFallback_001, Test
     EXPECT_EQ(itr->second.windowId, 50);
     EXPECT_TRUE(itr->second.isCaptureMode);
 
-    // Verify that no secondary group (1) entry exists - proving capture is not group-aware
-    // This test documents the current limitation: TASK-5/TASK-7 must add per-group capture.
+    // AUDIT FAILING ASSERTION: captureModeInfoMap_ should have an entry for group 1
+    // when capture is set for a window belonging to group 1. Currently it does not
+    // because SetMouseCaptureMode hardcodes MAIN_GROUPID. This will fail until
+    // TASK-5/TASK-7 add per-group capture mode storage.
     auto itr1 = mgr->captureModeInfoMap_.find(1);
-    EXPECT_EQ(itr1, mgr->captureModeInfoMap_.end())
-        << "AUDIT: captureModeInfoMap_ has entry for group 1, which is unexpected "
-        << "under current single-group capture implementation";
+    EXPECT_NE(itr1, mgr->captureModeInfoMap_.end())
+        << "AUDIT: captureModeInfoMap_ has no entry for group 1 - capture mode is not "
+        << "group-isolated; TASK-5/TASK-7 must fix this";
 }
 
 /**
@@ -16915,15 +16917,13 @@ HWTEST_F(InputWindowsManagerTest, MultiGroupAudit_GetDisplayIdNegativeFallback_0
     // bound to group 1, it should resolve to display id=2 instead.
     // This test documents the current fallback-to-main behavior.
     int32_t resolvedId = mgr->GetDisplayId(inputEvent);
-    // Current behavior: resolves to main group's display (1)
-    // Expected after TASK-4/5/6: should resolve based on device binding
-    EXPECT_EQ(resolvedId, 1)
+    // AUDIT FAILING ASSERTION: When a device bound to group 1 sends an event with
+    // displayId=-1, GetDisplayId should resolve to group 1's display (id=2), not
+    // the main group's. Currently it always falls back to main group display (1).
+    // This will fail until TASK-4/TASK-5 add device-binding-aware display resolution.
+    EXPECT_EQ(resolvedId, 2)
         << "AUDIT: GetDisplayId(-1) resolved to " << resolvedId
-        << "; currently always falls back to main group display";
-    // The following assertion will FAIL because there is no device-to-group binding
-    // mechanism yet. Once TASK-3 is implemented, events from devices bound to group 1
-    // should resolve to display id=2. Uncomment when ready:
-    // EXPECT_EQ(resolvedId, 2) << "GetDisplayId should resolve to secondary group display";
+        << " (main group display); should resolve to bound group display (2)";
 }
 
 /**
