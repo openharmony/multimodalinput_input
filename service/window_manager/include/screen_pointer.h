@@ -126,18 +126,6 @@ public:
         return isCurrentOffScreenRendering_;
     }
 
-    float GetOffRenderScale() const
-    {
-        return offRenderScale_;
-    }
-
-    int32_t GetScreenRealDPI() const
-    {
-        return screenRealDPI_;
-    }
-
-    float GetRenderDPI() const;
-
     void SetSourceScreenRotation(const rotation_t sourceScreenRotation)
     {
         sourceScreenRotation_ = sourceScreenRotation;
@@ -266,7 +254,6 @@ private:
     // isCurrentOffScreenRendering
     bool isCurrentOffScreenRendering_ = false;
     float offRenderScale_{1.0f};
-    int32_t screenRealDPI_{1.0f};
     bool isVirtualExtend_ = false;
 };
 

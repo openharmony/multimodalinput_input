@@ -124,34 +124,6 @@ HWTEST_F(ScreenPointerTest, ScreenPointerTest_InitSurface_003, TestSize.Level1)
 }
 
 /**
- * @tc.name: ScreenPointerTest_GetRenderDPI_001
- * @tc.desc: Test GetRenderDPI
- * @tc.type: Function
- * @tc.require:
- */
-HWTEST_F(ScreenPointerTest, ScreenPointerTest_GetRenderDPI_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    hwcmgr_ptr_t hwcmgr = nullptr;
-    handler_ptr_t handler = nullptr;
-    OLD::DisplayInfo di;
-    ScreenPointer* screenpointer = new ScreenPointer(hwcmgr, handler, di);
-    ASSERT_NE(screenpointer, nullptr);
-    screenpointer->isCurrentOffScreenRendering_ = true;
-    screenpointer->mode_ = mode_t::SCREEN_MIRROR;
-    float ret = screenpointer->GetRenderDPI();
-    EXPECT_EQ(ret, 0);
-    screenpointer->mode_ = mode_t::SCREEN_MAIN;
-    ret = screenpointer->GetRenderDPI();
-    screenpointer->isCurrentOffScreenRendering_ = false;
-    screenpointer->mode_ = mode_t::SCREEN_MIRROR;
-    ret = screenpointer->GetRenderDPI();
-    screenpointer->mode_ = mode_t::SCREEN_MAIN;
-    ret = screenpointer->GetRenderDPI();
-    EXPECT_EQ(ret, 0);
-}
-
-/**
  * @tc.name: ScreenPointerTest_SetInvisible_001
  * @tc.desc: Test SetInvisible
  * @tc.type: Function
@@ -1277,51 +1249,6 @@ HWTEST_F(ScreenPointerTest, ScreenPointerTest_SetInvisible_004, TestSize.Level1)
     screenpointer->Init(renderer);
     bool ret = screenpointer->SetInvisible();
     EXPECT_EQ(ret, hwcmgr->IsSupported());
-    delete screenpointer;
-}
-
-/**
- * @tc.name: ScreenPointerTest_GetRenderDPI_002
- * @tc.desc: Test GetRenderDPI with off screen rendering and mirror mode
- * @tc.type: Function
- * @tc.require:
- */
-HWTEST_F(ScreenPointerTest, ScreenPointerTest_GetRenderDPI_002, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    hwcmgr_ptr_t hwcmgr = std::make_shared<HardwareCursorPointerManager>();
-    ASSERT_NE(hwcmgr, nullptr);
-    handler_ptr_t handler = nullptr;
-    OLD::DisplayInfo di;
-    ScreenPointer* screenpointer = new ScreenPointer(hwcmgr, handler, di);
-    ASSERT_NE(screenpointer, nullptr);
-    screenpointer->isCurrentOffScreenRendering_ = true;
-    screenpointer->mode_ = mode_t::SCREEN_MIRROR;
-    float ret = screenpointer->GetRenderDPI();
-    EXPECT_GE(ret, 0);
-    delete screenpointer;
-}
-
-/**
- * @tc.name: ScreenPointerTest_GetRenderDPI_003
- * @tc.desc: Test GetRenderDPI without off screen rendering
- * @tc.type: Function
- * @tc.require:
- */
-HWTEST_F(ScreenPointerTest, ScreenPointerTest_GetRenderDPI_003, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    hwcmgr_ptr_t hwcmgr = std::make_shared<HardwareCursorPointerManager>();
-    ASSERT_NE(hwcmgr, nullptr);
-    handler_ptr_t handler = nullptr;
-    OLD::DisplayInfo di;
-    ScreenPointer* screenpointer = new ScreenPointer(hwcmgr, handler, di);
-    ASSERT_NE(screenpointer, nullptr);
-    screenpointer->isCurrentOffScreenRendering_ = false;
-    screenpointer->dpi_ = 2.0;
-    screenpointer->scale_ = 1.0;
-    float ret = screenpointer->GetRenderDPI();
-    EXPECT_EQ(ret, 2.0);
     delete screenpointer;
 }
 

@@ -375,14 +375,13 @@ void ScreenPointer::OnDisplayInfo(const OLD::DisplayInfo &di)
     MMI_HILOGD("Update with DisplayInfo, id=%{public}" PRIu64 ", shape=(%{public}u, %{public}u), mode=%{public}u, "
         "rotation=%{public}u, dpi=%{public}f", screenId_, width_, height_, mode_, rotation_, dpi_);
     if (isCurrentOffScreenRendering_) {
-        screenRealDPI_ = di.screenRealDPI;
         if (di.width == 0) {
             MMI_HILOGE("The divisor cannot be 0");
             return;
         }
         offRenderScale_ = float(di.screenRealWidth) / di.width;
         MMI_HILOGD("Update with DisplayInfo, screenRealDPI=%{public}d, offRenderScale_=(%{public}f ",
-            screenRealDPI_, offRenderScale_);
+            di.screenRealDPI, offRenderScale_);
     }
 }
 
@@ -603,15 +602,6 @@ bool ScreenPointer::SetInvisible()
     }
     MMI_HILOGI("SetInvisible success, screenId=%{public}" PRIu64, screenId_);
     return true;
-}
-
-float ScreenPointer::GetRenderDPI() const
-{
-    if (GetIsCurrentOffScreenRendering() && !IsMirror()) {
-        return float(GetScreenRealDPI()) / BASELINE_DENSITY;
-    } else {
-        return dpi_ * scale_;
-    }
 }
 
 bool ScreenPointer::IsPositionOutScreen(int32_t x, int32_t y)
