@@ -21350,5 +21350,1017 @@ HWTEST_F(InputWindowsManagerTest, SequenceClosure_DeviceOffline_ClearsSnapshots_
     EXPECT_FALSE(mgr.ConsumeSequenceSnapshot(btnA).has_value());
 }
 
+// =====================================================================
+// TASK-11: Compatibility And Final Evidence -- AC-5.1 through AC-5.4
+// =====================================================================
+
+/**
+ * @tc.name: Compat_WindowScopedPointerStyle_ByGroup_001
+ * @tc.desc: AC-5.1: Window-scoped SetPointerStyle / GetPointerStyle works by
+ *           the window's containing group.  Setting a per-window pointer style
+ *           on a process/window pair succeeds and is retrievable, and is
+ *           independent of styles set on a different process or window.
+ * @tc.type: FUNC
+ * @tc.require: AC-5.1
+ */
+HWTEST_F(InputWindowsManagerTest, Compat_WindowScopedPointerStyle_ByGroup_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager mgr;
+
+    constexpr int32_t PID_A = 10;
+    constexpr int32_t PID_B = 20;
+    constexpr int32_t WIN_A = 100;
+    constexpr int32_t WIN_B = 200;
+
+    // Set up default group with basic display info for pointer style init
+    OLD::DisplayGroupInfo defaultGroup;
+    defaultGroup.groupId = 0;
+    defaultGroup.type = GroupType::GROUP_DEFAULT;
+    OLD::DisplayInfo disp = { .id = 1 };
+    disp.width = 1920;
+    disp.height = 1080;
+    disp.dpi = 240;
+    disp.name = "main";
+    disp.uniq = "main0";
+    disp.direction = DIRECTION0;
+    defaultGroup.displaysInfo.push_back(disp);
+    mgr.UpdateDisplayInfo(defaultGroup);
+
+    // Set window-scoped pointer style for PID_A / WIN_A
+    PointerStyle styleA;
+    styleA.id = POINTER_STYLE_ID_1;
+    int32_t ret = mgr.SetPointerStyle(PID_A, WIN_A, styleA);
+    EXPECT_EQ(ret, RET_OK) << "Window-scoped SetPointerStyle must succeed for valid window";
+
+    // Set a different style for PID_B / WIN_B
+    PointerStyle styleB;
+    styleB.id = POINTER_STYLE_ID_2;
+    ret = mgr.SetPointerStyle(PID_B, WIN_B, styleB);
+    EXPECT_EQ(ret, RET_OK) << "Window-scoped SetPointerStyle for another window must succeed";
+
+    // Retrieve and verify isolation
+    PointerStyle readA;
+    ret = mgr.GetPointerStyle(PID_A, WIN_A, readA);
+    EXPECT_EQ(ret, RET_OK);
+    EXPECT_EQ(readA.id, POINTER_STYLE_ID_1)
+        << "Per-window pointer style must be retrievable for the correct pid/window pair";
+
+    PointerStyle readB;
+    ret = mgr.GetPointerStyle(PID_B, WIN_B, readB);
+    EXPECT_EQ(ret, RET_OK);
+    EXPECT_EQ(readB.id, POINTER_STYLE_ID_2)
+        << "Per-window pointer style must be independent per pid/window";
+
+    // Verify that changing one does NOT affect the other
+    PointerStyle newStyle;
+    newStyle.id = TEST_DEFAULT_POINTER_STYLE;
+    mgr.SetPointerStyle(PID_A, WIN_A, newStyle);
+    PointerStyle rereadB;
+    mgr.GetPointerStyle(PID_B, WIN_B, rereadB);
+    EXPECT_EQ(rereadB.id, POINTER_STYLE_ID_2)
+        << "Changing window A style must not affect window B style";
+}
+
+/**
+ * @tc.name: Compat_WindowScopedCapture_ByGroup_001
+ * @tc.desc: AC-5.1: Window-scoped SetMouseCaptureMode works per-group.
+ *           Setting capture on one group does not affect another group.
+ *           This is a focused regression test for the window-scoped capture API.
+ * @tc.type: FUNC
+ * @tc.require: AC-5.1
+ */
+HWTEST_F(InputWindowsManagerTest, Compat_WindowScopedCapture_ByGroup_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto mgr = std::make_shared<InputWindowsManager>();
+    ASSERT_NE(mgr, nullptr);
+
+    constexpr int32_t GROUP_DEFAULT = 0;
+    constexpr int32_t GROUP_EXT = 5;
+
+    // Set up default group
+    OLD::DisplayGroupInfo defaultGroup;
+    defaultGroup.groupId = GROUP_DEFAULT;
+    defaultGroup.type = GroupType::GROUP_DEFAULT;
+    OLD::DisplayInfo mainDisp = { .id = 1 };
+    mainDisp.width = 1920;
+    mainDisp.height = 1080;
+    mainDisp.dpi = 240;
+    mainDisp.name = "main";
+    mainDisp.uniq = "main0";
+    mainDisp.direction = DIRECTION0;
+    defaultGroup.displaysInfo.push_back(mainDisp);
+    mgr->UpdateDisplayInfo(defaultGroup);
+
+    // Set up external group
+    OLD::DisplayGroupInfo extGroup;
+    extGroup.groupId = GROUP_EXT;
+    extGroup.type = GroupType::GROUP_SPECIAL;
+    OLD::DisplayInfo extDisp = { .id = 10 };
+    extDisp.width = 1280;
+    extDisp.height = 720;
+    extDisp.dpi = 160;
+    extDisp.name = "ext";
+    extDisp.uniq = "ext0";
+    extDisp.direction = DIRECTION0;
+    extGroup.displaysInfo.push_back(extDisp);
+    mgr->UpdateDisplayInfo(extGroup);
+
+    // Before any capture, both groups should be non-capture
+    EXPECT_FALSE(mgr->GetMouseIsCaptureMode(GROUP_DEFAULT))
+        << "Default group must start with no capture mode";
+    EXPECT_FALSE(mgr->GetMouseIsCaptureMode(GROUP_EXT))
+        << "External group must start with no capture mode";
+
+    // Enable capture for default group window
+    int32_t ret = mgr->SetMouseCaptureMode(1, true, GROUP_DEFAULT);
+    EXPECT_EQ(ret, RET_OK);
+    EXPECT_TRUE(mgr->GetMouseIsCaptureMode(GROUP_DEFAULT))
+        << "Default group capture must be active after setting";
+    EXPECT_FALSE(mgr->GetMouseIsCaptureMode(GROUP_EXT))
+        << "External group capture must remain inactive when only default is set";
+
+    // Enable capture for external group
+    ret = mgr->SetMouseCaptureMode(10, true, GROUP_EXT);
+    EXPECT_EQ(ret, RET_OK);
+    EXPECT_TRUE(mgr->GetMouseIsCaptureMode(GROUP_EXT))
+        << "External group capture must be active after setting";
+
+    // Disable default - external stays
+    ret = mgr->SetMouseCaptureMode(1, false, GROUP_DEFAULT);
+    EXPECT_EQ(ret, RET_OK);
+    EXPECT_FALSE(mgr->GetMouseIsCaptureMode(GROUP_DEFAULT))
+        << "Default group capture must be cleared";
+    EXPECT_TRUE(mgr->GetMouseIsCaptureMode(GROUP_EXT))
+        << "External group capture must remain active when only default is cleared";
+}
+
+/**
+ * @tc.name: Compat_WindowScopedPointerStyle_GlobalOverride_001
+ * @tc.desc: AC-5.1: Setting GLOBAL_WINDOW_ID pointer style applies globally
+ *           but per-window styles take precedence for their specific windows.
+ *           Verifies backward compatibility of the global pointer style mechanism.
+ * @tc.type: FUNC
+ * @tc.require: AC-5.1
+ */
+HWTEST_F(InputWindowsManagerTest, Compat_WindowScopedPointerStyle_GlobalOverride_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager mgr;
+
+    constexpr int32_t PID_A = 10;
+    constexpr int32_t WIN_A = 100;
+
+    OLD::DisplayGroupInfo defaultGroup;
+    defaultGroup.groupId = 0;
+    defaultGroup.type = GroupType::GROUP_DEFAULT;
+    OLD::DisplayInfo disp = { .id = 1 };
+    disp.width = 1920;
+    disp.height = 1080;
+    disp.dpi = 240;
+    disp.name = "main";
+    disp.uniq = "main0";
+    disp.direction = DIRECTION0;
+    defaultGroup.displaysInfo.push_back(disp);
+    mgr.UpdateDisplayInfo(defaultGroup);
+
+    // Set a per-window style
+    PointerStyle windowStyle;
+    windowStyle.id = POINTER_STYLE_ID_1;
+    mgr.SetPointerStyle(PID_A, WIN_A, windowStyle);
+
+    // Set a global style (via GLOBAL_WINDOW_ID)
+    PointerStyle globalStyle;
+    globalStyle.id = POINTER_STYLE_ID_2;
+    mgr.SetPointerStyle(PID_A, GLOBAL_WINDOW_ID, globalStyle);
+
+    // Per-window style should still return the window-specific value
+    PointerStyle readWin;
+    mgr.GetPointerStyle(PID_A, WIN_A, readWin);
+    EXPECT_EQ(readWin.id, POINTER_STYLE_ID_1)
+        << "Per-window style must remain even after setting global style";
+
+    // Global style should return the global value
+    PointerStyle readGlobal;
+    mgr.GetPointerStyle(PID_A, GLOBAL_WINDOW_ID, readGlobal);
+    EXPECT_EQ(readGlobal.id, POINTER_STYLE_ID_2)
+        << "Global pointer style must be readable via GLOBAL_WINDOW_ID";
+}
+
+/**
+ * @tc.name: Compat_GlobalAPI_MouseInfo_DefaultGroupOnly_001
+ * @tc.desc: AC-5.2: Global GetMouseInfo API (no-arg or default group) affects only
+ *           the default group. Setting mouse location on the default group must NOT
+ *           appear in a non-default group's mouse info, and vice versa.
+ * @tc.type: FUNC
+ * @tc.require: AC-5.2
+ */
+HWTEST_F(InputWindowsManagerTest, Compat_GlobalAPI_MouseInfo_DefaultGroupOnly_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager mgr;
+
+    constexpr int32_t NON_DEFAULT_GROUP = 7;
+    constexpr int32_t DISPLAY_MAIN = 1;
+    constexpr int32_t DISPLAY_EXT = 20;
+
+    // Set up default group
+    OLD::DisplayGroupInfo defaultGroup;
+    defaultGroup.groupId = 0;
+    defaultGroup.type = GroupType::GROUP_DEFAULT;
+    OLD::DisplayInfo mainDisp = { .id = DISPLAY_MAIN };
+    mainDisp.width = 1920;
+    mainDisp.height = 1080;
+    mainDisp.validWidth = 1920;
+    mainDisp.validHeight = 1080;
+    mainDisp.dpi = 240;
+    mainDisp.name = "main";
+    mainDisp.uniq = "main0";
+    mainDisp.direction = DIRECTION0;
+    defaultGroup.displaysInfo.push_back(mainDisp);
+    mgr.UpdateDisplayInfo(defaultGroup);
+
+    // Set up non-default group
+    OLD::DisplayGroupInfo extGroup;
+    extGroup.groupId = NON_DEFAULT_GROUP;
+    extGroup.type = GroupType::GROUP_SPECIAL;
+    OLD::DisplayInfo extDisp = { .id = DISPLAY_EXT };
+    extDisp.width = 2560;
+    extDisp.height = 1440;
+    extDisp.validWidth = 2560;
+    extDisp.validHeight = 1440;
+    extDisp.dpi = 160;
+    extDisp.name = "ext";
+    extDisp.uniq = "ext0";
+    extDisp.direction = DIRECTION0;
+    extGroup.displaysInfo.push_back(extDisp);
+    mgr.UpdateDisplayInfo(extGroup);
+    mgr.EnsureGroupState(NON_DEFAULT_GROUP);
+
+    // Manually set mouse location for default group
+    mgr.mouseLocationMap_[DEFAULT_GROUP_ID].displayId = DISPLAY_MAIN;
+    mgr.mouseLocationMap_[DEFAULT_GROUP_ID].physicalX = 500;
+    mgr.mouseLocationMap_[DEFAULT_GROUP_ID].physicalY = 600;
+
+    // Set different mouse location for non-default group
+    mgr.mouseLocationMap_[NON_DEFAULT_GROUP].displayId = DISPLAY_EXT;
+    mgr.mouseLocationMap_[NON_DEFAULT_GROUP].physicalX = 1000;
+    mgr.mouseLocationMap_[NON_DEFAULT_GROUP].physicalY = 1200;
+
+    // Default GetMouseInfo() should return default group location
+    MouseLocation defaultLoc = mgr.GetMouseInfo();
+    EXPECT_EQ(defaultLoc.displayId, DISPLAY_MAIN)
+        << "Default GetMouseInfo must return default group display";
+    EXPECT_EQ(defaultLoc.physicalX, 500)
+        << "Default GetMouseInfo X must match default group";
+    EXPECT_EQ(defaultLoc.physicalY, 600)
+        << "Default GetMouseInfo Y must match default group";
+
+    // Explicit non-default group should return its own location
+    MouseLocation extLoc = mgr.GetMouseInfo(NON_DEFAULT_GROUP);
+    EXPECT_EQ(extLoc.displayId, DISPLAY_EXT)
+        << "Non-default GetMouseInfo must return non-default group display";
+    EXPECT_EQ(extLoc.physicalX, 1000)
+        << "Non-default GetMouseInfo X must match non-default group";
+    EXPECT_EQ(extLoc.physicalY, 1200)
+        << "Non-default GetMouseInfo Y must match non-default group";
+}
+
+/**
+ * @tc.name: Compat_GlobalAPI_CursorPos_DefaultGroupOnly_001
+ * @tc.desc: AC-5.2: Global GetCursorPos / ResetCursorPos APIs (no-arg or default
+ *           group) operate on the default group only. Cursor state is isolated
+ *           per group.
+ * @tc.type: FUNC
+ * @tc.require: AC-5.2
+ */
+HWTEST_F(InputWindowsManagerTest, Compat_GlobalAPI_CursorPos_DefaultGroupOnly_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager mgr;
+
+    constexpr int32_t NON_DEFAULT_GROUP = 4;
+    constexpr int32_t DISPLAY_MAIN = 1;
+    constexpr int32_t DISPLAY_EXT = 15;
+
+    // Set up default group
+    OLD::DisplayGroupInfo defaultGroup;
+    defaultGroup.groupId = 0;
+    defaultGroup.type = GroupType::GROUP_DEFAULT;
+    OLD::DisplayInfo mainDisp = { .id = DISPLAY_MAIN };
+    mainDisp.width = 1920;
+    mainDisp.height = 1080;
+    mainDisp.validWidth = 1920;
+    mainDisp.validHeight = 1080;
+    mainDisp.dpi = 240;
+    mainDisp.name = "main";
+    mainDisp.uniq = "main0";
+    mainDisp.direction = DIRECTION0;
+    defaultGroup.displaysInfo.push_back(mainDisp);
+    mgr.UpdateDisplayInfo(defaultGroup);
+
+    // Set up non-default group
+    OLD::DisplayGroupInfo extGroup;
+    extGroup.groupId = NON_DEFAULT_GROUP;
+    extGroup.type = GroupType::GROUP_SPECIAL;
+    OLD::DisplayInfo extDisp = { .id = DISPLAY_EXT };
+    extDisp.width = 3840;
+    extDisp.height = 2160;
+    extDisp.validWidth = 3840;
+    extDisp.validHeight = 2160;
+    extDisp.dpi = 160;
+    extDisp.name = "ext";
+    extDisp.uniq = "ext0";
+    extDisp.direction = DIRECTION0;
+    extGroup.displaysInfo.push_back(extDisp);
+    mgr.UpdateDisplayInfo(extGroup);
+    mgr.EnsureGroupState(NON_DEFAULT_GROUP);
+
+    // Manually set cursor position for default group
+    mgr.cursorPosMap_[DEFAULT_GROUP_ID].displayId = DISPLAY_MAIN;
+    mgr.cursorPosMap_[DEFAULT_GROUP_ID].cursorPos.x = 200;
+    mgr.cursorPosMap_[DEFAULT_GROUP_ID].cursorPos.y = 300;
+
+    // Manually set cursor position for non-default group
+    mgr.cursorPosMap_[NON_DEFAULT_GROUP].displayId = DISPLAY_EXT;
+    mgr.cursorPosMap_[NON_DEFAULT_GROUP].cursorPos.x = 1500;
+    mgr.cursorPosMap_[NON_DEFAULT_GROUP].cursorPos.y = 1800;
+
+    // Default GetCursorPos should return default group
+    CursorPosition defaultPos = mgr.GetCursorPos();
+    EXPECT_EQ(defaultPos.displayId, DISPLAY_MAIN)
+        << "Default GetCursorPos must use default group display";
+
+    // Non-default GetCursorPos should return non-default group
+    CursorPosition extPos = mgr.GetCursorPos(NON_DEFAULT_GROUP);
+    EXPECT_EQ(extPos.displayId, DISPLAY_EXT)
+        << "Non-default GetCursorPos must use non-default group display";
+
+    // They must be independent
+    EXPECT_NE(defaultPos.cursorPos.x, extPos.cursorPos.x)
+        << "Default and non-default cursor positions must be independent";
+}
+
+/**
+ * @tc.name: Compat_GlobalAPI_CaptureMode_DefaultGroupOnly_001
+ * @tc.desc: AC-5.2: Global capture mode APIs (no-arg / DEFAULT_GROUP_ID) affect only
+ *           the default group. A non-default group should remain unaffected.
+ * @tc.type: FUNC
+ * @tc.require: AC-5.2
+ */
+HWTEST_F(InputWindowsManagerTest, Compat_GlobalAPI_CaptureMode_DefaultGroupOnly_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto mgr = std::make_shared<InputWindowsManager>();
+    ASSERT_NE(mgr, nullptr);
+
+    constexpr int32_t GROUP_A = 0;
+    constexpr int32_t GROUP_B = 8;
+
+    // Set up default group
+    OLD::DisplayGroupInfo defaultGroup;
+    defaultGroup.groupId = GROUP_A;
+    defaultGroup.type = GroupType::GROUP_DEFAULT;
+    OLD::DisplayInfo mainDisp = { .id = 1 };
+    mainDisp.width = 1920;
+    mainDisp.height = 1080;
+    mainDisp.dpi = 240;
+    mainDisp.name = "main";
+    mainDisp.uniq = "main0";
+    mainDisp.direction = DIRECTION0;
+    defaultGroup.displaysInfo.push_back(mainDisp);
+    mgr->UpdateDisplayInfo(defaultGroup);
+
+    // Set up non-default group
+    OLD::DisplayGroupInfo extGroup;
+    extGroup.groupId = GROUP_B;
+    extGroup.type = GroupType::GROUP_SPECIAL;
+    OLD::DisplayInfo extDisp = { .id = 10 };
+    extDisp.width = 1280;
+    extDisp.height = 720;
+    extDisp.dpi = 160;
+    extDisp.name = "ext";
+    extDisp.uniq = "ext0";
+    extDisp.direction = DIRECTION0;
+    extGroup.displaysInfo.push_back(extDisp);
+    mgr->UpdateDisplayInfo(extGroup);
+
+    // Set capture via default (no-group arg = DEFAULT_GROUP_ID)
+    int32_t ret = mgr->SetMouseCaptureMode(1, true);
+    EXPECT_EQ(ret, RET_OK);
+
+    // Default group should be captured
+    EXPECT_TRUE(mgr->GetMouseIsCaptureMode())
+        << "Default group capture must be active via no-arg API";
+    EXPECT_TRUE(mgr->GetMouseIsCaptureMode(GROUP_A))
+        << "Default group capture must be active via explicit default group arg";
+
+    // Non-default group must NOT be affected
+    EXPECT_FALSE(mgr->GetMouseIsCaptureMode(GROUP_B))
+        << "Non-default group must NOT be captured by default global API";
+}
+
+/**
+ * @tc.name: Compat_GlobalAPI_DisplayGroupInfo_DefaultGroupOnly_001
+ * @tc.desc: AC-5.2: GetDisplayGroupInfo()/GetDisplayInfoVector()/GetWindowInfoVector()
+ *           with no args (or DEFAULT_GROUP_ID) return default group data, not non-default
+ *           group data.
+ * @tc.type: FUNC
+ * @tc.require: AC-5.2
+ */
+HWTEST_F(InputWindowsManagerTest, Compat_GlobalAPI_DisplayGroupInfo_DefaultGroupOnly_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager mgr;
+
+    constexpr int32_t NON_DEFAULT = 6;
+    constexpr int32_t MAIN_DISPLAY = 1;
+    constexpr int32_t EXT_DISPLAY = 30;
+
+    // Set up default group with display
+    OLD::DisplayGroupInfo defaultGroup;
+    defaultGroup.groupId = 0;
+    defaultGroup.type = GroupType::GROUP_DEFAULT;
+    OLD::DisplayInfo mainDisp = { .id = MAIN_DISPLAY };
+    mainDisp.width = 1920;
+    mainDisp.height = 1080;
+    mainDisp.dpi = 240;
+    mainDisp.name = "main";
+    mainDisp.uniq = "main0";
+    mainDisp.direction = DIRECTION0;
+    defaultGroup.displaysInfo.push_back(mainDisp);
+    WindowInfo win;
+    win.id = 100;
+    win.pid = 10;
+    win.uid = 10;
+    win.area = {0, 0, 1920, 1080};
+    win.defaultHotAreas = {win.area};
+    win.pointerHotAreas = {win.area};
+    defaultGroup.windowsInfo.push_back(win);
+    mgr.UpdateDisplayInfo(defaultGroup);
+
+    // Set up non-default group with different display
+    OLD::DisplayGroupInfo extGroup;
+    extGroup.groupId = NON_DEFAULT;
+    extGroup.type = GroupType::GROUP_SPECIAL;
+    OLD::DisplayInfo extDisp = { .id = EXT_DISPLAY };
+    extDisp.width = 2560;
+    extDisp.height = 1440;
+    extDisp.dpi = 160;
+    extDisp.name = "ext";
+    extDisp.uniq = "ext0";
+    extDisp.direction = DIRECTION0;
+    extGroup.displaysInfo.push_back(extDisp);
+    WindowInfo extWin;
+    extWin.id = 200;
+    extWin.pid = 20;
+    extWin.uid = 20;
+    extWin.area = {0, 0, 2560, 1440};
+    extWin.defaultHotAreas = {extWin.area};
+    extWin.pointerHotAreas = {extWin.area};
+    extGroup.windowsInfo.push_back(extWin);
+    mgr.UpdateDisplayInfo(extGroup);
+
+    // No-arg GetDisplayInfoVector should return default group displays
+    const auto &defaultDisplays = mgr.GetDisplayInfoVector();
+    ASSERT_FALSE(defaultDisplays.empty());
+    EXPECT_EQ(defaultDisplays[0].id, MAIN_DISPLAY)
+        << "No-arg GetDisplayInfoVector must return default group display";
+
+    // Explicit non-default should return its own displays
+    const auto &extDisplays = mgr.GetDisplayInfoVector(NON_DEFAULT);
+    ASSERT_FALSE(extDisplays.empty());
+    EXPECT_EQ(extDisplays[0].id, EXT_DISPLAY)
+        << "Explicit non-default GetDisplayInfoVector must return non-default display";
+
+    // No-arg GetWindowInfoVector should return default group windows
+    const auto &defaultWindows = mgr.GetWindowInfoVector();
+    bool foundMain = false;
+    for (const auto &w : defaultWindows) {
+        if (w.id == 100) foundMain = true;
+    }
+    EXPECT_TRUE(foundMain) << "No-arg GetWindowInfoVector must contain default group window";
+}
+
+/**
+ * @tc.name: Compat_Startup_NoNonDefaultBindingState_001
+ * @tc.desc: AC-5.3: On startup (freshly constructed InputWindowsManager), there must
+ *           be no non-default runtime bindings and no non-default group state in
+ *           any group-keyed maps.
+ * @tc.type: FUNC
+ * @tc.require: AC-5.3
+ */
+HWTEST_F(InputWindowsManagerTest, Compat_Startup_NoNonDefaultBindingState_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager mgr;
+
+    // No runtime bindings should exist at startup
+    const auto &bindings = mgr.bindInfo_.GetAllRuntimeBindings();
+    EXPECT_TRUE(bindings.empty())
+        << "On startup, no runtime bindings must exist";
+
+    // No non-default group state should exist in mouseLocationMap_
+    for (const auto &entry : mgr.mouseLocationMap_) {
+        EXPECT_EQ(entry.first, DEFAULT_GROUP_ID)
+            << "On startup, mouseLocationMap must not contain non-default group " << entry.first;
+    }
+
+    // No non-default group state in cursorPosMap_
+    for (const auto &entry : mgr.cursorPosMap_) {
+        EXPECT_EQ(entry.first, DEFAULT_GROUP_ID)
+            << "On startup, cursorPosMap must not contain non-default group " << entry.first;
+    }
+
+    // No non-default group state in captureModeInfoMap_
+    for (const auto &entry : mgr.captureModeInfoMap_) {
+        EXPECT_EQ(entry.first, DEFAULT_GROUP_ID)
+            << "On startup, captureModeInfoMap must not contain non-default group " << entry.first;
+    }
+
+    // No non-default group state in displayGroupInfoMap_ (until a non-default display is registered)
+    for (const auto &entry : mgr.displayGroupInfoMap_) {
+        EXPECT_EQ(entry.first, DEFAULT_GROUP_ID)
+            << "On startup, displayGroupInfoMap must not contain non-default group " << entry.first;
+    }
+}
+
+/**
+ * @tc.name: Compat_Startup_NoNonDefaultRenderContext_001
+ * @tc.desc: AC-5.3: On startup, no non-default render context exists.
+ *           pointerDrawFlagMap_ and displayModeMap_ must have no non-default entries.
+ * @tc.type: FUNC
+ * @tc.require: AC-5.3
+ */
+HWTEST_F(InputWindowsManagerTest, Compat_Startup_NoNonDefaultRenderContext_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager mgr;
+
+    // pointerDrawFlagMap_ should have no non-default entries
+    for (const auto &entry : mgr.pointerDrawFlagMap_) {
+        EXPECT_EQ(entry.first, DEFAULT_GROUP_ID)
+            << "On startup, pointerDrawFlagMap must not contain non-default group " << entry.first;
+    }
+
+    // displayModeMap_ should have no non-default entries
+    for (const auto &entry : mgr.displayModeMap_) {
+        EXPECT_EQ(entry.first, DEFAULT_GROUP_ID)
+            << "On startup, displayModeMap must not contain non-default group " << entry.first;
+    }
+}
+
+/**
+ * @tc.name: Compat_UnboundEvent_NoNonDefaultState_001
+ * @tc.desc: AC-5.3: Processing an event from an unbound device must NOT create
+ *           any non-default group state. ResolveGroupIdForDevice returns default
+ *           group for unbound devices, so no lazy allocation happens.
+ * @tc.type: FUNC
+ * @tc.require: AC-5.3
+ */
+HWTEST_F(InputWindowsManagerTest, Compat_UnboundEvent_NoNonDefaultState_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager mgr;
+
+    constexpr int32_t UNBOUND_DEVICE = 42;
+
+    // Set up default group
+    OLD::DisplayGroupInfo defaultGroup;
+    defaultGroup.groupId = 0;
+    defaultGroup.type = GroupType::GROUP_DEFAULT;
+    OLD::DisplayInfo mainDisp = { .id = 1 };
+    mainDisp.width = 1920;
+    mainDisp.height = 1080;
+    mainDisp.dpi = 240;
+    mainDisp.name = "main";
+    mainDisp.uniq = "main0";
+    mainDisp.direction = DIRECTION0;
+    defaultGroup.displaysInfo.push_back(mainDisp);
+    mgr.UpdateDisplayInfo(defaultGroup);
+
+    // Resolve group for unbound device - should return default
+    int32_t resolved = mgr.ResolveGroupIdForDevice(UNBOUND_DEVICE);
+    EXPECT_EQ(resolved, DEFAULT_GROUP_ID)
+        << "Unbound device must resolve to default group";
+
+    // After resolving, no non-default state should be created
+    EXPECT_FALSE(mgr.HasGroupState(1))
+        << "Resolving unbound device must not create state for group 1";
+    EXPECT_FALSE(mgr.HasGroupState(2))
+        << "Resolving unbound device must not create state for group 2";
+
+    // Verify no non-default entries in mouseLocationMap
+    for (const auto &entry : mgr.mouseLocationMap_) {
+        EXPECT_EQ(entry.first, DEFAULT_GROUP_ID)
+            << "After unbound event resolution, no non-default state must exist in mouseLocationMap";
+    }
+}
+
+/**
+ * @tc.name: Compat_DefaultGroupAudit_TopologyFallback_001
+ * @tc.desc: AC-5.4: topology-fallback points (FindDisplayGroupId miss, GetDisplayInfoVector
+ *           fallback, GetWindowInfoVector fallback, GetFocusWindowId fallback) correctly fall
+ *           back to default group when the requested group is not found.
+ * @tc.type: FUNC
+ * @tc.require: AC-5.4
+ */
+HWTEST_F(InputWindowsManagerTest, Compat_DefaultGroupAudit_TopologyFallback_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager mgr;
+
+    constexpr int32_t NONEXISTENT_GROUP = 999;
+    constexpr int32_t MAIN_DISPLAY = 1;
+
+    // Set up default group only
+    OLD::DisplayGroupInfo defaultGroup;
+    defaultGroup.groupId = 0;
+    defaultGroup.type = GroupType::GROUP_DEFAULT;
+    defaultGroup.focusWindowId = 42;
+    OLD::DisplayInfo mainDisp = { .id = MAIN_DISPLAY };
+    mainDisp.width = 1920;
+    mainDisp.height = 1080;
+    mainDisp.dpi = 240;
+    mainDisp.name = "main";
+    mainDisp.uniq = "main0";
+    mainDisp.direction = DIRECTION0;
+    defaultGroup.displaysInfo.push_back(mainDisp);
+    mgr.UpdateDisplayInfo(defaultGroup);
+
+    // GetDisplayInfoVector for nonexistent group should fall back to default
+    const auto &displays = mgr.GetDisplayInfoVector(NONEXISTENT_GROUP);
+    ASSERT_FALSE(displays.empty())
+        << "GetDisplayInfoVector must fall back to default group for unknown groupId";
+    EXPECT_EQ(displays[0].id, MAIN_DISPLAY)
+        << "Fallback display info must be from the default group";
+
+    // GetFocusWindowId for nonexistent group should fall back to default
+    int32_t focusId = mgr.GetFocusWindowId(NONEXISTENT_GROUP);
+    EXPECT_EQ(focusId, 42)
+        << "GetFocusWindowId must fall back to default group focusWindowId for unknown groupId";
+}
+
+/**
+ * @tc.name: Compat_DefaultGroupAudit_ResolvedGroupRequired_KeyboardRoute_001
+ * @tc.desc: AC-5.4: Verifies the resolved-group-required points for keyboard routing
+ *           (HandleKeyEventWindowId, GetPidAndUpdateTarget) use resolved group from
+ *           device binding instead of hardcoded MAIN_GROUPID. A bound keyboard device
+ *           must route to its bound group's focus window.
+ * @tc.type: FUNC
+ * @tc.require: AC-5.4
+ */
+HWTEST_F(InputWindowsManagerTest, Compat_DefaultGroupAudit_ResolvedGroupRequired_KeyboardRoute_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager mgr;
+
+    constexpr int32_t BOUND_DEVICE = 50;
+    constexpr int32_t BOUND_GROUP = 3;
+    constexpr int32_t BOUND_DISPLAY = 10;
+    constexpr int32_t FOCUS_WINDOW_EXT = 777;
+
+    // Set up default group
+    OLD::DisplayGroupInfo defaultGroup;
+    defaultGroup.groupId = 0;
+    defaultGroup.type = GroupType::GROUP_DEFAULT;
+    defaultGroup.focusWindowId = 100;
+    OLD::DisplayInfo mainDisp = { .id = 1 };
+    mainDisp.width = 1920;
+    mainDisp.height = 1080;
+    mainDisp.dpi = 240;
+    mainDisp.name = "main";
+    mainDisp.uniq = "main0";
+    mainDisp.direction = DIRECTION0;
+    defaultGroup.displaysInfo.push_back(mainDisp);
+    mgr.UpdateDisplayInfo(defaultGroup);
+
+    // Set up bound group with different focus window
+    OLD::DisplayGroupInfo extGroup;
+    extGroup.groupId = BOUND_GROUP;
+    extGroup.type = GroupType::GROUP_SPECIAL;
+    extGroup.focusWindowId = FOCUS_WINDOW_EXT;
+    OLD::DisplayInfo extDisp = { .id = BOUND_DISPLAY };
+    extDisp.width = 2560;
+    extDisp.height = 1440;
+    extDisp.dpi = 160;
+    extDisp.name = "ext";
+    extDisp.uniq = "ext0";
+    extDisp.direction = DIRECTION0;
+    extGroup.displaysInfo.push_back(extDisp);
+    mgr.UpdateDisplayInfo(extGroup);
+
+    // Create runtime binding
+    mgr.bindInfo_.AddRuntimeBinding(BOUND_DEVICE, BOUND_DISPLAY, BOUND_GROUP);
+    mgr.EnsureGroupState(BOUND_GROUP);
+
+    // Resolve group for bound device
+    int32_t resolved = mgr.ResolveGroupIdForDevice(BOUND_DEVICE);
+    EXPECT_EQ(resolved, BOUND_GROUP)
+        << "Bound device must resolve to its bound group";
+
+    // Focus window for resolved group must be the bound group's focus
+    int32_t focusWin = mgr.GetFocusWindowId(resolved);
+    EXPECT_EQ(focusWin, FOCUS_WINDOW_EXT)
+        << "Bound device keyboard events must use bound group focus window, not default";
+
+    // Default group focus must remain unchanged
+    int32_t defaultFocus = mgr.GetFocusWindowId(DEFAULT_GROUP_ID);
+    EXPECT_EQ(defaultFocus, 100)
+        << "Default group focus must not be affected by bound device routing";
+}
+
+/**
+ * @tc.name: Compat_DefaultGroupAudit_ResolvedGroupRequired_MouseLocation_001
+ * @tc.desc: AC-5.4: Verifies the resolved-group-required points for mouse location
+ *           (GetMouseInfo, mouseLocationMap_) correctly use per-group state.
+ *           A bound mouse device's cursor position updates should not leak into the
+ *           default group's mouse location state.
+ * @tc.type: FUNC
+ * @tc.require: AC-5.4
+ */
+HWTEST_F(InputWindowsManagerTest, Compat_DefaultGroupAudit_ResolvedGroupRequired_MouseLocation_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager mgr;
+
+    constexpr int32_t BOUND_GROUP = 5;
+    constexpr int32_t DISPLAY_MAIN = 1;
+    constexpr int32_t DISPLAY_EXT = 20;
+
+    // Set up default group
+    OLD::DisplayGroupInfo defaultGroup;
+    defaultGroup.groupId = 0;
+    defaultGroup.type = GroupType::GROUP_DEFAULT;
+    OLD::DisplayInfo mainDisp = { .id = DISPLAY_MAIN };
+    mainDisp.width = 1920;
+    mainDisp.height = 1080;
+    mainDisp.validWidth = 1920;
+    mainDisp.validHeight = 1080;
+    mainDisp.dpi = 240;
+    mainDisp.name = "main";
+    mainDisp.uniq = "main0";
+    mainDisp.direction = DIRECTION0;
+    defaultGroup.displaysInfo.push_back(mainDisp);
+    mgr.UpdateDisplayInfo(defaultGroup);
+
+    // Set up non-default group
+    OLD::DisplayGroupInfo extGroup;
+    extGroup.groupId = BOUND_GROUP;
+    extGroup.type = GroupType::GROUP_SPECIAL;
+    OLD::DisplayInfo extDisp = { .id = DISPLAY_EXT };
+    extDisp.width = 3840;
+    extDisp.height = 2160;
+    extDisp.validWidth = 3840;
+    extDisp.validHeight = 2160;
+    extDisp.dpi = 160;
+    extDisp.name = "ext";
+    extDisp.uniq = "ext0";
+    extDisp.direction = DIRECTION0;
+    extGroup.displaysInfo.push_back(extDisp);
+    mgr.UpdateDisplayInfo(extGroup);
+    mgr.EnsureGroupState(BOUND_GROUP);
+
+    // Simulate bound device cursor at ext position
+    mgr.mouseLocationMap_[BOUND_GROUP].displayId = DISPLAY_EXT;
+    mgr.mouseLocationMap_[BOUND_GROUP].physicalX = 2000;
+    mgr.mouseLocationMap_[BOUND_GROUP].physicalY = 1500;
+
+    // Default mouse location should be independent
+    MouseLocation defLoc = mgr.GetMouseInfo(DEFAULT_GROUP_ID);
+    MouseLocation extLoc = mgr.GetMouseInfo(BOUND_GROUP);
+
+    EXPECT_NE(defLoc.physicalX, extLoc.physicalX)
+        << "Default and bound group mouse X must be independent";
+    EXPECT_EQ(extLoc.displayId, DISPLAY_EXT)
+        << "Bound group mouse location must reference bound display";
+    EXPECT_EQ(extLoc.physicalX, 2000)
+        << "Bound group mouse X must reflect bound group state";
+}
+
+/**
+ * @tc.name: Compat_DefaultGroupAudit_ResolvedGroupRequired_CaptureMode_001
+ * @tc.desc: AC-5.4: Verifies the resolved-group-required points for capture mode
+ *           (SetMouseCaptureMode, GetMouseIsCaptureMode) now use per-group state
+ *           instead of hardcoded MAIN_GROUPID. This closes the audit row for
+ *           cpp:5223-5239.
+ * @tc.type: FUNC
+ * @tc.require: AC-5.4
+ */
+HWTEST_F(InputWindowsManagerTest, Compat_DefaultGroupAudit_ResolvedGroupRequired_CaptureMode_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto mgr = std::make_shared<InputWindowsManager>();
+    ASSERT_NE(mgr, nullptr);
+
+    constexpr int32_t GROUP_DEFAULT = 0;
+    constexpr int32_t GROUP_BOUND = 9;
+
+    // Set up both groups
+    OLD::DisplayGroupInfo defaultGroup;
+    defaultGroup.groupId = GROUP_DEFAULT;
+    defaultGroup.type = GroupType::GROUP_DEFAULT;
+    OLD::DisplayInfo mainDisp = { .id = 1 };
+    mainDisp.width = 1920;
+    mainDisp.height = 1080;
+    mainDisp.dpi = 240;
+    mainDisp.name = "main";
+    mainDisp.uniq = "main0";
+    mainDisp.direction = DIRECTION0;
+    defaultGroup.displaysInfo.push_back(mainDisp);
+    mgr->UpdateDisplayInfo(defaultGroup);
+
+    OLD::DisplayGroupInfo boundGroup;
+    boundGroup.groupId = GROUP_BOUND;
+    boundGroup.type = GroupType::GROUP_SPECIAL;
+    OLD::DisplayInfo extDisp = { .id = 20 };
+    extDisp.width = 1280;
+    extDisp.height = 720;
+    extDisp.dpi = 160;
+    extDisp.name = "ext";
+    extDisp.uniq = "ext0";
+    extDisp.direction = DIRECTION0;
+    boundGroup.displaysInfo.push_back(extDisp);
+    mgr->UpdateDisplayInfo(boundGroup);
+
+    // Set capture mode explicitly on bound group
+    int32_t ret = mgr->SetMouseCaptureMode(50, true, GROUP_BOUND);
+    EXPECT_EQ(ret, RET_OK);
+
+    // Bound group is captured, default is not
+    EXPECT_TRUE(mgr->GetMouseIsCaptureMode(GROUP_BOUND))
+        << "Bound group capture must be active after explicit group set";
+    EXPECT_FALSE(mgr->GetMouseIsCaptureMode(GROUP_DEFAULT))
+        << "Default group must not be captured when bound group is";
+
+    // Set capture on default group
+    ret = mgr->SetMouseCaptureMode(1, true, GROUP_DEFAULT);
+    EXPECT_EQ(ret, RET_OK);
+    EXPECT_TRUE(mgr->GetMouseIsCaptureMode(GROUP_DEFAULT))
+        << "Default group capture must be active after setting";
+
+    // Both are now captured independently
+    EXPECT_TRUE(mgr->GetMouseIsCaptureMode(GROUP_BOUND));
+    EXPECT_TRUE(mgr->GetMouseIsCaptureMode(GROUP_DEFAULT));
+}
+
+/**
+ * @tc.name: Compat_DefaultGroupAudit_ResolvedGroupRequired_CursorPos_001
+ * @tc.desc: AC-5.4: Verifies the resolved-group-required points for cursor position
+ *           (GetCursorPos, ResetCursorPos with cursorPosMap_ per-group) now use
+ *           resolved group instead of hardcoded MAIN_GROUPID. Closes audit rows
+ *           for cpp:7603-7671.
+ * @tc.type: FUNC
+ * @tc.require: AC-5.4
+ */
+HWTEST_F(InputWindowsManagerTest, Compat_DefaultGroupAudit_ResolvedGroupRequired_CursorPos_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager mgr;
+
+    constexpr int32_t BOUND_GROUP = 6;
+    constexpr int32_t DISPLAY_MAIN = 1;
+    constexpr int32_t DISPLAY_EXT = 25;
+
+    // Set up default group
+    OLD::DisplayGroupInfo defaultGroup;
+    defaultGroup.groupId = 0;
+    defaultGroup.type = GroupType::GROUP_DEFAULT;
+    OLD::DisplayInfo mainDisp = { .id = DISPLAY_MAIN };
+    mainDisp.width = 1920;
+    mainDisp.height = 1080;
+    mainDisp.validWidth = 1920;
+    mainDisp.validHeight = 1080;
+    mainDisp.dpi = 240;
+    mainDisp.name = "main";
+    mainDisp.uniq = "main0";
+    mainDisp.direction = DIRECTION0;
+    defaultGroup.displaysInfo.push_back(mainDisp);
+    mgr.UpdateDisplayInfo(defaultGroup);
+
+    // Set up bound group
+    OLD::DisplayGroupInfo extGroup;
+    extGroup.groupId = BOUND_GROUP;
+    extGroup.type = GroupType::GROUP_SPECIAL;
+    OLD::DisplayInfo extDisp = { .id = DISPLAY_EXT };
+    extDisp.width = 3840;
+    extDisp.height = 2160;
+    extDisp.validWidth = 3840;
+    extDisp.validHeight = 2160;
+    extDisp.dpi = 160;
+    extDisp.name = "ext";
+    extDisp.uniq = "ext0";
+    extDisp.direction = DIRECTION0;
+    extGroup.displaysInfo.push_back(extDisp);
+    mgr.UpdateDisplayInfo(extGroup);
+    mgr.EnsureGroupState(BOUND_GROUP);
+
+    // Set cursor for default group
+    mgr.cursorPosMap_[DEFAULT_GROUP_ID].displayId = DISPLAY_MAIN;
+    mgr.cursorPosMap_[DEFAULT_GROUP_ID].cursorPos.x = 100;
+    mgr.cursorPosMap_[DEFAULT_GROUP_ID].cursorPos.y = 200;
+
+    // Set cursor for bound group
+    mgr.cursorPosMap_[BOUND_GROUP].displayId = DISPLAY_EXT;
+    mgr.cursorPosMap_[BOUND_GROUP].cursorPos.x = 1900;
+    mgr.cursorPosMap_[BOUND_GROUP].cursorPos.y = 1080;
+
+    // Reset cursor for default group only
+    CursorPosition resetPos = mgr.ResetCursorPos(DEFAULT_GROUP_ID);
+
+    // Bound group cursor should be unchanged after default reset
+    CursorPosition boundPos = mgr.GetCursorPos(BOUND_GROUP);
+    EXPECT_EQ(boundPos.displayId, DISPLAY_EXT)
+        << "ResetCursorPos on default group must not affect bound group cursor display";
+    EXPECT_EQ(boundPos.cursorPos.x, 1900)
+        << "ResetCursorPos on default group must not affect bound group cursor X";
+    EXPECT_EQ(boundPos.cursorPos.y, 1080)
+        << "ResetCursorPos on default group must not affect bound group cursor Y";
+}
+
+/**
+ * @tc.name: Compat_DefaultGroupAudit_LegacyDefaultOnly_CameraCheck_001
+ * @tc.desc: AC-5.4: Verifies legacy-default-only audit points remain default-only.
+ *           JudgeCameraInFore intentionally uses MAIN_GROUPID for camera check.
+ *           UpdateDisplayInfoExtIfNeed returns early for non-default groups.
+ *           These are documented as legacy-default-only in the TASK-0 audit.
+ * @tc.type: FUNC
+ * @tc.require: AC-5.4
+ */
+HWTEST_F(InputWindowsManagerTest, Compat_DefaultGroupAudit_LegacyDefaultOnly_CameraCheck_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager mgr;
+
+    // Set up default group
+    OLD::DisplayGroupInfo defaultGroup;
+    defaultGroup.groupId = 0;
+    defaultGroup.type = GroupType::GROUP_DEFAULT;
+    defaultGroup.focusWindowId = 10;
+    OLD::DisplayInfo mainDisp = { .id = 1 };
+    mainDisp.width = 1920;
+    mainDisp.height = 1080;
+    mainDisp.dpi = 240;
+    mainDisp.name = "main";
+    mainDisp.uniq = "main0";
+    mainDisp.direction = DIRECTION0;
+    defaultGroup.displaysInfo.push_back(mainDisp);
+    mgr.UpdateDisplayInfo(defaultGroup);
+
+    // Camera check uses MAIN_GROUPID explicitly - verify focus window comes from main
+    int32_t mainFocus = mgr.GetFocusWindowId(0);
+    EXPECT_EQ(mainFocus, 10)
+        << "Legacy camera check uses MAIN_GROUPID=0 focus, which must remain correct";
+
+    // Main display ID from MAIN_GROUPID must return the main display
+    int32_t mainDisplayId = mgr.GetMainDisplayId(0);
+    EXPECT_EQ(mainDisplayId, 1)
+        << "Legacy camera check uses MAIN_GROUPID=0 main display, which must remain correct";
+}
+
+/**
+ * @tc.name: Compat_DefaultGroupAudit_EnsureGroupState_LazyAllocation_001
+ * @tc.desc: AC-5.4: EnsureGroupState creates per-group maps only when called for
+ *           a non-default group (lazily), not eagerly. This proves BR-5: no
+ *           pre-allocation of non-default state.
+ * @tc.type: FUNC
+ * @tc.require: AC-5.4
+ */
+HWTEST_F(InputWindowsManagerTest, Compat_DefaultGroupAudit_EnsureGroupState_LazyAllocation_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager mgr;
+
+    constexpr int32_t NEW_GROUP = 11;
+
+    // Before EnsureGroupState, the group should not exist
+    EXPECT_FALSE(mgr.HasGroupState(NEW_GROUP))
+        << "Group must not have state before EnsureGroupState";
+
+    // Call EnsureGroupState
+    mgr.EnsureGroupState(NEW_GROUP);
+
+    // After EnsureGroupState, state must exist
+    EXPECT_TRUE(mgr.HasGroupState(NEW_GROUP))
+        << "Group must have state after EnsureGroupState";
+
+    // Verify specific maps were populated
+    EXPECT_NE(mgr.mouseLocationMap_.find(NEW_GROUP), mgr.mouseLocationMap_.end())
+        << "mouseLocationMap must contain new group after EnsureGroupState";
+    EXPECT_NE(mgr.cursorPosMap_.find(NEW_GROUP), mgr.cursorPosMap_.end())
+        << "cursorPosMap must contain new group after EnsureGroupState";
+    EXPECT_NE(mgr.captureModeInfoMap_.find(NEW_GROUP), mgr.captureModeInfoMap_.end())
+        << "captureModeInfoMap must contain new group after EnsureGroupState";
+
+    // Calling EnsureGroupState for MAIN_GROUPID (0) should be a no-op
+    // (main group is always initialized in constructor)
+    size_t before = mgr.mouseLocationMap_.size();
+    mgr.EnsureGroupState(0);
+    size_t after = mgr.mouseLocationMap_.size();
+    EXPECT_EQ(before, after)
+        << "EnsureGroupState(0) must be a no-op for main group";
+}
+
 } // namespace MMI
 } // namespace OHOS

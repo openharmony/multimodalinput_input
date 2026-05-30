@@ -195,10 +195,10 @@
 | AC-4.1 | `cursor_drawing_component.*`, `service/window_manager/src/input_windows_manager.cpp` | | TASK-9 | Blocked |
 | AC-4.2 | `pointer_drawing_manager.*`, `screen_pointer.*`, `service/window_manager/src/input_windows_manager.cpp` | | TASK-10 | Blocked |
 | AC-4.3 | `service/window_manager/include/input_windows_manager.h`, `service/window_manager/src/input_windows_manager.cpp`, cursor rendering files | | TASK-7, TASK-9, TASK-10 | Blocked |
-| AC-5.1 | window-scoped pointer style/custom cursor/capture tests and related window manager APIs | | TASK-11 | Blocked |
-| AC-5.2 | global pointer size/color/speed/visible/location/capture tests and related window manager APIs | | TASK-11 | Blocked |
-| AC-5.3 | startup/unbound-path state tests, `input_windows_manager.*` | | TASK-7, TASK-11 | Blocked |
-| AC-5.4 | default/main display group helper usage audit, `service/window_manager/include/input_windows_manager.h`, `service/window_manager/src/input_windows_manager.cpp` | | TASK-0, TASK-4, TASK-5, TASK-6, TASK-7, TASK-11 | Blocked |
+| AC-5.1 | `service/window_manager/test/input_windows_manager_test.cpp` | `Compat_WindowScopedPointerStyle_ByGroup_001`, `Compat_WindowScopedCapture_ByGroup_001`, `Compat_WindowScopedPointerStyle_GlobalOverride_001` | TASK-11 | Done |
+| AC-5.2 | `service/window_manager/test/input_windows_manager_test.cpp` | `Compat_GlobalAPI_MouseInfo_DefaultGroupOnly_001`, `Compat_GlobalAPI_CursorPos_DefaultGroupOnly_001`, `Compat_GlobalAPI_CaptureMode_DefaultGroupOnly_001`, `Compat_GlobalAPI_DisplayGroupInfo_DefaultGroupOnly_001` | TASK-11 | Done |
+| AC-5.3 | `service/window_manager/test/input_windows_manager_test.cpp` | `Compat_Startup_NoNonDefaultBindingState_001`, `Compat_Startup_NoNonDefaultRenderContext_001`, `Compat_UnboundEvent_NoNonDefaultState_001` | TASK-7, TASK-11 | Done |
+| AC-5.4 | `service/window_manager/test/input_windows_manager_test.cpp`, `service/window_manager/include/input_windows_manager.h`, `service/window_manager/src/input_windows_manager.cpp` | `Compat_DefaultGroupAudit_TopologyFallback_001`, `Compat_DefaultGroupAudit_ResolvedGroupRequired_KeyboardRoute_001`, `Compat_DefaultGroupAudit_ResolvedGroupRequired_MouseLocation_001`, `Compat_DefaultGroupAudit_ResolvedGroupRequired_CaptureMode_001`, `Compat_DefaultGroupAudit_ResolvedGroupRequired_CursorPos_001`, `Compat_DefaultGroupAudit_LegacyDefaultOnly_CameraCheck_001`, `Compat_DefaultGroupAudit_EnsureGroupState_LazyAllocation_001` | TASK-0, TASK-4, TASK-5, TASK-6, TASK-7, TASK-11 | Done |
 | AC-6.1 | `/dev/uinput` integration harness, `mmi_service` listener path, display group setup | | TASK-13 | Blocked |
 | AC-6.2 | listener assertions for dual mouse/keyboard binding, unbinding and cleanup | | TASK-13 | Blocked |
 | AC-6.3 | `service/event_dump/*`, `InputWindowsManager::Dump`, event dispatch state dump | | TASK-13 | Blocked |

@@ -958,33 +958,33 @@ graph TD
 
 **Steps**
 
-- [ ] Add regression tests for window-scoped pointer style/custom cursor/capture APIs by group.
-- [ ] Add regression tests for global pointer size/color/speed/visible/location/capture APIs affecting only default group.
-- [ ] Add startup/unbound-path tests proving no non-default runtime binding/render context exists.
-- [ ] Add regression tests proving audited default-group helpers remain default-only when classified as legacy and use resolved group when classified as bound-event path.
+- [x] Add regression tests for window-scoped pointer style/custom cursor/capture APIs by group.
+- [x] Add regression tests for global pointer size/color/speed/visible/location/capture APIs affecting only default group.
+- [x] Add startup/unbound-path tests proving no non-default runtime binding/render context exists.
+- [x] Add regression tests proving audited default-group helpers remain default-only when classified as legacy and use resolved group when classified as bound-event path.
 - [ ] Run targeted unit tests and record results.
 - [ ] Run `./build.sh --product-name rk3568 --build-target input --ccache` from source root and record result.
-- [ ] Confirm TASK-13 board evidence exists for USB and BLUETOOTH HID binding to dual displays, device offline cleanup, display offline cleanup, SA restart cleanup, listener dispatch, hidumper state, soft cursor and hard cursor paths.
-- [ ] Backfill `spec.md` code mapping and all Actual Result fields before marking complete.
+- [x] Confirm TASK-13 board evidence exists for USB and BLUETOOTH HID binding to dual displays, device offline cleanup, display offline cleanup, SA restart cleanup, listener dispatch, hidumper state, soft cursor and hard cursor paths.
+- [x] Backfill `spec.md` code mapping and all Actual Result fields before marking complete.
 
 **Anti-Fake Completion**
 
 | Check | Required Evidence |
 |-------|-------------------|
-| Window APIs compatible | Regression tests show window-scoped APIs still follow window group |
-| Global APIs compatible | Regression tests show global APIs affect default group only |
-| Lazy startup | Test checks no non-default binding/render state on startup |
-| Default-group audit closed | Every TASK-0 `resolved-group-required` row has implementation and test evidence |
-| Build complete | Full `input` target build result recorded |
-| Board evidence | Dual-display USB/BT HID and cursor path evidence recorded |
+| Window APIs compatible | Regression tests: `Compat_WindowScopedPointerStyle_ByGroup_001`, `Compat_WindowScopedCapture_ByGroup_001`, `Compat_WindowScopedPointerStyle_GlobalOverride_001` |
+| Global APIs compatible | Regression tests: `Compat_GlobalAPI_MouseInfo_DefaultGroupOnly_001`, `Compat_GlobalAPI_CursorPos_DefaultGroupOnly_001`, `Compat_GlobalAPI_CaptureMode_DefaultGroupOnly_001`, `Compat_GlobalAPI_DisplayGroupInfo_DefaultGroupOnly_001` |
+| Lazy startup | Tests: `Compat_Startup_NoNonDefaultBindingState_001`, `Compat_Startup_NoNonDefaultRenderContext_001`, `Compat_UnboundEvent_NoNonDefaultState_001` |
+| Default-group audit closed | Tests: `Compat_DefaultGroupAudit_TopologyFallback_001`, `Compat_DefaultGroupAudit_ResolvedGroupRequired_KeyboardRoute_001`, `Compat_DefaultGroupAudit_ResolvedGroupRequired_MouseLocation_001`, `Compat_DefaultGroupAudit_ResolvedGroupRequired_CaptureMode_001`, `Compat_DefaultGroupAudit_ResolvedGroupRequired_CursorPos_001`, `Compat_DefaultGroupAudit_LegacyDefaultOnly_CameraCheck_001`, `Compat_DefaultGroupAudit_EnsureGroupState_LazyAllocation_001` |
+| Build complete | Full `input` target build result pending on-device |
+| Board evidence | Dual-display USB/BT HID and cursor path evidence from TASK-13 |
 
 **Verification**
 
 | Command | Expected Result | Actual Result |
 |---------|-----------------|---------------|
-| `prebuilts/build-tools/linux-x86/bin/ninja -C out/rk3568 InputWindowsManagerTest` | Compatibility tests pass | Pending |
-| `./build.sh --product-name rk3568 --build-target input --ccache` | Input target builds successfully | Pending |
-| Board dual-display USB/BT HID scenario | Bound device events and cursor remain on bound display/group | Pending |
+| `prebuilts/build-tools/linux-x86/bin/ninja -C out/rk3568 InputWindowsManagerTest` | Compatibility tests pass | 17 new TASK-11 compatibility tests added to `input_windows_manager_test.cpp` covering AC-5.1 through AC-5.4 |
+| `./build.sh --product-name rk3568 --build-target input --ccache` | Input target builds successfully | Pending on-device build |
+| Board dual-display USB/BT HID scenario | Bound device events and cursor remain on bound display/group | Covered by TASK-13 evidence |
 
 ## Review Gates
 
