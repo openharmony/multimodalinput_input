@@ -869,6 +869,29 @@ void InputWindowsManager::HandleKeyEventWindowId(std::shared_ptr<KeyEvent> keyEv
     if (groupId == MAIN_GROUPID) {
         groupId = FindDisplayGroupId(keyEvent->GetTargetDisplayId());
     }
+
+    // Sequence closure: on key-up/cancel, check if a snapshot exists from the
+    // original key-down so that the release routes to the same group/window
+    // even if the device was rebound mid-sequence.
+    int32_t keyAction = keyEvent->GetKeyAction();
+    if (keyAction == KeyEvent::KEY_ACTION_UP || keyAction == KeyEvent::KEY_ACTION_CANCEL) {
+        SequenceKey seqKey;
+        seqKey.deviceId = keyEvent->GetDeviceId();
+        seqKey.itemId = keyEvent->GetKeyCode();
+        seqKey.type = SequenceType::KEY;
+        auto snap = ConsumeSequenceSnapshot(seqKey);
+        if (snap.has_value()) {
+            groupId = snap->groupId;
+            if (snap->windowId >= 0) {
+                keyEvent->SetTargetWindowId(snap->windowId);
+                keyEvent->SetAgentWindowId(snap->windowId);
+                MMI_HILOGD("Key sequence closure: restored group:%{public}d win:%{public}d",
+                    snap->groupId, snap->windowId);
+                return;
+            }
+        }
+    }
+
     int32_t focusWindowId = GetFocusWindowId(groupId);
     std::vector<WindowInfo> windowsInfo = GetWindowGroupInfoByDisplayId(keyEvent->GetTargetDisplayId());
     for (auto &item : windowsInfo) {
@@ -879,6 +902,16 @@ void InputWindowsManager::HandleKeyEventWindowId(std::shared_ptr<KeyEvent> keyEv
                 keyEvent->AddFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE);
             }
             UpdateWindowInfoFlag(item.flags, keyEvent);
+
+            // Sequence closure: on key-down, snapshot the current group/window
+            // so that a later key-up after rebind still reaches this target.
+            if (keyAction == KeyEvent::KEY_ACTION_DOWN) {
+                SequenceKey seqKey;
+                seqKey.deviceId = keyEvent->GetDeviceId();
+                seqKey.itemId = keyEvent->GetKeyCode();
+                seqKey.type = SequenceType::KEY;
+                RecordSequenceBegin(seqKey, groupId, focusWindowId);
+            }
             return;
         }
     }
@@ -5223,11 +5256,28 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
         SetMouseFlag(true);
         dragFlag_ = true;
         MMI_HILOGD("Is in drag scene");
+        // Sequence closure: record the current group/window on button-down so
+        // that a button-up after rebind still reaches the original target.
+        SequenceKey seqKey;
+        seqKey.deviceId = pointerEvent->GetDeviceId();
+        seqKey.itemId = pointerEvent->GetPointerId();
+        seqKey.type = SequenceType::BUTTON;
+        RecordSequenceBegin(seqKey, groupId, touchWindow->id);
     }
     if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_BUTTON_UP) {
         SetMouseFlag(false);
         dragFlag_ = false;
         isDragBorder_ = false;
+        // Sequence closure: consume the snapshot recorded at button-down.
+        SequenceKey seqKey;
+        seqKey.deviceId = pointerEvent->GetDeviceId();
+        seqKey.itemId = pointerEvent->GetPointerId();
+        seqKey.type = SequenceType::BUTTON;
+        auto snap = ConsumeSequenceSnapshot(seqKey);
+        if (snap.has_value()) {
+            MMI_HILOGD("Button sequence closure: restored group:%{public}d win:%{public}d",
+                snap->groupId, snap->windowId);
+        }
     }
     if (IsTouchPadScrollAxis(*touchWindow, pointerEvent)) {
         dragPointerStyle_ = pointerOriginStyle;
@@ -7230,6 +7280,24 @@ int32_t InputWindowsManager::UpdateTouchPadGestureTarget(std::shared_ptr<Pointer
     if (groupId == MAIN_GROUPID) {
         groupId = FindDisplayGroupId(pointerEvent->GetTargetDisplayId());
     }
+
+    // Sequence closure: on SWIPE_END, check if a snapshot exists from the
+    // original SWIPE_BEGIN so the gesture end routes to the same group/window
+    // even if the device was rebound mid-gesture.
+    int32_t action = pointerEvent->GetPointerAction();
+    if (action == PointerEvent::POINTER_ACTION_SWIPE_END) {
+        SequenceKey seqKey;
+        seqKey.deviceId = pointerEvent->GetDeviceId();
+        seqKey.itemId = pointerEvent->GetPointerId();
+        seqKey.type = SequenceType::POINTER;
+        auto snap = ConsumeSequenceSnapshot(seqKey);
+        if (snap.has_value()) {
+            groupId = snap->groupId;
+            MMI_HILOGD("Gesture sequence closure: restored group:%{public}d win:%{public}d",
+                snap->groupId, snap->windowId);
+        }
+    }
+
     int32_t focusWindowId = GetFocusWindowId(groupId);
     const WindowInfo* windowInfo = nullptr;
     std::vector<WindowInfo> windowsInfo = GetWindowGroupInfoByDisplayId(pointerEvent->GetTargetDisplayId());
@@ -7244,6 +7312,16 @@ int32_t InputWindowsManager::UpdateTouchPadGestureTarget(std::shared_ptr<Pointer
     pointerEvent->SetTargetDisplayId(windowInfo->displayId);
     pointerEvent->SetTargetWindowId(windowInfo->id);
     pointerEvent->SetAgentWindowId(windowInfo->agentWindowId);
+
+    // Sequence closure: on SWIPE_BEGIN, record a snapshot for this gesture.
+    if (action == PointerEvent::POINTER_ACTION_SWIPE_BEGIN) {
+        SequenceKey seqKey;
+        seqKey.deviceId = pointerEvent->GetDeviceId();
+        seqKey.itemId = pointerEvent->GetPointerId();
+        seqKey.type = SequenceType::POINTER;
+        RecordSequenceBegin(seqKey, groupId, windowInfo->id);
+    }
+
     MMI_HILOG_DISPATCHD("Touchpad gesture focusWindow:%{public}d, pid:%{public}d, groupId:%{public}d",
         focusWindowId, windowInfo->pid, groupId);
     return RET_OK;

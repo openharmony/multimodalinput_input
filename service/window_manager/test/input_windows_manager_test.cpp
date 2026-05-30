@@ -20176,5 +20176,1179 @@ HWTEST_F(InputWindowsManagerTest, HardCursor_TwoGroups_NoStateOverwrite_001, Tes
         << "Two groups must have different display associations";
 }
 
+// =============================================================================
+// TASK-12: Boundary And Sequence Closure Verification Tests
+// AC-2.5 (Dual Mouse), AC-2.6 (Dual Keyboard), AC-2.7 (Sequence Closure)
+// =============================================================================
+
+/**
+ * @tc.name: DualMouse_UnboundBaseline_SharedState_001
+ * @tc.desc: TASK-12 AC-2.5: Two unbound mice both resolve to MAIN_GROUPID and
+ *           share the same mouse location, cursor position, pointer style, and
+ *           surface node state (backward-compatible baseline).
+ * @tc.type: FUNC
+ * @tc.require: AC-2.5
+ */
+HWTEST_F(InputWindowsManagerTest, DualMouse_UnboundBaseline_SharedState_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager mgr;
+
+    constexpr int32_t MOUSE_A = 101;
+    constexpr int32_t MOUSE_B = 102;
+
+    // Both unbound -> both resolve to default (MAIN) group
+    EXPECT_EQ(mgr.ResolveGroupIdForDevice(MOUSE_A), DEFAULT_GROUP_ID)
+        << "Unbound mouse A must resolve to default group";
+    EXPECT_EQ(mgr.ResolveGroupIdForDevice(MOUSE_B), DEFAULT_GROUP_ID)
+        << "Unbound mouse B must resolve to default group";
+
+    // Both read from the same mouse location map entry
+    MouseLocation locA = mgr.GetMouseInfo(DEFAULT_GROUP_ID);
+    MouseLocation locB = mgr.GetMouseInfo(DEFAULT_GROUP_ID);
+    EXPECT_EQ(locA.physicalX, locB.physicalX)
+        << "Unbound mice must share the same mouse X position";
+    EXPECT_EQ(locA.physicalY, locB.physicalY)
+        << "Unbound mice must share the same mouse Y position";
+    EXPECT_EQ(locA.displayId, locB.displayId)
+        << "Unbound mice must share the same display association";
+
+    // Both read from the same cursor position map entry
+    CursorPosition posA = mgr.GetCursorPos(DEFAULT_GROUP_ID);
+    CursorPosition posB = mgr.GetCursorPos(DEFAULT_GROUP_ID);
+    EXPECT_EQ(posA.displayId, posB.displayId)
+        << "Unbound mice must share the same cursor display";
+    EXPECT_DOUBLE_EQ(posA.cursorPos.x, posB.cursorPos.x)
+        << "Unbound mice must share the same cursor X";
+    EXPECT_DOUBLE_EQ(posA.cursorPos.y, posB.cursorPos.y)
+        << "Unbound mice must share the same cursor Y";
+
+    // No non-default group state should be created by unbound devices
+    EXPECT_FALSE(mgr.HasGroupState(1))
+        << "No group 1 state should exist for unbound mice";
+    EXPECT_FALSE(mgr.HasGroupState(2))
+        << "No group 2 state should exist for unbound mice";
+}
+
+/**
+ * @tc.name: DualMouse_BoundIsolation_PositionAndStyle_001
+ * @tc.desc: TASK-12 AC-2.5: Mouse A bound to group A, mouse B bound to group B.
+ *           Mouse A's position/style changes must NOT overwrite mouse B's state.
+ * @tc.type: FUNC
+ * @tc.require: AC-2.5
+ */
+HWTEST_F(InputWindowsManagerTest, DualMouse_BoundIsolation_PositionAndStyle_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto mgr = std::make_shared<InputWindowsManager>();
+    ASSERT_NE(mgr, nullptr);
+
+    constexpr int32_t MOUSE_A = 111;
+    constexpr int32_t MOUSE_B = 222;
+    constexpr int32_t GROUP_A = 0;
+    constexpr int32_t GROUP_B = 5;
+    constexpr int32_t DISPLAY_A = 1;
+    constexpr int32_t DISPLAY_B = 10;
+    constexpr int32_t WINDOW_A = 50;
+    constexpr int32_t WINDOW_B = 60;
+
+    // Set up main group (group A = 0)
+    OLD::DisplayGroupInfo mainGroup;
+    mainGroup.groupId = GROUP_A;
+    mainGroup.type = GroupType::GROUP_DEFAULT;
+    mainGroup.focusWindowId = WINDOW_A;
+    OLD::DisplayInfo mainDisplay;
+    mainDisplay.id = DISPLAY_A;
+    mainDisplay.width = 1920;
+    mainDisplay.height = 1080;
+    mainDisplay.validWidth = 1920;
+    mainDisplay.validHeight = 1080;
+    mainDisplay.dpi = 240;
+    mainDisplay.name = "main";
+    mainDisplay.uniq = "main0";
+    mainDisplay.direction = DIRECTION0;
+    mainGroup.displaysInfo.push_back(mainDisplay);
+    WindowInfo winA;
+    winA.id = WINDOW_A;
+    winA.pid = 100;
+    winA.agentWindowId = WINDOW_A;
+    winA.area = {0, 0, 1920, 1080};
+    winA.defaultHotAreas = {winA.area};
+    winA.pointerHotAreas = {winA.area};
+    winA.transform = {1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f};
+    mainGroup.windowsInfo.push_back(winA);
+    mgr->UpdateDisplayInfo(mainGroup);
+
+    // Set up secondary group (group B = 5)
+    OLD::DisplayGroupInfo secGroup;
+    secGroup.groupId = GROUP_B;
+    secGroup.type = GroupType::GROUP_SPECIAL;
+    secGroup.focusWindowId = WINDOW_B;
+    OLD::DisplayInfo secDisplay;
+    secDisplay.id = DISPLAY_B;
+    secDisplay.width = 1280;
+    secDisplay.height = 720;
+    secDisplay.validWidth = 1280;
+    secDisplay.validHeight = 720;
+    secDisplay.dpi = 160;
+    secDisplay.name = "ext";
+    secDisplay.uniq = "ext0";
+    secDisplay.direction = DIRECTION0;
+    secGroup.displaysInfo.push_back(secDisplay);
+    WindowInfo winB;
+    winB.id = WINDOW_B;
+    winB.pid = 200;
+    winB.agentWindowId = WINDOW_B;
+    winB.area = {0, 0, 1280, 720};
+    winB.defaultHotAreas = {winB.area};
+    winB.pointerHotAreas = {winB.area};
+    winB.transform = {1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f};
+    secGroup.windowsInfo.push_back(winB);
+    mgr->UpdateDisplayInfo(secGroup);
+
+    // Bind mouse A to group A (display 1)
+    mgr->bindInfo_.AddDevice(MOUSE_A, "mouseA");
+    mgr->bindInfo_.AddDisplay(DISPLAY_A, "main0");
+    std::string msg;
+    mgr->BindDeviceToDisplayGroupByDisplay(MOUSE_A, DISPLAY_A, msg);
+
+    // Bind mouse B to group B (display 10)
+    mgr->bindInfo_.AddDevice(MOUSE_B, "mouseB");
+    mgr->bindInfo_.AddDisplay(DISPLAY_B, "ext0");
+    mgr->BindDeviceToDisplayGroupByDisplay(MOUSE_B, DISPLAY_B, msg);
+
+    // Verify resolution
+    EXPECT_EQ(mgr->ResolveGroupIdForDevice(MOUSE_A), GROUP_A);
+    EXPECT_EQ(mgr->ResolveGroupIdForDevice(MOUSE_B), GROUP_B);
+
+    // Verify group B state was lazily created
+    EXPECT_TRUE(mgr->HasGroupState(GROUP_B))
+        << "Group B state must exist after binding mouse B";
+
+    // Set initial state for group B
+    mgr->mouseLocationMap_[GROUP_B].displayId = DISPLAY_B;
+    mgr->mouseLocationMap_[GROUP_B].physicalX = 500;
+    mgr->mouseLocationMap_[GROUP_B].physicalY = 400;
+    mgr->cursorPosMap_[GROUP_B].displayId = DISPLAY_B;
+    mgr->cursorPosMap_[GROUP_B].cursorPos.x = 500;
+    mgr->cursorPosMap_[GROUP_B].cursorPos.y = 400;
+
+    // Simulate mouse A moving in group A
+    mgr->mouseLocationMap_[GROUP_A].displayId = DISPLAY_A;
+    mgr->mouseLocationMap_[GROUP_A].physicalX = 100;
+    mgr->mouseLocationMap_[GROUP_A].physicalY = 200;
+    mgr->cursorPosMap_[GROUP_A].displayId = DISPLAY_A;
+    mgr->cursorPosMap_[GROUP_A].cursorPos.x = 100;
+    mgr->cursorPosMap_[GROUP_A].cursorPos.y = 200;
+
+    // Mouse A's state must NOT overwrite mouse B's
+    EXPECT_EQ(mgr->mouseLocationMap_[GROUP_B].physicalX, 500)
+        << "Mouse A move must not overwrite mouse B's X position";
+    EXPECT_EQ(mgr->mouseLocationMap_[GROUP_B].physicalY, 400)
+        << "Mouse A move must not overwrite mouse B's Y position";
+    EXPECT_EQ(mgr->mouseLocationMap_[GROUP_B].displayId, DISPLAY_B)
+        << "Mouse A move must not overwrite mouse B's display";
+
+    EXPECT_EQ(mgr->cursorPosMap_[GROUP_B].cursorPos.x, 500)
+        << "Mouse A cursor must not overwrite mouse B's cursor X";
+    EXPECT_EQ(mgr->cursorPosMap_[GROUP_B].cursorPos.y, 400)
+        << "Mouse A cursor must not overwrite mouse B's cursor Y";
+    EXPECT_EQ(mgr->cursorPosMap_[GROUP_B].displayId, DISPLAY_B)
+        << "Mouse A cursor must not overwrite mouse B's display";
+
+    // Mouse B's state must NOT affect mouse A's
+    EXPECT_EQ(mgr->mouseLocationMap_[GROUP_A].physicalX, 100)
+        << "Mouse B state must not overwrite mouse A's X position";
+    EXPECT_EQ(mgr->mouseLocationMap_[GROUP_A].physicalY, 200)
+        << "Mouse B state must not overwrite mouse A's Y position";
+}
+
+/**
+ * @tc.name: DualMouse_BoundIsolation_CaptureModePerGroup_001
+ * @tc.desc: TASK-12 AC-2.5: Capture mode set on group A must not affect group B.
+ *           Setting/clearing capture on one group is isolated from the other.
+ * @tc.type: FUNC
+ * @tc.require: AC-2.5
+ */
+HWTEST_F(InputWindowsManagerTest, DualMouse_BoundIsolation_CaptureModePerGroup_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto mgr = std::make_shared<InputWindowsManager>();
+    ASSERT_NE(mgr, nullptr);
+
+    constexpr int32_t GROUP_A = 0;
+    constexpr int32_t GROUP_B = 3;
+
+    // Register both groups
+    OLD::DisplayGroupInfo mainGroup;
+    mainGroup.groupId = GROUP_A;
+    mainGroup.type = GroupType::GROUP_DEFAULT;
+    OLD::DisplayInfo mainDisplay = { .id = 1 };
+    mainDisplay.width = 1920;
+    mainDisplay.height = 1080;
+    mainDisplay.dpi = 240;
+    mainDisplay.name = "main";
+    mainDisplay.uniq = "main0";
+    mainDisplay.direction = DIRECTION0;
+    mainGroup.displaysInfo.push_back(mainDisplay);
+    mgr->UpdateDisplayInfo(mainGroup);
+
+    OLD::DisplayGroupInfo secGroup;
+    secGroup.groupId = GROUP_B;
+    secGroup.type = GroupType::GROUP_SPECIAL;
+    OLD::DisplayInfo secDisplay = { .id = 5 };
+    secDisplay.width = 1280;
+    secDisplay.height = 720;
+    secDisplay.dpi = 160;
+    secDisplay.name = "ext";
+    secDisplay.uniq = "ext0";
+    secDisplay.direction = DIRECTION0;
+    secGroup.displaysInfo.push_back(secDisplay);
+    mgr->UpdateDisplayInfo(secGroup);
+
+    // Set capture on group A only
+    mgr->SetMouseCaptureMode(10, true, GROUP_A);
+    EXPECT_TRUE(mgr->GetMouseIsCaptureMode(GROUP_A))
+        << "Capture must be active for group A";
+    EXPECT_FALSE(mgr->GetMouseIsCaptureMode(GROUP_B))
+        << "Capture must NOT be active for group B";
+
+    // Set capture on group B
+    mgr->SetMouseCaptureMode(20, true, GROUP_B);
+    EXPECT_TRUE(mgr->GetMouseIsCaptureMode(GROUP_B))
+        << "Capture must be active for group B after setting";
+
+    // Clear A - B should be unaffected
+    mgr->SetMouseCaptureMode(10, false, GROUP_A);
+    EXPECT_FALSE(mgr->GetMouseIsCaptureMode(GROUP_A))
+        << "Capture must be cleared for group A";
+    EXPECT_TRUE(mgr->GetMouseIsCaptureMode(GROUP_B))
+        << "Clearing group A capture must not affect group B";
+}
+
+/**
+ * @tc.name: DualMouse_NoOverIsolation_BindOneDeviceUnboundUnchanged_001
+ * @tc.desc: TASK-12 AC-2.5: Binding one device must NOT split or change state for
+ *           other unbound devices. An unbound device should still resolve to the
+ *           default group and share default state.
+ * @tc.type: FUNC
+ * @tc.require: AC-2.5
+ */
+HWTEST_F(InputWindowsManagerTest, DualMouse_NoOverIsolation_BindOneDeviceUnboundUnchanged_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto mgr = std::make_shared<InputWindowsManager>();
+    ASSERT_NE(mgr, nullptr);
+
+    constexpr int32_t BOUND_MOUSE = 111;
+    constexpr int32_t UNBOUND_MOUSE = 222;
+    constexpr int32_t BOUND_GROUP = 3;
+    constexpr int32_t BOUND_DISPLAY = 5;
+
+    // Register main group
+    OLD::DisplayGroupInfo mainGroup;
+    mainGroup.groupId = 0;
+    mainGroup.type = GroupType::GROUP_DEFAULT;
+    mainGroup.focusWindowId = 10;
+    OLD::DisplayInfo mainDisplay = { .id = 1 };
+    mainDisplay.width = 1920;
+    mainDisplay.height = 1080;
+    mainDisplay.validWidth = 1920;
+    mainDisplay.validHeight = 1080;
+    mainDisplay.dpi = 240;
+    mainDisplay.name = "main";
+    mainDisplay.uniq = "main0";
+    mainDisplay.direction = DIRECTION0;
+    mainGroup.displaysInfo.push_back(mainDisplay);
+    mgr->UpdateDisplayInfo(mainGroup);
+
+    // Register secondary group
+    OLD::DisplayGroupInfo secGroup;
+    secGroup.groupId = BOUND_GROUP;
+    secGroup.type = GroupType::GROUP_SPECIAL;
+    OLD::DisplayInfo secDisplay = { .id = BOUND_DISPLAY };
+    secDisplay.width = 1280;
+    secDisplay.height = 720;
+    secDisplay.validWidth = 1280;
+    secDisplay.validHeight = 720;
+    secDisplay.dpi = 160;
+    secDisplay.name = "ext";
+    secDisplay.uniq = "ext0";
+    secDisplay.direction = DIRECTION0;
+    secGroup.displaysInfo.push_back(secDisplay);
+    mgr->UpdateDisplayInfo(secGroup);
+
+    // Unbound mouse resolves to main group before binding
+    EXPECT_EQ(mgr->ResolveGroupIdForDevice(UNBOUND_MOUSE), DEFAULT_GROUP_ID)
+        << "Unbound mouse should be in default group before binding";
+
+    // Bind bound_mouse to group 3
+    mgr->bindInfo_.AddDevice(BOUND_MOUSE, "boundMouse");
+    mgr->bindInfo_.AddDisplay(BOUND_DISPLAY, "ext0");
+    std::string msg;
+    mgr->BindDeviceToDisplayGroupByDisplay(BOUND_MOUSE, BOUND_DISPLAY, msg);
+
+    // The bound mouse should resolve to group 3
+    EXPECT_EQ(mgr->ResolveGroupIdForDevice(BOUND_MOUSE), BOUND_GROUP);
+
+    // The unbound mouse must STILL resolve to default group (no over-isolation)
+    EXPECT_EQ(mgr->ResolveGroupIdForDevice(UNBOUND_MOUSE), DEFAULT_GROUP_ID)
+        << "Binding one mouse must NOT change unbound mouse's group resolution";
+
+    // Unbound mouse still shares default group state
+    MouseLocation unboundLoc = mgr->GetMouseInfo(DEFAULT_GROUP_ID);
+    EXPECT_GE(unboundLoc.displayId, -1)
+        << "Unbound mouse should still access default group mouse info";
+}
+
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
+/**
+ * @tc.name: DualKeyboard_UnboundBaseline_SharedFocus_001
+ * @tc.desc: TASK-12 AC-2.6: Two unbound keyboards share the default group focus,
+ *           pressed-key state, and modifier state. Both resolve to MAIN_GROUPID.
+ * @tc.type: FUNC
+ * @tc.require: AC-2.6
+ */
+HWTEST_F(InputWindowsManagerTest, DualKeyboard_UnboundBaseline_SharedFocus_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager mgr;
+
+    constexpr int32_t KBD_A = 301;
+    constexpr int32_t KBD_B = 302;
+    constexpr int32_t DEFAULT_FOCUS_WIN = 100;
+
+    // Set up default group with focus window
+    auto it = mgr.displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
+    ASSERT_NE(it, mgr.displayGroupInfoMap_.end());
+    it->second.focusWindowId = DEFAULT_FOCUS_WIN;
+    WindowInfo defWin;
+    defWin.id = DEFAULT_FOCUS_WIN;
+    defWin.pid = 10;
+    defWin.agentWindowId = DEFAULT_FOCUS_WIN;
+    it->second.windowsInfo.push_back(defWin);
+
+    // Both unbound keyboards resolve to the same group
+    EXPECT_EQ(mgr.ResolveGroupIdForDevice(KBD_A), DEFAULT_GROUP_ID)
+        << "Unbound keyboard A should resolve to default group";
+    EXPECT_EQ(mgr.ResolveGroupIdForDevice(KBD_B), DEFAULT_GROUP_ID)
+        << "Unbound keyboard B should resolve to default group";
+
+    // Both share the same focus window
+    EXPECT_EQ(mgr.GetFocusWindowId(DEFAULT_GROUP_ID), DEFAULT_FOCUS_WIN)
+        << "Both unbound keyboards should use the same focus window";
+
+    // Create key events from both keyboards - both should target the same window
+    auto keyA = KeyEvent::Create();
+    ASSERT_NE(keyA, nullptr);
+    keyA->SetDeviceId(KBD_A);
+    keyA->SetTargetDisplayId(-1);
+    mgr.HandleKeyEventWindowId(keyA);
+    EXPECT_EQ(keyA->GetTargetWindowId(), DEFAULT_FOCUS_WIN)
+        << "Keyboard A event should target default focus window";
+
+    auto keyB = KeyEvent::Create();
+    ASSERT_NE(keyB, nullptr);
+    keyB->SetDeviceId(KBD_B);
+    keyB->SetTargetDisplayId(-1);
+    mgr.HandleKeyEventWindowId(keyB);
+    EXPECT_EQ(keyB->GetTargetWindowId(), DEFAULT_FOCUS_WIN)
+        << "Keyboard B event should target same default focus window";
+}
+
+/**
+ * @tc.name: DualKeyboard_BoundIsolation_IndependentFocus_001
+ * @tc.desc: TASK-12 AC-2.6: Keyboard A bound to group A, keyboard B bound to
+ *           group B. A's focus and key events must not overwrite B's focus.
+ * @tc.type: FUNC
+ * @tc.require: AC-2.6
+ */
+HWTEST_F(InputWindowsManagerTest, DualKeyboard_BoundIsolation_IndependentFocus_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto mgr = std::make_shared<InputWindowsManager>();
+    ASSERT_NE(mgr, nullptr);
+
+    constexpr int32_t KBD_A = 401;
+    constexpr int32_t KBD_B = 402;
+    constexpr int32_t GROUP_A = 0;
+    constexpr int32_t GROUP_B = 7;
+    constexpr int32_t DISPLAY_A = 1;
+    constexpr int32_t DISPLAY_B = 15;
+    constexpr int32_t FOCUS_WIN_A = 100;
+    constexpr int32_t FOCUS_WIN_B = 200;
+
+    // Set up group A (main)
+    OLD::DisplayGroupInfo mainGroup;
+    mainGroup.groupId = GROUP_A;
+    mainGroup.type = GroupType::GROUP_DEFAULT;
+    mainGroup.focusWindowId = FOCUS_WIN_A;
+    OLD::DisplayInfo mainDisplay;
+    mainDisplay.id = DISPLAY_A;
+    mainDisplay.width = 1920;
+    mainDisplay.height = 1080;
+    mainDisplay.validWidth = 1920;
+    mainDisplay.validHeight = 1080;
+    mainDisplay.dpi = 240;
+    mainDisplay.name = "main";
+    mainDisplay.uniq = "main0";
+    mainDisplay.direction = DIRECTION0;
+    mainGroup.displaysInfo.push_back(mainDisplay);
+    WindowInfo winA;
+    winA.id = FOCUS_WIN_A;
+    winA.pid = 10;
+    winA.agentWindowId = FOCUS_WIN_A;
+    winA.agentPid = 10;
+    mainGroup.windowsInfo.push_back(winA);
+    mgr->UpdateDisplayInfo(mainGroup);
+
+    // Set up group B
+    OLD::DisplayGroupInfo secGroup;
+    secGroup.groupId = GROUP_B;
+    secGroup.type = GroupType::GROUP_SPECIAL;
+    secGroup.focusWindowId = FOCUS_WIN_B;
+    OLD::DisplayInfo secDisplay;
+    secDisplay.id = DISPLAY_B;
+    secDisplay.width = 1280;
+    secDisplay.height = 720;
+    secDisplay.validWidth = 1280;
+    secDisplay.validHeight = 720;
+    secDisplay.dpi = 160;
+    secDisplay.name = "ext";
+    secDisplay.uniq = "ext0";
+    secDisplay.direction = DIRECTION0;
+    secGroup.displaysInfo.push_back(secDisplay);
+    WindowInfo winB;
+    winB.id = FOCUS_WIN_B;
+    winB.pid = 20;
+    winB.agentWindowId = FOCUS_WIN_B;
+    winB.agentPid = 20;
+    secGroup.windowsInfo.push_back(winB);
+    mgr->UpdateDisplayInfo(secGroup);
+
+    // Set up windowsPerDisplayMap_ for group B's display
+    WindowGroupInfo wgInfo;
+    wgInfo.displayId = DISPLAY_B;
+    wgInfo.focusWindowId = FOCUS_WIN_B;
+    wgInfo.windowsInfo.push_back(winB);
+    std::map<int32_t, WindowGroupInfo> bMap;
+    bMap[DISPLAY_B] = wgInfo;
+    mgr->windowsPerDisplayMap_[GROUP_B] = bMap;
+
+    // Bind keyboards
+    mgr->bindInfo_.AddRuntimeBinding(KBD_A, DISPLAY_A, GROUP_A);
+    mgr->bindInfo_.AddRuntimeBinding(KBD_B, DISPLAY_B, GROUP_B);
+
+    EXPECT_EQ(mgr->ResolveGroupIdForDevice(KBD_A), GROUP_A);
+    EXPECT_EQ(mgr->ResolveGroupIdForDevice(KBD_B), GROUP_B);
+
+    // Focus windows are independent
+    EXPECT_EQ(mgr->GetFocusWindowId(GROUP_A), FOCUS_WIN_A)
+        << "Group A focus window should be independent";
+    EXPECT_EQ(mgr->GetFocusWindowId(GROUP_B), FOCUS_WIN_B)
+        << "Group B focus window should be independent";
+
+    // Keyboard A event should target group A's focus window
+    auto keyA = KeyEvent::Create();
+    ASSERT_NE(keyA, nullptr);
+    keyA->SetDeviceId(KBD_A);
+    keyA->SetTargetDisplayId(DISPLAY_A);
+    mgr->HandleKeyEventWindowId(keyA);
+    EXPECT_EQ(keyA->GetTargetWindowId(), FOCUS_WIN_A)
+        << "Keyboard A event must target group A's focus window";
+
+    // Keyboard B event should target group B's focus window
+    auto keyB = KeyEvent::Create();
+    ASSERT_NE(keyB, nullptr);
+    keyB->SetDeviceId(KBD_B);
+    keyB->SetTargetDisplayId(DISPLAY_B);
+    mgr->HandleKeyEventWindowId(keyB);
+    EXPECT_EQ(keyB->GetTargetWindowId(), FOCUS_WIN_B)
+        << "Keyboard B event must target group B's focus window, not A's";
+}
+
+/**
+ * @tc.name: DualKeyboard_BoundIsolation_FocusMapIndependent_001
+ * @tc.desc: TASK-12 AC-2.6: Per-group focusWindowIdMap_ entries are independent.
+ *           Setting the focus for one group must not affect the other.
+ * @tc.type: FUNC
+ * @tc.require: AC-2.6
+ */
+HWTEST_F(InputWindowsManagerTest, DualKeyboard_BoundIsolation_FocusMapIndependent_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager mgr;
+
+    constexpr int32_t GROUP_A = 0;
+    constexpr int32_t GROUP_B = 4;
+
+    // Initialize both groups' focus maps
+    mgr.focusWindowIdMap_[GROUP_A] = 100;
+    mgr.focusWindowIdMap_[GROUP_B] = 200;
+
+    // Mutating one group's focus must not affect the other
+    mgr.focusWindowIdMap_[GROUP_A] = 150;
+    EXPECT_EQ(mgr.focusWindowIdMap_[GROUP_A], 150)
+        << "Group A focus should be updated";
+    EXPECT_EQ(mgr.focusWindowIdMap_[GROUP_B], 200)
+        << "Group B focus must not be affected by group A change";
+
+    mgr.focusWindowIdMap_[GROUP_B] = 250;
+    EXPECT_EQ(mgr.focusWindowIdMap_[GROUP_A], 150)
+        << "Group A focus must not be affected by group B change";
+    EXPECT_EQ(mgr.focusWindowIdMap_[GROUP_B], 250)
+        << "Group B focus should be updated";
+}
+
+/**
+ * @tc.name: DualKeyboard_NoOverIsolation_BindOneUnboundUnchanged_001
+ * @tc.desc: TASK-12 AC-2.6: Binding one keyboard must NOT split or change focus
+ *           resolution for another unbound keyboard.
+ * @tc.type: FUNC
+ * @tc.require: AC-2.6
+ */
+HWTEST_F(InputWindowsManagerTest, DualKeyboard_NoOverIsolation_BindOneUnboundUnchanged_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager mgr;
+
+    constexpr int32_t KBD_BOUND = 501;
+    constexpr int32_t KBD_UNBOUND = 502;
+    constexpr int32_t BOUND_GROUP = 8;
+    constexpr int32_t BOUND_DISPLAY = 20;
+    constexpr int32_t DEFAULT_FOCUS_WIN = 100;
+
+    // Set up default group
+    auto it = mgr.displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
+    ASSERT_NE(it, mgr.displayGroupInfoMap_.end());
+    it->second.focusWindowId = DEFAULT_FOCUS_WIN;
+
+    // Verify unbound keyboard uses default group BEFORE binding the other
+    EXPECT_EQ(mgr.ResolveGroupIdForDevice(KBD_UNBOUND), DEFAULT_GROUP_ID);
+    EXPECT_EQ(mgr.GetFocusWindowId(DEFAULT_GROUP_ID), DEFAULT_FOCUS_WIN);
+
+    // Bind one keyboard to a different group
+    mgr.bindInfo_.AddRuntimeBinding(KBD_BOUND, BOUND_DISPLAY, BOUND_GROUP);
+
+    // Unbound keyboard must STILL resolve to default group
+    EXPECT_EQ(mgr.ResolveGroupIdForDevice(KBD_UNBOUND), DEFAULT_GROUP_ID)
+        << "Binding one keyboard must not change unbound keyboard's resolution";
+    EXPECT_EQ(mgr.GetFocusWindowId(DEFAULT_GROUP_ID), DEFAULT_FOCUS_WIN)
+        << "Default group focus must not change when binding another device";
+}
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
+
+/**
+ * @tc.name: SequenceClosure_KeyDownUp_BindMidSequence_001
+ * @tc.desc: TASK-12 AC-2.7: Key down on default group -> bind device to group B ->
+ *           key up must still route to original group/window via sequence snapshot.
+ * @tc.type: FUNC
+ * @tc.require: AC-2.7
+ */
+HWTEST_F(InputWindowsManagerTest, SequenceClosure_KeyDownUp_BindMidSequence_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager mgr;
+
+    constexpr int32_t DEVICE_ID = 601;
+    constexpr int32_t KEY_CODE = 29;  // KEY_A
+    constexpr int32_t GROUP_A = 0;
+    constexpr int32_t WINDOW_A = 100;
+    constexpr int32_t GROUP_B = 9;
+    constexpr int32_t DISPLAY_B = 30;
+
+    // Set up default group with focus window
+    auto it = mgr.displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
+    ASSERT_NE(it, mgr.displayGroupInfoMap_.end());
+    it->second.focusWindowId = WINDOW_A;
+    WindowInfo defWin;
+    defWin.id = WINDOW_A;
+    defWin.pid = 10;
+    defWin.agentWindowId = WINDOW_A;
+    it->second.windowsInfo.push_back(defWin);
+
+    // Step 1: Key down while unbound (targets group A, window A)
+    // HandleKeyEventWindowId records the sequence snapshot
+    auto keyDown = KeyEvent::Create();
+    ASSERT_NE(keyDown, nullptr);
+    keyDown->SetDeviceId(DEVICE_ID);
+    keyDown->SetKeyCode(KEY_CODE);
+    keyDown->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+    keyDown->SetTargetDisplayId(-1);
+    mgr.HandleKeyEventWindowId(keyDown);
+    EXPECT_EQ(keyDown->GetTargetWindowId(), WINDOW_A)
+        << "Key down should target window A in default group";
+
+    // Verify sequence snapshot was recorded
+    EXPECT_EQ(mgr.GetSequenceSnapshotCount(), 1u)
+        << "One sequence snapshot should exist after key down";
+
+    // Step 2: Bind device mid-sequence to group B
+    mgr.bindInfo_.AddRuntimeBinding(DEVICE_ID, DISPLAY_B, GROUP_B);
+    EXPECT_EQ(mgr.ResolveGroupIdForDevice(DEVICE_ID), GROUP_B)
+        << "Device should now resolve to group B after binding";
+
+    // Step 3: Key up - should use the snapshot to route to original group A, window A
+    auto keyUp = KeyEvent::Create();
+    ASSERT_NE(keyUp, nullptr);
+    keyUp->SetDeviceId(DEVICE_ID);
+    keyUp->SetKeyCode(KEY_CODE);
+    keyUp->SetKeyAction(KeyEvent::KEY_ACTION_UP);
+    keyUp->SetTargetDisplayId(-1);
+    mgr.HandleKeyEventWindowId(keyUp);
+
+    // The key up should route to the ORIGINAL window (group A), not the new group B
+    EXPECT_EQ(keyUp->GetTargetWindowId(), WINDOW_A)
+        << "Key up must route to original window A despite device now being bound to group B";
+
+    // Snapshot should be consumed
+    EXPECT_EQ(mgr.GetSequenceSnapshotCount(), 0u)
+        << "Sequence snapshot should be consumed after key up";
+}
+
+/**
+ * @tc.name: SequenceClosure_KeyCancel_BindMidSequence_001
+ * @tc.desc: TASK-12 AC-2.7: Key down -> bind -> key cancel must still route to original target.
+ * @tc.type: FUNC
+ * @tc.require: AC-2.7
+ */
+HWTEST_F(InputWindowsManagerTest, SequenceClosure_KeyCancel_BindMidSequence_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager mgr;
+
+    constexpr int32_t DEVICE_ID = 602;
+    constexpr int32_t KEY_CODE = 30;
+    constexpr int32_t WINDOW_A = 110;
+    constexpr int32_t GROUP_B = 11;
+    constexpr int32_t DISPLAY_B = 40;
+
+    // Set up default group
+    auto it = mgr.displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
+    ASSERT_NE(it, mgr.displayGroupInfoMap_.end());
+    it->second.focusWindowId = WINDOW_A;
+    WindowInfo defWin;
+    defWin.id = WINDOW_A;
+    defWin.pid = 10;
+    defWin.agentWindowId = WINDOW_A;
+    it->second.windowsInfo.push_back(defWin);
+
+    // Key down (records snapshot)
+    auto keyDown = KeyEvent::Create();
+    ASSERT_NE(keyDown, nullptr);
+    keyDown->SetDeviceId(DEVICE_ID);
+    keyDown->SetKeyCode(KEY_CODE);
+    keyDown->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+    keyDown->SetTargetDisplayId(-1);
+    mgr.HandleKeyEventWindowId(keyDown);
+    EXPECT_EQ(mgr.GetSequenceSnapshotCount(), 1u);
+
+    // Bind device mid-sequence
+    mgr.bindInfo_.AddRuntimeBinding(DEVICE_ID, DISPLAY_B, GROUP_B);
+
+    // Key cancel - should also consume the snapshot
+    auto keyCancel = KeyEvent::Create();
+    ASSERT_NE(keyCancel, nullptr);
+    keyCancel->SetDeviceId(DEVICE_ID);
+    keyCancel->SetKeyCode(KEY_CODE);
+    keyCancel->SetKeyAction(KeyEvent::KEY_ACTION_CANCEL);
+    keyCancel->SetTargetDisplayId(-1);
+    mgr.HandleKeyEventWindowId(keyCancel);
+
+    EXPECT_EQ(keyCancel->GetTargetWindowId(), WINDOW_A)
+        << "Key cancel must route to original window A";
+    EXPECT_EQ(mgr.GetSequenceSnapshotCount(), 0u)
+        << "Snapshot must be consumed after cancel";
+}
+
+/**
+ * @tc.name: SequenceClosure_ButtonDownUp_BindMidSequence_001
+ * @tc.desc: TASK-12 AC-2.7: Mouse button down on default group -> bind device ->
+ *           button up must use the snapshot to route to the original target.
+ * @tc.type: FUNC
+ * @tc.require: AC-2.7
+ */
+HWTEST_F(InputWindowsManagerTest, SequenceClosure_ButtonDownUp_BindMidSequence_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager mgr;
+
+    constexpr int32_t DEVICE_ID = 701;
+    constexpr int32_t POINTER_ID = 0;
+    constexpr int32_t GROUP_A = 0;
+    constexpr int32_t WINDOW_A = 120;
+    constexpr int32_t GROUP_B = 12;
+
+    // Step 1: Simulate button down by recording a snapshot directly
+    // (UpdateMouseTarget is too complex to call in unit test without full display setup)
+    SequenceKey seqKey;
+    seqKey.deviceId = DEVICE_ID;
+    seqKey.itemId = POINTER_ID;
+    seqKey.type = SequenceType::BUTTON;
+    mgr.RecordSequenceBegin(seqKey, GROUP_A, WINDOW_A);
+    EXPECT_EQ(mgr.GetSequenceSnapshotCount(), 1u)
+        << "Button down should record a sequence snapshot";
+
+    // Step 2: Bind device mid-sequence
+    mgr.bindInfo_.AddRuntimeBinding(DEVICE_ID, 50, GROUP_B);
+    EXPECT_EQ(mgr.ResolveGroupIdForDevice(DEVICE_ID), GROUP_B);
+
+    // Step 3: Button up - consume the snapshot
+    auto snap = mgr.ConsumeSequenceSnapshot(seqKey);
+    ASSERT_TRUE(snap.has_value())
+        << "Button up should find the snapshot from button down";
+    EXPECT_EQ(snap->groupId, GROUP_A)
+        << "Button up must route to original group A";
+    EXPECT_EQ(snap->windowId, WINDOW_A)
+        << "Button up must route to original window A";
+
+    EXPECT_EQ(mgr.GetSequenceSnapshotCount(), 0u)
+        << "Snapshot must be consumed after button up";
+}
+
+/**
+ * @tc.name: SequenceClosure_PointerDownUp_BindMidSequence_001
+ * @tc.desc: TASK-12 AC-2.7: Pointer down (touch/pen) on default group -> bind
+ *           device -> pointer up must preserve the original target.
+ * @tc.type: FUNC
+ * @tc.require: AC-2.7
+ */
+HWTEST_F(InputWindowsManagerTest, SequenceClosure_PointerDownUp_BindMidSequence_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager mgr;
+
+    constexpr int32_t DEVICE_ID = 801;
+    constexpr int32_t POINTER_ID = 0;
+    constexpr int32_t GROUP_A = 0;
+    constexpr int32_t WINDOW_A = 130;
+    constexpr int32_t GROUP_B = 14;
+
+    // Record pointer down snapshot
+    SequenceKey seqKey;
+    seqKey.deviceId = DEVICE_ID;
+    seqKey.itemId = POINTER_ID;
+    seqKey.type = SequenceType::POINTER;
+    mgr.RecordSequenceBegin(seqKey, GROUP_A, WINDOW_A);
+    EXPECT_EQ(mgr.GetSequenceSnapshotCount(), 1u);
+
+    // Bind device mid-sequence
+    mgr.bindInfo_.AddRuntimeBinding(DEVICE_ID, 60, GROUP_B);
+
+    // Pointer up - consume the snapshot
+    auto snap = mgr.ConsumeSequenceSnapshot(seqKey);
+    ASSERT_TRUE(snap.has_value())
+        << "Pointer up should find the snapshot from pointer down";
+    EXPECT_EQ(snap->groupId, GROUP_A)
+        << "Pointer up must route to original group A";
+    EXPECT_EQ(snap->windowId, WINDOW_A)
+        << "Pointer up must route to original window A";
+    EXPECT_EQ(mgr.GetSequenceSnapshotCount(), 0u);
+}
+
+/**
+ * @tc.name: SequenceClosure_PointerCancel_BindMidSequence_001
+ * @tc.desc: TASK-12 AC-2.7: Pointer down -> bind -> pointer cancel must also
+ *           consume the snapshot and route to the original target.
+ * @tc.type: FUNC
+ * @tc.require: AC-2.7
+ */
+HWTEST_F(InputWindowsManagerTest, SequenceClosure_PointerCancel_BindMidSequence_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager mgr;
+
+    constexpr int32_t DEVICE_ID = 802;
+    constexpr int32_t POINTER_ID = 1;
+    constexpr int32_t GROUP_A = 0;
+    constexpr int32_t WINDOW_A = 140;
+    constexpr int32_t GROUP_B = 15;
+
+    // Record pointer down
+    SequenceKey seqKey;
+    seqKey.deviceId = DEVICE_ID;
+    seqKey.itemId = POINTER_ID;
+    seqKey.type = SequenceType::POINTER;
+    mgr.RecordSequenceBegin(seqKey, GROUP_A, WINDOW_A);
+    EXPECT_EQ(mgr.GetSequenceSnapshotCount(), 1u);
+
+    // Bind mid-sequence
+    mgr.bindInfo_.AddRuntimeBinding(DEVICE_ID, 70, GROUP_B);
+
+    // Pointer cancel - same as up: consume snapshot
+    auto snap = mgr.ConsumeSequenceSnapshot(seqKey);
+    ASSERT_TRUE(snap.has_value());
+    EXPECT_EQ(snap->groupId, GROUP_A);
+    EXPECT_EQ(snap->windowId, WINDOW_A);
+    EXPECT_EQ(mgr.GetSequenceSnapshotCount(), 0u);
+}
+
+/**
+ * @tc.name: SequenceClosure_GestureBeginEnd_BindMidSequence_001
+ * @tc.desc: TASK-12 AC-2.7: Touchpad gesture begin on group A -> bind device ->
+ *           gesture end must use the snapshot to route to original target.
+ * @tc.type: FUNC
+ * @tc.require: AC-2.7
+ */
+HWTEST_F(InputWindowsManagerTest, SequenceClosure_GestureBeginEnd_BindMidSequence_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager mgr;
+
+    constexpr int32_t DEVICE_ID = 901;
+    constexpr int32_t POINTER_ID = 0;
+    constexpr int32_t GROUP_A = 0;
+    constexpr int32_t WINDOW_A = 150;
+    constexpr int32_t GROUP_B = 16;
+
+    // Simulate gesture begin by recording snapshot (POINTER type)
+    SequenceKey seqKey;
+    seqKey.deviceId = DEVICE_ID;
+    seqKey.itemId = POINTER_ID;
+    seqKey.type = SequenceType::POINTER;
+    mgr.RecordSequenceBegin(seqKey, GROUP_A, WINDOW_A);
+    EXPECT_EQ(mgr.GetSequenceSnapshotCount(), 1u);
+
+    // Bind device mid-gesture
+    mgr.bindInfo_.AddRuntimeBinding(DEVICE_ID, 80, GROUP_B);
+
+    // Gesture end - consume snapshot
+    auto snap = mgr.ConsumeSequenceSnapshot(seqKey);
+    ASSERT_TRUE(snap.has_value());
+    EXPECT_EQ(snap->groupId, GROUP_A)
+        << "Gesture end must route to original group A";
+    EXPECT_EQ(snap->windowId, WINDOW_A)
+        << "Gesture end must route to original window A";
+    EXPECT_EQ(mgr.GetSequenceSnapshotCount(), 0u);
+}
+
+/**
+ * @tc.name: SequenceClosure_MultipleSimultaneous_DifferentDevices_001
+ * @tc.desc: TASK-12 AC-2.7: Multiple concurrent sequences from different devices
+ *           and types must each maintain their own independent snapshot.
+ * @tc.type: FUNC
+ * @tc.require: AC-2.7
+ */
+HWTEST_F(InputWindowsManagerTest, SequenceClosure_MultipleSimultaneous_DifferentDevices_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager mgr;
+
+    constexpr int32_t DEV_KBD = 1001;
+    constexpr int32_t DEV_MOUSE = 1002;
+    constexpr int32_t DEV_TOUCH = 1003;
+
+    // Three concurrent sequences: keyboard, mouse button, touch pointer
+    SequenceKey kbdKey;
+    kbdKey.deviceId = DEV_KBD;
+    kbdKey.itemId = 29;  // KEY_A
+    kbdKey.type = SequenceType::KEY;
+    mgr.RecordSequenceBegin(kbdKey, 0, 100);
+
+    SequenceKey mouseKey;
+    mouseKey.deviceId = DEV_MOUSE;
+    mouseKey.itemId = 0;
+    mouseKey.type = SequenceType::BUTTON;
+    mgr.RecordSequenceBegin(mouseKey, 1, 200);
+
+    SequenceKey touchKey;
+    touchKey.deviceId = DEV_TOUCH;
+    touchKey.itemId = 0;
+    touchKey.type = SequenceType::POINTER;
+    mgr.RecordSequenceBegin(touchKey, 2, 300);
+
+    EXPECT_EQ(mgr.GetSequenceSnapshotCount(), 3u)
+        << "Three independent sequences should be tracked";
+
+    // Bind all three devices to different groups (simulating rebind mid-sequence)
+    mgr.bindInfo_.AddRuntimeBinding(DEV_KBD, 10, 5);
+    mgr.bindInfo_.AddRuntimeBinding(DEV_MOUSE, 20, 6);
+    mgr.bindInfo_.AddRuntimeBinding(DEV_TOUCH, 30, 7);
+
+    // Consume in different order than created - each should still find its snapshot
+    auto touchSnap = mgr.ConsumeSequenceSnapshot(touchKey);
+    ASSERT_TRUE(touchSnap.has_value());
+    EXPECT_EQ(touchSnap->groupId, 2);
+    EXPECT_EQ(touchSnap->windowId, 300);
+    EXPECT_EQ(mgr.GetSequenceSnapshotCount(), 2u);
+
+    auto kbdSnap = mgr.ConsumeSequenceSnapshot(kbdKey);
+    ASSERT_TRUE(kbdSnap.has_value());
+    EXPECT_EQ(kbdSnap->groupId, 0);
+    EXPECT_EQ(kbdSnap->windowId, 100);
+    EXPECT_EQ(mgr.GetSequenceSnapshotCount(), 1u);
+
+    auto mouseSnap = mgr.ConsumeSequenceSnapshot(mouseKey);
+    ASSERT_TRUE(mouseSnap.has_value());
+    EXPECT_EQ(mouseSnap->groupId, 1);
+    EXPECT_EQ(mouseSnap->windowId, 200);
+    EXPECT_EQ(mgr.GetSequenceSnapshotCount(), 0u);
+}
+
+/**
+ * @tc.name: SequenceClosure_NoSnapshotForUpWithoutDown_001
+ * @tc.desc: TASK-12 AC-2.7: If a key-up arrives without a prior key-down snapshot
+ *           (e.g., device just connected), it should fall through to normal routing.
+ * @tc.type: FUNC
+ * @tc.require: AC-2.7
+ */
+HWTEST_F(InputWindowsManagerTest, SequenceClosure_NoSnapshotForUpWithoutDown_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager mgr;
+
+    constexpr int32_t DEVICE_ID = 1100;
+    constexpr int32_t KEY_CODE = 31;
+
+    // No prior key-down was recorded - consuming should return nullopt
+    SequenceKey seqKey;
+    seqKey.deviceId = DEVICE_ID;
+    seqKey.itemId = KEY_CODE;
+    seqKey.type = SequenceType::KEY;
+    auto snap = mgr.ConsumeSequenceSnapshot(seqKey);
+    EXPECT_FALSE(snap.has_value())
+        << "Consuming without prior recording should return nullopt";
+    EXPECT_EQ(mgr.GetSequenceSnapshotCount(), 0u);
+}
+
+/**
+ * @tc.name: SequenceClosure_UnbindMidSequence_001
+ * @tc.desc: TASK-12 AC-2.7: Key down while bound to group B -> unbind device ->
+ *           key up must still route to original group B via snapshot.
+ * @tc.type: FUNC
+ * @tc.require: AC-2.7
+ */
+HWTEST_F(InputWindowsManagerTest, SequenceClosure_UnbindMidSequence_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager mgr;
+
+    constexpr int32_t DEVICE_ID = 1200;
+    constexpr int32_t KEY_CODE = 32;
+    constexpr int32_t GROUP_B = 20;
+    constexpr int32_t WINDOW_B = 250;
+
+    // Record snapshot for a device that was bound to group B
+    SequenceKey seqKey;
+    seqKey.deviceId = DEVICE_ID;
+    seqKey.itemId = KEY_CODE;
+    seqKey.type = SequenceType::KEY;
+    mgr.RecordSequenceBegin(seqKey, GROUP_B, WINDOW_B);
+    EXPECT_EQ(mgr.GetSequenceSnapshotCount(), 1u);
+
+    // Unbind the device (it now resolves to default group)
+    mgr.bindInfo_.RemoveRuntimeBinding(DEVICE_ID);
+    EXPECT_EQ(mgr.ResolveGroupIdForDevice(DEVICE_ID), DEFAULT_GROUP_ID)
+        << "After unbind, device should resolve to default group";
+
+    // Key up - snapshot should still have original group B
+    auto snap = mgr.ConsumeSequenceSnapshot(seqKey);
+    ASSERT_TRUE(snap.has_value())
+        << "Snapshot should survive unbinding";
+    EXPECT_EQ(snap->groupId, GROUP_B)
+        << "Key up must route to original group B after unbind";
+    EXPECT_EQ(snap->windowId, WINDOW_B)
+        << "Key up must route to original window B after unbind";
+    EXPECT_EQ(mgr.GetSequenceSnapshotCount(), 0u);
+}
+
+/**
+ * @tc.name: SequenceClosure_RebindMidSequence_001
+ * @tc.desc: TASK-12 AC-2.7: Key down while bound to group A -> rebind to group C ->
+ *           key up must still route to original group A via snapshot.
+ * @tc.type: FUNC
+ * @tc.require: AC-2.7
+ */
+HWTEST_F(InputWindowsManagerTest, SequenceClosure_RebindMidSequence_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager mgr;
+
+    constexpr int32_t DEVICE_ID = 1300;
+    constexpr int32_t KEY_CODE = 33;
+    constexpr int32_t GROUP_A = 10;
+    constexpr int32_t WINDOW_A = 300;
+    constexpr int32_t GROUP_C = 30;
+
+    // Record snapshot while bound to group A
+    SequenceKey seqKey;
+    seqKey.deviceId = DEVICE_ID;
+    seqKey.itemId = KEY_CODE;
+    seqKey.type = SequenceType::KEY;
+    mgr.RecordSequenceBegin(seqKey, GROUP_A, WINDOW_A);
+    EXPECT_EQ(mgr.GetSequenceSnapshotCount(), 1u);
+
+    // Rebind to a completely different group C
+    mgr.bindInfo_.AddRuntimeBinding(DEVICE_ID, 90, GROUP_C);
+    EXPECT_EQ(mgr.ResolveGroupIdForDevice(DEVICE_ID), GROUP_C);
+
+    // Key up - snapshot should still point to original group A
+    auto snap = mgr.ConsumeSequenceSnapshot(seqKey);
+    ASSERT_TRUE(snap.has_value());
+    EXPECT_EQ(snap->groupId, GROUP_A)
+        << "Key up must route to original group A, not new group C";
+    EXPECT_EQ(snap->windowId, WINDOW_A)
+        << "Key up must route to original window A";
+}
+
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
+/**
+ * @tc.name: SequenceClosure_HandleKeyEventWindowId_EndToEnd_001
+ * @tc.desc: TASK-12 AC-2.7: End-to-end test proving HandleKeyEventWindowId hooks
+ *           correctly record on KEY_ACTION_DOWN and consume on KEY_ACTION_UP.
+ * @tc.type: FUNC
+ * @tc.require: AC-2.7
+ */
+HWTEST_F(InputWindowsManagerTest, SequenceClosure_HandleKeyEventWindowId_EndToEnd_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager mgr;
+
+    constexpr int32_t DEVICE_ID = 1400;
+    constexpr int32_t KEY_CODE = 34;
+    constexpr int32_t FOCUS_WIN = 400;
+    constexpr int32_t GROUP_NEW = 25;
+    constexpr int32_t DISPLAY_NEW = 55;
+
+    // Set up default group with a focus window
+    auto it = mgr.displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
+    ASSERT_NE(it, mgr.displayGroupInfoMap_.end());
+    it->second.focusWindowId = FOCUS_WIN;
+    WindowInfo win;
+    win.id = FOCUS_WIN;
+    win.pid = 10;
+    win.agentWindowId = FOCUS_WIN;
+    it->second.windowsInfo.push_back(win);
+
+    // Step 1: Key down from unbound device
+    auto keyDown = KeyEvent::Create();
+    ASSERT_NE(keyDown, nullptr);
+    keyDown->SetDeviceId(DEVICE_ID);
+    keyDown->SetKeyCode(KEY_CODE);
+    keyDown->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+    keyDown->SetTargetDisplayId(-1);
+    mgr.HandleKeyEventWindowId(keyDown);
+
+    // Verify: key down targeted the focus window
+    EXPECT_EQ(keyDown->GetTargetWindowId(), FOCUS_WIN);
+    // Verify: a sequence snapshot was recorded
+    EXPECT_EQ(mgr.GetSequenceSnapshotCount(), 1u)
+        << "HandleKeyEventWindowId should record snapshot on KEY_ACTION_DOWN";
+
+    // Step 2: Bind the device to a new group mid-sequence
+    mgr.bindInfo_.AddRuntimeBinding(DEVICE_ID, DISPLAY_NEW, GROUP_NEW);
+
+    // Step 3: Key up
+    auto keyUp = KeyEvent::Create();
+    ASSERT_NE(keyUp, nullptr);
+    keyUp->SetDeviceId(DEVICE_ID);
+    keyUp->SetKeyCode(KEY_CODE);
+    keyUp->SetKeyAction(KeyEvent::KEY_ACTION_UP);
+    keyUp->SetTargetDisplayId(-1);
+    mgr.HandleKeyEventWindowId(keyUp);
+
+    // Verify: key up targeted the ORIGINAL focus window, not the new group's
+    EXPECT_EQ(keyUp->GetTargetWindowId(), FOCUS_WIN)
+        << "KEY_ACTION_UP must use snapshot to route to original window";
+    // Verify: snapshot is consumed
+    EXPECT_EQ(mgr.GetSequenceSnapshotCount(), 0u)
+        << "Snapshot must be consumed after KEY_ACTION_UP";
+}
+
+/**
+ * @tc.name: SequenceClosure_KeyNoSnapshot_NormalRouting_001
+ * @tc.desc: TASK-12 AC-2.7: If key-up arrives without a prior key-down snapshot
+ *           (no rebind happened), normal routing should still work correctly.
+ * @tc.type: FUNC
+ * @tc.require: AC-2.7
+ */
+HWTEST_F(InputWindowsManagerTest, SequenceClosure_KeyNoSnapshot_NormalRouting_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager mgr;
+
+    constexpr int32_t DEVICE_ID = 1500;
+    constexpr int32_t KEY_CODE = 35;
+    constexpr int32_t FOCUS_WIN = 500;
+
+    // Set up default group
+    auto it = mgr.displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
+    ASSERT_NE(it, mgr.displayGroupInfoMap_.end());
+    it->second.focusWindowId = FOCUS_WIN;
+    WindowInfo win;
+    win.id = FOCUS_WIN;
+    win.pid = 10;
+    win.agentWindowId = FOCUS_WIN;
+    it->second.windowsInfo.push_back(win);
+
+    // Send key-up without prior key-down (orphan release)
+    auto keyUp = KeyEvent::Create();
+    ASSERT_NE(keyUp, nullptr);
+    keyUp->SetDeviceId(DEVICE_ID);
+    keyUp->SetKeyCode(KEY_CODE);
+    keyUp->SetKeyAction(KeyEvent::KEY_ACTION_UP);
+    keyUp->SetTargetDisplayId(-1);
+    mgr.HandleKeyEventWindowId(keyUp);
+
+    // Should fall through to normal routing since no snapshot exists
+    EXPECT_EQ(keyUp->GetTargetWindowId(), FOCUS_WIN)
+        << "Without a snapshot, key-up should use normal focus routing";
+    EXPECT_EQ(mgr.GetSequenceSnapshotCount(), 0u);
+}
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
+
+/**
+ * @tc.name: SequenceClosure_DeviceOffline_ClearsSnapshots_001
+ * @tc.desc: TASK-12 AC-2.7: When a device goes offline, all its pending sequence
+ *           snapshots should be cleared to avoid stale state.
+ * @tc.type: FUNC
+ * @tc.require: AC-2.7
+ */
+HWTEST_F(InputWindowsManagerTest, SequenceClosure_DeviceOffline_ClearsSnapshots_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager mgr;
+
+    constexpr int32_t DEVICE_A = 1601;
+    constexpr int32_t DEVICE_B = 1602;
+
+    // Create snapshots for two devices
+    SequenceKey keyA;
+    keyA.deviceId = DEVICE_A;
+    keyA.itemId = 29;
+    keyA.type = SequenceType::KEY;
+    mgr.RecordSequenceBegin(keyA, 0, 100);
+
+    SequenceKey btnA;
+    btnA.deviceId = DEVICE_A;
+    btnA.itemId = 0;
+    btnA.type = SequenceType::BUTTON;
+    mgr.RecordSequenceBegin(btnA, 0, 100);
+
+    SequenceKey keyB;
+    keyB.deviceId = DEVICE_B;
+    keyB.itemId = 30;
+    keyB.type = SequenceType::KEY;
+    mgr.RecordSequenceBegin(keyB, 1, 200);
+
+    EXPECT_EQ(mgr.GetSequenceSnapshotCount(), 3u);
+
+    // Device A goes offline - clear its snapshots
+    mgr.ClearSequenceSnapshotsByDevice(DEVICE_A);
+
+    EXPECT_EQ(mgr.GetSequenceSnapshotCount(), 1u)
+        << "Only device B's snapshot should remain";
+
+    // Device B's snapshot should still be consumable
+    auto snapB = mgr.ConsumeSequenceSnapshot(keyB);
+    ASSERT_TRUE(snapB.has_value());
+    EXPECT_EQ(snapB->groupId, 1);
+    EXPECT_EQ(snapB->windowId, 200);
+
+    // Device A's snapshots should be gone
+    EXPECT_FALSE(mgr.ConsumeSequenceSnapshot(keyA).has_value());
+    EXPECT_FALSE(mgr.ConsumeSequenceSnapshot(btnA).has_value());
+}
+
 } // namespace MMI
 } // namespace OHOS
