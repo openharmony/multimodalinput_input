@@ -363,6 +363,7 @@ private:
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 #ifdef OHOS_BUILD_ENABLE_POINTER
     int32_t UpdateTouchPadTarget(std::shared_ptr<PointerEvent> pointerEvent);
+    int32_t UpdateTouchPadGestureTarget(std::shared_ptr<PointerEvent> pointerEvent);
 #endif // OHOS_BUILD_ENABLE_POINTER
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     std::optional<WindowInfo> SelectWindowInfo(int32_t logicalX, int32_t logicalY,

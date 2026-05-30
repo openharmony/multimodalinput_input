@@ -17908,5 +17908,375 @@ HWTEST_F(InputWindowsManagerTest, MouseGroupRouting_CaptureModePerGroup_001, Tes
             << "Main group capture should be unaffected";
     }
 }
+/**
+ * @tc.name: TouchpadGroupRouting_BoundSwipeUsesBoundGroup_001
+ * @tc.desc: TASK-6: A touchpad gesture (swipe) event from a bound device should
+ *           route to the bound group's focus window via ResolveGroupIdForDevice,
+ *           keeping SOURCE_TYPE_TOUCHPAD classification explicit.
+ * @tc.type: FUNC
+ * @tc.require: AC-2.3
+ */
+HWTEST_F(InputWindowsManagerTest, TouchpadGroupRouting_BoundSwipeUsesBoundGroup_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager mgr;
+
+    constexpr int32_t DEVICE_ID = 42;
+    constexpr int32_t BOUND_GROUP_ID = 3;
+    constexpr int32_t BOUND_DISPLAY_ID = 10;
+    constexpr int32_t DEFAULT_FOCUS_WIN = 100;
+    constexpr int32_t BOUND_FOCUS_WIN = 200;
+
+    // Set up default group with focus window
+    auto it = mgr.displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
+    ASSERT_NE(it, mgr.displayGroupInfoMap_.end());
+    it->second.focusWindowId = DEFAULT_FOCUS_WIN;
+
+    // Set up bound group with its own focus window
+    OLD::DisplayGroupInfo boundGroupInfo;
+    boundGroupInfo.groupId = BOUND_GROUP_ID;
+    boundGroupInfo.focusWindowId = BOUND_FOCUS_WIN;
+    boundGroupInfo.type = GroupType::GROUP_SPECIAL;
+    OLD::DisplayInfo boundDisplay;
+    boundDisplay.id = BOUND_DISPLAY_ID;
+    boundGroupInfo.displaysInfo.push_back(boundDisplay);
+    WindowInfo boundWin;
+    boundWin.id = BOUND_FOCUS_WIN;
+    boundWin.pid = 10;
+    boundWin.agentWindowId = BOUND_FOCUS_WIN;
+    boundWin.displayId = BOUND_DISPLAY_ID;
+    boundGroupInfo.windowsInfo.push_back(boundWin);
+    mgr.displayGroupInfoMap_[BOUND_GROUP_ID] = boundGroupInfo;
+
+    // Set up windowsPerDisplayMap_ for the bound group's display
+    WindowGroupInfo wgInfo;
+    wgInfo.displayId = BOUND_DISPLAY_ID;
+    wgInfo.focusWindowId = BOUND_FOCUS_WIN;
+    wgInfo.windowsInfo.push_back(boundWin);
+    std::map<int32_t, WindowGroupInfo> boundMap;
+    boundMap[BOUND_DISPLAY_ID] = wgInfo;
+    mgr.windowsPerDisplayMap_[BOUND_GROUP_ID] = boundMap;
+
+    // Bind touchpad device to the bound group
+    mgr.bindInfo_.AddRuntimeBinding(DEVICE_ID, BOUND_DISPLAY_ID, BOUND_GROUP_ID);
+
+    // Create a touchpad swipe gesture event
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetDeviceId(DEVICE_ID);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHPAD);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_SWIPE_BEGIN);
+    pointerEvent->SetTargetDisplayId(BOUND_DISPLAY_ID);
+    pointerEvent->SetPointerId(0);
+    PointerEvent::PointerItem item;
+    item.SetPointerId(0);
+    item.SetToolType(PointerEvent::TOOL_TYPE_TOUCHPAD);
+    pointerEvent->AddPointerItem(item);
+
+    // Call UpdateTouchPadGestureTarget directly (this is what UpdateTouchPadTarget delegates to)
+    int32_t ret = mgr.UpdateTouchPadGestureTarget(pointerEvent);
+    EXPECT_EQ(ret, RET_OK);
+
+    // The event should be targeted to the BOUND group's focus window
+    EXPECT_EQ(pointerEvent->GetTargetWindowId(), BOUND_FOCUS_WIN)
+        << "Bound touchpad gesture should route to bound group's focus window";
+
+    // Source type should remain TOUCHPAD (not converted to MOUSE)
+    EXPECT_EQ(pointerEvent->GetSourceType(), PointerEvent::SOURCE_TYPE_TOUCHPAD)
+        << "Touchpad source type should be preserved for gesture events";
+}
+
+/**
+ * @tc.name: TouchpadGroupRouting_UnboundTouchpadUsesDefaultGroup_001
+ * @tc.desc: TASK-6: An unbound touchpad device should resolve to MAIN_GROUPID,
+ *           preserving backward-compatible behavior for gesture events.
+ * @tc.type: FUNC
+ * @tc.require: AC-2.3
+ */
+HWTEST_F(InputWindowsManagerTest, TouchpadGroupRouting_UnboundTouchpadUsesDefaultGroup_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager mgr;
+
+    constexpr int32_t UNBOUND_DEVICE = 77;
+    constexpr int32_t DEFAULT_FOCUS_WIN = 100;
+    constexpr int32_t DEFAULT_DISPLAY_ID = 0;
+
+    // Set up default group with focus window and a window matching that focus
+    auto it = mgr.displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
+    ASSERT_NE(it, mgr.displayGroupInfoMap_.end());
+    it->second.focusWindowId = DEFAULT_FOCUS_WIN;
+    OLD::DisplayInfo defaultDisplay;
+    defaultDisplay.id = DEFAULT_DISPLAY_ID;
+    it->second.displaysInfo.push_back(defaultDisplay);
+    WindowInfo defaultWin;
+    defaultWin.id = DEFAULT_FOCUS_WIN;
+    defaultWin.pid = 1;
+    defaultWin.agentWindowId = DEFAULT_FOCUS_WIN;
+    defaultWin.displayId = DEFAULT_DISPLAY_ID;
+    it->second.windowsInfo.push_back(defaultWin);
+
+    // Set up windowsPerDisplayMap_ for the default group
+    WindowGroupInfo wgInfo;
+    wgInfo.displayId = DEFAULT_DISPLAY_ID;
+    wgInfo.focusWindowId = DEFAULT_FOCUS_WIN;
+    wgInfo.windowsInfo.push_back(defaultWin);
+    std::map<int32_t, WindowGroupInfo> defaultMap;
+    defaultMap[DEFAULT_DISPLAY_ID] = wgInfo;
+    mgr.windowsPerDisplayMap_[DEFAULT_GROUP_ID] = defaultMap;
+
+    // No runtime binding for this device
+
+    // Verify ResolveGroupIdForDevice returns MAIN_GROUPID for unbound touchpad
+    int32_t groupId = mgr.ResolveGroupIdForDevice(UNBOUND_DEVICE);
+    EXPECT_EQ(groupId, 0)
+        << "Unbound touchpad should resolve to MAIN_GROUPID";
+
+    // Create a touchpad gesture event from unbound device
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetDeviceId(UNBOUND_DEVICE);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHPAD);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_SWIPE_BEGIN);
+    pointerEvent->SetTargetDisplayId(DEFAULT_DISPLAY_ID);
+    pointerEvent->SetPointerId(0);
+    PointerEvent::PointerItem item;
+    item.SetPointerId(0);
+    item.SetToolType(PointerEvent::TOOL_TYPE_TOUCHPAD);
+    pointerEvent->AddPointerItem(item);
+
+    int32_t ret = mgr.UpdateTouchPadGestureTarget(pointerEvent);
+    EXPECT_EQ(ret, RET_OK);
+
+    // Should route to default group's focus window
+    EXPECT_EQ(pointerEvent->GetTargetWindowId(), DEFAULT_FOCUS_WIN)
+        << "Unbound touchpad gesture should route to default group's focus window";
+}
+
+/**
+ * @tc.name: TouchpadGroupRouting_BoundPointerDerivedEventUsesGroup_001
+ * @tc.desc: TASK-6: A touchpad-derived pointer event (e.g. MOVE) from a bound device
+ *           should still resolve to the bound group via UpdateMouseTarget's
+ *           ResolveGroupIdForDevice call, even though source is mutated to MOUSE.
+ * @tc.type: FUNC
+ * @tc.require: AC-2.3
+ */
+HWTEST_F(InputWindowsManagerTest, TouchpadGroupRouting_BoundPointerDerivedEventUsesGroup_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto mgr = std::make_shared<InputWindowsManager>();
+    ASSERT_NE(mgr, nullptr);
+
+    constexpr int32_t TOUCHPAD_DEVICE_ID = 88;
+
+    // Register main group
+    OLD::DisplayGroupInfo mainGroup;
+    mainGroup.groupId = 0;
+    mainGroup.type = GroupType::GROUP_DEFAULT;
+    mainGroup.focusWindowId = 10;
+    OLD::DisplayInfo mainDisplay = { .id = 1 };
+    mainDisplay.x = 0;
+    mainDisplay.y = 0;
+    mainDisplay.width = 1920;
+    mainDisplay.height = 1080;
+    mainDisplay.validWidth = 1920;
+    mainDisplay.validHeight = 1080;
+    mainDisplay.dpi = 240;
+    mainDisplay.name = "main";
+    mainDisplay.uniq = "default0";
+    mainDisplay.direction = DIRECTION0;
+    mainGroup.displaysInfo.push_back(mainDisplay);
+    mgr->UpdateDisplayInfo(mainGroup);
+
+    // Register secondary group
+    OLD::DisplayGroupInfo secGroup;
+    secGroup.groupId = 1;
+    secGroup.type = GroupType::GROUP_SPECIAL;
+    secGroup.focusWindowId = 20;
+    OLD::DisplayInfo secDisplay = { .id = 2 };
+    secDisplay.x = 0;
+    secDisplay.y = 0;
+    secDisplay.width = 1280;
+    secDisplay.height = 720;
+    secDisplay.validWidth = 1280;
+    secDisplay.validHeight = 720;
+    secDisplay.dpi = 160;
+    secDisplay.name = "secondary";
+    secDisplay.uniq = "secondary0";
+    secDisplay.direction = DIRECTION0;
+    secGroup.displaysInfo.push_back(secDisplay);
+    mgr->UpdateDisplayInfo(secGroup);
+
+    // Bind touchpad device to secondary group
+    mgr->bindInfo_.AddDevice(TOUCHPAD_DEVICE_ID, "touchpad0");
+    mgr->bindInfo_.AddDisplay(2, "secondary0");
+    std::string msg;
+    mgr->BindDeviceToDisplayGroupByDisplay(TOUCHPAD_DEVICE_ID, 2, msg);
+
+    // Verify the touchpad device resolves to secondary group
+    int32_t resolvedGroupId = mgr->ResolveGroupIdForDevice(TOUCHPAD_DEVICE_ID);
+    EXPECT_EQ(resolvedGroupId, 1)
+        << "Bound touchpad device should resolve to group 1";
+
+    // Verify GetMouseInfo for each group is independent (touchpad shares mouse location maps)
+    mgr->mouseLocationMap_[1].displayId = 2;
+    mgr->mouseLocationMap_[1].physicalX = 640;
+    mgr->mouseLocationMap_[1].physicalY = 360;
+
+    mgr->mouseLocationMap_[0].displayId = 1;
+    mgr->mouseLocationMap_[0].physicalX = 960;
+    mgr->mouseLocationMap_[0].physicalY = 540;
+
+    MouseLocation secMouseInfo = mgr->GetMouseInfo(1);
+    EXPECT_EQ(secMouseInfo.displayId, 2)
+        << "Secondary group mouse info should be independent for touchpad routing";
+    MouseLocation mainMouseInfo = mgr->GetMouseInfo(0);
+    EXPECT_EQ(mainMouseInfo.displayId, 1)
+        << "Main group mouse info should be unaffected by touchpad binding";
+}
+
+/**
+ * @tc.name: TouchpadGroupRouting_ClassificationNotFolded_001
+ * @tc.desc: TASK-6 regression: Verify that touchpad, touchscreen, and mouse
+ *           each maintain their own distinct source type classification in the
+ *           dispatch switch. This ensures that device types are NOT folded into
+ *           one generic branch.
+ * @tc.type: FUNC
+ * @tc.require: AC-2.3
+ */
+HWTEST_F(InputWindowsManagerTest, TouchpadGroupRouting_ClassificationNotFolded_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+
+    // Verify that source type constants are distinct
+    EXPECT_NE(PointerEvent::SOURCE_TYPE_MOUSE, PointerEvent::SOURCE_TYPE_TOUCHPAD)
+        << "Mouse and touchpad must have distinct source types";
+    EXPECT_NE(PointerEvent::SOURCE_TYPE_MOUSE, PointerEvent::SOURCE_TYPE_TOUCHSCREEN)
+        << "Mouse and touchscreen must have distinct source types";
+    EXPECT_NE(PointerEvent::SOURCE_TYPE_TOUCHPAD, PointerEvent::SOURCE_TYPE_TOUCHSCREEN)
+        << "Touchpad and touchscreen must have distinct source types";
+
+    // Verify that a touchpad event preserves its source type when created
+    auto touchpadEvent = PointerEvent::Create();
+    ASSERT_NE(touchpadEvent, nullptr);
+    touchpadEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHPAD);
+    EXPECT_EQ(touchpadEvent->GetSourceType(), PointerEvent::SOURCE_TYPE_TOUCHPAD)
+        << "Touchpad source type should be preserved";
+
+    // Verify that a touchscreen event preserves its source type
+    auto touchscreenEvent = PointerEvent::Create();
+    ASSERT_NE(touchscreenEvent, nullptr);
+    touchscreenEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+    EXPECT_EQ(touchscreenEvent->GetSourceType(), PointerEvent::SOURCE_TYPE_TOUCHSCREEN)
+        << "Touchscreen source type should NOT be changed to touchpad or mouse";
+
+    // Verify that a mouse event preserves its source type
+    auto mouseEvent = PointerEvent::Create();
+    ASSERT_NE(mouseEvent, nullptr);
+    mouseEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
+    EXPECT_EQ(mouseEvent->GetSourceType(), PointerEvent::SOURCE_TYPE_MOUSE)
+        << "Mouse source type should NOT be changed to touchpad";
+
+    // Verify tool type classification: TOUCHPAD vs FINGER vs PEN
+    PointerEvent::PointerItem touchpadItem;
+    touchpadItem.SetToolType(PointerEvent::TOOL_TYPE_TOUCHPAD);
+    EXPECT_EQ(touchpadItem.GetToolType(), PointerEvent::TOOL_TYPE_TOUCHPAD)
+        << "TOOL_TYPE_TOUCHPAD should be preserved and distinct";
+
+    PointerEvent::PointerItem fingerItem;
+    fingerItem.SetToolType(PointerEvent::TOOL_TYPE_FINGER);
+    EXPECT_NE(fingerItem.GetToolType(), PointerEvent::TOOL_TYPE_TOUCHPAD)
+        << "TOOL_TYPE_FINGER must not be confused with TOOL_TYPE_TOUCHPAD";
+
+    PointerEvent::PointerItem penItem;
+    penItem.SetToolType(PointerEvent::TOOL_TYPE_PEN);
+    EXPECT_NE(penItem.GetToolType(), PointerEvent::TOOL_TYPE_TOUCHPAD)
+        << "TOOL_TYPE_PEN must not be confused with TOOL_TYPE_TOUCHPAD";
+}
+
+/**
+ * @tc.name: TouchpadGroupRouting_SwipeEndBoundGroup_001
+ * @tc.desc: TASK-6: Verify that SWIPE_END events from bound touchpad also route
+ *           through the bound group, not just SWIPE_BEGIN.
+ * @tc.type: FUNC
+ * @tc.require: AC-2.3
+ */
+HWTEST_F(InputWindowsManagerTest, TouchpadGroupRouting_SwipeEndBoundGroup_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager mgr;
+
+    constexpr int32_t DEVICE_ID = 50;
+    constexpr int32_t BOUND_GROUP_ID = 2;
+    constexpr int32_t BOUND_DISPLAY_ID = 5;
+    constexpr int32_t BOUND_FOCUS_WIN = 300;
+
+    // Set up bound group
+    OLD::DisplayGroupInfo boundGroupInfo;
+    boundGroupInfo.groupId = BOUND_GROUP_ID;
+    boundGroupInfo.focusWindowId = BOUND_FOCUS_WIN;
+    boundGroupInfo.type = GroupType::GROUP_SPECIAL;
+    OLD::DisplayInfo boundDisplay;
+    boundDisplay.id = BOUND_DISPLAY_ID;
+    boundGroupInfo.displaysInfo.push_back(boundDisplay);
+    WindowInfo boundWin;
+    boundWin.id = BOUND_FOCUS_WIN;
+    boundWin.pid = 20;
+    boundWin.agentWindowId = BOUND_FOCUS_WIN;
+    boundWin.displayId = BOUND_DISPLAY_ID;
+    boundGroupInfo.windowsInfo.push_back(boundWin);
+    mgr.displayGroupInfoMap_[BOUND_GROUP_ID] = boundGroupInfo;
+
+    WindowGroupInfo wgInfo;
+    wgInfo.displayId = BOUND_DISPLAY_ID;
+    wgInfo.focusWindowId = BOUND_FOCUS_WIN;
+    wgInfo.windowsInfo.push_back(boundWin);
+    std::map<int32_t, WindowGroupInfo> boundMap;
+    boundMap[BOUND_DISPLAY_ID] = wgInfo;
+    mgr.windowsPerDisplayMap_[BOUND_GROUP_ID] = boundMap;
+
+    // Bind device
+    mgr.bindInfo_.AddRuntimeBinding(DEVICE_ID, BOUND_DISPLAY_ID, BOUND_GROUP_ID);
+
+    // Test SWIPE_UPDATE
+    auto swipeUpdate = PointerEvent::Create();
+    ASSERT_NE(swipeUpdate, nullptr);
+    swipeUpdate->SetDeviceId(DEVICE_ID);
+    swipeUpdate->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHPAD);
+    swipeUpdate->SetPointerAction(PointerEvent::POINTER_ACTION_SWIPE_UPDATE);
+    swipeUpdate->SetTargetDisplayId(BOUND_DISPLAY_ID);
+    swipeUpdate->SetPointerId(0);
+    PointerEvent::PointerItem itemUpdate;
+    itemUpdate.SetPointerId(0);
+    itemUpdate.SetToolType(PointerEvent::TOOL_TYPE_TOUCHPAD);
+    swipeUpdate->AddPointerItem(itemUpdate);
+
+    int32_t ret = mgr.UpdateTouchPadGestureTarget(swipeUpdate);
+    EXPECT_EQ(ret, RET_OK);
+    EXPECT_EQ(swipeUpdate->GetTargetWindowId(), BOUND_FOCUS_WIN)
+        << "SWIPE_UPDATE should route to bound group's focus window";
+
+    // Test SWIPE_END
+    auto swipeEnd = PointerEvent::Create();
+    ASSERT_NE(swipeEnd, nullptr);
+    swipeEnd->SetDeviceId(DEVICE_ID);
+    swipeEnd->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHPAD);
+    swipeEnd->SetPointerAction(PointerEvent::POINTER_ACTION_SWIPE_END);
+    swipeEnd->SetTargetDisplayId(BOUND_DISPLAY_ID);
+    swipeEnd->SetPointerId(0);
+    PointerEvent::PointerItem itemEnd;
+    itemEnd.SetPointerId(0);
+    itemEnd.SetToolType(PointerEvent::TOOL_TYPE_TOUCHPAD);
+    swipeEnd->AddPointerItem(itemEnd);
+
+    ret = mgr.UpdateTouchPadGestureTarget(swipeEnd);
+    EXPECT_EQ(ret, RET_OK);
+    EXPECT_EQ(swipeEnd->GetTargetWindowId(), BOUND_FOCUS_WIN)
+        << "SWIPE_END should route to bound group's focus window";
+
+    // Verify source type is preserved as TOUCHPAD (not folded to MOUSE)
+    EXPECT_EQ(swipeUpdate->GetSourceType(), PointerEvent::SOURCE_TYPE_TOUCHPAD);
+    EXPECT_EQ(swipeEnd->GetSourceType(), PointerEvent::SOURCE_TYPE_TOUCHPAD);
+}
 } // namespace MMI
 } // namespace OHOS

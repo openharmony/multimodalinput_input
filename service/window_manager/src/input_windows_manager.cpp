@@ -7037,6 +7037,10 @@ int32_t InputWindowsManager::UpdateTouchPadTarget(std::shared_ptr<PointerEvent> 
 {
     CALL_DEBUG_ENTER;
     int32_t pointerAction = pointerEvent->GetPointerAction();
+    // Touchpad-derived pointer events delegate to UpdateMouseTarget which resolves
+    // the bound group via ResolveGroupIdForDevice. Source type is converted to MOUSE
+    // for pointer dispatch while the original touchpad classification is preserved
+    // in the pointer item's tool type (TOOL_TYPE_TOUCHPAD).
     switch (pointerAction) {
         case PointerEvent::POINTER_ACTION_BUTTON_DOWN:
         case PointerEvent::POINTER_ACTION_BUTTON_UP:
@@ -7061,11 +7065,46 @@ int32_t InputWindowsManager::UpdateTouchPadTarget(std::shared_ptr<PointerEvent> 
         case PointerEvent::POINTER_ACTION_TOUCHPAD_ACTIVE: {
             return UpdateMouseTarget(pointerEvent);
         }
+        // Touchpad gesture events: resolve group via device binding, route to
+        // the bound group's focus window. Source type stays SOURCE_TYPE_TOUCHPAD
+        // to keep the touchpad classification explicit and separate from mouse.
+        case PointerEvent::POINTER_ACTION_SWIPE_BEGIN:
+        case PointerEvent::POINTER_ACTION_SWIPE_UPDATE:
+        case PointerEvent::POINTER_ACTION_SWIPE_END: {
+            return UpdateTouchPadGestureTarget(pointerEvent);
+        }
         default: {
             MMI_HILOG_DISPATCHE("pointer action is unknown, pointerAction:%{public}d", pointerAction);
             return RET_ERR;
         }
     }
+    return RET_OK;
+}
+
+int32_t InputWindowsManager::UpdateTouchPadGestureTarget(std::shared_ptr<PointerEvent> pointerEvent)
+{
+    CALL_DEBUG_ENTER;
+    CHKPR(pointerEvent, ERROR_NULL_POINTER);
+    int32_t groupId = ResolveGroupIdForDevice(pointerEvent->GetDeviceId());
+    if (groupId == MAIN_GROUPID) {
+        groupId = FindDisplayGroupId(pointerEvent->GetTargetDisplayId());
+    }
+    int32_t focusWindowId = GetFocusWindowId(groupId);
+    const WindowInfo* windowInfo = nullptr;
+    std::vector<WindowInfo> windowsInfo = GetWindowGroupInfoByDisplayId(pointerEvent->GetTargetDisplayId());
+    for (const auto &item : windowsInfo) {
+        if (item.id == focusWindowId) {
+            windowInfo = &item;
+            break;
+        }
+    }
+    CHKPR(windowInfo, ERROR_NULL_POINTER);
+    SetPrivacyModeFlag(windowInfo->privacyMode, pointerEvent);
+    pointerEvent->SetTargetDisplayId(windowInfo->displayId);
+    pointerEvent->SetTargetWindowId(windowInfo->id);
+    pointerEvent->SetAgentWindowId(windowInfo->agentWindowId);
+    MMI_HILOG_DISPATCHD("Touchpad gesture focusWindow:%{public}d, pid:%{public}d, groupId:%{public}d",
+        focusWindowId, windowInfo->pid, groupId);
     return RET_OK;
 }
 #endif // OHOS_BUILD_ENABLE_POINTER
