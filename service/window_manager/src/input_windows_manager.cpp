@@ -671,6 +671,17 @@ int32_t InputWindowsManager::FindDisplayGroupId(int32_t displayId) const
     return DEFAULT_GROUP_ID;
 }
 
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
+int32_t InputWindowsManager::ResolveGroupIdForDevice(int32_t deviceId) const
+{
+    auto binding = bindInfo_.GetRuntimeBinding(deviceId);
+    if (binding.has_value()) {
+        return binding->groupId;
+    }
+    return MAIN_GROUPID;
+}
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
+
 int32_t InputWindowsManager::FindDisplayUserId(int32_t displayId) const
 {
     for (const auto& it : displayGroupInfoMap_) {
@@ -748,7 +759,10 @@ void InputWindowsManager::HandleKeyEventWindowId(std::shared_ptr<KeyEvent> keyEv
 {
     CALL_DEBUG_ENTER;
     CHKPV(keyEvent);
-    int32_t groupId = FindDisplayGroupId(keyEvent->GetTargetDisplayId());
+    int32_t groupId = ResolveGroupIdForDevice(keyEvent->GetDeviceId());
+    if (groupId == MAIN_GROUPID) {
+        groupId = FindDisplayGroupId(keyEvent->GetTargetDisplayId());
+    }
     int32_t focusWindowId = GetFocusWindowId(groupId);
     std::vector<WindowInfo> windowsInfo = GetWindowGroupInfoByDisplayId(keyEvent->GetTargetDisplayId());
     for (auto &item : windowsInfo) {
@@ -801,7 +815,15 @@ int32_t InputWindowsManager::GetDisplayId(std::shared_ptr<InputEvent> inputEvent
     int32_t displayId = inputEvent->GetTargetDisplayId();
     if (displayId < 0) {
         MMI_HILOGD("Target display is -1");
-        int32_t groupId = FindDisplayGroupId(displayId);
+        auto binding = bindInfo_.GetRuntimeBinding(inputEvent->GetDeviceId());
+        int32_t groupId = MAIN_GROUPID;
+        if (binding.has_value()) {
+            groupId = binding->groupId;
+            displayId = binding->displayId;
+            inputEvent->SetTargetDisplayId(displayId);
+            return displayId;
+        }
+        groupId = FindDisplayGroupId(displayId);
             const auto iter = displayGroupInfoMap_.find(groupId);
             if (iter != displayGroupInfoMap_.end()) {
                 if (iter->second.displaysInfo.empty()) {
@@ -872,7 +894,10 @@ std::vector<std::pair<int32_t, TargetInfo>> InputWindowsManager::GetPidAndUpdate
         MMI_HILOG_DISPATCHE("keyEvent is nullptr");
         return secSubWindows;
     }
-    int32_t groupId = FindDisplayGroupId(keyEvent->GetTargetDisplayId());
+    int32_t groupId = ResolveGroupIdForDevice(keyEvent->GetDeviceId());
+    if (groupId == MAIN_GROUPID) {
+        groupId = FindDisplayGroupId(keyEvent->GetTargetDisplayId());
+    }
     const int32_t focusWindowId = GetFocusWindowId(groupId);
     UpdateKeyEventDisplayId(keyEvent, focusWindowId, groupId);
     const WindowInfo* windowInfo = nullptr;

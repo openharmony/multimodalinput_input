@@ -17233,5 +17233,274 @@ HWTEST_F(InputWindowsManagerTest, BindDeviceToDisplayGroupByDisplay_EmptyDisplay
     EXPECT_EQ(ret, RET_ERR);
     EXPECT_FALSE(msg.empty());
 }
+
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
+/**
+ * @tc.name: ResolveGroupIdForDevice_BoundDevice_001
+ * @tc.desc: Test ResolveGroupIdForDevice returns bound group for a bound device
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, ResolveGroupIdForDevice_BoundDevice_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager mgr;
+
+    // Add a runtime binding: device 42 -> display 5, group 7
+    int32_t ret = mgr.bindInfo_.AddRuntimeBinding(42, 5, 7);
+    EXPECT_EQ(ret, RET_OK);
+
+    // ResolveGroupIdForDevice should return the bound group
+    int32_t groupId = mgr.ResolveGroupIdForDevice(42);
+    EXPECT_EQ(groupId, 7);
+}
+
+/**
+ * @tc.name: ResolveGroupIdForDevice_UnboundDevice_001
+ * @tc.desc: Test ResolveGroupIdForDevice returns MAIN_GROUPID for unbound device
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, ResolveGroupIdForDevice_UnboundDevice_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager mgr;
+
+    // No runtime binding for device 99
+    int32_t groupId = mgr.ResolveGroupIdForDevice(99);
+    EXPECT_EQ(groupId, DEFAULT_GROUP_ID);
+}
+
+/**
+ * @tc.name: HandleKeyEventWindowId_BoundKeyboard_UsesBindGroup_001
+ * @tc.desc: Bound keyboard dispatches to bound group's focus window, not default
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, HandleKeyEventWindowId_BoundKeyboard_UsesBindGroup_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager mgr;
+
+    constexpr int32_t BOUND_GROUP_ID = 3;
+    constexpr int32_t BOUND_DISPLAY_ID = 10;
+    constexpr int32_t DEFAULT_FOCUS_WIN = 100;
+    constexpr int32_t BOUND_FOCUS_WIN = 200;
+    constexpr int32_t DEVICE_ID = 42;
+
+    // Set up default group (group 0) with focus window 100
+    auto it = mgr.displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
+    ASSERT_NE(it, mgr.displayGroupInfoMap_.end());
+    it->second.focusWindowId = DEFAULT_FOCUS_WIN;
+    WindowInfo defaultWin;
+    defaultWin.id = DEFAULT_FOCUS_WIN;
+    defaultWin.pid = 1;
+    defaultWin.agentWindowId = DEFAULT_FOCUS_WIN;
+    it->second.windowsInfo.push_back(defaultWin);
+
+    // Set up bound group (group 3) with focus window 200
+    OLD::DisplayGroupInfo boundGroupInfo;
+    boundGroupInfo.groupId = BOUND_GROUP_ID;
+    boundGroupInfo.focusWindowId = BOUND_FOCUS_WIN;
+    boundGroupInfo.type = GroupType::GROUP_SPECIAL;
+    OLD::DisplayInfo boundDisplay;
+    boundDisplay.id = BOUND_DISPLAY_ID;
+    boundGroupInfo.displaysInfo.push_back(boundDisplay);
+    WindowInfo boundWin;
+    boundWin.id = BOUND_FOCUS_WIN;
+    boundWin.pid = 2;
+    boundWin.agentWindowId = BOUND_FOCUS_WIN;
+    boundGroupInfo.windowsInfo.push_back(boundWin);
+    mgr.displayGroupInfoMap_[BOUND_GROUP_ID] = boundGroupInfo;
+
+    // Set up windowsPerDisplayMap_ for the bound group's display
+    WindowGroupInfo wgInfo;
+    wgInfo.displayId = BOUND_DISPLAY_ID;
+    wgInfo.focusWindowId = BOUND_FOCUS_WIN;
+    wgInfo.windowsInfo.push_back(boundWin);
+    std::map<int32_t, WindowGroupInfo> boundMap;
+    boundMap[BOUND_DISPLAY_ID] = wgInfo;
+    mgr.windowsPerDisplayMap_[BOUND_GROUP_ID] = boundMap;
+
+    // Bind device 42 to group 3
+    mgr.bindInfo_.AddRuntimeBinding(DEVICE_ID, BOUND_DISPLAY_ID, BOUND_GROUP_ID);
+
+    // Create key event from bound device
+    auto keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    keyEvent->SetDeviceId(DEVICE_ID);
+    keyEvent->SetTargetDisplayId(BOUND_DISPLAY_ID);
+
+    mgr.HandleKeyEventWindowId(keyEvent);
+
+    // Key event should target the BOUND group's focus window, not the default
+    EXPECT_EQ(keyEvent->GetTargetWindowId(), BOUND_FOCUS_WIN);
+}
+
+/**
+ * @tc.name: HandleKeyEventWindowId_UnboundKeyboard_UsesDefaultGroup_001
+ * @tc.desc: Unbound keyboard still uses default group focus
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, HandleKeyEventWindowId_UnboundKeyboard_UsesDefaultGroup_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager mgr;
+
+    constexpr int32_t DEFAULT_FOCUS_WIN = 100;
+    constexpr int32_t UNBOUND_DEVICE = 77;
+
+    // Set up default group with focus window
+    auto it = mgr.displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
+    ASSERT_NE(it, mgr.displayGroupInfoMap_.end());
+    it->second.focusWindowId = DEFAULT_FOCUS_WIN;
+    WindowInfo defaultWin;
+    defaultWin.id = DEFAULT_FOCUS_WIN;
+    defaultWin.pid = 1;
+    defaultWin.agentWindowId = DEFAULT_FOCUS_WIN;
+    it->second.windowsInfo.push_back(defaultWin);
+
+    // No runtime binding for device 77
+
+    auto keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    keyEvent->SetDeviceId(UNBOUND_DEVICE);
+    keyEvent->SetTargetDisplayId(-1);
+
+    mgr.HandleKeyEventWindowId(keyEvent);
+
+    // Should use default group's focus window
+    EXPECT_EQ(keyEvent->GetTargetWindowId(), DEFAULT_FOCUS_WIN);
+}
+
+/**
+ * @tc.name: GetPidAndUpdateTarget_BoundKeyboard_UsesBoundGroupFocus_001
+ * @tc.desc: GetPidAndUpdateTarget resolves bound keyboard to bound group's focus
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, GetPidAndUpdateTarget_BoundKeyboard_UsesBoundGroupFocus_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager mgr;
+
+    constexpr int32_t BOUND_GROUP_ID = 5;
+    constexpr int32_t BOUND_DISPLAY_ID = 20;
+    constexpr int32_t DEFAULT_FOCUS_WIN = 300;
+    constexpr int32_t BOUND_FOCUS_WIN = 400;
+    constexpr int32_t DEVICE_ID = 55;
+    constexpr int32_t BOUND_WIN_PID = 10;
+
+    // Set up default group with different focus window
+    auto it = mgr.displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
+    ASSERT_NE(it, mgr.displayGroupInfoMap_.end());
+    it->second.focusWindowId = DEFAULT_FOCUS_WIN;
+
+    // Set up bound group
+    OLD::DisplayGroupInfo boundGroupInfo;
+    boundGroupInfo.groupId = BOUND_GROUP_ID;
+    boundGroupInfo.focusWindowId = BOUND_FOCUS_WIN;
+    boundGroupInfo.type = GroupType::GROUP_SPECIAL;
+    OLD::DisplayInfo boundDisplay;
+    boundDisplay.id = BOUND_DISPLAY_ID;
+    boundGroupInfo.displaysInfo.push_back(boundDisplay);
+    WindowInfo boundWin;
+    boundWin.id = BOUND_FOCUS_WIN;
+    boundWin.pid = BOUND_WIN_PID;
+    boundWin.agentPid = BOUND_WIN_PID;
+    boundWin.agentWindowId = BOUND_FOCUS_WIN;
+    boundGroupInfo.windowsInfo.push_back(boundWin);
+    mgr.displayGroupInfoMap_[BOUND_GROUP_ID] = boundGroupInfo;
+
+    // Set up windowsPerDisplayMap_ for the bound group's display
+    WindowGroupInfo wgInfo;
+    wgInfo.displayId = BOUND_DISPLAY_ID;
+    wgInfo.focusWindowId = BOUND_FOCUS_WIN;
+    wgInfo.windowsInfo.push_back(boundWin);
+    std::map<int32_t, WindowGroupInfo> boundMap;
+    boundMap[BOUND_DISPLAY_ID] = wgInfo;
+    mgr.windowsPerDisplayMap_[BOUND_GROUP_ID] = boundMap;
+
+    // Bind device
+    mgr.bindInfo_.AddRuntimeBinding(DEVICE_ID, BOUND_DISPLAY_ID, BOUND_GROUP_ID);
+
+    // Create key event from bound device
+    auto keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    keyEvent->SetDeviceId(DEVICE_ID);
+    keyEvent->SetTargetDisplayId(BOUND_DISPLAY_ID);
+
+    auto result = mgr.GetPidAndUpdateTarget(keyEvent);
+
+    // Should resolve to bound group's focus window PID
+    ASSERT_FALSE(result.empty());
+    EXPECT_EQ(result[0].second.id, BOUND_FOCUS_WIN);
+    EXPECT_EQ(result[0].first, BOUND_WIN_PID);
+}
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
+
+/**
+ * @tc.name: GetDisplayId_BoundDevice_ResolvesBoundDisplay_001
+ * @tc.desc: GetDisplayId resolves to bound display when device has runtime binding
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, GetDisplayId_BoundDevice_ResolvesBoundDisplay_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager mgr;
+
+    constexpr int32_t DEVICE_ID = 60;
+    constexpr int32_t BOUND_DISPLAY_ID = 15;
+    constexpr int32_t BOUND_GROUP_ID = 4;
+
+    // Bind device to a specific display
+    mgr.bindInfo_.AddRuntimeBinding(DEVICE_ID, BOUND_DISPLAY_ID, BOUND_GROUP_ID);
+
+    // Create an input event with no target display (displayId < 0)
+    auto inputEvent = InputEvent::Create();
+    ASSERT_NE(inputEvent, nullptr);
+    inputEvent->SetDeviceId(DEVICE_ID);
+    inputEvent->SetTargetDisplayId(-1);
+
+    int32_t displayId = mgr.GetDisplayId(inputEvent);
+
+    // Should resolve to the bound display
+    EXPECT_EQ(displayId, BOUND_DISPLAY_ID);
+    EXPECT_EQ(inputEvent->GetTargetDisplayId(), BOUND_DISPLAY_ID);
+}
+
+/**
+ * @tc.name: GetDisplayId_UnboundDevice_FallsBackToDefault_001
+ * @tc.desc: GetDisplayId falls back to default display for unbound device
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, GetDisplayId_UnboundDevice_FallsBackToDefault_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager mgr;
+
+    constexpr int32_t DEFAULT_DISPLAY_ID = 1;
+
+    // Set up default group with a display
+    auto it = mgr.displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
+    ASSERT_NE(it, mgr.displayGroupInfoMap_.end());
+    OLD::DisplayInfo display;
+    display.id = DEFAULT_DISPLAY_ID;
+    it->second.displaysInfo.push_back(display);
+
+    // Create input event with no target display, no binding
+    auto inputEvent = InputEvent::Create();
+    ASSERT_NE(inputEvent, nullptr);
+    inputEvent->SetDeviceId(999);
+    inputEvent->SetTargetDisplayId(-1);
+
+    int32_t displayId = mgr.GetDisplayId(inputEvent);
+
+    // Should fall back to the default group's display
+    EXPECT_EQ(displayId, DEFAULT_DISPLAY_ID);
+}
 } // namespace MMI
 } // namespace OHOS
