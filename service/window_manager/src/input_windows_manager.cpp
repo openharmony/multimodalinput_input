@@ -4988,12 +4988,22 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
     CALL_DEBUG_ENTER;
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
     auto displayId = pointerEvent->GetTargetDisplayId();
+    // For bound devices, override displayId so that hardware cursor rendering
+    // (CPU draw, HWC buffer, RS buffer) targets the correct bound display
+    // instead of the default display. This ensures per-group cursor isolation.
+    auto binding = bindInfo_.GetRuntimeBinding(pointerEvent->GetDeviceId());
+    if (binding.has_value()) {
+        displayId = binding->displayId;
+        pointerEvent->SetTargetDisplayId(displayId);
+        MMI_HILOGD("Bound device %{public}d overrides displayId to %{public}d",
+            pointerEvent->GetDeviceId(), displayId);
+    }
     if (!UpdateDisplayId(displayId)) {
         MMI_HILOGE("This display:%{public}d is not existent", displayId);
         return RET_ERR;
     }
     pointerEvent->SetTargetDisplayId(displayId);
-    int32_t groupId = ResolveGroupIdForDevice(pointerEvent->GetDeviceId());
+    int32_t groupId = binding.has_value() ? binding->groupId : MAIN_GROUPID;
     if (groupId == MAIN_GROUPID) {
         groupId = FindDisplayGroupId(displayId);
     }
