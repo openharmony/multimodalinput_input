@@ -6667,11 +6667,18 @@ void InputWindowsManager::PullEnterLeaveEvent(int32_t logicalX, int32_t logicalY
         lastInfo.lastTouchWindowInfo.id, touchWindow->id);
     if (lastInfo.lastTouchWindowInfo.id != touchWindow->id) {
         int32_t groupId = FindDisplayGroupId(pointerEvent->GetTargetDisplayId());
+        PointerEvent::PointerItem pointerItem;
+        if (!pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), pointerItem)) {
+            MMI_HILOGE("Failed to get pointer item for pointerId: %{public}d in PullEnterLeaveEvent",
+                       pointerEvent->GetPointerId());
+            return;
+        }
+        int32_t toolType = pointerItem.GetToolType();
         if (lastInfo.lastTouchWindowInfo.id != -1) {
-            DispatchTouch(PointerEvent::POINTER_ACTION_PULL_OUT_WINDOW, groupId);
+            DispatchTouch(PointerEvent::POINTER_ACTION_PULL_OUT_WINDOW, groupId, toolType);
         }
         UpdateStashTouchEventInfo(logicalX, logicalY, pointerEvent, touchWindow);
-        DispatchTouch(PointerEvent::POINTER_ACTION_PULL_IN_WINDOW, groupId);
+        DispatchTouch(PointerEvent::POINTER_ACTION_PULL_IN_WINDOW, groupId, toolType);
         return;
     }
     UpdateStashTouchEventInfo(logicalX, logicalY, pointerEvent, touchWindow);
@@ -6747,12 +6754,28 @@ std::shared_ptr<PointerEvent> InputWindowsManager::GetDelayLevitateEvent()
 
 void InputWindowsManager::DispatchLevitateInEvent(const std::shared_ptr<PointerEvent> pointerEvent)
 {
-    DispatchTouch(PointerEvent::POINTER_ACTION_LEVITATE_IN_WINDOW, pointerEvent->GetTargetDisplayId());
+    PointerEvent::PointerItem pointerItem;
+    if (!pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), pointerItem)) {
+        MMI_HILOGE("Failed to get pointer item for pointerId: %{public}d in DispatchLevitateInEvent",
+                   pointerEvent->GetPointerId());
+        return;
+    }
+    int32_t toolType = pointerItem.GetToolType();
+    int32_t groupId = FindDisplayGroupId(pointerEvent->GetTargetDisplayId());
+    DispatchTouch(PointerEvent::POINTER_ACTION_LEVITATE_IN_WINDOW, groupId, toolType);
 }
 
 void InputWindowsManager::DispatchLevitateOutEvent(const std::shared_ptr<PointerEvent> pointerEvent)
 {
-    DispatchTouch(PointerEvent::POINTER_ACTION_LEVITATE_OUT_WINDOW, pointerEvent->GetTargetDisplayId());
+    PointerEvent::PointerItem pointerItem;
+    if (!pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), pointerItem)) {
+        MMI_HILOGE("Failed to get pointer item for pointerId: %{public}d in DispatchLevitateOutEvent",
+                   pointerEvent->GetPointerId());
+        return;
+    }
+    int32_t toolType = pointerItem.GetToolType();
+    int32_t groupId = FindDisplayGroupId(pointerEvent->GetTargetDisplayId());
+    DispatchTouch(PointerEvent::POINTER_ACTION_LEVITATE_OUT_WINDOW, groupId, toolType);
 }
 
 void InputWindowsManager::HandleLevitateInOutEvent(int32_t logicalX, int32_t logicalY,
@@ -6809,14 +6832,14 @@ void InputWindowsManager::UpdateStashTouchEventInfo(int32_t logicalX, int32_t lo
     TouchDispatchEventCache().Update(pointerEvent);
 }
 
-void InputWindowsManager::DispatchTouch(int32_t pointerAction, int32_t groupId)
+void InputWindowsManager::DispatchTouch(int32_t pointerAction, int32_t groupId, int32_t toolType)
 {
     CALL_INFO_TRACE;
     if (udsServer_ == nullptr) {
         MMI_HILOGE("udsServer_ is nullptr");
         return;
     }
-    auto dispatchTouchEvent = TouchDispatchEventCache().GetForDispatch(pointerAction);
+    auto dispatchTouchEvent = TouchDispatchEventCache().GetForDispatch(toolType);
     if (dispatchTouchEvent == nullptr) {
         MMI_HILOGE("dispatchTouchEvent is nullptr, pointerAction:%{public}d", pointerAction);
         return;
@@ -9032,13 +9055,14 @@ void InputWindowsManager::TouchEnterLeaveEvent(int32_t logicalX, int32_t logical
                 "lastWindowType:%{public}d, nowWindowType:%{public}d",
                 static_cast<int32_t>(lastInfo.lastTouchWindowInfo.windowInputType),
                 static_cast<int32_t>(touchWindow->windowInputType));
-            DispatchTouch(PointerEvent::POINTER_ACTION_CANCEL);
+            int32_t toolType = pointerItem.GetToolType();
+            DispatchTouch(PointerEvent::POINTER_ACTION_CANCEL, DEFAULT_GROUP_ID, toolType);
             MMI_HILOG_DISPATCHI("Send down-action to the new window, (lastWId:%{public}d, LastPId:%{public}d), "
                 "(newWId:%{public}d, newWId:%{public}d)",
             lastInfo.lastTouchWindowInfo.id, lastInfo.lastTouchWindowInfo.pid, touchWindow->id, touchWindow->pid);
             UpdateStashTouchEventInfo(logicalX, logicalY, pointerEvent, touchWindow);
             TouchLockWindowInfo() = *touchWindow;
-            DispatchTouch(PointerEvent::POINTER_ACTION_DOWN);
+            DispatchTouch(PointerEvent::POINTER_ACTION_DOWN, DEFAULT_GROUP_ID, toolType);
             return;
         }
     }

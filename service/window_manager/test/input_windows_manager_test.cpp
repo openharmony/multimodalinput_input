@@ -2222,11 +2222,11 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_DispatchTouch_001, Tes
 {
     CALL_TEST_DEBUG;
     int32_t pointerAction = PointerEvent::POINTER_ACTION_PULL_IN_WINDOW;
-    ASSERT_NO_FATAL_FAILURE(WIN_MGR->DispatchTouch(pointerAction));
+    ASSERT_NO_FATAL_FAILURE(WIN_MGR->DispatchTouch(pointerAction, DEFAULT_GROUP_ID, PointerEvent::TOOL_TYPE_FINGER));
     pointerAction = PointerEvent::POINTER_ACTION_DOWN;
-    ASSERT_NO_FATAL_FAILURE(WIN_MGR->DispatchTouch(pointerAction));
+    ASSERT_NO_FATAL_FAILURE(WIN_MGR->DispatchTouch(pointerAction, DEFAULT_GROUP_ID, PointerEvent::TOOL_TYPE_FINGER));
     pointerAction = PointerEvent::POINTER_ACTION_LEVITATE_IN_WINDOW;
-    ASSERT_NO_FATAL_FAILURE(WIN_MGR->DispatchTouch(pointerAction));
+    ASSERT_NO_FATAL_FAILURE(WIN_MGR->DispatchTouch(pointerAction, DEFAULT_GROUP_ID, PointerEvent::TOOL_TYPE_FINGER));
 }
 
 /**
@@ -11068,11 +11068,9 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_DeviceStatusChanged_Cl
     pointerEvent->SetDeviceId(deviceId);
     inputWindowsManager.dispatchEventCache_.Update(pointerEvent);
 
-    ASSERT_NE(inputWindowsManager.dispatchEventCache_.GetForDispatch(
-        PointerEvent::POINTER_ACTION_LEVITATE_IN_WINDOW), nullptr);
+    ASSERT_NE(inputWindowsManager.dispatchEventCache_.GetForDispatch(PointerEvent::TOOL_TYPE_PEN), nullptr);
     ASSERT_NO_FATAL_FAILURE(inputWindowsManager.DeviceStatusChanged(deviceId, name, sysUid, devStatus));
-    ASSERT_EQ(inputWindowsManager.dispatchEventCache_.GetForDispatch(
-        PointerEvent::POINTER_ACTION_LEVITATE_IN_WINDOW), nullptr);
+    ASSERT_EQ(inputWindowsManager.dispatchEventCache_.GetForDispatch(PointerEvent::TOOL_TYPE_PEN), nullptr);
 }
 
 #ifdef OHOS_BUILD_ENABLE_TOUCH
