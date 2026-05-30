@@ -207,6 +207,9 @@ InputWindowsManager::InputWindowsManager() : bindInfo_(BIND_CFG_FILE_NAME)
     lastDpiMap_[MAIN_GROUPID] = lastDpi_;
     CursorPosition cursorPos = {};
     cursorPosMap_[MAIN_GROUPID] = cursorPos;
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
+    focusWindowIdMap_[MAIN_GROUPID] = -1;
+#endif
 }
 
 InputWindowsManager::~InputWindowsManager()
@@ -680,6 +683,78 @@ int32_t InputWindowsManager::ResolveGroupIdForDevice(int32_t deviceId) const
     return MAIN_GROUPID;
 }
 
+void InputWindowsManager::EnsureGroupState(int32_t groupId)
+{
+    if (groupId == MAIN_GROUPID) {
+        return;  // Main group is always initialized in constructor
+    }
+    // Only create entries if they do not already exist (lazy allocation)
+    if (mouseLocationMap_.find(groupId) == mouseLocationMap_.end()) {
+        MouseLocation loc = { -1, 0, 0 };
+        mouseLocationMap_[groupId] = loc;
+    }
+    if (cursorPosMap_.find(groupId) == cursorPosMap_.end()) {
+        CursorPosition cursorPos = {};
+        cursorPosMap_[groupId] = cursorPos;
+    }
+    if (captureModeInfoMap_.find(groupId) == captureModeInfoMap_.end()) {
+        CaptureModeInfo info;
+        captureModeInfoMap_[groupId] = info;
+    }
+    if (pointerDrawFlagMap_.find(groupId) == pointerDrawFlagMap_.end()) {
+        pointerDrawFlagMap_[groupId] = false;
+    }
+    if (displayModeMap_.find(groupId) == displayModeMap_.end()) {
+        displayModeMap_[groupId] = DisplayMode::UNKNOWN;
+    }
+    if (lastDpiMap_.find(groupId) == lastDpiMap_.end()) {
+        lastDpiMap_[groupId] = 0;
+    }
+    if (lastPointerEventForWindowChangeMap_.find(groupId) == lastPointerEventForWindowChangeMap_.end()) {
+        lastPointerEventForWindowChangeMap_[groupId] = nullptr;
+    }
+    if (backCenterDisplayChangeMap_.find(groupId) == backCenterDisplayChangeMap_.end()) {
+        backCenterDisplayChangeMap_[groupId] = false;
+    }
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
+    if (focusWindowIdMap_.find(groupId) == focusWindowIdMap_.end()) {
+        focusWindowIdMap_[groupId] = -1;
+    }
+#endif
+    MMI_HILOGI("EnsureGroupState: lazily created state for groupId:%{public}d", groupId);
+}
+
+bool InputWindowsManager::HasGroupState(int32_t groupId) const
+{
+    return mouseLocationMap_.find(groupId) != mouseLocationMap_.end();
+}
+
+void InputWindowsManager::RecordSequenceBegin(const SequenceKey &key, int32_t groupId, int32_t windowId)
+{
+    SequenceSnapshot snap;
+    snap.groupId = groupId;
+    snap.windowId = windowId;
+    sequenceSnapshots_[key] = snap;
+    MMI_HILOGD("RecordSequenceBegin: dev:%{public}d item:%{public}d type:%{public}d -> group:%{public}d win:%{public}d",
+        key.deviceId, key.itemId, static_cast<int32_t>(key.type), groupId, windowId);
+}
+
+std::optional<SequenceSnapshot> InputWindowsManager::ConsumeSequenceSnapshot(const SequenceKey &key)
+{
+    auto it = sequenceSnapshots_.find(key);
+    if (it == sequenceSnapshots_.end()) {
+        return std::nullopt;
+    }
+    SequenceSnapshot snap = it->second;
+    sequenceSnapshots_.erase(it);
+    return snap;
+}
+
+size_t InputWindowsManager::GetSequenceSnapshotCount() const
+{
+    return sequenceSnapshots_.size();
+}
+
 int32_t InputWindowsManager::FindDisplayUserId(int32_t displayId) const
 {
     for (const auto& it : displayGroupInfoMap_) {
@@ -776,11 +851,20 @@ void InputWindowsManager::HandleKeyEventWindowId(std::shared_ptr<KeyEvent> keyEv
     }
 }
 
-void InputWindowsManager::ReissueEvent(std::shared_ptr<KeyEvent> keyEvent, int32_t focusWindowId)
+void InputWindowsManager::ReissueEvent(std::shared_ptr<KeyEvent> keyEvent, int32_t focusWindowId, int32_t groupId)
 {
     CHKPV(keyEvent);
-    if (keyEvent->GetKeyAction() != KeyEvent::KEY_ACTION_CANCEL && focusWindowId_ != -1 &&
-        focusWindowId_ != focusWindowId && keyEvent->IsRepeatKey()) {
+    // Use per-group focus window id so bound keyboards don't overwrite each other
+    int32_t prevFocusWinId = -1;
+    auto it = focusWindowIdMap_.find(groupId);
+    if (it != focusWindowIdMap_.end()) {
+        prevFocusWinId = it->second;
+    } else {
+        prevFocusWinId = focusWindowId_;   // fallback for legacy callers
+    }
+
+    if (keyEvent->GetKeyAction() != KeyEvent::KEY_ACTION_CANCEL && prevFocusWinId != -1 &&
+        prevFocusWinId != focusWindowId && keyEvent->IsRepeatKey()) {
         auto keyEventReissue = std::make_shared<KeyEvent>(*keyEvent);
         auto keyItem = keyEventReissue->GetKeyItems();
         for (auto item = keyItem.begin(); item != keyItem.end(); ++item) {
@@ -790,20 +874,22 @@ void InputWindowsManager::ReissueEvent(std::shared_ptr<KeyEvent> keyEvent, int32
         keyEventReissue->UpdateId();
         keyEventReissue->SetAction(KeyEvent::KEY_ACTION_CANCEL);
         keyEventReissue->SetKeyAction(KeyEvent::KEY_ACTION_CANCEL);
-        keyEventReissue->SetTargetWindowId(focusWindowId_);
-        keyEventReissue->SetAgentWindowId(focusWindowId_);
+        keyEventReissue->SetTargetWindowId(prevFocusWinId);
+        keyEventReissue->SetAgentWindowId(prevFocusWinId);
 
         auto eventDispatchHandler = InputHandler->GetEventDispatchHandler();
         auto udServer = InputHandler->GetUDSServer();
         CHKPV(udServer);
-        auto fd = udServer->GetClientFd(GetWindowAgentPid(focusWindowId_));
-        MMI_HILOG_DISPATCHI("Out focus window:%{public}d is replaced by window:%{public}d",
-            focusWindowId_, focusWindowId);
+        auto fd = udServer->GetClientFd(GetWindowAgentPid(prevFocusWinId));
+        MMI_HILOG_DISPATCHI("Out focus window:%{public}d is replaced by window:%{public}d (groupId:%{public}d)",
+            prevFocusWinId, focusWindowId, groupId);
         if (eventDispatchHandler != nullptr && udServer != nullptr) {
             eventDispatchHandler->DispatchKeyEvent(fd, *udServer, keyEventReissue);
         }
     }
+    // Update both legacy global and per-group maps
     focusWindowId_ = focusWindowId;
+    focusWindowIdMap_[groupId] = focusWindowId;
 }
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 
@@ -1088,6 +1174,10 @@ int32_t InputWindowsManager::BindDeviceToDisplayGroupByDisplay(int32_t deviceId,
         return RET_ERR;
     }
     MMI_HILOGI("Resolved displayId:%{public}d to groupId:%{public}d", displayId, resolvedGroupId);
+    // Lazily allocate group state when the first device binds to a non-default group
+    if (resolvedGroupId != MAIN_GROUPID && !HasGroupState(resolvedGroupId)) {
+        EnsureGroupState(resolvedGroupId);
+    }
     return bindInfo_.AddRuntimeBinding(deviceId, displayId, resolvedGroupId);
 }
 
@@ -7621,6 +7711,13 @@ void InputWindowsManager::UpdateMouseLocationMaps(int32_t groupId, int32_t displ
     CALL_DEBUG_ENTER;
     auto displayInfo = GetPhysicalDisplay(displayId);
     CHKPV(displayInfo);
+
+    // Lazy allocation: if a bound event arrives for a group that has no state
+    // yet, create state now.  Unbound devices resolve to MAIN_GROUPID which is
+    // always pre-initialised, so this only fires for bound non-default groups.
+    if (groupId != MAIN_GROUPID && !HasGroupState(groupId)) {
+        EnsureGroupState(groupId);
+    }
 
     int32_t integerX = static_cast<int32_t>(x);
     int32_t integerY = static_cast<int32_t>(y);

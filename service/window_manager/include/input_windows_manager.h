@@ -34,6 +34,45 @@ struct SwitchFocusKey {
     int32_t pressedKey { -1 };
 };
 
+/**
+ * Snapshot of the dispatch target captured at the start of an input sequence
+ * (key-down, button-down, or pointer-down).  When a device binding changes
+ * mid-sequence the release/end event must still reach the original target,
+ * so we record the group + window at sequence begin and look it up at end.
+ */
+struct SequenceSnapshot {
+    int32_t groupId { DEFAULT_GROUP_ID };
+    int32_t windowId { -1 };
+};
+
+/**
+ * Composite key for identifying an in-flight input sequence.
+ * A sequence is uniquely identified by device, pointer/key id, and type.
+ */
+enum class SequenceType : int32_t {
+    KEY = 0,
+    BUTTON = 1,
+    POINTER = 2,
+};
+
+struct SequenceKey {
+    int32_t deviceId { -1 };
+    int32_t itemId { -1 };          // keyCode for KEY, pointerId for BUTTON/POINTER
+    SequenceType type { SequenceType::KEY };
+
+    bool operator<(const SequenceKey &other) const
+    {
+        if (deviceId != other.deviceId) return deviceId < other.deviceId;
+        if (itemId != other.itemId) return itemId < other.itemId;
+        return static_cast<int32_t>(type) < static_cast<int32_t>(other.type);
+    }
+
+    bool operator==(const SequenceKey &other) const
+    {
+        return deviceId == other.deviceId && itemId == other.itemId && type == other.type;
+    }
+};
+
 enum AcrossDirection : int32_t {
     ACROSS_ERROR = 0,
     UPWARDS = 1,
@@ -99,12 +138,13 @@ public:
     int32_t ResolveGroupIdForDevice(int32_t deviceId) const;
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     std::vector<std::pair<int32_t, TargetInfo>> GetPidAndUpdateTarget(std::shared_ptr<KeyEvent> keyEvent);
-    void ReissueEvent(std::shared_ptr<KeyEvent> keyEvent, int32_t focusWindowId);
+    void ReissueEvent(std::shared_ptr<KeyEvent> keyEvent, int32_t focusWindowId, int32_t groupId = DEFAULT_GROUP_ID);
     std::vector<std::pair<int32_t, TargetInfo>> UpdateTarget(std::shared_ptr<KeyEvent> keyEvent);
     bool IsKeyPressed(int32_t pressedKey, std::vector<KeyEvent::KeyItem> &keyItems);
     bool IsOnTheWhitelist(std::shared_ptr<KeyEvent> keyEvent);
     void HandleKeyEventWindowId(std::shared_ptr<KeyEvent> keyEvent);
     int32_t focusWindowId_ { -1 };
+    std::map<int32_t, int32_t> focusWindowIdMap_;   // groupId -> last-known focusWindowId
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
     int32_t CheckWindowIdPermissionByPid(int32_t windowId, int32_t pid);
     int32_t ClearMouseHideFlag(int32_t eventId);
@@ -570,6 +610,26 @@ private:
     void ApplyCoordinateCorrection(const OLD::DisplayInfo* displayInfo, int32_t width, int32_t height, double& x, double& y);
     void UpdateMouseLocationMaps(int32_t groupId, int32_t displayId, double x, double y);
 
+    // --- Group state lazy-allocation helpers (TASK-7) ---
+    /**
+     * Lazily create state entries for a non-default group.  Called only when a
+     * device is first bound to the group or the first event for a bound group
+     * actually needs state.  Must NOT be called for unbound / default-group
+     * events.
+     */
+    void EnsureGroupState(int32_t groupId);
+
+    /**
+     * Return true when the group already has lazily-allocated state entries
+     * (i.e. EnsureGroupState has been called for it).
+     */
+    bool HasGroupState(int32_t groupId) const;
+
+    // --- Sequence closure (begin-before-bind / end-after-bind) ---
+    void RecordSequenceBegin(const SequenceKey &key, int32_t groupId, int32_t windowId);
+    std::optional<SequenceSnapshot> ConsumeSequenceSnapshot(const SequenceKey &key);
+    size_t GetSequenceSnapshotCount() const;
+
 private:
     UDSServer* udsServer_ { nullptr };
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
@@ -703,6 +763,9 @@ private:
     MouseRedispatchStore mouseRedispatchStore_;
     TouchRedispatchStore touchRedispatchStore_;
     int32_t activeDragToolType_ { -1 };
+
+    // --- Sequence closure snapshot map (TASK-7) ---
+    std::map<SequenceKey, SequenceSnapshot> sequenceSnapshots_;
 };
 } // namespace MMI
 } // namespace OHOS
