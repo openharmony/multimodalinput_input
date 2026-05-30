@@ -629,6 +629,10 @@ private:
     void RecordSequenceBegin(const SequenceKey &key, int32_t groupId, int32_t windowId);
     std::optional<SequenceSnapshot> ConsumeSequenceSnapshot(const SequenceKey &key);
     size_t GetSequenceSnapshotCount() const;
+    void ClearSequenceSnapshotsByDevice(int32_t deviceId);
+
+    // --- Lifecycle cleanup ---
+    void CleanupGroupState(int32_t groupId);
 
 private:
     UDSServer* udsServer_ { nullptr };

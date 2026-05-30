@@ -225,6 +225,8 @@ void InputWindowsManager::DeviceStatusChanged(int32_t deviceId, const std::strin
         bindInfo_.AddInputDevice(deviceId, name, sysUid);
     } else {
         bindInfo_.RemoveInputDevice(deviceId);
+        bindInfo_.ClearRuntimeBindingsByDevice(deviceId);
+        ClearSequenceSnapshotsByDevice(deviceId);
         TouchDispatchEventCache().ClearDeviceEvents(deviceId);
     }
 }
@@ -755,6 +757,37 @@ size_t InputWindowsManager::GetSequenceSnapshotCount() const
     return sequenceSnapshots_.size();
 }
 
+void InputWindowsManager::ClearSequenceSnapshotsByDevice(int32_t deviceId)
+{
+    for (auto it = sequenceSnapshots_.begin(); it != sequenceSnapshots_.end();) {
+        if (it->first.deviceId == deviceId) {
+            it = sequenceSnapshots_.erase(it);
+        } else {
+            ++it;
+        }
+    }
+    MMI_HILOGD("ClearSequenceSnapshotsByDevice: cleared snapshots for deviceId:%{public}d", deviceId);
+}
+
+void InputWindowsManager::CleanupGroupState(int32_t groupId)
+{
+    if (groupId == MAIN_GROUPID) {
+        return;  // Never remove the main group state
+    }
+    mouseLocationMap_.erase(groupId);
+    cursorPosMap_.erase(groupId);
+    captureModeInfoMap_.erase(groupId);
+    pointerDrawFlagMap_.erase(groupId);
+    displayModeMap_.erase(groupId);
+    lastDpiMap_.erase(groupId);
+    lastPointerEventForWindowChangeMap_.erase(groupId);
+    backCenterDisplayChangeMap_.erase(groupId);
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
+    focusWindowIdMap_.erase(groupId);
+#endif
+    MMI_HILOGI("CleanupGroupState: removed state for groupId:%{public}d", groupId);
+}
+
 int32_t InputWindowsManager::FindDisplayUserId(int32_t displayId) const
 {
     for (const auto& it : displayGroupInfoMap_) {
@@ -1123,6 +1156,7 @@ void InputWindowsManager::UpdateDisplayIdAndName()
     for (auto it = oldInfo.begin(); it != oldInfo.end();) {
         if (newInfo.find(*it) == newInfo.end()) {
             bindInfo_.RemoveDisplay(it->first);
+            bindInfo_.ClearRuntimeBindingsByDisplay(it->first);
             oldInfo.erase(it++);
         } else {
             ++it;
@@ -1185,6 +1219,7 @@ int32_t InputWindowsManager::UnbindDeviceFromDisplayGroup(int32_t deviceId, std:
 {
     CALL_DEBUG_ENTER;
     MMI_HILOGI("UnbindDeviceFromDisplayGroup deviceId:%{public}d", deviceId);
+    ClearSequenceSnapshotsByDevice(deviceId);
     return bindInfo_.RemoveRuntimeBinding(deviceId);
 }
 
@@ -1306,6 +1341,12 @@ void InputWindowsManager::ClearDisplayMap(const UserScreenInfo &userScreenInfo)
             }
         }
     };
+
+    // Clean runtime bindings and lazily-allocated state for removed groups
+    for (const auto &id : invalidGroupIds) {
+        bindInfo_.ClearRuntimeBindingsByGroup(id);
+        CleanupGroupState(id);
+    }
 
     eraseInvalidGroups(displayGroupInfoMap_);
     eraseInvalidGroups(displayGroupInfoMapTmp_);

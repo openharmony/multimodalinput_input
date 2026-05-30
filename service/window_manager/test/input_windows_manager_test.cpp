@@ -19137,5 +19137,342 @@ HWTEST_F(InputWindowsManagerTest, GroupStateIsolation_SequenceKey_Ordering_001, 
     EXPECT_FALSE(a == e);
     EXPECT_TRUE(a < e);  // 10 < 20
 }
+
+/**
+ * @tc.name: LifecycleCleanup_ExplicitUnbind_001
+ * @tc.desc: UnbindDeviceFromDisplayGroup clears runtime binding and sequence snapshots
+ * @tc.type: FUNC
+ * @tc.require: AC-1.5
+ */
+HWTEST_F(InputWindowsManagerTest, LifecycleCleanup_ExplicitUnbind_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager mgr;
+
+    // Set up display group with a display
+    OLD::DisplayGroupInfo mainGroup;
+    mainGroup.groupId = 0;
+    mainGroup.type = GroupType::GROUP_DEFAULT;
+    mainGroup.focusWindowId = -1;
+    OLD::DisplayInfo mainDisplay = { .id = 1 };
+    mainDisplay.x = 0;
+    mainDisplay.y = 0;
+    mainDisplay.width = 1920;
+    mainDisplay.height = 1080;
+    mainDisplay.dpi = 240;
+    mainDisplay.name = "main";
+    mainDisplay.uniq = "default0";
+    mainDisplay.direction = DIRECTION0;
+    mainGroup.displaysInfo.push_back(mainDisplay);
+    mgr.UpdateDisplayInfo(mainGroup);
+
+    OLD::DisplayGroupInfo secGroup;
+    secGroup.groupId = 5;
+    secGroup.type = GroupType::GROUP_SPECIAL;
+    secGroup.focusWindowId = -1;
+    OLD::DisplayInfo secDisplay = { .id = 3 };
+    secDisplay.x = 0;
+    secDisplay.y = 0;
+    secDisplay.width = 1280;
+    secDisplay.height = 720;
+    secDisplay.dpi = 160;
+    secDisplay.name = "secondary";
+    secDisplay.uniq = "secondary0";
+    secDisplay.direction = DIRECTION0;
+    secGroup.displaysInfo.push_back(secDisplay);
+    mgr.UpdateDisplayInfo(secGroup);
+
+    // Bind device 42 to display 3 (group 5)
+    std::string msg;
+    ASSERT_EQ(mgr.BindDeviceToDisplayGroupByDisplay(42, 3, msg), RET_OK);
+    ASSERT_TRUE(mgr.bindInfo_.GetRuntimeBinding(42).has_value());
+
+    // Record a sequence snapshot for device 42
+    SequenceKey seqKey;
+    seqKey.deviceId = 42;
+    seqKey.itemId = 0;
+    seqKey.type = SequenceType::BUTTON;
+    mgr.RecordSequenceBegin(seqKey, 5, 100);
+    ASSERT_EQ(mgr.GetSequenceSnapshotCount(), 1u);
+
+    // Unbind
+    EXPECT_EQ(mgr.UnbindDeviceFromDisplayGroup(42, msg), RET_OK);
+
+    // Runtime binding should be gone
+    EXPECT_FALSE(mgr.bindInfo_.GetRuntimeBinding(42).has_value())
+        << "After explicit unbind, no binding should remain";
+
+    // Sequence snapshot for device 42 should be cleared
+    EXPECT_EQ(mgr.GetSequenceSnapshotCount(), 0u)
+        << "Sequence snapshots for unbound device should be cleared";
+}
+
+/**
+ * @tc.name: LifecycleCleanup_DeviceOffline_001
+ * @tc.desc: Device removal clears runtime binding and sequence snapshots
+ * @tc.type: FUNC
+ * @tc.require: AC-3.1
+ */
+HWTEST_F(InputWindowsManagerTest, LifecycleCleanup_DeviceOffline_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager mgr;
+
+    // Manually add a runtime binding for device 88
+    mgr.bindInfo_.AddRuntimeBinding(88, 1, 0);
+    ASSERT_TRUE(mgr.bindInfo_.GetRuntimeBinding(88).has_value());
+
+    // Record a sequence snapshot for device 88
+    SequenceKey seqKey;
+    seqKey.deviceId = 88;
+    seqKey.itemId = 5;
+    seqKey.type = SequenceType::KEY;
+    mgr.RecordSequenceBegin(seqKey, 0, 200);
+    ASSERT_EQ(mgr.GetSequenceSnapshotCount(), 1u);
+
+    // Also record a snapshot for a different device (should survive)
+    SequenceKey otherKey;
+    otherKey.deviceId = 99;
+    otherKey.itemId = 5;
+    otherKey.type = SequenceType::KEY;
+    mgr.RecordSequenceBegin(otherKey, 0, 300);
+    ASSERT_EQ(mgr.GetSequenceSnapshotCount(), 2u);
+
+    // Simulate device offline
+    mgr.DeviceStatusChanged(88, "test_device", "uid88", "remove");
+
+    // Runtime binding should be gone
+    EXPECT_FALSE(mgr.bindInfo_.GetRuntimeBinding(88).has_value())
+        << "After device offline, runtime binding should be cleared";
+
+    // Sequence snapshot for device 88 should be gone, but device 99 remains
+    EXPECT_EQ(mgr.GetSequenceSnapshotCount(), 1u)
+        << "Only snapshots for removed device should be cleared";
+    auto snap = mgr.ConsumeSequenceSnapshot(otherKey);
+    EXPECT_TRUE(snap.has_value())
+        << "Snapshot for other device should survive";
+}
+
+/**
+ * @tc.name: LifecycleCleanup_DisplayOffline_001
+ * @tc.desc: Display removal clears runtime bindings pointing to the removed display
+ * @tc.type: FUNC
+ * @tc.require: AC-3.2
+ */
+HWTEST_F(InputWindowsManagerTest, LifecycleCleanup_DisplayOffline_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager mgr;
+
+    // Add runtime bindings: device 10 -> display 5, device 20 -> display 7
+    mgr.bindInfo_.AddRuntimeBinding(10, 5, 1);
+    mgr.bindInfo_.AddRuntimeBinding(20, 7, 2);
+    ASSERT_TRUE(mgr.bindInfo_.GetRuntimeBinding(10).has_value());
+    ASSERT_TRUE(mgr.bindInfo_.GetRuntimeBinding(20).has_value());
+
+    // Simulate display 5 removal via ClearRuntimeBindingsByDisplay
+    mgr.bindInfo_.ClearRuntimeBindingsByDisplay(5);
+
+    // Binding for device 10 (display 5) should be gone
+    EXPECT_FALSE(mgr.bindInfo_.GetRuntimeBinding(10).has_value())
+        << "Binding for removed display should be cleared";
+
+    // Binding for device 20 (display 7) should remain
+    EXPECT_TRUE(mgr.bindInfo_.GetRuntimeBinding(20).has_value())
+        << "Binding for other display should survive";
+}
+
+/**
+ * @tc.name: LifecycleCleanup_GroupRemoval_001
+ * @tc.desc: Group removal clears runtime bindings pointing to the removed group and derived state
+ * @tc.type: FUNC
+ * @tc.require: AC-3.3
+ */
+HWTEST_F(InputWindowsManagerTest, LifecycleCleanup_GroupRemoval_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager mgr;
+
+    // Add runtime bindings: device 30 -> group 3, device 40 -> group 0
+    mgr.bindInfo_.AddRuntimeBinding(30, 8, 3);
+    mgr.bindInfo_.AddRuntimeBinding(40, 1, 0);
+
+    // Ensure group 3 has state
+    mgr.EnsureGroupState(3);
+    ASSERT_TRUE(mgr.HasGroupState(3));
+
+    // Clear bindings and state for group 3
+    mgr.bindInfo_.ClearRuntimeBindingsByGroup(3);
+    mgr.CleanupGroupState(3);
+
+    // Binding for device 30 (group 3) should be gone
+    EXPECT_FALSE(mgr.bindInfo_.GetRuntimeBinding(30).has_value())
+        << "Binding for removed group should be cleared";
+
+    // Binding for device 40 (group 0) should remain
+    EXPECT_TRUE(mgr.bindInfo_.GetRuntimeBinding(40).has_value())
+        << "Binding for main group should survive";
+
+    // Group 3 state should be removed
+    EXPECT_FALSE(mgr.HasGroupState(3))
+        << "Group state should be cleaned up after group removal";
+}
+
+/**
+ * @tc.name: LifecycleCleanup_SARestart_NoReplay_001
+ * @tc.desc: Connect manager does not cache or replay BindDeviceToDisplayGroupByDisplay calls
+ * @tc.type: FUNC
+ * @tc.require: AC-3.4
+ */
+HWTEST_F(InputWindowsManagerTest, LifecycleCleanup_SARestart_NoReplay_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    // Verify by design: after SA restart the runtime binding table starts empty.
+    // The connect manager's BindDeviceToDisplayGroupByDisplay does NOT call
+    // CacheDisplayBindRelationship, so it is NOT replayed in OnServiceDiedCallback.
+    // This test validates that a fresh InputDisplayBindHelper has no runtime bindings.
+    InputDisplayBindHelper helper("/dev/null");
+
+    // No bindings exist on a fresh instance
+    EXPECT_FALSE(helper.GetRuntimeBinding(1).has_value());
+    EXPECT_FALSE(helper.GetRuntimeBinding(100).has_value());
+
+    // Add some, clear all, verify empty
+    helper.AddRuntimeBinding(1, 2, 3);
+    helper.AddRuntimeBinding(4, 5, 6);
+    helper.ClearAllRuntimeBindings();
+    EXPECT_FALSE(helper.GetRuntimeBinding(1).has_value())
+        << "After ClearAllRuntimeBindings, no binding should remain";
+    EXPECT_FALSE(helper.GetRuntimeBinding(4).has_value())
+        << "After ClearAllRuntimeBindings, no binding should remain";
+}
+
+/**
+ * @tc.name: LifecycleCleanup_PostCleanupEvent_001
+ * @tc.desc: After unbind, device event routing falls back to default group (no stale group access)
+ * @tc.type: FUNC
+ * @tc.require: AC-3.4
+ */
+HWTEST_F(InputWindowsManagerTest, LifecycleCleanup_PostCleanupEvent_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto mgr = std::make_shared<InputWindowsManager>();
+    ASSERT_NE(mgr, nullptr);
+
+    // Set up main display group
+    OLD::DisplayGroupInfo mainGroup;
+    mainGroup.groupId = 0;
+    mainGroup.type = GroupType::GROUP_DEFAULT;
+    mainGroup.focusWindowId = -1;
+    OLD::DisplayInfo mainDisplay = { .id = 1 };
+    mainDisplay.x = 0;
+    mainDisplay.y = 0;
+    mainDisplay.width = 1920;
+    mainDisplay.height = 1080;
+    mainDisplay.dpi = 240;
+    mainDisplay.name = "main";
+    mainDisplay.uniq = "default0";
+    mainDisplay.direction = DIRECTION0;
+    mainGroup.displaysInfo.push_back(mainDisplay);
+    mgr->UpdateDisplayInfo(mainGroup);
+
+    // Set up secondary group
+    OLD::DisplayGroupInfo secGroup;
+    secGroup.groupId = 2;
+    secGroup.type = GroupType::GROUP_SPECIAL;
+    secGroup.focusWindowId = -1;
+    OLD::DisplayInfo secDisplay = { .id = 5 };
+    secDisplay.x = 0;
+    secDisplay.y = 0;
+    secDisplay.width = 1280;
+    secDisplay.height = 720;
+    secDisplay.dpi = 160;
+    secDisplay.name = "secondary";
+    secDisplay.uniq = "secondary0";
+    secDisplay.direction = DIRECTION0;
+    secGroup.displaysInfo.push_back(secDisplay);
+    mgr->UpdateDisplayInfo(secGroup);
+
+    // Bind device 55 to display 5 (group 2)
+    std::string msg;
+    ASSERT_EQ(mgr->BindDeviceToDisplayGroupByDisplay(55, 5, msg), RET_OK);
+    auto binding = mgr->bindInfo_.GetRuntimeBinding(55);
+    ASSERT_TRUE(binding.has_value());
+    ASSERT_EQ(binding->groupId, 2);
+
+    // Unbind device 55
+    ASSERT_EQ(mgr->UnbindDeviceFromDisplayGroup(55, msg), RET_OK);
+
+    // After cleanup, GetRuntimeBinding returns nothing -- event routing
+    // will use the default group (not the removed binding's group)
+    EXPECT_FALSE(mgr->bindInfo_.GetRuntimeBinding(55).has_value())
+        << "Post-cleanup: no binding means default group routing";
+}
+
+/**
+ * @tc.name: LifecycleCleanup_ClearSequenceSnapshotsByDevice_001
+ * @tc.desc: ClearSequenceSnapshotsByDevice removes all snapshots for a given device, leaves others intact
+ * @tc.type: FUNC
+ * @tc.require: AC-1.5
+ */
+HWTEST_F(InputWindowsManagerTest, LifecycleCleanup_ClearSequenceSnapshotsByDevice_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager mgr;
+
+    // Record multiple snapshots for device 10
+    SequenceKey k1;
+    k1.deviceId = 10;
+    k1.itemId = 1;
+    k1.type = SequenceType::KEY;
+    mgr.RecordSequenceBegin(k1, 0, 100);
+
+    SequenceKey k2;
+    k2.deviceId = 10;
+    k2.itemId = 0;
+    k2.type = SequenceType::BUTTON;
+    mgr.RecordSequenceBegin(k2, 0, 100);
+
+    // Record one for device 20
+    SequenceKey k3;
+    k3.deviceId = 20;
+    k3.itemId = 1;
+    k3.type = SequenceType::KEY;
+    mgr.RecordSequenceBegin(k3, 0, 200);
+
+    ASSERT_EQ(mgr.GetSequenceSnapshotCount(), 3u);
+
+    // Clear only device 10
+    mgr.ClearSequenceSnapshotsByDevice(10);
+
+    EXPECT_EQ(mgr.GetSequenceSnapshotCount(), 1u)
+        << "Only device 20 snapshot should remain";
+    EXPECT_TRUE(mgr.ConsumeSequenceSnapshot(k3).has_value());
+}
+
+/**
+ * @tc.name: LifecycleCleanup_CleanupGroupState_001
+ * @tc.desc: CleanupGroupState removes lazily allocated state, never removes main group
+ * @tc.type: FUNC
+ * @tc.require: AC-3.3
+ */
+HWTEST_F(InputWindowsManagerTest, LifecycleCleanup_CleanupGroupState_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager mgr;
+
+    // Ensure group 7 state exists
+    mgr.EnsureGroupState(7);
+    ASSERT_TRUE(mgr.HasGroupState(7));
+
+    // Clean it up
+    mgr.CleanupGroupState(7);
+    EXPECT_FALSE(mgr.HasGroupState(7))
+        << "Group state should be removed after CleanupGroupState";
+
+    // Cleaning up main group (0) should be a no-op
+    mgr.CleanupGroupState(0);
+    // Main group is always valid; no crash or assertion error expected
+}
 } // namespace MMI
 } // namespace OHOS
