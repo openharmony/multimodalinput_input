@@ -49,6 +49,8 @@ public:
     void UpdateWindowInfo(const WindowGroupInfo&) override {}
     MOCK_METHOD(int32_t, ClearWindowPointerStyle, (int32_t, int32_t));
     void Dump(int32_t, const std::vector<std::string>&) override {}
+    void DumpMultiGroupState(int32_t) override {}
+    size_t GetGroupStateMapSize() const override { return 0; }
     MOCK_METHOD(int32_t, GetWindowPid, (int32_t), (const));
     MOCK_METHOD(int32_t, GetWindowAgentPid, (int32_t), (const));
     MOCK_METHOD(int32_t, SetMouseCaptureMode, (int32_t, bool));

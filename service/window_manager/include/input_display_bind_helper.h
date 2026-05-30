@@ -104,6 +104,7 @@ public:
     int32_t AddRuntimeBinding(int32_t deviceId, int32_t displayId, int32_t groupId);
     int32_t RemoveRuntimeBinding(int32_t deviceId);
     std::optional<RuntimeDeviceBinding> GetRuntimeBinding(int32_t deviceId) const;
+    const std::unordered_map<int32_t, RuntimeDeviceBinding>& GetAllRuntimeBindings() const;
     void ClearRuntimeBindingsByDevice(int32_t deviceId);
     void ClearRuntimeBindingsByDisplay(int32_t displayId);
     void ClearRuntimeBindingsByGroup(int32_t groupId);

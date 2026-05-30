@@ -86,6 +86,8 @@ public:
     virtual void UpdateWindowInfo(const WindowGroupInfo &windowGroupInfo) = 0;
     virtual int32_t ClearWindowPointerStyle(int32_t pid, int32_t windowId) = 0;
     virtual void Dump(int32_t fd, const std::vector<std::string> &args) = 0;
+    virtual void DumpMultiGroupState(int32_t fd) = 0;
+    virtual size_t GetGroupStateMapSize() const = 0;
     virtual int32_t GetWindowPid(int32_t windowId) const = 0;
     virtual int32_t GetWindowAgentPid(int32_t windowId) const = 0;
     virtual int32_t SetMouseCaptureMode(int32_t windowId, bool isCaptureMode,

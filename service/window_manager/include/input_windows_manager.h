@@ -110,6 +110,8 @@ public:
     void ProcessInjectEventGlobalXY(std::shared_ptr<PointerEvent> pointerEvent, int32_t useCoordinate);
     int32_t ClearWindowPointerStyle(int32_t pid, int32_t windowId);
     void Dump(int32_t fd, const std::vector<std::string> &args);
+    void DumpMultiGroupState(int32_t fd);
+    size_t GetGroupStateMapSize() const;
     void DumpDisplayInfo(int32_t fd, const std::vector<OLD::DisplayInfo>& displaysInfo);
     void DumpWindowsInfo(int32_t fd, const std::vector<WindowInfo>& windowsInfo);
     void DumpWindowInfo(int32_t fd, const WindowInfo &item);

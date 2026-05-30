@@ -780,6 +780,11 @@ std::optional<RuntimeDeviceBinding> InputDisplayBindHelper::GetRuntimeBinding(in
     return std::nullopt;
 }
 
+const std::unordered_map<int32_t, RuntimeDeviceBinding>& InputDisplayBindHelper::GetAllRuntimeBindings() const
+{
+    return runtimeBindings_;
+}
+
 void InputDisplayBindHelper::ClearRuntimeBindingsByDevice(int32_t deviceId)
 {
     MMI_HILOGI("ClearRuntimeBindingsByDevice deviceId:%{public}d", deviceId);

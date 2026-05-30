@@ -659,5 +659,80 @@ HWTEST_F(EventDumpTest, EventDumpTest_ParseCommand_013, TestSize.Level1)
     std::vector<std::string> args = {"-hKe"};
     EXPECT_NO_FATAL_FAILURE(MMIEventDump->ParseCommand(fd_, args));
 }
+/**
+ * @tc.name: EventDumpTest_ParseCommand_014
+ * @tc.desc: Verify ParseCommand with '-G' option (multigroup)
+ * @tc.type: FUNC
+ * @tc.require: AC-6.1
+ */
+HWTEST_F(EventDumpTest, EventDumpTest_ParseCommand_014, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::vector<std::string> args = {"-G"};
+    EXPECT_NO_FATAL_FAILURE(MMIEventDump->ParseCommand(fd_, args));
+}
+
+/**
+ * @tc.name: EventDumpTest_ParseCommand_015
+ * @tc.desc: Verify ParseCommand with '--multigroup' long option
+ * @tc.type: FUNC
+ * @tc.require: AC-6.1
+ */
+HWTEST_F(EventDumpTest, EventDumpTest_ParseCommand_015, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::vector<std::string> args = {"--multigroup"};
+    EXPECT_NO_FATAL_FAILURE(MMIEventDump->ParseCommand(fd_, args));
+}
+
+/**
+ * @tc.name: EventDumpTest_DumpHelp_003
+ * @tc.desc: Verify DumpHelp contains multigroup help information
+ * @tc.type: FUNC
+ * @tc.require: AC-6.1
+ */
+HWTEST_F(EventDumpTest, EventDumpTest_DumpHelp_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    const char *tmpFile = "/data/tmp_dumphelp_multigroup.log";
+    int fd = open(tmpFile, O_CREAT | O_WRONLY | O_TRUNC, S_IRUSR | S_IWUSR);
+    ASSERT_GE(fd, 0);
+    ASSERT_NE(MMIEventDump, nullptr);
+    MMIEventDump->DumpHelp(fd);
+    close(fd);
+    std::string content;
+    {
+        int fdRead = open(tmpFile, O_RDONLY);
+        ASSERT_GE(fdRead, 0);
+        char buf[2048] = {};
+        ssize_t bytes = read(fdRead, buf, sizeof(buf) - 1);
+        ASSERT_GT(bytes, 0);
+        if (bytes < static_cast<ssize_t>(sizeof(buf))) {
+            buf[bytes] = '\0';
+        } else {
+            buf[sizeof(buf) - 1] = '\0';
+        }
+        content = buf;
+        close(fdRead);
+    }
+    EXPECT_NE(content.find("-G, --multigroup"), std::string::npos);
+    unlink(tmpFile);
+}
+
+/**
+ * @tc.name: EventDumpTest_CheckCount_006
+ * @tc.desc: Verify CheckCount with '-G' option
+ * @tc.type: FUNC
+ * @tc.require: AC-6.1
+ */
+HWTEST_F(EventDumpTest, EventDumpTest_CheckCount_006, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t count = 0;
+    std::vector<std::string> args = {"-G"};
+    MMIEventDump->CheckCount(fd_, args, count);
+    EXPECT_EQ(count, 1);
+}
+
 } // namespace MMI
 } // namespace OHOS

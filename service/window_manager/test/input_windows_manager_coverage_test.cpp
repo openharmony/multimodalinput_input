@@ -13,6 +13,9 @@
  * limitations under the License.
  */
 
+#include <fcntl.h>
+#include <unistd.h>
+
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
@@ -300,6 +303,283 @@ HWTEST_F(InputWindowsManagerCoverageTest, GetWindowAndDisplayInfo_002, TestSize.
     CALL_TEST_DEBUG;
     auto result = WIN_MGR->GetWindowAndDisplayInfo(1, 1);
     EXPECT_TRUE(result.has_value());
+}
+
+/**
+ * @tc.name: DumpMultiGroupState_SectionHeaders_001
+ * @tc.desc: Verify DumpMultiGroupState outputs all required section headers
+ * @tc.type: FUNC
+ * @tc.require: AC-6.1
+ */
+HWTEST_F(InputWindowsManagerCoverageTest, DumpMultiGroupState_SectionHeaders_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    const char *tmpFile = "/data/tmp_dump_multigroup.log";
+    int32_t fd = open(tmpFile, O_CREAT | O_WRONLY | O_TRUNC, S_IRUSR | S_IWUSR);
+    ASSERT_GE(fd, 0);
+
+    WIN_MGR->DumpMultiGroupState(fd);
+    close(fd);
+
+    int32_t fdRead = open(tmpFile, O_RDONLY);
+    ASSERT_GE(fdRead, 0);
+    char buf[4096] = {};
+    ssize_t bytes = read(fdRead, buf, sizeof(buf) - 1);
+    ASSERT_GT(bytes, 0);
+    buf[bytes] = '\0';
+    close(fdRead);
+
+    std::string content(buf);
+    EXPECT_NE(content.find("--- RuntimeBindings ---"), std::string::npos);
+    EXPECT_NE(content.find("--- DisplayGroups ---"), std::string::npos);
+    EXPECT_NE(content.find("--- PointerStateByGroup ---"), std::string::npos);
+    EXPECT_NE(content.find("--- KeyboardStateByGroup ---"), std::string::npos);
+    EXPECT_NE(content.find("--- SequenceSnapshots ---"), std::string::npos);
+    unlink(tmpFile);
+}
+
+/**
+ * @tc.name: DumpMultiGroupState_EmptyBindings_002
+ * @tc.desc: Verify DumpMultiGroupState shows (empty) when no runtime bindings exist
+ * @tc.type: FUNC
+ * @tc.require: AC-6.2
+ */
+HWTEST_F(InputWindowsManagerCoverageTest, DumpMultiGroupState_EmptyBindings_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    const char *tmpFile = "/data/tmp_dump_empty_bind.log";
+    int32_t fd = open(tmpFile, O_CREAT | O_WRONLY | O_TRUNC, S_IRUSR | S_IWUSR);
+    ASSERT_GE(fd, 0);
+
+    WIN_MGR->DumpMultiGroupState(fd);
+    close(fd);
+
+    int32_t fdRead = open(tmpFile, O_RDONLY);
+    ASSERT_GE(fdRead, 0);
+    char buf[4096] = {};
+    ssize_t bytes = read(fdRead, buf, sizeof(buf) - 1);
+    ASSERT_GT(bytes, 0);
+    buf[bytes] = '\0';
+    close(fdRead);
+
+    std::string content(buf);
+    // RuntimeBindings section should show (empty) when no bindings exist
+    auto rtPos = content.find("--- RuntimeBindings ---");
+    ASSERT_NE(rtPos, std::string::npos);
+    auto dgPos = content.find("--- DisplayGroups ---");
+    ASSERT_NE(dgPos, std::string::npos);
+    std::string rtSection = content.substr(rtPos, dgPos - rtPos);
+    EXPECT_NE(rtSection.find("(empty)"), std::string::npos);
+    unlink(tmpFile);
+}
+
+/**
+ * @tc.name: DumpMultiGroupState_WithBindings_003
+ * @tc.desc: Verify DumpMultiGroupState shows correct binding info after binding a device
+ * @tc.type: FUNC
+ * @tc.require: AC-6.3
+ */
+HWTEST_F(InputWindowsManagerCoverageTest, DumpMultiGroupState_WithBindings_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    // Set up a second display group and bind a device to it
+    OLD::DisplayGroupInfo secondGroup;
+    secondGroup.groupId = 5;
+    secondGroup.type = GroupType::GROUP_DEFAULT;
+    secondGroup.focusWindowId = 50;
+    OLD::DisplayInfo dispInfo;
+    dispInfo.id = 10;
+    dispInfo.x = 0;
+    dispInfo.y = 0;
+    dispInfo.width = 1280;
+    dispInfo.height = 720;
+    dispInfo.dpi = 160;
+    dispInfo.name = "external";
+    dispInfo.uniq = "ext1";
+    dispInfo.direction = DIRECTION0;
+    secondGroup.displaysInfo.push_back(dispInfo);
+    WIN_MGR->UpdateDisplayInfo(secondGroup);
+
+    std::string msg;
+    WIN_MGR->BindDeviceToDisplayGroupByDisplay(42, 10, msg);
+
+    const char *tmpFile = "/data/tmp_dump_with_bind.log";
+    int32_t fd = open(tmpFile, O_CREAT | O_WRONLY | O_TRUNC, S_IRUSR | S_IWUSR);
+    ASSERT_GE(fd, 0);
+
+    WIN_MGR->DumpMultiGroupState(fd);
+    close(fd);
+
+    int32_t fdRead = open(tmpFile, O_RDONLY);
+    ASSERT_GE(fdRead, 0);
+    char buf[8192] = {};
+    ssize_t bytes = read(fdRead, buf, sizeof(buf) - 1);
+    ASSERT_GT(bytes, 0);
+    buf[bytes] = '\0';
+    close(fdRead);
+
+    std::string content(buf);
+    // Should contain the binding info with deviceId=42
+    EXPECT_NE(content.find("deviceId=42"), std::string::npos);
+    EXPECT_NE(content.find("displayId=10"), std::string::npos);
+    EXPECT_NE(content.find("groupId=5"), std::string::npos);
+
+    // Clean up: unbind
+    WIN_MGR->UnbindDeviceFromDisplayGroup(42, msg);
+    unlink(tmpFile);
+}
+
+/**
+ * @tc.name: DumpMultiGroupState_DisplayGroups_004
+ * @tc.desc: Verify DisplayGroups section shows display and focus info
+ * @tc.type: FUNC
+ * @tc.require: AC-6.2
+ */
+HWTEST_F(InputWindowsManagerCoverageTest, DumpMultiGroupState_DisplayGroups_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    const char *tmpFile = "/data/tmp_dump_dispgroups.log";
+    int32_t fd = open(tmpFile, O_CREAT | O_WRONLY | O_TRUNC, S_IRUSR | S_IWUSR);
+    ASSERT_GE(fd, 0);
+
+    WIN_MGR->DumpMultiGroupState(fd);
+    close(fd);
+
+    int32_t fdRead = open(tmpFile, O_RDONLY);
+    ASSERT_GE(fdRead, 0);
+    char buf[4096] = {};
+    ssize_t bytes = read(fdRead, buf, sizeof(buf) - 1);
+    ASSERT_GT(bytes, 0);
+    buf[bytes] = '\0';
+    close(fdRead);
+
+    std::string content(buf);
+    // DisplayGroups section should contain the default group with display 1
+    auto dgPos = content.find("--- DisplayGroups ---");
+    ASSERT_NE(dgPos, std::string::npos);
+    auto psgPos = content.find("--- PointerStateByGroup ---");
+    ASSERT_NE(psgPos, std::string::npos);
+    std::string dgSection = content.substr(dgPos, psgPos - dgPos);
+    EXPECT_NE(dgSection.find("groupId=0"), std::string::npos);
+    EXPECT_NE(dgSection.find("mainDisplayId="), std::string::npos);
+    unlink(tmpFile);
+}
+
+/**
+ * @tc.name: DumpMultiGroupState_NoAllocation_005
+ * @tc.desc: Verify dump does NOT allocate new group state (AC-6.5)
+ * @tc.type: FUNC
+ * @tc.require: AC-6.5
+ */
+HWTEST_F(InputWindowsManagerCoverageTest, DumpMultiGroupState_NoAllocation_005, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    // Record state map sizes before dump
+    size_t sizeBefore = WIN_MGR->GetGroupStateMapSize();
+
+    const char *tmpFile = "/data/tmp_dump_noalloc.log";
+    int32_t fd = open(tmpFile, O_CREAT | O_WRONLY | O_TRUNC, S_IRUSR | S_IWUSR);
+    ASSERT_GE(fd, 0);
+
+    WIN_MGR->DumpMultiGroupState(fd);
+    close(fd);
+
+    // Record state map sizes after dump - must be unchanged
+    size_t sizeAfter = WIN_MGR->GetGroupStateMapSize();
+    EXPECT_EQ(sizeBefore, sizeAfter) << "DumpMultiGroupState must not allocate new group state";
+    unlink(tmpFile);
+}
+
+/**
+ * @tc.name: DumpMultiGroupState_AbsentGroupShowsAbsent_006
+ * @tc.desc: Verify absent non-default group shows (absent) in PointerStateByGroup
+ * @tc.type: FUNC
+ * @tc.require: AC-6.4
+ */
+HWTEST_F(InputWindowsManagerCoverageTest, DumpMultiGroupState_AbsentGroupShowsAbsent_006, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    // Create a display group without calling EnsureGroupState (no lazy state)
+    OLD::DisplayGroupInfo absentGroup;
+    absentGroup.groupId = 99;
+    absentGroup.type = GroupType::GROUP_DEFAULT;
+    absentGroup.focusWindowId = -1;
+    OLD::DisplayInfo dispInfo;
+    dispInfo.id = 88;
+    dispInfo.x = 0;
+    dispInfo.y = 0;
+    dispInfo.width = 800;
+    dispInfo.height = 600;
+    dispInfo.dpi = 120;
+    dispInfo.name = "absent_display";
+    dispInfo.uniq = "absent1";
+    dispInfo.direction = DIRECTION0;
+    absentGroup.displaysInfo.push_back(dispInfo);
+    WIN_MGR->UpdateDisplayInfo(absentGroup);
+
+    size_t sizeBefore = WIN_MGR->GetGroupStateMapSize();
+
+    const char *tmpFile = "/data/tmp_dump_absent.log";
+    int32_t fd = open(tmpFile, O_CREAT | O_WRONLY | O_TRUNC, S_IRUSR | S_IWUSR);
+    ASSERT_GE(fd, 0);
+
+    WIN_MGR->DumpMultiGroupState(fd);
+    close(fd);
+
+    size_t sizeAfter = WIN_MGR->GetGroupStateMapSize();
+    EXPECT_EQ(sizeBefore, sizeAfter) << "Dump must not create state for absent groups";
+
+    int32_t fdRead = open(tmpFile, O_RDONLY);
+    ASSERT_GE(fdRead, 0);
+    char buf[8192] = {};
+    ssize_t bytes = read(fdRead, buf, sizeof(buf) - 1);
+    ASSERT_GT(bytes, 0);
+    buf[bytes] = '\0';
+    close(fdRead);
+
+    std::string content(buf);
+    // The PointerStateByGroup section should show groupId=99 as (absent)
+    auto psgPos = content.find("--- PointerStateByGroup ---");
+    ASSERT_NE(psgPos, std::string::npos);
+    auto ksgPos = content.find("--- KeyboardStateByGroup ---");
+    ASSERT_NE(ksgPos, std::string::npos);
+    std::string psgSection = content.substr(psgPos, ksgPos - psgPos);
+    EXPECT_NE(psgSection.find("groupId=99"), std::string::npos);
+    EXPECT_NE(psgSection.find("(absent)"), std::string::npos);
+    unlink(tmpFile);
+}
+
+/**
+ * @tc.name: DumpMultiGroupState_EmptySequences_007
+ * @tc.desc: Verify SequenceSnapshots section shows (empty) when no sequences
+ * @tc.type: FUNC
+ * @tc.require: AC-6.2
+ */
+HWTEST_F(InputWindowsManagerCoverageTest, DumpMultiGroupState_EmptySequences_007, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    const char *tmpFile = "/data/tmp_dump_emptyseq.log";
+    int32_t fd = open(tmpFile, O_CREAT | O_WRONLY | O_TRUNC, S_IRUSR | S_IWUSR);
+    ASSERT_GE(fd, 0);
+
+    WIN_MGR->DumpMultiGroupState(fd);
+    close(fd);
+
+    int32_t fdRead = open(tmpFile, O_RDONLY);
+    ASSERT_GE(fdRead, 0);
+    char buf[4096] = {};
+    ssize_t bytes = read(fdRead, buf, sizeof(buf) - 1);
+    ASSERT_GT(bytes, 0);
+    buf[bytes] = '\0';
+    close(fdRead);
+
+    std::string content(buf);
+    auto seqPos = content.find("--- SequenceSnapshots ---");
+    ASSERT_NE(seqPos, std::string::npos);
+    // Everything after SequenceSnapshots to the end
+    std::string seqSection = content.substr(seqPos);
+    EXPECT_NE(seqSection.find("(empty)"), std::string::npos);
+    unlink(tmpFile);
 }
 
 } // namespace MMI

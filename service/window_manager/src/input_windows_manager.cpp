@@ -757,6 +757,11 @@ size_t InputWindowsManager::GetSequenceSnapshotCount() const
     return sequenceSnapshots_.size();
 }
 
+size_t InputWindowsManager::GetGroupStateMapSize() const
+{
+    return mouseLocationMap_.size() + cursorPosMap_.size() + captureModeInfoMap_.size();
+}
+
 void InputWindowsManager::ClearSequenceSnapshotsByDevice(int32_t deviceId)
 {
     for (auto it = sequenceSnapshots_.begin(); it != sequenceSnapshots_.end();) {
@@ -8263,6 +8268,134 @@ void InputWindowsManager::Dump(int32_t fd, const std::vector<std::string> &args)
     DumpAncoWindows(ancoWindows);
     mprintf(fd, "%s\n", ancoWindows.c_str());
 #endif // OHOS_BUILD_ENABLE_ANCO
+}
+
+namespace {
+const char* SequenceTypeToString(SequenceType type)
+{
+    switch (type) {
+        case SequenceType::KEY:     return "KEY";
+        case SequenceType::BUTTON:  return "BUTTON";
+        case SequenceType::POINTER: return "POINTER";
+        default:                    return "UNKNOWN";
+    }
+}
+} // namespace
+
+void InputWindowsManager::DumpMultiGroupState(int32_t fd)
+{
+    // --- RuntimeBindings ---
+    mprintf(fd, "--- RuntimeBindings ---");
+    const auto& bindings = bindInfo_.GetAllRuntimeBindings();
+    if (bindings.empty()) {
+        mprintf(fd, "  (empty)");
+    } else {
+        for (const auto& [devId, binding] : bindings) {
+            mprintf(fd, "  deviceId=%d displayId=%d groupId=%d",
+                binding.deviceId, binding.displayId, binding.groupId);
+        }
+    }
+
+    // --- DisplayGroups ---
+    mprintf(fd, "--- DisplayGroups ---");
+    if (displayGroupInfoMap_.empty()) {
+        mprintf(fd, "  (empty)");
+    } else {
+        for (const auto& [gid, groupInfo] : displayGroupInfoMap_) {
+            std::string displayIds;
+            for (size_t i = 0; i < groupInfo.displaysInfo.size(); ++i) {
+                if (i > 0) {
+                    displayIds += ",";
+                }
+                displayIds += std::to_string(groupInfo.displaysInfo[i].id);
+            }
+            int32_t focusWinId = -1;
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
+            auto focusIt = focusWindowIdMap_.find(gid);
+            if (focusIt != focusWindowIdMap_.end()) {
+                focusWinId = focusIt->second;
+            }
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
+            mprintf(fd, "  groupId=%d displays=[%s] mainDisplayId=%d focusWindowId=%d",
+                gid, displayIds.c_str(), groupInfo.mainDisplayId, focusWinId);
+        }
+    }
+
+    // --- PointerStateByGroup ---
+    mprintf(fd, "--- PointerStateByGroup ---");
+    {
+        // Collect all known group ids from displayGroupInfoMap_ and state maps
+        std::set<int32_t> allGroupIds;
+        for (const auto& [gid, _] : displayGroupInfoMap_) {
+            allGroupIds.insert(gid);
+        }
+        for (const auto& [gid, _] : mouseLocationMap_) {
+            allGroupIds.insert(gid);
+        }
+        for (const auto& [gid, _] : cursorPosMap_) {
+            allGroupIds.insert(gid);
+        }
+
+        if (allGroupIds.empty()) {
+            mprintf(fd, "  (empty)");
+        }
+        for (int32_t gid : allGroupIds) {
+            auto mouseIt = mouseLocationMap_.find(gid);
+            auto cursorIt = cursorPosMap_.find(gid);
+            auto captureIt = captureModeInfoMap_.find(gid);
+            if (mouseIt == mouseLocationMap_.end() && cursorIt == cursorPosMap_.end()) {
+                mprintf(fd, "  groupId=%d: (absent)", gid);
+                continue;
+            }
+            double cursorX = 0;
+            double cursorY = 0;
+            if (cursorIt != cursorPosMap_.end()) {
+                cursorX = cursorIt->second.cursorPos.x;
+                cursorY = cursorIt->second.cursorPos.y;
+            }
+            int32_t mouseDisplayId = -1;
+            int32_t mouseX = 0;
+            int32_t mouseY = 0;
+            if (mouseIt != mouseLocationMap_.end()) {
+                mouseDisplayId = mouseIt->second.displayId;
+                mouseX = mouseIt->second.physicalX;
+                mouseY = mouseIt->second.physicalY;
+            }
+            bool captureMode = false;
+            if (captureIt != captureModeInfoMap_.end()) {
+                captureMode = captureIt->second.isCaptureMode;
+            }
+            mprintf(fd, "  groupId=%d: cursorPos=(%.0f,%.0f) mouseLocation=(%d,%d,%d) captureMode=%s",
+                gid, cursorX, cursorY, mouseX, mouseY, mouseDisplayId,
+                captureMode ? "true" : "false");
+        }
+    }
+
+    // --- KeyboardStateByGroup ---
+    mprintf(fd, "--- KeyboardStateByGroup ---");
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
+    if (focusWindowIdMap_.empty()) {
+        mprintf(fd, "  (empty)");
+    } else {
+        for (const auto& [gid, focusWinId] : focusWindowIdMap_) {
+            mprintf(fd, "  groupId=%d: focusWindowId=%d", gid, focusWinId);
+        }
+    }
+#else
+    mprintf(fd, "  (keyboard not enabled)");
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
+
+    // --- SequenceSnapshots ---
+    mprintf(fd, "--- SequenceSnapshots ---");
+    if (sequenceSnapshots_.empty()) {
+        mprintf(fd, "  (empty)");
+    } else {
+        for (const auto& [key, snap] : sequenceSnapshots_) {
+            mprintf(fd, "  deviceId=%d itemId=%d type=%s beginGroup=%d beginWindow=%d",
+                key.deviceId, key.itemId, SequenceTypeToString(key.type),
+                snap.groupId, snap.windowId);
+        }
+    }
 }
 
 std::pair<double, double> InputWindowsManager::TransformWindowXY(const WindowInfo &window,
