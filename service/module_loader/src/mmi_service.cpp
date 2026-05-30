@@ -3220,6 +3220,28 @@ ErrCode MMIService::SetDisplayBind(int32_t deviceId, int32_t displayId, std::str
     return RET_OK;
 }
 
+ErrCode MMIService::BindDeviceToDisplayGroupByDisplay(int32_t deviceId, int32_t displayId, std::string &msg)
+{
+    CALL_INFO_TRACE;
+    if (!IsRunning()) {
+        MMI_HILOGE("Service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
+    MMI_HILOGI("BindDeviceToDisplayGroupByDisplay: deviceId:%{public}d, displayId:%{public}d", deviceId, displayId);
+    return RET_OK;
+}
+
+ErrCode MMIService::UnbindDeviceFromDisplayGroup(int32_t deviceId, std::string &msg)
+{
+    CALL_INFO_TRACE;
+    if (!IsRunning()) {
+        MMI_HILOGE("Service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
+    MMI_HILOGI("UnbindDeviceFromDisplayGroup: deviceId:%{public}d", deviceId);
+    return RET_OK;
+}
+
 ErrCode MMIService::GetFunctionKeyState(int32_t funcKey, bool &state)
 {
     CALL_INFO_TRACE;

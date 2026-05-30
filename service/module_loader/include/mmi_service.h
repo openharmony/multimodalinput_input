@@ -142,6 +142,8 @@ public:
     ErrCode GetDisplayBindInfo(std::vector<DisplayBindInfo>& infos) override;
     ErrCode GetAllMmiSubscribedEvents(MmiEventMap& mmiEventMap) override;
     ErrCode SetDisplayBind(int32_t deviceId, int32_t displayId, std::string &msg) override;
+    ErrCode BindDeviceToDisplayGroupByDisplay(int32_t deviceId, int32_t displayId, std::string &msg) override;
+    ErrCode UnbindDeviceFromDisplayGroup(int32_t deviceId, std::string &msg) override;
     ErrCode GetFunctionKeyState(int32_t funcKey, bool &state) override;
     ErrCode SetFunctionKeyState(int32_t funcKey, bool enable) override;
     ErrCode SetPointerLocation(int32_t x, int32_t y, int32_t displayId) override;
