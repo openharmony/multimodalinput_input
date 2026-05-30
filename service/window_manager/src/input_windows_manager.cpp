@@ -671,7 +671,6 @@ int32_t InputWindowsManager::FindDisplayGroupId(int32_t displayId) const
     return DEFAULT_GROUP_ID;
 }
 
-#ifdef OHOS_BUILD_ENABLE_KEYBOARD
 int32_t InputWindowsManager::ResolveGroupIdForDevice(int32_t deviceId) const
 {
     auto binding = bindInfo_.GetRuntimeBinding(deviceId);
@@ -680,7 +679,6 @@ int32_t InputWindowsManager::ResolveGroupIdForDevice(int32_t deviceId) const
     }
     return MAIN_GROUPID;
 }
-#endif // OHOS_BUILD_ENABLE_KEYBOARD
 
 int32_t InputWindowsManager::FindDisplayUserId(int32_t displayId) const
 {
@@ -2730,6 +2728,10 @@ void InputWindowsManager::DispatchPointer(int32_t pointerAction, int32_t windowI
         SendPointerEvent(pointerAction);
         return;
     }
+    int32_t resolvedGroupId = ResolveGroupIdForDevice(lastPointerEventCopy->GetDeviceId());
+    if (resolvedGroupId == MAIN_GROUPID) {
+        resolvedGroupId = FindDisplayGroupId(lastPointerEventCopy->GetTargetDisplayId());
+    }
     auto pointerEvent = PointerEvent::Create();
     CHKPV(pointerEvent);
     pointerEvent->UpdateId();
@@ -2748,7 +2750,7 @@ void InputWindowsManager::DispatchPointer(int32_t pointerAction, int32_t windowI
             (eventAction >= PointerEvent::POINTER_ACTION_AXIS_BEGIN &&
             eventAction <= PointerEvent::POINTER_ACTION_AXIS_END);
         if (checkFlag) {
-            windowInfo = GetWindowInfo(lastLogicX_, lastLogicY_, MAIN_GROUPID);
+            windowInfo = GetWindowInfo(lastLogicX_, lastLogicY_, resolvedGroupId);
         } else {
             windowInfo = SelectWindowInfo(lastLogicX_, lastLogicY_, lastPointerEventCopy);
         }
@@ -2772,7 +2774,7 @@ void InputWindowsManager::DispatchPointer(int32_t pointerAction, int32_t windowI
         double cursorPosx = 0.0;
         double cursorPosy = 0.0;
 
-        const auto iter = mouseLocationMap_.find(MAIN_GROUPID);
+        const auto iter = mouseLocationMap_.find(resolvedGroupId);
         if (iter != mouseLocationMap_.end()) {
             displayId = iter->second.displayId;
             cursorPosx = iter->second.physicalX;
@@ -4860,7 +4862,10 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
         return RET_ERR;
     }
     pointerEvent->SetTargetDisplayId(displayId);
-    int32_t groupId = FindDisplayGroupId(displayId);
+    int32_t groupId = ResolveGroupIdForDevice(pointerEvent->GetDeviceId());
+    if (groupId == MAIN_GROUPID) {
+        groupId = FindDisplayGroupId(displayId);
+    }
     int32_t action = pointerEvent->GetPointerAction();
     bool dispatchEventFlag = mouseRedispatchStore_.IsActive();
     auto physicalDisplayInfo = GetPhysicalDisplay(displayId);
@@ -5266,30 +5271,30 @@ void InputWindowsManager::JudgMouseIsDownOrUp(bool dragState)
 }
 #endif // OHOS_BUILD_ENABLE_POINTER
 
-int32_t InputWindowsManager::SetMouseCaptureMode(int32_t windowId, bool isCaptureMode)
+int32_t InputWindowsManager::SetMouseCaptureMode(int32_t windowId, bool isCaptureMode, int32_t groupId)
 {
     CALL_DEBUG_ENTER;
     if (windowId < 0) {
         MMI_HILOGE("Windowid(%{public}d) is invalid", windowId);
         return RET_ERR;
     }
-    auto itr = captureModeInfoMap_.find(MAIN_GROUPID);
+    auto itr = captureModeInfoMap_.find(groupId);
     if (itr != captureModeInfoMap_.end()) {
         if (itr->second.isCaptureMode == isCaptureMode && !isCaptureMode) {
             MMI_HILOGE("Windowid:(%{public}d) is not capture mode", windowId);
             return RET_OK;
         }
-        captureModeInfoMap_[MAIN_GROUPID].windowId = windowId;
-        captureModeInfoMap_[MAIN_GROUPID].isCaptureMode = isCaptureMode;
+        captureModeInfoMap_[groupId].windowId = windowId;
+        captureModeInfoMap_[groupId].isCaptureMode = isCaptureMode;
     }
-    MMI_HILOGI("Windowid:(%{public}d) is (%{public}d)", windowId, isCaptureMode);
+    MMI_HILOGI("Windowid:(%{public}d) is (%{public}d), groupId:(%{public}d)", windowId, isCaptureMode, groupId);
     return RET_OK;
 }
 
-bool InputWindowsManager::GetMouseIsCaptureMode() const
+bool InputWindowsManager::GetMouseIsCaptureMode(int32_t groupId) const
 {
     CALL_DEBUG_ENTER;
-    auto itr = captureModeInfoMap_.find(MAIN_GROUPID);
+    auto itr = captureModeInfoMap_.find(groupId);
     if (itr != captureModeInfoMap_.end()) {
         return itr->second.isCaptureMode;
     }
@@ -7642,26 +7647,26 @@ void InputWindowsManager::UpdateAndAdjustMouseLocation(int32_t& displayId, doubl
         static_cast<int32_t>(isRealData), displayId, oldX, oldY, x, y);
 }
 
-MouseLocation InputWindowsManager::GetMouseInfo()
+MouseLocation InputWindowsManager::GetMouseInfo(int32_t groupId)
 {
-    auto &displaysInfoVector = GetDisplayInfoVector(MAIN_GROUPID);
+    auto &displaysInfoVector = GetDisplayInfoVector(groupId);
     MouseLocation curMouseLocation;
-    const auto iter = mouseLocationMap_.find(MAIN_GROUPID);
+    const auto iter = mouseLocationMap_.find(groupId);
     if (iter != mouseLocationMap_.end()) {
         curMouseLocation = iter->second;
     }
-    MMI_HILOGD("Mouselocation start: displayId:%{public}d, X:%{private}d, Y:%{private}d",
-        curMouseLocation.displayId, curMouseLocation.physicalX, curMouseLocation.physicalY);
+    MMI_HILOGD("Mouselocation start: displayId:%{public}d, X:%{private}d, Y:%{private}d, groupId:%{public}d",
+        curMouseLocation.displayId, curMouseLocation.physicalX, curMouseLocation.physicalY, groupId);
     if ((curMouseLocation.displayId < 0) && !displaysInfoVector.empty()) {
         OLD::DisplayInfo displayInfo = displaysInfoVector[0];
 #ifdef OHOS_BUILD_ENABLE_EXTERNAL_SCREEN
         (void)GetMainScreenDisplayInfo(displaysInfoVector, displayInfo);
 #endif // OHOS_BUILD_ENABLE_EXTERNAL_SCREEN
-        const auto iter = mouseLocationMap_.find(MAIN_GROUPID);
+        const auto iter = mouseLocationMap_.find(groupId);
         if (iter != mouseLocationMap_.end()) {
-            mouseLocationMap_[MAIN_GROUPID].displayId = displayInfo.id;
-            mouseLocationMap_[MAIN_GROUPID].physicalX = displayInfo.validWidth / TWOFOLD;
-            mouseLocationMap_[MAIN_GROUPID].physicalY = displayInfo.validHeight / TWOFOLD;
+            mouseLocationMap_[groupId].displayId = displayInfo.id;
+            mouseLocationMap_[groupId].physicalX = displayInfo.validWidth / TWOFOLD;
+            mouseLocationMap_[groupId].physicalY = displayInfo.validHeight / TWOFOLD;
             curMouseLocation = iter->second;
         }
         MMI_HILOGD("Mouselocation displayinfo: displayId:%{public}d, W:%{public}d, H:%{public}d",

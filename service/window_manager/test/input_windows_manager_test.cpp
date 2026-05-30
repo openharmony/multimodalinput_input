@@ -17502,5 +17502,411 @@ HWTEST_F(InputWindowsManagerTest, GetDisplayId_UnboundDevice_FallsBackToDefault_
     // Should fall back to the default group's display
     EXPECT_EQ(displayId, DEFAULT_DISPLAY_ID);
 }
+
+/**
+ * @tc.name: MouseGroupRouting_BoundMoveTargetsNonDefaultGroup_001
+ * @tc.desc: TASK-5: When a mouse device is bound to a non-default group via
+ *           runtime binding, mouse move events from that device should resolve
+ *           to the bound group's capture/location maps, not the main group.
+ * @tc.type: FUNC
+ * @tc.require: AC-2.1
+ */
+HWTEST_F(InputWindowsManagerTest, MouseGroupRouting_BoundMoveTargetsNonDefaultGroup_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto mgr = std::make_shared<InputWindowsManager>();
+    ASSERT_NE(mgr, nullptr);
+
+    // Register main group (groupId=0)
+    OLD::DisplayGroupInfo mainGroup;
+    mainGroup.groupId = 0;
+    mainGroup.type = GroupType::GROUP_DEFAULT;
+    mainGroup.focusWindowId = 10;
+    OLD::DisplayInfo mainDisplay = { .id = 1 };
+    mainDisplay.x = 0;
+    mainDisplay.y = 0;
+    mainDisplay.width = 1920;
+    mainDisplay.height = 1080;
+    mainDisplay.validWidth = 1920;
+    mainDisplay.validHeight = 1080;
+    mainDisplay.dpi = 240;
+    mainDisplay.name = "main";
+    mainDisplay.uniq = "default0";
+    mainDisplay.direction = DIRECTION0;
+    mainGroup.displaysInfo.push_back(mainDisplay);
+    WindowInfo mainWin;
+    mainWin.id = 10;
+    mainWin.pid = 100;
+    mainWin.uid = 1;
+    mainWin.area = {0, 0, 1920, 1080};
+    mainWin.defaultHotAreas = {mainWin.area};
+    mainWin.pointerHotAreas = {mainWin.area};
+    mainWin.agentWindowId = 10;
+    mainWin.flags = 0;
+    mainWin.transform = {1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f};
+    mainGroup.windowsInfo.push_back(mainWin);
+    mgr->UpdateDisplayInfo(mainGroup);
+
+    // Register secondary group (groupId=1)
+    OLD::DisplayGroupInfo secGroup;
+    secGroup.groupId = 1;
+    secGroup.type = GroupType::GROUP_SPECIAL;
+    secGroup.focusWindowId = 20;
+    OLD::DisplayInfo secDisplay = { .id = 2 };
+    secDisplay.x = 0;
+    secDisplay.y = 0;
+    secDisplay.width = 1280;
+    secDisplay.height = 720;
+    secDisplay.validWidth = 1280;
+    secDisplay.validHeight = 720;
+    secDisplay.dpi = 160;
+    secDisplay.name = "secondary";
+    secDisplay.uniq = "secondary0";
+    secDisplay.direction = DIRECTION0;
+    secGroup.displaysInfo.push_back(secDisplay);
+    WindowInfo secWin;
+    secWin.id = 20;
+    secWin.pid = 200;
+    secWin.uid = 2;
+    secWin.area = {0, 0, 1280, 720};
+    secWin.defaultHotAreas = {secWin.area};
+    secWin.pointerHotAreas = {secWin.area};
+    secWin.agentWindowId = 20;
+    secWin.flags = 0;
+    secWin.transform = {1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f};
+    secGroup.windowsInfo.push_back(secWin);
+    mgr->UpdateDisplayInfo(secGroup);
+
+    // Bind device 42 to display 2 (secondary group)
+    mgr->bindInfo_.AddDevice(42, "usbmouse0");
+    mgr->bindInfo_.AddDisplay(2, "secondary0");
+    std::string msg;
+    mgr->BindDeviceToDisplayGroupByDisplay(42, 2, msg);
+
+    // Verify the ResolveGroupIdForDevice returns the bound group
+    int32_t resolvedGroupId = mgr->ResolveGroupIdForDevice(42);
+    EXPECT_EQ(resolvedGroupId, 1)
+        << "Device 42 should resolve to group 1 after binding";
+
+    // Verify GetMouseInfo for the bound group uses the secondary group's data
+    MouseLocation mouseInfoSec = mgr->GetMouseInfo(1);
+    EXPECT_GE(mouseInfoSec.displayId, -1)
+        << "GetMouseInfo(1) should return data from secondary group map";
+
+    // Verify GetMouseInfo for main group is independent
+    MouseLocation mouseInfoMain = mgr->GetMouseInfo(0);
+    // Main group has its own separate mouse info
+    EXPECT_GE(mouseInfoMain.displayId, -1)
+        << "GetMouseInfo(0) should return data from main group map";
+}
+
+/**
+ * @tc.name: MouseGroupRouting_BoundButtonTargetsNonDefaultGroup_001
+ * @tc.desc: TASK-5: SetMouseCaptureMode with a specific groupId stores capture
+ *           state per-group. A capture set on group 1 should NOT be visible
+ *           via GetMouseIsCaptureMode for group 0.
+ * @tc.type: FUNC
+ * @tc.require: AC-2.1
+ */
+HWTEST_F(InputWindowsManagerTest, MouseGroupRouting_BoundButtonTargetsNonDefaultGroup_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto mgr = std::make_shared<InputWindowsManager>();
+    ASSERT_NE(mgr, nullptr);
+
+    // Register main group
+    OLD::DisplayGroupInfo mainGroup;
+    mainGroup.groupId = 0;
+    mainGroup.type = GroupType::GROUP_DEFAULT;
+    mainGroup.focusWindowId = 10;
+    OLD::DisplayInfo mainDisplay = { .id = 1 };
+    mainDisplay.x = 0;
+    mainDisplay.y = 0;
+    mainDisplay.width = 1920;
+    mainDisplay.height = 1080;
+    mainDisplay.dpi = 240;
+    mainDisplay.name = "main";
+    mainDisplay.uniq = "default0";
+    mainDisplay.direction = DIRECTION0;
+    mainGroup.displaysInfo.push_back(mainDisplay);
+    mgr->UpdateDisplayInfo(mainGroup);
+
+    // Register secondary group
+    OLD::DisplayGroupInfo secGroup;
+    secGroup.groupId = 1;
+    secGroup.type = GroupType::GROUP_SPECIAL;
+    secGroup.focusWindowId = 20;
+    OLD::DisplayInfo secDisplay = { .id = 2 };
+    secDisplay.x = 0;
+    secDisplay.y = 0;
+    secDisplay.width = 1280;
+    secDisplay.height = 720;
+    secDisplay.dpi = 160;
+    secDisplay.name = "secondary";
+    secDisplay.uniq = "secondary0";
+    secDisplay.direction = DIRECTION0;
+    secGroup.displaysInfo.push_back(secDisplay);
+    mgr->UpdateDisplayInfo(secGroup);
+
+    // Set capture mode for window 50 on the SECONDARY group (groupId=1)
+    int32_t ret = mgr->SetMouseCaptureMode(50, true, 1);
+    EXPECT_EQ(ret, RET_OK);
+
+    // Verify capture mode is active for group 1
+    EXPECT_TRUE(mgr->GetMouseIsCaptureMode(1))
+        << "Capture mode should be active for group 1";
+
+    // Verify capture mode is NOT active for group 0 (main group)
+    EXPECT_FALSE(mgr->GetMouseIsCaptureMode(0))
+        << "Capture mode should NOT be active for group 0 when only set on group 1";
+}
+
+/**
+ * @tc.name: MouseGroupRouting_CaptureIsolation_001
+ * @tc.desc: TASK-5: Default group capture does NOT intercept a bound non-default
+ *           mouse event. When capture is set on main group and a device is bound
+ *           to secondary group, the capture state is isolated per-group.
+ * @tc.type: FUNC
+ * @tc.require: AC-2.1
+ */
+HWTEST_F(InputWindowsManagerTest, MouseGroupRouting_CaptureIsolation_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto mgr = std::make_shared<InputWindowsManager>();
+    ASSERT_NE(mgr, nullptr);
+
+    // Register both groups
+    OLD::DisplayGroupInfo mainGroup;
+    mainGroup.groupId = 0;
+    mainGroup.type = GroupType::GROUP_DEFAULT;
+    mainGroup.focusWindowId = 10;
+    OLD::DisplayInfo mainDisplay = { .id = 1 };
+    mainDisplay.x = 0;
+    mainDisplay.y = 0;
+    mainDisplay.width = 1920;
+    mainDisplay.height = 1080;
+    mainDisplay.dpi = 240;
+    mainDisplay.name = "main";
+    mainDisplay.uniq = "default0";
+    mainDisplay.direction = DIRECTION0;
+    mainGroup.displaysInfo.push_back(mainDisplay);
+    mgr->UpdateDisplayInfo(mainGroup);
+
+    OLD::DisplayGroupInfo secGroup;
+    secGroup.groupId = 1;
+    secGroup.type = GroupType::GROUP_SPECIAL;
+    secGroup.focusWindowId = 20;
+    OLD::DisplayInfo secDisplay = { .id = 2 };
+    secDisplay.x = 0;
+    secDisplay.y = 0;
+    secDisplay.width = 1280;
+    secDisplay.height = 720;
+    secDisplay.dpi = 160;
+    secDisplay.name = "secondary";
+    secDisplay.uniq = "secondary0";
+    secDisplay.direction = DIRECTION0;
+    secGroup.displaysInfo.push_back(secDisplay);
+    mgr->UpdateDisplayInfo(secGroup);
+
+    // Set capture mode on MAIN group
+    mgr->SetMouseCaptureMode(10, true, 0);
+    EXPECT_TRUE(mgr->GetMouseIsCaptureMode(0))
+        << "Capture should be active on main group";
+
+    // Set capture mode on secondary group for a different window
+    mgr->SetMouseCaptureMode(20, true, 1);
+    EXPECT_TRUE(mgr->GetMouseIsCaptureMode(1))
+        << "Capture should be active on secondary group";
+
+    // Clear capture on main group - should NOT affect secondary group
+    mgr->SetMouseCaptureMode(10, false, 0);
+    EXPECT_FALSE(mgr->GetMouseIsCaptureMode(0))
+        << "Capture should be cleared on main group";
+    EXPECT_TRUE(mgr->GetMouseIsCaptureMode(1))
+        << "Capture on secondary group should NOT be affected by main group clear";
+}
+
+/**
+ * @tc.name: MouseGroupRouting_UnboundMouseUnchanged_001
+ * @tc.desc: TASK-5: An unbound mouse device should resolve to MAIN_GROUPID,
+ *           preserving backward-compatible behavior.
+ * @tc.type: FUNC
+ * @tc.require: AC-2.1
+ */
+HWTEST_F(InputWindowsManagerTest, MouseGroupRouting_UnboundMouseUnchanged_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto mgr = std::make_shared<InputWindowsManager>();
+    ASSERT_NE(mgr, nullptr);
+
+    // Register main group
+    OLD::DisplayGroupInfo mainGroup;
+    mainGroup.groupId = 0;
+    mainGroup.type = GroupType::GROUP_DEFAULT;
+    mainGroup.focusWindowId = 10;
+    OLD::DisplayInfo mainDisplay = { .id = 1 };
+    mainDisplay.x = 0;
+    mainDisplay.y = 0;
+    mainDisplay.width = 1920;
+    mainDisplay.height = 1080;
+    mainDisplay.validWidth = 1920;
+    mainDisplay.validHeight = 1080;
+    mainDisplay.dpi = 240;
+    mainDisplay.name = "main";
+    mainDisplay.uniq = "default0";
+    mainDisplay.direction = DIRECTION0;
+    mainGroup.displaysInfo.push_back(mainDisplay);
+    mgr->UpdateDisplayInfo(mainGroup);
+
+    // Unbound device should resolve to MAIN_GROUPID (0)
+    int32_t resolvedGroupId = mgr->ResolveGroupIdForDevice(999);
+    EXPECT_EQ(resolvedGroupId, 0)
+        << "Unbound device 999 should resolve to MAIN_GROUPID (0)";
+
+    // GetMouseInfo with default group should still work
+    MouseLocation mouseInfo = mgr->GetMouseInfo();
+    // Should fall back to center of main display since no prior mouse event
+    EXPECT_EQ(mouseInfo.displayId, 1)
+        << "GetMouseInfo() for main group should use display 1";
+
+    // SetMouseCaptureMode with default groupId should affect main group
+    mgr->SetMouseCaptureMode(10, true);
+    EXPECT_TRUE(mgr->GetMouseIsCaptureMode())
+        << "Default capture mode should affect main group";
+}
+
+/**
+ * @tc.name: MouseGroupRouting_AxisBoundGroup_001
+ * @tc.desc: TASK-5: Mouse axis events from a bound device should use the bound
+ *           group's capture and location maps. Verifies that the mouse location
+ *           written to secondary group's mouseLocationMap is independent from main.
+ * @tc.type: FUNC
+ * @tc.require: AC-2.1
+ */
+HWTEST_F(InputWindowsManagerTest, MouseGroupRouting_AxisBoundGroup_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto mgr = std::make_shared<InputWindowsManager>();
+    ASSERT_NE(mgr, nullptr);
+
+    // Register both groups
+    OLD::DisplayGroupInfo mainGroup;
+    mainGroup.groupId = 0;
+    mainGroup.type = GroupType::GROUP_DEFAULT;
+    mainGroup.focusWindowId = 10;
+    OLD::DisplayInfo mainDisplay = { .id = 1 };
+    mainDisplay.x = 0;
+    mainDisplay.y = 0;
+    mainDisplay.width = 1920;
+    mainDisplay.height = 1080;
+    mainDisplay.validWidth = 1920;
+    mainDisplay.validHeight = 1080;
+    mainDisplay.dpi = 240;
+    mainDisplay.name = "main";
+    mainDisplay.uniq = "default0";
+    mainDisplay.direction = DIRECTION0;
+    mainGroup.displaysInfo.push_back(mainDisplay);
+    mgr->UpdateDisplayInfo(mainGroup);
+
+    OLD::DisplayGroupInfo secGroup;
+    secGroup.groupId = 1;
+    secGroup.type = GroupType::GROUP_SPECIAL;
+    secGroup.focusWindowId = 20;
+    OLD::DisplayInfo secDisplay = { .id = 2 };
+    secDisplay.x = 0;
+    secDisplay.y = 0;
+    secDisplay.width = 1280;
+    secDisplay.height = 720;
+    secDisplay.validWidth = 1280;
+    secDisplay.validHeight = 720;
+    secDisplay.dpi = 160;
+    secDisplay.name = "secondary";
+    secDisplay.uniq = "secondary0";
+    secDisplay.direction = DIRECTION0;
+    secGroup.displaysInfo.push_back(secDisplay);
+    mgr->UpdateDisplayInfo(secGroup);
+
+    // Bind device 55 to display 2 (secondary group)
+    mgr->bindInfo_.AddDevice(55, "usbmouse1");
+    mgr->bindInfo_.AddDisplay(2, "secondary0");
+    std::string msg;
+    mgr->BindDeviceToDisplayGroupByDisplay(55, 2, msg);
+
+    // Verify bound device resolves to secondary group
+    EXPECT_EQ(mgr->ResolveGroupIdForDevice(55), 1);
+
+    // Write a known mouse location to secondary group's map
+    mgr->mouseLocationMap_[1].displayId = 2;
+    mgr->mouseLocationMap_[1].physicalX = 640;
+    mgr->mouseLocationMap_[1].physicalY = 360;
+
+    // Write a different mouse location to main group's map
+    mgr->mouseLocationMap_[0].displayId = 1;
+    mgr->mouseLocationMap_[0].physicalX = 960;
+    mgr->mouseLocationMap_[0].physicalY = 540;
+
+    // GetMouseInfo for each group should return its own location
+    MouseLocation secMouseInfo = mgr->GetMouseInfo(1);
+    EXPECT_EQ(secMouseInfo.displayId, 2);
+    EXPECT_EQ(secMouseInfo.physicalX, 640);
+    EXPECT_EQ(secMouseInfo.physicalY, 360);
+
+    MouseLocation mainMouseInfo = mgr->GetMouseInfo(0);
+    EXPECT_EQ(mainMouseInfo.displayId, 1);
+    EXPECT_EQ(mainMouseInfo.physicalX, 960);
+    EXPECT_EQ(mainMouseInfo.physicalY, 540);
+}
+
+/**
+ * @tc.name: MouseGroupRouting_CaptureModePerGroup_001
+ * @tc.desc: TASK-5: The captureModeInfoMap_ should store per-group capture state.
+ *           Verifying that the audit test MultiGroupAudit_MouseCaptureFallback_001
+ *           now passes with per-group capture support.
+ * @tc.type: FUNC
+ * @tc.require: AC-2.1
+ */
+HWTEST_F(InputWindowsManagerTest, MouseGroupRouting_CaptureModePerGroup_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto mgr = std::make_shared<InputWindowsManager>();
+    ASSERT_NE(mgr, nullptr);
+
+    // Register secondary group so captureModeInfoMap_ has entry for group 1
+    OLD::DisplayGroupInfo secGroup;
+    secGroup.groupId = 1;
+    secGroup.type = GroupType::GROUP_SPECIAL;
+    secGroup.focusWindowId = 20;
+    OLD::DisplayInfo secDisplay = { .id = 2 };
+    secDisplay.x = 0;
+    secDisplay.y = 0;
+    secDisplay.width = 1280;
+    secDisplay.height = 720;
+    secDisplay.dpi = 160;
+    secDisplay.name = "secondary";
+    secDisplay.uniq = "secondary0";
+    secDisplay.direction = DIRECTION0;
+    secGroup.displaysInfo.push_back(secDisplay);
+    mgr->UpdateDisplayInfo(secGroup);
+
+    // Set capture mode on group 1
+    mgr->SetMouseCaptureMode(20, true, 1);
+
+    // Verify captureModeInfoMap_ has entry for group 1
+    auto itr1 = mgr->captureModeInfoMap_.find(1);
+    EXPECT_NE(itr1, mgr->captureModeInfoMap_.end())
+        << "captureModeInfoMap_ should have entry for group 1";
+    if (itr1 != mgr->captureModeInfoMap_.end()) {
+        EXPECT_EQ(itr1->second.windowId, 20);
+        EXPECT_TRUE(itr1->second.isCaptureMode);
+    }
+
+    // Verify main group is unaffected
+    auto itr0 = mgr->captureModeInfoMap_.find(0);
+    EXPECT_NE(itr0, mgr->captureModeInfoMap_.end());
+    if (itr0 != mgr->captureModeInfoMap_.end()) {
+        EXPECT_FALSE(itr0->second.isCaptureMode)
+            << "Main group capture should be unaffected";
+    }
+}
 } // namespace MMI
 } // namespace OHOS

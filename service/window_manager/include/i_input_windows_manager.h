@@ -88,8 +88,9 @@ public:
     virtual void Dump(int32_t fd, const std::vector<std::string> &args) = 0;
     virtual int32_t GetWindowPid(int32_t windowId) const = 0;
     virtual int32_t GetWindowAgentPid(int32_t windowId) const = 0;
-    virtual int32_t SetMouseCaptureMode(int32_t windowId, bool isCaptureMode) = 0;
-    virtual bool GetMouseIsCaptureMode() const = 0;
+    virtual int32_t SetMouseCaptureMode(int32_t windowId, bool isCaptureMode,
+        int32_t groupId = DEFAULT_GROUP_ID) = 0;
+    virtual bool GetMouseIsCaptureMode(int32_t groupId = DEFAULT_GROUP_ID) const = 0;
     virtual int32_t GetDisplayBindInfo(DisplayBindInfos &infos) = 0;
     virtual int32_t SetDisplayBind(int32_t deviceId, int32_t displayId, std::string &msg) = 0;
     virtual int32_t BindDeviceToDisplayGroupByDisplay(int32_t deviceId, int32_t displayId, std::string &msg) = 0;
@@ -120,7 +121,7 @@ public:
     virtual int32_t ClearMouseHideFlag(int32_t eventId) = 0;
 
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
-    virtual MouseLocation GetMouseInfo() = 0;
+    virtual MouseLocation GetMouseInfo(int32_t groupId = DEFAULT_GROUP_ID) = 0;
     virtual CursorPosition GetCursorPos() = 0;
     virtual CursorPosition ResetCursorPos() = 0;
     virtual void UpdateAndAdjustMouseLocation(int32_t& displayId, double& x, double& y, bool isRealData = true) = 0;

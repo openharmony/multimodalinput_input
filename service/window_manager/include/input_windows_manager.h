@@ -77,8 +77,8 @@ public:
     int32_t GetWindowPid(int32_t windowId, const std::vector<WindowInfo> &windowsInfo) const;
     int32_t GetWindowPid(int32_t windowId) const;
     int32_t GetWindowAgentPid(int32_t windowId) const;
-    int32_t SetMouseCaptureMode(int32_t windowId, bool isCaptureMode);
-    bool GetMouseIsCaptureMode() const;
+    int32_t SetMouseCaptureMode(int32_t windowId, bool isCaptureMode, int32_t groupId = DEFAULT_GROUP_ID);
+    bool GetMouseIsCaptureMode(int32_t groupId = DEFAULT_GROUP_ID) const;
     void DeviceStatusChanged(int32_t deviceId, const std::string &name, const std::string &sysUid,
         const std::string devStatus);
     int32_t GetDisplayBindInfo(DisplayBindInfos &infos);
@@ -96,6 +96,7 @@ public:
     void SetFoldState ();
     bool CheckAppFocused(int32_t pid);
     void UpdateUIExtensionInfo(const std::vector<UIExtensionInfo> &uiExtensionInfos);
+    int32_t ResolveGroupIdForDevice(int32_t deviceId) const;
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     std::vector<std::pair<int32_t, TargetInfo>> GetPidAndUpdateTarget(std::shared_ptr<KeyEvent> keyEvent);
     void ReissueEvent(std::shared_ptr<KeyEvent> keyEvent, int32_t focusWindowId);
@@ -103,14 +104,13 @@ public:
     bool IsKeyPressed(int32_t pressedKey, std::vector<KeyEvent::KeyItem> &keyItems);
     bool IsOnTheWhitelist(std::shared_ptr<KeyEvent> keyEvent);
     void HandleKeyEventWindowId(std::shared_ptr<KeyEvent> keyEvent);
-    int32_t ResolveGroupIdForDevice(int32_t deviceId) const;
     int32_t focusWindowId_ { -1 };
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
     int32_t CheckWindowIdPermissionByPid(int32_t windowId, int32_t pid);
     int32_t ClearMouseHideFlag(int32_t eventId);
 
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
-    MouseLocation GetMouseInfo();
+    MouseLocation GetMouseInfo(int32_t groupId = DEFAULT_GROUP_ID);
     CursorPosition GetCursorPos();
     CursorPosition ResetCursorPos();
     void UpdateAndAdjustMouseLocation(int32_t& displayId, double& x, double& y, bool isRealData = true);
