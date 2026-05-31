@@ -3274,6 +3274,76 @@ HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_OnDisplayInfo_008, T
     ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.OnDisplayInfo(displayGroupInfo));
 }
 
+#ifdef OHOS_BUILD_ENABLE_EXTERNAL_SCREEN
+/**
+ * @tc.name: InputWindowsManagerTest_OnDisplayInfo_009
+ * @tc.desc: Test OnDisplayInfo with isDisplayChanged=true, should use main display info
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_OnDisplayInfo_009, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerDrawingManager pointerDrawingManager;
+    OLD::DisplayInfo mainDisplayInfo;
+    mainDisplayInfo.rsId = 1;
+    mainDisplayInfo.id = 1;
+    mainDisplayInfo.displaySourceMode = OHOS::MMI::DisplaySourceMode::SCREEN_MAIN;
+    mainDisplayInfo.validWidth = 1920;
+    mainDisplayInfo.validHeight = 1080;
+
+    OLD::DisplayInfo currentDisplayInfo;
+    currentDisplayInfo.rsId = 2;
+    currentDisplayInfo.id = 2;
+    currentDisplayInfo.displaySourceMode = OHOS::MMI::DisplaySourceMode::SCREEN_MIRROR;
+    currentDisplayInfo.validWidth = 1280;
+    currentDisplayInfo.validHeight = 720;
+
+    OLD::DisplayGroupInfo displayGroupInfo;
+    displayGroupInfo.displaysInfo.push_back(mainDisplayInfo);
+    displayGroupInfo.displaysInfo.push_back(currentDisplayInfo);
+    displayGroupInfo.focusWindowId = 0;
+    displayGroupInfo.mainDisplayId = 1;
+
+    pointerDrawingManager.displayInfo_ = currentDisplayInfo;
+    bool isDisplayChanged = true;
+    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.OnDisplayInfo(displayGroupInfo, isDisplayChanged));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_OnDisplayInfo_010
+ * @tc.desc: Test OnDisplayInfo with isDisplayChanged=false, should update current display info
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_OnDisplayInfo_010, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerDrawingManager pointerDrawingManager;
+    OLD::DisplayInfo displaysInfo;
+    displaysInfo.rsId = 11;
+    displaysInfo.displaySourceMode = OHOS::MMI::DisplaySourceMode::SCREEN_MAIN;
+    OLD::DisplayGroupInfo displayGroupInfo;
+    displayGroupInfo.displaysInfo.push_back(displaysInfo);
+    displayGroupInfo.focusWindowId = 0;
+
+    Rosen::RSSurfaceNodeConfig surfaceNodeConfig;
+    surfaceNodeConfig.SurfaceNodeName = "pointer window";
+    Rosen::RSSurfaceNodeType surfaceNodeType = Rosen::RSSurfaceNodeType::SELF_DRAWING_WINDOW_NODE;
+    pointerDrawingManager.surfaceNode_ = Rosen::RSSurfaceNode::Create(surfaceNodeConfig, surfaceNodeType, true, false,
+        rsUIContext_);
+    pointerDrawingManager.surfaceNode_->SetFrameGravity(Rosen::Gravity::RESIZE_ASPECT_FILL);
+    pointerDrawingManager.surfaceNode_->SetPositionZ(Rosen::RSSurfaceNode::POINTER_WINDOW_POSITION_Z);
+
+    OLD::DisplayInfo displaysInfo_;
+    displaysInfo_.rsId = 11;
+    displaysInfo_.displaySourceMode = OHOS::MMI::DisplaySourceMode::SCREEN_MAIN;
+    pointerDrawingManager.displayInfo_ = displaysInfo_;
+    bool isDisplayChanged = false;
+    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.OnDisplayInfo(displayGroupInfo, isDisplayChanged));
+}
+#endif // OHOS_BUILD_ENABLE_EXTERNAL_SCREEN
+
 /**
  * @tc.name: InputWindowsManagerTest_CreatePointerWindowForScreenPointer_003
  * @tc.desc: Test CreatePointerWindowForScreenPointer

@@ -2279,9 +2279,9 @@ void InputWindowsManager::UpdateDisplayMode(int32_t groupId)
 }
 
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
-void InputWindowsManager::DrawPointer(bool isDisplayRemoved)
+void InputWindowsManager::DrawPointer(bool isDisplayChanged)
 {
-    if (!isDisplayRemoved) {
+    if (!isDisplayChanged) {
         CursorDrawingComponent::GetInstance().DrawPointerStyle(dragPointerStyle_);
     } else {
         CursorDrawingComponent::GetInstance().DrawScreenCenterPointer(dragPointerStyle_);
@@ -2289,14 +2289,14 @@ void InputWindowsManager::DrawPointer(bool isDisplayRemoved)
 }
 
 void InputWindowsManager::PointerDrawingManagerOnDisplayInfo(const OLD::DisplayGroupInfo &displayGroupInfo,
-    bool isDisplayRemoved)
+    bool isDisplayChanged)
 {
     if (!INPUT_DEV_MGR->HasPointerDeviceIncludingVirtual()) {
         MMI_HILOGI("OnDisplayInfo no pointer device");
         return;
     }
     auto currentDisplayInfo = CursorDrawingComponent::GetInstance().GetCurrentDisplayInfo();
-    CursorDrawingComponent::GetInstance().OnDisplayInfo(displayGroupInfo);
+    CursorDrawingComponent::GetInstance().OnDisplayInfo(displayGroupInfo, isDisplayChanged);
     int32_t groupId = displayGroupInfo.groupId;
     int32_t newId = 0;
     int32_t &lastDpiTmp = lastDpi_;
@@ -2388,7 +2388,7 @@ void InputWindowsManager::PointerDrawingManagerOnDisplayInfo(const OLD::DisplayG
         }
         if (windowInfo == std::nullopt) {
             MMI_HILOGE("The windowInfo is nullptr");
-            DrawPointer(isDisplayRemoved);
+            DrawPointer(isDisplayChanged);
             return;
         }
         int32_t windowPid = GetWindowPid(windowInfo->id);
@@ -2420,7 +2420,7 @@ void InputWindowsManager::PointerDrawingManagerOnDisplayInfo(const OLD::DisplayG
             dragPointerStyle_ = pointerStyle;
             MMI_HILOGI("Window is changed, pointerStyle is:%{public}d", dragPointerStyle_.id);
         }
-        DrawPointer(isDisplayRemoved);
+        DrawPointer(isDisplayChanged);
     }
 }
 

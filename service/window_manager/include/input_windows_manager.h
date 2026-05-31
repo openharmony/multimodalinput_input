@@ -394,8 +394,8 @@ private:
 
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
     void PointerDrawingManagerOnDisplayInfo(const OLD::DisplayGroupInfo &displayGroupInfo,
-        bool isDisplayRemoved = false);
-void DrawPointer(bool isDisplayRemoved);
+        bool isDisplayChanged = false);
+void DrawPointer(bool isDisplayChanged);
 bool NeedUpdatePointDrawFlag(const std::vector<WindowInfo> &windows);
 #endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
 

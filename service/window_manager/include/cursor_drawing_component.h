@@ -49,7 +49,7 @@ public:
         const PointerStyle pointerStyle, Direction direction);
     void UpdateDisplayInfo(const OLD::DisplayInfo &displayInfo);
     void UpdateBindDisplayId(uint64_t rsId);
-    void OnDisplayInfo(const OLD::DisplayGroupInfo &displayGroupInfo);
+    void OnDisplayInfo(const OLD::DisplayGroupInfo &displayGroupInfo, bool isDisplayChanged = false);
     void OnWindowInfo(const WinInfo &info);
     bool Init();
     void DeletePointerVisible(int32_t pid);

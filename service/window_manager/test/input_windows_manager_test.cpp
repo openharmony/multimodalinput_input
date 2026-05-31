@@ -10240,6 +10240,82 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_DrawPointer_001, TestS
     std::shared_ptr<InputWindowsManager> inputWindowsManager = std::make_shared<InputWindowsManager>();
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager->DrawPointer(isDisplayRemoved));
 }
+
+#ifdef OHOS_BUILD_ENABLE_EXTERNAL_SCREEN
+/**
+ * @tc.name: InputWindowsManagerTest_DrawPointer_002
+ * @tc.desc: Test DrawPointer with isDisplayChanged=true
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_DrawPointer_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    bool isDisplayChanged = true;
+    std::shared_ptr<InputWindowsManager> inputWindowsManager = std::make_shared<InputWindowsManager>();
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->DrawPointer(isDisplayChanged));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_DrawPointer_003
+ * @tc.desc: Test DrawPointer with isDisplayChanged=false
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_DrawPointer_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    bool isDisplayChanged = false;
+    std::shared_ptr<InputWindowsManager> inputWindowsManager = std::make_shared<InputWindowsManager>();
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->DrawPointer(isDisplayChanged));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_PointerDrawingManagerOnDisplayInfo005
+ * @tc.desc: Test PointerDrawingManagerOnDisplayInfo with isDisplayChanged=true
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_PointerDrawingManagerOnDisplayInfo005, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    OLD::DisplayGroupInfo displayGroupInfo;
+    OLD::DisplayInfo displayInfo;
+    displayInfo.id = 521;
+    displayInfo.uniq = "uniq_test";
+    displayInfo.dpi = 1000;
+    displayGroupInfo.displaysInfo.push_back(displayInfo);
+    int32_t deviceId = 1;
+    InputDeviceManager::InputDeviceInfo inputDeviceInfo;
+    inputDeviceInfo.isPointerDevice = true;
+    INPUT_DEV_MGR->inputDevice_.insert(std::make_pair(deviceId, inputDeviceInfo));
+    bool isDisplayChanged = true;
+    EXPECT_NO_FATAL_FAILURE(WIN_MGR->PointerDrawingManagerOnDisplayInfo(displayGroupInfo, isDisplayChanged));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_PointerDrawingManagerOnDisplayInfo006
+ * @tc.desc: Test PointerDrawingManagerOnDisplayInfo with isDisplayChanged=false
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_PointerDrawingManagerOnDisplayInfo006, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    OLD::DisplayGroupInfo displayGroupInfo;
+    OLD::DisplayInfo displayInfo;
+    displayInfo.id = 521;
+    displayInfo.uniq = "uniq_test";
+    displayInfo.dpi = 1000;
+    displayGroupInfo.displaysInfo.push_back(displayInfo);
+    int32_t deviceId = 1;
+    InputDeviceManager::InputDeviceInfo inputDeviceInfo;
+    inputDeviceInfo.isPointerDevice = true;
+    INPUT_DEV_MGR->inputDevice_.insert(std::make_pair(deviceId, inputDeviceInfo));
+    bool isDisplayChanged = false;
+    EXPECT_NO_FATAL_FAILURE(WIN_MGR->PointerDrawingManagerOnDisplayInfo(displayGroupInfo, isDisplayChanged));
+}
+#endif // OHOS_BUILD_ENABLE_EXTERNAL_SCREEN
 #endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
 
 /**
