@@ -981,6 +981,9 @@ void KeySubscriberHandler::NotifySubscriber(std::shared_ptr<KeyEvent> keyEvent,
     CHKPV(sess);
     int32_t fd = sess->GetFd();
     pkt << fd << subscriber->id_;
+    if (InputEventDataTransformation::WriteKeyEventExt(keyEvent, pkt) != RET_OK) {
+        MMI_HILOGE("Write key event extension failed");
+    }
     if (!EventLogHelper::IsBetaVersion()) {
         MMI_HILOGI("Notify subscriber id:%{public}d, pid:%{public}d", subscriber->id_, sess->GetPid());
     } else {

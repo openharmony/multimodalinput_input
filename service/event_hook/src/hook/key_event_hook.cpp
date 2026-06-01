@@ -41,6 +41,9 @@ bool KeyEventHook::OnKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
         MMI_HILOGE("Packet key event failed, errCode:%{public}d", STREAM_BUF_WRITE_FAIL);
         return false;
     }
+    if (InputEventDataTransformation::WriteKeyEventExt(keyEvent, pkt) != RET_OK) {
+        MMI_HILOGE("Write key event extension failed");
+    }
     if (!SendNetPacketToHook(pkt)) {
         MMI_HILOGE("SendNetPacketToHook failed");
         return false;

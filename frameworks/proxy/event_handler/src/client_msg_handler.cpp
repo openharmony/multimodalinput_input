@@ -162,6 +162,9 @@ int32_t ClientMsgHandler::OnKeyEvent(const UDSClient& client, NetPacket& pkt)
         MMI_HILOG_DISPATCHE("Packet read fd failed");
         return PACKET_READ_FAIL;
     }
+    if (InputEventDataTransformation::ReadKeyEventExt(pkt, key) != RET_OK) {
+        MMI_HILOG_DISPATCHE("Read key event extension failed");
+    }
     MMI_HILOG_DISPATCHW("The client receives a key, Fd:%{public}d", fd);
     BytraceAdapter::StartBytrace(key, BytraceAdapter::TRACE_START, BytraceAdapter::KEY_DISPATCH_EVENT);
     key->SetProcessedCallback(dispatchCallback_);
@@ -186,6 +189,9 @@ int32_t ClientMsgHandler::OnPreKeyEvent(const UDSClient& client, NetPacket& pkt)
         MMI_HILOG_ANRDETECTE("Packet read fd failed");
         return PACKET_READ_FAIL;
     }
+    if (InputEventDataTransformation::ReadKeyEventExt(pkt, keyEvent) != RET_OK) {
+        MMI_HILOG_DISPATCHE("Read key event extension failed");
+    }
     MMI_HILOG_DISPATCHD("PRE key event dispathcer of clent, Fd:%{public}d", fd);
     BytraceAdapter::StartBytrace(keyEvent, BytraceAdapter::TRACE_START, BytraceAdapter::KEY_DISPATCH_EVENT);
     PRE_MONITOR_MGR.OnPreKeyEvent(keyEvent, handlerId);
@@ -201,6 +207,9 @@ int32_t ClientMsgHandler::OnHookKeyEvent(const UDSClient& client, NetPacket& pkt
     if (ret != RET_OK) {
         MMI_HILOG_DISPATCHE("Read netPacket failed");
         return RET_ERR;
+    }
+    if (InputEventDataTransformation::ReadKeyEventExt(pkt, keyEvent) != RET_OK) {
+        MMI_HILOG_DISPATCHE("Read key event extension failed");
     }
     BytraceAdapter::StartBytrace(keyEvent, BytraceAdapter::TRACE_START, BytraceAdapter::KEY_DISPATCH_EVENT);
     KEY_EVENT_HOOK_HANDLER.OnKeyEvent(keyEvent);
@@ -318,6 +327,9 @@ int32_t ClientMsgHandler::OnSubscribeKeyEventCallback(const UDSClient &client, N
         MMI_HILOGE("Packet read fd failed");
         return PACKET_READ_FAIL;
     }
+    if (InputEventDataTransformation::ReadKeyEventExt(pkt, keyEvent) != RET_OK) {
+        MMI_HILOGE("Read key event extension failed");
+    }
     if (keyEvent->GetKeyCode() == KeyEvent::KEYCODE_POWER) {
         if (!EventLogHelper::IsBetaVersion()) {
             MMI_HILOGI("Subscribe:%{public}d,Fd:%{public}d,KeyEvent:%{public}d, "
@@ -352,6 +364,9 @@ int32_t ClientMsgHandler::OnSubscribeKeyMonitor(const UDSClient &client, NetPack
     if (ret != RET_OK) {
         MMI_HILOGE("Read net packet failed");
         return RET_ERR;
+    }
+    if (InputEventDataTransformation::ReadKeyEventExt(pkt, keyEvent) != RET_OK) {
+        MMI_HILOGE("Read key event extension failed");
     }
     MMI_HILOGD("Key monitor(No:%{public}d, KC:%{private}d, KA:%{public}d)",
         keyEvent->GetId(), keyEvent->GetKeyCode(), keyEvent->GetKeyAction());
@@ -435,6 +450,9 @@ int32_t ClientMsgHandler::ReportKeyEvent(const UDSClient& client, NetPacket& pkt
     if (InputEventDataTransformation::NetPacketToKeyEvent(pkt, keyEvent) != ERR_OK) {
         MMI_HILOG_DISPATCHE("Failed to deserialize key event");
         return RET_ERR;
+    }
+    if (InputEventDataTransformation::ReadKeyEventExt(pkt, keyEvent) != RET_OK) {
+        MMI_HILOG_DISPATCHE("Read key event extension failed");
     }
     LogTracer lt(keyEvent->GetId(), keyEvent->GetEventType(), keyEvent->GetKeyAction());
     BytraceAdapter::StartBytrace(keyEvent, BytraceAdapter::TRACE_START, BytraceAdapter::KEY_INTERCEPT_EVENT);
@@ -606,6 +624,11 @@ int32_t ClientMsgHandler::OnSubscribeInputActiveCallback(const UDSClient& client
         MMI_HILOGE("Packet read subscribeId failed");
         return RET_ERR;
     }
+    if (handleEventType == HANDLE_EVENT_TYPE_KEY) {
+        if (InputEventDataTransformation::ReadKeyEventExt(pkt, keyEvent) != RET_OK) {
+            MMI_HILOGE("Read key event extension failed");
+        }
+    }
     return handleEventType == HANDLE_EVENT_TYPE_KEY ?
         INPUT_ACTIVE_SUBSCRIBE_MGR.OnSubscribeInputActiveCallback(keyEvent, subscribeId) :
         INPUT_ACTIVE_SUBSCRIBE_MGR.OnSubscribeInputActiveCallback(pointerEvent, subscribeId);
@@ -620,6 +643,9 @@ int32_t ClientMsgHandler::OnHookKey(const UDSClient &client, NetPacket &pkt)
     if (ret != RET_OK) {
         MMI_HILOG_DISPATCHE("Read netPacket failed, ret:%{public}d", ret);
         return RET_ERR;
+    }
+    if (InputEventDataTransformation::ReadKeyEventExt(pkt, keyEvent) != RET_OK) {
+        MMI_HILOG_DISPATCHE("Read key event extension failed");
     }
     BytraceAdapter::StartBytrace(keyEvent, BytraceAdapter::TRACE_START, BytraceAdapter::KEY_HOOK_EVENT);
     INPUT_EVENT_HOOK_HANDLER.OnKeyEvent(keyEvent);

@@ -148,7 +148,9 @@ int32_t KeyEventNormalize::Normalize(struct libinput_event *event, std::shared_p
     keyEvent->SetDeviceId(deviceId);
     keyEvent->SetSourceType(InputEvent::SOURCE_TYPE_UNKNOWN);
     keyEvent->SetKeyCode(keyCode);
+    keyEvent->SetRawCode(rawCode);
     keyEvent->SetKeyAction(keyAction);
+    keyEvent->SetRepeatCount(0);
     StartLogTraceId(keyEvent->GetId(), keyEvent->GetEventType(), keyEvent->GetKeyAction());
     if (keyEvent->GetPressedKeys().empty()) {
         keyEvent->SetActionStartTime(time);
@@ -158,6 +160,7 @@ int32_t KeyEventNormalize::Normalize(struct libinput_event *event, std::shared_p
     bool isKeyPressed = (libinput_event_keyboard_get_key_state(data) != KEYSTATUS);
     item.SetDownTime(time);
     item.SetKeyCode(keyCode);
+    item.SetRawCode(rawCode);
     item.SetDeviceId(deviceId);
     item.SetPressed(isKeyPressed);
     item.SetUnicode(KeyCodeToUnicode(keyCode, keyEvent));
@@ -815,12 +818,15 @@ std::shared_ptr<KeyEvent> KeyEventNormalize::PackageKeyUpEvent(int32_t deviceId,
     keyEvent->RemoveReleasedKeyItems();
     keyEvent->SetDeviceId(deviceId);
     keyEvent->SetKeyCode(keyCode);
+    keyEvent->SetRawCode(rawCode);
     keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP);
+    keyEvent->SetRepeatCount(0);
     keyEvent->SetActionTime(time);
 
     KeyEvent::KeyItem item {};
     item.SetDownTime(time);
     item.SetKeyCode(keyCode);
+    item.SetRawCode(rawCode);
     item.SetDeviceId(deviceId);
     item.SetPressed(false);
     item.SetUnicode(KeyCodeToUnicode(keyCode, keyEvent));

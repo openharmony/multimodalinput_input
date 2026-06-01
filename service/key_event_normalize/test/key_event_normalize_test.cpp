@@ -115,6 +115,10 @@ HWTEST_F(KeyEventNormalizeTest, KeyEventNormalizeTest_Normalize_001, TestSize.Le
     keyEvent->SetAction(KeyEvent::KEY_ACTION_UP);
     int32_t result = KeyEventHdr->Normalize(event, keyEvent);
     EXPECT_EQ(result, RET_OK);
+    EXPECT_EQ(keyEvent->GetRawCode(), 29);
+    auto keyItem = keyEvent->GetKeyItem();
+    ASSERT_TRUE(keyItem.has_value());
+    EXPECT_EQ(keyItem->GetRawCode(), 29);
 }
 
 /**

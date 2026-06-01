@@ -377,6 +377,9 @@ void KeyMonitorManager::NotifyKeyMonitor(std::shared_ptr<KeyEvent> keyEvent,
     InputEventDataTransformation::KeyEventToNetPacket(keyEvent, pkt);
     pkt << status;
     CHKPV(keyEvent);
+    if (InputEventDataTransformation::WriteKeyEventExt(keyEvent, pkt) != RET_OK) {
+        MMI_HILOGE("Write key event extension failed");
+    }
     if (pkt.ChkRWError()) {
         MMI_HILOGE("Failed to package key event(No:%{public}d)", keyEvent->GetId());
         return;

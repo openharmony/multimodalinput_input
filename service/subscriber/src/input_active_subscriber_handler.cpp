@@ -294,6 +294,9 @@ void InputActiveSubscriberHandler::NotifySubscriber(
     }
     int32_t fd = subscriber->sess_->GetFd();
     pkt << subscriber->id_;
+    if (InputEventDataTransformation::WriteKeyEventExt(keyEvent, pkt) != RET_OK) {
+        MMI_HILOGE("Write key event extension failed");
+    }
     MMI_HILOGI("Notify subscriber id: %{public}d, keycode:%{private}d, pid: %{public}d",
         subscriber->id_, keyEvent->GetKeyCode(), subscriber->sess_->GetPid());
     if (pkt.ChkRWError()) {

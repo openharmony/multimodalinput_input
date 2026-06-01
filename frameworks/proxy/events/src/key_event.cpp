@@ -904,6 +904,7 @@ const int32_t KeyEvent::INTENTION_REJECTCALL = 202;
 
 const int32_t KeyEvent::INTENTION_CAMERA = 300;
 const int32_t maxKeysSize = 1000;
+constexpr size_t KEY_EVENT_RAW_CODE_MIN_SIZE { sizeof(int32_t) * 3 };
 
 const uint32_t KeyEvent::EXTENDED_FUNCTION_KEY_MASK = 0xFF000000;
 const uint32_t KeyEvent::EXTENDED_FUNCTION_KEY_FLAG = 0x01000000;
@@ -931,6 +932,16 @@ int32_t KeyEvent::KeyItem::GetKeyCode() const
 void KeyEvent::KeyItem::SetKeyCode(int32_t keyCode)
 {
     keyCode_ = keyCode;
+}
+
+int32_t KeyEvent::KeyItem::GetRawCode() const
+{
+    return rawCode_;
+}
+
+void KeyEvent::KeyItem::SetRawCode(int32_t rawCode)
+{
+    rawCode_ = rawCode;
 }
 
 int64_t KeyEvent::KeyItem::GetDownTime() const
@@ -1011,6 +1022,7 @@ KeyEvent::KeyEvent(int32_t eventType) : InputEvent(eventType) {}
 KeyEvent::KeyEvent(const KeyEvent& other)
     : InputEvent(other),
       keyCode_(other.keyCode_),
+      rawCode_(other.rawCode_),
       keys_(other.keys_),
       keyAction_(other.keyAction_),
       keyIntention_(other.keyIntention_),
@@ -1021,7 +1033,8 @@ KeyEvent::KeyEvent(const KeyEvent& other)
       enhanceData_(other.enhanceData_),
 #endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
       repeat_(other.repeat_),
-      repeatKey_(other.repeatKey_) {}
+      repeatKey_(other.repeatKey_),
+      repeatCount_(other.repeatCount_) {}
 
 KeyEvent::~KeyEvent() {}
 
@@ -1037,6 +1050,7 @@ void KeyEvent::Reset()
     // LCOV_EXCL_START
     InputEvent::Reset();
     keyCode_ = KeyEvent::UNKNOWN_FUNCTION_KEY;
+    rawCode_ = -1;
     keyAction_ = KeyEvent::KEY_ACTION_UNKNOWN;
     keyIntention_ = KeyEvent::INTENTION_UNKNOWN;
     numLock_ = false;
@@ -1044,6 +1058,7 @@ void KeyEvent::Reset()
     scrollLock_ = false;
     repeat_ = false;
     repeatKey_ = false;
+    repeatCount_ = 0;
     keys_.clear();
 #ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
     enhanceData_.clear();
@@ -1056,6 +1071,10 @@ std::string KeyEvent::ToString()
     std::string eventStr = InputEvent::ToString();
     eventStr += ",keyCode:";
     eventStr += std::to_string(keyCode_);
+    eventStr += ",rawCode:";
+    eventStr += std::to_string(rawCode_);
+    eventStr += ",repeatCount:";
+    eventStr += std::to_string(repeatCount_);
     eventStr += ",keyAction:";
     eventStr += std::to_string(keyAction_);
     eventStr += ",keyItems:[";
@@ -1067,6 +1086,8 @@ std::string KeyEvent::ToString()
         eventStr += std::to_string(keys_[i].GetDeviceId());
         eventStr += ",keyCode:";
         eventStr += std::to_string(keys_[i].GetKeyCode());
+        eventStr += ",rawCode:";
+        eventStr += std::to_string(keys_[i].GetRawCode());
         eventStr += ",downTime:";
         eventStr += std::to_string(keys_[i].GetDownTime());
         eventStr += ",unicode:";
@@ -1094,6 +1115,26 @@ int32_t KeyEvent::GetKeyCode() const
 void KeyEvent::SetKeyCode(int32_t keyCode)
 {
     keyCode_ = keyCode;
+}
+
+int32_t KeyEvent::GetRawCode() const
+{
+    return rawCode_;
+}
+
+void KeyEvent::SetRawCode(int32_t rawCode)
+{
+    rawCode_ = rawCode;
+}
+
+int32_t KeyEvent::GetRepeatCount() const
+{
+    return repeatCount_;
+}
+
+void KeyEvent::SetRepeatCount(int32_t repeatCount)
+{
+    repeatCount_ = repeatCount < 0 ? 0 : repeatCount;
 }
 
 int32_t KeyEvent::GetKeyAction() const
@@ -1351,6 +1392,12 @@ bool KeyEvent::WriteToParcel(Parcel &out) const
         WRITEUINT32(out, enhanceData_[i]);
     }
 #endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
+    WRITEINT32(out, rawCode_);
+    WRITEINT32(out, static_cast<int32_t>(keys_.size()));
+    for (const auto &item : keys_) {
+        WRITEINT32(out, item.GetRawCode());
+    }
+    WRITEINT32(out, repeatCount_);
     return true;
 }
 
@@ -1388,6 +1435,33 @@ bool KeyEvent::ReadFromParcel(Parcel &in)
         return false;
     }
 #endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
+    if (in.GetReadableBytes() < KEY_EVENT_RAW_CODE_MIN_SIZE) {
+        return true;
+    }
+
+    int32_t rawCode = -1;
+    READINT32(in, rawCode);
+
+    int32_t rawCodeSize = 0;
+    READINT32(in, rawCodeSize);
+    if (rawCodeSize < 0 || rawCodeSize > keysSize) {
+        MMI_HILOGW("Key event raw code size is invalid");
+        return true;
+    }
+    const size_t rawCodeBytes = static_cast<size_t>(rawCodeSize) * sizeof(int32_t);
+    if (in.GetReadableBytes() < rawCodeBytes + sizeof(int32_t)) {
+        MMI_HILOGW("Key event raw code extension is truncated");
+        return true;
+    }
+    for (int32_t i = 0; i < rawCodeSize; i++) {
+        int32_t rawCode = -1;
+        READINT32(in, rawCode);
+        keys_[static_cast<size_t>(i)].SetRawCode(rawCode);
+    }
+    int32_t repeatCount = 0;
+    READINT32(in, repeatCount);
+    rawCode_ = rawCode;
+    SetRepeatCount(repeatCount);
     return true;
 }
 

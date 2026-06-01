@@ -143,6 +143,9 @@ void EventPreMonitorHandler::SessionHandler::SendToClient(
     }
     int32_t fd = session_->GetFd();
     pkt << fd << handlerId;
+    if (InputEventDataTransformation::WriteKeyEventExt(keyEvent, pkt) != RET_OK) {
+        MMI_HILOGE("Write key event extension failed");
+    }
     if (!session_->SendMsg(pkt)) {
         MMI_HILOGE("Send message failed, errCode:%{public}d", MSG_SEND_FAIL);
     }

@@ -31,6 +31,8 @@ class InputEventDataTransformation {
 public:
     static int32_t KeyEventToNetPacket(const std::shared_ptr<KeyEvent> key, NetPacket &pkt);
     static int32_t NetPacketToKeyEvent(NetPacket &pkt, std::shared_ptr<KeyEvent> key);
+    static int32_t WriteKeyEventExt(const std::shared_ptr<KeyEvent> key, NetPacket &pkt);
+    static int32_t ReadKeyEventExt(NetPacket &pkt, std::shared_ptr<KeyEvent> key);
     static int32_t SwitchEventToNetPacket(const std::shared_ptr<SwitchEvent> key, NetPacket &pkt);
     static int32_t NetPacketToSwitchEvent(NetPacket &pkt, std::shared_ptr<SwitchEvent> key);
     static int32_t LongPressEventToNetPacket(const LongPressEvent &longPressEvent, NetPacket &pkt);
