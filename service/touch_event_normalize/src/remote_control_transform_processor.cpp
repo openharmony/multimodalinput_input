@@ -130,7 +130,8 @@ bool Remote_ControlTransformProcessor::HandlePostInner(struct libinput_event* ev
 {
     CALL_DEBUG_ENTER;
     CHKPF(pointerEvent_);
-    auto mouseInfo = WIN_MGR->GetMouseInfo();
+    int32_t groupId = WIN_MGR->GetDeviceGroupId(deviceId_);
+    auto mouseInfo = WIN_MGR->GetMouseInfo(groupId);
     PointerEvent::PointerItem pointerItem;
     pointerItem.SetDisplayX(mouseInfo.physicalX);
     pointerItem.SetDisplayY(mouseInfo.physicalY);
