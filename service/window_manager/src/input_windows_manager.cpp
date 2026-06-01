@@ -731,9 +731,9 @@ bool InputWindowsManager::HasGroupState(int32_t groupId) const
     return mouseLocationMap_.find(groupId) != mouseLocationMap_.end();
 }
 
-void InputWindowsManager::RecordSequenceBegin(const SequenceKey &key, int32_t groupId, int32_t windowId)
+void InputWindowsManager::RecordSequenceBegin(const InputSequenceKey &key, int32_t groupId, int32_t windowId)
 {
-    SequenceSnapshot snap;
+    InputSequenceSnapshot snap;
     snap.groupId = groupId;
     snap.windowId = windowId;
     sequenceSnapshots_[key] = snap;
@@ -741,13 +741,13 @@ void InputWindowsManager::RecordSequenceBegin(const SequenceKey &key, int32_t gr
         key.deviceId, key.itemId, static_cast<int32_t>(key.type), groupId, windowId);
 }
 
-std::optional<SequenceSnapshot> InputWindowsManager::ConsumeSequenceSnapshot(const SequenceKey &key)
+std::optional<InputSequenceSnapshot> InputWindowsManager::ConsumeSequenceSnapshot(const InputSequenceKey &key)
 {
     auto it = sequenceSnapshots_.find(key);
     if (it == sequenceSnapshots_.end()) {
         return std::nullopt;
     }
-    SequenceSnapshot snap = it->second;
+    InputSequenceSnapshot snap = it->second;
     sequenceSnapshots_.erase(it);
     return snap;
 }
@@ -880,10 +880,10 @@ void InputWindowsManager::HandleKeyEventWindowId(std::shared_ptr<KeyEvent> keyEv
     // even if the device was rebound mid-sequence.
     int32_t keyAction = keyEvent->GetKeyAction();
     if (keyAction == KeyEvent::KEY_ACTION_UP || keyAction == KeyEvent::KEY_ACTION_CANCEL) {
-        SequenceKey seqKey;
+        InputSequenceKey seqKey;
         seqKey.deviceId = keyEvent->GetDeviceId();
         seqKey.itemId = keyEvent->GetKeyCode();
-        seqKey.type = SequenceType::KEY;
+        seqKey.type = InputSequenceType::KEY;
         auto snap = ConsumeSequenceSnapshot(seqKey);
         if (snap.has_value()) {
             groupId = snap->groupId;
@@ -911,10 +911,10 @@ void InputWindowsManager::HandleKeyEventWindowId(std::shared_ptr<KeyEvent> keyEv
             // Sequence closure: on key-down, snapshot the current group/window
             // so that a later key-up after rebind still reaches this target.
             if (keyAction == KeyEvent::KEY_ACTION_DOWN) {
-                SequenceKey seqKey;
+                InputSequenceKey seqKey;
                 seqKey.deviceId = keyEvent->GetDeviceId();
                 seqKey.itemId = keyEvent->GetKeyCode();
-                seqKey.type = SequenceType::KEY;
+                seqKey.type = InputSequenceType::KEY;
                 RecordSequenceBegin(seqKey, groupId, focusWindowId);
             }
             return;
@@ -5263,10 +5263,10 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
         MMI_HILOGD("Is in drag scene");
         // Sequence closure: record the current group/window on button-down so
         // that a button-up after rebind still reaches the original target.
-        SequenceKey seqKey;
+        InputSequenceKey seqKey;
         seqKey.deviceId = pointerEvent->GetDeviceId();
         seqKey.itemId = pointerEvent->GetPointerId();
-        seqKey.type = SequenceType::BUTTON;
+        seqKey.type = InputSequenceType::BUTTON;
         RecordSequenceBegin(seqKey, groupId, touchWindow->id);
     }
     if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_BUTTON_UP) {
@@ -5274,10 +5274,10 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
         dragFlag_ = false;
         isDragBorder_ = false;
         // Sequence closure: consume the snapshot recorded at button-down.
-        SequenceKey seqKey;
+        InputSequenceKey seqKey;
         seqKey.deviceId = pointerEvent->GetDeviceId();
         seqKey.itemId = pointerEvent->GetPointerId();
-        seqKey.type = SequenceType::BUTTON;
+        seqKey.type = InputSequenceType::BUTTON;
         auto snap = ConsumeSequenceSnapshot(seqKey);
         if (snap.has_value()) {
             MMI_HILOGD("Button sequence closure: restored group:%{public}d win:%{public}d",
@@ -7291,10 +7291,10 @@ int32_t InputWindowsManager::UpdateTouchPadGestureTarget(std::shared_ptr<Pointer
     // even if the device was rebound mid-gesture.
     int32_t action = pointerEvent->GetPointerAction();
     if (action == PointerEvent::POINTER_ACTION_SWIPE_END) {
-        SequenceKey seqKey;
+        InputSequenceKey seqKey;
         seqKey.deviceId = pointerEvent->GetDeviceId();
         seqKey.itemId = pointerEvent->GetPointerId();
-        seqKey.type = SequenceType::POINTER;
+        seqKey.type = InputSequenceType::POINTER;
         auto snap = ConsumeSequenceSnapshot(seqKey);
         if (snap.has_value()) {
             groupId = snap->groupId;
@@ -7320,10 +7320,10 @@ int32_t InputWindowsManager::UpdateTouchPadGestureTarget(std::shared_ptr<Pointer
 
     // Sequence closure: on SWIPE_BEGIN, record a snapshot for this gesture.
     if (action == PointerEvent::POINTER_ACTION_SWIPE_BEGIN) {
-        SequenceKey seqKey;
+        InputSequenceKey seqKey;
         seqKey.deviceId = pointerEvent->GetDeviceId();
         seqKey.itemId = pointerEvent->GetPointerId();
-        seqKey.type = SequenceType::POINTER;
+        seqKey.type = InputSequenceType::POINTER;
         RecordSequenceBegin(seqKey, groupId, windowInfo->id);
     }
 
@@ -8271,12 +8271,12 @@ void InputWindowsManager::Dump(int32_t fd, const std::vector<std::string> &args)
 }
 
 namespace {
-const char* SequenceTypeToString(SequenceType type)
+const char* InputSequenceTypeToString(InputSequenceType type)
 {
     switch (type) {
-        case SequenceType::KEY:     return "KEY";
-        case SequenceType::BUTTON:  return "BUTTON";
-        case SequenceType::POINTER: return "POINTER";
+        case InputSequenceType::KEY:     return "KEY";
+        case InputSequenceType::BUTTON:  return "BUTTON";
+        case InputSequenceType::POINTER: return "POINTER";
         default:                    return "UNKNOWN";
     }
 }
@@ -8392,7 +8392,7 @@ void InputWindowsManager::DumpMultiGroupState(int32_t fd)
     } else {
         for (const auto& [key, snap] : sequenceSnapshots_) {
             mprintf(fd, "  deviceId=%d itemId=%d type=%s beginGroup=%d beginWindow=%d",
-                key.deviceId, key.itemId, SequenceTypeToString(key.type),
+                key.deviceId, key.itemId, InputSequenceTypeToString(key.type),
                 snap.groupId, snap.windowId);
         }
     }

@@ -18673,10 +18673,10 @@ HWTEST_F(InputWindowsManagerTest, GroupStateIsolation_SequenceClosure_KeyDown_00
     constexpr int32_t GROUP_B = 2;
 
     // Simulate key-down while unbound (group A = main)
-    SequenceKey seqKey;
+    InputSequenceKey seqKey;
     seqKey.deviceId = DEVICE_ID;
     seqKey.itemId = KEY_CODE_A;
-    seqKey.type = SequenceType::KEY;
+    seqKey.type = InputSequenceType::KEY;
 
     mgr.RecordSequenceBegin(seqKey, GROUP_A, WINDOW_A);
 
@@ -18718,24 +18718,24 @@ HWTEST_F(InputWindowsManagerTest, GroupStateIsolation_SequenceClosure_MultipleKe
     InputWindowsManager mgr;
 
     // Sequence 1: device 10, key 29, group 0, window 100
-    SequenceKey seq1;
+    InputSequenceKey seq1;
     seq1.deviceId = 10;
     seq1.itemId = 29;
-    seq1.type = SequenceType::KEY;
+    seq1.type = InputSequenceType::KEY;
     mgr.RecordSequenceBegin(seq1, 0, 100);
 
     // Sequence 2: device 20, key 30, group 1, window 200
-    SequenceKey seq2;
+    InputSequenceKey seq2;
     seq2.deviceId = 20;
     seq2.itemId = 30;
-    seq2.type = SequenceType::KEY;
+    seq2.type = InputSequenceType::KEY;
     mgr.RecordSequenceBegin(seq2, 1, 200);
 
     // Sequence 3: device 10, pointer 0 (BUTTON), group 0, window 100
-    SequenceKey seq3;
+    InputSequenceKey seq3;
     seq3.deviceId = 10;
     seq3.itemId = 0;
-    seq3.type = SequenceType::BUTTON;
+    seq3.type = InputSequenceType::BUTTON;
     mgr.RecordSequenceBegin(seq3, 0, 100);
 
     EXPECT_EQ(mgr.GetSequenceSnapshotCount(), 3u)
@@ -19087,25 +19087,25 @@ HWTEST_F(InputWindowsManagerTest, GroupStateIsolation_EnsureGroupState_MainGroup
 }
 
 /**
- * @tc.name: GroupStateIsolation_SequenceKey_Ordering_001
- * @tc.desc: TASK-7: SequenceKey comparison operators should correctly
+ * @tc.name: GroupStateIsolation_InputSequenceKey_Ordering_001
+ * @tc.desc: TASK-7: InputSequenceKey comparison operators should correctly
  *           distinguish keys by deviceId, itemId, and type.
  * @tc.type: FUNC
  * @tc.require: AC-2.7
  */
-HWTEST_F(InputWindowsManagerTest, GroupStateIsolation_SequenceKey_Ordering_001, TestSize.Level1)
+HWTEST_F(InputWindowsManagerTest, GroupStateIsolation_InputSequenceKey_Ordering_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
 
-    SequenceKey a;
+    InputSequenceKey a;
     a.deviceId = 1;
     a.itemId = 10;
-    a.type = SequenceType::KEY;
+    a.type = InputSequenceType::KEY;
 
-    SequenceKey b;
+    InputSequenceKey b;
     b.deviceId = 1;
     b.itemId = 10;
-    b.type = SequenceType::KEY;
+    b.type = InputSequenceType::KEY;
 
     // Equal keys
     EXPECT_TRUE(a == b);
@@ -19113,27 +19113,27 @@ HWTEST_F(InputWindowsManagerTest, GroupStateIsolation_SequenceKey_Ordering_001, 
     EXPECT_FALSE(b < a);
 
     // Different deviceId
-    SequenceKey c;
+    InputSequenceKey c;
     c.deviceId = 2;
     c.itemId = 10;
-    c.type = SequenceType::KEY;
+    c.type = InputSequenceType::KEY;
     EXPECT_FALSE(a == c);
     EXPECT_TRUE(a < c);  // 1 < 2
 
     // Different type
-    SequenceKey d;
+    InputSequenceKey d;
     d.deviceId = 1;
     d.itemId = 10;
-    d.type = SequenceType::BUTTON;
+    d.type = InputSequenceType::BUTTON;
     EXPECT_FALSE(a == d);
     // KEY (0) < BUTTON (1)
     EXPECT_TRUE(a < d);
 
     // Different itemId
-    SequenceKey e;
+    InputSequenceKey e;
     e.deviceId = 1;
     e.itemId = 20;
-    e.type = SequenceType::KEY;
+    e.type = InputSequenceType::KEY;
     EXPECT_FALSE(a == e);
     EXPECT_TRUE(a < e);  // 10 < 20
 }
@@ -19188,10 +19188,10 @@ HWTEST_F(InputWindowsManagerTest, LifecycleCleanup_ExplicitUnbind_001, TestSize.
     ASSERT_TRUE(mgr.bindInfo_.GetRuntimeBinding(42).has_value());
 
     // Record a sequence snapshot for device 42
-    SequenceKey seqKey;
+    InputSequenceKey seqKey;
     seqKey.deviceId = 42;
     seqKey.itemId = 0;
-    seqKey.type = SequenceType::BUTTON;
+    seqKey.type = InputSequenceType::BUTTON;
     mgr.RecordSequenceBegin(seqKey, 5, 100);
     ASSERT_EQ(mgr.GetSequenceSnapshotCount(), 1u);
 
@@ -19223,18 +19223,18 @@ HWTEST_F(InputWindowsManagerTest, LifecycleCleanup_DeviceOffline_001, TestSize.L
     ASSERT_TRUE(mgr.bindInfo_.GetRuntimeBinding(88).has_value());
 
     // Record a sequence snapshot for device 88
-    SequenceKey seqKey;
+    InputSequenceKey seqKey;
     seqKey.deviceId = 88;
     seqKey.itemId = 5;
-    seqKey.type = SequenceType::KEY;
+    seqKey.type = InputSequenceType::KEY;
     mgr.RecordSequenceBegin(seqKey, 0, 200);
     ASSERT_EQ(mgr.GetSequenceSnapshotCount(), 1u);
 
     // Also record a snapshot for a different device (should survive)
-    SequenceKey otherKey;
+    InputSequenceKey otherKey;
     otherKey.deviceId = 99;
     otherKey.itemId = 5;
-    otherKey.type = SequenceType::KEY;
+    otherKey.type = InputSequenceType::KEY;
     mgr.RecordSequenceBegin(otherKey, 0, 300);
     ASSERT_EQ(mgr.GetSequenceSnapshotCount(), 2u);
 
@@ -19421,23 +19421,23 @@ HWTEST_F(InputWindowsManagerTest, LifecycleCleanup_ClearSequenceSnapshotsByDevic
     InputWindowsManager mgr;
 
     // Record multiple snapshots for device 10
-    SequenceKey k1;
+    InputSequenceKey k1;
     k1.deviceId = 10;
     k1.itemId = 1;
-    k1.type = SequenceType::KEY;
+    k1.type = InputSequenceType::KEY;
     mgr.RecordSequenceBegin(k1, 0, 100);
 
-    SequenceKey k2;
+    InputSequenceKey k2;
     k2.deviceId = 10;
     k2.itemId = 0;
-    k2.type = SequenceType::BUTTON;
+    k2.type = InputSequenceType::BUTTON;
     mgr.RecordSequenceBegin(k2, 0, 100);
 
     // Record one for device 20
-    SequenceKey k3;
+    InputSequenceKey k3;
     k3.deviceId = 20;
     k3.itemId = 1;
-    k3.type = SequenceType::KEY;
+    k3.type = InputSequenceType::KEY;
     mgr.RecordSequenceBegin(k3, 0, 200);
 
     ASSERT_EQ(mgr.GetSequenceSnapshotCount(), 3u);
@@ -20881,10 +20881,10 @@ HWTEST_F(InputWindowsManagerTest, SequenceClosure_ButtonDownUp_BindMidSequence_0
 
     // Step 1: Simulate button down by recording a snapshot directly
     // (UpdateMouseTarget is too complex to call in unit test without full display setup)
-    SequenceKey seqKey;
+    InputSequenceKey seqKey;
     seqKey.deviceId = DEVICE_ID;
     seqKey.itemId = POINTER_ID;
-    seqKey.type = SequenceType::BUTTON;
+    seqKey.type = InputSequenceType::BUTTON;
     mgr.RecordSequenceBegin(seqKey, GROUP_A, WINDOW_A);
     EXPECT_EQ(mgr.GetSequenceSnapshotCount(), 1u)
         << "Button down should record a sequence snapshot";
@@ -20925,10 +20925,10 @@ HWTEST_F(InputWindowsManagerTest, SequenceClosure_PointerDownUp_BindMidSequence_
     constexpr int32_t GROUP_B = 14;
 
     // Record pointer down snapshot
-    SequenceKey seqKey;
+    InputSequenceKey seqKey;
     seqKey.deviceId = DEVICE_ID;
     seqKey.itemId = POINTER_ID;
-    seqKey.type = SequenceType::POINTER;
+    seqKey.type = InputSequenceType::POINTER;
     mgr.RecordSequenceBegin(seqKey, GROUP_A, WINDOW_A);
     EXPECT_EQ(mgr.GetSequenceSnapshotCount(), 1u);
 
@@ -20965,10 +20965,10 @@ HWTEST_F(InputWindowsManagerTest, SequenceClosure_PointerCancel_BindMidSequence_
     constexpr int32_t GROUP_B = 15;
 
     // Record pointer down
-    SequenceKey seqKey;
+    InputSequenceKey seqKey;
     seqKey.deviceId = DEVICE_ID;
     seqKey.itemId = POINTER_ID;
-    seqKey.type = SequenceType::POINTER;
+    seqKey.type = InputSequenceType::POINTER;
     mgr.RecordSequenceBegin(seqKey, GROUP_A, WINDOW_A);
     EXPECT_EQ(mgr.GetSequenceSnapshotCount(), 1u);
 
@@ -21002,10 +21002,10 @@ HWTEST_F(InputWindowsManagerTest, SequenceClosure_GestureBeginEnd_BindMidSequenc
     constexpr int32_t GROUP_B = 16;
 
     // Simulate gesture begin by recording snapshot (POINTER type)
-    SequenceKey seqKey;
+    InputSequenceKey seqKey;
     seqKey.deviceId = DEVICE_ID;
     seqKey.itemId = POINTER_ID;
-    seqKey.type = SequenceType::POINTER;
+    seqKey.type = InputSequenceType::POINTER;
     mgr.RecordSequenceBegin(seqKey, GROUP_A, WINDOW_A);
     EXPECT_EQ(mgr.GetSequenceSnapshotCount(), 1u);
 
@@ -21039,22 +21039,22 @@ HWTEST_F(InputWindowsManagerTest, SequenceClosure_MultipleSimultaneous_Different
     constexpr int32_t DEV_TOUCH = 1003;
 
     // Three concurrent sequences: keyboard, mouse button, touch pointer
-    SequenceKey kbdKey;
+    InputSequenceKey kbdKey;
     kbdKey.deviceId = DEV_KBD;
     kbdKey.itemId = 29;  // KEY_A
-    kbdKey.type = SequenceType::KEY;
+    kbdKey.type = InputSequenceType::KEY;
     mgr.RecordSequenceBegin(kbdKey, 0, 100);
 
-    SequenceKey mouseKey;
+    InputSequenceKey mouseKey;
     mouseKey.deviceId = DEV_MOUSE;
     mouseKey.itemId = 0;
-    mouseKey.type = SequenceType::BUTTON;
+    mouseKey.type = InputSequenceType::BUTTON;
     mgr.RecordSequenceBegin(mouseKey, 1, 200);
 
-    SequenceKey touchKey;
+    InputSequenceKey touchKey;
     touchKey.deviceId = DEV_TOUCH;
     touchKey.itemId = 0;
-    touchKey.type = SequenceType::POINTER;
+    touchKey.type = InputSequenceType::POINTER;
     mgr.RecordSequenceBegin(touchKey, 2, 300);
 
     EXPECT_EQ(mgr.GetSequenceSnapshotCount(), 3u)
@@ -21101,10 +21101,10 @@ HWTEST_F(InputWindowsManagerTest, SequenceClosure_NoSnapshotForUpWithoutDown_001
     constexpr int32_t KEY_CODE = 31;
 
     // No prior key-down was recorded - consuming should return nullopt
-    SequenceKey seqKey;
+    InputSequenceKey seqKey;
     seqKey.deviceId = DEVICE_ID;
     seqKey.itemId = KEY_CODE;
-    seqKey.type = SequenceType::KEY;
+    seqKey.type = InputSequenceType::KEY;
     auto snap = mgr.ConsumeSequenceSnapshot(seqKey);
     EXPECT_FALSE(snap.has_value())
         << "Consuming without prior recording should return nullopt";
@@ -21129,10 +21129,10 @@ HWTEST_F(InputWindowsManagerTest, SequenceClosure_UnbindMidSequence_001, TestSiz
     constexpr int32_t WINDOW_B = 250;
 
     // Record snapshot for a device that was bound to group B
-    SequenceKey seqKey;
+    InputSequenceKey seqKey;
     seqKey.deviceId = DEVICE_ID;
     seqKey.itemId = KEY_CODE;
-    seqKey.type = SequenceType::KEY;
+    seqKey.type = InputSequenceType::KEY;
     mgr.RecordSequenceBegin(seqKey, GROUP_B, WINDOW_B);
     EXPECT_EQ(mgr.GetSequenceSnapshotCount(), 1u);
 
@@ -21171,10 +21171,10 @@ HWTEST_F(InputWindowsManagerTest, SequenceClosure_RebindMidSequence_001, TestSiz
     constexpr int32_t GROUP_C = 30;
 
     // Record snapshot while bound to group A
-    SequenceKey seqKey;
+    InputSequenceKey seqKey;
     seqKey.deviceId = DEVICE_ID;
     seqKey.itemId = KEY_CODE;
-    seqKey.type = SequenceType::KEY;
+    seqKey.type = InputSequenceType::KEY;
     mgr.RecordSequenceBegin(seqKey, GROUP_A, WINDOW_A);
     EXPECT_EQ(mgr.GetSequenceSnapshotCount(), 1u);
 
@@ -21313,22 +21313,22 @@ HWTEST_F(InputWindowsManagerTest, SequenceClosure_DeviceOffline_ClearsSnapshots_
     constexpr int32_t DEVICE_B = 1602;
 
     // Create snapshots for two devices
-    SequenceKey keyA;
+    InputSequenceKey keyA;
     keyA.deviceId = DEVICE_A;
     keyA.itemId = 29;
-    keyA.type = SequenceType::KEY;
+    keyA.type = InputSequenceType::KEY;
     mgr.RecordSequenceBegin(keyA, 0, 100);
 
-    SequenceKey btnA;
+    InputSequenceKey btnA;
     btnA.deviceId = DEVICE_A;
     btnA.itemId = 0;
-    btnA.type = SequenceType::BUTTON;
+    btnA.type = InputSequenceType::BUTTON;
     mgr.RecordSequenceBegin(btnA, 0, 100);
 
-    SequenceKey keyB;
+    InputSequenceKey keyB;
     keyB.deviceId = DEVICE_B;
     keyB.itemId = 30;
-    keyB.type = SequenceType::KEY;
+    keyB.type = InputSequenceType::KEY;
     mgr.RecordSequenceBegin(keyB, 1, 200);
 
     EXPECT_EQ(mgr.GetSequenceSnapshotCount(), 3u);
