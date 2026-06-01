@@ -127,6 +127,7 @@ public:
     int32_t SetDisplayBind(int32_t deviceId, int32_t displayId, std::string &msg) override;
     int32_t BindDeviceToDisplayGroupByDisplay(int32_t deviceId, int32_t displayId, std::string &msg) override;
     int32_t UnbindDeviceFromDisplayGroup(int32_t deviceId, std::string &msg) override;
+    void OnDeviceUnbind(int32_t deviceId) override;
     int32_t AppendExtraData(const ExtraData& extraData) override;
     bool IsWindowVisible(int32_t pid) override;
     void ClearExtraData();

@@ -1270,6 +1270,30 @@ int32_t InputWindowsManager::UnbindDeviceFromDisplayGroup(int32_t deviceId, std:
     return bindInfo_.RemoveRuntimeBinding(deviceId);
 }
 
+void InputWindowsManager::OnDeviceUnbind(int32_t deviceId)
+{
+    CALL_DEBUG_ENTER;
+    auto binding = bindInfo_.GetRuntimeBinding(deviceId);
+    if (!binding.has_value()) {
+        return;
+    }
+    int32_t groupId = binding->groupId;
+    std::string msg;
+    UnbindDeviceFromDisplayGroup(deviceId, msg);
+    // Notify pointer drawing manager to clean up per-group context if no more bindings for this group
+    bool hasOtherBindingsForGroup = false;
+    auto &allBindings = bindInfo_.GetAllRuntimeBindings();
+    for (const auto &[id, b] : allBindings) {
+        if (b.groupId == groupId) {
+            hasOtherBindingsForGroup = true;
+            break;
+        }
+    }
+    if (!hasOtherBindingsForGroup) {
+        IPointerDrawingManager::GetInstance()->RemoveContext(groupId);
+    }
+}
+
 void InputWindowsManager::UpdateCaptureMode(const OLD::DisplayGroupInfo &displayGroupInfo)
 {
     auto &WindowInfo = GetWindowInfoVector(displayGroupInfo.groupId);

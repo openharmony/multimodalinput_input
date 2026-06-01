@@ -60,6 +60,7 @@ public:
     MOCK_METHOD(int32_t, SetDisplayBind, (int32_t, int32_t, std::string&));
     int32_t BindDeviceToDisplayGroupByDisplay(int32_t, int32_t, std::string&) override { return 0; }
     int32_t UnbindDeviceFromDisplayGroup(int32_t, std::string&) override { return 0; }
+    void OnDeviceUnbind(int32_t) override {}
     MOCK_METHOD(int32_t, AppendExtraData, (const ExtraData&));
     MOCK_METHOD(bool, IsWindowVisible, (int32_t));
     MOCK_METHOD(ExtraData, GetExtraData, (), (const));

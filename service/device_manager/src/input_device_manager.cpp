@@ -976,6 +976,7 @@ void InputDeviceManager::OnInputDeviceRemoved(struct libinput_device *inputDevic
     DEVICE_STATE_MGR->OnDeviceRemoved(deviceId);
     WIN_MGR->ClearTargetDeviceWindowId(deviceId);
     WIN_MGR->ClearFirstTouchWindowInfos(deviceId);
+    WIN_MGR->OnDeviceUnbind(deviceId);
     std::string sysUid = GetInputIdentification(inputDevice);
     if (!sysUid.empty()) {
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD_EXT_FLAG
@@ -1182,8 +1183,8 @@ void InputDeviceManager::Dump(int32_t fd, const std::vector<std::string> &args)
 void InputDeviceManager::DumpDeviceList(int32_t fd, const std::vector<std::string> &args)
 {
     CALL_DEBUG_ENTER;
-    std::vector<int32_t> ids = GetInputDeviceIds();
-    mprintf(fd, "Total device:%zu, Device list:\t", ids.size());
+    mprintf(fd, "Physical device:%zu, Virtual device:%zu, Device list:\t",
+        inputDevice_.size(), virtualInputDevices_.size());
     for (const auto &item : inputDevice_) {
         std::shared_ptr<InputDevice> inputDevice = GetInputDevice(item.first, false);
         CHKPV(inputDevice);
@@ -1193,6 +1194,16 @@ void InputDeviceManager::DumpDeviceList(int32_t fd, const std::vector<std::strin
             deviceId, inputDevice->GetName().c_str(), inputDevice->GetType(), inputDevice->GetBus(),
             inputDevice->GetVersion(), inputDevice->GetProduct(), inputDevice->GetVendor(),
             inputDevice->IsVirtual(), inputDevice->IsLocal());
+    }
+    if (!virtualInputDevices_.empty()) {
+        mprintf(fd, "Virtual device list:\t");
+        for (const auto &[deviceId, dev] : virtualInputDevices_) {
+            CHKPV(dev);
+            mprintf(fd, "deviceId:%d | deviceName:%s | deviceType:%d | bus:%d | version:%d | product:%d "
+                "| vendor:%d\t",
+                dev->GetId(), dev->GetName().c_str(), dev->GetType(), dev->GetBus(),
+                dev->GetVersion(), dev->GetProduct(), dev->GetVendor());
+        }
     }
 }
 
