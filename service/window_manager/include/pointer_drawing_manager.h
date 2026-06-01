@@ -27,6 +27,7 @@
 #include "screen_manager_lite.h"
 #include "i_pointer_drawing_manager.h"
 #include "mouse_event_interface.h"
+#include "pointer_drawing_context.h"
 #include "screen_pointer.h"
 #include "ui/rs_ui_context.h"
 #include "ui/rs_ui_director.h"
@@ -184,6 +185,25 @@ public:
     void RecordCursorVisibleStatus(bool status);
     void UpdatePointerItemCursorInfo(PointerEvent::PointerItem& pointerItem) override;
     void AllPointerDeviceRemoved() override;
+
+    // Per-group pointer drawing methods
+    std::shared_ptr<PointerDrawingContext> GetOrCreateContext(int32_t groupId);
+    std::shared_ptr<PointerDrawingContext> GetContext(int32_t groupId) const;
+    void RemoveContext(int32_t groupId) override;
+    void DrawPointer(int32_t groupId, uint64_t rsId, PhysicalCoord coord,
+        const PointerStyle pointerStyle, Direction direction) override;
+    void DrawMovePointer(int32_t groupId, uint64_t rsId, int32_t physicalX, int32_t physicalY) override;
+    void SetMouseDisplayState(int32_t groupId, bool state) override;
+    bool GetMouseDisplayState(int32_t groupId) const override;
+    void SetPointerLocation(int32_t groupId, int32_t x, int32_t y, uint64_t rsId) override;
+    int32_t SetPointerStyleForGroup(int32_t groupId, int32_t pid, int32_t windowId,
+        PointerStyle pointerStyle) override;
+    int32_t GetPointerStyleForGroup(int32_t groupId, int32_t pid, int32_t windowId,
+        PointerStyle &style) const override;
+    int32_t SetPointerSizeForGroup(int32_t groupId, int32_t size) override;
+    int32_t GetPointerSizeForGroup(int32_t groupId) override;
+    int32_t SetPointerColorForGroup(int32_t groupId, int32_t color) override;
+    int32_t GetPointerColorForGroup(int32_t groupId) override;
 private:
     struct PixelMapInfo {
         std::shared_ptr<OHOS::Media::PixelMap> pixelMap { nullptr };
@@ -407,6 +427,10 @@ private:
     std::mutex cursorBlurEnableMutex_;
     bool isRsRemoteDied_ { false };
     std::atomic<bool> isHardCursorSurfaceNodeInited_ { false };
+
+    // Per-group drawing contexts for HID display group binding
+    std::map<int32_t, std::shared_ptr<PointerDrawingContext>> contexts_;
+    mutable std::mutex contextsMutex_;
 };
 } // namespace MMI
 } // namespace OHOS

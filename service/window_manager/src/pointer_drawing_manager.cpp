@@ -4211,5 +4211,230 @@ std::shared_ptr<Rosen::RSUIContext> PointerDrawingManager::GetRSUIContext()
         return rsUIContext_;
     }
 }
+
+std::shared_ptr<PointerDrawingContext> PointerDrawingManager::GetOrCreateContext(int32_t groupId)
+{
+    CALL_DEBUG_ENTER;
+    if (groupId == DEFAULT_GROUP_ID) {
+        MMI_HILOGD("Default group uses existing singleton state");
+        return nullptr;
+    }
+    std::lock_guard<std::mutex> lock(contextsMutex_);
+    auto it = contexts_.find(groupId);
+    if (it != contexts_.end()) {
+        return it->second;
+    }
+    auto ctx = std::make_shared<PointerDrawingContext>();
+    contexts_[groupId] = ctx;
+    MMI_HILOGI("Created PointerDrawingContext for groupId:%{public}d", groupId);
+    return ctx;
+}
+
+std::shared_ptr<PointerDrawingContext> PointerDrawingManager::GetContext(int32_t groupId) const
+{
+    if (groupId == DEFAULT_GROUP_ID) {
+        return nullptr;
+    }
+    std::lock_guard<std::mutex> lock(contextsMutex_);
+    auto it = contexts_.find(groupId);
+    if (it != contexts_.end()) {
+        return it->second;
+    }
+    return nullptr;
+}
+
+void PointerDrawingManager::RemoveContext(int32_t groupId)
+{
+    CALL_DEBUG_ENTER;
+    if (groupId == DEFAULT_GROUP_ID) {
+        MMI_HILOGW("Cannot remove default group context");
+        return;
+    }
+    std::lock_guard<std::mutex> lock(contextsMutex_);
+    auto it = contexts_.find(groupId);
+    if (it == contexts_.end()) {
+        MMI_HILOGW("No context for groupId:%{public}d", groupId);
+        return;
+    }
+    auto ctx = it->second;
+    if (ctx != nullptr && ctx->surfaceNode != nullptr) {
+        MMI_HILOGI("Detaching surface node for groupId:%{public}d, screenId:%{public}" PRIu64,
+            groupId, ctx->screenId);
+        ctx->surfaceNode->DetachToDisplay(ctx->screenId);
+        ctx->surfaceNode = nullptr;
+        RsFlushImplicitTransaction();
+    }
+    contexts_.erase(it);
+    MMI_HILOGI("Removed PointerDrawingContext for groupId:%{public}d", groupId);
+}
+
+void PointerDrawingManager::DrawPointer(int32_t groupId, uint64_t rsId, PhysicalCoord coord,
+    const PointerStyle pointerStyle, Direction direction)
+{
+    CALL_DEBUG_ENTER;
+    if (groupId == DEFAULT_GROUP_ID) {
+        DrawPointer(rsId, coord.x, coord.y, pointerStyle, direction);
+        return;
+    }
+    auto ctx = GetOrCreateContext(groupId);
+    CHKPV(ctx);
+    ctx->lastPhysicalX = coord.x;
+    ctx->lastPhysicalY = coord.y;
+    ctx->lastMouseStyle = pointerStyle;
+    ctx->currentDirection = direction;
+    ctx->displayId = rsId;
+    MMI_HILOGI("DrawPointer for groupId:%{public}d, rsId:%{public}" PRIu64
+        ", x:%{public}d, y:%{public}d, style:%{public}d",
+        groupId, rsId, coord.x, coord.y, pointerStyle.id);
+}
+
+void PointerDrawingManager::DrawMovePointer(int32_t groupId, uint64_t rsId,
+    int32_t physicalX, int32_t physicalY)
+{
+    CALL_DEBUG_ENTER;
+    if (groupId == DEFAULT_GROUP_ID) {
+        DrawMovePointer(rsId, physicalX, physicalY);
+        return;
+    }
+    auto ctx = GetOrCreateContext(groupId);
+    CHKPV(ctx);
+    ctx->lastPhysicalX = physicalX;
+    ctx->lastPhysicalY = physicalY;
+    ctx->displayId = rsId;
+    if (ctx->surfaceNode != nullptr) {
+        ctx->surfaceNode->SetBounds(physicalX, physicalY,
+            canvasWidth_, canvasHeight_);
+        RsFlushImplicitTransaction();
+    }
+    MMI_HILOGD("DrawMovePointer for groupId:%{public}d, x:%{public}d, y:%{public}d",
+        groupId, physicalX, physicalY);
+}
+
+void PointerDrawingManager::SetMouseDisplayState(int32_t groupId, bool state)
+{
+    CALL_DEBUG_ENTER;
+    if (groupId == DEFAULT_GROUP_ID) {
+        SetMouseDisplayState(state);
+        return;
+    }
+    auto ctx = GetOrCreateContext(groupId);
+    CHKPV(ctx);
+    if (ctx->mouseDisplayState != state) {
+        ctx->mouseDisplayState = state;
+        MMI_HILOGI("SetMouseDisplayState for groupId:%{public}d, state:%{public}s",
+            groupId, state ? "true" : "false");
+    }
+}
+
+bool PointerDrawingManager::GetMouseDisplayState(int32_t groupId) const
+{
+    if (groupId == DEFAULT_GROUP_ID) {
+        return GetMouseDisplayState();
+    }
+    auto ctx = GetContext(groupId);
+    if (ctx == nullptr) {
+        return false;
+    }
+    return ctx->mouseDisplayState;
+}
+
+void PointerDrawingManager::SetPointerLocation(int32_t groupId, int32_t x, int32_t y, uint64_t rsId)
+{
+    CALL_DEBUG_ENTER;
+    if (groupId == DEFAULT_GROUP_ID) {
+        SetPointerLocation(x, y, rsId);
+        return;
+    }
+    auto ctx = GetOrCreateContext(groupId);
+    CHKPV(ctx);
+    ctx->lastPhysicalX = x;
+    ctx->lastPhysicalY = y;
+    ctx->displayId = rsId;
+    if (ctx->surfaceNode != nullptr) {
+        ctx->surfaceNode->SetBounds(x, y,
+            ctx->surfaceNode->GetStagingProperties().GetBounds().z_,
+            ctx->surfaceNode->GetStagingProperties().GetBounds().w_);
+        RsFlushImplicitTransaction();
+    }
+    MMI_HILOGD("SetPointerLocation for groupId:%{public}d, x:%{public}d, y:%{public}d", groupId, x, y);
+}
+
+int32_t PointerDrawingManager::SetPointerStyleForGroup(int32_t groupId, int32_t pid,
+    int32_t windowId, PointerStyle pointerStyle)
+{
+    CALL_DEBUG_ENTER;
+    if (groupId == DEFAULT_GROUP_ID) {
+        return SetPointerStyle(pid, windowId, pointerStyle);
+    }
+    auto ctx = GetOrCreateContext(groupId);
+    CHKPR(ctx, RET_ERR);
+    ctx->pid = pid;
+    ctx->windowId = windowId;
+    ctx->currentMouseStyle = pointerStyle;
+    MMI_HILOGI("SetPointerStyleForGroup groupId:%{public}d, pid:%{public}d, windowId:%{public}d, style:%{public}d",
+        groupId, pid, windowId, pointerStyle.id);
+    return RET_OK;
+}
+
+int32_t PointerDrawingManager::GetPointerStyleForGroup(int32_t groupId, int32_t pid,
+    int32_t windowId, PointerStyle &style) const
+{
+    CALL_DEBUG_ENTER;
+    if (groupId == DEFAULT_GROUP_ID) {
+        style = lastMouseStyle_;
+        return RET_OK;
+    }
+    auto ctx = GetContext(groupId);
+    CHKPR(ctx, RET_ERR);
+    style = ctx->currentMouseStyle;
+    return RET_OK;
+}
+
+int32_t PointerDrawingManager::SetPointerSizeForGroup(int32_t groupId, int32_t size)
+{
+    CALL_DEBUG_ENTER;
+    if (groupId == DEFAULT_GROUP_ID) {
+        return SetPointerSize(GetCurrentUser(), size);
+    }
+    auto ctx = GetOrCreateContext(groupId);
+    CHKPR(ctx, RET_ERR);
+    MMI_HILOGI("SetPointerSizeForGroup groupId:%{public}d, size:%{public}d", groupId, size);
+    return RET_OK;
+}
+
+int32_t PointerDrawingManager::GetPointerSizeForGroup(int32_t groupId)
+{
+    CALL_DEBUG_ENTER;
+    if (groupId == DEFAULT_GROUP_ID) {
+        return GetPointerSize(GetCurrentUser());
+    }
+    auto ctx = GetContext(groupId);
+    CHKPR(ctx, RET_ERR);
+    return RET_OK;
+}
+
+int32_t PointerDrawingManager::SetPointerColorForGroup(int32_t groupId, int32_t color)
+{
+    CALL_DEBUG_ENTER;
+    if (groupId == DEFAULT_GROUP_ID) {
+        return SetPointerColor(GetCurrentUser(), color);
+    }
+    auto ctx = GetOrCreateContext(groupId);
+    CHKPR(ctx, RET_ERR);
+    MMI_HILOGI("SetPointerColorForGroup groupId:%{public}d, color:%{public}d", groupId, color);
+    return RET_OK;
+}
+
+int32_t PointerDrawingManager::GetPointerColorForGroup(int32_t groupId)
+{
+    CALL_DEBUG_ENTER;
+    if (groupId == DEFAULT_GROUP_ID) {
+        return GetPointerColor(GetCurrentUser());
+    }
+    auto ctx = GetContext(groupId);
+    CHKPR(ctx, RET_ERR);
+    return RET_OK;
+}
+
 } // namespace MMI
 } // namespace OHOS
