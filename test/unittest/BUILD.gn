@@ -39,6 +39,12 @@ ohos_executable("hid_display_bind_board_test") {
     "ipc:ipc_single",
   ]
 
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
+
   install_enable = true
   part_name = "input"
   subsystem_name = "multimodalinput"
