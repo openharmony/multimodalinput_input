@@ -17578,7 +17578,7 @@ HWTEST_F(InputWindowsManagerTest, MouseGroupRouting_BoundMoveTargetsNonDefaultGr
     mgr->UpdateDisplayInfo(secGroup);
 
     // Bind device 42 to display 2 (secondary group)
-    mgr->bindInfo_.AddDevice(42, "usbmouse0");
+    mgr->bindInfo_.AddInputDevice(42, "usbmouse0", "usbmouse0");
     mgr->bindInfo_.AddDisplay(2, "secondary0");
     std::string msg;
     mgr->BindDeviceToDisplayGroupByDisplay(42, 2, msg);
@@ -17827,7 +17827,7 @@ HWTEST_F(InputWindowsManagerTest, MouseGroupRouting_AxisBoundGroup_001, TestSize
     mgr->UpdateDisplayInfo(secGroup);
 
     // Bind device 55 to display 2 (secondary group)
-    mgr->bindInfo_.AddDevice(55, "usbmouse1");
+    mgr->bindInfo_.AddInputDevice(55, "usbmouse1", "usbmouse1");
     mgr->bindInfo_.AddDisplay(2, "secondary0");
     std::string msg;
     mgr->BindDeviceToDisplayGroupByDisplay(55, 2, msg);
@@ -18108,7 +18108,7 @@ HWTEST_F(InputWindowsManagerTest, TouchpadGroupRouting_BoundPointerDerivedEventU
     mgr->UpdateDisplayInfo(secGroup);
 
     // Bind touchpad device to secondary group
-    mgr->bindInfo_.AddDevice(TOUCHPAD_DEVICE_ID, "touchpad0");
+    mgr->bindInfo_.AddInputDevice(TOUCHPAD_DEVICE_ID, "touchpad0", "touchpad0");
     mgr->bindInfo_.AddDisplay(2, "secondary0");
     std::string msg;
     mgr->BindDeviceToDisplayGroupByDisplay(TOUCHPAD_DEVICE_ID, 2, msg);
@@ -18363,7 +18363,7 @@ HWTEST_F(InputWindowsManagerTest, GroupStateIsolation_LazyAllocation_BindCreates
         << "Group 5 state maps should not exist before any bind";
 
     // Bind device 77 to display 10 (group 5)
-    mgr->bindInfo_.AddDevice(77, "usbmouse77");
+    mgr->bindInfo_.AddInputDevice(77, "usbmouse77", "usbmouse77");
     mgr->bindInfo_.AddDisplay(10, "ext0");
     std::string msg;
     mgr->BindDeviceToDisplayGroupByDisplay(77, 10, msg);
@@ -18447,7 +18447,7 @@ HWTEST_F(InputWindowsManagerTest, GroupStateIsolation_MouseLocationIsolation_001
     mgr.UpdateDisplayInfo(secGroup);
 
     // Bind device 50 to group 2 (display 5)
-    mgr.bindInfo_.AddDevice(50, "usbmouse50");
+    mgr.bindInfo_.AddInputDevice(50, "usbmouse50", "usbmouse50");
     mgr.bindInfo_.AddDisplay(5, "sec0");
     std::string msg;
     mgr.BindDeviceToDisplayGroupByDisplay(50, 5, msg);
@@ -18539,7 +18539,7 @@ HWTEST_F(InputWindowsManagerTest, GroupStateIsolation_CaptureModeIsolation_001, 
     mgr.UpdateDisplayInfo(secGroup);
 
     // Bind device to secondary group
-    mgr.bindInfo_.AddDevice(60, "usbmouse60");
+    mgr.bindInfo_.AddInputDevice(60, "usbmouse60", "usbmouse60");
     mgr.bindInfo_.AddDisplay(3, "sec0");
     std::string msg;
     mgr.BindDeviceToDisplayGroupByDisplay(60, 3, msg);
@@ -18629,7 +18629,7 @@ HWTEST_F(InputWindowsManagerTest, GroupStateIsolation_KeyboardFocusIsolation_001
     mgr.UpdateDisplayInfo(secGroup);
 
     // Bind keyboard device 80 to group 3
-    mgr.bindInfo_.AddDevice(80, "usbkbd80");
+    mgr.bindInfo_.AddInputDevice(80, "usbkbd80", "usbkbd80");
     mgr.bindInfo_.AddDisplay(7, "ext0");
     std::string msg;
     mgr.BindDeviceToDisplayGroupByDisplay(80, 7, msg);
@@ -18670,7 +18670,6 @@ HWTEST_F(InputWindowsManagerTest, GroupStateIsolation_SequenceClosure_KeyDown_00
     constexpr int32_t KEY_CODE_A = 29;   // KeyEvent::KEYCODE_A
     constexpr int32_t GROUP_A = 0;
     constexpr int32_t WINDOW_A = 10;
-    constexpr int32_t GROUP_B = 2;
 
     // Simulate key-down while unbound (group A = main)
     InputSequenceKey seqKey;
@@ -18868,13 +18867,13 @@ HWTEST_F(InputWindowsManagerTest, GroupStateIsolation_DualBoundMice_IndependentS
     mgr->UpdateDisplayInfo(secGroup);
 
     // Bind mouse A to main group (display 0)
-    mgr->bindInfo_.AddDevice(11, "mouseA");
+    mgr->bindInfo_.AddInputDevice(11, "mouseA", "mouseA");
     mgr->bindInfo_.AddDisplay(0, "main0");
     std::string msg;
     mgr->BindDeviceToDisplayGroupByDisplay(11, 0, msg);
 
     // Bind mouse B to secondary group (display 8)
-    mgr->bindInfo_.AddDevice(22, "mouseB");
+    mgr->bindInfo_.AddInputDevice(22, "mouseB", "mouseB");
     mgr->bindInfo_.AddDisplay(8, "ext0");
     mgr->BindDeviceToDisplayGroupByDisplay(22, 8, msg);
 
@@ -18999,13 +18998,13 @@ HWTEST_F(InputWindowsManagerTest, GroupStateIsolation_DualBoundKeyboards_Indepen
     mgr->UpdateDisplayInfo(secGroup);
 
     // Bind keyboard A to main group
-    mgr->bindInfo_.AddDevice(31, "kbdA");
+    mgr->bindInfo_.AddInputDevice(31, "kbdA", "kbdA");
     mgr->bindInfo_.AddDisplay(0, "main0");
     std::string msg;
     mgr->BindDeviceToDisplayGroupByDisplay(31, 0, msg);
 
     // Bind keyboard B to secondary group
-    mgr->bindInfo_.AddDevice(32, "kbdB");
+    mgr->bindInfo_.AddInputDevice(32, "kbdB", "kbdB");
     mgr->bindInfo_.AddDisplay(12, "ext0");
     mgr->BindDeviceToDisplayGroupByDisplay(32, 12, msg);
 
@@ -20307,13 +20306,13 @@ HWTEST_F(InputWindowsManagerTest, DualMouse_BoundIsolation_PositionAndStyle_001,
     mgr->UpdateDisplayInfo(secGroup);
 
     // Bind mouse A to group A (display 1)
-    mgr->bindInfo_.AddDevice(MOUSE_A, "mouseA");
+    mgr->bindInfo_.AddInputDevice(MOUSE_A, "mouseA", "mouseA");
     mgr->bindInfo_.AddDisplay(DISPLAY_A, "main0");
     std::string msg;
     mgr->BindDeviceToDisplayGroupByDisplay(MOUSE_A, DISPLAY_A, msg);
 
     // Bind mouse B to group B (display 10)
-    mgr->bindInfo_.AddDevice(MOUSE_B, "mouseB");
+    mgr->bindInfo_.AddInputDevice(MOUSE_B, "mouseB", "mouseB");
     mgr->bindInfo_.AddDisplay(DISPLAY_B, "ext0");
     mgr->BindDeviceToDisplayGroupByDisplay(MOUSE_B, DISPLAY_B, msg);
 
@@ -20483,7 +20482,7 @@ HWTEST_F(InputWindowsManagerTest, DualMouse_NoOverIsolation_BindOneDeviceUnbound
         << "Unbound mouse should be in default group before binding";
 
     // Bind bound_mouse to group 3
-    mgr->bindInfo_.AddDevice(BOUND_MOUSE, "boundMouse");
+    mgr->bindInfo_.AddInputDevice(BOUND_MOUSE, "boundMouse", "boundMouse");
     mgr->bindInfo_.AddDisplay(BOUND_DISPLAY, "ext0");
     std::string msg;
     mgr->BindDeviceToDisplayGroupByDisplay(BOUND_MOUSE, BOUND_DISPLAY, msg);
@@ -20752,7 +20751,6 @@ HWTEST_F(InputWindowsManagerTest, SequenceClosure_KeyDownUp_BindMidSequence_001,
 
     constexpr int32_t DEVICE_ID = 601;
     constexpr int32_t KEY_CODE = 29;  // KEY_A
-    constexpr int32_t GROUP_A = 0;
     constexpr int32_t WINDOW_A = 100;
     constexpr int32_t GROUP_B = 9;
     constexpr int32_t DISPLAY_B = 30;
@@ -22268,6 +22266,7 @@ HWTEST_F(InputWindowsManagerTest, Compat_DefaultGroupAudit_ResolvedGroupRequired
 
     // Reset cursor for default group only
     CursorPosition resetPos = mgr.ResetCursorPos(DEFAULT_GROUP_ID);
+    static_cast<void>(resetPos);
 
     // Bound group cursor should be unchanged after default reset
     CursorPosition boundPos = mgr.GetCursorPos(BOUND_GROUP);
