@@ -1290,7 +1290,7 @@ void InputWindowsManager::OnDeviceUnbind(int32_t deviceId)
         }
     }
     if (!hasOtherBindingsForGroup) {
-        IPointerDrawingManager::GetInstance()->RemoveContext(groupId);
+        CursorDrawingComponent::GetInstance().RemoveContext(groupId);
     }
 }
 
