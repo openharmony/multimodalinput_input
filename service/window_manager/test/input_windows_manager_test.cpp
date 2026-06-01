@@ -18458,7 +18458,7 @@ HWTEST_F(InputWindowsManagerTest, GroupStateIsolation_MouseLocationIsolation_001
     EXPECT_GE(mainLoc.displayId, -1);
 
     // Set secondary group mouse location by reading it (triggers init)
-    MouseLocation secLoc = mgr.GetMouseInfo(2);
+    static_cast<void>(mgr.GetMouseInfo(2));
     // Group 2 now has lazy state
     EXPECT_TRUE(mgr.HasGroupState(2))
         << "Group 2 should have state after bind";
@@ -18886,8 +18886,8 @@ HWTEST_F(InputWindowsManagerTest, GroupStateIsolation_DualBoundMice_IndependentS
         << "Group 4 state should exist after binding mouse B";
 
     // Mouse info for each group is independent
-    MouseLocation locMain = mgr->GetMouseInfo(0);
-    MouseLocation locSec = mgr->GetMouseInfo(4);
+    static_cast<void>(mgr->GetMouseInfo(0));
+    static_cast<void>(mgr->GetMouseInfo(4));
 
     // They should have been initialized independently
     // (displayId for group 4 should refer to display 8, not display 0)
