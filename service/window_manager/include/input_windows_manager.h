@@ -122,6 +122,7 @@ public:
     bool GetMouseIsCaptureMode(int32_t groupId = DEFAULT_GROUP_ID) const override;
     void DeviceStatusChanged(int32_t deviceId, const std::string &name, const std::string &sysUid,
         const std::string devStatus);
+    int32_t GetDeviceGroupId(int32_t deviceId) const override;
     int32_t GetDisplayBindInfo(DisplayBindInfos &infos) override;
     int32_t SetDisplayBind(int32_t deviceId, int32_t displayId, std::string &msg) override;
     int32_t BindDeviceToDisplayGroupByDisplay(int32_t deviceId, int32_t displayId, std::string &msg) override;

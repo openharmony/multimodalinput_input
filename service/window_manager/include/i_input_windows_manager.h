@@ -93,6 +93,7 @@ public:
     virtual int32_t SetMouseCaptureMode(int32_t windowId, bool isCaptureMode,
         int32_t groupId = DEFAULT_GROUP_ID) = 0;
     virtual bool GetMouseIsCaptureMode(int32_t groupId = DEFAULT_GROUP_ID) const = 0;
+    virtual int32_t GetDeviceGroupId(int32_t deviceId) const { return DEFAULT_GROUP_ID; }
     virtual int32_t GetDisplayBindInfo(DisplayBindInfos &infos) = 0;
     virtual int32_t SetDisplayBind(int32_t deviceId, int32_t displayId, std::string &msg) = 0;
     virtual int32_t BindDeviceToDisplayGroupByDisplay(int32_t deviceId, int32_t displayId, std::string &msg) = 0;

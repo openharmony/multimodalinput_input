@@ -685,6 +685,15 @@ int32_t InputWindowsManager::ResolveGroupIdForDevice(int32_t deviceId) const
     return MAIN_GROUPID;
 }
 
+int32_t InputWindowsManager::GetDeviceGroupId(int32_t deviceId) const
+{
+    auto binding = bindInfo_.GetRuntimeBinding(deviceId);
+    if (binding.has_value()) {
+        return binding->groupId;
+    }
+    return DEFAULT_GROUP_ID;
+}
+
 void InputWindowsManager::EnsureGroupState(int32_t groupId)
 {
     if (groupId == MAIN_GROUPID) {

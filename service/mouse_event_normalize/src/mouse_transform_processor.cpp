@@ -91,6 +91,10 @@ MouseTransformProcessor::MouseTransformProcessor(IInputServiceContext *env, int3
         MMI_HILOGE("Env is nullptr");
         return;
     }
+    auto winMgr = GetInputWindowsManager();
+    if (winMgr != nullptr) {
+        groupId_ = winMgr->GetDeviceGroupId(deviceId);
+    }
 }
 
 MouseTransformProcessor::~MouseTransformProcessor()
@@ -207,7 +211,7 @@ MouseTransformProcessor::MotionDataContext MouseTransformProcessor::ExtractMotio
     ctx.libinputEventType = libinput_event_get_type(event);
     ctx.offset = Offset { unaccelerated_.dx, unaccelerated_.dy };
 
-    CursorPosition cursorPos = winMgr->GetCursorPos();
+    CursorPosition cursorPos = winMgr->GetCursorPos(groupId_);
     if (cursorPos.displayId < 0) {
         MMI_HILOGE("No display");
         return ctx;
@@ -671,7 +675,7 @@ int32_t MouseTransformProcessor::UpdateCursorPositionOnButtonPress()
         return RET_ERR;
     }
 
-    CursorPosition cursorPos = winMgr->GetCursorPos();
+    CursorPosition cursorPos = winMgr->GetCursorPos(groupId_);
     if (cursorPos.displayId < 0) {
         MMI_HILOGE("No display");
         return RET_ERR;
@@ -690,7 +694,7 @@ int32_t MouseTransformProcessor::UpdateCursorPositionOnButtonPress()
 int32_t MouseTransformProcessor::HandleButtonReleased(uint32_t button, uint32_t originButton, int32_t type)
 {
     SetPointerEventRightButtonSource(type, button);
-    MouseState->MouseBtnStateCounts(button, BUTTON_STATE_RELEASED);
+    MouseState->MouseBtnStateCounts(groupId_, button, BUTTON_STATE_RELEASED);
     pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_UP);
 
     int32_t buttonId = MouseState->LibinputChangeToPointer(button);
@@ -705,7 +709,7 @@ int32_t MouseTransformProcessor::HandleButtonReleased(uint32_t button, uint32_t 
 int32_t MouseTransformProcessor::HandleButtonPressed(uint32_t button, uint32_t originButton, int32_t type)
 {
     SetPointerEventRightButtonSource(type, button);
-    MouseState->MouseBtnStateCounts(button, BUTTON_STATE_PRESSED);
+    MouseState->MouseBtnStateCounts(groupId_, button, BUTTON_STATE_PRESSED);
     pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_DOWN);
 
     int32_t buttonId = MouseState->LibinputChangeToPointer(button);

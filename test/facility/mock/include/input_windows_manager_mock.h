@@ -55,6 +55,7 @@ public:
     MOCK_METHOD(int32_t, GetWindowAgentPid, (int32_t), (const));
     MOCK_METHOD(int32_t, SetMouseCaptureMode, (int32_t, bool, int32_t));
     MOCK_METHOD(bool, GetMouseIsCaptureMode, (int32_t), (const));
+    MOCK_METHOD(int32_t, GetDeviceGroupId, (int32_t), (const));
     MOCK_METHOD(int32_t, GetDisplayBindInfo, (DisplayBindInfos&));
     MOCK_METHOD(int32_t, SetDisplayBind, (int32_t, int32_t, std::string&));
     int32_t BindDeviceToDisplayGroupByDisplay(int32_t, int32_t, std::string&) override { return 0; }
