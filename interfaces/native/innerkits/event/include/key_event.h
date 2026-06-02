@@ -3767,7 +3767,6 @@ private:
 #ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
     bool ReadEnhanceDataFromParcel(Parcel &in);
 #endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
-    bool ReadKeyEventExtFromParcel(Parcel &in, int32_t keysSize);
     bool IsValidKeyItem() const;
 
 private:

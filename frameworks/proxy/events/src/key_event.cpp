@@ -904,7 +904,6 @@ const int32_t KeyEvent::INTENTION_REJECTCALL = 202;
 
 const int32_t KeyEvent::INTENTION_CAMERA = 300;
 const int32_t maxKeysSize = 1000;
-constexpr size_t KEY_EVENT_RAW_CODE_MIN_SIZE { sizeof(int32_t) * 3 };
 
 const uint32_t KeyEvent::EXTENDED_FUNCTION_KEY_MASK = 0xFF000000;
 const uint32_t KeyEvent::EXTENDED_FUNCTION_KEY_FLAG = 0x01000000;
@@ -997,6 +996,7 @@ bool KeyEvent::KeyItem::WriteToParcel(Parcel &out) const
     WRITEINT32(out, deviceId_);
     WRITEINT32(out, keyCode_);
     WRITEUINT32(out, unicode_);
+    WRITEINT32(out, rawCode_);
     return true;
 }
 
@@ -1007,6 +1007,7 @@ bool KeyEvent::KeyItem::ReadFromParcel(Parcel &in)
     READINT32(in, deviceId_);
     READINT32(in, keyCode_);
     READUINT32(in, unicode_);
+    READINT32(in, rawCode_);
     return true;
 }
 
@@ -1393,10 +1394,6 @@ bool KeyEvent::WriteToParcel(Parcel &out) const
     }
 #endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
     WRITEINT32(out, rawCode_);
-    WRITEINT32(out, static_cast<int32_t>(keys_.size()));
-    for (const auto &item : keys_) {
-        WRITEINT32(out, item.GetRawCode());
-    }
     WRITEINT32(out, repeatCount_);
     return true;
 }
@@ -1435,34 +1432,9 @@ bool KeyEvent::ReadFromParcel(Parcel &in)
         return false;
     }
 #endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
-    return ReadKeyEventExtFromParcel(in, keysSize);
-}
-
-bool KeyEvent::ReadKeyEventExtFromParcel(Parcel &in, int32_t keysSize)
-{
-    if (in.GetReadableBytes() < KEY_EVENT_RAW_CODE_MIN_SIZE) {
-        return true;
-    }
-
     int32_t rawCode = -1;
     READINT32(in, rawCode);
 
-    int32_t rawCodeSize = 0;
-    READINT32(in, rawCodeSize);
-    if (rawCodeSize < 0 || rawCodeSize > keysSize) {
-        MMI_HILOGW("Key event raw code size is invalid");
-        return true;
-    }
-    const size_t rawCodeBytes = static_cast<size_t>(rawCodeSize) * sizeof(int32_t);
-    if (in.GetReadableBytes() < rawCodeBytes + sizeof(int32_t)) {
-        MMI_HILOGW("Key event raw code extension is truncated");
-        return true;
-    }
-    for (int32_t i = 0; i < rawCodeSize; i++) {
-        int32_t rawCode = -1;
-        READINT32(in, rawCode);
-        keys_[static_cast<size_t>(i)].SetRawCode(rawCode);
-    }
     int32_t repeatCount = 0;
     READINT32(in, repeatCount);
     rawCode_ = rawCode;

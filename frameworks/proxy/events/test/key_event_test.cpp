@@ -29,6 +29,7 @@ namespace OHOS {
 namespace MMI {
 namespace {
 using namespace testing::ext;
+constexpr int64_t TEST_KEY_DOWN_TIME { 100 };
 } // namespace
 
 class KeyEventTest : public testing::Test {
@@ -271,7 +272,7 @@ HWTEST_F(KeyEventTest, KeyEventTest_GetRawCode_002, TestSize.Level1)
 
     KeyEvent::KeyItem item;
     item.SetKeyCode(KeyEvent::KEYCODE_A);
-    item.SetDownTime(100);
+    item.SetDownTime(TEST_KEY_DOWN_TIME);
     item.SetPressed(true);
     item.SetRawCode(30);
     keyEvent->AddKeyItem(item);
@@ -290,59 +291,11 @@ HWTEST_F(KeyEventTest, KeyEventTest_GetRawCode_002, TestSize.Level1)
 
 /**
  * @tc.name: KeyEventTest_GetRawCode_003
- * @tc.desc: Verify key event reads old parcel without rawCode and repeatCount tail
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(KeyEventTest, KeyEventTest_GetRawCode_003, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    auto keyEvent = KeyEvent::Create();
-    ASSERT_NE(keyEvent, nullptr);
-    keyEvent->SetKeyCode(KeyEvent::KEYCODE_A);
-    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
-
-    KeyEvent::KeyItem item;
-    item.SetKeyCode(KeyEvent::KEYCODE_A);
-    item.SetDownTime(100);
-    item.SetPressed(true);
-    keyEvent->AddKeyItem(item);
-
-    MessageParcel data;
-    ASSERT_TRUE(keyEvent->InputEvent::WriteToParcel(data));
-    ASSERT_TRUE(data.WriteInt32(keyEvent->GetKeyCode()));
-    ASSERT_TRUE(data.WriteInt32(static_cast<int32_t>(keyEvent->GetKeyItems().size())));
-    for (const auto &keyItem : keyEvent->GetKeyItems()) {
-        ASSERT_TRUE(keyItem.WriteToParcel(data));
-    }
-    ASSERT_TRUE(data.WriteInt32(keyEvent->GetKeyAction()));
-    ASSERT_TRUE(data.WriteInt32(keyEvent->GetKeyIntention()));
-    ASSERT_TRUE(data.WriteBool(keyEvent->GetFunctionKey(KeyEvent::NUM_LOCK_FUNCTION_KEY)));
-    ASSERT_TRUE(data.WriteBool(keyEvent->GetFunctionKey(KeyEvent::CAPS_LOCK_FUNCTION_KEY)));
-    ASSERT_TRUE(data.WriteBool(keyEvent->GetFunctionKey(KeyEvent::SCROLL_LOCK_FUNCTION_KEY)));
-    ASSERT_TRUE(data.WriteBool(keyEvent->IsRepeat()));
-    ASSERT_TRUE(data.WriteBool(keyEvent->IsRepeatKey()));
-#ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
-    ASSERT_TRUE(data.WriteInt32(0));
-#endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
-
-    auto outEvent = KeyEvent::Create();
-    ASSERT_NE(outEvent, nullptr);
-    ASSERT_TRUE(outEvent->ReadFromParcel(data));
-    EXPECT_EQ(outEvent->GetRawCode(), -1);
-    EXPECT_EQ(outEvent->GetRepeatCount(), 0);
-    auto outItem = outEvent->GetKeyItem(KeyEvent::KEYCODE_A);
-    ASSERT_TRUE(outItem.has_value());
-    EXPECT_EQ(outItem->GetRawCode(), -1);
-}
-
-/**
- * @tc.name: KeyEventTest_GetRawCode_004
  * @tc.desc: Verify cloned and reset key event preserve rawCode and repeatCount rules
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(KeyEventTest, KeyEventTest_GetRawCode_004, TestSize.Level1)
+HWTEST_F(KeyEventTest, KeyEventTest_GetRawCode_003, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     auto keyEvent = KeyEvent::Create();

@@ -193,9 +193,6 @@ void EventInterceptorHandler::SessionHandler::SendToClient(std::shared_ptr<KeyEv
         MMI_HILOGE("Packet key event failed, errCode:%{public}d", STREAM_BUF_WRITE_FAIL);
         return;
     }
-    if (InputEventDataTransformation::WriteKeyEventExt(keyEvent, pkt) != RET_OK) {
-        MMI_HILOGE("Write key event extension failed");
-    }
     if (!session_->SendMsg(pkt)) {
         MMI_HILOGE("Send message failed, errCode:%{public}d", MSG_SEND_FAIL);
         return;

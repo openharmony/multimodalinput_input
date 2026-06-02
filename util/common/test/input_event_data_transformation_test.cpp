@@ -23,33 +23,6 @@ namespace {
 using namespace testing::ext;
 using namespace OHOS;
 constexpr int64_t TEST_KEY_DOWN_TIME { 100 };
-
-std::shared_ptr<KeyEvent> CreateKeyEventForExtTest()
-{
-    auto keyEvent = KeyEvent::Create();
-    if (keyEvent == nullptr) {
-        return nullptr;
-    }
-    keyEvent->SetKeyCode(KeyEvent::KEYCODE_A);
-    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
-
-    KeyEvent::KeyItem item;
-    item.SetKeyCode(KeyEvent::KEYCODE_A);
-    item.SetDownTime(TEST_KEY_DOWN_TIME);
-    item.SetPressed(true);
-    keyEvent->AddKeyItem(item);
-    return keyEvent;
-}
-
-void CheckDefaultKeyEventExt(const std::shared_ptr<KeyEvent> keyEvent)
-{
-    ASSERT_NE(keyEvent, nullptr);
-    EXPECT_EQ(keyEvent->GetRawCode(), -1);
-    EXPECT_EQ(keyEvent->GetRepeatCount(), 0);
-    auto item = keyEvent->GetKeyItem(KeyEvent::KEYCODE_A);
-    ASSERT_TRUE(item.has_value());
-    EXPECT_EQ(item->GetRawCode(), -1);
-}
 } // namespace
 
 class InputEventDataTransformationTest : public testing::Test {
@@ -191,12 +164,12 @@ HWTEST_F(InputEventDataTransformationTest, LongPressEventToNetPacket, TestSize.L
 }
 
 /**
- * @tc.name: KeyEventExtToNetPacket
- * @tc.desc: Test key event extension serialization
+ * @tc.name: KeyEventToNetPacket
+ * @tc.desc: Test key event serialization
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputEventDataTransformationTest, KeyEventExtToNetPacket, TestSize.Level1)
+HWTEST_F(InputEventDataTransformationTest, KeyEventToNetPacket, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     auto keyEvent = KeyEvent::Create();
@@ -215,140 +188,15 @@ HWTEST_F(InputEventDataTransformationTest, KeyEventExtToNetPacket, TestSize.Leve
 
     NetPacket pkt(MmiMessageId::ON_KEY_EVENT);
     ASSERT_EQ(InputEventDataTransformation::KeyEventToNetPacket(keyEvent, pkt), RET_OK);
-    ASSERT_EQ(InputEventDataTransformation::WriteKeyEventExt(keyEvent, pkt), RET_OK);
 
     auto outEvent = KeyEvent::Create();
     ASSERT_NE(outEvent, nullptr);
     ASSERT_EQ(InputEventDataTransformation::NetPacketToKeyEvent(pkt, outEvent), RET_OK);
-    ASSERT_EQ(InputEventDataTransformation::ReadKeyEventExt(pkt, outEvent), RET_OK);
     EXPECT_EQ(outEvent->GetRawCode(), 30);
     EXPECT_EQ(outEvent->GetRepeatCount(), 2);
     auto outItem = outEvent->GetKeyItem(KeyEvent::KEYCODE_A);
     ASSERT_TRUE(outItem.has_value());
     EXPECT_EQ(outItem->GetRawCode(), 30);
-}
-
-/**
- * @tc.name: KeyEventExtToNetPacketWithoutTail
- * @tc.desc: Test key event extension defaults for old packets
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputEventDataTransformationTest, KeyEventExtToNetPacketWithoutTail, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    auto keyEvent = KeyEvent::Create();
-    ASSERT_NE(keyEvent, nullptr);
-    keyEvent->SetKeyCode(KeyEvent::KEYCODE_A);
-    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
-
-    KeyEvent::KeyItem item;
-    item.SetKeyCode(KeyEvent::KEYCODE_A);
-    item.SetDownTime(TEST_KEY_DOWN_TIME);
-    item.SetPressed(true);
-    keyEvent->AddKeyItem(item);
-
-    NetPacket pkt(MmiMessageId::ON_KEY_EVENT);
-    ASSERT_EQ(InputEventDataTransformation::KeyEventToNetPacket(keyEvent, pkt), RET_OK);
-
-    auto outEvent = KeyEvent::Create();
-    ASSERT_NE(outEvent, nullptr);
-    ASSERT_EQ(InputEventDataTransformation::NetPacketToKeyEvent(pkt, outEvent), RET_OK);
-    ASSERT_EQ(InputEventDataTransformation::ReadKeyEventExt(pkt, outEvent), RET_OK);
-    EXPECT_EQ(outEvent->GetRawCode(), -1);
-    EXPECT_EQ(outEvent->GetRepeatCount(), 0);
-}
-
-/**
- * @tc.name: KeyEventExtToNetPacketWithShortTail
- * @tc.desc: Test key event extension rejects a truncated extension tail
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputEventDataTransformationTest, KeyEventExtToNetPacketWithShortTail, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    auto keyEvent = CreateKeyEventForExtTest();
-    ASSERT_NE(keyEvent, nullptr);
-
-    NetPacket pkt(MmiMessageId::ON_KEY_EVENT);
-    ASSERT_EQ(InputEventDataTransformation::KeyEventToNetPacket(keyEvent, pkt), RET_OK);
-    pkt << 30;
-
-    auto outEvent = KeyEvent::Create();
-    ASSERT_NE(outEvent, nullptr);
-    ASSERT_EQ(InputEventDataTransformation::NetPacketToKeyEvent(pkt, outEvent), RET_OK);
-    EXPECT_EQ(InputEventDataTransformation::ReadKeyEventExt(pkt, outEvent), RET_ERR);
-    CheckDefaultKeyEventExt(outEvent);
-}
-
-/**
- * @tc.name: KeyEventExtToNetPacketWithNegativeRawCodeCount
- * @tc.desc: Test key event extension rejects negative key item rawCode count
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputEventDataTransformationTest, KeyEventExtToNetPacketWithNegativeRawCodeCount, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    auto keyEvent = CreateKeyEventForExtTest();
-    ASSERT_NE(keyEvent, nullptr);
-
-    NetPacket pkt(MmiMessageId::ON_KEY_EVENT);
-    ASSERT_EQ(InputEventDataTransformation::KeyEventToNetPacket(keyEvent, pkt), RET_OK);
-    pkt << 30 << -1 << 0;
-
-    auto outEvent = KeyEvent::Create();
-    ASSERT_NE(outEvent, nullptr);
-    ASSERT_EQ(InputEventDataTransformation::NetPacketToKeyEvent(pkt, outEvent), RET_OK);
-    EXPECT_EQ(InputEventDataTransformation::ReadKeyEventExt(pkt, outEvent), RET_ERR);
-    CheckDefaultKeyEventExt(outEvent);
-}
-
-/**
- * @tc.name: KeyEventExtToNetPacketWithTooManyRawCodes
- * @tc.desc: Test key event extension rejects rawCode count greater than key item count
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputEventDataTransformationTest, KeyEventExtToNetPacketWithTooManyRawCodes, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    auto keyEvent = CreateKeyEventForExtTest();
-    ASSERT_NE(keyEvent, nullptr);
-
-    NetPacket pkt(MmiMessageId::ON_KEY_EVENT);
-    ASSERT_EQ(InputEventDataTransformation::KeyEventToNetPacket(keyEvent, pkt), RET_OK);
-    pkt << 30 << 2 << 0;
-
-    auto outEvent = KeyEvent::Create();
-    ASSERT_NE(outEvent, nullptr);
-    ASSERT_EQ(InputEventDataTransformation::NetPacketToKeyEvent(pkt, outEvent), RET_OK);
-    EXPECT_EQ(InputEventDataTransformation::ReadKeyEventExt(pkt, outEvent), RET_ERR);
-    CheckDefaultKeyEventExt(outEvent);
-}
-
-/**
- * @tc.name: KeyEventExtToNetPacketWithInsufficientRawCodeData
- * @tc.desc: Test key event extension rejects missing key item rawCode or repeatCount
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputEventDataTransformationTest, KeyEventExtToNetPacketWithInsufficientRawCodeData, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    auto keyEvent = CreateKeyEventForExtTest();
-    ASSERT_NE(keyEvent, nullptr);
-
-    NetPacket pkt(MmiMessageId::ON_KEY_EVENT);
-    ASSERT_EQ(InputEventDataTransformation::KeyEventToNetPacket(keyEvent, pkt), RET_OK);
-    pkt << 30 << 1 << 30;
-
-    auto outEvent = KeyEvent::Create();
-    ASSERT_NE(outEvent, nullptr);
-    ASSERT_EQ(InputEventDataTransformation::NetPacketToKeyEvent(pkt, outEvent), RET_OK);
-    EXPECT_EQ(InputEventDataTransformation::ReadKeyEventExt(pkt, outEvent), RET_ERR);
-    CheckDefaultKeyEventExt(outEvent);
 }
 } // namespace MMI
 } // namespace OHOS

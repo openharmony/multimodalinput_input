@@ -29,7 +29,6 @@ namespace {
 constexpr size_t MAX_PRESSED_BUTTONS { 10 };
 constexpr size_t MAX_POINTER_COUNT { 10 };
 constexpr size_t MAX_PRESSED_KEYS { 10 };
-constexpr int32_t KEY_EVENT_EXT_MIN_SIZE { static_cast<int32_t>(sizeof(int32_t) * 3) };
 } // namespace
 
 int32_t InputEventDataTransformation::KeyEventToNetPacket(
@@ -50,88 +49,16 @@ int32_t InputEventDataTransformation::KeyEventToNetPacket(
     pkt << size;
     for (const auto &item : keys) {
         pkt << item.GetKeyCode() << item.GetDownTime()
-            << item.GetDeviceId() << item.IsPressed() << item.GetUnicode();
+            << item.GetDeviceId() << item.IsPressed() << item.GetUnicode() << item.GetRawCode();
     }
     pkt << key->GetFunctionKey(KeyEvent::NUM_LOCK_FUNCTION_KEY)
         << key->GetFunctionKey(KeyEvent::CAPS_LOCK_FUNCTION_KEY)
-        << key->GetFunctionKey(KeyEvent::SCROLL_LOCK_FUNCTION_KEY);
+        << key->GetFunctionKey(KeyEvent::SCROLL_LOCK_FUNCTION_KEY)
+        << key->GetRawCode() << key->GetRepeatCount();
     if (pkt.ChkRWError()) {
         MMI_HILOGE("Packet write key event failed");
         return RET_ERR;
     }
-    return RET_OK;
-}
-
-int32_t InputEventDataTransformation::WriteKeyEventExt(const std::shared_ptr<KeyEvent> key, NetPacket &pkt)
-{
-    CHKPR(key, RET_ERR);
-    auto keys = key->GetKeyItems();
-    int32_t size = static_cast<int32_t>(keys.size());
-    if (size > MAX_KEY_SIZE) {
-        MMI_HILOGE("Key exceeds the max range");
-        return RET_ERR;
-    }
-    int32_t expectSize = static_cast<int32_t>(sizeof(int32_t)) * (size + 3);
-    if (pkt.GetAvailableBufSize() < expectSize) {
-        MMI_HILOGE("No space for key event extension");
-        return RET_ERR;
-    }
-    pkt << key->GetRawCode() << size;
-    for (const auto &item : keys) {
-        pkt << item.GetRawCode();
-    }
-    pkt << key->GetRepeatCount();
-    if (pkt.ChkRWError()) {
-        MMI_HILOGE("Packet write key event extension failed");
-        return RET_ERR;
-    }
-    return RET_OK;
-}
-
-int32_t InputEventDataTransformation::ReadKeyEventExt(NetPacket &pkt, std::shared_ptr<KeyEvent> key)
-{
-    CHKPR(key, RET_ERR);
-    if (pkt.ChkRWError()) {
-        MMI_HILOGE("Packet has read or write error");
-        return RET_ERR;
-    }
-    const int32_t unreadSize = pkt.UnreadSize();
-    if (unreadSize == 0) {
-        return RET_OK;
-    }
-    if (unreadSize < KEY_EVENT_EXT_MIN_SIZE) {
-        MMI_HILOGE("Packet key event extension is truncated");
-        return RET_ERR;
-    }
-
-    int32_t rawCode = -1;
-    int32_t keyItemRawCodeCount = 0;
-    pkt >> rawCode >> keyItemRawCodeCount;
-    auto keys = key->GetKeyItems();
-    if (keyItemRawCodeCount < 0 || static_cast<size_t>(keyItemRawCodeCount) > keys.size()) {
-        MMI_HILOGE("Key extension size is invalid");
-        return RET_ERR;
-    }
-    const int32_t keyItemRawCodeBytes = static_cast<int32_t>(sizeof(int32_t)) * keyItemRawCodeCount;
-    if (pkt.UnreadSize() < keyItemRawCodeBytes + static_cast<int32_t>(sizeof(int32_t))) {
-        MMI_HILOGE("Packet key event extension raw code is truncated");
-        return RET_ERR;
-    }
-    for (int32_t i = 0; i < keyItemRawCodeCount; i++) {
-        int32_t itemRawCode = -1;
-        pkt >> itemRawCode;
-        keys[static_cast<size_t>(i)].SetRawCode(itemRawCode);
-    }
-
-    int32_t repeatCount = 0;
-    pkt >> repeatCount;
-    if (pkt.ChkRWError()) {
-        MMI_HILOGE("Packet read key event extension failed");
-        return RET_ERR;
-    }
-    key->SetRawCode(rawCode);
-    key->SetKeyItem(keys);
-    key->SetRepeatCount(repeatCount);
     return RET_OK;
 }
 
@@ -153,7 +80,7 @@ int32_t InputEventDataTransformation::NetPacketToKeyEvent(NetPacket &pkt, std::s
     key->SetRepeatKey(isRepeatKey);
     int32_t size = 0;
     pkt >> size;
-    if (size > MAX_KEY_SIZE) {
+    if (size < 0 || size > MAX_KEY_SIZE) {
         MMI_HILOGE("Key exceeds the max range");
         return RET_ERR;
     }
@@ -161,28 +88,51 @@ int32_t InputEventDataTransformation::NetPacketToKeyEvent(NetPacket &pkt, std::s
         MMI_HILOGE("Packet read size failed");
         return RET_ERR;
     }
-    bool isPressed = false;
     for (int32_t i = 0; i < size; i++) {
         KeyEvent::KeyItem keyItem;
-        pkt >> data;
-        keyItem.SetKeyCode(data);
-        int64_t datatime = 0;
-        pkt >> datatime;
-        keyItem.SetDownTime(datatime);
-        pkt >> data;
-        keyItem.SetDeviceId(data);
-        pkt >> isPressed;
-        if (pkt.ChkRWError()) {
-            MMI_HILOGE("Packet read item isPressed failed");
+        if (DeserializeKeyItem(pkt, keyItem) != RET_OK) {
             return RET_ERR;
         }
-        keyItem.SetPressed(isPressed);
-        uint32_t unicode;
-        pkt >> unicode;
-        keyItem.SetUnicode(unicode);
         key->AddKeyItem(keyItem);
     }
     ReadFunctionKeys(pkt, key);
+    pkt >> data;
+    key->SetRawCode(data);
+    pkt >> data;
+    key->SetRepeatCount(data);
+    if (pkt.ChkRWError()) {
+        MMI_HILOGE("Packet read key event failed");
+        return RET_ERR;
+    }
+    return RET_OK;
+}
+
+int32_t InputEventDataTransformation::DeserializeKeyItem(NetPacket &pkt, KeyEvent::KeyItem &item)
+{
+    int32_t data = 0;
+    pkt >> data;
+    item.SetKeyCode(data);
+    int64_t datatime = 0;
+    pkt >> datatime;
+    item.SetDownTime(datatime);
+    pkt >> data;
+    item.SetDeviceId(data);
+    bool isPressed = false;
+    pkt >> isPressed;
+    if (pkt.ChkRWError()) {
+        MMI_HILOGE("Packet read item isPressed failed");
+        return RET_ERR;
+    }
+    item.SetPressed(isPressed);
+    uint32_t unicode = 0;
+    pkt >> unicode;
+    item.SetUnicode(unicode);
+    pkt >> data;
+    if (pkt.ChkRWError()) {
+        MMI_HILOGE("Packet read item raw code failed");
+        return RET_ERR;
+    }
+    item.SetRawCode(data);
     return RET_OK;
 }
 

@@ -321,9 +321,6 @@ bool KeyEventHookManager::HookHandler(SessionPtr session, std::shared_ptr<Hook> 
         MMI_HILOGE("Packet key event failed, errCode:%{public}d", STREAM_BUF_WRITE_FAIL);
         return false;
     }
-    if (InputEventDataTransformation::WriteKeyEventExt(keyEvent, pkt) != RET_OK) {
-        MMI_HILOGE("Write key event extension failed");
-    }
     CHKPF(session);
     if (!session->SendMsg(pkt)) {
         MMI_HILOGE("Send to hook:%{public}d failed", session->GetPid());

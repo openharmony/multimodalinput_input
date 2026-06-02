@@ -634,9 +634,6 @@ int32_t EventDispatchHandler::DispatchKeyEvent(int32_t fd, UDSServer& udsServer,
 #ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
     InputEventDataTransformation::MarshallingEnhanceData(key, pkt);
 #endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
-    if (InputEventDataTransformation::WriteKeyEventExt(key, pkt) != RET_OK) {
-        MMI_HILOGE("Write key event extension failed");
-    }
     if (pkt.ChkRWError()) {
         MMI_HILOGE("Packet write structure of EventKeyboard failed");
         return RET_ERR;
