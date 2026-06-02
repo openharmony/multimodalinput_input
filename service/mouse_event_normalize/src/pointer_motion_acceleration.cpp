@@ -54,6 +54,8 @@ constexpr int32_t AXIS_CURVE_M_TABLET_INDEX = 7;
 constexpr int32_t AXIS_CURVE_Q_TABLET_INDEX = 8;
 constexpr int32_t AXIS_CURVE_G_TABLET_INDEX = 9;
 constexpr int32_t AXIS_CURVE_M_PC_PRO_INDEX = 10;
+constexpr int32_t AXIS_CURVE_S_FOLD_PC_INDEX = 11;
+constexpr int32_t AXIS_CURVE_D_TABLET_INDEX = 12;
 } // namespace
 
 std::atomic_bool PointerMotionAcceleration::loading_ { false };
@@ -725,6 +727,12 @@ const PointerMotionAcceleration::AxisCurve* PointerMotionAcceleration::MatchAxis
             break;
         case DeviceType::DEVICE_M_PC_PRO:
             validDeviceType = AXIS_CURVE_M_PC_PRO_INDEX;
+            break;
+        case DeviceType::DEVICE_S_FOLD_PC:
+            validDeviceType = AXIS_CURVE_S_FOLD_PC_INDEX;
+            break;
+        case DeviceType::DEVICE_D_TABLET:
+            validDeviceType = AXIS_CURVE_D_TABLET_INDEX;
             break;
         default:
             validDeviceType = 1;
