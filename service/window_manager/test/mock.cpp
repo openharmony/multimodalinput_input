@@ -440,4 +440,23 @@ int32_t InputWindowsManager::SyncKnuckleStatus(bool isKnuckleEnable)
     return ERR_OK;
 }
 #endif // OHOS_BUILD_ENABLE_ANCO
+
+int32_t InputWindowsManager::GetDeviceGroupId(int32_t deviceId) const
+{
+    auto binding = bindInfo_.GetRuntimeBinding(deviceId);
+    if (binding.has_value()) {
+        return binding->groupId;
+    }
+    return DEFAULT_GROUP_ID;
+}
+
+void InputWindowsManager::OnDeviceUnbind(int32_t deviceId)
+{
+    auto binding = bindInfo_.GetRuntimeBinding(deviceId);
+    if (!binding.has_value()) {
+        return;
+    }
+    std::string msg;
+    UnbindDeviceFromDisplayGroup(deviceId, msg);
+}
 } // namespace OHOS
