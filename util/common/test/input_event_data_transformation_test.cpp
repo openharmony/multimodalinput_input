@@ -22,6 +22,7 @@ namespace MMI {
 namespace {
 using namespace testing::ext;
 using namespace OHOS;
+constexpr int64_t TEST_KEY_DOWN_TIME { 100 };
 
 std::shared_ptr<KeyEvent> CreateKeyEventForExtTest()
 {
@@ -34,7 +35,7 @@ std::shared_ptr<KeyEvent> CreateKeyEventForExtTest()
 
     KeyEvent::KeyItem item;
     item.SetKeyCode(KeyEvent::KEYCODE_A);
-    item.SetDownTime(100);
+    item.SetDownTime(TEST_KEY_DOWN_TIME);
     item.SetPressed(true);
     keyEvent->AddKeyItem(item);
     return keyEvent;
@@ -207,7 +208,7 @@ HWTEST_F(InputEventDataTransformationTest, KeyEventExtToNetPacket, TestSize.Leve
 
     KeyEvent::KeyItem item;
     item.SetKeyCode(KeyEvent::KEYCODE_A);
-    item.SetDownTime(100);
+    item.SetDownTime(TEST_KEY_DOWN_TIME);
     item.SetPressed(true);
     item.SetRawCode(30);
     keyEvent->AddKeyItem(item);
@@ -243,7 +244,7 @@ HWTEST_F(InputEventDataTransformationTest, KeyEventExtToNetPacketWithoutTail, Te
 
     KeyEvent::KeyItem item;
     item.SetKeyCode(KeyEvent::KEYCODE_A);
-    item.SetDownTime(100);
+    item.SetDownTime(TEST_KEY_DOWN_TIME);
     item.SetPressed(true);
     keyEvent->AddKeyItem(item);
 

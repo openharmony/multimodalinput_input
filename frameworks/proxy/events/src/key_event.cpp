@@ -1435,6 +1435,11 @@ bool KeyEvent::ReadFromParcel(Parcel &in)
         return false;
     }
 #endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
+    return ReadKeyEventExtFromParcel(in, keysSize);
+}
+
+bool KeyEvent::ReadKeyEventExtFromParcel(Parcel &in, int32_t keysSize)
+{
     if (in.GetReadableBytes() < KEY_EVENT_RAW_CODE_MIN_SIZE) {
         return true;
     }
