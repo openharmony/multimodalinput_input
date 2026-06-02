@@ -90,9 +90,29 @@ int32_t InputEventDataTransformation::NetPacketToKeyEvent(NetPacket &pkt, std::s
     }
     for (int32_t i = 0; i < size; i++) {
         KeyEvent::KeyItem keyItem;
-        if (DeserializeKeyItem(pkt, keyItem) != RET_OK) {
+        pkt >> data;
+        keyItem.SetKeyCode(data);
+        int64_t datatime = 0;
+        pkt >> datatime;
+        keyItem.SetDownTime(datatime);
+        pkt >> data;
+        keyItem.SetDeviceId(data);
+        bool isPressed = false;
+        pkt >> isPressed;
+        if (pkt.ChkRWError()) {
+            MMI_HILOGE("Packet read item isPressed failed");
             return RET_ERR;
         }
+        keyItem.SetPressed(isPressed);
+        uint32_t unicode = 0;
+        pkt >> unicode;
+        keyItem.SetUnicode(unicode);
+        pkt >> data;
+        if (pkt.ChkRWError()) {
+            MMI_HILOGE("Packet read item raw code failed");
+            return RET_ERR;
+        }
+        keyItem.SetRawCode(data);
         key->AddKeyItem(keyItem);
     }
     ReadFunctionKeys(pkt, key);
@@ -104,35 +124,6 @@ int32_t InputEventDataTransformation::NetPacketToKeyEvent(NetPacket &pkt, std::s
         MMI_HILOGE("Packet read key event failed");
         return RET_ERR;
     }
-    return RET_OK;
-}
-
-int32_t InputEventDataTransformation::DeserializeKeyItem(NetPacket &pkt, KeyEvent::KeyItem &item)
-{
-    int32_t data = 0;
-    pkt >> data;
-    item.SetKeyCode(data);
-    int64_t datatime = 0;
-    pkt >> datatime;
-    item.SetDownTime(datatime);
-    pkt >> data;
-    item.SetDeviceId(data);
-    bool isPressed = false;
-    pkt >> isPressed;
-    if (pkt.ChkRWError()) {
-        MMI_HILOGE("Packet read item isPressed failed");
-        return RET_ERR;
-    }
-    item.SetPressed(isPressed);
-    uint32_t unicode = 0;
-    pkt >> unicode;
-    item.SetUnicode(unicode);
-    pkt >> data;
-    if (pkt.ChkRWError()) {
-        MMI_HILOGE("Packet read item raw code failed");
-        return RET_ERR;
-    }
-    item.SetRawCode(data);
     return RET_OK;
 }
 

@@ -1432,13 +1432,8 @@ bool KeyEvent::ReadFromParcel(Parcel &in)
         return false;
     }
 #endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
-    int32_t rawCode = -1;
-    READINT32(in, rawCode);
-
-    int32_t repeatCount = 0;
-    READINT32(in, repeatCount);
-    rawCode_ = rawCode;
-    SetRepeatCount(repeatCount);
+    READINT32(in, rawCode_);
+    READINT32(in, repeatCount_);
     return true;
 }
 

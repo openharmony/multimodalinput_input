@@ -50,7 +50,6 @@ private:
     static void SerializePointerEvent(const std::shared_ptr<PointerEvent> event, NetPacket &pkt);
     static int32_t SerializePointerItem(NetPacket &pkt, PointerEvent::PointerItem &item);
     static int32_t DeserializePointerItem(NetPacket &pkt, PointerEvent::PointerItem &item);
-    static int32_t DeserializeKeyItem(NetPacket &pkt, KeyEvent::KeyItem &item);
     static void SetAxisInfo(NetPacket &pkt, std::shared_ptr<PointerEvent> event);
     static void ReadFunctionKeys(NetPacket &pkt, std::shared_ptr<KeyEvent> key);
     static int32_t DeserializePointerIds(std::shared_ptr<PointerEvent> event, NetPacket &pkt);
