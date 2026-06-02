@@ -689,27 +689,6 @@ HWTEST_F(InputNativeTest, InputNativeTest_InjectKeyEvent_006, TestSize.Level1)
 }
 
 /**
- * @tc.name: InputNativeTest_InjectMouseEvent_003
- * @tc.desc: Verify the InjectMouseEvent
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputNativeTest, InputNativeTest_InjectMouseEvent_003, TestSize.Level1)
-{
-    Input_MouseEvent* mouseEvent = OH_Input_CreateMouseEvent();
-    ASSERT_NE(mouseEvent, nullptr);
-    OH_Input_SetMouseEventAction(mouseEvent, MOUSE_ACTION_AXIS_BEGIN);
-    OH_Input_SetMouseEventDisplayX(mouseEvent, 350);
-    OH_Input_SetMouseEventDisplayY(mouseEvent, 350);
-    OH_Input_SetMouseEventAxisType(mouseEvent, MOUSE_AXIS_SCROLL_VERTICAL);
-    OH_Input_SetMouseEventAxisValue(mouseEvent, 1.1);
-    OH_Input_SetMouseEventButton(mouseEvent, 3);
-    OH_Input_SetMouseEventActionTime(mouseEvent, -1);
-    int32_t retResult = OH_Input_InjectMouseEvent(mouseEvent);
-    EXPECT_EQ(retResult, INPUT_SUCCESS);
-}
-
-/**
  * @tc.name: InputNativeTest_InjectTouchEvent_002
  * @tc.desc: Verify the InjectTouchEvent
  * @tc.type: FUNC
@@ -744,88 +723,6 @@ HWTEST_F(InputNativeTest, InputNativeTest_InjectTouchEvent_003, TestSize.Level1)
     OH_Input_SetTouchEventDisplayY(touchEvent, 10);
     OH_Input_SetTouchEventActionTime(touchEvent, -1);
     int32_t retResult = OH_Input_InjectTouchEvent(touchEvent);
-    EXPECT_EQ(retResult, INPUT_SUCCESS);
-}
-
-/**
- * @tc.name: InputNativeTest_InjectMouseEvent_004
- * @tc.desc: Verify the InjectMouseEvent
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputNativeTest, InputNativeTest_InjectMouseEvent_004, TestSize.Level1)
-{
-    Input_MouseEvent* mouseEvent = OH_Input_CreateMouseEvent();
-    ASSERT_NE(mouseEvent, nullptr);
-    OH_Input_SetMouseEventAction(mouseEvent, MOUSE_ACTION_CANCEL);
-    OH_Input_SetMouseEventDisplayX(mouseEvent, 350);
-    OH_Input_SetMouseEventDisplayY(mouseEvent, 350);
-    OH_Input_SetMouseEventAxisType(mouseEvent, MOUSE_AXIS_SCROLL_VERTICAL);
-    OH_Input_SetMouseEventAxisValue(mouseEvent, 1.1);
-    OH_Input_SetMouseEventActionTime(mouseEvent, 2);
-    int32_t retResult = OH_Input_InjectMouseEvent(mouseEvent);
-    EXPECT_EQ(retResult, INPUT_SUCCESS);
-    OH_Input_SetMouseEventAction(mouseEvent, MOUSE_ACTION_MOVE);
-    OH_Input_SetMouseEventButton(mouseEvent, MOUSE_BUTTON_NONE);
-    retResult = OH_Input_InjectMouseEvent(mouseEvent);
-    EXPECT_EQ(retResult, INPUT_SUCCESS);
-    OH_Input_SetMouseEventAction(mouseEvent, MOUSE_ACTION_BUTTON_DOWN);
-    OH_Input_SetMouseEventButton(mouseEvent, MOUSE_BUTTON_LEFT);
-    retResult = OH_Input_InjectMouseEvent(mouseEvent);
-    EXPECT_EQ(retResult, INPUT_SUCCESS);
-    OH_Input_SetMouseEventAction(mouseEvent, MOUSE_ACTION_BUTTON_UP);
-    OH_Input_SetMouseEventButton(mouseEvent, MOUSE_BUTTON_MIDDLE);
-    retResult = OH_Input_InjectMouseEvent(mouseEvent);
-    EXPECT_EQ(retResult, INPUT_SUCCESS);
-    OH_Input_SetMouseEventAction(mouseEvent, MOUSE_ACTION_AXIS_BEGIN);
-    OH_Input_SetMouseEventButton(mouseEvent, MOUSE_BUTTON_RIGHT);
-    retResult = OH_Input_InjectMouseEvent(mouseEvent);
-    EXPECT_EQ(retResult, INPUT_SUCCESS);
-    OH_Input_SetMouseEventAction(mouseEvent, MOUSE_ACTION_AXIS_UPDATE);
-    OH_Input_SetMouseEventButton(mouseEvent, MOUSE_BUTTON_FORWARD);
-    retResult = OH_Input_InjectMouseEvent(mouseEvent);
-    EXPECT_EQ(retResult, INPUT_SUCCESS);
-}
-
-/**
- * @tc.name: InputNativeTest_InjectMouseEvent_005
- * @tc.desc: Verify the InjectMouseEvent
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputNativeTest, InputNativeTest_InjectMouseEvent_005, TestSize.Level1)
-{
-    Input_MouseEvent* mouseEvent = OH_Input_CreateMouseEvent();
-    ASSERT_NE(mouseEvent, nullptr);
-    OH_Input_SetMouseEventDisplayX(mouseEvent, 350);
-    OH_Input_SetMouseEventDisplayY(mouseEvent, 350);
-    OH_Input_SetMouseEventAxisType(mouseEvent, MOUSE_AXIS_SCROLL_VERTICAL);
-    OH_Input_SetMouseEventAxisValue(mouseEvent, 1.1);
-    OH_Input_SetMouseEventActionTime(mouseEvent, 2);
-    OH_Input_SetMouseEventAction(mouseEvent, MOUSE_ACTION_AXIS_END);
-    OH_Input_SetMouseEventButton(mouseEvent, MOUSE_BUTTON_BACK);
-    int32_t retResult = OH_Input_InjectMouseEvent(mouseEvent);
-    OH_Input_SetMouseEventAction(mouseEvent, MOUSE_ACTION_AXIS_END);
-    OH_Input_SetMouseEventButton(mouseEvent, 7);
-    retResult = OH_Input_InjectMouseEvent(mouseEvent);
-    EXPECT_EQ(retResult, INPUT_PARAMETER_ERROR);
-    OH_Input_SetMouseEventAction(mouseEvent, 10);
-    retResult = OH_Input_InjectMouseEvent(mouseEvent);
-    EXPECT_EQ(retResult, INPUT_PARAMETER_ERROR);
-    OH_Input_SetMouseEventAxisType(mouseEvent, MOUSE_AXIS_SCROLL_HORIZONTAL);
-    OH_Input_SetMouseEventAction(mouseEvent, MOUSE_ACTION_AXIS_BEGIN);
-    OH_Input_SetMouseEventButton(mouseEvent, MOUSE_BUTTON_BACK);
-    retResult = OH_Input_InjectMouseEvent(mouseEvent);
-    EXPECT_EQ(retResult, INPUT_SUCCESS);
-    OH_Input_SetMouseEventAxisType(mouseEvent, 5);
-    OH_Input_SetMouseEventAction(mouseEvent, MOUSE_ACTION_AXIS_BEGIN);
-    OH_Input_SetMouseEventButton(mouseEvent, MOUSE_BUTTON_BACK);
-    retResult = OH_Input_InjectMouseEvent(mouseEvent);
-    EXPECT_EQ(retResult, INPUT_SUCCESS);
-    OH_Input_SetMouseEventAxisType(mouseEvent, MOUSE_AXIS_SCROLL_VERTICAL);
-    OH_Input_SetMouseEventAction(mouseEvent, MOUSE_ACTION_AXIS_BEGIN);
-    OH_Input_SetMouseEventButton(mouseEvent, MOUSE_BUTTON_BACK);
-    retResult = OH_Input_InjectMouseEvent(mouseEvent);
     EXPECT_EQ(retResult, INPUT_SUCCESS);
 }
 

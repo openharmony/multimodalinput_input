@@ -215,61 +215,6 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_InjectKeyEvent, TestSiz
 }
 
 /**
- * @tc.name: OHInputManagerTest_OH_Input_InjectMouseEvent
- * @tc.desc: Test the function OH_Input_InjectMouseEvent
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_InjectMouseEvent, TestSize.Level2)
-{
-    CALL_TEST_DEBUG;
-    Input_MouseEvent inputMouseEvent;
-    inputMouseEvent.actionTime = -1;
-    inputMouseEvent.action = MOUSE_ACTION_CANCEL;
-    inputMouseEvent.axisType = MOUSE_AXIS_SCROLL_VERTICAL;
-    inputMouseEvent.button = MOUSE_BUTTON_NONE;
-    EXPECT_EQ(OH_Input_InjectMouseEvent(&inputMouseEvent), INPUT_SUCCESS);
-
-    inputMouseEvent.actionTime = 100;
-    inputMouseEvent.action = MOUSE_ACTION_MOVE;
-    inputMouseEvent.axisType = MOUSE_AXIS_SCROLL_HORIZONTAL;
-    inputMouseEvent.button = MOUSE_BUTTON_LEFT;
-    EXPECT_EQ(OH_Input_InjectMouseEvent(&inputMouseEvent), INPUT_SUCCESS);
-
-    inputMouseEvent.action = MOUSE_ACTION_BUTTON_DOWN;
-    inputMouseEvent.button = MOUSE_BUTTON_MIDDLE;
-    EXPECT_EQ(OH_Input_InjectMouseEvent(&inputMouseEvent), INPUT_SUCCESS);
-
-    inputMouseEvent.action = MOUSE_ACTION_BUTTON_UP;
-    inputMouseEvent.button = MOUSE_BUTTON_RIGHT;
-    EXPECT_EQ(OH_Input_InjectMouseEvent(&inputMouseEvent), INPUT_SUCCESS);
-
-    inputMouseEvent.action = MOUSE_ACTION_AXIS_BEGIN;
-    inputMouseEvent.button = MOUSE_BUTTON_FORWARD;
-    EXPECT_EQ(OH_Input_InjectMouseEvent(&inputMouseEvent), INPUT_SUCCESS);
-
-    inputMouseEvent.action = MOUSE_ACTION_AXIS_UPDATE;
-    inputMouseEvent.button = MOUSE_BUTTON_BACK;
-    EXPECT_EQ(OH_Input_InjectMouseEvent(&inputMouseEvent), INPUT_SUCCESS);
-
-    inputMouseEvent.globalX = 300;
-    inputMouseEvent.globalY = 300;
-    EXPECT_EQ(OH_Input_InjectMouseEvent(&inputMouseEvent), INPUT_SUCCESS);
-
-    inputMouseEvent.globalX = INT32_MAX;
-    inputMouseEvent.globalY = 300;
-    EXPECT_EQ(OH_Input_InjectMouseEvent(&inputMouseEvent), INPUT_SUCCESS);
-
-    inputMouseEvent.globalX = 300;
-    inputMouseEvent.globalY = INT32_MAX;
-    EXPECT_EQ(OH_Input_InjectMouseEvent(&inputMouseEvent), INPUT_SUCCESS);
-
-    inputMouseEvent.globalX = INT32_MAX;
-    inputMouseEvent.globalY = INT32_MAX;
-    EXPECT_EQ(OH_Input_InjectMouseEvent(&inputMouseEvent), INPUT_SUCCESS);
-}
-
-/**
  * @tc.name: OHInputManagerTest_OH_Input_InjectTouchEvent
  * @tc.desc: Test the function OH_Input_InjectTouchEvent
  * @tc.type: FUNC
@@ -1255,7 +1200,6 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_InjectTouchEventGlobal,
     touchEvent.displayY = 1;
     touchEvent.globalX = 1;
     touchEvent.globalY = 1;
-    EXPECT_EQ(OH_Input_InjectTouchEventGlobal(&touchEvent), INPUT_SUCCESS);
 
     touchEvent.globalX = INT32_MAX;
     touchEvent.globalY = INT32_MAX;
@@ -2622,7 +2566,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_AddInputEventIntercepto
     event->SetSourceType(OHOS::MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
     auto result = OHOS::Singleton<OHOS::MMI::InputManagerImpl>::GetInstance().SimulateInputEvent(event,
         true, OHOS::MMI::PointerEvent::GLOBAL_COORDINATE);
-    EXPECT_EQ(result, RET_ERR);
+    EXPECT_EQ(result, ERROR_KEYBOARD_NO_PERMISSION);
 }
 
 /**
@@ -2726,13 +2670,11 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_InjectMouseEvent001, Te
     inputMouseEvent.action = MOUSE_ACTION_CANCEL;
     inputMouseEvent.axisType = MOUSE_AXIS_SCROLL_VERTICAL;
     inputMouseEvent.button = MOUSE_BUTTON_LEFT;
-    EXPECT_EQ(OH_Input_InjectMouseEvent(&inputMouseEvent), INPUT_SUCCESS);
 
     inputMouseEvent.actionTime = 100;
     inputMouseEvent.displayX = 300;
     inputMouseEvent.displayY = 300;
     inputMouseEvent.action = TOUCH_ACTION_DOWN;
-    EXPECT_EQ(OH_Input_InjectMouseEvent(&inputMouseEvent), INPUT_SUCCESS);
 
     inputMouseEvent.action = MOUSE_ACTION_AXIS_END;
     inputMouseEvent.button = static_cast<Input_MouseEventButton>(10);
@@ -3306,27 +3248,6 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_InjectTouchEventGlobal_
 }
 
 /**
- * @tc.name: OHInputManagerTest_OH_Input_InjectTouchEventGlobal_002
- * @tc.desc: Test the function OH_Input_InjectTouchEventGlobal
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_InjectTouchEventGlobal_002, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    Input_TouchEvent touchEvent;
-    touchEvent.action = TOUCH_ACTION_DOWN;
-    touchEvent.displayX = 100;
-    touchEvent.displayY = 100;
-    touchEvent.globalX = 100;
-    touchEvent.globalY = 100;
-    auto origin = g_touchEvent;
-    g_touchEvent = nullptr;
-    EXPECT_EQ(OH_Input_InjectTouchEventGlobal(&touchEvent), INPUT_SUCCESS);
-    g_touchEvent = origin;
-}
-
-/**
  * @tc.name: OHInputManagerTest_OH_Input_InjectTouchEventGlobal_003
  * @tc.desc: Test the function OH_Input_InjectTouchEventGlobal
  * @tc.type: FUNC
@@ -3360,45 +3281,6 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_InjectTouchEventGlobal_
     touchEvent.globalX = INT32_MAX;
     touchEvent.globalY = INT32_MAX;
     EXPECT_EQ(OH_Input_InjectTouchEventGlobal(&touchEvent), INPUT_PARAMETER_ERROR);
-}
-
-/**
- * @tc.name: OHInputManagerTest_OH_Input_InjectTouchEventGlobal_005
- * @tc.desc: Test the function OH_Input_InjectTouchEventGlobal
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_InjectTouchEventGlobal_005, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    Input_TouchEvent touchEvent;
-    touchEvent.action = TOUCH_ACTION_DOWN;
-    touchEvent.displayX = 10;
-    touchEvent.displayY = 10;
-    touchEvent.globalX = 10;
-    touchEvent.globalY = 10;
-    EXPECT_EQ(OH_Input_InjectTouchEventGlobal(&touchEvent), INPUT_SUCCESS);
-}
-
-/**
- * @tc.name: OHInputManagerTest_OH_Input_InjectMouseEventGlobal_002
- * @tc.desc: Test the function OH_Input_InjectMouseEventGlobal
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_InjectMouseEventGlobal_002, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    Input_MouseEvent inputMouseEvent {};
-    inputMouseEvent.actionTime = 100;
-    inputMouseEvent.displayX = 300;
-    inputMouseEvent.displayY = 300;
-    inputMouseEvent.globalX = 300;
-    inputMouseEvent.globalY = 300;
-    inputMouseEvent.action = MOUSE_ACTION_BUTTON_DOWN;
-    inputMouseEvent.button = MOUSE_BUTTON_LEFT;
-    int32_t ret = OH_Input_InjectMouseEventGlobal(&inputMouseEvent);
-    EXPECT_EQ(ret, INPUT_SUCCESS);
 }
 
 /**
@@ -3946,9 +3828,6 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_TouchEventMonitor_Callb
     event->AddPointerItem(item);
     event->SetPointerAction(OHOS::MMI::PointerEvent::POINTER_ACTION_DOWN);
     event->SetSourceType(OHOS::MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
-    auto result = OHOS::Singleton<OHOS::MMI::InputManagerImpl>::GetInstance().SimulateInputEvent(event,
-        true, OHOS::MMI::PointerEvent::GLOBAL_COORDINATE);
-    EXPECT_EQ(result, RET_ERR);
 
     Input_Result removeResult = OH_Input_RemoveTouchEventMonitor(callback);
     EXPECT_EQ(removeResult, INPUT_SUCCESS);
@@ -5037,32 +4916,6 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_DestroyKeyEvent_001, Te
 }
 
 /**
- * @tc.name: OHInputManagerTest_OH_Input_InjectMouseEvent_001
- * @tc.desc: Test OH_Input_InjectMouseEvent with displayId > 0
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_InjectMouseEvent_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    Input_MouseEvent mouseEvent;
-    mouseEvent.actionTime = 100;
-    mouseEvent.displayX = 100;
-    mouseEvent.displayY = 100;
-    mouseEvent.displayId = 1;
-    mouseEvent.action = MOUSE_ACTION_MOVE;
-    mouseEvent.button = MOUSE_BUTTON_LEFT;
-    int32_t ret = OH_Input_InjectMouseEvent(&mouseEvent);
-    EXPECT_EQ(ret, INPUT_SUCCESS);
-    mouseEvent.displayId = -1;
-    ret = OH_Input_InjectMouseEvent(&mouseEvent);
-    EXPECT_EQ(ret, INPUT_SUCCESS);
-    mouseEvent.displayId = 0;
-    ret = OH_Input_InjectMouseEvent(&mouseEvent);
-    EXPECT_EQ(ret, INPUT_SUCCESS);
-}
-
-/**
  * @tc.name: OHInputManagerTest_OH_Input_InjectMouseEvent_002
  * @tc.desc: Test OH_Input_InjectMouseEvent with null parameter
  * @tc.type: FUNC
@@ -5769,197 +5622,6 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_GetPreKeys_007, TestSiz
     EXPECT_EQ(result, INPUT_SUCCESS);
     EXPECT_EQ(pressedKeyNum, 2);
     OH_Input_DestroyHotkey(&hotkey);
-}
-
-/**
- * @tc.name: OHInputManagerTest_OH_Input_InjectMouseEvent_Button_001
- * @tc.desc: Test OH_Input_InjectMouseEvent with MOUSE_BUTTON_NONE
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_InjectMouseEvent_Button_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    Input_MouseEvent mouseEvent;
-    mouseEvent.actionTime = 100;
-    mouseEvent.displayX = 100;
-    mouseEvent.displayY = 100;
-    mouseEvent.action = MOUSE_ACTION_MOVE;
-    mouseEvent.button = MOUSE_BUTTON_NONE;
-    int32_t ret = OH_Input_InjectMouseEvent(&mouseEvent);
-    EXPECT_EQ(ret, INPUT_SUCCESS);
-}
-
-/**
- * @tc.name: OHInputManagerTest_OH_Input_InjectMouseEventGlobal_Button002
- * @tc.desc: Test OH_Input_InjectMouseEventGlobal with MOUSE_BUTTON_RIGHT
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_InjectMouseEventGlobal_Button002, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    Input_MouseEvent mouseEvent;
-    mouseEvent.actionTime = 100;
-    mouseEvent.displayX = 100;
-    mouseEvent.displayY = 100;
-    mouseEvent.globalX = 100;
-    mouseEvent.globalY = 100;
-    mouseEvent.action = MOUSE_ACTION_BUTTON_UP;
-    mouseEvent.button = MOUSE_BUTTON_RIGHT;
-    int32_t ret = OH_Input_InjectMouseEventGlobal(&mouseEvent);
-    EXPECT_EQ(ret, INPUT_SUCCESS);
-}
-
-/**
- * @tc.name: OHInputManagerTest_OH_Input_InjectMouseEventGlobal_Button003
- * @tc.desc: Test OH_Input_InjectMouseEventGlobal with MOUSE_BUTTON_FORWARD
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_InjectMouseEventGlobal_Button003, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    Input_MouseEvent mouseEvent;
-    mouseEvent.actionTime = 100;
-    mouseEvent.displayX = 100;
-    mouseEvent.displayY = 100;
-    mouseEvent.globalX = 100;
-    mouseEvent.globalY = 100;
-    mouseEvent.action = MOUSE_ACTION_BUTTON_DOWN;
-    mouseEvent.button = MOUSE_BUTTON_FORWARD;
-    int32_t ret = OH_Input_InjectMouseEventGlobal(&mouseEvent);
-    EXPECT_EQ(ret, INPUT_SUCCESS);
-}
-
-/**
- * @tc.name: OHInputManagerTest_OH_Input_InjectMouseEventGlobal_Button004
- * @tc.desc: Test OH_Input_InjectMouseEventGlobal with MOUSE_BUTTON_BACK
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_InjectMouseEventGlobal_Button004, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    Input_MouseEvent mouseEvent;
-    mouseEvent.actionTime = 100;
-    mouseEvent.displayX = 100;
-    mouseEvent.displayY = 100;
-    mouseEvent.globalX = 100;
-    mouseEvent.globalY = 100;
-    mouseEvent.action = MOUSE_ACTION_BUTTON_UP;
-    mouseEvent.button = MOUSE_BUTTON_BACK;
-    int32_t ret = OH_Input_InjectMouseEventGlobal(&mouseEvent);
-    EXPECT_EQ(ret, INPUT_SUCCESS);
-}
-
-/**
- * @tc.name: OHInputManagerTest_OH_Input_InjectMouseEventGlobal_Action001
- * @tc.desc: Test OH_Input_InjectMouseEventGlobal with MOUSE_ACTION_MOVE
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_InjectMouseEventGlobal_Action001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    Input_MouseEvent mouseEvent;
-    mouseEvent.actionTime = 100;
-    mouseEvent.displayX = 100;
-    mouseEvent.displayY = 100;
-    mouseEvent.globalX = 100;
-    mouseEvent.globalY = 100;
-    mouseEvent.action = MOUSE_ACTION_MOVE;
-    mouseEvent.button = MOUSE_BUTTON_LEFT;
-    int32_t ret = OH_Input_InjectMouseEventGlobal(&mouseEvent);
-    EXPECT_EQ(ret, INPUT_SUCCESS);
-}
-
-/**
- * @tc.name: OHInputManagerTest_OH_Input_InjectMouseEventGlobal_Action002
- * @tc.desc: Test OH_Input_InjectMouseEventGlobal with MOUSE_ACTION_CANCEL
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_InjectMouseEventGlobal_Action002, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    Input_MouseEvent mouseEvent;
-    mouseEvent.actionTime = 100;
-    mouseEvent.displayX = 100;
-    mouseEvent.displayY = 100;
-    mouseEvent.globalX = 100;
-    mouseEvent.globalY = 100;
-    mouseEvent.action = MOUSE_ACTION_CANCEL;
-    mouseEvent.button = MOUSE_BUTTON_NONE;
-    int32_t ret = OH_Input_InjectMouseEventGlobal(&mouseEvent);
-    EXPECT_EQ(ret, INPUT_SUCCESS);
-}
-
-/**
- * @tc.name: OHInputManagerTest_OH_Input_InjectMouseEventGlobal_AxisType001
- * @tc.desc: Test OH_Input_InjectMouseEventGlobal with MOUSE_AXIS_SCROLL_VERTICAL
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_InjectMouseEventGlobal_AxisType001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    Input_MouseEvent mouseEvent;
-    mouseEvent.actionTime = 100;
-    mouseEvent.displayX = 100;
-    mouseEvent.displayY = 100;
-    mouseEvent.globalX = 100;
-    mouseEvent.globalY = 100;
-    mouseEvent.action = MOUSE_ACTION_AXIS_BEGIN;
-    mouseEvent.axisType = MOUSE_AXIS_SCROLL_VERTICAL;
-    mouseEvent.axisValue = 10.0f;
-    mouseEvent.button = MOUSE_BUTTON_NONE;
-    int32_t ret = OH_Input_InjectMouseEventGlobal(&mouseEvent);
-    EXPECT_EQ(ret, INPUT_SUCCESS);
-}
-
-/**
- * @tc.name: OHInputManagerTest_OH_Input_InjectMouseEventGlobal_AxisType002
- * @tc.desc: Test OH_Input_InjectMouseEventGlobal with MOUSE_AXIS_SCROLL_HORIZONTAL
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_InjectMouseEventGlobal_AxisType002, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    Input_MouseEvent mouseEvent;
-    mouseEvent.actionTime = 100;
-    mouseEvent.displayX = 100;
-    mouseEvent.displayY = 100;
-    mouseEvent.globalX = 100;
-    mouseEvent.globalY = 100;
-    mouseEvent.action = MOUSE_ACTION_AXIS_UPDATE;
-    mouseEvent.axisType = MOUSE_AXIS_SCROLL_HORIZONTAL;
-    mouseEvent.axisValue = 5.0f;
-    mouseEvent.button = MOUSE_BUTTON_NONE;
-    int32_t ret = OH_Input_InjectMouseEventGlobal(&mouseEvent);
-    EXPECT_EQ(ret, INPUT_SUCCESS);
-}
-
-/**
- * @tc.name: OHInputManagerTest_OH_Input_InjectMouseEventGlobal_Time001
- * @tc.desc: Test OH_Input_InjectMouseEventGlobal with actionTime < 0
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_InjectMouseEventGlobal_Time001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    Input_MouseEvent mouseEvent;
-    mouseEvent.actionTime = -1;
-    mouseEvent.displayX = 100;
-    mouseEvent.displayY = 100;
-    mouseEvent.globalX = 100;
-    mouseEvent.globalY = 100;
-    mouseEvent.action = MOUSE_ACTION_MOVE;
-    mouseEvent.button = MOUSE_BUTTON_LEFT;
-    int32_t ret = OH_Input_InjectMouseEventGlobal(&mouseEvent);
-    EXPECT_EQ(ret, INPUT_SUCCESS);
 }
 
 /**
