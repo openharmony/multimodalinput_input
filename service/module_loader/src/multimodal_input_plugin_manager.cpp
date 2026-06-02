@@ -130,6 +130,7 @@ int32_t InputPluginManager::Init(UDSServer& udsServer)
             auto plugin = LoadPlugin(path);
             if (plugin != nullptr) {
                 AddPluginToStages(plugin);
+                AddCallbackToPlugin(plugin);
             }
         }
     }
@@ -557,11 +558,10 @@ void InputPluginManager::AddCallbackToPlugin(const std::shared_ptr<IPluginContex
         if (stage != InputPluginStage::INPUT_BEFORE_LIBINPUT_ADAPTER_ON_EVENT) {
             continue;
         }
-        auto funInputEvent = [](void *event, int64_t frameTime) { InputHandler->OnEvent(event, frameTime); };
-        auto callback = [funInputEvent](PluginEventType pluginEvent, int64_t frameTime) {
+        auto callback = [](PluginEventType pluginEvent, int64_t frameTime) {
             auto event = std::get_if<libinput_event*>(&pluginEvent);
             if (!event) return;
-            funInputEvent(static_cast<void *>(*event), frameTime);
+            InputHandler->OnEvent(static_cast<void *>(*event), frameTime);
         };
         cPin->SetCallback(callback);
         return;

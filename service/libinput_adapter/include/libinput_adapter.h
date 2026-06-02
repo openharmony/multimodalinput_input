@@ -112,7 +112,9 @@ private:
     void OnDeviceAdded(std::string path);
     void OnDeviceRemoved(std::string path);
     void InitRightButtonAreaConfig();
+    bool ProcessEventBeforeLibinputStage(libinput_event *event, int64_t frameTime);
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
+    void ProcessEventAsVKeyboardEvent(libinput_event *event, int64_t frameTime);
     void ProcessTouchEventAsVKeyboardEvent(libinput_event *event, libinput_event_type eventType, int64_t frameTime);
     void MapTouchToVKeyboardCoordinates(
         libinput_event_touch *touch, int32_t touchId, double &x, double &y, bool &isInsideSpecialWindow);
