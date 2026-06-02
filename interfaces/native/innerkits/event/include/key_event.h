@@ -3337,7 +3337,7 @@ public:
         /**
          * @brief Obtains the raw key code of the key.
          * @return Returns the raw key code.
-         * @since 9
+         * @since 26.0.0
          */
         int32_t GetRawCode() const;
 
@@ -3345,7 +3345,7 @@ public:
          * @brief Sets a raw key code for the key.
          * @param rawCode Indicates the raw key code to set.
          * @return void
-         * @since 9
+         * @since 26.0.0
          */
         void SetRawCode(int32_t rawCode);
 
@@ -3509,7 +3509,7 @@ public:
     /**
      * @brief Obtains the raw key code of this key event.
      * @return Returns the raw key code.
-     * @since 9
+     * @since 26.0.0
      */
     int32_t GetRawCode() const;
 
@@ -3517,7 +3517,7 @@ public:
      * @brief Sets a raw key code for this key event.
      * @param rawCode Indicates the raw key code to set.
      * @return void
-     * @since 9
+     * @since 26.0.0
      */
     void SetRawCode(int32_t rawCode);
 
@@ -3678,7 +3678,7 @@ public:
     /**
      * @brief Gets the repeat count of the current key event.
      * @return Returns the repeat count.
-     * @since 13
+     * @since 26.0.0
      */
     int32_t GetRepeatCount() const;
 
@@ -3686,7 +3686,7 @@ public:
      * @brief Sets the repeat count of the current key event.
      * @param repeatCount Indicates the repeat count to set.
      * @return void
-     * @since 13
+     * @since 26.0.0
      */
     void SetRepeatCount(int32_t repeatCount);
 
