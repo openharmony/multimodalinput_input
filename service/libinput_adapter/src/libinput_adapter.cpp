@@ -1027,7 +1027,7 @@ void LibinputAdapter::ProcessEventAsVKeyboardEvent(libinput_event *event, int64_
 }
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
 
-bool LibInputAdapter::ProcessEventBeforeLibinputStage(libinput_event *event, int64_t frameTime)
+bool LibinputAdapter::ProcessEventBeforeLibinputStage(libinput_event *event, int64_t frameTime)
 {
     if (event == nullptr) {
         return false;
@@ -1041,7 +1041,7 @@ bool LibInputAdapter::ProcessEventBeforeLibinputStage(libinput_event *event, int
 
     auto pData = std::make_shared<IPluginData>();
     pData->frameTime = frameTime;
-    pData->stage = InputPluginStage::INPUT_BEFORE_LIBINPUT_ADATER_ON_EVENT;
+    pData->stage = InputPluginStage::INPUT_BEFORE_LIBINPUT_ADAPTER_ON_EVENT;
     int32_t res = manager->HandleEvent(event, pData);
     if (res == RET_DO) {
         return true;
