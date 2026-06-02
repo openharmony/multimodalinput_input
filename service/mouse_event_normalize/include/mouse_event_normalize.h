@@ -62,6 +62,7 @@ public:
     void MouseBtnStateCounts(uint32_t btnCode, const BUTTON_STATE btnState) override;
     int32_t LibinputChangeToPointer(const uint32_t keyValue) override;
     int32_t SetScrollSwitchSetterPid(int32_t pid) override;
+    void OnGroupRemoved(int32_t groupId) override;
 
 private:
     std::shared_ptr<MouseTransformProcessor> GetProcessor(int32_t deviceId) const;

@@ -106,6 +106,7 @@ public:
     void GetPressedButtons(std::vector<int32_t>& pressedButtons);
     void MouseBtnStateCounts(uint32_t btnCode, const BUTTON_STATE btnState);
     int32_t LibinputChangeToPointer(const uint32_t keyValue);
+    void OnGroupRemoved(int32_t groupId);
 
 private:
     void OnDeviceEnabled(std::shared_ptr<MouseEventInterface> self, int32_t deviceId);

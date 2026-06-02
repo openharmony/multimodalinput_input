@@ -192,6 +192,10 @@ group("mmi_tests") {
   testonly = true
   deps = [
     "test/unittest:hid_display_bind_board_test",
+    "test/systemtest:multi_group_system_tests",
+    "service:MultiGroupBindingTest",
+    "service:MultiGroupBindingSupplementTest",
+    "service/mouse_event_normalize/test:MouseDeviceStateGroupTest",
     "frameworks/ets/common/test:AniCommonTest",
     "frameworks/native/input:OHInputManagerEXTest",
     "frameworks/native/input:OHInputManagerTest",

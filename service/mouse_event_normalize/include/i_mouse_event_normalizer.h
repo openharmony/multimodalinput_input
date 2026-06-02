@@ -81,6 +81,7 @@ public:
     virtual void MouseBtnStateCounts(uint32_t btnCode, const BUTTON_STATE btnState) = 0;
     virtual int32_t LibinputChangeToPointer(const uint32_t keyValue) = 0;
     virtual int32_t SetScrollSwitchSetterPid(int32_t pid) = 0;
+    virtual void OnGroupRemoved(int32_t groupId) {}
 };
 } // namespace MMI
 } // namespace OHOS

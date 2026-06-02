@@ -346,6 +346,11 @@ int32_t MouseEventNormalize::SetScrollSwitchSetterPid(int32_t pid)
     return RET_OK;
 }
 
+void MouseEventNormalize::OnGroupRemoved(int32_t groupId)
+{
+    MouseState->RemoveGroupState(groupId);
+}
+
 extern "C" IMouseEventNormalize* CreateInstance(IInputServiceContext *env)
 {
     return new MouseEventNormalize(env);

@@ -514,6 +514,15 @@ int32_t MouseEventInterface::LibinputChangeToPointer(const uint32_t keyValue)
     return mouse->LibinputChangeToPointer(keyValue);
 }
 
+void MouseEventInterface::OnGroupRemoved(int32_t groupId)
+{
+    auto mouse = GetMouse();
+    if (mouse == nullptr) {
+        return;
+    }
+    mouse->OnGroupRemoved(groupId);
+}
+
 std::shared_ptr<MouseEventInterface> MouseEventInterface::GetInstance()
 {
     static std::once_flag flag;
