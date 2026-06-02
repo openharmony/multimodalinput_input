@@ -108,10 +108,6 @@ int32_t InputEventDataTransformation::NetPacketToKeyEvent(NetPacket &pkt, std::s
         pkt >> unicode;
         keyItem.SetUnicode(unicode);
         pkt >> data;
-        if (pkt.ChkRWError()) {
-            MMI_HILOGE("Packet read item raw code failed");
-            return RET_ERR;
-        }
         keyItem.SetRawCode(data);
         key->AddKeyItem(keyItem);
     }
