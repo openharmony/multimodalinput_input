@@ -52,6 +52,7 @@ private:
     static int32_t DeserializePointerItem(NetPacket &pkt, PointerEvent::PointerItem &item);
     static void SetAxisInfo(NetPacket &pkt, std::shared_ptr<PointerEvent> event);
     static void ReadFunctionKeys(NetPacket &pkt, std::shared_ptr<KeyEvent> key);
+    static int32_t ReadKeyEventBaseInfo(NetPacket &pkt, std::shared_ptr<KeyEvent> key, int32_t &size);
     static int32_t DeserializePointerIds(std::shared_ptr<PointerEvent> event, NetPacket &pkt);
     static int32_t DeserializePressedButtons(std::shared_ptr<PointerEvent> event, NetPacket &pkt);
     static bool SerializeSettings(std::shared_ptr<PointerEvent> event, NetPacket &pkt);
