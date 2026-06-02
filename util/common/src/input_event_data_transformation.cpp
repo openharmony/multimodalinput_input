@@ -69,12 +69,9 @@ int32_t InputEventDataTransformation::NetPacketToKeyEvent(NetPacket &pkt, std::s
         return RET_ERR;
     }
     int32_t data = 0;
-    pkt >> data;
-    key->SetKeyCode(data);
-    pkt >> data;
-    key->SetKeyAction(data);
-    pkt >> data;
-    key->SetKeyIntention(data);
+    pkt >> data; key->SetKeyCode(data);
+    pkt >> data; key->SetKeyAction(data);
+    pkt >> data; key->SetKeyIntention(data);
     bool isRepeatKey { false };
     pkt >> isRepeatKey;
     key->SetRepeatKey(isRepeatKey);
@@ -112,10 +109,8 @@ int32_t InputEventDataTransformation::NetPacketToKeyEvent(NetPacket &pkt, std::s
         key->AddKeyItem(keyItem);
     }
     ReadFunctionKeys(pkt, key);
-    pkt >> data;
-    key->SetRawCode(data);
-    pkt >> data;
-    key->SetRepeatCount(data);
+    pkt >> data; key->SetRawCode(data);
+    pkt >> data; key->SetRepeatCount(data);
     return RET_OK;
 }
 
