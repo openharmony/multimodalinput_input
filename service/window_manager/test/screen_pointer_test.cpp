@@ -1628,5 +1628,163 @@ HWTEST_F(ScreenPointerTest, ScreenPointerTest_MoveSoft_NullCheck_002, TestSize.L
     bool result = screenpointer->MoveSoft(100, 100);
     EXPECT_EQ(result, false);
 }
+
+/**
+ * @tc.name: ScreenPointerTest_CalculateHwcPositionForExtend_003
+ * @tc.desc: Test CalculateHwcPositionForExtend with DIRECTION0 (no rotation, no swap)
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(ScreenPointerTest, ScreenPointerTest_CalculateHwcPositionForExtend_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    hwcmgr_ptr_t hwcmgr = std::make_shared<HardwareCursorPointerManager>();
+    ASSERT_NE(hwcmgr, nullptr);
+    handler_ptr_t handler = nullptr;
+    OLD::DisplayInfo di;
+    auto screenpointer = std::make_shared<ScreenPointer>(hwcmgr, handler, di);
+    ASSERT_NE(screenpointer, nullptr);
+    screenpointer->displayDirection_ = Direction::DIRECTION0;
+    screenpointer->width_ = 1920;
+    screenpointer->height_ = 1080;
+    screenpointer->isCurrentOffScreenRendering_ = false;
+    int32_t x = 100;
+    int32_t y = 200;
+    screenpointer->CalculateHwcPositionForExtend(x, y);
+    EXPECT_EQ(x, 100);
+    EXPECT_EQ(y, 200);
+}
+
+/**
+ * @tc.name: ScreenPointerTest_CalculateHwcPositionForExtend_004
+ * @tc.desc: Test CalculateHwcPositionForExtend with DIRECTION90 (rotation=270, swap width/height)
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(ScreenPointerTest, ScreenPointerTest_CalculateHwcPositionForExtend_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    hwcmgr_ptr_t hwcmgr = std::make_shared<HardwareCursorPointerManager>();
+    ASSERT_NE(hwcmgr, nullptr);
+    handler_ptr_t handler = nullptr;
+    OLD::DisplayInfo di;
+    auto screenpointer = std::make_shared<ScreenPointer>(hwcmgr, handler, di);
+    ASSERT_NE(screenpointer, nullptr);
+    screenpointer->displayDirection_ = Direction::DIRECTION90;
+    screenpointer->width_ = 1920;
+    screenpointer->height_ = 1080;
+    screenpointer->isCurrentOffScreenRendering_ = false;
+    int32_t x = 100;
+    int32_t y = 200;
+    screenpointer->CalculateHwcPositionForExtend(x, y);
+    EXPECT_EQ(x, 200);
+    EXPECT_EQ(y, 980);
+}
+
+/**
+ * @tc.name: ScreenPointerTest_CalculateHwcPositionForExtend_005
+ * @tc.desc: Test CalculateHwcPositionForExtend with DIRECTION180 (rotation=180, no swap)
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(ScreenPointerTest, ScreenPointerTest_CalculateHwcPositionForExtend_005, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    hwcmgr_ptr_t hwcmgr = std::make_shared<HardwareCursorPointerManager>();
+    ASSERT_NE(hwcmgr, nullptr);
+    handler_ptr_t handler = nullptr;
+    OLD::DisplayInfo di;
+    auto screenpointer = std::make_shared<ScreenPointer>(hwcmgr, handler, di);
+    ASSERT_NE(screenpointer, nullptr);
+    screenpointer->displayDirection_ = Direction::DIRECTION180;
+    screenpointer->width_ = 1920;
+    screenpointer->height_ = 1080;
+    screenpointer->isCurrentOffScreenRendering_ = false;
+    int32_t x = 100;
+    int32_t y = 200;
+    screenpointer->CalculateHwcPositionForExtend(x, y);
+    EXPECT_EQ(x, 1820);
+    EXPECT_EQ(y, 880);
+}
+
+/**
+ * @tc.name: ScreenPointerTest_CalculateHwcPositionForExtend_006
+ * @tc.desc: Test CalculateHwcPositionForExtend with DIRECTION270 (rotation=90, swap width/height)
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(ScreenPointerTest, ScreenPointerTest_CalculateHwcPositionForExtend_006, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    hwcmgr_ptr_t hwcmgr = std::make_shared<HardwareCursorPointerManager>();
+    ASSERT_NE(hwcmgr, nullptr);
+    handler_ptr_t handler = nullptr;
+    OLD::DisplayInfo di;
+    auto screenpointer = std::make_shared<ScreenPointer>(hwcmgr, handler, di);
+    ASSERT_NE(screenpointer, nullptr);
+    screenpointer->displayDirection_ = Direction::DIRECTION270;
+    screenpointer->width_ = 1920;
+    screenpointer->height_ = 1080;
+    screenpointer->isCurrentOffScreenRendering_ = false;
+    int32_t x = 100;
+    int32_t y = 200;
+    screenpointer->CalculateHwcPositionForExtend(x, y);
+    EXPECT_EQ(x, 1720);
+    EXPECT_EQ(y, 100);
+}
+
+/**
+ * @tc.name: ScreenPointerTest_CalculateHwcPositionForExtend_007
+ * @tc.desc: Test CalculateHwcPositionForExtend with DIRECTION90 and offScreenRendering
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(ScreenPointerTest, ScreenPointerTest_CalculateHwcPositionForExtend_007, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    hwcmgr_ptr_t hwcmgr = std::make_shared<HardwareCursorPointerManager>();
+    ASSERT_NE(hwcmgr, nullptr);
+    handler_ptr_t handler = nullptr;
+    OLD::DisplayInfo di;
+    auto screenpointer = std::make_shared<ScreenPointer>(hwcmgr, handler, di);
+    ASSERT_NE(screenpointer, nullptr);
+    screenpointer->displayDirection_ = Direction::DIRECTION90;
+    screenpointer->width_ = 1920;
+    screenpointer->height_ = 1080;
+    screenpointer->isCurrentOffScreenRendering_ = true;
+    screenpointer->offRenderScale_ = 2.0;
+    int32_t x = 50;
+    int32_t y = 100;
+    screenpointer->CalculateHwcPositionForExtend(x, y);
+    EXPECT_EQ(x, 200);
+    EXPECT_EQ(y, 980);
+}
+
+/**
+ * @tc.name: ScreenPointerTest_CalculateHwcPositionForExtend_008
+ * @tc.desc: Test CalculateHwcPositionForExtend with DIRECTION180 and offScreenRendering
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(ScreenPointerTest, ScreenPointerTest_CalculateHwcPositionForExtend_008, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    hwcmgr_ptr_t hwcmgr = std::make_shared<HardwareCursorPointerManager>();
+    ASSERT_NE(hwcmgr, nullptr);
+    handler_ptr_t handler = nullptr;
+    OLD::DisplayInfo di;
+    auto screenpointer = std::make_shared<ScreenPointer>(hwcmgr, handler, di);
+    ASSERT_NE(screenpointer, nullptr);
+    screenpointer->displayDirection_ = Direction::DIRECTION180;
+    screenpointer->width_ = 1920;
+    screenpointer->height_ = 1080;
+    screenpointer->isCurrentOffScreenRendering_ = true;
+    screenpointer->offRenderScale_ = 0.5;
+    int32_t x = 100;
+    int32_t y = 200;
+    screenpointer->CalculateHwcPositionForExtend(x, y);
+    EXPECT_EQ(x, 1870);
+    EXPECT_EQ(y, 980);
+}
 } // namespace MMI
 } // namespace OHOS

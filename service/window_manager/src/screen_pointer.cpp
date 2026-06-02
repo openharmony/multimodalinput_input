@@ -467,6 +467,14 @@ void ScreenPointer::CalculateHwcPositionForExtend(int32_t& x, int32_t& y)
         x = x * offRenderScale_;
         y = y * offRenderScale_;
     }
+    Direction direction = static_cast<Direction>((((DIRECTION0 - displayDirection_) *
+        ANGLE_90 + ANGLE_360) % ANGLE_360) / ANGLE_90);
+    int32_t width = static_cast<int32_t>(width_);
+    int32_t height = static_cast<int32_t>(height_);
+    if (displayDirection_ == DIRECTION90 || displayDirection_ == DIRECTION270) {
+        std::swap(width, height);
+    }
+    Rotate(rotation_t(direction), x, y, width, height);
 }
 
 void ScreenPointer::CalculateHwcPositionForMirror(int32_t& x, int32_t& y)
