@@ -416,7 +416,7 @@ bool InputWindowsManager::GetCancelEventFlag(std::shared_ptr<PointerEvent> point
         return true;
     } else if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_MOUSE ||
         pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHPAD) {
-        return mouseDownInfo_.pid == -1;
+        return mouseDownInfoMap_[pointerEvent->GetDeviceId()].pid == -1;
     }
     return false;
 }
@@ -573,10 +573,11 @@ int32_t InputWindowsManager::GetClientFd(std::shared_ptr<PointerEvent> pointerEv
 #ifdef OHOS_BUILD_ENABLE_POINTER
     if ((pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_MOUSE) ||
         (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_CROWN)) {
-        if (mouseDownInfo_.agentPid != -1) {
-            agentPid = GetWindowAgentPid(mouseDownInfo_.agentWindowId);
+        auto& mouseDownInfoDev = mouseDownInfoMap_[pointerEvent->GetDeviceId()];
+        if (mouseDownInfoDev.agentPid != -1) {
+            agentPid = GetWindowAgentPid(mouseDownInfoDev.agentWindowId);
             if (agentPid < 0) {
-                agentPid = mouseDownInfo_.agentPid;
+                agentPid = mouseDownInfoDev.agentPid;
             }
             MMI_HILOGD("mouseevent occurs, update the agentPid:%{public}d", agentPid);
             InitMouseDownInfo();
@@ -591,13 +592,14 @@ int32_t InputWindowsManager::GetClientFd(std::shared_ptr<PointerEvent> pointerEv
                 mouseRedispatchStore_.EraseAxisBeginWindow(mouseRedispatchStore_.GetZOrder());
             }
         } else {
-            if (axisBeginWindowInfo_ && axisBeginWindowInfo_->agentPid != -1) {
-                agentPid = GetWindowAgentPid(axisBeginWindowInfo_->agentWindowId);
+            auto& axisBeginWindowInfoDev = axisBeginWindowInfoMap_[pointerEvent->GetDeviceId()];
+            if (axisBeginWindowInfoDev && axisBeginWindowInfoDev->agentPid != -1) {
+                agentPid = GetWindowAgentPid(axisBeginWindowInfoDev->agentWindowId);
                 if (agentPid < 0) {
-                    agentPid = axisBeginWindowInfo_->agentPid;
+                    agentPid = axisBeginWindowInfoDev->agentPid;
                 }
                 MMI_HILOGD("The axisBeginEvent occurs, update the agentPid:%{public}d", agentPid);
-                axisBeginWindowInfo_ = std::nullopt;
+                axisBeginWindowInfoDev = std::nullopt;
             }
         }
     }
@@ -2033,13 +2035,13 @@ void InputWindowsManager::EnsureMouseEventCycle(std::shared_ptr<PointerEvent> ev
         return;
     }
     if ((event->GetPointerAction() == PointerEvent::POINTER_ACTION_BUTTON_UP) &&
-        (mouseDownInfo_.id >= 0) &&
-        (mouseDownInfo_.id != event->GetTargetWindowId())) {
+        (mouseDownInfoMap_[event->GetDeviceId()].id >= 0) &&
+        (mouseDownInfoMap_[event->GetDeviceId()].id != event->GetTargetWindowId())) {
         MMI_HILOGD("Target window shift from %{private}d to %{private}d at button-up",
-            mouseDownInfo_.id, event->GetTargetWindowId());
-        event->SetTargetDisplayId(mouseDownInfo_.displayId);
-        event->SetTargetWindowId(mouseDownInfo_.id);
-        event->SetAgentWindowId(mouseDownInfo_.agentWindowId);
+            mouseDownInfoMap_[event->GetDeviceId()].id, event->GetTargetWindowId());
+        event->SetTargetDisplayId(mouseDownInfoMap_[event->GetDeviceId()].displayId);
+        event->SetTargetWindowId(mouseDownInfoMap_[event->GetDeviceId()].id);
+        event->SetAgentWindowId(mouseDownInfoMap_[event->GetDeviceId()].agentWindowId);
     }
 }
 
@@ -2655,19 +2657,19 @@ void InputWindowsManager::PointerDrawingManagerOnDisplayInfo(const OLD::DisplayG
         GetPointerStyle(info.windowPid, info.windowId, pointerStyle);
         MMI_HILOGD("Get pointer style, pid:%{public}d, windowid:%{public}d, style:%{public}d",
             info.windowPid, info.windowId, pointerStyle.id);
-        if (!dragFlag_) {
+        if (!dragFlagMap_[lastPointerEventCopy->GetDeviceId()]) {
             SetMouseFlag(lastPointerEventCopy->GetPointerAction() == PointerEvent::POINTER_ACTION_BUTTON_UP);
             isDragBorder_ = SelectPointerChangeArea(*windowInfo, pointerStyle, logicX, logicY);
             dragPointerStyle_ = pointerStyle;
             MMI_HILOGD("Not in drag SelectPointerStyle, pointerStyle is:%{public}d", dragPointerStyle_.id);
         }
-        JudgMouseIsDownOrUp(dragFlag_);
+        JudgMouseIsDownOrUp(dragFlagMap_[lastPointerEventCopy->GetDeviceId()]);
         if (lastPointerEventCopy->GetPointerAction() == PointerEvent::POINTER_ACTION_BUTTON_DOWN) {
-            dragFlag_ = true;
+            dragFlagMap_[lastPointerEventCopy->GetDeviceId()] = true;
             MMI_HILOGD("Is in drag scene");
         }
         if (lastPointerEventCopy->GetPointerAction() == PointerEvent::POINTER_ACTION_BUTTON_UP) {
-            dragFlag_ = false;
+            dragFlagMap_[lastPointerEventCopy->GetDeviceId()] = false;
             isDragBorder_ = false;
         }
         int32_t focusWindowId = GetFocusWindowId(groupId);
@@ -4583,9 +4585,10 @@ std::optional<WindowInfo> InputWindowsManager::SelectWindowInfo(int32_t logicalX
             }
         }
     } else if (action != PointerEvent::POINTER_ACTION_TOUCHPAD_ACTIVE) {
-        if (axisBeginWindowInfo_ &&
+        auto& axisBeginWindowInfoDev = axisBeginWindowInfoMap_[pointerEvent->GetDeviceId()];
+        if (axisBeginWindowInfoDev &&
             (action == PointerEvent::POINTER_ACTION_AXIS_UPDATE || action == PointerEvent::POINTER_ACTION_AXIS_END)) {
-            firstBtnDownWindowInfo = {axisBeginWindowInfo_->id, axisBeginWindowInfo_->displayId};
+            firstBtnDownWindowInfo = {axisBeginWindowInfoDev->id, axisBeginWindowInfoDev->displayId};
         }
         firstBtnDownWindowInfo_ = firstBtnDownWindowInfo;
     }
@@ -5058,6 +5061,10 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
 {
     CALL_DEBUG_ENTER;
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
+    int32_t deviceId = pointerEvent->GetDeviceId();
+    auto& mouseDownInfo = mouseDownInfoMap_[deviceId];
+    auto& dragFlag = dragFlagMap_[deviceId];
+    auto& axisBeginWindowInfo = axisBeginWindowInfoMap_[deviceId];
     auto displayId = pointerEvent->GetTargetDisplayId();
     // For bound devices, override displayId so that hardware cursor rendering
     // (CPU draw, HWC buffer, RS buffer) targets the correct bound display
@@ -5113,14 +5120,14 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
                 mouseRedispatchStore_.SetWindowActive(touchWindow->id);
             }
         } else {
-            axisBeginWindowInfo_ = touchWindow;
-            if (axisBeginWindowInfo_) {
+            axisBeginWindowInfo = touchWindow;
+            if (axisBeginWindowInfo) {
                 std::vector<float> keysToErase;
                 for (const auto &entry : mouseRedispatchStore_.GetAxisBeginWindowMap()) {
-                    if (entry.second && entry.second->id == axisBeginWindowInfo_->id) {
+                    if (entry.second && entry.second->id == axisBeginWindowInfo->id) {
                         DispatchPointerRedispatch(PointerEvent::POINTER_ACTION_AXIS_END,
-                            axisBeginWindowInfo_.value());
-                        mouseRedispatchStore_.DeactivateWindow(axisBeginWindowInfo_->id);
+                            axisBeginWindowInfo.value());
+                        mouseRedispatchStore_.DeactivateWindow(axisBeginWindowInfo->id);
                         keysToErase.push_back(entry.first);
                     }
                 }
@@ -5137,7 +5144,7 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
         bool followWindowIsNull = dispatchEventFlag
                                       ? mouseRedispatchStore_.GetAxisBeginWindow() == std::nullopt
                                       : pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_BUTTON_DOWN ||
-                                            (mouseDownInfo_.id == -1 && axisBeginWindowInfo_ == std::nullopt);
+                                            (mouseDownInfo.id == -1 && axisBeginWindowInfo == std::nullopt);
         if (followWindowIsNull) {
             MMI_HILOGE("touchWindow is nullptr, targetWindow:%{public}d", pointerEvent->GetTargetWindowId());
             if (!CursorDrawingComponent::GetInstance().GetMouseDisplayState() &&
@@ -5180,7 +5187,7 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
                 MMI_HILOGW("Rs process timeout");
             }
             if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_BUTTON_UP) {
-                dragFlag_ = false;
+                dragFlag = false;
                 isDragBorder_ = false;
             }
             return RET_ERR;
@@ -5191,10 +5198,10 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
                 touchWindow = axisWindow;
             }
         } else {
-            if (mouseDownInfo_.id != -1) {
-                touchWindow = std::make_optional(mouseDownInfo_);
-            } else if (axisBeginWindowInfo_) {
-                touchWindow = axisBeginWindowInfo_;
+            if (mouseDownInfo.id != -1) {
+                touchWindow = std::make_optional(mouseDownInfo);
+            } else if (axisBeginWindowInfo) {
+                touchWindow = axisBeginWindowInfo;
             }
         }
         int32_t pointerAction = pointerEvent->GetPointerAction();
@@ -5284,7 +5291,7 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
         dragPointerStyle_ = pointerStyle;
     }
     WindowInfo window = *touchWindow;
-    if (!dragFlag_) {
+    if (!dragFlag) {
         isDragBorder_ = SelectPointerChangeArea(window, pointerStyle, logicalX, logicalY);
         dragPointerStyle_ = pointerStyle;
         MMI_HILOGD("pointerStyle is :%{public}d, windowId is :%{public}d, logicalX is :%{private}d,"
@@ -5292,7 +5299,7 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
     }
     if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_BUTTON_DOWN) {
         SetMouseFlag(true);
-        dragFlag_ = true;
+        dragFlag = true;
         MMI_HILOGD("Is in drag scene");
         // Sequence closure: record the current group/window on button-down so
         // that a button-up after rebind still reaches the original target.
@@ -5304,7 +5311,7 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
     }
     if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_BUTTON_UP) {
         SetMouseFlag(false);
-        dragFlag_ = false;
+        dragFlag = false;
         isDragBorder_ = false;
         // Sequence closure: consume the snapshot recorded at button-down.
         InputSequenceKey seqKey;
@@ -5420,13 +5427,14 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
     }
 #endif // OHOS_BUILD_ENABLE_ANCO
     if (action == PointerEvent::POINTER_ACTION_BUTTON_DOWN) {
+        mouseDownInfo = *touchWindow;
         mouseDownInfo_ = *touchWindow;
         mouseDownEventId_ = pointerEvent->GetId();
     }
     if ((action == PointerEvent::POINTER_ACTION_MOVE && !pointerEvent->GetPressedButtons().empty()) ||
         (action == PointerEvent::POINTER_ACTION_BUTTON_UP)) {
-        if (touchWindow->id != mouseDownInfo_.id) {
-            MMI_HILOGE("Mouse from:%{public}d move to new window:%{public}d", mouseDownInfo_.id, touchWindow->id);
+        if (touchWindow->id != mouseDownInfo.id) {
+            MMI_HILOGE("Mouse from:%{public}d move to new window:%{public}d", mouseDownInfo.id, touchWindow->id);
         }
     }
     if (action == PointerEvent::POINTER_ACTION_BUTTON_UP) {
@@ -5440,7 +5448,7 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
         if (dispatchEventFlag) {
             mouseRedispatchStore_.EraseAxisBeginWindow(mouseRedispatchStore_.GetZOrder());
         } else {
-            axisBeginWindowInfo_ = std::nullopt;
+            axisBeginWindowInfo = std::nullopt;
         }
         MMI_HILOGD("Axis end, clear axis begin info");
     }
@@ -6588,7 +6596,7 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
             GetPointerStyle(touchWindow->pid, touchWindow->id, pointerStyle);
             dragPointerStyle_ = pointerStyle;
         }
-        if (!dragFlag_) {
+        if (!dragFlagMap_[pointerEvent->GetDeviceId()]) {
             isDragBorder_ = SelectPointerChangeArea(*touchWindow, pointerStyle,
                 static_cast<int32_t>(logicalX), static_cast<int32_t>(logicalY));
             dragPointerStyle_ = pointerStyle;
@@ -7371,7 +7379,11 @@ int32_t InputWindowsManager::UpdateJoystickTarget(std::shared_ptr<PointerEvent> 
 {
     CALL_DEBUG_ENTER;
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
-    int32_t groupId = FindDisplayGroupId(pointerEvent->GetTargetDisplayId());
+    int32_t deviceId = pointerEvent->GetDeviceId();
+    int32_t groupId = ResolveGroupIdForDevice(deviceId);
+    if (groupId == MAIN_GROUPID) {
+        groupId = FindDisplayGroupId(pointerEvent->GetTargetDisplayId());
+    }
     int32_t focusWindowId = GetFocusWindowId(groupId);
     const WindowInfo* windowInfo = nullptr;
     std::vector<WindowInfo> windowsInfo = GetWindowGroupInfoByDisplayId(pointerEvent->GetTargetDisplayId());
@@ -9507,11 +9519,11 @@ std::pair<int32_t, int32_t> InputWindowsManager::CalcDrawCoordinate(const OLD::D
 void InputWindowsManager::SetDragFlagByPointer(std::shared_ptr<PointerEvent> lastPointerEvent)
 {
     if (lastPointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_BUTTON_DOWN) {
-        dragFlag_ = true;
+        dragFlagMap_[lastPointerEvent->GetDeviceId()] = true;
         MMI_HILOGD("Is in drag scene");
     }
     if (lastPointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_BUTTON_UP) {
-        dragFlag_ = false;
+        dragFlagMap_[lastPointerEvent->GetDeviceId()] = false;
         isDragBorder_ = false;
     }
 }
