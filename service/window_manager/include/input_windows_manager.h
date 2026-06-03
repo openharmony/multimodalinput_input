@@ -449,7 +449,7 @@ void HandleOneHandMode(const OLD::DisplayInfo &displayInfo, std::shared_ptr<Poin
     MouseRedispatchStore& GetMouseRedispatchStore();
     TouchRedispatchStore& GetTouchRedispatchStore();
     int32_t GetRealFingerDownWindowId(int32_t deviceId, int32_t pointerId);
-    void DispatchTouch(int32_t pointerAction, int32_t groupId = DEFAULT_GROUP_ID);
+    void DispatchTouch(int32_t pointerAction, int32_t groupId, int32_t toolType);
     const OLD::DisplayInfo *FindPhysicalDisplayInfo(const std::string& uniq) const;
     bool GetPhysicalDisplayCoord(int32_t deviceId, struct libinput_event_touch* touch,
         const OLD::DisplayInfo& info, EventTouch& touchInfo, bool isNeedClear = false,

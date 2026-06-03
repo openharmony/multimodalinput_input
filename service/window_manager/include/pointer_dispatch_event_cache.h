@@ -25,7 +25,7 @@ namespace MMI {
 class PointerDispatchEventCache final {
 public:
     void Update(const std::shared_ptr<PointerEvent>& pointerEvent);
-    std::shared_ptr<PointerEvent> GetForDispatch(int32_t pointerAction) const;
+    std::shared_ptr<PointerEvent> GetForDispatch(int32_t toolType) const;
     std::shared_ptr<PointerEvent> GetTouchEvent() const;
     void ClearDeviceEvents(int32_t deviceId);
     void ClearTouch();

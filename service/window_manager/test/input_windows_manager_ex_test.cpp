@@ -1615,7 +1615,7 @@ HWTEST_F(InputWindowsManagerTest, DispatchTouch_001, TestSize.Level1)
         it->second.windowsInfo.push_back(windowInfo);
     }
     int32_t pointerAction = PointerEvent::POINTER_ACTION_PULL_IN_WINDOW;
-    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->DispatchTouch(pointerAction));
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->DispatchTouch(pointerAction, DEFAULT_GROUP_ID, PointerEvent::TOOL_TYPE_FINGER));
     inputWindowsManager->udsServer_ = nullptr;
     inputWindowsManager->dispatchEventCache_.ClearTouch();
     it->second.windowsInfo.clear();
@@ -1663,7 +1663,7 @@ HWTEST_F(InputWindowsManagerTest, DispatchTouch_002, TestSize.Level1)
     lastInfo.lastTouchLogicY = 8;
     inputWindowsManager->LastTouchInfos_[touch] = lastInfo;
     int32_t pointerAction = PointerEvent::POINTER_ACTION_PULL_IN_WINDOW;
-    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->DispatchTouch(pointerAction));
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->DispatchTouch(pointerAction, DEFAULT_GROUP_ID, PointerEvent::TOOL_TYPE_FINGER));
     inputWindowsManager->udsServer_ = nullptr;
     inputWindowsManager->dispatchEventCache_.ClearTouch();
     it->second.windowsInfo.clear();
@@ -1724,7 +1724,7 @@ HWTEST_F(InputWindowsManagerTest, DispatchTouch_003, TestSize.Level1)
         it->second.windowsInfo.push_back(windowInfo);
     }
     int32_t pointerAction = PointerEvent::POINTER_ACTION_PULL_IN_WINDOW;
-    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->DispatchTouch(pointerAction));
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->DispatchTouch(pointerAction, DEFAULT_GROUP_ID, PointerEvent::TOOL_TYPE_FINGER));
     inputWindowsManager->udsServer_ = nullptr;
     inputWindowsManager->dispatchEventCache_.ClearTouch();
     it->second.windowsInfo.clear();
@@ -1779,7 +1779,7 @@ HWTEST_F(InputWindowsManagerTest, DispatchTouch_004, TestSize.Level1)
     lastInfo.lastTouchLogicY = 8;
     inputWindowsManager->LastTouchInfos_[touch] = lastInfo;
     int32_t pointerAction = PointerEvent::POINTER_ACTION_PULL_OUT_WINDOW;
-    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->DispatchTouch(pointerAction));
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->DispatchTouch(pointerAction, DEFAULT_GROUP_ID, PointerEvent::TOOL_TYPE_FINGER));
     inputWindowsManager->udsServer_ = nullptr;
     inputWindowsManager->dispatchEventCache_.ClearTouch();
     it->second.windowsInfo.clear();
@@ -1837,7 +1837,7 @@ HWTEST_F(InputWindowsManagerTest, DispatchTouch_005, TestSize.Level1)
     lastInfo.lastTouchLogicY = 8;
     inputWindowsManager->LastTouchInfos_[touch] = lastInfo;
     int32_t pointerAction = PointerEvent::POINTER_ACTION_PULL_OUT_WINDOW;
-    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->DispatchTouch(pointerAction));
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->DispatchTouch(pointerAction, DEFAULT_GROUP_ID, PointerEvent::TOOL_TYPE_FINGER));
     inputWindowsManager->udsServer_ = nullptr;
     inputWindowsManager->dispatchEventCache_.ClearTouch();
     it->second.windowsInfo.clear();
@@ -1870,7 +1870,7 @@ HWTEST_F(InputWindowsManagerTest, DispatchTouch_006, TestSize.Level1)
     inputWindowsManager->dispatchEventCache_.Update(cacheEvent);
 
     int32_t pointerAction = PointerEvent::POINTER_ACTION_PULL_IN_WINDOW;
-    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->DispatchTouch(pointerAction));
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->DispatchTouch(pointerAction, DEFAULT_GROUP_ID, PointerEvent::TOOL_TYPE_FINGER));
 }
 
 /**
@@ -1897,7 +1897,7 @@ HWTEST_F(InputWindowsManagerTest, DispatchTouch_007, TestSize.Level1)
     inputWindowsManager->dispatchEventCache_.Update(cacheEvent);
 
     int32_t pointerAction = PointerEvent::POINTER_ACTION_PULL_OUT_WINDOW;
-    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->DispatchTouch(pointerAction));
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->DispatchTouch(pointerAction, DEFAULT_GROUP_ID, PointerEvent::TOOL_TYPE_FINGER));
 }
 
 /**
