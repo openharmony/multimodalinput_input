@@ -299,8 +299,8 @@ BindInfo BindInfos::GetUnbindDisplay(const std::string &inputDeviceName)
         }
         ++it;
     }
-    bool product =  (PRODUCT_TYPE == PRODUCT_TYPE_CAR) || PRODUCT_PC_OR_TABLET; 
-    return product ? BindInfo() : GetUnbindDisplay();
+    bool isSpecialProductType =  (PRODUCT_TYPE == PRODUCT_TYPE_CAR) || PRODUCT_PC_OR_TABLET; 
+    return isSpecialProductType ? BindInfo() : GetUnbindDisplay();
 }
 
 std::ostream &operator << (std::ostream &os, const BindInfos &r)
