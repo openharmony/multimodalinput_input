@@ -2420,6 +2420,10 @@ void InputWindowsManager::PointerDrawingManagerOnDisplayInfo(const OLD::DisplayG
             dragPointerStyle_ = pointerStyle;
             MMI_HILOGI("Window is changed, pointerStyle is:%{public}d", dragPointerStyle_.id);
         }
+        if (lastPointerStyle_ == pointerStyle) {
+            MMI_HILOGD("The cursor style does not change");
+            return;
+        }
         DrawPointer(isDisplayChanged);
     }
 }
@@ -6400,7 +6404,7 @@ void InputWindowsManager::ProcessOtherTouchHit(std::shared_ptr<PointerEvent> poi
         !(touchWindow->flags & WindowInputPolicy::FLAG_FIRST_TOUCH_HIT)) {
         return;
     }
-    // Mouse event injected as touch event will carry the flag. 
+    // Mouse event injected as touch event will carry the flag.
     if (pointerEvent->HasFlag(InputEvent::EVENT_FLAG_GESTURE_SUPPLEMENT)) {
         return;
     }
@@ -6429,7 +6433,7 @@ bool InputWindowsManager::IsFollowFirstTouchWindow(std::shared_ptr<PointerEvent>
     if (pointerEvent == nullptr) {
         return false;
     }
-    // Mouse event injected as touch event will carry the flag. 
+    // Mouse event injected as touch event will carry the flag.
     if (pointerEvent->HasFlag(InputEvent::EVENT_FLAG_GESTURE_SUPPLEMENT)) {
         return false;
     }
@@ -6491,7 +6495,7 @@ void InputWindowsManager::UpdateFirstTouchWindowInfos(std::shared_ptr<PointerEve
     if (pointerEvent == nullptr || touchWindow == nullptr) {
         return;
     }
-    // Mouse event injected as touch event will carry the flag. 
+    // Mouse event injected as touch event will carry the flag.
     if (pointerEvent->HasFlag(InputEvent::EVENT_FLAG_GESTURE_SUPPLEMENT)) {
         return;
     }
