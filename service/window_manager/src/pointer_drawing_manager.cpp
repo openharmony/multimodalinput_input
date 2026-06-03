@@ -1125,6 +1125,7 @@ void PointerDrawingManager::HardwareCursorDynamicRender(MOUSE_ICON mouseStyle, u
     for (auto it : screenPointers) {
         CHKPV(it.second);
         cfg.dpi = it.second->GetDPI() * it.second->GetScale();
+        cfg.screenId = it.first;
         cfg.direction = it.second->IsMirror() ? DIRECTION0 : displayInfo_.direction;
         MMI_HILOGD("HardwareCursorRender, screen = %{public}" PRIu64 ", dpi = %{public}f",
             it.first, cfg.dpi);
@@ -1193,6 +1194,7 @@ void PointerDrawingManager::SoftwareCursorDynamicRender(MOUSE_ICON mouseStyle, u
         cfg.direction = it.second->IsMirror() ? DIRECTION0 : direction;
         auto sn = it.second->GetSurfaceNode();
         cfg.dpi = it.second->GetDPI();
+        cfg.screenId = it.first;
         MMI_HILOGD("SoftwareCursorDynamicRender, screen = %{public}" PRIu64 ", dpi = %{public}f", it.first, cfg.dpi);
         if (it.second->IsMirror() || it.first == displayId) {
             if (mouseStyle == MOUSE_ICON::LOADING) {
