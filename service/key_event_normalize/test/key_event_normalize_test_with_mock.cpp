@@ -337,7 +337,8 @@ HWTEST_F(KeyEventNormalizeWithMockTest, KeyEventNormalizeWithMockTest_SimulatedM
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(KeyEventNormalizeWithMockTest, KeyEventNormalizeWithMockTest_SimulatedModifierKeyEventNormalize_NonSimulated_002,
+HWTEST_F(KeyEventNormalizeWithMockTest,
+    KeyEventNormalizeWithMockTest_SimulatedModifierKeyEventNormalize_NonSimulated_002,
     TestSize.Level1)
 {
     CALL_TEST_DEBUG;
@@ -354,7 +355,8 @@ HWTEST_F(KeyEventNormalizeWithMockTest, KeyEventNormalizeWithMockTest_SimulatedM
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(KeyEventNormalizeWithMockTest, KeyEventNormalizeWithMockTest_SimulatedModifierKeyEventNormalize_NonFunc_003,
+HWTEST_F(KeyEventNormalizeWithMockTest,
+    KeyEventNormalizeWithMockTest_SimulatedModifierKeyEventNormalize_NonFunc_003,
     TestSize.Level1)
 {
     CALL_TEST_DEBUG;
@@ -372,7 +374,8 @@ HWTEST_F(KeyEventNormalizeWithMockTest, KeyEventNormalizeWithMockTest_SimulatedM
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(KeyEventNormalizeWithMockTest, KeyEventNormalizeWithMockTest_SimulatedModifierKeyEventNormalize_Shell_004,
+HWTEST_F(KeyEventNormalizeWithMockTest,
+    KeyEventNormalizeWithMockTest_SimulatedModifierKeyEventNormalize_Shell_004,
     TestSize.Level1)
 {
     CALL_TEST_DEBUG;
