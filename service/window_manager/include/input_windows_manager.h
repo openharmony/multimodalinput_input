@@ -647,13 +647,16 @@ private:
     sptr<IRemoteObject> uiExtensionToken_ { nullptr };
     std::pair<int32_t, int32_t> firstBtnDownWindowInfo_ {-1, -1};
     std::optional<WindowInfo> axisBeginWindowInfo_ { std::nullopt };
+    std::map<int32_t, std::optional<WindowInfo>> axisBeginWindowInfoMap_; // per-device
     int32_t lastLogicX_ { -1 };
     int32_t lastLogicY_ { -1 };
     WindowInfo lastWindowInfo_;
     std::shared_ptr<PointerEvent> lastPointerEvent_ { nullptr };
+    std::map<int32_t, std::shared_ptr<PointerEvent>> lastPointerEventMap_; // per-device
     std::map<int32_t, std::map<int32_t, PointerStyle>> pointerStyle_;
     std::map<int32_t, std::map<int32_t, PointerStyle>> uiExtensionPointerStyle_;
     WindowInfo mouseDownInfo_;
+    std::map<int32_t, WindowInfo> mouseDownInfoMap_; // per-device
     PointerStyle globalStyle_;
     WindowInfo lastLevitateInWindowInfo_;
     bool isDelayLevitateEvent_ { false };
@@ -705,6 +708,7 @@ private:
     int32_t mouseDownEventId_ { -1 };
     bool haveSetObserver_ { false };
     bool dragFlag_ { false };
+    std::map<int32_t, bool> dragFlagMap_; // per-device
     bool isDragBorder_ { false };
     bool pointerDrawFlag_ { false };
     std::map<int32_t, bool> pointerDrawFlagMap_;
