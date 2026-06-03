@@ -138,7 +138,7 @@ bool operator < (const BindInfo &l, const BindInfo &r)
 
 std::ostream &operator << (std::ostream &os, const BindInfo &r)
 {
-    os << r.inputDeviceName_ << "<=>" << r.displayName_ << std::endl;
+    os << r.inputDeviceName_ << "<=>" << r.inputNodeName_ << "<=>" << r.displayName_ << std::endl;
     return os;
 }
 
@@ -299,7 +299,8 @@ BindInfo BindInfos::GetUnbindDisplay(const std::string &inputDeviceName)
         }
         ++it;
     }
-    return PRODUCT_PC_OR_TABLET ? BindInfo() : GetUnbindDisplay();
+    bool product =  (PRODUCT_TYPE == PRODUCT_TYPE_CAR) || PRODUCT_PC_OR_TABLET; 
+    return product ? BindInfo() : GetUnbindDisplay();
 }
 
 std::ostream &operator << (std::ostream &os, const BindInfos &r)
