@@ -299,7 +299,7 @@ BindInfo BindInfos::GetUnbindDisplay(const std::string &inputDeviceName)
         }
         ++it;
     }
-    bool isSpecialProductType = (PRODUCT_TYPE == PRODUCT_TYPE_CAR) || PRODUCT_PC_OR_TABLET; 
+    bool isSpecialProductType = (PRODUCT_TYPE == PRODUCT_TYPE_CAR) || PRODUCT_PC_OR_TABLET;
     return isSpecialProductType ? BindInfo() : GetUnbindDisplay();
 }
 
