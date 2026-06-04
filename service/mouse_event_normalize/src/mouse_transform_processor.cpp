@@ -998,7 +998,7 @@ int32_t MouseTransformProcessor::UpdateCursorLocationIfNeeded()
         MMI_HILOGE("winMgr is nullptr");
         return RET_ERR;
     }
-    CursorPosition cursorPos = winMgr->GetCursorPos();
+    CursorPosition cursorPos = winMgr->GetCursorPos(groupId_);
     if (cursorPos.displayId < 0) {
         MMI_HILOGE("No display");
         return RET_ERR;
@@ -1348,7 +1348,7 @@ void MouseTransformProcessor::HandleMotionMoveMouse(int32_t offsetX, int32_t off
         return;
     }
     pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
-    CursorPosition cursorPos = winMgr->GetCursorPos();
+    CursorPosition cursorPos = winMgr->GetCursorPos(groupId_);
     cursorPos.cursorPos.x += offsetX;
     cursorPos.cursorPos.y += offsetY;
     winMgr->UpdateAndAdjustMouseLocation(cursorPos.displayId, cursorPos.cursorPos.x,
