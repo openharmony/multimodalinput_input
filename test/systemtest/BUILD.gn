@@ -12,11 +12,14 @@
 # limitations under the License.
 
 import("//build/ohos.gni")
+import("//build/test.gni")
 import("//foundation/multimodalinput/input/multimodalinput_mini.gni")
 
-template("mmi_systemtest_executable") {
-  ohos_executable(target_name) {
+template("mmi_systemtest_unittest") {
+  ohos_unittest(target_name) {
     forward_variables_from(invoker, "*")
+
+    module_out_path = "multimodalinput/systemtest"
 
     if (!defined(include_dirs)) {
       include_dirs = []
@@ -24,6 +27,7 @@ template("mmi_systemtest_executable") {
     include_dirs += [
       "${mmi_path}/interfaces/native/innerkits/proxy/include",
       "${mmi_path}/interfaces/native/innerkits/event/include",
+      "${mmi_path}/util/common/include",
     ]
 
     if (!defined(deps)) {
@@ -56,19 +60,19 @@ template("mmi_systemtest_executable") {
   }
 }
 
-mmi_systemtest_executable("multi_group_binding_real_service_test") {
+mmi_systemtest_unittest("multi_group_binding_real_service_test") {
   sources = [ "multi_group_binding_real_service_test.cpp" ]
 }
 
-mmi_systemtest_executable("multi_group_api_impact_test") {
+mmi_systemtest_unittest("multi_group_api_impact_test") {
   sources = [ "multi_group_api_impact_test.cpp" ]
 }
 
-mmi_systemtest_executable("mouse_api_hidumper_test") {
+mmi_systemtest_unittest("mouse_api_hidumper_test") {
   sources = [ "mouse_api_hidumper_test.cpp" ]
 }
 
-mmi_systemtest_executable("mouse_visual_movement_test") {
+mmi_systemtest_unittest("mouse_visual_movement_test") {
   sources = [ "mouse_visual_movement_test.cpp" ]
 }
 
