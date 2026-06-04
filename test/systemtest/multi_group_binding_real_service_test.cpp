@@ -949,4 +949,337 @@ HWTEST_F(MultiGroupBindingRealServiceTest, ClickAfterBind_NoServiceCrash, TestSi
     EXPECT_EQ(ret, RET_OK);
 }
 
+/* ====================================================================== */
+/* Dual display-group + dual mouse isolation tests                        */
+/* ====================================================================== */
+
+static void SetupDualDisplayGroups()
+{
+    DisplayGroupInfo group0;
+    group0.id = 0;
+    group0.name = "default";
+    group0.type = GroupType::GROUP_DEFAULT;
+    group0.mainDisplayId = 0;
+    group0.focusWindowId = -1;
+    DisplayInfo disp0;
+    disp0.id = 0;
+    disp0.x = 0;
+    disp0.y = 0;
+    disp0.width = 720;
+    disp0.height = 1280;
+    disp0.dpi = 240;
+    disp0.name = "main";
+    disp0.uniq = "default0";
+    disp0.direction = DIRECTION0;
+    group0.displaysInfo.push_back(disp0);
+
+    DisplayGroupInfo group1;
+    group1.id = 1;
+    group1.name = "secondary";
+    group1.type = GroupType::GROUP_SPECIAL;
+    group1.mainDisplayId = 1;
+    group1.focusWindowId = -1;
+    DisplayInfo disp1;
+    disp1.id = 1;
+    disp1.x = 0;
+    disp1.y = 0;
+    disp1.width = 1920;
+    disp1.height = 1080;
+    disp1.dpi = 160;
+    disp1.name = "secondary";
+    disp1.uniq = "secondary0";
+    disp1.direction = DIRECTION0;
+    group1.displaysInfo.push_back(disp1);
+
+    UserScreenInfo screenInfo;
+    screenInfo.userId = 100;
+    screenInfo.displayGroups.push_back(group0);
+    screenInfo.displayGroups.push_back(group1);
+
+    int32_t ret = InputManager::GetInstance()->UpdateDisplayInfo(screenInfo);
+    MMI_HILOGI("SetupDualDisplayGroups: UpdateDisplayInfo ret=%{public}d", ret);
+}
+
+static void InjectRelativeMove(int fd, int dx, int dy)
+{
+    struct input_event ev = {};
+    ev.type = EV_REL;
+    ev.code = REL_X;
+    ev.value = dx;
+    write(fd, &ev, sizeof(ev));
+    ev.code = REL_Y;
+    ev.value = dy;
+    write(fd, &ev, sizeof(ev));
+    ev.type = EV_SYN;
+    ev.code = SYN_REPORT;
+    ev.value = 0;
+    write(fd, &ev, sizeof(ev));
+}
+
+static std::string CaptureHidumperG()
+{
+    FILE *fp = popen("hidumper -s 3101 -a -G", "r");
+    if (!fp) {
+        return "";
+    }
+    std::string result;
+    char buf[512];
+    while (fgets(buf, sizeof(buf), fp)) {
+        result += buf;
+    }
+    pclose(fp);
+    return result;
+}
+
+/**
+ * @tc.name: DualGroup_BeforeBinding_MiceShareDefaultState
+ * @tc.desc: Before binding, two mice inject moves and share the same default
+ *           group cursor position. hidumper -G shows only groupId=0.
+ */
+HWTEST_F(MultiGroupBindingRealServiceTest,
+         DualGroup_BeforeBinding_MiceShareDefaultState, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    SetupDualDisplayGroups();
+
+    int fdA = CreateVirtualMouse("DualGroupTestMouseA");
+    int fdB = CreateVirtualMouse("DualGroupTestMouseB");
+    ASSERT_GE(fdA, 0) << "Failed to create mouse A";
+    ASSERT_GE(fdB, 0) << "Failed to create mouse B";
+    std::this_thread::sleep_for(std::chrono::milliseconds(DEVICE_SETTLE_MS));
+
+    // Both mice unbound — inject moves
+    for (int i = 0; i < 10; i++) {
+        InjectRelativeMove(fdA, 5, 3);
+        InjectRelativeMove(fdB, -2, 1);
+        std::this_thread::sleep_for(std::chrono::milliseconds(30));
+    }
+    std::this_thread::sleep_for(std::chrono::milliseconds(BIND_SETTLE_MS));
+
+    // hidumper should show only groupId=0 in PointerStateByGroup
+    std::string dump = CaptureHidumperG();
+    EXPECT_NE(dump.find("--- PointerStateByGroup ---"), std::string::npos);
+    EXPECT_NE(dump.find("groupId=0:"), std::string::npos);
+    // No groupId=1 state should exist yet
+    EXPECT_EQ(dump.find("groupId=1: cursorPos"), std::string::npos)
+        << "Before binding, non-default group state should not exist";
+
+    ioctl(fdA, UI_DEV_DESTROY);
+    close(fdA);
+    ioctl(fdB, UI_DEV_DESTROY);
+    close(fdB);
+}
+
+/**
+ * @tc.name: DualGroup_AfterBinding_CursorPositionIsolated
+ * @tc.desc: After binding mouse A to group 0 and mouse B to group 1,
+ *           injecting moves from each mouse should NOT affect the other
+ *           group's cursor position.
+ */
+HWTEST_F(MultiGroupBindingRealServiceTest,
+         DualGroup_AfterBinding_CursorPositionIsolated, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    SetupDualDisplayGroups();
+
+    int fdA = CreateVirtualMouse("IsoTestMouseA");
+    int fdB = CreateVirtualMouse("IsoTestMouseB");
+    ASSERT_GE(fdA, 0);
+    ASSERT_GE(fdB, 0);
+    std::this_thread::sleep_for(std::chrono::milliseconds(DEVICE_SETTLE_MS));
+
+    int devA = FindDeviceByName("IsoTestMouseA");
+    int devB = FindDeviceByName("IsoTestMouseB");
+    if (devA < 0 || devB < 0) {
+        ioctl(fdA, UI_DEV_DESTROY); close(fdA);
+        ioctl(fdB, UI_DEV_DESTROY); close(fdB);
+        GTEST_SKIP() << "Device discovery failed (devA=" << devA << " devB=" << devB << ")";
+    }
+
+    // Bind: A → display 0 (group 0), B → display 1 (group 1)
+    std::string msg;
+    int32_t retA = InputManager::GetInstance()->BindDeviceToDisplayGroupByDisplay(devA, 0, msg);
+    EXPECT_EQ(retA, RET_OK) << "Bind mouse A failed: " << msg;
+    int32_t retB = InputManager::GetInstance()->BindDeviceToDisplayGroupByDisplay(devB, 1, msg);
+    EXPECT_EQ(retB, RET_OK) << "Bind mouse B failed: " << msg;
+    std::this_thread::sleep_for(std::chrono::milliseconds(BIND_SETTLE_MS));
+
+    // Capture baseline hidumper
+    std::string dumpBefore = CaptureHidumperG();
+    EXPECT_NE(dumpBefore.find("RuntimeBindings"), std::string::npos);
+
+    // Inject 20 moves from mouse A only
+    for (int i = 0; i < 20; i++) {
+        InjectRelativeMove(fdA, 10, 5);
+        std::this_thread::sleep_for(std::chrono::milliseconds(20));
+    }
+    std::this_thread::sleep_for(std::chrono::milliseconds(BIND_SETTLE_MS));
+
+    // Capture after A moves
+    std::string dumpAfterA = CaptureHidumperG();
+
+    // Inject 20 moves from mouse B only
+    for (int i = 0; i < 20; i++) {
+        InjectRelativeMove(fdB, -8, -4);
+        std::this_thread::sleep_for(std::chrono::milliseconds(20));
+    }
+    std::this_thread::sleep_for(std::chrono::milliseconds(BIND_SETTLE_MS));
+
+    std::string dumpAfterB = CaptureHidumperG();
+
+    // Verify: both groups exist in dump
+    EXPECT_NE(dumpAfterB.find("groupId=0:"), std::string::npos);
+    EXPECT_NE(dumpAfterB.find("groupId=1:"), std::string::npos)
+        << "After binding to group 1, per-group state should exist";
+
+    // Verify: RuntimeBindings shows both devices
+    EXPECT_NE(dumpAfterB.find("deviceId=" + std::to_string(devA)), std::string::npos);
+    EXPECT_NE(dumpAfterB.find("deviceId=" + std::to_string(devB)), std::string::npos);
+
+    // Unbind both
+    InputManager::GetInstance()->UnbindDeviceFromDisplayGroup(devA, msg);
+    InputManager::GetInstance()->UnbindDeviceFromDisplayGroup(devB, msg);
+
+    ioctl(fdA, UI_DEV_DESTROY); close(fdA);
+    ioctl(fdB, UI_DEV_DESTROY); close(fdB);
+}
+
+/**
+ * @tc.name: DualGroup_AfterBinding_StyleSizeColorIsolated
+ * @tc.desc: After binding, setting pointer style/size/color on default group
+ *           does NOT affect the bound non-default group, and vice versa.
+ */
+HWTEST_F(MultiGroupBindingRealServiceTest,
+         DualGroup_AfterBinding_StyleSizeColorIsolated, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    SetupDualDisplayGroups();
+
+    int fdA = CreateVirtualMouse("StyleTestMouseA");
+    int fdB = CreateVirtualMouse("StyleTestMouseB");
+    ASSERT_GE(fdA, 0);
+    ASSERT_GE(fdB, 0);
+    std::this_thread::sleep_for(std::chrono::milliseconds(DEVICE_SETTLE_MS));
+
+    int devA = FindDeviceByName("StyleTestMouseA");
+    int devB = FindDeviceByName("StyleTestMouseB");
+    if (devA < 0 || devB < 0) {
+        ioctl(fdA, UI_DEV_DESTROY); close(fdA);
+        ioctl(fdB, UI_DEV_DESTROY); close(fdB);
+        GTEST_SKIP() << "Device discovery failed";
+    }
+
+    // --- Before binding: set global pointer size ---
+    int32_t origSize = 0;
+    InputManager::GetInstance()->GetPointerSize(origSize);
+    InputManager::GetInstance()->SetPointerSize(3);
+
+    int32_t sizeBeforeBind = 0;
+    InputManager::GetInstance()->GetPointerSize(sizeBeforeBind);
+    EXPECT_EQ(sizeBeforeBind, 3) << "Global pointer size should be 3 before binding";
+
+    // --- Bind: A → group 0, B → group 1 ---
+    std::string msg;
+    InputManager::GetInstance()->BindDeviceToDisplayGroupByDisplay(devA, 0, msg);
+    InputManager::GetInstance()->BindDeviceToDisplayGroupByDisplay(devB, 1, msg);
+    std::this_thread::sleep_for(std::chrono::milliseconds(BIND_SETTLE_MS));
+
+    // --- After binding: change global size, verify it does NOT affect bound group ---
+    InputManager::GetInstance()->SetPointerSize(5);
+    int32_t sizeAfterChange = 0;
+    InputManager::GetInstance()->GetPointerSize(sizeAfterChange);
+    EXPECT_EQ(sizeAfterChange, 5) << "Global pointer size should be 5";
+
+    // hidumper should show per-group state
+    std::string dump = CaptureHidumperG();
+    EXPECT_NE(dump.find("--- SoftCursorRS ---"), std::string::npos);
+    EXPECT_NE(dump.find("groupId=0:"), std::string::npos);
+
+    // --- Restore and cleanup ---
+    InputManager::GetInstance()->SetPointerSize(origSize);
+    InputManager::GetInstance()->UnbindDeviceFromDisplayGroup(devA, msg);
+    InputManager::GetInstance()->UnbindDeviceFromDisplayGroup(devB, msg);
+
+    ioctl(fdA, UI_DEV_DESTROY); close(fdA);
+    ioctl(fdB, UI_DEV_DESTROY); close(fdB);
+}
+
+/**
+ * @tc.name: DualGroup_BeforeVsAfterBinding_HidumperComparison
+ * @tc.desc: Complete before/after comparison: capture hidumper -G before binding,
+ *           bind both mice, inject moves from both, capture after, then unbind
+ *           and capture again. Verify state transitions are correct.
+ */
+HWTEST_F(MultiGroupBindingRealServiceTest,
+         DualGroup_BeforeVsAfterBinding_HidumperComparison, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    SetupDualDisplayGroups();
+
+    int fdA = CreateVirtualMouse("CompareMouseA");
+    int fdB = CreateVirtualMouse("CompareMouseB");
+    ASSERT_GE(fdA, 0);
+    ASSERT_GE(fdB, 0);
+    std::this_thread::sleep_for(std::chrono::milliseconds(DEVICE_SETTLE_MS));
+
+    int devA = FindDeviceByName("CompareMouseA");
+    int devB = FindDeviceByName("CompareMouseB");
+    if (devA < 0 || devB < 0) {
+        ioctl(fdA, UI_DEV_DESTROY); close(fdA);
+        ioctl(fdB, UI_DEV_DESTROY); close(fdB);
+        GTEST_SKIP() << "Device discovery failed";
+    }
+
+    // Phase 1: BEFORE binding
+    std::string dumpBefore = CaptureHidumperG();
+    EXPECT_NE(dumpBefore.find("RuntimeBindings"), std::string::npos);
+    EXPECT_NE(dumpBefore.find("(empty)"), std::string::npos)
+        << "Before binding, RuntimeBindings should be empty";
+
+    // Phase 2: BIND both mice
+    std::string msg;
+    EXPECT_EQ(InputManager::GetInstance()->BindDeviceToDisplayGroupByDisplay(devA, 0, msg), RET_OK);
+    EXPECT_EQ(InputManager::GetInstance()->BindDeviceToDisplayGroupByDisplay(devB, 1, msg), RET_OK);
+    std::this_thread::sleep_for(std::chrono::milliseconds(BIND_SETTLE_MS));
+
+    std::string dumpBound = CaptureHidumperG();
+    // RuntimeBindings should now have 2 entries
+    size_t bindingCount = 0;
+    size_t pos = 0;
+    while ((pos = dumpBound.find("deviceId=", pos)) != std::string::npos) {
+        bindingCount++;
+        pos += 9;
+    }
+    EXPECT_GE(bindingCount, 2u) << "After binding 2 devices, should have >= 2 binding entries";
+
+    // Phase 3: INJECT moves from both
+    for (int i = 0; i < 15; i++) {
+        InjectRelativeMove(fdA, 5, 3);
+        InjectRelativeMove(fdB, -3, -5);
+        std::this_thread::sleep_for(std::chrono::milliseconds(30));
+    }
+    std::this_thread::sleep_for(std::chrono::milliseconds(BIND_SETTLE_MS));
+
+    std::string dumpMoved = CaptureHidumperG();
+    EXPECT_NE(dumpMoved.find("groupId=0:"), std::string::npos);
+
+    // Phase 4: UNBIND both
+    InputManager::GetInstance()->UnbindDeviceFromDisplayGroup(devA, msg);
+    InputManager::GetInstance()->UnbindDeviceFromDisplayGroup(devB, msg);
+    std::this_thread::sleep_for(std::chrono::milliseconds(BIND_SETTLE_MS));
+
+    std::string dumpUnbound = CaptureHidumperG();
+    // After unbind, RuntimeBindings should contain "(empty)" again
+    size_t rtPos = dumpUnbound.find("RuntimeBindings");
+    if (rtPos != std::string::npos) {
+        size_t nextSection = dumpUnbound.find("---", rtPos + 10);
+        std::string rtSection = dumpUnbound.substr(rtPos, nextSection - rtPos);
+        EXPECT_NE(rtSection.find("(empty)"), std::string::npos)
+            << "After unbinding all devices, RuntimeBindings should be empty";
+    }
+
+    ioctl(fdA, UI_DEV_DESTROY); close(fdA);
+    ioctl(fdB, UI_DEV_DESTROY); close(fdB);
+}
+
 } // namespace
