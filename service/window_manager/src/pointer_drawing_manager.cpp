@@ -3093,6 +3093,37 @@ void PointerDrawingManager::Dump(int32_t fd, const std::vector<std::string> &arg
     std::vector<std::vector<std::string>> hardCursorInfos;
     hardCursorInfos.push_back({GetHardCursorEnabled() ? "true" : "false"});
     DumpFullTable(oss, "Hard Cursor Info", hardCursorTitles, hardCursorInfos);
+
+    // Per-group contexts
+    if (!contexts_.empty()) {
+        oss << std::endl;
+        std::vector<std::string> ctxTitles = {"groupId", "displayId", "screenId", "lastPhysicalX", "lastPhysicalY",
+                                               "mouseDisplayState", "hasDisplay", "hasPointerDevice",
+                                               "lastDirection", "currentDirection",
+                                               "lastMouseStyle.id", "currentMouseStyle.id",
+                                               "surfaceNode"};
+        std::vector<std::vector<std::string>> ctxData;
+        std::lock_guard<std::mutex> guard(contextsMutex_);
+        for (const auto& [gid, ctx] : contexts_) {
+            if (!ctx) continue;
+            ctxData.push_back({
+                std::to_string(gid),
+                std::to_string(ctx->displayId),
+                std::to_string(ctx->screenId),
+                std::to_string(ctx->lastPhysicalX),
+                std::to_string(ctx->lastPhysicalY),
+                ctx->mouseDisplayState ? "true" : "false",
+                ctx->hasDisplay ? "true" : "false",
+                ctx->hasPointerDevice ? "true" : "false",
+                std::to_string(ctx->lastDirection),
+                std::to_string(ctx->currentDirection),
+                std::to_string(ctx->lastMouseStyle.id),
+                std::to_string(ctx->currentMouseStyle.id),
+                ctx->surfaceNode ? "present" : "null"
+            });
+        }
+        DumpFullTable(oss, "Per-Group Cursor Contexts", ctxTitles, ctxData);
+    }
     oss << std::endl;
 
     std::string dumpInfo = oss.str();

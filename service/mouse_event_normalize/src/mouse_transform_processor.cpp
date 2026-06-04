@@ -1130,7 +1130,7 @@ void MouseTransformProcessor::HandleAxisPostInner(PointerEvent::PointerItem &poi
         return;
     }
     auto mouseInfo = winMgr->GetMouseInfo();
-    MouseState->SetMouseCoords(mouseInfo.physicalX, mouseInfo.physicalY);
+    MouseState->SetMouseCoords(groupId_, mouseInfo.physicalX, mouseInfo.physicalY);
     pointerItem.SetDisplayX(mouseInfo.physicalX);
     pointerItem.SetDisplayY(mouseInfo.physicalY);
     pointerItem.SetDisplayXPos(mouseInfo.physicalX);
@@ -1174,7 +1174,7 @@ bool MouseTransformProcessor::HandlePostInner(struct libinput_event_pointer* dat
         return false;
     }
     auto mouseInfo = winMgr->GetMouseInfo();
-    MouseState->SetMouseCoords(mouseInfo.physicalX, mouseInfo.physicalY);
+    MouseState->SetMouseCoords(groupId_, mouseInfo.physicalX, mouseInfo.physicalY);
     pointerItem.SetDisplayX(mouseInfo.physicalX);
     pointerItem.SetDisplayY(mouseInfo.physicalY);
     pointerItem.SetDisplayXPos(mouseInfo.physicalX);
@@ -1380,7 +1380,7 @@ void MouseTransformProcessor::HandlePostMoveMouse(PointerEvent::PointerItem& poi
     }
     auto mouseInfo = winMgr->GetMouseInfo();
     CHKPV(pointerEvent_);
-    MouseState->SetMouseCoords(mouseInfo.physicalX, mouseInfo.physicalY);
+    MouseState->SetMouseCoords(groupId_, mouseInfo.physicalX, mouseInfo.physicalY);
     pointerItem.SetDisplayX(mouseInfo.physicalX);
     pointerItem.SetDisplayY(mouseInfo.physicalY);
     pointerItem.SetDisplayXPos(mouseInfo.physicalX);

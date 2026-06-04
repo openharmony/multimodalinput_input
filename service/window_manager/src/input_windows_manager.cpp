@@ -8441,6 +8441,25 @@ void InputWindowsManager::DumpMultiGroupState(int32_t fd)
                 snap.groupId, snap.windowId);
         }
     }
+
+    // --- SoftCursorRS ---
+    mprintf(fd, "--- SoftCursorRS ---");
+    for (int32_t gid : allGroupIds) {
+        auto cursorIt = cursorPosMap_.find(gid);
+        if (cursorIt == cursorPosMap_.end()) {
+            mprintf(fd, "  groupId=%d: (absent)", gid);
+            continue;
+        }
+        auto& cp = cursorIt->second;
+        auto drawIt = pointerDrawFlagMap_.find(gid);
+        bool drawFlag = (drawIt != pointerDrawFlagMap_.end()) ? drawIt->second : false;
+        mprintf(fd, "  groupId=%d: displayId=%d cursorPos=(%.0f,%.0f) direction=%d drawFlag=%s",
+            gid, cp.displayId, cp.cursorPos.x, cp.cursorPos.y, cp.direction, drawFlag ? "true" : "false");
+    }
+
+    // --- HardwareCursor ---
+    mprintf(fd, "--- HardwareCursor ---");
+    mprintf(fd, "  (see hidumper -s 3101 -a -c for detailed hard cursor state)");
 }
 
 std::pair<double, double> InputWindowsManager::TransformWindowXY(const WindowInfo &window,

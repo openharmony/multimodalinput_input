@@ -523,6 +523,70 @@ void MouseEventInterface::OnGroupRemoved(int32_t groupId)
     mouse->OnGroupRemoved(groupId);
 }
 
+int32_t MouseEventInterface::GetMouseCoordsX(int32_t groupId)
+{
+    LoadMouse();
+    auto mouse = GetMouse();
+    if (mouse == nullptr) {
+        MMI_HILOGE("Mouse module not loaded");
+        return RET_ERR;
+    }
+    return mouse->GetMouseCoordsX(groupId);
+}
+
+int32_t MouseEventInterface::GetMouseCoordsY(int32_t groupId)
+{
+    LoadMouse();
+    auto mouse = GetMouse();
+    if (mouse == nullptr) {
+        MMI_HILOGE("Mouse module not loaded");
+        return RET_ERR;
+    }
+    return mouse->GetMouseCoordsY(groupId);
+}
+
+void MouseEventInterface::SetMouseCoords(int32_t groupId, int32_t x, int32_t y)
+{
+    LoadMouse();
+    auto mouse = GetMouse();
+    if (mouse == nullptr) {
+        MMI_HILOGE("Mouse module not loaded");
+        return;
+    }
+    mouse->SetMouseCoords(groupId, x, y);
+}
+
+bool MouseEventInterface::IsLeftBtnPressed(int32_t groupId)
+{
+    auto mouse = GetMouse();
+    if (mouse == nullptr) {
+        MMI_HILOGE("Mouse module not loaded");
+        return false;
+    }
+    return mouse->IsLeftBtnPressed(groupId);
+}
+
+void MouseEventInterface::GetPressedButtons(int32_t groupId, std::vector<int32_t>& pressedButtons)
+{
+    auto mouse = GetMouse();
+    if (mouse == nullptr) {
+        MMI_HILOGE("Mouse module not loaded");
+        return;
+    }
+    mouse->GetPressedButtons(groupId, pressedButtons);
+}
+
+void MouseEventInterface::MouseBtnStateCounts(int32_t groupId, uint32_t btnCode, const BUTTON_STATE btnState)
+{
+    LoadMouse();
+    auto mouse = GetMouse();
+    if (mouse == nullptr) {
+        MMI_HILOGE("Mouse module not loaded");
+        return;
+    }
+    mouse->MouseBtnStateCounts(groupId, btnCode, btnState);
+}
+
 std::shared_ptr<MouseEventInterface> MouseEventInterface::GetInstance()
 {
     static std::once_flag flag;

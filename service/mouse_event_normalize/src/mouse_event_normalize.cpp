@@ -351,6 +351,36 @@ void MouseEventNormalize::OnGroupRemoved(int32_t groupId)
     MouseState->RemoveGroupState(groupId);
 }
 
+int32_t MouseEventNormalize::GetMouseCoordsX(int32_t groupId) const
+{
+    return MouseState->GetMouseCoordsX(groupId);
+}
+
+int32_t MouseEventNormalize::GetMouseCoordsY(int32_t groupId) const
+{
+    return MouseState->GetMouseCoordsY(groupId);
+}
+
+void MouseEventNormalize::SetMouseCoords(int32_t groupId, int32_t x, int32_t y)
+{
+    MouseState->SetMouseCoords(groupId, x, y);
+}
+
+bool MouseEventNormalize::IsLeftBtnPressed(int32_t groupId)
+{
+    return MouseState->IsLeftBtnPressed(groupId);
+}
+
+void MouseEventNormalize::GetPressedButtons(int32_t groupId, std::vector<int32_t>& pressedButtons)
+{
+    MouseState->GetPressedButtons(groupId, pressedButtons);
+}
+
+void MouseEventNormalize::MouseBtnStateCounts(int32_t groupId, uint32_t btnCode, const BUTTON_STATE btnState)
+{
+    MouseState->MouseBtnStateCounts(groupId, btnCode, btnState);
+}
+
 extern "C" IMouseEventNormalize* CreateInstance(IInputServiceContext *env)
 {
     return new MouseEventNormalize(env);
