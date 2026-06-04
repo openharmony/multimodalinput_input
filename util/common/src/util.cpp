@@ -385,7 +385,6 @@ void ReadProConfigFile(const std::string &realPath, int32_t deviceId,
             realLine = nullptr;
             return;
         }
-        *(realLine + len + 1) = '\0';
         int32_t ret = ReadConfigInfo(realLine, len, &elementKey, &elementValue);
         free(realLine);
         realLine = nullptr;
