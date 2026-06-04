@@ -420,5 +420,92 @@ HWTEST_F(PointerDrawingManagerHardCursorTest, PointerDrawingManagerHardCursorTes
     EXPECT_EQ(pointerDrawingManager.screenId_, 1);
     EXPECT_EQ(pointerDrawingManager.mouseStylePending_.load(), 1);
 }
+
+/**
+ * @tc.name: PointerDrawingManagerHardCursorTest_SetPointerSize_001
+ * @tc.desc: Test SetPointerSize when hard cursor and cursor blur are both enabled
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerHardCursorTest, PointerDrawingManagerHardCursorTest_SetPointerSize_001,
+    TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerDrawingManager pointerDrawingManager;
+    ASSERT_NE(pointerDrawingManager.hardwareCursorPointerManager_, nullptr);
+    EXPECT_CALL(*pointerDrawingManager.hardwareCursorPointerManager_, IsSupported).WillRepeatedly(Return(true));
+    pointerDrawingManager.currentCursorBlurEnabled_ = true;
+    pointerDrawingManager.lastPhysicalX_ = 100;
+    pointerDrawingManager.lastPhysicalY_ = 100;
+    pointerDrawingManager.displayId_ = 0;
+    pointerDrawingManager.displayInfo_.dpi = 160;
+    pointerDrawingManager.lastMouseStyle_.id = MOUSE_ICON::DEFAULT;
+    Rosen::RSSurfaceNodeConfig surfaceNodeConfig;
+    surfaceNodeConfig.SurfaceNodeName = "pointer window";
+    Rosen::RSSurfaceNodeType surfaceNodeType = Rosen::RSSurfaceNodeType::SELF_DRAWING_WINDOW_NODE;
+    pointerDrawingManager.surfaceNode_ = Rosen::RSSurfaceNode::Create(surfaceNodeConfig, surfaceNodeType);
+    ASSERT_TRUE(pointerDrawingManager.surfaceNode_ != nullptr);
+    int32_t userId = 0;
+    int32_t size = 3;
+    EXPECT_NO_FATAL_FAILURE(pointerDrawingManager.SetPointerSize(userId, size));
+}
+
+/**
+ * @tc.name: PointerDrawingManagerHardCursorTest_SetPointerSize_002
+ * @tc.desc: Test SetPointerSize when cursor blur is disabled
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerHardCursorTest, PointerDrawingManagerHardCursorTest_SetPointerSize_002,
+    TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerDrawingManager pointerDrawingManager;
+    ASSERT_NE(pointerDrawingManager.hardwareCursorPointerManager_, nullptr);
+    EXPECT_CALL(*pointerDrawingManager.hardwareCursorPointerManager_, IsSupported).WillRepeatedly(Return(true));
+    pointerDrawingManager.currentCursorBlurEnabled_ = false;
+    pointerDrawingManager.lastPhysicalX_ = 100;
+    pointerDrawingManager.lastPhysicalY_ = 100;
+    pointerDrawingManager.displayId_ = 0;
+    pointerDrawingManager.displayInfo_.dpi = 160;
+    pointerDrawingManager.lastMouseStyle_.id = MOUSE_ICON::DEFAULT;
+    Rosen::RSSurfaceNodeConfig surfaceNodeConfig;
+    surfaceNodeConfig.SurfaceNodeName = "pointer window";
+    Rosen::RSSurfaceNodeType surfaceNodeType = Rosen::RSSurfaceNodeType::SELF_DRAWING_WINDOW_NODE;
+    pointerDrawingManager.surfaceNode_ = Rosen::RSSurfaceNode::Create(surfaceNodeConfig, surfaceNodeType);
+    ASSERT_TRUE(pointerDrawingManager.surfaceNode_ != nullptr);
+    int32_t userId = 0;
+    int32_t size = 3;
+    EXPECT_NO_FATAL_FAILURE(pointerDrawingManager.SetPointerSize(userId, size));
+}
+
+/**
+ * @tc.name: PointerDrawingManagerHardCursorTest_SetPointerSize_003
+ * @tc.desc: Test SetPointerSize when hard cursor is disabled
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerHardCursorTest, PointerDrawingManagerHardCursorTest_SetPointerSize_003,
+    TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerDrawingManager pointerDrawingManager;
+    ASSERT_NE(pointerDrawingManager.hardwareCursorPointerManager_, nullptr);
+    EXPECT_CALL(*pointerDrawingManager.hardwareCursorPointerManager_, IsSupported).WillRepeatedly(Return(false));
+    pointerDrawingManager.currentCursorBlurEnabled_ = true;
+    pointerDrawingManager.lastPhysicalX_ = 100;
+    pointerDrawingManager.lastPhysicalY_ = 100;
+    pointerDrawingManager.displayId_ = 0;
+    pointerDrawingManager.displayInfo_.dpi = 160;
+    pointerDrawingManager.lastMouseStyle_.id = MOUSE_ICON::DEFAULT;
+    Rosen::RSSurfaceNodeConfig surfaceNodeConfig;
+    surfaceNodeConfig.SurfaceNodeName = "pointer window";
+    Rosen::RSSurfaceNodeType surfaceNodeType = Rosen::RSSurfaceNodeType::SELF_DRAWING_WINDOW_NODE;
+    pointerDrawingManager.surfaceNode_ = Rosen::RSSurfaceNode::Create(surfaceNodeConfig, surfaceNodeType);
+    ASSERT_TRUE(pointerDrawingManager.surfaceNode_ != nullptr);
+    int32_t userId = 0;
+    int32_t size = 3;
+    EXPECT_NO_FATAL_FAILURE(pointerDrawingManager.SetPointerSize(userId, size));
+}
 } // namespace MMI
 } // namespace OHOS

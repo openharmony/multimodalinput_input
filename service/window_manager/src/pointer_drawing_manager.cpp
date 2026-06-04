@@ -2328,6 +2328,9 @@ int32_t PointerDrawingManager::SetPointerColor(int32_t userId, int32_t color)
             return RET_ERR;
         }
     }
+    // Note: Similar to SetPointerSize, when the cursor blur function is enabled and the hard cursor
+    // is not moved, the cursor may need to be redrawn. However, there is currently no business
+    // scenario requiring this for SetPointerColor.
     UpdatePointerVisible();
     return RET_OK;
 }
@@ -2465,6 +2468,13 @@ int32_t PointerDrawingManager::SetPointerSize(int32_t userId, int32_t size)
         MMI_HILOGE("Init layer failed");
         return RET_ERR;
     }
+
+    // When mouse has not moved and cursor blur is enabled, directly trigger rendering
+    // to bypass OnVsync which returns early when resample_ has no coordinates
+    if (GetHardCursorEnabled() && GetCursorBlurEnabled()) {
+        RenderAndMoveOnVsync(lastPhysicalX_, lastPhysicalY_, displayId_);
+    }
+
     UpdatePointerVisible();
     return RET_OK;
 }
