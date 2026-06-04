@@ -77,6 +77,7 @@ mmi_systemtest_unittest("mouse_visual_movement_test") {
 }
 
 group("multi_group_system_tests") {
+  testonly = true
   deps = [
     ":multi_group_binding_real_service_test",
     ":multi_group_api_impact_test",
