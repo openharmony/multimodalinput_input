@@ -435,3 +435,32 @@ HardCursor: isHardCursorEnabled=false
 - **hidumper -G 诊断输出**经板侧验证：5 个 section 完整、dump 只读性确认、cursor 参数可观测
 - **发现并修复 1 个运行时 bug**（SetMouseCaptureMode 新 group 不创建条目），通过测试发现、修复、验证闭环
 - 综合验收 **26/28 AC PASS，2 AC PARTIAL**（受单屏硬件和测试进程权限限制）
+
+---
+
+## 10. 双显示组隔离测试
+
+### 10.1 测试环境
+
+- **硬件：** DAYU200 / RK3568
+- **显示组拓扑：** 通过 `UpdateDisplayInfo` 构建双显示组
+  - Group 0（默认）：720x1280，displayId=0，dpi=240
+  - Group 1（secondary）：1920x1080，displayId=1，dpi=160
+- **虚拟设备：** 通过 `/dev/uinput` 创建 2 个 USB HID 鼠标
+- **测试文件：** `test/systemtest/multi_group_binding_real_service_test.cpp`
+
+### 10.2 测试用例
+
+| 编号 | 测试名称 | 描述 | 预期行为 |
+|------|---------|------|---------|
+| 1 | `DualGroup_BeforeBinding_InterleavedMoves_PositionsAffectEachOther` | 绑定前，两只鼠标交替移动，通过 `GetPointerLocation` 查询位置 | 两只鼠标共享同一默认组光标位置，B 的移动会改变 A 刚设置的位置 |
+| 2 | `DualGroup_AfterBinding_InterleavedMoves_PositionsIsolated` | 绑定后（A→group0, B→group1），交替移动并查询位置 | B 在 group1 的移动不会改变 group0 的光标位置，两组完全隔离 |
+| 3 | `DualGroup_AfterBinding_GlobalApiOnlyAffectsDefaultGroup` | 绑定后调用全局 API（SetPointerSize/Color/Speed），验证影响范围 | 全局 API 仅影响默认组，通过 hidumper -G 和 hidumper -c 捕获证据 |
+| 4 | `DualGroup_AfterBinding_PerGroupStyleIsolated` | 绑定后分别从 A、B 注入移动，通过 hidumper 验证每组位置状态独立 | A 的移动仅改变 group0 的 PointerState，B 的移动仅改变 group1 |
+| 5 | `DualGroup_BeforeVsAfterBinding_FullComparison` | 完整生命周期：未绑定→双绑定→注入移动→解绑A→解绑B，每阶段捕获 hidumper | RuntimeBindings 状态转换：empty → 2 条 → 1 条 → empty |
+
+### 10.3 证据收集方式
+
+- **位置查询：** 通过 `InputManager::GetPointerLocation(displayId, x, y)` API 程序化采集
+- **hidumper 证据：** 通过 `popen("hidumper -s 3101 -a -G", "r")` 和 `popen("hidumper -s 3101 -a -c", "r")` 程序化捕获
+- **标准输出：** 所有关键值通过 `std::cout` 打印到测试输出，便于结果审查
