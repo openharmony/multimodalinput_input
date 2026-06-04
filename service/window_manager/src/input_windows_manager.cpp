@@ -8368,13 +8368,12 @@ void InputWindowsManager::DumpMultiGroupState(int32_t fd)
 
     // --- PointerStateByGroup ---
     mprintf(fd, "--- PointerStateByGroup ---");
-    {
-        // Collect all known group ids from displayGroupInfoMap_ and state maps
-        std::set<int32_t> allGroupIds;
-        for (const auto& [gid, _] : displayGroupInfoMap_) {
-            allGroupIds.insert(gid);
-        }
-        for (const auto& [gid, _] : mouseLocationMap_) {
+    // Collect all known group ids from displayGroupInfoMap_ and state maps
+    std::set<int32_t> allGroupIds;
+    for (const auto& [gid, _] : displayGroupInfoMap_) {
+        allGroupIds.insert(gid);
+    }
+    for (const auto& [gid, _] : mouseLocationMap_) {
             allGroupIds.insert(gid);
         }
         for (const auto& [gid, _] : cursorPosMap_) {
@@ -8414,7 +8413,6 @@ void InputWindowsManager::DumpMultiGroupState(int32_t fd)
                 gid, cursorX, cursorY, mouseX, mouseY, mouseDisplayId,
                 captureMode ? "true" : "false");
         }
-    }
 
     // --- KeyboardStateByGroup ---
     mprintf(fd, "--- KeyboardStateByGroup ---");
