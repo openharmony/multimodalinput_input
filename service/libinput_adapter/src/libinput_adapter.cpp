@@ -240,28 +240,7 @@ bool LibinputAdapter::Init(FunInputEvent funInputEvent)
     CALL_DEBUG_ENTER;
     CHKPF(funInputEvent);
 
-    auto callback = [funInputEvent](PluginEventType pluginEvent, int64_t frameTime) {
-        auto event = std::get_if<libinput_event*>(&pluginEvent);
-        if (!event) return;
-        funInputEvent(static_cast<void *>(*event), frameTime);
-    };
-
-    auto manager = InputPluginManager::GetInstance();
-    if (manager != nullptr) {
-        manager->PluginAssignmentCallBack(callback, InputPluginStage::INPUT_BEFORE_LIBINPUT_ADAPTER_ON_EVENT);
-    }
-    funInputEvent_ = [manager, callback](void *event, int64_t frameTime) {
-        if (manager != nullptr) {
-            std::shared_ptr<IPluginData> pData = std::make_shared<IPluginData>();
-            pData->frameTime = frameTime;
-            pData->stage = InputPluginStage::INPUT_BEFORE_LIBINPUT_ADAPTER_ON_EVENT;
-            int32_t result = manager->HandleEvent(static_cast<libinput_event *>(event), pData);
-            if (result != RET_NOTDO) {
-                return;
-            }
-        }
-        callback(static_cast<libinput_event *>(event), frameTime);
-    };
+    funInputEvent_ = funInputEvent;
 
     input_ = libinput_path_create_context(&LIBINPUT_INTERFACE, nullptr);
     CHKPF(input_);
@@ -982,42 +961,12 @@ void LibinputAdapter::OnEventHandler()
         msg += std::to_string(eventType);
         BytraceAdapter::MMIServiceTraceStart(BytraceAdapter::MMI_THREAD_LOOP_DEPTH_THREE, msg);
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
-        // confirm boot completed msg in case of mmi restart.
-        UpdateBootFlag();
-
-        // add the logic of screen capture window conuming touch point in high priority
-        bool isCaptureMode = GetIsCaptureMode();
-        if (((eventType == LIBINPUT_EVENT_TOUCH_DOWN && !isCaptureMode)
-            || eventType == LIBINPUT_EVENT_TOUCH_UP
-            || eventType == LIBINPUT_EVENT_TOUCH_MOTION
-            || eventType == LIBINPUT_EVENT_TOUCH_CANCEL
-            || eventType == LIBINPUT_EVENT_TOUCH_FRAME) && isBootCompleted_) {
-            ProcessTouchEventAsVKeyboardEvent(event, eventType, frameTime);
-        } else if (eventType == LIBINPUT_EVENT_KEYBOARD_KEY) {
-            struct libinput_event_keyboard* keyboardEvent = libinput_event_get_keyboard_event(event);
-            std::shared_ptr<KeyEvent> keyEvent = KeyEventHdr->GetKeyEvent();
-
-            if (libinput_event_keyboard_get_key_state(keyboardEvent) == LIBINPUT_KEY_STATE_PRESSED &&
-                libinput_event_keyboard_get_key(keyboardEvent) == KEY_CAPSLOCK && keyEvent != nullptr) {
-                bool oldCapsLockOn = keyEvent->GetFunctionKey(MMI::KeyEvent::CAPS_LOCK_FUNCTION_KEY);
-                HandleHWKeyEventForVKeyboard(event);
-                funInputEvent_(event, frameTime);
-                libinput_event_destroy(event);
-                MultiKeyboardSetLedState(!oldCapsLockOn);
-                keyEvent->SetFunctionKey(MMI::KeyEvent::CAPS_LOCK_FUNCTION_KEY, !oldCapsLockOn);
-                libinput_toggle_caps_key();
-            } else {
-                HandleHWKeyEventForVKeyboard(event);
-                funInputEvent_(event, frameTime);
-                libinput_event_destroy(event);
-            }
-        } else {
-            funInputEvent_(event, frameTime);
-            libinput_event_destroy(event);
-        }
+        ProcessEventAsVKeyboardEvent(event, frameTime);
 #else // OHOS_BUILD_ENABLE_VKEYBOARD
         MultiKeyboardSetFuncState(event);
-        funInputEvent_(event, frameTime);
+        if (!ProcessEventBeforeLibinputStage(event, frameTime)) {
+            funInputEvent_(event, frameTime);
+        }
         libinput_event_destroy(event);
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
         if (libinput_next_event_type(input_) == LIBINPUT_EVENT_KEYBOARD_KEY) {
@@ -1034,6 +983,70 @@ void LibinputAdapter::OnEventHandler()
     } else {
         hasPendingEvents_ = true;
     }
+}
+
+#ifdef OHOS_BUILD_ENABLE_VKEYBOARD
+void LibinputAdapter::ProcessEventAsVKeyboardEvent(libinput_event *event, int64_t frameTime)
+{
+    libinput_event_type eventType = libinput_event_get_type(event);
+    // confirm boot completed msg in case of mmi restart.
+    UpdateBootFlag();
+
+    // add the logic of screen capture window conuming touch point in high priority
+    bool isCaptureMode = GetIsCaptureMode();
+    if (((eventType == LIBINPUT_EVENT_TOUCH_DOWN && !isCaptureMode)
+        || eventType == LIBINPUT_EVENT_TOUCH_UP
+        || eventType == LIBINPUT_EVENT_TOUCH_MOTION
+        || eventType == LIBINPUT_EVENT_TOUCH_CANCEL
+        || eventType == LIBINPUT_EVENT_TOUCH_FRAME) && isBootCompleted_) {
+        ProcessTouchEventAsVKeyboardEvent(event, eventType, frameTime);
+    } else if (eventType == LIBINPUT_EVENT_KEYBOARD_KEY) {
+        struct libinput_event_keyboard* keyboardEvent = libinput_event_get_keyboard_event(event);
+        std::shared_ptr<KeyEvent> keyEvent = KeyEventHdr->GetKeyEvent();
+
+        if (libinput_event_keyboard_get_key_state(keyboardEvent) == LIBINPUT_KEY_STATE_PRESSED &&
+            libinput_event_keyboard_get_key(keyboardEvent) == KEY_CAPSLOCK && keyEvent != nullptr) {
+            bool oldCapsLockOn = keyEvent->GetFunctionKey(MMI::KeyEvent::CAPS_LOCK_FUNCTION_KEY);
+            HandleHWKeyEventForVKeyboard(event);
+            funInputEvent_(event, frameTime);
+            libinput_event_destroy(event);
+            MultiKeyboardSetLedState(!oldCapsLockOn);
+            keyEvent->SetFunctionKey(MMI::KeyEvent::CAPS_LOCK_FUNCTION_KEY, !oldCapsLockOn);
+            libinput_toggle_caps_key();
+        } else {
+            HandleHWKeyEventForVKeyboard(event);
+            funInputEvent_(event, frameTime);
+            libinput_event_destroy(event);
+        }
+    } else {
+        if (!ProcessEventBeforeLibinputStage(event, frameTime)) {
+            funInputEvent_(event, frameTime);
+        }
+        libinput_event_destroy(event);
+    }
+}
+#endif // OHOS_BUILD_ENABLE_VKEYBOARD
+
+bool LibinputAdapter::ProcessEventBeforeLibinputStage(libinput_event *event, int64_t frameTime)
+{
+    if (event == nullptr) {
+        return false;
+    }
+
+    auto manager = InputPluginManager::GetInstance();
+    if (manager == nullptr) {
+        MMI_HILOGE("InputPluginManager is nullptr");
+        return false;
+    }
+
+    auto pData = std::make_shared<IPluginData>();
+    pData->frameTime = frameTime;
+    pData->stage = InputPluginStage::INPUT_BEFORE_LIBINPUT_ADAPTER_ON_EVENT;
+    int32_t res = manager->HandleEvent(event, pData);
+    if (res == RET_DO) {
+        return true;
+    }
+    return false;
 }
 
 void LibinputAdapter::ReloadDevice()

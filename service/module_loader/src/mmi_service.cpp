@@ -458,7 +458,6 @@ int32_t MMIService::Init()
     NapProcess::GetInstance()->Init(*this);
     MMI_HILOGD("ANRManager Init");
     ANRMgr->Init(*this);
-    InputPluginManager::GetInstance()->Init(*this);
     MMI_HILOGI("PointerDrawingManager Init");
     mmiFd_ = EpollCreate(MAX_EVENT_SIZE);
     if (mmiFd_ < 0) {
@@ -486,6 +485,7 @@ int32_t MMIService::Init()
     }
     MMI_HILOGI("Set para input.pointer.device false");
     INPUT_SETTING_MANAGER->Initialize();
+    InputPluginManager::GetInstance()->Init(*this);
     return RET_OK;
     // LCOV_EXCL_STOP
 }
