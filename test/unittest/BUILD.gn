@@ -49,3 +49,36 @@ ohos_executable("hid_display_bind_board_test") {
   part_name = "input"
   subsystem_name = "multimodalinput"
 }
+
+ohos_executable("dual_group_interleave_test") {
+  sources = [
+    "../systemtest/dual_group_interleave_test.cpp",
+  ]
+
+  include_dirs = [
+    "${mmi_path}/interfaces/native/innerkits/proxy/include",
+    "${mmi_path}/interfaces/native/innerkits/event/include",
+  ]
+
+  deps = [
+    "${mmi_path}/frameworks/proxy:libmmi-client",
+    "${mmi_path}/util:libmmi-util",
+  ]
+
+  external_deps = [
+    "c_utils:utils",
+    "eventhandler:libeventhandler",
+    "hilog:libhilog",
+    "ipc:ipc_single",
+  ]
+
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
+
+  install_enable = true
+  part_name = "input"
+  subsystem_name = "multimodalinput"
+}
