@@ -460,9 +460,21 @@ bool TabletToolTransformProcessor::OnTipUp(struct libinput_event_tablet_tool* ev
     PointerEvent::PointerItem item;
     if (!pointerEvent_->GetPointerItem(DEFAULT_POINTER_ID, item)) {
         MMI_HILOGE("GetPointerItem failed");
+        isPressed_ = false;
+        return false;
+    }
+    int32_t targetDisplayId = pointerEvent_->GetTargetDisplayId();
+    PhysicalCoordinate tCoord;
+    if (!CalculateCalibratedTipPoint(event, targetDisplayId, tCoord, item)) {
+        MMI_HILOGI("OnTipUp rejected: position out of valid display");
+        isPressed_ = false;
         return false;
     }
     item.SetPressed(false);
+    item.SetDisplayXPos(tCoord.x);
+    item.SetDisplayYPos(tCoord.y);
+    item.SetRawDisplayX(static_cast<int32_t>(tCoord.x));
+    item.SetRawDisplayY(static_cast<int32_t>(tCoord.y));
     pointerEvent_->UpdatePointerItem(DEFAULT_POINTER_ID, item);
     return true;
 }
