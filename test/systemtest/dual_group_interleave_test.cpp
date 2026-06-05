@@ -123,17 +123,17 @@ static void SetupDualDisplayGroups()
 
 static void DumpG(const char *label)
 {
-    std::cout << "\n===== " << label << " =====" << std::endl;
+    { FILE *f = fopen("/data/local/tmp/dual_group_dump.txt","a"); if(f){fprintf(f,"\n===== %s =====\n",label);fclose(f);} } std::cout << "\n===== " << label << " =====" << std::endl;
     std::cout.flush();
-    system("hidumper -s 3101 -a -G 2>/dev/null");
+    system("hidumper -s 3101 -a -G >> /data/local/tmp/dual_group_dump.txt 2>&1");
     std::cout.flush();
 }
 
 int main()
 {
-    std::cout << "============================================" << std::endl;
+    system("rm -f /data/local/tmp/dual_group_dump.txt"); std::cout << "============================================" << std::endl;
     std::cout << " 双显示组 + 双鼠标 绑定前后交互移动对比" << std::endl;
-    std::cout << "============================================" << std::endl;
+    system("rm -f /data/local/tmp/dual_group_dump.txt"); std::cout << "============================================" << std::endl;
 
     // Step 1: 构造双显示组
     std::cout << "\n[Step 1] 构造双显示组 (group0: 720x1280, group1: 1920x1080)" << std::endl;
