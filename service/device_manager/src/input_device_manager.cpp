@@ -72,6 +72,9 @@ std::vector<std::pair<enum libinput_device_capability, InputDeviceCapability>> d
 
 constexpr size_t EXPECTED_N_SUBMATCHES{ 2 };
 constexpr size_t EXPECTED_SUBMATCH{ 1 };
+constexpr uint32_t STYLUS_MOUSE_VENDOR_ID { 4817 };
+constexpr uint32_t STYLUS_MOUSE_PRODUCT_ID_V1 { 4361 };
+constexpr uint32_t STYLUS_MOUSE_PRODUCT_ID_V2 { 4261 };
 } // namespace
 
 std::shared_ptr<InputDeviceManager> InputDeviceManager::instance_ = nullptr;
@@ -660,6 +663,14 @@ bool InputDeviceManager::HasLocalMouseDevice()
     for (const auto &item : inputDevice_) {
         auto inputDevice = item.second.inputDeviceOrigin;
         if (inputDevice == nullptr) {
+            continue;
+        }
+        auto vendor = libinput_device_get_id_vendor(inputDevice);
+        auto product = libinput_device_get_id_product(inputDevice);
+        if (vendor == STYLUS_MOUSE_VENDOR_ID &&
+            (product == STYLUS_MOUSE_PRODUCT_ID_V1 || product == STYLUS_MOUSE_PRODUCT_ID_V2)) {
+            MMI_HILOGI("device:%{public}d is a stylus, vendor:%{public}d, product:%{public}d",
+                item.first, vendor, product);
             continue;
         }
         enum evdev_device_udev_tags udevTags = libinput_device_get_tags(inputDevice);
