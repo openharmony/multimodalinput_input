@@ -271,17 +271,25 @@ void InputMonitor::SetKeys(std::vector<int32_t> keys)
     keys_ = keys;
 }
 
+bool InputMonitor::ShouldSkipMouseMove() const
+{
+    int32_t flowCtrl = flowCtrl_.load(std::memory_order_relaxed);
+    int32_t nextFlowCtrl = (flowCtrl + 1) % MOUSE_FLOW;
+    if (!flowCtrl_.compare_exchange_strong(flowCtrl, nextFlowCtrl,
+        std::memory_order_relaxed, std::memory_order_relaxed)) {
+        return true;
+    }
+    return nextFlowCtrl != 0;
+}
+
 void InputMonitor::OnInputEvent(std::shared_ptr<PointerEvent> pointerEvent) const
 {
     CALL_DEBUG_ENTER;
     CHKPV(pointerEvent);
-    if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_MOUSE
-        && pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_MOVE) {
-        if (++flowCtrl_ < MOUSE_FLOW) {
-            return;
-        } else {
-            flowCtrl_ = 0;
-        }
+    if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_MOUSE &&
+        pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_MOVE &&
+        ShouldSkipMouseMove()) {
+        return;
     }
     std::function<void(std::shared_ptr<PointerEvent>)> callback;
     {
