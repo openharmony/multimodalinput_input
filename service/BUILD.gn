@@ -269,6 +269,7 @@ ohos_shared_library("libcursor_drawing_adapter") {
       "ipc:ipc_single",
       "safwk:system_ability_fwk",
       "window_manager:libwm_lite",
+      "ability_base:want"
     ]
   }
   if (resource_schedule_service_enabled) {
