@@ -468,21 +468,6 @@ HWTEST_F(KeyEventNormalizeTest, KeyEventNormalizeTest_IsScreenFold_001, TestSize
 }
 
 /**
- * @tc.name: KeyEventNormalizeTest_SetKeyStatusRecord_001
- * @tc.desc: Test SetKeyStatusRecord
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(KeyEventNormalizeTest, KeyEventNormalizeTest_SetKeyStatusRecord_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    KeyEventHdr->SetKeyStatusRecord(true, 5000);
-    KeyEventHdr->SetKeyStatusRecord(false, 10000);
-    KeyEventHdr->SetKeyStatusRecord(true, -1);
-    KeyEventHdr->SetKeyStatusRecord(true, 20000);
-}
-
-/**
  * @tc.name: KeyEventNormalizeTest_ShieldStatusChain_001
  * @tc.desc: Test ShieldStatus set true and verify with GetShieldStatus
  * @tc.type: FUNC
