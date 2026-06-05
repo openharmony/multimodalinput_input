@@ -3875,117 +3875,6 @@ ohos_unittest("DfxHisysEventTest") {
   ]
 }
 
-ohos_unittest("KeymapMgrTest") {
-  module_out_path = module_output_path
-
-  configs = [
-    "${mmi_path}:coverage_flags",
-    ":libmmi_server_config",
-    "${mmi_path}/service/filter:mmi_event_filter_config",
-  ]
-
-  cflags = [
-    "-Dprivate=public",
-    "-Dprotected=public",
-  ]
-
-  include_dirs = [
-    "${mmi_path}/common/event_integrity/include",
-    "${mmi_path}/service/key_command/include",
-    "${mmi_path}/test/facility/libinput_interface/include",
-    "${mmi_path}/libudev/include",
-    "${mmi_path}/service/event_handler/include",
-    "${mmi_path}/service/event_handler/test",
-    "${mmi_path}/service/common/include",
-    "${mmi_path}/service/common/setting_datashare/include",
-  ]
-
-  sources = [
-    "event_handler/src/key_map_manager.cpp",
-    "event_handler/test/key_map_manager_mock.cpp",
-    "event_handler/test/key_map_manager_test.cpp",
-  ]
-
-  deps = [
-    "${mmi_path}/service:libmmi-server",
-    "${mmi_path}/test/facility/libinput_interface:libinput_interface_sources",
-    "${mmi_path}/util:libmmi-util",
-  ]
-
-  external_deps = [
-    "ability_base:want",
-    "ability_base:zuri",
-    "ability_runtime:ability_connect_callback_stub",
-    "ability_runtime:ability_manager",
-    "ability_runtime:abilitykit_native",
-    "ability_runtime:app_manager",
-    "ability_runtime:dataobs_manager",
-    "cJSON:cjson",
-    "common_event_service:cesfwk_innerkits",
-    "config_policy:configpolicy_util",
-    "data_share:datashare_consumer",
-    "googletest:gmock_main",
-    "hilog:libhilog",
-    "hisysevent:libhisysevent",
-    "preferences:native_preferences",
-  ]
-}
-
-ohos_unittest("ProductTypeParserTest") {
-  module_out_path = module_output_path
-
-  include_dirs = [
-    "${mmi_path}/interfaces/native/innerkits/proxy/include",
-    "${mmi_path}/interfaces/native/innerkits/event/include",
-    "${mmi_path}/service/custom_config_parser/include",
-    "${mmi_service_path}/window_manager/include",
-    "${mmi_path}/service/touch_event_normalize/include",
-    "${mmi_path}/service/product_property_config/include",
-    "${mmi_path}/service/delegate_task/include",
-    "${mmi_path}/service/event_handler/include",
-    "${mmi_path}/service/module_loader/include",
-    "${mmi_path}/util/json_parser/include",
-    "${mmi_path}/service/connect_manager/include",
-    "${mmi_path}/service/key_command/include",
-    "${mmi_path}/service/common/timer_manager/include",
-  ]
-
-  configs = [
-    "${mmi_path}:coverage_flags",
-  ]
-
-  cflags = [
-    "-Dprivate=public",
-    "-Dprotected=public",
-  ]
-
-  cflags_cc = [ "-Wno-string-conversion" ]
-
-  sources = [
-    "custom_config_parser/test/product_type_parser_test.cpp",
-    "custom_config_parser/test/product_type_parser_mock.cpp",
-  ]
-
-  deps = [
-    "${mmi_path}/service:libmmi-server",
-    "${mmi_path}/util:libmmi-util",
-  ]
-
-  external_deps = [
-    "cJSON:cjson",
-    "c_utils:utilsbase",
-    "googletest:gmock_main",
-    "googletest:gtest_main",
-    "graphic_2d:2d_graphics",
-    "hilog:libhilog",
-    "hisysevent:libhisysevent",
-    "init:libbegetutil",
-    "ipc:ipc_core",
-    "libinput:libinput-third-mmi",
-    "window_manager:libdm_lite",
-  ]
-}
-
 ohos_unittest("BundleNameParserTest") {
   module_out_path = module_output_path
 
@@ -4818,95 +4707,6 @@ ohos_unittest("KeyEventHookTest") {
   ]
 }
 
-ohos_unittest("InputEventHookTest") {
-  module_out_path = module_output_path
-
-  configs = [
-    "${mmi_path}:coverage_flags",
-    "${mmi_path}/common/anco/comm:mmi_anco_channel_config",
-    "${mmi_path}/service/filter:mmi_event_filter_config",
-  ]
-
-  cflags = [
-    "-Dprivate=public",
-    "-Dprotected=public",
-  ]
-
-  cflags_cc = [ "-Wno-string-conversion" ]
-
-  sanitize = {
-    cfi = true
-    cfi_cross_dso = true
-    debug = false
-    blocklist = "./ipc_blocklist.txt"
-  }
-
-  include_dirs = [
-    "${mmi_path}/common/anco/comm/include",
-    "${mmi_path}/common/event_integrity/include",
-    "${mmi_path}/interfaces/native/innerkits/proxy/include",
-    "${mmi_path}/service/connect_manager/include",
-    "${mmi_path}/service/delegate_task/include",
-    "${mmi_path}/service/device_config/include",
-    "${mmi_path}/service/device_manager/include",
-    "${mmi_path}/service/event_dispatch/include",
-    "${mmi_path}/service/event_handler/include",
-    "${mmi_path}/service/filter/include",
-    "${mmi_path}/service/interceptor/include",
-    "${mmi_path}/service/key_command/include",
-    "${mmi_path}/service/key_event_normalize/include",
-    "${mmi_path}/service/module_loader/include",
-    "${mmi_path}/service/monitor/include",
-    "${mmi_path}/service/mouse_event_normalize/include",
-    "${mmi_path}/service/nap_process/include",
-    "${mmi_path}/service/subscriber/include",
-    "${mmi_path}/service/common/timer_manager/include",
-    "${mmi_path}/service/touch_event_normalize/include",
-    "${mmi_path}/service/window_manager/include",
-    "${mmi_path}/service/event_hook/include",
-    "${mmi_path}/test/facility/mock/include",
-    "${mmi_path}/util/common/include",
-    "${mmi_path}/service/event_hook/include",
-    "${mmi_path}/service/event_hook/include/hook",
-    "${mmi_path}/service/event_hook/include/checker",
-    "${mmi_path}/service/common/include",
-    "${mmi_path}/service/common/setting_datashare/include",
-    "${mmi_path}/intention/scheduler/component_manager/include",
-  ]
-
-  sources = [
-    "event_hook/test/input_event_hook_test.cpp",
-    "event_hook/src/hook/input_event_hook.cpp",
-    "event_hook/src/hook/key_event_hook.cpp",
-    "event_hook/src/hook/pointer_event_hook.cpp",
-  ]
-
-  deps = [
-    "${mmi_path}/service:libmmi-server",
-    "${mmi_path}/test/facility/libinput_interface:libinput_interface_sources",
-    "${mmi_path}/test/facility/libinput_wrapper:libinput_wrapper_sources",
-    "${mmi_path}/test/facility/virtual_device:virtual_device_sources",
-    "${mmi_path}/util:libmmi-util",
-  ]
-
-  external_deps = [
-    "cJSON:cjson",
-    "c_utils:utils",
-    "data_share:datashare_consumer",
-    "googletest:gmock_main",
-    "graphic_2d:2d_graphics",
-    "graphic_2d:librender_service_client",
-    "hilog:libhilog",
-    "hisysevent:libhisysevent",
-    "image_framework:image_native",
-    "init:libbegetutil",
-    "ipc:ipc_core",
-    "libinput:libinput-third-mmi",
-    "preferences:native_preferences",
-    "samgr:samgr_proxy",
-    "window_manager:libwm",
-  ]
-}
 
 ohos_unittest("ExpirationCheckerTest") {
   module_out_path = module_output_path
@@ -4996,6 +4796,117 @@ ohos_unittest("HardwareCursorPointerManagerTest") {
     "graphic_2d:librender_service_client",
     "hilog:libhilog",
     "init:libbegetutil",
+  ]
+}
+
+ohos_unittest("KeymapMgrTest") {
+  module_out_path = module_output_path
+
+  configs = [
+    "${mmi_path}:coverage_flags",
+    ":libmmi_server_config",
+    "${mmi_path}/service/filter:mmi_event_filter_config",
+  ]
+
+  cflags = [
+    "-Dprivate=public",
+    "-Dprotected=public",
+  ]
+
+  include_dirs = [
+    "${mmi_path}/common/event_integrity/include",
+    "${mmi_path}/service/key_command/include",
+    "${mmi_path}/test/facility/libinput_interface/include",
+    "${mmi_path}/libudev/include",
+    "${mmi_path}/service/event_handler/include",
+    "${mmi_path}/service/event_handler/test",
+    "${mmi_path}/service/common/include",
+    "${mmi_path}/service/common/setting_datashare/include",
+  ]
+
+  sources = [
+    "event_handler/src/key_map_manager.cpp",
+    "event_handler/test/key_map_manager_mock.cpp",
+    "event_handler/test/key_map_manager_test.cpp",
+  ]
+
+  deps = [
+    "${mmi_path}/service:libmmi-server",
+    "${mmi_path}/test/facility/libinput_interface:libinput_interface_sources",
+    "${mmi_path}/util:libmmi-util",
+  ]
+
+  external_deps = [
+    "ability_base:want",
+    "ability_base:zuri",
+    "ability_runtime:ability_connect_callback_stub",
+    "ability_runtime:ability_manager",
+    "ability_runtime:abilitykit_native",
+    "ability_runtime:app_manager",
+    "ability_runtime:dataobs_manager",
+    "cJSON:cjson",
+    "common_event_service:cesfwk_innerkits",
+    "config_policy:configpolicy_util",
+    "data_share:datashare_consumer",
+    "googletest:gmock_main",
+    "hilog:libhilog",
+    "hisysevent:libhisysevent",
+    "preferences:native_preferences",
+  ]
+}
+
+ohos_unittest("ProductTypeParserTest") {
+  module_out_path = module_output_path
+
+  include_dirs = [
+    "${mmi_path}/interfaces/native/innerkits/proxy/include",
+    "${mmi_path}/interfaces/native/innerkits/event/include",
+    "${mmi_path}/service/custom_config_parser/include",
+    "${mmi_service_path}/window_manager/include",
+    "${mmi_path}/service/touch_event_normalize/include",
+    "${mmi_path}/service/product_property_config/include",
+    "${mmi_path}/service/delegate_task/include",
+    "${mmi_path}/service/event_handler/include",
+    "${mmi_path}/service/module_loader/include",
+    "${mmi_path}/util/json_parser/include",
+    "${mmi_path}/service/connect_manager/include",
+    "${mmi_path}/service/key_command/include",
+    "${mmi_path}/service/common/timer_manager/include",
+  ]
+
+  configs = [
+    "${mmi_path}:coverage_flags",
+  ]
+
+  cflags = [
+    "-Dprivate=public",
+    "-Dprotected=public",
+  ]
+
+  cflags_cc = [ "-Wno-string-conversion" ]
+
+  sources = [
+    "custom_config_parser/test/product_type_parser_test.cpp",
+    "custom_config_parser/test/product_type_parser_mock.cpp",
+  ]
+
+  deps = [
+    "${mmi_path}/service:libmmi-server",
+    "${mmi_path}/util:libmmi-util",
+  ]
+
+  external_deps = [
+    "cJSON:cjson",
+    "c_utils:utilsbase",
+    "googletest:gmock_main",
+    "googletest:gtest_main",
+    "graphic_2d:2d_graphics",
+    "hilog:libhilog",
+    "hisysevent:libhisysevent",
+    "init:libbegetutil",
+    "ipc:ipc_core",
+    "libinput:libinput-third-mmi",
+    "window_manager:libdm_lite",
   ]
 }
 
@@ -5169,6 +5080,96 @@ ohos_unittest("PropertyNameMapperTest") {
     "googletest:gmock_main",
     "googletest:gtest_main",
     "preferences:native_preferences",
+  ]
+}
+
+ohos_unittest("InputEventHookTest") {
+  module_out_path = module_output_path
+
+  configs = [
+    "${mmi_path}:coverage_flags",
+    "${mmi_path}/common/anco/comm:mmi_anco_channel_config",
+    "${mmi_path}/service/filter:mmi_event_filter_config",
+  ]
+
+  cflags = [
+    "-Dprivate=public",
+    "-Dprotected=public",
+  ]
+
+  cflags_cc = [ "-Wno-string-conversion" ]
+
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+    blocklist = "./ipc_blocklist.txt"
+  }
+
+  include_dirs = [
+    "${mmi_path}/common/anco/comm/include",
+    "${mmi_path}/common/event_integrity/include",
+    "${mmi_path}/interfaces/native/innerkits/proxy/include",
+    "${mmi_path}/service/connect_manager/include",
+    "${mmi_path}/service/delegate_task/include",
+    "${mmi_path}/service/device_config/include",
+    "${mmi_path}/service/device_manager/include",
+    "${mmi_path}/service/event_dispatch/include",
+    "${mmi_path}/service/event_handler/include",
+    "${mmi_path}/service/filter/include",
+    "${mmi_path}/service/interceptor/include",
+    "${mmi_path}/service/key_command/include",
+    "${mmi_path}/service/key_event_normalize/include",
+    "${mmi_path}/service/module_loader/include",
+    "${mmi_path}/service/monitor/include",
+    "${mmi_path}/service/mouse_event_normalize/include",
+    "${mmi_path}/service/nap_process/include",
+    "${mmi_path}/service/subscriber/include",
+    "${mmi_path}/service/common/timer_manager/include",
+    "${mmi_path}/service/touch_event_normalize/include",
+    "${mmi_path}/service/window_manager/include",
+    "${mmi_path}/service/event_hook/include",
+    "${mmi_path}/test/facility/mock/include",
+    "${mmi_path}/util/common/include",
+    "${mmi_path}/service/event_hook/include",
+    "${mmi_path}/service/event_hook/include/hook",
+    "${mmi_path}/service/event_hook/include/checker",
+    "${mmi_path}/service/common/include",
+    "${mmi_path}/service/common/setting_datashare/include",
+    "${mmi_path}/intention/scheduler/component_manager/include",
+  ]
+
+  sources = [
+    "event_hook/test/input_event_hook_test.cpp",
+    "event_hook/src/hook/input_event_hook.cpp",
+    "event_hook/src/hook/key_event_hook.cpp",
+    "event_hook/src/hook/pointer_event_hook.cpp",
+  ]
+
+  deps = [
+    "${mmi_path}/service:libmmi-server",
+    "${mmi_path}/test/facility/libinput_interface:libinput_interface_sources",
+    "${mmi_path}/test/facility/libinput_wrapper:libinput_wrapper_sources",
+    "${mmi_path}/test/facility/virtual_device:virtual_device_sources",
+    "${mmi_path}/util:libmmi-util",
+  ]
+
+  external_deps = [
+    "cJSON:cjson",
+    "c_utils:utils",
+    "data_share:datashare_consumer",
+    "googletest:gmock_main",
+    "graphic_2d:2d_graphics",
+    "graphic_2d:librender_service_client",
+    "hilog:libhilog",
+    "hisysevent:libhisysevent",
+    "image_framework:image_native",
+    "init:libbegetutil",
+    "ipc:ipc_core",
+    "libinput:libinput-third-mmi",
+    "preferences:native_preferences",
+    "samgr:samgr_proxy",
+    "window_manager:libwm",
   ]
 }
 

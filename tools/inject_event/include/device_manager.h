@@ -25,10 +25,10 @@ namespace MMI {
 class DeviceManager {
 public:
     DeviceManager() = default;
+    static int32_t ExtractEventNumber(const std::string& fileName);
     std::vector<InputDevice> DiscoverDevices();
     void PrintDeviceList();
 
-    static int32_t ExtractEventNumber(const std::string& fileName);
 private:
     std::string BuildDevicePath(const std::string& fileName) const;
 };

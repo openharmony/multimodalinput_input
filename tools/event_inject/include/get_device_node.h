@@ -16,8 +16,8 @@
 #ifndef GET_DEVICE_NODE_H
 #define GET_DEVICE_NODE_H
 
-#include "nocopyable.h"
 #include "msg_head.h"
+#include "nocopyable.h"
 
 namespace OHOS {
 namespace MMI {

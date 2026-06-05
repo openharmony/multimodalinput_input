@@ -14,13 +14,12 @@
  */
 
 #include <gtest/gtest.h>
-#include <fcntl.h>
 
+#include <fcntl.h>
 #include "input_manager.h"
 #include "input_manager_command.h"
-#include "pixel_map.h"
-
 #include "mock.h"
+#include "pixel_map.h"
 
 namespace OHOS {
 namespace MMI {
