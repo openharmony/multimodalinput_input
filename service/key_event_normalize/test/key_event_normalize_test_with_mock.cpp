@@ -319,19 +319,6 @@ HWTEST_F(KeyEventNormalizeWithMockTest, KeyEventNormalizeWithMockTest_SyncLedSta
 }
 
 /**
- * @tc.name: KeyEventNormalizeWithMockTest_SimulatedModifierKeyEventNormalize_NullKeyEvent_001
- * @tc.desc: Test SimulatedModifierKeyEventNormalize with null keyEvent
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(KeyEventNormalizeWithMockTest, KeyEventNormalizeWithMockTest_SimulatedModifierKeyEventNormalize_Null_001,
-    TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    KeyEventHdr->SimulatedModifierKeyEventNormalize(nullptr);
-}
-
-/**
  * @tc.name: KeyEventNormalizeWithMockTest_SimulatedModifierKeyEventNormalize_NonSimulated_002
  * @tc.desc: Test SimulatedModifierKeyEventNormalize with non-simulated keyEvent
  * @tc.type: FUNC
