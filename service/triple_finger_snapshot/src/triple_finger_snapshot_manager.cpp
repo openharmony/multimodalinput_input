@@ -109,9 +109,11 @@ bool TripleFingerSnapshotManager::Enable()
         auto displayInfo = WIN_MGR->GetDefaultDisplayInfo();
         if (displayInfo != nullptr) {
             auto direction = WIN_MGR->GetDisplayDirection(displayInfo);
-            UpdateDisplayInfo(displayInfo->validWidth, displayInfo->validHeight, direction);
-            MMI_HILOGI("Initialized display info: width:%{public}d, height=%{public}d, direction=%{public}d",
-                displayInfo->validWidth, displayInfo->validHeight, direction);
+            UpdateDisplayInfo(displayInfo->validWidth, displayInfo->validHeight, direction,
+                displayInfo->screenRealDPI);
+            MMI_HILOGI("Initialized display info: width:%{public}d, height=%{public}d, direction=%{public}d, "
+                "screenRealDPI=%{public}d", displayInfo->validWidth, displayInfo->validHeight, direction,
+                displayInfo->screenRealDPI);
         } else {
             MMI_HILOGW("Failed to get default display info");
         }
@@ -150,13 +152,14 @@ bool TripleFingerSnapshotManager::Disable()
     return true;
 }
 
-void TripleFingerSnapshotManager::UpdateDisplayInfo(int32_t displayWidth, int32_t displayHeight, int32_t direction)
+void TripleFingerSnapshotManager::UpdateDisplayInfo(int32_t displayWidth, int32_t displayHeight,
+    int32_t direction, int32_t screenRealDPI)
 {
     auto impl = GetImpl();
     if (impl == nullptr) {
         return;
     }
-    impl->UpdateDisplayInfo(displayWidth, displayHeight, direction);
+    impl->UpdateDisplayInfo(displayWidth, displayHeight, direction, screenRealDPI);
 }
 
 void TripleFingerSnapshotManager::Dump(int32_t fd)

@@ -1189,7 +1189,8 @@ void InputWindowsManager::UpdateDisplayInfoExtIfNeed(OLD::DisplayGroupInfo &disp
 #ifdef OHOS_BUILD_ENABLE_TRIPLE_FINGER_SNAPSHOT
     // 更新三指截屏的显示信息
     TripleFingerSnapshotManager::GetInstance().UpdateDisplayInfo(physicDisplayInfo->validWidth,
-        physicDisplayInfo->validHeight, GetDisplayDirection(physicDisplayInfo));
+        physicDisplayInfo->validHeight, GetDisplayDirection(physicDisplayInfo),
+        physicDisplayInfo->screenRealDPI);
 #endif // OHOS_BUILD_ENABLE_TRIPLE_FINGER_SNAPSHOT
 #ifdef OHOS_BUILD_ENABLE_TOUCH_DRAWING
     TOUCH_DRAWING_MGR->UpdateDisplayInfo(*physicDisplayInfo);
