@@ -42,7 +42,7 @@ public:
     MOCK_METHOD1(HandleTouchEvent, bool(std::shared_ptr<PointerEvent>));
     MOCK_METHOD0(Enable, void());
     MOCK_METHOD0(Disable, void());
-    MOCK_METHOD3(UpdateDisplayInfo, void(int32_t, int32_t, int32_t));
+    MOCK_METHOD4(UpdateDisplayInfo, void(int32_t, int32_t, int32_t, int32_t));
     MOCK_METHOD1(Dump, void(int32_t));
     MOCK_METHOD1(UpdateAppsEnable, void(bool));
 };
@@ -464,7 +464,7 @@ HWTEST_F(TripleFingerSnapshotManagerTest, TripleFingerSnapshotManagerTest_Update
 {
     TripleFingerSnapshotManager &manager = TripleFingerSnapshotManager::GetInstance();
     // Should not crash when impl is null
-    manager.UpdateDisplayInfo(1920, 1080, 0);
+    manager.UpdateDisplayInfo(1920, 1080, 0, 160);
     ASSERT_TRUE(true);
 }
 
@@ -477,16 +477,16 @@ HWTEST_F(TripleFingerSnapshotManagerTest, TripleFingerSnapshotManagerTest_Update
 {
     TripleFingerSnapshotManager &manager = TripleFingerSnapshotManager::GetInstance();
     auto mockImpl = std::make_shared<MockITripleFingerSnapshot>();
-    
+
     {
         std::lock_guard<std::mutex> lock(manager.mutex_);
         manager.impl_ = mockImpl;
     }
-    
-    EXPECT_CALL(*mockImpl, UpdateDisplayInfo(1920, 1080, 0))
+
+    EXPECT_CALL(*mockImpl, UpdateDisplayInfo(1920, 1080, 0, 160))
         .Times(1);
-    
-    manager.UpdateDisplayInfo(1920, 1080, 0);
+
+    manager.UpdateDisplayInfo(1920, 1080, 0, 160);
     
     // Clean up
     {
