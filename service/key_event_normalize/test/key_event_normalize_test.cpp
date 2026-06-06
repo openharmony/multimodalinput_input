@@ -423,5 +423,72 @@ HWTEST_F(KeyEventNormalizeTest, GetShieldStatus_NotFound, TestSize.Level1)
     int32_t result = KeyEventHdr->GetShieldStatus(shieldMode, isShield);
     EXPECT_EQ(result, RET_ERR);
 }
+
+/**
+ * @tc.name: KeyEventNormalizeTest_GetKeyEvent_001
+ * @tc.desc: Test GetKeyEvent returns non-null KeyEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyEventNormalizeTest, KeyEventNormalizeTest_GetKeyEvent_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto keyEvent = KeyEventHdr->GetKeyEvent();
+    ASSERT_NE(keyEvent, nullptr);
+}
+
+/**
+ * @tc.name: KeyEventNormalizeTest_SetGetCurrentShieldMode_001
+ * @tc.desc: Test SetCurrentShieldMode and GetCurrentShieldMode
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyEventNormalizeTest, KeyEventNormalizeTest_SetGetCurrentShieldMode_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t defaultMode = KeyEventHdr->GetCurrentShieldMode();
+    KeyEventHdr->SetCurrentShieldMode(SHIELD_MODE::FACTORY_MODE);
+    EXPECT_EQ(KeyEventHdr->GetCurrentShieldMode(), SHIELD_MODE::FACTORY_MODE);
+    KeyEventHdr->SetCurrentShieldMode(SHIELD_MODE::OOBE_MODE);
+    EXPECT_EQ(KeyEventHdr->GetCurrentShieldMode(), SHIELD_MODE::OOBE_MODE);
+    KeyEventHdr->SetCurrentShieldMode(defaultMode);
+    EXPECT_EQ(KeyEventHdr->GetCurrentShieldMode(), defaultMode);
+}
+
+/**
+ * @tc.name: KeyEventNormalizeTest_IsScreenFold_001
+ * @tc.desc: Test IsScreenFold returns false when Init not called
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyEventNormalizeTest, KeyEventNormalizeTest_IsScreenFold_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EXPECT_FALSE(KeyEventHdr->IsScreenFold());
+}
+
+/**
+ * @tc.name: KeyEventNormalizeTest_ShieldStatusChain_001
+ * @tc.desc: Test ShieldStatus set true and verify with GetShieldStatus
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyEventNormalizeTest, KeyEventNormalizeTest_ShieldStatusChain_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t ret = KeyEventHdr->SetShieldStatus(SHIELD_MODE::FACTORY_MODE, true);
+    ASSERT_EQ(ret, RET_OK);
+    bool isShield = false;
+    ret = KeyEventHdr->GetShieldStatus(SHIELD_MODE::FACTORY_MODE, isShield);
+    ASSERT_EQ(ret, RET_OK);
+    EXPECT_TRUE(isShield);
+    ret = KeyEventHdr->SetShieldStatus(SHIELD_MODE::FACTORY_MODE, false);
+    ASSERT_EQ(ret, RET_OK);
+    isShield = true;
+    ret = KeyEventHdr->GetShieldStatus(SHIELD_MODE::FACTORY_MODE, isShield);
+    ASSERT_EQ(ret, RET_OK);
+    EXPECT_FALSE(isShield);
+    KeyEventHdr->SetCurrentShieldMode(SHIELD_MODE::UNSET_MODE);
+}
 }
 }
