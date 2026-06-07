@@ -1043,6 +1043,170 @@ HWTEST_F(ScreenPointerTest, ScreenPointerTest_OnDisplayInfo_003, TestSize.Level1
 }
 
 /**
+ * @tc.name: ScreenPointerTest_OnDisplayInfo_004
+ * @tc.desc: Test OnDisplayInfo with zero screenRealWidth for off screen rendering
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(ScreenPointerTest, ScreenPointerTest_OnDisplayInfo_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    hwcmgr_ptr_t hwcmgr = std::make_shared<HardwareCursorPointerManager>();
+    ASSERT_NE(hwcmgr, nullptr);
+    handler_ptr_t handler = nullptr;
+    OLD::DisplayInfo di;
+    di.id = 1;
+    di.width = 1920;
+    di.screenRealWidth = 0;
+    di.screenRealHeight = 1080;
+    di.isCurrentOffScreenRendering = true;
+    std::shared_ptr<ScreenPointer> screenpointer = std::make_shared<ScreenPointer>(hwcmgr, handler, di);
+    ASSERT_NE(screenpointer, nullptr);
+    screenpointer->screenId_ = di.rsId;
+    screenpointer->OnDisplayInfo(di);
+}
+
+/**
+ * @tc.name: ScreenPointerTest_OnDisplayInfo_005
+ * @tc.desc: Test OnDisplayInfo with zero screenRealHeight for off screen rendering
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(ScreenPointerTest, ScreenPointerTest_OnDisplayInfo_005, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    hwcmgr_ptr_t hwcmgr = std::make_shared<HardwareCursorPointerManager>();
+    ASSERT_NE(hwcmgr, nullptr);
+    handler_ptr_t handler = nullptr;
+    OLD::DisplayInfo di;
+    di.id = 1;
+    di.width = 1920;
+    di.screenRealWidth = 1080;
+    di.screenRealHeight = 0;
+    di.isCurrentOffScreenRendering = true;
+    std::shared_ptr<ScreenPointer> screenpointer = std::make_shared<ScreenPointer>(hwcmgr, handler, di);
+    ASSERT_NE(screenpointer, nullptr);
+    screenpointer->screenId_ = di.rsId;
+    screenpointer->OnDisplayInfo(di);
+}
+
+/**
+ * @tc.name: ScreenPointerTest_OnDisplayInfo_006
+ * @tc.desc: Test OnDisplayInfo with DIRECTION0 (no swap)
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(ScreenPointerTest, ScreenPointerTest_OnDisplayInfo_006, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    hwcmgr_ptr_t hwcmgr = std::make_shared<HardwareCursorPointerManager>();
+    ASSERT_NE(hwcmgr, nullptr);
+    handler_ptr_t handler = nullptr;
+    OLD::DisplayInfo di;
+    di.id = 1;
+    di.rsId = 100;
+    di.width = 1920;
+    di.screenRealWidth = 3840;
+    di.screenRealHeight = 2160;
+    di.isCurrentOffScreenRendering = true;
+    di.direction = Direction::DIRECTION0;
+    std::shared_ptr<ScreenPointer> screenpointer = std::make_shared<ScreenPointer>(hwcmgr, handler, di);
+    ASSERT_NE(screenpointer, nullptr);
+    screenpointer->screenId_ = di.rsId;
+    screenpointer->mode_ = mode_t::SCREEN_MAIN;
+    screenpointer->OnDisplayInfo(di);
+    float expectedScale = float(di.screenRealWidth) / di.width;
+    EXPECT_FLOAT_EQ(screenpointer->offRenderScale_, expectedScale);
+}
+
+/**
+ * @tc.name: ScreenPointerTest_OnDisplayInfo_007
+ * @tc.desc: Test OnDisplayInfo with DIRECTION90 (swap width and height)
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(ScreenPointerTest, ScreenPointerTest_OnDisplayInfo_007, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    hwcmgr_ptr_t hwcmgr = std::make_shared<HardwareCursorPointerManager>();
+    ASSERT_NE(hwcmgr, nullptr);
+    handler_ptr_t handler = nullptr;
+    OLD::DisplayInfo di;
+    di.id = 1;
+    di.rsId = 100;
+    di.width = 1920;
+    di.screenRealWidth = 3840;
+    di.screenRealHeight = 2160;
+    di.isCurrentOffScreenRendering = true;
+    di.direction = Direction::DIRECTION90;
+    std::shared_ptr<ScreenPointer> screenpointer = std::make_shared<ScreenPointer>(hwcmgr, handler, di);
+    ASSERT_NE(screenpointer, nullptr);
+    screenpointer->screenId_ = di.rsId;
+    screenpointer->mode_ = mode_t::SCREEN_MAIN;
+    screenpointer->OnDisplayInfo(di);
+    float expectedScale = float(di.screenRealHeight) / di.width;
+    EXPECT_FLOAT_EQ(screenpointer->offRenderScale_, expectedScale);
+}
+
+/**
+ * @tc.name: ScreenPointerTest_OnDisplayInfo_008
+ * @tc.desc: Test OnDisplayInfo with ROTATION_180 (no swap)
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(ScreenPointerTest, ScreenPointerTest_OnDisplayInfo_008, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    hwcmgr_ptr_t hwcmgr = std::make_shared<HardwareCursorPointerManager>();
+    ASSERT_NE(hwcmgr, nullptr);
+    handler_ptr_t handler = nullptr;
+    OLD::DisplayInfo di;
+    di.id = 1;
+    di.rsId = 100;
+    di.width = 1920;
+    di.screenRealWidth = 3840;
+    di.screenRealHeight = 2160;
+    di.isCurrentOffScreenRendering = true;
+    di.direction = Direction::DIRECTION180;
+    std::shared_ptr<ScreenPointer> screenpointer = std::make_shared<ScreenPointer>(hwcmgr, handler, di);
+    ASSERT_NE(screenpointer, nullptr);
+    screenpointer->screenId_ = di.rsId;
+    screenpointer->mode_ = mode_t::SCREEN_MAIN;
+    screenpointer->OnDisplayInfo(di);
+    float expectedScale = float(di.screenRealWidth) / di.width;
+    EXPECT_FLOAT_EQ(screenpointer->offRenderScale_, expectedScale);
+}
+
+/**
+ * @tc.name: ScreenPointerTest_OnDisplayInfo_009
+ * @tc.desc: Test OnDisplayInfo with ROTATION_270 (swap width and height)
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(ScreenPointerTest, ScreenPointerTest_OnDisplayInfo_009, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    hwcmgr_ptr_t hwcmgr = std::make_shared<HardwareCursorPointerManager>();
+    ASSERT_NE(hwcmgr, nullptr);
+    handler_ptr_t handler = nullptr;
+    OLD::DisplayInfo di;
+    di.id = 1;
+    di.rsId = 100;
+    di.width = 1920;
+    di.screenRealWidth = 3840;
+    di.screenRealHeight = 2160;
+    di.isCurrentOffScreenRendering = true;
+    di.direction = Direction::DIRECTION270;
+    std::shared_ptr<ScreenPointer> screenpointer = std::make_shared<ScreenPointer>(hwcmgr, handler, di);
+    ASSERT_NE(screenpointer, nullptr);
+    screenpointer->screenId_ = di.rsId;
+    screenpointer->mode_ = mode_t::SCREEN_MAIN;
+    screenpointer->OnDisplayInfo(di);
+    float expectedScale = float(di.screenRealHeight) / di.width;
+    EXPECT_FLOAT_EQ(screenpointer->offRenderScale_, expectedScale);
+}
+
+/**
  * @tc.name: ScreenPointerTest_UpdatePadding_002
  * @tc.desc: Test UpdatePadding with external screen build and main screen mode
  * @tc.type: Function

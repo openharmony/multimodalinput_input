@@ -375,11 +375,19 @@ void ScreenPointer::OnDisplayInfo(const OLD::DisplayInfo &di)
     MMI_HILOGD("Update with DisplayInfo, id=%{public}" PRIu64 ", shape=(%{public}u, %{public}u), mode=%{public}u, "
         "rotation=%{public}u, dpi=%{public}f", screenId_, width_, height_, mode_, rotation_, dpi_);
     if (isCurrentOffScreenRendering_) {
-        if (di.width == 0) {
-            MMI_HILOGE("The divisor cannot be 0");
+        if (di.width == 0 || di.screenRealWidth == 0 || di.screenRealHeight == 0) {
+            MMI_HILOGE("invalid data, width=%{public}u, screenRealWidth=%{public}u, screenRealHeight=%{public}u",
+                di.width, di.screenRealWidth, di.screenRealHeight);
             return;
         }
-        offRenderScale_ = float(di.screenRealWidth) / di.width;
+
+        int32_t realWidth = di.screenRealWidth;
+        int32_t realHeight = di.screenRealHeight;
+        if ((rotation_ == rotation_t::ROTATION_90 || rotation_ == rotation_t::ROTATION_270)) {
+            std::swap(realWidth, realHeight);
+        }
+
+        offRenderScale_ = float(realWidth) / di.width;
         MMI_HILOGD("Update with DisplayInfo, screenRealDPI=%{public}d, offRenderScale_=(%{public}f ",
             di.screenRealDPI, offRenderScale_);
     }
