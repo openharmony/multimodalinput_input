@@ -4501,5 +4501,76 @@ HWTEST_F(PointerDrawingManagerTest, PointerDrawingManagerTest_InitLayer_001, Tes
     usleep(WAIT_TIME);
     EXPECT_EQ(pointerDrawingManager.initEventHandlerFlag_.load(), true);
 }
+
+/**
+ * @tc.name: PointerDrawingManagerTest_ScalePixelMap_01
+ * @tc.desc: Test ScalePixelMap
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerTest, PointerDrawingManagerTest_ScalePixelMap_01, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerDrawingManager pointerDrawingManager;
+    const std::string iconPath = "/system/etc/multimodalinput/mouse_icon/North_South.svg";
+    std::unique_ptr<OHOS::Media::PixelMap> pixelMap = SetMouseIconTest(iconPath);
+    ASSERT_NE(pixelMap, nullptr);
+    float scale = 1.0f;
+    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.ScalePixelMap(pixelMap.get(), scale, scale));
+}
+
+/**
+ * @tc.name: PointerDrawingManagerTest_ScalePixelMap_02
+ * @tc.desc: Test ScalePixelMap
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerTest, PointerDrawingManagerTest_ScalePixelMap_02, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerDrawingManager pointerDrawingManager;
+    const std::string iconPath = "/system/etc/multimodalinput/mouse_icon/North_South.svg";
+    std::unique_ptr<OHOS::Media::PixelMap> pixelMap = SetMouseIconTest(iconPath);
+    ASSERT_NE(pixelMap, nullptr);
+    float scale = 1.0f;
+    ASSERT_NO_FATAL_FAILURE(
+        pointerDrawingManager.ScalePixelMap(pixelMap.get(), scale * INT32_BYTE, scale * INT32_BYTE));
+}
+
+/**
+ * @tc.name: PointerDrawingManagerTest_ScalePixelMap_03
+ * @tc.desc: Test ScalePixelMap
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerTest, PointerDrawingManagerTest_ScalePixelMap_03, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerDrawingManager pointerDrawingManager;
+    const std::string iconPath = "/system/etc/multimodalinput/mouse_icon/North_South.svg";
+    std::unique_ptr<OHOS::Media::PixelMap> pixelMap = SetMouseIconTest(iconPath);
+    ASSERT_NE(pixelMap, nullptr);
+    float scale = 1.0f;
+    ASSERT_NO_FATAL_FAILURE(
+        pointerDrawingManager.ScalePixelMap(pixelMap.get(), scale / INT32_BYTE, scale / INT32_BYTE));
+}
+
+/**
+ * @tc.name: PointerDrawingManagerTest_ScalePixelMap_04
+ * @tc.desc: Test ScalePixelMap
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerTest, PointerDrawingManagerTest_ScalePixelMap_04, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerDrawingManager pointerDrawingManager;
+    const std::string iconPath = "/system/etc/multimodalinput/mouse_icon/North_South.svg";
+    std::unique_ptr<OHOS::Media::PixelMap> pixelMap = SetMouseIconTest(iconPath);
+    ASSERT_NE(pixelMap, nullptr);
+    float scale = 1.0f;
+    ASSERT_NO_FATAL_FAILURE(
+        pointerDrawingManager.ScalePixelMap(pixelMap.get(), scale * INT32_BYTE, scale / INT32_BYTE));
+}
 } // namespace MMI
 } // namespace OHOS

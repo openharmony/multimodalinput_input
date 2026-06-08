@@ -317,6 +317,7 @@ private:
     void InitPointerThread();
     void DestroyPointerWindowOfHardCursor();
     void DestroyPointerWindowOfSoftCursor();
+    void ScalePixelMap(Media::PixelMap* pixelMap, float xScale, float yScale);
 private:
     bool hasDisplay_ { false };
     bool hasPointerDevice_ { false };
