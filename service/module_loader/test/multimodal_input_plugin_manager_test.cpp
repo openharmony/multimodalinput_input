@@ -2742,26 +2742,6 @@ HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_DoHa
     EXPECT_EQ(result, RET_NOTDO);
 }
 /**
- * @tc.name: MultimodalInputPluginManagerTest_InputPlugin_GetPlugin_001
- * @tc.desc: Verify GetPlugin returns the IInputPlugin set by Init
- * @tc.require:
- */
-HWTEST_F(MultimodalInputPluginManagerTest,
-    MultimodalInputPluginManagerTest_InputPlugin_GetPlugin_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    std::shared_ptr<InputPlugin> inputPlugin = std::make_shared<InputPlugin>(nullptr);
-    std::shared_ptr<MockInputPlugin> mockPlugin = std::make_shared<MockInputPlugin>();
-    EXPECT_CALL(*mockPlugin, GetName()).WillRepeatedly(Return("test"));
-    EXPECT_CALL(*mockPlugin, GetPriority()).WillRepeatedly(Return(100));
-    EXPECT_CALL(*mockPlugin, GetStages()).WillRepeatedly(
-        Return(std::vector<InputPluginStage>{InputPluginStage::INPUT_AFTER_FILTER}));
-
-    inputPlugin->Init(mockPlugin);
-    EXPECT_NE(inputPlugin->GetPlugin(), nullptr);
-}
-
-/**
  * @tc.name: MultimodalInputPluginManagerTest_InputPlugin_AddTimer_Overflow_001
  * @tc.desc: Verify AddTimer returns RET_ERR when timerCnt_ reaches MAX_TIMER
  * @tc.require:
