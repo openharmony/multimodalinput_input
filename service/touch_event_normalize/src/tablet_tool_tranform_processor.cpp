@@ -460,7 +460,6 @@ bool TabletToolTransformProcessor::OnTipUp(struct libinput_event_tablet_tool* ev
     PointerEvent::PointerItem item;
     if (!pointerEvent_->GetPointerItem(DEFAULT_POINTER_ID, item)) {
         MMI_HILOGE("GetPointerItem failed");
-        isPressed_ = false;
         return false;
     }
     int32_t targetDisplayId = pointerEvent_->GetTargetDisplayId();
