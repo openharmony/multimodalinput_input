@@ -432,6 +432,11 @@ bool TabletToolTransformProcessor::OnTipMotion(struct libinput_event* event)
 
     PhysicalCoordinate tCoord;
     if (!CalculateCalibratedTipPoint(tabletEvent, targetDisplayId, tCoord, item)) {
+        item.SetDisplayXPos(tCoord.x);
+        item.SetDisplayYPos(tCoord.y);
+        item.SetRawDisplayX(static_cast<int32_t>(tCoord.x));
+        item.SetRawDisplayY(static_cast<int32_t>(tCoord.y));
+        pointerEvent_->UpdatePointerItem(DEFAULT_POINTER_ID, item);
         MMI_HILOGE("CalculateCalibratedTipPoint failed");
         return false;
     }
@@ -470,10 +475,6 @@ bool TabletToolTransformProcessor::OnTipUp(struct libinput_event_tablet_tool* ev
         return false;
     }
     item.SetPressed(false);
-    item.SetDisplayXPos(tCoord.x);
-    item.SetDisplayYPos(tCoord.y);
-    item.SetRawDisplayX(static_cast<int32_t>(tCoord.x));
-    item.SetRawDisplayY(static_cast<int32_t>(tCoord.y));
     pointerEvent_->UpdatePointerItem(DEFAULT_POINTER_ID, item);
     return true;
 }

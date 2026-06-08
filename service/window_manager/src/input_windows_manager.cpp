@@ -426,7 +426,14 @@ bool InputWindowsManager::AdjustFingerFlag(std::shared_ptr<PointerEvent> pointer
     int32_t pointerId = pointerEvent->GetPointerId();
     int32_t deviceId = pointerEvent->GetDeviceId();
     PointerEvent::PointerItem pointerItem;
-    bool isPenHover = pointerEvent->GetPointerItem(pointerId, pointerItem) && pointerItem.IsPressed() == false &&
+    int32_t action = pointerEvent->GetPointerAction();
+    bool isPenHoverAction = (action == PointerEvent::POINTER_ACTION_LEVITATE_MOVE ||
+        action == PointerEvent::POINTER_ACTION_LEVITATE_IN_WINDOW ||
+        action == PointerEvent::POINTER_ACTION_LEVITATE_OUT_WINDOW ||
+        action == PointerEvent::POINTER_ACTION_PROXIMITY_IN ||
+        action == PointerEvent::POINTER_ACTION_PROXIMITY_OUT);
+    bool isPenHover = pointerEvent->GetPointerItem(pointerId, pointerItem) &&
+        isPenHoverAction &&
         (pointerItem.GetToolType() == PointerEvent::TOOL_TYPE_PEN ||
         pointerItem.GetToolType() == PointerEvent::TOOL_TYPE_PENCIL);
     if (isPenHover) {
@@ -458,7 +465,14 @@ int32_t InputWindowsManager::GetClientFd(std::shared_ptr<PointerEvent> pointerEv
     if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHSCREEN) {
         int32_t pointerId = pointerEvent->GetPointerId();
         PointerEvent::PointerItem pointerItem;
-        bool isPenHover = pointerEvent->GetPointerItem(pointerId, pointerItem) && pointerItem.IsPressed() == false &&
+        int32_t action = pointerEvent->GetPointerAction();
+        bool isPenHoverAction = (action == PointerEvent::POINTER_ACTION_LEVITATE_MOVE ||
+            action == PointerEvent::POINTER_ACTION_LEVITATE_IN_WINDOW ||
+            action == PointerEvent::POINTER_ACTION_LEVITATE_OUT_WINDOW ||
+            action == PointerEvent::POINTER_ACTION_PROXIMITY_IN ||
+            action == PointerEvent::POINTER_ACTION_PROXIMITY_OUT);
+        bool isPenHover = pointerEvent->GetPointerItem(pointerId, pointerItem) &&
+            isPenHoverAction &&
             (pointerItem.GetToolType() == PointerEvent::TOOL_TYPE_PEN ||
             pointerItem.GetToolType() == PointerEvent::TOOL_TYPE_PENCIL);
         if (isPenHover) {
