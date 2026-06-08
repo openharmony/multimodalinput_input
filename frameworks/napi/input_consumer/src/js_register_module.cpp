@@ -17,6 +17,7 @@
 #include "js_register_util.h"
 #include "mmi_api_metrics_histograms.h"
 #include "napi_constants.h"
+#include "permission_helper.h"
 #include "util_napi_error.h"
 #include "trigger_event_dispatcher.h"
 
@@ -352,6 +353,17 @@ static bool ParseFinalKeyParameter(napi_env env, napi_value argv, std::shared_pt
 static bool ParseTriggerTypeParameter(napi_env env, napi_value argv, std::shared_ptr<KeyOption> keyOption)
 {
     CALL_DEBUG_ENTER;
+    napi_value triggerTypeValue = nullptr;
+    napi_get_named_property(env, argv, "triggerType", &triggerTypeValue);
+    if (triggerTypeValue != nullptr) {
+        napi_valuetype valueType = napi_undefined;
+        napi_typeof(env, triggerTypeValue, &valueType);
+        if (valueType == napi_undefined || valueType == napi_null) {
+            MMI_HILOGE("triggerType cannot be null or undefined");
+            THROWERR_API9(env, COMMON_PARAMETER_ERROR, "triggerType", "KeyCommandTriggerType");
+            return false;
+        }
+    }
     std::optional<int32_t> tempTriggerType = GetNamedPropertyInt32(env, argv, "triggerType");
     if (!tempTriggerType) {
         // triggerType is optional, keep default value 0 (not set)
@@ -442,15 +454,14 @@ napi_value GetEventInfoAPI26(napi_env env, napi_callback_info info, sptr<KeyEven
     }
     int32_t triggerType = keyOption->GetTriggerType();
     if (triggerType == TRIGGER_TYPE_NOT_SET) {
-        if (!ParseLegacyParameters(env, argv[KEY_COMMAND_OPTIONS_INDEX], keyOption, subKeyNames)) {
-            THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "legacy parameters error");
-            return nullptr;
-        }
-    } else {
-        subKeyNames += std::to_string(triggerType);
-        subKeyNames += ",false,";
-        MMI_HILOGI("Using triggerType mode, ignoring isFinalKeyDown and isRepeat");
+        MMI_HILOGE("triggerType is required for onKey/offKey API");
+        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR,
+            "triggerType is required and must be one of KeyCommandTriggerType values");
+        return nullptr;
     }
+    subKeyNames += std::to_string(triggerType);
+    subKeyNames += ",false,";
+    MMI_HILOGI("Using triggerType mode, ignoring isFinalKeyDown and isRepeat");
     event->eventType = subKeyNames;
     napi_value ret;
     CHKRP(napi_create_int32(env, RET_OK, &ret), CREATE_INT32);
@@ -939,6 +950,11 @@ napi_value SubscribeKeyCommand(napi_env env, napi_callback_info info, sptr<KeyEv
     CALL_DEBUG_ENTER;
     CHKPP(event);
     CHKPP(keyOption);
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        THROWERR_CUSTOM(env, COMMON_USE_SYSAPI_ERROR, "Non system applications use system API");
+        return nullptr;
+    }
     if (GetEventInfoAPI26(env, info, event, keyOption) == nullptr) {
         MMI_HILOGE("GetEventInfoAPI26 failed");
         return nullptr;
@@ -1228,6 +1244,20 @@ static bool ValidateOffKeyCommandParameters(napi_env env, size_t argc, napi_valu
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "keyOptions", "object");
         return false;
     }
+    if (argc >= 2 && argv[1] != nullptr) {
+        napi_valuetype valueType = napi_undefined;
+        napi_typeof(env, argv[1], &valueType);
+        if (valueType == napi_null || valueType == napi_undefined) {
+            MMI_HILOGE("The callback parameter cannot be null or undefined");
+            THROWERR_API9(env, COMMON_PARAMETER_ERROR, "callback", "function");
+            return false;
+        }
+        if (!UtilNapi::TypeOf(env, argv[1], napi_function)) {
+            MMI_HILOGE("The callback parameter is not napi_function");
+            THROWERR_API9(env, COMMON_PARAMETER_ERROR, "callback", "function");
+            return false;
+        }
+    }
 
     keyType = "key";
     return true;
@@ -1238,6 +1268,11 @@ static bool UnsubscribeKeyCommand(napi_env env, sptr<KeyEventMonitorInfo> event,
     CALL_DEBUG_ENTER;
     CHKPF(event);
     CHKPF(keyOption);
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        THROWERR_CUSTOM(env, COMMON_USE_SYSAPI_ERROR, "Non system applications use system API");
+        return false;
+    }
 
     int32_t subscribeId = INVALID_SUBSCRIBER_ID;
     if (DelEventCallback(env, keyCommandCallbacks, event, subscribeId) < 0) {

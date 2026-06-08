@@ -908,10 +908,6 @@ int32_t ParseAPI26PreKeys(KeyOptions const& keyOptions, std::shared_ptr<KeyOptio
     std::string& subKeyNames)
 {
     CALL_DEBUG_ENTER;
-    if (keyOptions.preKeys.empty()) {
-        taihe::set_business_error(COMMON_PARAMETER_ERROR, "preKeys not found");
-        return RET_ERR;
-    }
     std::set<int32_t> preKeys;
     std::vector<int32_t> etsPreKeys(keyOptions.preKeys.begin(), keyOptions.preKeys.end());
     if (GetPreKeys(etsPreKeys, preKeys) != RET_OK) {
@@ -981,6 +977,12 @@ int32_t GetEventInfoAPI26(KeyOptions const& keyOptions, std::shared_ptr<KeyEvent
     subKeyNames += std::to_string(keyOptions.finalKeyDownDuration) + ",";
     keyOption->SetFinalKeyDownDuration(keyOptions.finalKeyDownDuration);
     ParseAPI26TriggerTypeAndLegacy(keyOptions, keyOption, subKeyNames);
+    if (keyOption->GetTriggerType() == TRIGGER_TYPE_NOT_SET) {
+        MMI_HILOGE("triggerType is required for onKey/offKey API");
+        taihe::set_business_error(COMMON_PARAMETER_ERROR,
+            "triggerType is required and must be one of KeyCommandTriggerType values");
+        return RET_ERR;
+    }
     event->eventType = subKeyNames;
     return RET_OK;
 }

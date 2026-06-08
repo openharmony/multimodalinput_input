@@ -23,6 +23,7 @@ config("inputconsumer_config") {
     "${mmi_path}/interfaces/native/innerkits/proxy/include",
     "${mmi_path}/util/napi/include",
     "${mmi_path}/service/event_handler/include",
+    "${mmi_path}/service/permission_helper/include",
   ]
 }
 
