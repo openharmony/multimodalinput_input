@@ -1121,6 +1121,41 @@ int main()
         DumpG("Step14: 全部解绑后 — RuntimeBindings 应为 empty");
     }
 
+    // Cleanup: 恢复默认单组 DisplayGroupInfo，避免破坏真机触屏路由
+    std::cout << "\n[Cleanup] 恢复默认单显示组" << std::endl;
+    {
+        DisplayGroupInfo g0;
+        g0.id = 0;
+        g0.name = "default";
+        g0.type = GroupType::GROUP_DEFAULT;
+        g0.mainDisplayId = 0;
+        g0.focusWindowId = -1;
+        DisplayInfo d0;
+        d0.id = 0; d0.x = 0; d0.y = 0;
+        d0.width = 720; d0.height = 1280; d0.dpi = 240;
+        d0.name = "main";
+        d0.direction = DIRECTION0; d0.displayDirection = DIRECTION0;
+        d0.screenArea.id = 0;
+        d0.screenArea.area = { 0, 0, 720, 1280 };
+        g0.displaysInfo.push_back(d0);
+
+        UserScreenInfo restoreInfo;
+        restoreInfo.userId = 100;
+        restoreInfo.displayGroups.push_back(g0);
+
+        ScreenInfo scr0;
+        scr0.id = 0; scr0.uniqueId = "default0";
+        scr0.width = 720; scr0.height = 1280;
+        scr0.physicalWidth = 62; scr0.physicalHeight = 110;
+        scr0.dpi = 240; scr0.ppi = 295;
+        scr0.tpDirection = DIRECTION0;
+        restoreInfo.screens.push_back(scr0);
+
+        int32_t ret = InputManager::GetInstance()->UpdateDisplayInfo(restoreInfo);
+        std::cout << "  UpdateDisplayInfo (restore default) ret=" << ret << std::endl;
+        std::this_thread::sleep_for(std::chrono::seconds(1));
+    }
+
     // Cleanup: 销毁 uinput 设备
     if (fdA >= 0)    { ioctl(fdA, UI_DEV_DESTROY); close(fdA); }
     if (fdB >= 0)    { ioctl(fdB, UI_DEV_DESTROY); close(fdB); }
