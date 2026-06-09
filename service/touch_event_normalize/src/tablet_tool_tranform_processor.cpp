@@ -470,7 +470,7 @@ bool TabletToolTransformProcessor::OnTipUp(struct libinput_event_tablet_tool* ev
     int32_t targetDisplayId = pointerEvent_->GetTargetDisplayId();
     PhysicalCoordinate tCoord;
     if (!CalculateCalibratedTipPoint(event, targetDisplayId, tCoord, item)) {
-        MMI_HILOGI("OnTipUp rejected: position out of valid display");
+        MMI_HILOGD("OnTipUp rejected: position out of valid display");
         isPressed_ = false;
         return false;
     }
