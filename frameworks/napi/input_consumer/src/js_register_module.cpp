@@ -1244,15 +1244,15 @@ static bool ValidateOffKeyCommandParameters(napi_env env, size_t argc, napi_valu
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "keyOptions", "object");
         return false;
     }
-    if (argc >= 2 && argv[1] != nullptr) {
+    if (argc > KEY_COMMAND_CALLBACK_INDEX && argv[KEY_COMMAND_CALLBACK_INDEX] != nullptr) {
         napi_valuetype valueType = napi_undefined;
-        napi_typeof(env, argv[1], &valueType);
+        napi_typeof(env, argv[KEY_COMMAND_CALLBACK_INDEX], &valueType);
         if (valueType == napi_null || valueType == napi_undefined) {
             MMI_HILOGE("The callback parameter cannot be null or undefined");
             THROWERR_API9(env, COMMON_PARAMETER_ERROR, "callback", "function");
             return false;
         }
-        if (!UtilNapi::TypeOf(env, argv[1], napi_function)) {
+        if (!UtilNapi::TypeOf(env, argv[KEY_COMMAND_CALLBACK_INDEX], napi_function)) {
             MMI_HILOGE("The callback parameter is not napi_function");
             THROWERR_API9(env, COMMON_PARAMETER_ERROR, "callback", "function");
             return false;
