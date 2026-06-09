@@ -8354,15 +8354,9 @@ void InputWindowsManager::DumpMultiGroupState(int32_t fd)
                 }
                 displayIds += std::to_string(groupInfo.displaysInfo[i].id);
             }
-            int32_t focusWinId = -1;
-#ifdef OHOS_BUILD_ENABLE_KEYBOARD
-            auto focusIt = focusWindowIdMap_.find(gid);
-            if (focusIt != focusWindowIdMap_.end()) {
-                focusWinId = focusIt->second;
-            }
-#endif // OHOS_BUILD_ENABLE_KEYBOARD
-            mprintf(fd, "  groupId=%d displays=[%s] mainDisplayId=%d focusWindowId=%d",
-                gid, displayIds.c_str(), groupInfo.mainDisplayId, focusWinId);
+            mprintf(fd, "  groupId=%d displays=[%s] mainDisplayId=%d focusWindowId=%d windowCount=%zu",
+                gid, displayIds.c_str(), groupInfo.mainDisplayId,
+                groupInfo.focusWindowId, groupInfo.windowsInfo.size());
         }
     }
 
@@ -8417,11 +8411,11 @@ void InputWindowsManager::DumpMultiGroupState(int32_t fd)
     // --- KeyboardStateByGroup ---
     mprintf(fd, "--- KeyboardStateByGroup ---");
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
-    if (focusWindowIdMap_.empty()) {
+    if (displayGroupInfoMap_.empty()) {
         mprintf(fd, "  (empty)");
     } else {
-        for (const auto& [gid, focusWinId] : focusWindowIdMap_) {
-            mprintf(fd, "  groupId=%d: focusWindowId=%d", gid, focusWinId);
+        for (const auto& [gid, groupInfo] : displayGroupInfoMap_) {
+            mprintf(fd, "  groupId=%d: focusWindowId=%d", gid, groupInfo.focusWindowId);
         }
     }
 #else
@@ -8440,24 +8434,34 @@ void InputWindowsManager::DumpMultiGroupState(int32_t fd)
         }
     }
 
-    // --- SoftCursorRS ---
-    mprintf(fd, "--- SoftCursorRS ---");
-    for (int32_t gid : allGroupIds) {
-        auto cursorIt = cursorPosMap_.find(gid);
-        if (cursorIt == cursorPosMap_.end()) {
-            mprintf(fd, "  groupId=%d: (absent)", gid);
-            continue;
+    // --- MouseDownState ---
+    mprintf(fd, "--- MouseDownState ---");
+    if (mouseDownInfoMap_.empty()) {
+        mprintf(fd, "  (empty)");
+    } else {
+        for (const auto& [devId, winInfo] : mouseDownInfoMap_) {
+            mprintf(fd, "  deviceId=%d windowId=%d displayId=%d",
+                devId, winInfo.id, winInfo.displayId);
         }
-        auto& cp = cursorIt->second;
-        auto drawIt = pointerDrawFlagMap_.find(gid);
-        bool drawFlag = (drawIt != pointerDrawFlagMap_.end()) ? drawIt->second : false;
-        mprintf(fd, "  groupId=%d: displayId=%d cursorPos=(%.0f,%.0f) direction=%d drawFlag=%s",
-            gid, cp.displayId, cp.cursorPos.x, cp.cursorPos.y, cp.direction, drawFlag ? "true" : "false");
     }
 
-    // --- HardwareCursor ---
+    // --- MouseTransformCoords ---
+    mprintf(fd, "--- MouseTransformCoords ---");
+    if (displayGroupInfoMap_.empty()) {
+        mprintf(fd, "  (no groups)");
+    } else {
+        for (const auto& [gid, groupInfo] : displayGroupInfoMap_) {
+            int32_t mx = MouseEventHdr->GetMouseCoordsX(gid);
+            int32_t my = MouseEventHdr->GetMouseCoordsY(gid);
+            mprintf(fd, "  groupId=%d: physicalXY=(%d,%d)", gid, mx, my);
+        }
+    }
+
+    // --- SoftCursorRS / HardwareCursor ---
+    mprintf(fd, "--- SoftCursorRS ---");
+    mprintf(fd, "  (see hidumper -s 3101 -a -c for PointerDrawingManager singleton + per-group context)");
     mprintf(fd, "--- HardwareCursor ---");
-    mprintf(fd, "  (see hidumper -s 3101 -a -c for detailed hard cursor state)");
+    mprintf(fd, "  (see hidumper -s 3101 -a -c for detailed cursor state)");
 }
 
 std::pair<double, double> InputWindowsManager::TransformWindowXY(const WindowInfo &window,
