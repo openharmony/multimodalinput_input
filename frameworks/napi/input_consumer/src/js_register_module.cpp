@@ -401,29 +401,6 @@ static bool ParseFinalKeyDownDurationParameter(napi_env env, napi_value argv, st
     return true;
 }
 
-static bool ParseLegacyParameters(napi_env env, napi_value argv, std::shared_ptr<KeyOption> keyOption,
-    std::string& subKeyNames)
-{
-    CALL_DEBUG_ENTER;
-    bool isFinalKeyDown;
-    if (!GetNamedPropertyBool(env, argv, "isFinalKeyDown", isFinalKeyDown)) {
-        MMI_HILOGE("GetNamedPropertyBool failed");
-        return false;
-    }
-    subKeyNames += std::to_string(isFinalKeyDown);
-    subKeyNames += ",";
-    keyOption->SetFinalKeyDown(isFinalKeyDown);
-    MMI_HILOGD("IsFinalKeyDown:%{private}d", (isFinalKeyDown == true ? 1 : 0));
-    bool isRepeat = true;
-    if (!GetNamedPropertyBool(env, argv, "isRepeat", isRepeat)) {
-        MMI_HILOGD("IsRepeat field is default");
-    }
-    subKeyNames += std::to_string(isRepeat);
-    keyOption->SetRepeat(isRepeat);
-    MMI_HILOGD("IsRepeat:%{public}s", (isRepeat ? "true" : "false"));
-    return true;
-}
-
 napi_value GetEventInfoAPI26(napi_env env, napi_callback_info info, sptr<KeyEventMonitorInfo> event,
     std::shared_ptr<KeyOption> keyOption)
 {
