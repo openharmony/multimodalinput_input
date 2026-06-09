@@ -97,9 +97,6 @@ enum ShieldMode: i32 {
         return onKeyCommandImpl(keyOptions, callback, callback);
     }
     function offKey(keyOptions: KeyOptions, callback?: (keyOptions: KeyOptions, keyEvent: ohos_multimodalInput_keyEvent.KeyEvent) => void): void {
-        if (arguments.length > 1 && (callback === null || callback === undefined)) {
-            throw { name: "BusinessError", code: 401, message: "Parameter error: callback cannot be null or undefined" };
-        }
         return offKeyCommandImpl(keyOptions, callback);
     }
 """)
