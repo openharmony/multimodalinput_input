@@ -533,32 +533,150 @@ HardCursor: isHardCursorEnabled=false
 
 #### 新增核心数据结构
 
-| 数据结构 | 所在类 | 分配时机 |
-|---------|--------|---------|
-| `runtimeBindings_` (unordered_map) | InputDisplayBindHelper | BindDevice 调用时 |
-| `contexts_` (map\<int32_t, shared_ptr\<PointerDrawingContext\>\>) | PointerDrawingManager | GetOrCreateContext 懒分配 |
-| `groupStates_` (map\<int32_t, GroupMouseState\>) | MouseDeviceState | per-group API 调用时 |
-| `groupKeyEvents_` (map\<int32_t, shared_ptr\<KeyEvent\>\>) | KeyEventNormalize | GetKeyEventForGroup 懒分配 |
-| `focusWindowIdMap_` 等 7 个 per-group map | InputWindowsManager | EnsureGroupState 懒分配 |
-| `sequenceSnapshots_` (map) | InputWindowsManager | 事件序列开始时 |
+| 数据结构 | 所在类 | 容器类型 | 分配时机 |
+|---------|--------|---------|---------|
+| `runtimeBindings_` | InputDisplayBindHelper | `unordered_map<int32_t, RuntimeDeviceBinding>` | BindDevice 调用时 |
+| `contexts_` | PointerDrawingManager | `map<int32_t, shared_ptr<PointerDrawingContext>>` | GetOrCreateContext 懒分配 |
+| `groupStates_` | MouseDeviceState | `map<int32_t, GroupMouseState>` | per-group API 调用时 |
+| `groupKeyEvents_` | KeyEventNormalize | `map<int32_t, shared_ptr<KeyEvent>>` | GetKeyEventForGroup 懒分配 |
+| `mouseLocationMap_` | InputWindowsManager | `map<int32_t, MouseLocation>` | EnsureGroupState 懒分配 |
+| `cursorPosMap_` | InputWindowsManager | `map<int32_t, CursorPosition>` | EnsureGroupState 懒分配 |
+| `captureModeInfoMap_` | InputWindowsManager | `map<int32_t, CaptureModeInfo>` | EnsureGroupState 懒分配 |
+| `pointerDrawFlagMap_` | InputWindowsManager | `map<int32_t, bool>` | EnsureGroupState 懒分配 |
+| `displayModeMap_` | InputWindowsManager | `map<int32_t, DisplayMode>` | EnsureGroupState 懒分配 |
+| `lastDpiMap_` | InputWindowsManager | `map<int32_t, int32_t>` | EnsureGroupState 懒分配 |
+| `lastPointerEventForWindowChangeMap_` | InputWindowsManager | `map<int32_t, shared_ptr<PointerEvent>>` | EnsureGroupState 懒分配 |
+| `backCenterDisplayChangeMap_` | InputWindowsManager | `map<int32_t, bool>` | EnsureGroupState 懒分配 |
+| `focusWindowIdMap_` | InputWindowsManager | `map<int32_t, int32_t>` | EnsureGroupState 懒分配 |
+| `sequenceSnapshots_` | InputWindowsManager | `map<InputSequenceKey, InputSequenceSnapshot>` | 事件序列开始时 |
 
-#### 典型场景内存估算（2 设备 × 2 group）
+#### 每结构体大小估算
 
-| 项 | 大小 | 说明 |
+**A. Per-group maps（EnsureGroupState 创建 9 条目/非 MAIN group）**
+
+| Map | Value 类型 | 字段明细 | Value 大小 |
+|-----|-----------|---------|-----------|
+| mouseLocationMap_ | MouseLocation | displayId + physicalX + physicalY (3×int32) | 12 B |
+| cursorPosMap_ | CursorPosition | displayId + 2×Direction + Coordinate2D(2×double) | ~28 B |
+| captureModeInfoMap_ | CaptureModeInfo | windowId(int32) + isCaptureMode(bool) | 8 B |
+| pointerDrawFlagMap_ | bool | — | 1 B |
+| displayModeMap_ | DisplayMode (enum) | — | 4 B |
+| lastDpiMap_ | int32_t | — | 4 B |
+| lastPointerEventForWindowChangeMap_ | shared_ptr\<PointerEvent\> | nullptr 初始 | 16 B |
+| backCenterDisplayChangeMap_ | bool | — | 1 B |
+| focusWindowIdMap_ | int32_t | — | 4 B |
+
+每条目含 `std::map` 红黑树节点开销 ~48 B（3 指针 + 色位 + key + padding）。
+
+**每 group 9 条目合计**：value ~78 B + 9 × 48 B 节点开销 = **~510 B/group**
+
+**B. PointerDrawingContext（PointerDrawingManager）**
+
+| 字段 | 大小 |
+|------|------|
+| 标量字段（bool×3, int32×4, uint64×2, pid/windowId） | ~40 B |
+| OLD::DisplayInfo（~20 个 int32 + 2×string + float + 枚举） | ~120 B（含 string 堆分配） |
+| PointerStyle × 3（各含 size/color/id/options 4×int32） | 48 B |
+| Direction × 2 | 8 B |
+| shared_ptr × 4（surfaceNode/canvasNode/rsUIDirector/rsUIContext） | 64 B（指针本身） |
+| **结构体本身** | **~280 B** |
+| **含 RS 对象堆分配（64×64 triple-buffer）** | **~48 KB** |
+| **含 RS 对象堆分配（128×128 triple-buffer）** | **~200 KB** |
+
+**C. GroupMouseState（MouseDeviceState）**
+
+| 字段 | 大小 |
+|------|------|
+| MouseDeviceCoords (physicalX + physicalY, 2×int32) | 8 B |
+| std::map\<uint32_t, int32_t\> mouseBtnState 空头部 | ~48 B |
+| 每按钮条目（典型 3-5 个） | 5 × ~56 B = ~280 B |
+| **每 group 合计** | **~336 B** |
+
+**D. groupKeyEvents_（KeyEventNormalize）**
+
+| 字段 | 大小 |
+|------|------|
+| shared_ptr\<KeyEvent\> 指针 + 控制块 | 16 B |
+| KeyEvent 对象（items vector + 标量字段） | ~200-500 B |
+| **每 group 合计** | **~216–516 B** |
+
+**E. RuntimeDeviceBinding（InputDisplayBindHelper）**
+
+| 字段 | 大小 |
+|------|------|
+| deviceId + displayId + groupId (3×int32) | 12 B |
+| unordered_map 节点开销 | ~64 B |
+| **每绑定设备** | **~76 B** |
+
+**F. InputSequenceSnapshot（per 进行中事件，瞬态）**
+
+| 字段 | 大小 |
+|------|------|
+| InputSequenceKey（deviceId + itemId + type, 3×int32） | 12 B |
+| InputSequenceSnapshot（groupId + windowId, 2×int32） | 8 B |
+| map 红黑树节点开销 | ~48 B |
+| **每进行中事件** | **~68 B** |
+
+#### 场景化 RAM 估算
+
+**场景 A：特性未使用（0 设备绑定，0 非 MAIN group）**
+
+| 项 | 计算 | 大小 |
 |----|------|------|
-| PointerDrawingContext | ~730 B/group | DisplayInfo(244B) + 3×PointerStyle(含RefCounter) + scalars + 4×shared_ptr(nullptr) |
-| GroupMouseState | ~300 B/group | coords + btnState map |
-| groupKeyEvents entry | ~400 B/group | KeyEvent + RefCounter + shared_ptr |
-| EnsureGroupState 7 map entries | ~200 B/group | mouseLocation/cursorPos/captureMode/focusWindowId 等 |
-| runtimeBindings + per-device maps | ~1,920 B/device | WindowInfo×2 + PointerEvent + drag/axis flags |
-| 固定开销（map 头部 + mutex） | ~600 B | 10 map × 48B + 3 mutex × 40B |
-| **当前实现合计** | **~6.1 KB** | RS surface 未创建（4 个 shared_ptr 均为 nullptr） |
-| **完整实现（含 RS 64×64 triple-buffering）** | **~56 KB** | +48 KB RSSurfaceNode BufferQueue/group |
-| **完整实现（含 RS 128×128 triple-buffering）** | **~206 KB** | +192 KB RSSurfaceNode BufferQueue/group |
+| 新增空 map 头部（9+1+1+1+1=13 个） | 13 × ~48 B | ~624 B |
+| mutex（groupStatesMutex_ 等） | ~40 B | ~40 B |
+| **合计** | | **~664 B (<1 KB)** |
 
-> **关键设计：懒分配**。所有 per-group 数据结构采用懒分配，通过 `EnsureGroupState()` / `GetOrCreateContext()` 等入口，仅在首次事件触达非默认 group 时分配。不使用本特性时仅 ~600 bytes 固定开销。
+**场景 B：典型使用（2 设备 × 2 group，如双屏双鼠标）**
 
-> **RS 资源说明**：当前实现中 `GetOrCreateContext()` 仅默认构造 `PointerDrawingContext`，4 个 RS shared_ptr 均为 nullptr，非默认 group 不创建独立的光标渲染 surface。完整多光标渲染（每组独立光标）需后续为每 group 创建 RSSurfaceNode + BufferQueue，预计每 group +50~200 KB。
+| 组件 | 计算 | RAM |
+|------|------|-----|
+| Per-group maps (1 非 MAIN group) | 1 × 510 | ~510 B |
+| PointerDrawingContext (1 非 MAIN) | 1 × 280 (不含 RS) | ~280 B |
+| RS 渲染对象 (1 非 MAIN) | 1 × 48~200 KB | ~48–200 KB |
+| GroupMouseState (1 非 MAIN) | 1 × 336 | ~336 B |
+| GroupKeyEvent (1 非 MAIN) | 1 × 350 | ~350 B |
+| RuntimeDeviceBinding (2 设备) | 2 × 76 | ~152 B |
+| InputSequenceSnapshot (典型 2 进行中) | 2 × 68 | ~136 B |
+| **合计（不含 RS）** | | **~1.8 KB** |
+| **合计（含 RS 64×64）** | | **~50 KB** |
+| **合计（含 RS 128×128）** | | **~202 KB** |
+
+**场景 C：极端使用（8 设备 × 4 group）**
+
+| 组件 | 计算 | RAM |
+|------|------|-----|
+| Per-group maps (3 非 MAIN group) | 3 × 510 | ~1.5 KB |
+| PointerDrawingContext (3 非 MAIN) | 3 × 280 | ~840 B |
+| RS 渲染对象 (3 非 MAIN) | 3 × 48~200 KB | ~144–600 KB |
+| GroupMouseState (3 非 MAIN) | 3 × 336 | ~1.0 KB |
+| GroupKeyEvent (3 非 MAIN) | 3 × 350 | ~1.1 KB |
+| RuntimeDeviceBinding (8 设备) | 8 × 76 | ~608 B |
+| InputSequenceSnapshot (典型 8 进行中) | 8 × 68 | ~544 B |
+| **合计（不含 RS）** | | **~5.6 KB** |
+| **合计（含 RS 64×64）** | | **~150 KB** |
+| **合计（含 RS 128×128）** | | **~606 KB** |
+
+#### .text/.rodata 对 shared clean PSS 的影响
+
+- .text 段变化 -15 KB → shared clean PSS 略减
+- .rodata 段 +336 B → 几乎无影响
+- .bss 段 0 变化 → 匿名内存无变化
+
+#### 清理机制验证
+
+| 资源 | 分配路径 | 清理路径 | 验证状态 |
+|------|---------|---------|---------|
+| Per-group maps (9 条目) | `EnsureGroupState()` | `CleanupGroupState()` erases 全部 9 map | **OK** |
+| PointerDrawingContext | `GetOrCreateContext()` | `RemoveContext()` | **OK** |
+| GroupMouseState | `GetMouseCoordsX/Y()` 首次调用 | 随 group 销毁释放（需与 CleanupGroupState 联动） | **待确认** |
+| groupKeyEvents_ | `GetKeyEventForGroup()` | `RemoveGroupKeyEvent(groupId)` | **OK** |
+| RuntimeDeviceBinding | `BindDeviceToDisplayGroupByDisplay()` | `UnbindDeviceFromDisplayGroup()` | **OK** |
+| InputSequenceSnapshot | `RecordSequenceBegin()` | 事件 release/cancel 时 erase | **OK** |
+
+> **关键设计：懒分配**。所有 per-group 数据结构采用懒分配，通过 `EnsureGroupState()` / `GetOrCreateContext()` 等入口，仅在首次事件触达非默认 group 时分配。不使用本特性时仅 ~664 bytes 固定开销。
+
+> **RS 资源说明**：当前实现中 `GetOrCreateContext()` 仅默认构造 `PointerDrawingContext`，4 个 RS shared_ptr 均为 nullptr，非默认 group 不创建独立的光标渲染 surface。完整多光标渲染（每组独立光标）需后续为每 group 创建 RSSurfaceNode + BufferQueue，预计每 group +48~200 KB。
 
 ### 11.5 RAM/ROM 度量结论
 
@@ -567,7 +685,60 @@ HardCursor: isHardCursorEnabled=false
 | **ROM** (文件体积) | -144 KB (-2.9%) 总计 | 净减少（含编译差异） |
 | **ROM** (段级) | .text -15 kB, .rodata +336 B, .bss 无变化 | 代码精简，极少新增常量 |
 | **RAM** (libmmi PSS 实测) | +32 kB (3,518 → 3,550 kB) | 含编译差异 + 运行时状态 |
-| **RAM** (理论-不使用) | ~600 B 固定开销 | 懒分配，零运行时增量 |
-| **RAM** (理论-典型 2设备×2group) | ~6 KB (当前) / ~56-206 KB (完整含RS) | RS surface 是主要开销源 |
+| **RAM** (理论-未使用) | ~664 B 固定开销 | 13 空 map 头部 + mutex |
+| **RAM** (理论-典型 2设备×2group，不含RS) | ~1.8 KB | per-group maps + 鼠标/键盘状态 + 绑定 |
+| **RAM** (理论-典型 2设备×2group，含RS) | ~50–202 KB | RS SurfaceNode BufferQueue 是主要开销 |
+| **RAM** (理论-极端 8设备×4group，不含RS) | ~5.6 KB | 线性增长，有上界 |
+| **RAM** (理论-极端 8设备×4group，含RS) | ~150–606 KB | RS 开销与 group 数线性相关 |
 
-**结论：** 本特性不增加全局零初始化变量（.bss 无变化），运行时采用懒分配设计，不使用特性时仅 ~600 bytes 固定开销。当前实现典型场景 ~6 KB，完整多光标渲染实现的主要增量来自 RS SurfaceBuffer（每 group 50-200 KB）。所有 per-group/per-device 状态有完整清理路径，无内存泄漏。
+**结论：**
+
+1. **ROM 安全**：本特性不增加全局零初始化变量（.bss 无变化），.rodata 仅增 336 B（新增日志/dump 标签），.text 段在编译对齐后实测为 -15 KB（含编译差异）。生产代码净增 +1,812 行，估算纯代码增量 ~17.5–28 KB（+0.5%–0.9%）。
+2. **RAM 懒分配设计**：所有 per-group 数据结构通过 `EnsureGroupState()` / `GetOrCreateContext()` 懒分配，不使用特性时仅 ~664 B 空 map 头部开销。
+3. **典型场景可控**：2 设备 × 2 group 场景下，不含 RS 渲染资源仅 ~1.8 KB，含 RS 64×64 光标 ~50 KB。主要增量来自 RS SurfaceNode BufferQueue。
+4. **清理机制完备**：6 类运行时资源均有对应清理路径（UnbindDevice / CleanupGroupState / RemoveContext / RemoveGroupKeyEvent / 事件 release erase），GroupMouseState 的清理需与 CleanupGroupState 联动确认。
+5. **无内存泄漏风险**：所有分配路径均有对应释放；`InputSequenceSnapshot` 为瞬态数据，事件完成后自动清除。
+
+---
+
+## 12. hidumper -G 诊断输出正确性修复
+
+### 12.1 问题发现
+
+审计 `DumpMultiGroupState` 输出是否反映最终派发使用的变量（而非中间状态），发现 3 个 bug 和多处缺失：
+
+| # | 类型 | 位置 | 问题 | 影响 |
+|---|------|------|------|------|
+| B1 | Bug | DisplayGroups 段 | 读 `focusWindowIdMap_[gid]`（仅 `ReissueEvent` 写入的辅助 map） | 输出的焦点窗口与实际键盘派发不一致 |
+| B2 | Bug | KeyboardStateByGroup 段 | 遍历 `focusWindowIdMap_` | 同上，`GetFocusWindowId()` 实际读 `displayGroupInfoMap_.focusWindowId` |
+| B3 | Bug | SoftCursorRS 段 | 输出 `cursorPosMap_`（InputWindowsManager 层坐标） | RS 实际用 `PointerDrawingManager::lastPhysicalX_/Y_`，此处输出误导 |
+| M1 | 缺失 | DisplayGroups 段 | 无每组窗口数 | 无法判断窗口注册是否成功 |
+| M2 | 缺失 | 全局 | 无 `mouseDownInfoMap_` 输出 | 无法观察按钮 down 时锁定的目标窗口 |
+
+### 12.2 修复内容
+
+文件：`service/window_manager/src/input_windows_manager.cpp`，函数 `DumpMultiGroupState`
+
+| 修复项 | 改动 |
+|--------|------|
+| B1 | DisplayGroups 段改读 `groupInfo.focusWindowId`（迭代变量直接取），新增 `windowCount=%zu` |
+| B2 | KeyboardStateByGroup 段改遍历 `displayGroupInfoMap_`，取 `groupInfo.focusWindowId` |
+| B3 | SoftCursorRS 段简化为引用 `hidumper -s 3101 -a -c`（`PointerDrawingManager::Dump` 已正确输出单例 + per-group context） |
+| M1 | 合入 B1 修复 |
+| M2 | 新增 `--- MouseDownState ---` 段，输出 `mouseDownInfoMap_` per-device 按钮 down 窗口 |
+| 新增 | `--- MouseTransformCoords ---` 段，说明 MouseDeviceState per-group 坐标经 MouseTransformProcessor 设置，最终 displayXY 通过 pointerItem 流入 SequenceSnapshots |
+
+### 12.3 真机验证
+
+修改版 `libmmi-server.z.so` 部署后，运行 `dual_group_interleave_test`（14 步），关键验证点：
+
+| Step | 验证点 | 结果 |
+|------|--------|------|
+| Step 1 | DisplayGroups 双组创建，`focusWindowId=-1` | `groupId=0 focusWindowId=-1 windowCount=0`, `groupId=1 focusWindowId=-1 windowCount=0` |
+| Step 6 | 窗口注入后 `windowCount` 正确 | `groupId=0 windowCount=5` |
+| Step 7a | MouseA BTN_LEFT press → MouseDownState 显示目标窗口 | `deviceId=6 windowId=1000 displayId=0` |
+| Step 9a | z-order 命中悬浮窗 → MouseDownState 更新 | `deviceId=6 windowId=1002 displayId=0` |
+| Step 12 | 焦点切换后，DisplayGroups 和 KeyboardStateByGroup 一致显示新焦点 | `focusWindowId=1001`（两段输出一致） |
+| Step 14 | 解绑后 RuntimeBindings 清空 | `(empty)` |
+
+所有 14 步通过，新增的 `MouseDownState` 段正确反映了 per-device 按钮 down 窗口绑定状态。

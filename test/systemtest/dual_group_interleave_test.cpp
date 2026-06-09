@@ -4,10 +4,10 @@
  * 双显示组 + 双鼠标/双键盘 综合验收测试
  * 通过 UpdateDisplayInfo 构造双显示组（含 ScreenInfo/screenArea），
  * 用 /dev/uinput 创建双鼠标+双键盘，覆盖：
- *   鼠标移动隔离、按钮隔离、滚轮隔离、z-order 命中（含全屏位置无关）、
- *   热区穿透、窗口 ADD→CHANGE→DEL 生命周期、键盘路由、
- *   动态焦点切换（含非主组）、captureMode 隔离、PointerStyle per-window、
- *   并发压力
+ *   鼠标移动隔离、光标边界钳制、按钮隔离、跨组同时按钮保持、滚轮隔离、
+ *   z-order 命中（含全屏位置无关）、热区穿透、窗口 ADD→CHANGE→DEL 生命周期、
+ *   键盘路由、修饰键状态隔离、动态焦点切换（含非主组）、设备重绑定、
+ *   显示组移除+状态清理、captureMode 隔离、PointerStyle per-window、并发压力
  *
  * 验证手段：注入 uinput 事件 → hidumper -G → SequenceSnapshots / PointerState
  */
@@ -493,6 +493,53 @@ int main()
     DumpG("Step5: 绑定后交互移动 — group0 和 group1 光标位置应独立变化");
 
     // ================================================================
+    // Step 5.5: 光标边界钳制 — 验证各组光标不超出 display 边界
+    // group0: 720×1280, group1: 1920×1080
+    // ================================================================
+    std::cout << "\n[Step 5.5] 光标边界钳制测试" << std::endl;
+    EnsureBindings({{devA, 0}, {devB, 1}});
+
+    // MouseA: 大幅右移（远超 720），光标 X 应钳制在 [0, 720) 内
+    std::cout << "  MouseA: 极大右移 (+5000,0) — 应钳制在 720 内" << std::endl;
+    for (int i = 0; i < 50; ++i) {
+        Inject(fdA, 100, 0);
+        std::this_thread::sleep_for(std::chrono::milliseconds(10));
+    }
+    std::this_thread::sleep_for(std::chrono::milliseconds(300));
+    DumpG("Step5.5a: MouseA 极大右移 — group0 X 应≤719");
+
+    // MouseA: 大幅下移（远超 1280）
+    std::cout << "  MouseA: 极大下移 (0,+5000) — 应钳制在 1280 内" << std::endl;
+    for (int i = 0; i < 50; ++i) {
+        Inject(fdA, 0, 100);
+        std::this_thread::sleep_for(std::chrono::milliseconds(10));
+    }
+    std::this_thread::sleep_for(std::chrono::milliseconds(300));
+    DumpG("Step5.5b: MouseA 极大下移 — group0 Y 应≤1279");
+
+    // MouseB: 大幅右移（远超 1920），然后大幅下移（远超 1080）
+    std::cout << "  MouseB: 极大右移 (+5000,0) 然后极大下移 (0,+5000)" << std::endl;
+    for (int i = 0; i < 50; ++i) {
+        Inject(fdB, 100, 0);
+        std::this_thread::sleep_for(std::chrono::milliseconds(10));
+    }
+    for (int i = 0; i < 50; ++i) {
+        Inject(fdB, 0, 100);
+        std::this_thread::sleep_for(std::chrono::milliseconds(10));
+    }
+    std::this_thread::sleep_for(std::chrono::milliseconds(300));
+    DumpG("Step5.5c: MouseB 极大右下移 — group1 X≤1919, Y≤1079");
+
+    // MouseA: 大幅左上移（负向），光标应钳制在 (0,0) 或附近
+    std::cout << "  MouseA: 极大左上移 (-5000,-5000) — 应钳制在 (0,0)" << std::endl;
+    for (int i = 0; i < 50; ++i) {
+        Inject(fdA, -100, -100);
+        std::this_thread::sleep_for(std::chrono::milliseconds(10));
+    }
+    std::this_thread::sleep_for(std::chrono::milliseconds(300));
+    DumpG("Step5.5d: MouseA 极大左上移 — group0 位置应≈(0,0)");
+
+    // ================================================================
     // Step 6: 注入窗口（为后续测试提供目标窗口）
     // ================================================================
     std::cout << "\n[Step 6] 注入多窗口 + 设置焦点" << std::endl;
@@ -560,6 +607,43 @@ int main()
     std::this_thread::sleep_for(std::chrono::milliseconds(300));
     DumpG("Step7c: MouseA BTN_RIGHT pressed — beginGroup=0");
     InjectButton(fdA, BTN_RIGHT, 0);
+    std::this_thread::sleep_for(std::chrono::milliseconds(200));
+
+    // ================================================================
+    // Step 7.5: 跨组同时按钮保持
+    // MouseA 和 MouseB 同时按住 BTN_LEFT，验证两组独立追踪
+    // ================================================================
+    std::cout << "\n[Step 7.5] 跨组同时按钮保持" << std::endl;
+    EnsureBindings({{devA, 0}, {devB, 1}});
+
+    std::cout << "  MouseA: BTN_LEFT press (hold)..." << std::endl;
+    InjectButton(fdA, BTN_LEFT, 1);
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+
+    std::cout << "  MouseB: BTN_LEFT press (hold) — 两组同时按住..." << std::endl;
+    InjectButton(fdB, BTN_LEFT, 1);
+    std::this_thread::sleep_for(std::chrono::milliseconds(300));
+    DumpG("Step7.5a: 双鼠标同时 BTN_LEFT held — 两组各有独立 BUTTON snapshot");
+
+    // 释放 MouseA，MouseB 仍保持
+    std::cout << "  MouseA: BTN_LEFT release, MouseB: still held..." << std::endl;
+    InjectButton(fdA, BTN_LEFT, 0);
+    std::this_thread::sleep_for(std::chrono::milliseconds(300));
+    DumpG("Step7.5b: MouseA released, MouseB still held — group1 仍有 BUTTON snapshot");
+
+    // 释放 MouseB
+    InjectButton(fdB, BTN_LEFT, 0);
+    std::this_thread::sleep_for(std::chrono::milliseconds(200));
+
+    // BTN_MIDDLE 交叉测试: A 按中键，B 按右键
+    std::cout << "  MouseA: BTN_MIDDLE press, MouseB: BTN_RIGHT press..." << std::endl;
+    InjectButton(fdA, BTN_MIDDLE, 1);
+    std::this_thread::sleep_for(std::chrono::milliseconds(50));
+    InjectButton(fdB, BTN_RIGHT, 1);
+    std::this_thread::sleep_for(std::chrono::milliseconds(300));
+    DumpG("Step7.5c: A=BTN_MIDDLE held, B=BTN_RIGHT held — 不同按钮跨组独立");
+    InjectButton(fdA, BTN_MIDDLE, 0);
+    InjectButton(fdB, BTN_RIGHT, 0);
     std::this_thread::sleep_for(std::chrono::milliseconds(200));
 
     // ================================================================
@@ -793,6 +877,60 @@ int main()
         std::this_thread::sleep_for(std::chrono::milliseconds(200));
 
         // ================================================================
+        // Step 11.5: 修饰键状态隔离
+        // KbdA 按住 Shift → KbdB 按 KEY_A → KbdB 的事件不应带 Shift 修饰
+        // ================================================================
+        std::cout << "\n[Step 11.5] 修饰键状态隔离" << std::endl;
+        EnsureBindings({{devA, 0}, {devB, 1}, {devKbdA, 0}, {devKbdB, 1}});
+
+        // KbdA: 按住 LEFT_SHIFT（group0 的修饰键状态变化）
+        std::cout << "  KbdA: KEY_LEFTSHIFT press (hold)..." << std::endl;
+        InjectKeyEvent(fdKbdA, KEY_LEFTSHIFT, 1);
+        std::this_thread::sleep_for(std::chrono::milliseconds(200));
+
+        // KbdA: Shift held 状态下按 KEY_A（group0 应带 Shift 修饰）
+        std::cout << "  KbdA: KEY_A press (with Shift held in group0)..." << std::endl;
+        InjectKeyEvent(fdKbdA, KEY_A, 1);
+        std::this_thread::sleep_for(std::chrono::milliseconds(300));
+        DumpG("Step11.5a: KbdA KEY_A with Shift — beginGroup=0, 应带 Shift 修饰");
+        InjectKeyEvent(fdKbdA, KEY_A, 0);
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+
+        // KbdB: 按 KEY_A（group1 不应受 KbdA 的 Shift 影响）
+        std::cout << "  KbdB: KEY_A press (Shift only on KbdA/group0)..." << std::endl;
+        InjectKeyEvent(fdKbdB, KEY_A, 1);
+        std::this_thread::sleep_for(std::chrono::milliseconds(300));
+        DumpG("Step11.5b: KbdB KEY_A (no Shift) — beginGroup=1, 不应带 Shift 修饰");
+        InjectKeyEvent(fdKbdB, KEY_A, 0);
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+
+        // 释放 KbdA 的 Shift
+        InjectKeyEvent(fdKbdA, KEY_LEFTSHIFT, 0);
+        std::this_thread::sleep_for(std::chrono::milliseconds(200));
+
+        // Ctrl 修饰键隔离测试
+        std::cout << "  KbdB: KEY_LEFTCTRL press (hold on group1)..." << std::endl;
+        InjectKeyEvent(fdKbdB, KEY_LEFTCTRL, 1);
+        std::this_thread::sleep_for(std::chrono::milliseconds(200));
+
+        std::cout << "  KbdA: KEY_C press (Ctrl only on KbdB/group1)..." << std::endl;
+        InjectKeyEvent(fdKbdA, KEY_C, 1);
+        std::this_thread::sleep_for(std::chrono::milliseconds(300));
+        DumpG("Step11.5c: KbdA KEY_C (no Ctrl) — beginGroup=0, 不应带 Ctrl 修饰");
+        InjectKeyEvent(fdKbdA, KEY_C, 0);
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+
+        std::cout << "  KbdB: KEY_C press (with Ctrl held on group1)..." << std::endl;
+        InjectKeyEvent(fdKbdB, KEY_C, 1);
+        std::this_thread::sleep_for(std::chrono::milliseconds(300));
+        DumpG("Step11.5d: KbdB KEY_C with Ctrl — beginGroup=1, 应带 Ctrl 修饰");
+        InjectKeyEvent(fdKbdB, KEY_C, 0);
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+
+        InjectKeyEvent(fdKbdB, KEY_LEFTCTRL, 0);
+        std::this_thread::sleep_for(std::chrono::milliseconds(200));
+
+        // ================================================================
         // Step 12: 动态焦点切换 (G-3)
         // 12a: group0 焦点 1000 → 1001
         // 12b: group1 焦点 2000 → 2001（非主组，必须通过 UpdateDisplayInfo）
@@ -837,6 +975,44 @@ int main()
         std::this_thread::sleep_for(std::chrono::milliseconds(500));
 
         // ================================================================
+        // Step 12.5: 设备重绑定 — 将 MouseA 从 group0 移到 group1
+        // ================================================================
+        std::cout << "\n[Step 12.5] 设备重绑定（MouseA: group0→group1→group0）" << std::endl;
+        EnsureBindings({{devA, 0}, {devB, 1}, {devKbdA, 0}, {devKbdB, 1}});
+
+        // 重绑定 MouseA 到 display1 (group1)
+        std::cout << "  Rebind MouseA → display1 (group1)..." << std::endl;
+        int32_t rebindRet = InputManager::GetInstance()->BindDeviceToDisplayGroupByDisplay(devA, 1, msg);
+        std::cout << "  Rebind ret=" << rebindRet << " msg=" << msg << std::endl;
+        std::this_thread::sleep_for(std::chrono::milliseconds(500));
+        DumpG("Step12.5a: MouseA 重绑定到 group1 — RuntimeBindings 应反映变化");
+
+        // MouseA 现在在 group1，移动应影响 group1 的光标
+        std::cout << "  MouseA 移动 (+30,+20) — 应影响 group1 光标" << std::endl;
+        for (int i = 0; i < 5; ++i) {
+            Inject(fdA, 30, 20);
+            std::this_thread::sleep_for(std::chrono::milliseconds(30));
+        }
+        std::this_thread::sleep_for(std::chrono::milliseconds(300));
+
+        // MouseA 按钮也应路由到 group1
+        std::cout << "  MouseA: BTN_LEFT press (now in group1)..." << std::endl;
+        SetCursorPos(960, 540, 1);
+        InjectButton(fdA, BTN_LEFT, 1);
+        std::this_thread::sleep_for(std::chrono::milliseconds(300));
+        DumpG("Step12.5b: MouseA BTN_LEFT in group1 — beginGroup 应=1");
+        InjectButton(fdA, BTN_LEFT, 0);
+        std::this_thread::sleep_for(std::chrono::milliseconds(200));
+
+        // 恢复 MouseA 到 group0
+        std::cout << "  Rebind MouseA back → display0 (group0)..." << std::endl;
+        rebindRet = InputManager::GetInstance()->BindDeviceToDisplayGroupByDisplay(devA, 0, msg);
+        std::cout << "  Rebind back ret=" << rebindRet << " msg=" << msg << std::endl;
+        std::this_thread::sleep_for(std::chrono::milliseconds(500));
+        WarmUp(fdA, fdB);
+        DumpG("Step12.5c: MouseA 恢复到 group0 — RuntimeBindings 恢复原状");
+
+        // ================================================================
         // Step 13: 并发压力测试 (G-8)
         // ================================================================
         std::cout << "\n[Step 13] 并发压力测试 (4 设备交替注入 x50)" << std::endl;
@@ -858,6 +1034,76 @@ int main()
         std::cout << "  GetPointerSpeed ret=" << speedRet << " speed=" << speed
                   << (speedRet == 0 ? " — 服务存活" : " — 服务异常") << std::endl;
         DumpG("Step13: 并发压力后 — 服务应存活，RuntimeBindings 应完整");
+
+        // ================================================================
+        // Step 13.5: 显示组移除 + 状态清理
+        // 移除 group1 → 验证 group1 绑定/光标被清理
+        // 重建 group1 → 验证可以重新绑定
+        // ================================================================
+        std::cout << "\n[Step 13.5] 显示组移除 + 状态清理" << std::endl;
+
+        // 13.5a: 移除 group1 — 只发送 group0 的 DisplayInfo
+        std::cout << "  13.5a: 移除 group1（只保留 group0）" << std::endl;
+        {
+            DisplayGroupInfo g0only;
+            g0only.id = 0;
+            g0only.name = "default";
+            g0only.type = GroupType::GROUP_DEFAULT;
+            g0only.mainDisplayId = 0;
+            g0only.focusWindowId = g_focusWin0;
+            DisplayInfo d0;
+            d0.id = 0; d0.x = 0; d0.y = 0;
+            d0.width = 720; d0.height = 1280; d0.dpi = 240;
+            d0.name = "main";
+            d0.direction = DIRECTION0; d0.displayDirection = DIRECTION0;
+            d0.screenArea.id = 0;
+            d0.screenArea.area = { 0, 0, 720, 1280 };
+            g0only.displaysInfo.push_back(d0);
+
+            UserScreenInfo singleGroupInfo;
+            singleGroupInfo.userId = 100;
+            singleGroupInfo.displayGroups.push_back(g0only);
+
+            ScreenInfo scr0;
+            scr0.id = 0; scr0.uniqueId = "default0";
+            scr0.width = 720; scr0.height = 1280;
+            scr0.physicalWidth = 62; scr0.physicalHeight = 110;
+            scr0.dpi = 240; scr0.ppi = 295;
+            scr0.tpDirection = DIRECTION0;
+            singleGroupInfo.screens.push_back(scr0);
+
+            int32_t removeRet = InputManager::GetInstance()->UpdateDisplayInfo(singleGroupInfo);
+            std::cout << "  UpdateDisplayInfo (group0 only) ret=" << removeRet << std::endl;
+        }
+        std::this_thread::sleep_for(std::chrono::seconds(1));
+        DumpG("Step13.5a: group1 移除后 — group1 绑定/光标应被清理");
+
+        // 13.5b: MouseB 事件应回落到默认组（或被忽略）
+        std::cout << "  MouseB: 移动 (+10,+10) — group1 已移除" << std::endl;
+        Inject(fdB, 10, 10);
+        std::this_thread::sleep_for(std::chrono::milliseconds(300));
+        DumpG("Step13.5b: group1 移除后 MouseB 事件行为");
+
+        // 13.5c: 重建双显示组
+        std::cout << "  13.5c: 重建双显示组" << std::endl;
+        SetupDualDisplayGroups(1000, 2000);
+        std::this_thread::sleep_for(std::chrono::seconds(1));
+        InjectAllWindows();
+        std::this_thread::sleep_for(std::chrono::milliseconds(500));
+
+        // 重新绑定 MouseB 到 group1
+        EnsureBindings({{devA, 0}, {devB, 1}, {devKbdA, 0}, {devKbdB, 1}});
+        WarmUp(fdA, fdB);
+        DumpG("Step13.5c: 双显示组重建并重绑后 — RuntimeBindings 应恢复完整");
+
+        // 验证重建后 MouseB 仍正常路由到 group1
+        std::cout << "  MouseB: BTN_LEFT press (验证重建后路由)..." << std::endl;
+        SetCursorPos(500, 500, 1);
+        InjectButton(fdB, BTN_LEFT, 1);
+        std::this_thread::sleep_for(std::chrono::milliseconds(300));
+        DumpG("Step13.5d: 重建后 MouseB BTN_LEFT — beginGroup 应=1");
+        InjectButton(fdB, BTN_LEFT, 0);
+        std::this_thread::sleep_for(std::chrono::milliseconds(200));
 
         // ================================================================
         // Step 14: 全部解绑 + 清理
