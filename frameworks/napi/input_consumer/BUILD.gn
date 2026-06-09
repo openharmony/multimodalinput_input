@@ -32,6 +32,7 @@ ohos_shared_library("inputconsumer") {
     "${mmi_path}/util/napi/src/util_napi.cpp",
     "${mmi_path}/util/napi/src/util_napi_error.cpp",
     "${mmi_path}/service/event_handler/src/trigger_event_dispatcher.cpp",
+    "${mmi_path}/service/permission_helper/src/permission_helper.cpp",
     "src/js_register_module.cpp",
     "src/js_register_util.cpp",
   ]
