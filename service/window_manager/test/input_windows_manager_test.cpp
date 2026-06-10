@@ -8637,6 +8637,102 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_AdjustFingerFlag_009, 
 }
 
 /**
+ * @tc.name: InputWindowsManagerTest_AdjustFingerFlag_010
+ * @tc.desc: Test AdjustFingerFlag pen hover: LEVITATE_MOVE + PEN tool → hover early exit
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_AdjustFingerFlag_010, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_LEVITATE_MOVE);
+    PointerEvent::PointerItem item;
+    item.SetPointerId(1);
+    item.SetToolType(PointerEvent::TOOL_TYPE_PEN);
+    pointerEvent->AddPointerItem(item);
+    pointerEvent->SetPointerId(1);
+    bool result = WIN_MGR->AdjustFingerFlag(pointerEvent);
+    EXPECT_FALSE(result);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_AdjustFingerFlag_011
+ * @tc.desc: Test AdjustFingerFlag non-hover action + PEN → falls through to flag check
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_AdjustFingerFlag_011, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
+    PointerEvent::PointerItem item;
+    item.SetPointerId(1);
+    item.SetToolType(PointerEvent::TOOL_TYPE_PEN);
+    pointerEvent->AddPointerItem(item);
+    pointerEvent->SetPointerId(1);
+    WIN_MGR->touchItemDownInfos_.clear();
+    WindowInfoEX windowInfoEX;
+    windowInfoEX.flag = false;
+    WIN_MGR->touchItemDownInfos_[pointerEvent->GetDeviceId()][pointerEvent->GetPointerId()] = windowInfoEX;
+    bool result = WIN_MGR->AdjustFingerFlag(pointerEvent);
+    EXPECT_TRUE(result);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_AdjustFingerFlag_012
+ * @tc.desc: Test AdjustFingerFlag hover action + FINGER tool → not hover, falls through
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_AdjustFingerFlag_012, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_LEVITATE_MOVE);
+    PointerEvent::PointerItem item;
+    item.SetPointerId(1);
+    item.SetToolType(PointerEvent::TOOL_TYPE_FINGER);
+    pointerEvent->AddPointerItem(item);
+    pointerEvent->SetPointerId(1);
+    WIN_MGR->touchItemDownInfos_.clear();
+    WindowInfoEX windowInfoEX;
+    windowInfoEX.flag = false;
+    WIN_MGR->touchItemDownInfos_[pointerEvent->GetDeviceId()][pointerEvent->GetPointerId()] = windowInfoEX;
+    bool result = WIN_MGR->AdjustFingerFlag(pointerEvent);
+    EXPECT_TRUE(result);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_AdjustFingerFlag_013
+ * @tc.desc: Test AdjustFingerFlag hover action + PEN but GetPointerItem fails → not hover
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_AdjustFingerFlag_013, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_LEVITATE_MOVE);
+    pointerEvent->SetPointerId(999);
+    WIN_MGR->touchItemDownInfos_.clear();
+    WindowInfoEX windowInfoEX;
+    windowInfoEX.flag = false;
+    WIN_MGR->touchItemDownInfos_[pointerEvent->GetDeviceId()][pointerEvent->GetPointerId()] = windowInfoEX;
+    bool result = WIN_MGR->AdjustFingerFlag(pointerEvent);
+    EXPECT_TRUE(result);
+}
+
+/**
  * @tc.name: InputWindowsManagerTest_GetClientFd_007
  * @tc.desc: Test GetClientFd
  * @tc.type: FUNC
