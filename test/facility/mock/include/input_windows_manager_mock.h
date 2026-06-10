@@ -92,6 +92,9 @@ public:
     MOCK_METHOD(int32_t, GetMainDisplayId, (int32_t), (const));
     MOCK_METHOD(bool, IsMouseSimulate, ());
     MOCK_METHOD(bool, HasMouseHideFlag, ());
+#ifdef OHOS_BUILD_ENABLE_EXTERNAL_SCREEN
+    MOCK_METHOD(void, OnScreenModeChangeForMirrorScreen, (size_t screenCount));
+#endif // OHOS_BUILD_ENABLE_EXTERNAL_SCREEN
     MOCK_METHOD(bool, SelectPointerChangeArea, (int32_t, int32_t, int32_t));
 #endif // OHOS_BUILD_ENABLE_POINTER
 
