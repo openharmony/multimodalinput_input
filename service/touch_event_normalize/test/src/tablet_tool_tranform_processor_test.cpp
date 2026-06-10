@@ -279,6 +279,69 @@ HWTEST_F(TabletToolTranformProcessorTest, TabletToolTranformProcessorTest_OnTipM
 }
 
 /**
+ * @tc.name: TabletToolTranformProcessorTest_OnTipMotion_005
+ * @tc.desc: Test OnTipMotion out-of-range: CalculateTipPoint fails with coord written, cache should update
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(TabletToolTranformProcessorTest, TabletToolTranformProcessorTest_OnTipMotion_005, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EXPECT_CALL(*WIN_MGR_MOCK, CalculateTipPoint)
+        .WillOnce(DoAll(SetArgReferee<2>(PhysicalCoordinate{150.0, 250.0}), Return(false)));
+    int32_t deviceId = 6;
+    TabletToolTransformProcessor processor(deviceId);
+    libinput_event event = {};
+    processor.pointerEvent_ = PointerEvent::Create();
+    ASSERT_NE(processor.pointerEvent_, nullptr);
+    PointerEvent::PointerItem pointerItem = {};
+    pointerItem.SetPointerId(0);
+    pointerItem.SetDisplayXPos(10.0);
+    pointerItem.SetDisplayYPos(20.0);
+    processor.pointerEvent_->AddPointerItem(pointerItem);
+    NiceMock<LibinputInterfaceMock> libinputMock;
+    libinput_event_tablet_tool eventTabletTool = {};
+    EXPECT_CALL(libinputMock, GetTabletToolEvent).WillOnce(Return(&eventTabletTool));
+    EXPECT_FALSE(processor.OnTipMotion(&event));
+    PointerEvent::PointerItem updatedItem = {};
+    ASSERT_TRUE(processor.pointerEvent_->GetPointerItem(0, updatedItem));
+    EXPECT_DOUBLE_EQ(updatedItem.GetDisplayXPos(), 150.0);
+    EXPECT_DOUBLE_EQ(updatedItem.GetDisplayYPos(), 250.0);
+    InputWindowsManagerMock::ReleaseInstance();
+}
+
+/**
+ * @tc.name: TabletToolTranformProcessorTest_OnTipMotion_006
+ * @tc.desc: Test OnTipMotion other failure: CalculateTipPoint fails without coord, cache should NOT update
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(TabletToolTranformProcessorTest, TabletToolTranformProcessorTest_OnTipMotion_006, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EXPECT_CALL(*WIN_MGR_MOCK, CalculateTipPoint).WillOnce(Return(false));
+    int32_t deviceId = 6;
+    TabletToolTransformProcessor processor(deviceId);
+    libinput_event event = {};
+    processor.pointerEvent_ = PointerEvent::Create();
+    ASSERT_NE(processor.pointerEvent_, nullptr);
+    PointerEvent::PointerItem pointerItem = {};
+    pointerItem.SetPointerId(0);
+    pointerItem.SetDisplayXPos(10.0);
+    pointerItem.SetDisplayYPos(20.0);
+    processor.pointerEvent_->AddPointerItem(pointerItem);
+    NiceMock<LibinputInterfaceMock> libinputMock;
+    libinput_event_tablet_tool eventTabletTool = {};
+    EXPECT_CALL(libinputMock, GetTabletToolEvent).WillOnce(Return(&eventTabletTool));
+    EXPECT_FALSE(processor.OnTipMotion(&event));
+    PointerEvent::PointerItem updatedItem = {};
+    ASSERT_TRUE(processor.pointerEvent_->GetPointerItem(0, updatedItem));
+    EXPECT_DOUBLE_EQ(updatedItem.GetDisplayXPos(), 10.0);
+    EXPECT_DOUBLE_EQ(updatedItem.GetDisplayYPos(), 20.0);
+    InputWindowsManagerMock::ReleaseInstance();
+}
+
+/**
  * @tc.name: TabletToolTranformProcessorTest_OnTipProximity_001
  * @tc.desc: Test the function TabletToolTranformProcessorTest_OnTipProximity_001
  * @tc.type: FUNC
