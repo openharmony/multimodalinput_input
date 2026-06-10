@@ -65,3 +65,5 @@
 - [ ] 光标绘制上下文（`PointerDrawingContext`）是否按 group 隔离
 - [ ] 焦点窗口（`focusWindowIdMap_`）是否按 group 隔离
 - [ ] 事件序列快照是否记录原始 group/window
+- [ ] 鼠标按下状态（`MouseDownState`）是否按 deviceId 隔离（记录 windowId/displayId）
+- [ ] 键盘 repeat 定时器（`KeyAutoRepeat`）是否按 group 隔离
