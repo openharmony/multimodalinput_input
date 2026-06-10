@@ -1479,6 +1479,33 @@ void InputWindowsManager::ResetPointerPosition(const OLD::DisplayGroupInfo &disp
     (void)SendBackCenterPointerEvent(cursorPos);
 }
 
+void InputWindowsManager::OnScreenModeChangeForMirrorScreen(size_t screenCount)
+{
+    CALL_DEBUG_ENTER;
+    MMI_HILOGI("OnScreenModeChangeForMirrorScreen enter, screenCount:%{public}zu", screenCount);
+ 
+#ifdef OHOS_BUILD_ENABLE_EXTERNAL_SCREEN
+    if (screenCount == lastScreenCount_) {
+        MMI_HILOGD("Screen count not changed, skip cursor center reset");
+        return;
+    }
+ 
+    MMI_HILOGI("Screen count changed from %{public}zu to %{public}zu, triggering cursor center reset",
+        lastScreenCount_, screenCount);
+    lastScreenCount_ = screenCount;
+ 
+    const auto iter = displayGroupInfoMap_.find(MAIN_GROUPID);
+    if (iter != displayGroupInfoMap_.end() && !iter->second.displaysInfo.empty()) {
+        MMI_HILOGI("Triggering ResetPointerPosition due to screen change");
+        ResetPointerPosition(iter->second);
+    } else {
+        MMI_HILOGW("DisplayGroupInfo not available for cursor center reset");
+    }
+#else
+    (void)screenCount;
+#endif // OHOS_BUILD_ENABLE_EXTERNAL_SCREEN
+}
+
 bool InputWindowsManager::IsPointerOnCenter(const CursorPosition &currentPos, const OLD::DisplayInfo &currentDisplay)
 {
     auto displayCenterX = currentDisplay.validWidth * HALF_RATIO;
