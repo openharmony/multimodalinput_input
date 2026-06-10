@@ -512,6 +512,7 @@ void HandleOneHandMode(const OLD::DisplayInfo &displayInfo, std::shared_ptr<Poin
         const OLD::DisplayInfo &newDisplay) const;
     void ChangeWindowArea(int32_t x, int32_t y, WindowInfo &windowInfo);
     void ResetPointerPosition(const OLD::DisplayGroupInfo &displayGroupInfo);
+    void OnScreenModeChangeForMirrorScreen(size_t screenCount);
     int32_t GetMainScreenDisplayInfo(const std::vector<OLD::DisplayInfo> &displaysInfo,
         OLD::DisplayInfo &mainScreenDisplayInfo) const;
     bool IsPointerOnCenter(const CursorPosition &currentPos, const OLD::DisplayInfo &currentDisplay);
@@ -611,6 +612,7 @@ private:
     WindowInfo lockWindowInfo_;
 
     std::map<int32_t, MouseLocation> mouseLocationMap_;
+    size_t lastScreenCount_ { 0 };
     CursorPosition cursorPos_ {};
     std::map<int32_t, CursorPosition> cursorPosMap_;
 

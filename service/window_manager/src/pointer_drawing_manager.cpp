@@ -3280,6 +3280,12 @@ void PointerDrawingManager::OnScreenModeChange(const std::vector<sptr<OHOS::Rose
         this->UpdatePointerVisible();
         return RET_OK;
     });
+#ifdef OHOS_BUILD_ENABLE_EXTERNAL_SCREEN
+    delegateProxy->OnPostSyncTask([screens] {
+        WIN_MGR->OnScreenModeChangeForMirrorScreen(screens.size());
+        return RET_OK;
+    });
+#endif // OHOS_BUILD_ENABLE_EXTERNAL_SCREEN
 }
 
 void PointerDrawingManager::SetMainScreenTargetDevice(const std::vector<sptr<OHOS::Rosen::ScreenInfo>> &screens)
