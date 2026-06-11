@@ -1098,6 +1098,11 @@ void UnsubscribeKeyCommand(KeyOptions const& keyOptions, optional_view<uintptr_t
         HandleCommonErrors(COMMON_USE_SYSAPI_ERROR, histogramError);
         return;
     }
+    if (opq.has_value() && opq.value() == 0) {
+        MMI_HILOGE("callback cannot be null or undefined");
+        taihe::set_business_error(COMMON_PARAMETER_ERROR, "callback cannot be null or undefined");
+        return;
+    }
     if (GetEventInfoAPI26(keyOptions, event, keyOption) != RET_OK) {
         MMI_HILOGE("GetEventInfoAPI26 failed");
         return;
