@@ -867,6 +867,44 @@ HWTEST_F(EventStatisticTest, EventStatisticTest_PushPointerEvent_MoveFiltered, T
 }
 
 /**
+ * @tc.name: EventStatisticTest_PushPointerEvent_StylusActionFiltered
+ * @tc.desc: Verify PushPointerRecord filters out stylus-specific actions (PROXIMITY/LEVITATE_MOVE)
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventStatisticTest, EventStatisticTest_PushPointerEvent_StylusActionFiltered, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EventStatistic eventStatistic;
+    eventStatistic.ringHead_ = 0;
+    eventStatistic.ringTail_ = 0;
+    eventStatistic.ringSize_ = 0;
+
+    auto makeStylusEvent = [](int32_t action) {
+        auto event = PointerEvent::Create();
+        event->SetSourceType(InputEvent::SOURCE_TYPE_TOUCHSCREEN);
+        event->SetPointerAction(action);
+        PointerEvent::PointerItem item;
+        item.SetDisplayX(100);
+        item.SetDisplayY(200);
+        item.SetPressure(0.5);
+        event->AddPointerItem(item);
+        return event;
+    };
+
+    eventStatistic.PushPointerRecord(makeStylusEvent(PointerEvent::POINTER_ACTION_PROXIMITY_IN));
+    EXPECT_EQ(eventStatistic.ringSize_, 0u);
+    eventStatistic.PushPointerRecord(makeStylusEvent(PointerEvent::POINTER_ACTION_PROXIMITY_OUT));
+    EXPECT_EQ(eventStatistic.ringSize_, 0u);
+    eventStatistic.PushPointerRecord(makeStylusEvent(PointerEvent::POINTER_ACTION_LEVITATE_MOVE));
+    EXPECT_EQ(eventStatistic.ringSize_, 0u);
+    eventStatistic.PushPointerRecord(makeStylusEvent(PointerEvent::POINTER_ACTION_DOWN));
+    EXPECT_EQ(eventStatistic.ringSize_, 1u);
+    eventStatistic.PushPointerRecord(makeStylusEvent(PointerEvent::POINTER_ACTION_UP));
+    EXPECT_EQ(eventStatistic.ringSize_, 2u);
+}
+
+/**
  * @tc.name: EventStatisticTest_QueryPointerRecord_TargetDisplayId
  * @tc.desc: Verify targetDisplayId is recorded and restored in QueryPointerRecord
  * @tc.type: FUNC
