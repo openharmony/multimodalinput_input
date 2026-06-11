@@ -3321,7 +3321,7 @@ HWTEST_F(PointerEventTest, ResetPointerItemsId_001, TestSize.Level1)
 
 /**
  * @tc.name: PointerEventTest_ReadFromParcel_006
- * @tc.desc: Verify ReadFromParcel fails when nPressedKeys > MAX_N_PRESSED_KEYS
+ * @tc.desc: Verify CallingUid is correctly serialized and deserialized via Parcel
  * @tc.type: FUNC
  * @tc.require:
  */
