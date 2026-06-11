@@ -178,7 +178,7 @@ HWTEST_F(InputEventDataTransformationTest, Unmarshalling_001, TestSize.Level1)
     NetPacket pkt(MmiMessageId::ON_POINTER_EVENT);
     int32_t marshallingResult = InputEventDataTransformation::Marshalling(pointerEvent, pkt);
     EXPECT_EQ(marshallingResult, RET_OK);
-    
+
     auto newEvent = PointerEvent::Create();
     ASSERT_NE(newEvent, nullptr);
     int32_t ret = InputEventDataTransformation::Unmarshalling(pkt, newEvent);
