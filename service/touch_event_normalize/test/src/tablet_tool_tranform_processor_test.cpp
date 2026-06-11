@@ -279,6 +279,69 @@ HWTEST_F(TabletToolTranformProcessorTest, TabletToolTranformProcessorTest_OnTipM
 }
 
 /**
+ * @tc.name: TabletToolTranformProcessorTest_OnTipMotion_005
+ * @tc.desc: Test OnTipMotion out-of-range: CalculateTipPoint fails with coord written, cache should update
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(TabletToolTranformProcessorTest, TabletToolTranformProcessorTest_OnTipMotion_005, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EXPECT_CALL(*WIN_MGR_MOCK, CalculateTipPoint)
+        .WillOnce(DoAll(SetArgReferee<2>(PhysicalCoordinate{150.0, 250.0}), Return(false)));
+    int32_t deviceId = 6;
+    TabletToolTransformProcessor processor(deviceId);
+    libinput_event event = {};
+    processor.pointerEvent_ = PointerEvent::Create();
+    ASSERT_NE(processor.pointerEvent_, nullptr);
+    PointerEvent::PointerItem pointerItem = {};
+    pointerItem.SetPointerId(0);
+    pointerItem.SetDisplayXPos(10.0);
+    pointerItem.SetDisplayYPos(20.0);
+    processor.pointerEvent_->AddPointerItem(pointerItem);
+    NiceMock<LibinputInterfaceMock> libinputMock;
+    libinput_event_tablet_tool eventTabletTool = {};
+    EXPECT_CALL(libinputMock, GetTabletToolEvent).WillOnce(Return(&eventTabletTool));
+    EXPECT_FALSE(processor.OnTipMotion(&event));
+    PointerEvent::PointerItem updatedItem = {};
+    ASSERT_TRUE(processor.pointerEvent_->GetPointerItem(0, updatedItem));
+    EXPECT_DOUBLE_EQ(updatedItem.GetDisplayXPos(), 150.0);
+    EXPECT_DOUBLE_EQ(updatedItem.GetDisplayYPos(), 250.0);
+    InputWindowsManagerMock::ReleaseInstance();
+}
+
+/**
+ * @tc.name: TabletToolTranformProcessorTest_OnTipMotion_006
+ * @tc.desc: Test OnTipMotion other failure: CalculateTipPoint fails without coord, cache should NOT update
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(TabletToolTranformProcessorTest, TabletToolTranformProcessorTest_OnTipMotion_006, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EXPECT_CALL(*WIN_MGR_MOCK, CalculateTipPoint).WillOnce(Return(false));
+    int32_t deviceId = 6;
+    TabletToolTransformProcessor processor(deviceId);
+    libinput_event event = {};
+    processor.pointerEvent_ = PointerEvent::Create();
+    ASSERT_NE(processor.pointerEvent_, nullptr);
+    PointerEvent::PointerItem pointerItem = {};
+    pointerItem.SetPointerId(0);
+    pointerItem.SetDisplayXPos(10.0);
+    pointerItem.SetDisplayYPos(20.0);
+    processor.pointerEvent_->AddPointerItem(pointerItem);
+    NiceMock<LibinputInterfaceMock> libinputMock;
+    libinput_event_tablet_tool eventTabletTool = {};
+    EXPECT_CALL(libinputMock, GetTabletToolEvent).WillOnce(Return(&eventTabletTool));
+    EXPECT_FALSE(processor.OnTipMotion(&event));
+    PointerEvent::PointerItem updatedItem = {};
+    ASSERT_TRUE(processor.pointerEvent_->GetPointerItem(0, updatedItem));
+    EXPECT_DOUBLE_EQ(updatedItem.GetDisplayXPos(), 10.0);
+    EXPECT_DOUBLE_EQ(updatedItem.GetDisplayYPos(), 20.0);
+    InputWindowsManagerMock::ReleaseInstance();
+}
+
+/**
  * @tc.name: TabletToolTranformProcessorTest_OnTipProximity_001
  * @tc.desc: Test the function TabletToolTranformProcessorTest_OnTipProximity_001
  * @tc.type: FUNC
@@ -376,6 +439,83 @@ HWTEST_F(TabletToolTranformProcessorTest, TabletToolTranformProcessorTest_OnTipU
     libinput_event_tablet_tool *event = nullptr;
     bool ret = processor.OnTipUp(event);
     ASSERT_FALSE(ret);
+}
+
+/**
+ * @tc.name: TabletToolTranformProcessorTest_OnTipUp_002
+ * @tc.desc: Test OnTipUp when GetPointerItem fails, isPressed_ should be reset to false
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(TabletToolTranformProcessorTest, TabletToolTranformProcessorTest_OnTipUp_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t deviceId = 6;
+    TabletToolTransformProcessor processor(deviceId);
+    libinput_event_tablet_tool event = {};
+    NiceMock<LibinputInterfaceMock> libinputMock;
+    processor.pointerEvent_ = PointerEvent::Create();
+    ASSERT_NE(processor.pointerEvent_, nullptr);
+    processor.isPressed_ = true;
+    bool ret = processor.OnTipUp(&event);
+    EXPECT_FALSE(ret);
+    EXPECT_TRUE(processor.isPressed_);
+}
+
+/**
+ * @tc.name: TabletToolTranformProcessorTest_OnTipUp_003
+ * @tc.desc: Test OnTipUp when CalculateCalibratedTipPoint fails, isPressed_ should be reset to false
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(TabletToolTranformProcessorTest, TabletToolTranformProcessorTest_OnTipUp_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EXPECT_CALL(*WIN_MGR_MOCK, CalculateTipPoint).WillOnce(Return(false));
+    int32_t deviceId = 6;
+    TabletToolTransformProcessor processor(deviceId);
+    libinput_event_tablet_tool event = {};
+    NiceMock<LibinputInterfaceMock> libinputMock;
+    processor.pointerEvent_ = PointerEvent::Create();
+    ASSERT_NE(processor.pointerEvent_, nullptr);
+    PointerEvent::PointerItem pointerItem = {};
+    pointerItem.SetPointerId(0);
+    pointerItem.SetPressed(true);
+    processor.pointerEvent_->AddPointerItem(pointerItem);
+    processor.isPressed_ = true;
+    bool ret = processor.OnTipUp(&event);
+    EXPECT_FALSE(ret);
+    EXPECT_FALSE(processor.isPressed_);
+    InputWindowsManagerMock::ReleaseInstance();
+}
+
+/**
+ * @tc.name: TabletToolTranformProcessorTest_OnTipUp_004
+ * @tc.desc: Test OnTipUp success path, coordinates should be updated from calibrated result
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(TabletToolTranformProcessorTest, TabletToolTranformProcessorTest_OnTipUp_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EXPECT_CALL(*WIN_MGR_MOCK, CalculateTipPoint).WillOnce(Return(true));
+    int32_t deviceId = 6;
+    TabletToolTransformProcessor processor(deviceId);
+    libinput_event_tablet_tool event = {};
+    NiceMock<LibinputInterfaceMock> libinputMock;
+    processor.pointerEvent_ = PointerEvent::Create();
+    ASSERT_NE(processor.pointerEvent_, nullptr);
+    PointerEvent::PointerItem pointerItem = {};
+    pointerItem.SetPointerId(0);
+    pointerItem.SetPressed(true);
+    processor.pointerEvent_->AddPointerItem(pointerItem);
+    processor.isPressed_ = true;
+    bool ret = processor.OnTipUp(&event);
+    EXPECT_TRUE(ret);
+    PointerEvent::PointerItem updatedItem = {};
+    ASSERT_TRUE(processor.pointerEvent_->GetPointerItem(0, updatedItem));
+    EXPECT_FALSE(updatedItem.IsPressed());
+    InputWindowsManagerMock::ReleaseInstance();
 }
 
 /**

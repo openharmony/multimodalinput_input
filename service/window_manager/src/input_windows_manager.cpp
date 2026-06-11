@@ -417,19 +417,34 @@ bool InputWindowsManager::GetCancelEventFlag(std::shared_ptr<PointerEvent> point
 }
 
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
+bool InputWindowsManager::IsPenHoverEvent(std::shared_ptr<PointerEvent> pointerEvent) const
+{
+    CHKPF(pointerEvent);
+    int32_t action = pointerEvent->GetPointerAction();
+    bool isHoverAction = (action == PointerEvent::POINTER_ACTION_LEVITATE_MOVE ||
+        action == PointerEvent::POINTER_ACTION_LEVITATE_IN_WINDOW ||
+        action == PointerEvent::POINTER_ACTION_LEVITATE_OUT_WINDOW ||
+        action == PointerEvent::POINTER_ACTION_PROXIMITY_IN ||
+        action == PointerEvent::POINTER_ACTION_PROXIMITY_OUT);
+    if (!isHoverAction) {
+        return false;
+    }
+    PointerEvent::PointerItem pointerItem;
+    if (!pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), pointerItem)) {
+        return false;
+    }
+    return (pointerItem.GetToolType() == PointerEvent::TOOL_TYPE_PEN ||
+        pointerItem.GetToolType() == PointerEvent::TOOL_TYPE_PENCIL);
+}
+
 bool InputWindowsManager::AdjustFingerFlag(std::shared_ptr<PointerEvent> pointerEvent)
 {
     CHKPF(pointerEvent);
     if (pointerEvent->GetSourceType() != PointerEvent::SOURCE_TYPE_TOUCHSCREEN) {
         return false;
     }
-    int32_t pointerId = pointerEvent->GetPointerId();
     int32_t deviceId = pointerEvent->GetDeviceId();
-    PointerEvent::PointerItem pointerItem;
-    bool isPenHover = pointerEvent->GetPointerItem(pointerId, pointerItem) && pointerItem.IsPressed() == false &&
-        (pointerItem.GetToolType() == PointerEvent::TOOL_TYPE_PEN ||
-        pointerItem.GetToolType() == PointerEvent::TOOL_TYPE_PENCIL);
-    if (isPenHover) {
+    if (IsPenHoverEvent(pointerEvent)) {
         return false;
     }
     auto& infos = TouchItemDownInfos();
@@ -456,12 +471,7 @@ int32_t InputWindowsManager::GetClientFd(std::shared_ptr<PointerEvent> pointerEv
     }
     auto iter = devIter->second.find(pointerEvent->GetPointerId());
     if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHSCREEN) {
-        int32_t pointerId = pointerEvent->GetPointerId();
-        PointerEvent::PointerItem pointerItem;
-        bool isPenHover = pointerEvent->GetPointerItem(pointerId, pointerItem) && pointerItem.IsPressed() == false &&
-            (pointerItem.GetToolType() == PointerEvent::TOOL_TYPE_PEN ||
-            pointerItem.GetToolType() == PointerEvent::TOOL_TYPE_PENCIL);
-        if (isPenHover) {
+        if (IsPenHoverEvent(pointerEvent)) {
             MMI_HILOG_DISPATCHD("Skip hover event");
         } else if (iter != devIter->second.end() && !(iter->second.flag)) {
             MMI_HILOG_DISPATCHD("Drop event");
@@ -3493,6 +3503,8 @@ bool InputWindowsManager::TransformTipPoint(struct libinput_event_tablet_tool* t
     Coordinate2D pos = { .x = phys.x, .y = phys.y };
     if (IsPositionOutValidDisplay(pos, *displayInfo, true)) {
         MMI_HILOGD("The position is out of the valid display");
+        coord.x = pos.x;
+        coord.y = pos.y;
         return false;
     }
     MMI_HILOGD("IsPositionOutValidDisplay physicalXY:{%{private}f %{private}f}->{%{private}f %{private}f}",
