@@ -173,7 +173,7 @@ HWTEST_F(InputEventDataTransformationTest, Unmarshalling_001, TestSize.Level1)
     CALL_TEST_DEBUG;
     auto pointerEvent = PointerEvent::Create();
     ASSERT_NE(pointerEvent, nullptr);
-    int32_t callingUid = 2222;
+    int32_t callingUid = 1111;
     pointerEvent->SetCallingUid(callingUid);
     NetPacket pkt(MmiMessageId::ON_POINTER_EVENT);
     int32_t marshallingResult = InputEventDataTransformation::Marshalling(pointerEvent, pkt);
