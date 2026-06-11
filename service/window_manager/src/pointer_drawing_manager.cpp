@@ -2570,9 +2570,11 @@ void PointerDrawingManager::OnDisplayInfo(const OLD::DisplayGroupInfo &displayGr
     (void)GetMainScreenDisplayInfo(displayGroupInfo, displayInfo);
 #endif // OHOS_BUILD_ENABLE_EXTERNAL_SCREEN
     UpdateDisplayInfo(displayInfo);
-    lastPhysicalX_ = displayInfo.validWidth / CALCULATE_MIDDLE;
-    lastPhysicalY_ = displayInfo.validHeight / CALCULATE_MIDDLE;
     MouseEventHdr->OnDisplayLost(displayInfo_.rsId);
+    const auto cursorPos = WIN_MGR->GetCursorPos();
+    lastPhysicalX_ = cursorPos.cursorPos.x;
+    lastPhysicalY_ = cursorPos.cursorPos.y;
+
     auto surfaceNodePtr = GetSurfaceNode();
     if (surfaceNodePtr != nullptr) {
         if (!GetHardCursorEnabled()) {
@@ -2701,10 +2703,11 @@ void PointerDrawingManager::DrawManager()
             surfaceNodePtr->DetachToDisplay(screenId_);
             SetSurfaceNode(nullptr);
             RsFlushImplicitTransaction();
+            return;
         }
     }
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
-    if (hasDisplay_ && hasPointerDevice_ && (surfaceNodePtr == nullptr)) {
+    if (hasDisplay_ && hasPointerDevice_) {
         PointerStyle pointerStyle;
         WIN_MGR->GetPointerStyle(pid_, windowId_, pointerStyle);
         MMI_HILOGI("Pid_:%{public}d, windowId_:%{public}d, pointerStyle.id:%{public}d", pid_,
