@@ -3669,15 +3669,24 @@ void PointerDrawingManager::SoftwareCursorMoveAsync(uint64_t displayId, int32_t 
     });
 }
 
+void PointerDrawingManager::SetMoveRetryFailedScreens(const std::unordered_set<uint64_t> &failedScreens)
+{
+    std::lock_guard lock(moveRetryFailedScreensMutex_);
+    moveRetryFailedScreens_ = failedScreens;
+}
+
+std::unordered_set<uint64_t> PointerDrawingManager::GetMoveRetryFailedScreens()
+{
+    std::lock_guard lock(moveRetryFailedScreensMutex_);
+    return moveRetryFailedScreens_;
+}
+
 void PointerDrawingManager::MoveRetryAsync(uint64_t displayId, int32_t x, int32_t y,
     const std::unordered_set<uint64_t>& failedScreens)
 {
     moveRetryActive_ = true;
     moveRetryCount_ = 0;
-    {
-        std::lock_guard lock(moveRetryFailedScreensMutex_);
-        moveRetryFailedScreens_ = failedScreens;
-    }
+    SetMoveRetryFailedScreens(failedScreens);
     moveRetryTimerId_ = TimerMgr->AddTimer(MOVE_RETRY_TIME, MAX_MOVE_RETRY_COUNT, [this, displayId, x, y]() {
         PostMoveRetryTask([this, displayId, x, y]() {
             if (!moveRetryActive_.load()) {
@@ -3685,11 +3694,7 @@ void PointerDrawingManager::MoveRetryAsync(uint64_t displayId, int32_t x, int32_
                 return;
             }
             moveRetryCount_++;
-            std::unordered_set<uint64_t> moveRetryFailedScreens;
-            {
-                std::lock_guard lock(moveRetryFailedScreensMutex_);
-                moveRetryFailedScreens = moveRetryFailedScreens_;
-            }
+            std::unordered_set<uint64_t> moveRetryFailedScreens = GetMoveRetryFailedScreens();
             MMI_HILOGI("MoveRetryAsync start, x:%{private}d, y:%{private}d, Timer Id:%{public}d,"
                 "move retry count:%{public}d, failedScreens size:%{public}zu",
                 x, y, moveRetryTimerId_.load(), moveRetryCount_.load(), moveRetryFailedScreens.size());
@@ -3699,14 +3704,10 @@ void PointerDrawingManager::MoveRetryAsync(uint64_t displayId, int32_t x, int32_
                 moveRetryActive_ = false;
                 moveRetryTimerId_ = DEFAULT_VALUE;
                 moveRetryCount_ = 0;
-                std::lock_guard lock(moveRetryFailedScreensMutex_);
-                moveRetryFailedScreens_.clear();
+                SetMoveRetryFailedScreens({});
                 return;
             }
-            {
-                std::lock_guard lock(moveRetryFailedScreensMutex_);
-                moveRetryFailedScreens_ = stillFailedScreens;
-            }
+            SetMoveRetryFailedScreens(stillFailedScreens);
             MMI_HILOGE("Move retry failed, stillFailedScreens size:%{public}zu, TimerId:%{public}d",
                 stillFailedScreens.size(), moveRetryTimerId_.load());
             if (moveRetryCount_.load() == MAX_MOVE_RETRY_COUNT) {
@@ -3714,8 +3715,7 @@ void PointerDrawingManager::MoveRetryAsync(uint64_t displayId, int32_t x, int32_
                 moveRetryActive_ = false;
                 moveRetryTimerId_ = DEFAULT_VALUE;
                 moveRetryCount_ = 0;
-                std::lock_guard lock(moveRetryFailedScreensMutex_);
-                moveRetryFailedScreens_.clear();
+                SetMoveRetryFailedScreens({});
             }
         });
     }, "PointerDrawingManager-MoveRetryAsync");
