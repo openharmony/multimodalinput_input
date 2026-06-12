@@ -842,11 +842,9 @@ void LibinputAdapter::ProcessTouchEventAsVKeyboardEvent(
         touchPressure = libinput_event_touch_get_pressure(touch);
         accumulatedPressure = GetAccumulatedPressure(touchId, eventType, touchPressure);
     }
-    if (deviceId_ == -1) {
-        // initialize touch device ID.
-        libinput_device* device = libinput_event_get_device(event);
-        deviceId_ = INPUT_DEV_MGR->FindInputDeviceId(device);
-    }
+    // initialize touch device ID.
+    libinput_device* device = libinput_event_get_device(event);
+    deviceId_ = INPUT_DEV_MGR->FindInputDeviceId(device);
     double x = 0.0;
     double y = 0.0;
     int32_t touchEventType = ConvertToTouchEventType(eventType);
