@@ -16,6 +16,7 @@
 #ifndef POINTER_DRAWING_MANAGER_H
 #define POINTER_DRAWING_MANAGER_H
 
+#include <unordered_set>
 #include "transaction/rs_transaction.h"
 #include "transaction/rs_interfaces.h"
 
@@ -282,9 +283,13 @@ private:
     void HardwareCursorRender(MOUSE_ICON mouseStyle, int32_t x, int32_t y, uint64_t displayId);
     void SoftwareCursorMove(uint64_t displayId, int32_t x, int32_t y);
     void SoftwareCursorMoveAsync(uint64_t displayId, int32_t x, int32_t y);
-    void MoveRetryAsync(uint64_t displayId, int32_t x, int32_t y);
+    void MoveRetryAsync(uint64_t displayId, int32_t x, int32_t y,
+        const std::unordered_set<uint64_t>& failedScreens);
     void ResetMoveRetryTimer();
-    int32_t HardwareCursorMove(uint64_t displayId, int32_t x, int32_t y);
+    int32_t HardwareCursorMove(uint64_t displayId, int32_t x, int32_t y,
+        std::unordered_set<uint64_t>& failedScreens);
+    int32_t HardwareCursorMoveRetry(uint64_t displayId, int32_t x, int32_t y,
+        const std::unordered_set<uint64_t>& failedScreens, std::unordered_set<uint64_t>& stillFailedScreens);
     void HideHardwareCursors();
     int32_t GetMainScreenDisplayInfo(const OLD::DisplayGroupInfo &displayGroupInfo,
         OLD::DisplayInfo &mainScreenDisplayInfo) const;
@@ -376,6 +381,8 @@ private:
     std::atomic<int32_t> moveRetryTimerId_ { -1 };
     std::atomic<int32_t> moveRetryCount_ { 0 };
     std::atomic<bool> moveRetryActive_ { false };
+    std::unordered_set<uint64_t> moveRetryFailedScreens_;
+    std::mutex moveRetryFailedScreensMutex_;
     float hardwareCanvasSize_ { HARDWARE_CANVAS_SIZE };
 #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
     std::shared_ptr<OHOS::Media::PixelMap> pixelMap_ { nullptr };
