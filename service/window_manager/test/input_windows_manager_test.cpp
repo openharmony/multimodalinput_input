@@ -65,7 +65,6 @@ constexpr uint32_t TEST_WINDOW_END {100000};
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
 constexpr int32_t TEST_PROCESS_ID = 100;
 constexpr int32_t TEST_WINDOW_ID = 1;
-constexpr int32_t TEST_WINDOW_ID_MAX = 10;
 constexpr int32_t POINTER_STYLE_ID_1 = 1;
 constexpr int32_t POINTER_STYLE_ID_2 = 2;
 constexpr int32_t TEST_DEFAULT_POINTER_STYLE = 0;
@@ -1109,30 +1108,6 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_OnSessionLost_001, Tes
 }
 
 /**
- * @tc.name: InputWindowsManagerTest_UpdatePoinerStyle_001
- * @tc.desc: Test updating pointer style
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdatePoinerStyle_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    int32_t pid = 1;
-    int32_t windowId = 2;
-    PointerStyle pointerStyle;
-    int32_t ret = WIN_MGR->UpdatePoinerStyle(pid, windowId, pointerStyle);
-    EXPECT_EQ(ret, RET_OK);
-    pid = -1;
-    windowId = -2;
-    ret = WIN_MGR->UpdatePoinerStyle(pid, windowId, pointerStyle);
-    EXPECT_EQ(ret, 401);
-    pid = 1;
-    windowId = -2;
-    ret = WIN_MGR->UpdatePoinerStyle(pid, windowId, pointerStyle);
-    EXPECT_EQ(ret, RET_OK);
-}
-
-/**
  * @tc.name: InputWindowsManagerTest_SetPointerStyle_001
  * @tc.desc: Test setting pointer style
  * @tc.type: FUNC
@@ -1151,7 +1126,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_SetPointerStyle_001, T
     pid = 1;
     windowId = 2;
     ret = WIN_MGR->SetPointerStyle(pid, windowId, pointerStyle);
-    EXPECT_EQ(ret, WIN_MGR->UpdatePoinerStyle(pid, windowId, pointerStyle));
+    EXPECT_EQ(ret, WIN_MGR->SetPointerStyle(pid, windowId, pointerStyle));
 }
 
 /**
@@ -3305,39 +3280,6 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_OnSessionLost, TestSiz
 }
 
 /**
- * @tc.name: InputWindowsManagerTest_UpdatePoinerStyle
- * @tc.desc: Test UpdatePoinerStyle
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdatePoinerStyle, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    InputWindowsManager inputWindowsManager;
-    int32_t pid = 1;
-    int32_t windowId = 1;
-    PointerStyle pointerStyle;
-    pointerStyle.size = 1;
-    pointerStyle.color = 2;
-    pointerStyle.id = 3;
-    std::map<int32_t, PointerStyle> pointerStyleMap;
-    pointerStyleMap.insert(std::make_pair(windowId, pointerStyle));
-    inputWindowsManager.pointerStyle_.insert(std::make_pair(pid, pointerStyleMap));
-    windowId = 2;
-    WindowInfo windowInfo;
-    windowInfo.id = 3;
-    windowInfo.pid = 6;
-    auto it = inputWindowsManager.displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
-    if (it != inputWindowsManager.displayGroupInfoMap_.end()) {
-        it->second.windowsInfo.push_back(windowInfo);
-    }
-    windowInfo.id = 2;
-    windowInfo.pid = 1;
-    it->second.windowsInfo.push_back(windowInfo);
-    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.UpdatePoinerStyle(pid, windowId, pointerStyle));
-}
-
-/**
  * @tc.name: InputWindowsManagerTest_SetPointerStyle
  * @tc.desc: Test SetPointerStyle
  * @tc.type: FUNC
@@ -3353,7 +3295,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_SetPointerStyle, TestS
     pointerStyle.id = 0;
     std::map<int32_t, PointerStyle> pointerStyleMap;
     pointerStyleMap.insert(std::make_pair(windowId, pointerStyle));
-    inputWindowsManager.uiExtensionPointerStyle_.insert(std::make_pair(pid, pointerStyleMap));
+    inputWindowsManager.pointerStyle_.insert(std::make_pair(pid, pointerStyleMap));
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager.SetPointerStyle(pid, windowId, pointerStyle));
 }
 
@@ -3396,7 +3338,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetPointerStyle, TestS
     pointerStyle.id = 0;
     std::map<int32_t, PointerStyle> pointerStyleMap;
     pointerStyleMap.insert(std::make_pair(windowId, pointerStyle));
-    inputWindowsManager.uiExtensionPointerStyle_.insert(std::make_pair(pid, pointerStyleMap));
+    inputWindowsManager.pointerStyle_.insert(std::make_pair(pid, pointerStyleMap));
     pid = 101;
     EXPECT_EQ(inputWindowsManager.GetPointerStyle(pid, windowId, pointerStyle), RET_OK);
     pid = 100;
@@ -4318,7 +4260,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateMouseTarget_002,
     PointerStyle pointerStyle;
     CursorDrawingComponent::GetInstance().SetMouseDisplayState(false);
     styleMap.insert(std::make_pair(windowInfo.id, pointerStyle));
-    inputWindowsManager.uiExtensionPointerStyle_.insert(std::make_pair(windowInfo.pid, styleMap));
+    inputWindowsManager.pointerStyle_.insert(std::make_pair(windowInfo.pid, styleMap));
     UDSServer udsServer;
     inputWindowsManager.udsServer_ = &udsServer;
     inputWindowsManager.isDragBorder_ = true;
@@ -4377,7 +4319,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateMouseTarget_003,
     PointerStyle pointerStyle;
     CursorDrawingComponent::GetInstance().SetMouseDisplayState(true);
     styleMap.insert(std::make_pair(windowInfo.id, pointerStyle));
-    inputWindowsManager.uiExtensionPointerStyle_.insert(std::make_pair(windowInfo.pid, styleMap));
+    inputWindowsManager.pointerStyle_.insert(std::make_pair(windowInfo.pid, styleMap));
     UDSServer udsServer;
     inputWindowsManager.udsServer_ = &udsServer;
     inputWindowsManager.isDragBorder_ = false;
@@ -4439,7 +4381,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateMouseTarget_004,
     PointerStyle pointerStyle;
     IPointerDrawingManager::GetInstance()->SetMouseDisplayState(true);
     styleMap.insert(std::make_pair(windowInfo.id, pointerStyle));
-    inputWindowsManager.uiExtensionPointerStyle_.insert(std::make_pair(windowInfo.pid, styleMap));
+    inputWindowsManager.pointerStyle_.insert(std::make_pair(windowInfo.pid, styleMap));
     UDSServer udsServer;
     inputWindowsManager.udsServer_ = &udsServer;
     inputWindowsManager.isDragBorder_ = false;
@@ -15787,116 +15729,12 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_SelectWindowInfo_AxisU
 }
 
 /**
- * @tc.name: UpdateUIExtensionPointerStyle_PidMismatch_001
- * @tc.desc: Test UpdateUIExtensionPointerStyle with pid mismatch
+ * @tc.name: SetPointerStyleInfo_AddNewStyle_001
+ * @tc.desc: Test SetPointerStyleInfo adding new pointer style
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputWindowsManagerTest, UpdateUIExtensionPointerStyle_PidMismatch_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    auto inputWindowsManager = std::make_shared<InputWindowsManager>();
-    ASSERT_NE(inputWindowsManager, nullptr);
-
-    UIExtensionInfo uecInfo(nullptr, TEST_PROCESS_ID, TEST_WINDOW_ID);
-    PointerStyle pointerStyle;
-    pointerStyle.id = 1;
-
-    int32_t result = inputWindowsManager->UpdateUIExtensionPointerStyle(
-        TEST_PROCESS_ID + 1, uecInfo, pointerStyle);
-
-    EXPECT_EQ(result, RET_ERR);
-}
-
-/**
- * @tc.name: UpdateUIExtensionPointerStyle_AddNewStyle_002
- * @tc.desc: Test UpdateUIExtensionPointerStyle adding new pointer style
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputWindowsManagerTest, UpdateUIExtensionPointerStyle_AddNewStyle_002, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    auto inputWindowsManager = std::make_shared<InputWindowsManager>();
-    ASSERT_NE(inputWindowsManager, nullptr);
-
-    UIExtensionInfo uecInfo(nullptr, TEST_PROCESS_ID, TEST_WINDOW_ID);
-    PointerStyle pointerStyle;
-    pointerStyle.id = POINTER_STYLE_ID_1;
-
-    int32_t result = inputWindowsManager->UpdateUIExtensionPointerStyle(
-        TEST_PROCESS_ID, uecInfo, pointerStyle);
-
-    EXPECT_EQ(result, RET_OK);
-    auto iter = inputWindowsManager->uiExtensionPointerStyle_.find(TEST_PROCESS_ID);
-    ASSERT_NE(iter, inputWindowsManager->uiExtensionPointerStyle_.end());
-    auto windowIter = iter->second.find(TEST_WINDOW_ID);
-    ASSERT_NE(windowIter, iter->second.end());
-    EXPECT_EQ(windowIter->second.id, POINTER_STYLE_ID_1);
-}
-
-/**
- * @tc.name: UpdateUIExtensionPointerStyle_UpdateExistingStyle_003
- * @tc.desc: Test UpdateUIExtensionPointerStyle updating existing pointer style
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputWindowsManagerTest, UpdateUIExtensionPointerStyle_UpdateExistingStyle_003, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    auto inputWindowsManager = std::make_shared<InputWindowsManager>();
-    ASSERT_NE(inputWindowsManager, nullptr);
-
-    UIExtensionInfo uecInfo(nullptr, TEST_PROCESS_ID, TEST_WINDOW_ID);
-    PointerStyle pointerStyle1;
-    pointerStyle1.id = POINTER_STYLE_ID_1;
-    inputWindowsManager->UpdateUIExtensionPointerStyle(
-        TEST_PROCESS_ID, uecInfo, pointerStyle1);
-
-    PointerStyle pointerStyle2;
-    pointerStyle2.id = POINTER_STYLE_ID_2;
-    int32_t result = inputWindowsManager->UpdateUIExtensionPointerStyle(
-        TEST_PROCESS_ID, uecInfo, pointerStyle2);
-
-    EXPECT_EQ(result, RET_OK);
-    auto iter = inputWindowsManager->uiExtensionPointerStyle_.find(TEST_PROCESS_ID);
-    ASSERT_NE(iter, inputWindowsManager->uiExtensionPointerStyle_.end());
-    auto windowIter = iter->second.find(TEST_WINDOW_ID);
-    ASSERT_NE(windowIter, iter->second.end());
-    EXPECT_EQ(windowIter->second.id, POINTER_STYLE_ID_2);
-}
-
-/**
- * @tc.name: UpdateUIExtensionPointerStyle_NoChangeStyle_004
- * @tc.desc: Test UpdateUIExtensionPointerStyle with same pointer style (no change)
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputWindowsManagerTest, UpdateUIExtensionPointerStyle_NoChangeStyle_004, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    auto inputWindowsManager = std::make_shared<InputWindowsManager>();
-    ASSERT_NE(inputWindowsManager, nullptr);
-
-    UIExtensionInfo uecInfo(nullptr, TEST_PROCESS_ID, TEST_WINDOW_ID);
-    PointerStyle pointerStyle;
-    pointerStyle.id = POINTER_STYLE_ID_1;
-    inputWindowsManager->UpdateUIExtensionPointerStyle(
-        TEST_PROCESS_ID, uecInfo, pointerStyle);
-
-    int32_t result = inputWindowsManager->UpdateUIExtensionPointerStyle(
-        TEST_PROCESS_ID, uecInfo, pointerStyle);
-
-    EXPECT_EQ(result, RET_OK);
-}
-
-/**
- * @tc.name: UpdateNormalPointerStyle_AddNewStyle_001
- * @tc.desc: Test UpdateNormalPointerStyle adding new pointer style
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputWindowsManagerTest, UpdateNormalPointerStyle_AddNewStyle_001, TestSize.Level1)
+HWTEST_F(InputWindowsManagerTest, SetPointerStyleInfo_AddNewStyle_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     auto inputWindowsManager = std::make_shared<InputWindowsManager>();
@@ -15905,7 +15743,7 @@ HWTEST_F(InputWindowsManagerTest, UpdateNormalPointerStyle_AddNewStyle_001, Test
     PointerStyle pointerStyle;
     pointerStyle.id = POINTER_STYLE_ID_1;
 
-    int32_t result = inputWindowsManager->UpdateNormalPointerStyle(
+    int32_t result = inputWindowsManager->SetPointerStyleInfo(
         TEST_PROCESS_ID, TEST_WINDOW_ID, pointerStyle);
 
     EXPECT_EQ(result, RET_OK);
@@ -15917,12 +15755,12 @@ HWTEST_F(InputWindowsManagerTest, UpdateNormalPointerStyle_AddNewStyle_001, Test
 }
 
 /**
- * @tc.name: UpdateNormalPointerStyle_AddNewStyle_002
- * @tc.desc: Test UpdateNormalPointerStyle adding new pointer style
+ * @tc.name: SetPointerStyleInfo_ReachMaxWindowNum_002
+ * @tc.desc: Test SetPointerStyleInfo when windowMap size exceeds limit
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputWindowsManagerTest, UpdateNormalPointerStyle_AddNewStyle_002, TestSize.Level1)
+HWTEST_F(InputWindowsManagerTest, SetPointerStyleInfo_ReachMaxWindowNum_002, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     auto inputWindowsManager = std::make_shared<InputWindowsManager>();
@@ -15931,28 +15769,26 @@ HWTEST_F(InputWindowsManagerTest, UpdateNormalPointerStyle_AddNewStyle_002, Test
     PointerStyle pointerStyle;
     pointerStyle.id = POINTER_STYLE_ID_1;
 
-    for (int32_t windowId = 1; windowId <= TEST_WINDOW_ID_MAX; windowId++) {
+    for (int32_t windowId = 1; windowId <= 11; windowId++) {
         inputWindowsManager->pointerStyle_[TEST_PROCESS_ID][windowId] = pointerStyle;
     }
 
-    int32_t result = inputWindowsManager->UpdateNormalPointerStyle(
-        TEST_PROCESS_ID, 0, pointerStyle);
+    int32_t result = inputWindowsManager->SetPointerStyleInfo(
+        TEST_PROCESS_ID, 12, pointerStyle);
 
     EXPECT_EQ(result, RET_OK);
     auto iter = inputWindowsManager->pointerStyle_.find(TEST_PROCESS_ID);
     ASSERT_NE(iter, inputWindowsManager->pointerStyle_.end());
-    auto windowIter = iter->second.find(0);
-    ASSERT_NE(windowIter, iter->second.end());
-    EXPECT_EQ(windowIter->second.id, POINTER_STYLE_ID_1);
+    EXPECT_EQ(iter->second.size(), 1u);
 }
 
 /**
- * @tc.name: UpdateNormalPointerStyle_UpdateExistingStyle_002
- * @tc.desc: Test UpdateNormalPointerStyle updating existing pointer style
+ * @tc.name: SetPointerStyleInfo_UpdateExistingStyle_003
+ * @tc.desc: Test SetPointerStyleInfo updating existing pointer style
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputWindowsManagerTest, UpdateNormalPointerStyle_UpdateExistingStyle_002, TestSize.Level1)
+HWTEST_F(InputWindowsManagerTest, SetPointerStyleInfo_UpdateExistingStyle_003, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     auto inputWindowsManager = std::make_shared<InputWindowsManager>();
@@ -15960,12 +15796,12 @@ HWTEST_F(InputWindowsManagerTest, UpdateNormalPointerStyle_UpdateExistingStyle_0
 
     PointerStyle pointerStyle1;
     pointerStyle1.id = POINTER_STYLE_ID_1;
-    inputWindowsManager->UpdateNormalPointerStyle(
+    inputWindowsManager->SetPointerStyleInfo(
         TEST_PROCESS_ID, TEST_WINDOW_ID, pointerStyle1);
 
     PointerStyle pointerStyle2;
     pointerStyle2.id = POINTER_STYLE_ID_2;
-    int32_t result = inputWindowsManager->UpdateNormalPointerStyle(
+    int32_t result = inputWindowsManager->SetPointerStyleInfo(
         TEST_PROCESS_ID, TEST_WINDOW_ID, pointerStyle2);
 
     EXPECT_EQ(result, RET_OK);
@@ -15977,12 +15813,12 @@ HWTEST_F(InputWindowsManagerTest, UpdateNormalPointerStyle_UpdateExistingStyle_0
 }
 
 /**
- * @tc.name: UpdateNormalPointerStyle_NoChangeStyle_003
- * @tc.desc: Test UpdateNormalPointerStyle with same pointer style (no change)
+ * @tc.name: SetPointerStyleInfo_NoChangeStyle_004
+ * @tc.desc: Test SetPointerStyleInfo with same pointer style (no change)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputWindowsManagerTest, UpdateNormalPointerStyle_NoChangeStyle_003, TestSize.Level1)
+HWTEST_F(InputWindowsManagerTest, SetPointerStyleInfo_NoChangeStyle_004, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     auto inputWindowsManager = std::make_shared<InputWindowsManager>();
@@ -15990,96 +15826,13 @@ HWTEST_F(InputWindowsManagerTest, UpdateNormalPointerStyle_NoChangeStyle_003, Te
 
     PointerStyle pointerStyle;
     pointerStyle.id = POINTER_STYLE_ID_1;
-    inputWindowsManager->UpdateNormalPointerStyle(
+    inputWindowsManager->SetPointerStyleInfo(
         TEST_PROCESS_ID, TEST_WINDOW_ID, pointerStyle);
 
-    int32_t result = inputWindowsManager->UpdateNormalPointerStyle(
+    int32_t result = inputWindowsManager->SetPointerStyleInfo(
         TEST_PROCESS_ID, TEST_WINDOW_ID, pointerStyle);
 
     EXPECT_EQ(result, RET_OK);
-}
-
-/**
- * @tc.name: ClearUIExtensionPointerStyle_ExistingPid_001
- * @tc.desc: Test ClearUIExtensionPointerStyle clearing existing pid style
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputWindowsManagerTest, ClearUIExtensionPointerStyle_ExistingPid_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    auto inputWindowsManager = std::make_shared<InputWindowsManager>();
-    ASSERT_NE(inputWindowsManager, nullptr);
-
-    UIExtensionInfo uecInfo(nullptr, TEST_PROCESS_ID, TEST_WINDOW_ID);
-    PointerStyle pointerStyle;
-    pointerStyle.id = POINTER_STYLE_ID_1;
-    inputWindowsManager->UpdateUIExtensionPointerStyle(
-        TEST_PROCESS_ID, uecInfo, pointerStyle);
-
-    inputWindowsManager->ClearUIExtensionPointerStyle(TEST_PROCESS_ID);
-
-    auto iter = inputWindowsManager->uiExtensionPointerStyle_.find(TEST_PROCESS_ID);
-    EXPECT_EQ(iter, inputWindowsManager->uiExtensionPointerStyle_.end());
-}
-
-/**
- * @tc.name: ClearUIExtensionPointerStyle_NonExistingPid_002
- * @tc.desc: Test ClearUIExtensionPointerStyle with non-existing pid
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputWindowsManagerTest, ClearUIExtensionPointerStyle_NonExistingPid_002, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    auto inputWindowsManager = std::make_shared<InputWindowsManager>();
-    ASSERT_NE(inputWindowsManager, nullptr);
-
-    inputWindowsManager->ClearUIExtensionPointerStyle(TEST_PROCESS_ID);
-
-    auto iter = inputWindowsManager->uiExtensionPointerStyle_.find(TEST_PROCESS_ID);
-    EXPECT_EQ(iter, inputWindowsManager->uiExtensionPointerStyle_.end());
-}
-
-/**
- * @tc.name: SaveLatestPointerStyleInfo_UIExtensionToken_001
- * @tc.desc: Test SaveLatestPointerStyleInfo with UIExtension token
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputWindowsManagerTest, SaveLatestPointerStyleInfo_UIExtensionToken_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    auto inputWindowsManager = std::make_shared<InputWindowsManager>();
-    ASSERT_NE(inputWindowsManager, nullptr);
-
-    sptr<IRemoteObject> token = new (std::nothrow) IPCObjectProxy(0);
-    inputWindowsManager->SaveLatestPointerStyleInfo(
-        TEST_PROCESS_ID, TEST_WINDOW_ID, token);
-
-    EXPECT_TRUE(inputWindowsManager->isUIExtension_);
-    EXPECT_EQ(inputWindowsManager->uiExtensionPid_, TEST_PROCESS_ID);
-    EXPECT_EQ(inputWindowsManager->uiExtensionWindowId_, TEST_WINDOW_ID);
-}
-
-/**
- * @tc.name: SaveLatestPointerStyleInfo_NullToken_002
- * @tc.desc: Test SaveLatestPointerStyleInfo with null token (normal window)
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputWindowsManagerTest, SaveLatestPointerStyleInfo_NullToken_002, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    auto inputWindowsManager = std::make_shared<InputWindowsManager>();
-    ASSERT_NE(inputWindowsManager, nullptr);
-
-    inputWindowsManager->SaveLatestPointerStyleInfo(
-        TEST_PROCESS_ID, TEST_WINDOW_ID, nullptr);
-
-    EXPECT_FALSE(inputWindowsManager->isUIExtension_);
-    EXPECT_EQ(inputWindowsManager->uiExtensionPid_, TEST_PROCESS_ID);
-    EXPECT_EQ(inputWindowsManager->uiExtensionWindowId_, TEST_WINDOW_ID);
 }
 
 /**
@@ -16106,35 +15859,8 @@ HWTEST_F(InputWindowsManagerTest, GetPointerStyle_GlobalWindowId_001, TestSize.L
 }
 
 /**
- * @tc.name: GetPointerStyle_UIExtensionToken_002
- * @tc.desc: Test GetPointerStyle with UIExtension token (calls GetUIExtensionPointerStyle)
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputWindowsManagerTest, GetPointerStyle_UIExtensionToken_002, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    InputWindowsManager winMgr;
-
-    sptr<IRemoteObject> token = new (std::nothrow) IPCObjectProxy(0);
-    ASSERT_NE(token, nullptr);
-    UIExtensionInfo uecInfo(token, TEST_PROCESS_ID, TEST_WINDOW_ID);
-    winMgr.uiExtensionInfos_.push_back(uecInfo);
-
-    PointerStyle pointerStyle;
-    pointerStyle.id = POINTER_STYLE_ID_1;
-    winMgr.uiExtensionPointerStyle_[TEST_PROCESS_ID][TEST_WINDOW_ID] = pointerStyle;
-
-    PointerStyle styleRet;
-    int32_t ret = winMgr.GetPointerStyle(TEST_PROCESS_ID, TEST_WINDOW_ID, styleRet, token);
-
-    EXPECT_EQ(ret, RET_OK);
-    EXPECT_EQ(styleRet.id, POINTER_STYLE_ID_1);
-}
-
-/**
  * @tc.name: GetPointerStyle_NormalWindow_003
- * @tc.desc: Test GetPointerStyle for normal window (calls GetNormalPointerStyle)
+ * @tc.desc: Test GetPointerStyle for normal window (calls GetPointerStyleInfo)
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -16155,85 +15881,12 @@ HWTEST_F(InputWindowsManagerTest, GetPointerStyle_NormalWindow_003, TestSize.Lev
 }
 
 /**
- * @tc.name: GetUIExtensionPointerStyle_PidNotFound_001
- * @tc.desc: Test GetUIExtensionPointerStyle when pid not found (returns global style)
+ * @tc.name: GetPointerStyleInfo_PidNotFound_001
+ * @tc.desc: Test GetPointerStyleInfo when pid not found (returns global style)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputWindowsManagerTest, GetUIExtensionPointerStyle_PidNotFound_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    InputWindowsManager winMgr;
-
-    PointerStyle globalStyle;
-    globalStyle.id = MOUSE_ICON::DEVELOPER_DEFINED_ICON;
-    winMgr.globalStyle_ = globalStyle;
-
-    UIExtensionInfo uecInfo(nullptr, TEST_PROCESS_ID, TEST_WINDOW_ID);
-    PointerStyle styleRet;
-    int32_t ret = winMgr.GetUIExtensionPointerStyle(uecInfo, styleRet);
-
-    EXPECT_EQ(ret, RET_OK);
-    EXPECT_EQ(styleRet.id, MOUSE_ICON::DEVELOPER_DEFINED_ICON);
-}
-
-/**
- * @tc.name: GetUIExtensionPointerStyle_WindowIdNotFound_002
- * @tc.desc: Test GetUIExtensionPointerStyle when hostWindowId not found (returns global style)
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputWindowsManagerTest, GetUIExtensionPointerStyle_WindowIdNotFound_002, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    InputWindowsManager winMgr;
-
-    PointerStyle globalStyle;
-    globalStyle.id = MOUSE_ICON::DEVELOPER_DEFINED_ICON;
-    winMgr.globalStyle_ = globalStyle;
-
-    PointerStyle tmpStyle;
-    tmpStyle.id = MOUSE_ICON::EAST;
-    winMgr.uiExtensionPointerStyle_[TEST_PROCESS_ID][TEST_WINDOW_ID + 1] = tmpStyle;
-
-    UIExtensionInfo uecInfo(nullptr, TEST_PROCESS_ID, TEST_WINDOW_ID);
-    PointerStyle styleRet;
-    int32_t ret = winMgr.GetUIExtensionPointerStyle(uecInfo, styleRet);
-
-    EXPECT_EQ(ret, RET_OK);
-    EXPECT_EQ(styleRet.id, MOUSE_ICON::DEVELOPER_DEFINED_ICON);
-}
-
-/**
- * @tc.name: GetUIExtensionPointerStyle_Found_003
- * @tc.desc: Test GetUIExtensionPointerStyle when pid and windowId both found
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputWindowsManagerTest, GetUIExtensionPointerStyle_Found_003, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    InputWindowsManager winMgr;
-
-    PointerStyle pointerStyle;
-    pointerStyle.id = POINTER_STYLE_ID_1;
-    winMgr.uiExtensionPointerStyle_[TEST_PROCESS_ID][TEST_WINDOW_ID] = pointerStyle;
-
-    UIExtensionInfo uecInfo(nullptr, TEST_PROCESS_ID, TEST_WINDOW_ID);
-    PointerStyle styleRet;
-    int32_t ret = winMgr.GetUIExtensionPointerStyle(uecInfo, styleRet);
-
-    EXPECT_EQ(ret, RET_OK);
-    EXPECT_EQ(styleRet.id, POINTER_STYLE_ID_1);
-}
-
-/**
- * @tc.name: GetNormalPointerStyle_PidNotFound_SceneBoardEnabled_001
- * @tc.desc: Test GetNormalPointerStyle when pid not found but SceneBoard enabled (returns global style)
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputWindowsManagerTest, GetNormalPointerStyle_PidNotFound_SceneBoardEnabled_001, TestSize.Level1)
+HWTEST_F(InputWindowsManagerTest, GetPointerStyleInfo_PidNotFound_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     InputWindowsManager winMgr;
@@ -16243,19 +15896,19 @@ HWTEST_F(InputWindowsManagerTest, GetNormalPointerStyle_PidNotFound_SceneBoardEn
     winMgr.globalStyle_ = globalStyle;
 
     PointerStyle styleRet;
-    int32_t ret = winMgr.GetNormalPointerStyle(TEST_PROCESS_ID, TEST_WINDOW_ID, styleRet);
+    int32_t ret = winMgr.GetPointerStyleInfo(TEST_PROCESS_ID, TEST_WINDOW_ID, styleRet);
 
     EXPECT_EQ(ret, RET_OK);
     EXPECT_EQ(styleRet.id, MOUSE_ICON::DEVELOPER_DEFINED_ICON);
 }
 
 /**
- * @tc.name: GetNormalPointerStyle_WindowIdNotFound_002
- * @tc.desc: Test GetNormalPointerStyle when windowId not found (returns global style)
+ * @tc.name: GetPointerStyleInfo_WindowIdNotFound_002
+ * @tc.desc: Test GetPointerStyleInfo when windowId not found (returns global style)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputWindowsManagerTest, GetNormalPointerStyle_WindowIdNotFound_002, TestSize.Level1)
+HWTEST_F(InputWindowsManagerTest, GetPointerStyleInfo_WindowIdNotFound_002, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     InputWindowsManager winMgr;
@@ -16266,22 +15919,22 @@ HWTEST_F(InputWindowsManagerTest, GetNormalPointerStyle_WindowIdNotFound_002, Te
 
     PointerStyle tmpStyle;
     tmpStyle.id = MOUSE_ICON::EAST;
-    winMgr.uiExtensionPointerStyle_[TEST_PROCESS_ID][TEST_WINDOW_ID + 1] = tmpStyle;
+    winMgr.pointerStyle_[TEST_PROCESS_ID][TEST_WINDOW_ID + 1] = tmpStyle;
 
     PointerStyle styleRet;
-    int32_t ret = winMgr.GetNormalPointerStyle(TEST_PROCESS_ID, TEST_WINDOW_ID, styleRet);
+    int32_t ret = winMgr.GetPointerStyleInfo(TEST_PROCESS_ID, TEST_WINDOW_ID, styleRet);
 
     EXPECT_EQ(ret, RET_OK);
     EXPECT_EQ(styleRet.id, MOUSE_ICON::DEVELOPER_DEFINED_ICON);
 }
 
 /**
- * @tc.name: GetNormalPointerStyle_DefaultStyleId_003
- * @tc.desc: Test GetNormalPointerStyle when style.id equals TEST_DEFAULT_POINTER_STYLE (returns global style)
+ * @tc.name: GetPointerStyleInfo_DefaultStyleId_003
+ * @tc.desc: Test GetPointerStyleInfo when style.id equals TEST_DEFAULT_POINTER_STYLE (returns global style)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputWindowsManagerTest, GetNormalPointerStyle_DefaultStyleId_003, TestSize.Level1)
+HWTEST_F(InputWindowsManagerTest, GetPointerStyleInfo_DefaultStyleId_003, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     InputWindowsManager winMgr;
@@ -16295,19 +15948,19 @@ HWTEST_F(InputWindowsManagerTest, GetNormalPointerStyle_DefaultStyleId_003, Test
     winMgr.pointerStyle_[TEST_PROCESS_ID][TEST_WINDOW_ID] = storedStyle;
 
     PointerStyle styleRet;
-    int32_t ret = winMgr.GetNormalPointerStyle(TEST_PROCESS_ID, TEST_WINDOW_ID, styleRet);
+    int32_t ret = winMgr.GetPointerStyleInfo(TEST_PROCESS_ID, TEST_WINDOW_ID, styleRet);
 
     EXPECT_EQ(ret, RET_OK);
     EXPECT_EQ(styleRet.id, MOUSE_ICON::DEVELOPER_DEFINED_ICON);
 }
 
 /**
- * @tc.name: GetNormalPointerStyle_Found_004
- * @tc.desc: Test GetNormalPointerStyle when both pid and windowId found with valid style
+ * @tc.name: GetPointerStyleInfo_Found_004
+ * @tc.desc: Test GetPointerStyleInfo when both pid and windowId found with valid style
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputWindowsManagerTest, GetNormalPointerStyle_Found_004, TestSize.Level1)
+HWTEST_F(InputWindowsManagerTest, GetPointerStyleInfo_Found_004, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     InputWindowsManager winMgr;
@@ -16317,10 +15970,156 @@ HWTEST_F(InputWindowsManagerTest, GetNormalPointerStyle_Found_004, TestSize.Leve
     winMgr.pointerStyle_[TEST_PROCESS_ID][TEST_WINDOW_ID] = pointerStyle;
 
     PointerStyle styleRet;
-    int32_t ret = winMgr.GetNormalPointerStyle(TEST_PROCESS_ID, TEST_WINDOW_ID, styleRet);
+    int32_t ret = winMgr.GetPointerStyleInfo(TEST_PROCESS_ID, TEST_WINDOW_ID, styleRet);
 
     EXPECT_EQ(ret, RET_OK);
     EXPECT_EQ(styleRet.id, POINTER_STYLE_ID_1);
+}
+
+/**
+ * @tc.name: GetHostPidAndHostWindowId_NullToken_001
+ * @tc.desc: Test GetHostPidAndHostWindowId with null token
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, GetHostPidAndHostWindowId_NullToken_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager winMgr;
+
+    auto [isCheckOk, hostPid, hostWindowId] = winMgr.GetHostPidAndHostWindowId(
+        TEST_PROCESS_ID, TEST_WINDOW_ID, nullptr);
+
+    EXPECT_TRUE(isCheckOk);
+    EXPECT_EQ(hostPid, TEST_PROCESS_ID);
+    EXPECT_EQ(hostWindowId, TEST_WINDOW_ID);
+}
+
+/**
+ * @tc.name: GetHostPidAndHostWindowId_NoMatchUIExtension_002
+ * @tc.desc: Test GetHostPidAndHostWindowId when UIExtensionInfo not found
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, GetHostPidAndHostWindowId_NoMatchUIExtension_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager winMgr;
+
+    sptr<IRemoteObject> token = new (std::nothrow) IPCObjectProxy(0);
+    ASSERT_NE(token, nullptr);
+
+    auto [isCheckOk, hostPid, hostWindowId] = winMgr.GetHostPidAndHostWindowId(
+        TEST_PROCESS_ID, TEST_WINDOW_ID, token);
+
+    EXPECT_FALSE(isCheckOk);
+    EXPECT_EQ(hostPid, INVALID_PID);
+    EXPECT_EQ(hostWindowId, -1);
+}
+
+/**
+ * @tc.name: GetHostPidAndHostWindowId_GetWindowPidFail_003
+ * @tc.desc: Test GetHostPidAndHostWindowId when GetWindowPid returns invalid pid
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, GetHostPidAndHostWindowId_GetWindowPidFail_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager winMgr;
+
+    sptr<IRemoteObject> token = new (std::nothrow) IPCObjectProxy(0);
+    ASSERT_NE(token, nullptr);
+
+    UIExtensionInfo uecInfo(token, TEST_PROCESS_ID, TEST_WINDOW_ID);
+    winMgr.uiExtensionInfos_.push_back(uecInfo);
+
+    auto [isCheckOk, hostPid, hostWindowId] = winMgr.GetHostPidAndHostWindowId(
+        TEST_PROCESS_ID, TEST_WINDOW_ID, token);
+
+    EXPECT_FALSE(isCheckOk);
+    EXPECT_EQ(hostPid, INVALID_PID);
+    EXPECT_EQ(hostWindowId, -1);
+}
+
+/**
+ * @tc.name: GetHostPidAndHostWindowId_Success_004
+ * @tc.desc: Test GetHostPidAndHostWindowId success case
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, GetHostPidAndHostWindowId_Success_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager winMgr;
+
+    sptr<IRemoteObject> token = new (std::nothrow) IPCObjectProxy(0);
+    ASSERT_NE(token, nullptr);
+
+    UIExtensionInfo uecInfo(token, TEST_PROCESS_ID, TEST_WINDOW_ID);
+    winMgr.uiExtensionInfos_.push_back(uecInfo);
+
+    WindowInfo windowInfo;
+    windowInfo.id = TEST_WINDOW_ID;
+    windowInfo.pid = TEST_PROCESS_ID + 1;
+    auto it = winMgr.displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
+    if (it != winMgr.displayGroupInfoMap_.end()) {
+        it->second.windowsInfo.push_back(windowInfo);
+    }
+
+    auto [isCheckOk, hostPid, hostWindowId] = winMgr.GetHostPidAndHostWindowId(
+        TEST_PROCESS_ID, TEST_WINDOW_ID, token);
+
+    EXPECT_TRUE(isCheckOk);
+    EXPECT_EQ(hostPid, TEST_PROCESS_ID + 1);
+    EXPECT_EQ(hostWindowId, TEST_WINDOW_ID);
+}
+
+/**
+ * @tc.name: SetPointerStyle_GetHostFail_002
+ * @tc.desc: Test SetPointerStyle when GetHostPidAndHostWindowId fails
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, SetPointerStyle_GetHostFail_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager winMgr;
+
+    sptr<IRemoteObject> token = new (std::nothrow) IPCObjectProxy(0);
+    ASSERT_NE(token, nullptr);
+
+    PointerStyle pointerStyle;
+    pointerStyle.id = POINTER_STYLE_ID_1;
+
+    int32_t ret = winMgr.SetPointerStyle(TEST_PROCESS_ID, TEST_WINDOW_ID, pointerStyle, token);
+
+    EXPECT_EQ(ret, RET_ERR);
+}
+
+/**
+ * @tc.name: GetPointerStyle_GetHostFail_002
+ * @tc.desc: Test GetPointerStyle when GetHostPidAndHostWindowId fails (returns global style)
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, GetPointerStyle_GetHostFail_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager winMgr;
+
+    PointerStyle globalStyle;
+    globalStyle.id = MOUSE_ICON::DEVELOPER_DEFINED_ICON;
+    winMgr.globalStyle_ = globalStyle;
+
+    sptr<IRemoteObject> token = new (std::nothrow) IPCObjectProxy(0);
+    ASSERT_NE(token, nullptr);
+
+    PointerStyle styleRet;
+    int32_t ret = winMgr.GetPointerStyle(TEST_PROCESS_ID, TEST_WINDOW_ID, styleRet, token);
+
+    EXPECT_EQ(ret, RET_OK);
+    EXPECT_EQ(styleRet.id, MOUSE_ICON::DEVELOPER_DEFINED_ICON);
 }
 
 /**
