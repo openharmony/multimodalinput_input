@@ -233,6 +233,7 @@ int32_t TimerManager::CalcNextDelayInternal()
 
 void TimerManager::ProcessTimersInternal()
 {
+    std::list<std::function<void()>> tempCallbacks;
     std::lock_guard<std::recursive_mutex> lock(timerMutex_);
     if (timers_.empty()) {
         return;
@@ -265,8 +266,11 @@ void TimerManager::ProcessTimersInternal()
         }
         auto callback = curTimer->callback;
         InsertTimerInternal(curTimer);
-        callback();
+        tempCallbacks.emplace_back(callback);
         BytraceAdapter::MMIServiceTraceStop();
+    }
+    for(const auto & callback : tempCallbacks){
+        callback();
     }
 }
 } // namespace MMI
