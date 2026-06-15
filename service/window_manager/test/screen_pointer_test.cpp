@@ -667,36 +667,36 @@ HWTEST_F(ScreenPointerTest, ScreenPointerTest_UpdatePadding_001, TestSize.Level1
     ASSERT_NE(hwcmgr, nullptr);
     handler_ptr_t handler = nullptr;
     OLD::DisplayInfo di;
-    ScreenPointer* screenpointer = new ScreenPointer(hwcmgr, handler, di);
+    std::shared_ptr<ScreenPointer> screenpointer = std::make_shared<ScreenPointer>(hwcmgr, handler, di);
     ASSERT_NE(screenpointer, nullptr);
     screenpointer->mode_ = mode_t::SCREEN_MAIN;
-    uint32_t mainWidth = 0;
-    uint32_t mainHeight = 0;
-    bool ret = screenpointer->UpdatePadding(mainWidth, mainHeight);
+    uint32_t sourceScreenWidth = 0;
+    uint32_t sourceScreenHeight = 0;
+    bool ret = screenpointer->UpdatePadding(sourceScreenWidth, sourceScreenHeight);
     EXPECT_FALSE(ret);
     screenpointer->mode_ = mode_t::SCREEN_MIRROR;
-    mainWidth = 0;
-    mainHeight = 0;
-    ret = screenpointer->UpdatePadding(mainWidth, mainHeight);
+    sourceScreenWidth = 0;
+    sourceScreenHeight = 0;
+    ret = screenpointer->UpdatePadding(sourceScreenWidth, sourceScreenHeight);
     EXPECT_FALSE(ret);
-    mainWidth = 0;
-    mainHeight = 5;
-    ret = screenpointer->UpdatePadding(mainWidth, mainHeight);
+    sourceScreenWidth = 0;
+    sourceScreenHeight = 5;
+    ret = screenpointer->UpdatePadding(sourceScreenWidth, sourceScreenHeight);
     EXPECT_FALSE(ret);
-    mainWidth = 5;
-    mainHeight = 0;
-    ret = screenpointer->UpdatePadding(mainWidth, mainHeight);
+    sourceScreenWidth = 5;
+    sourceScreenHeight = 0;
+    ret = screenpointer->UpdatePadding(sourceScreenWidth, sourceScreenHeight);
     EXPECT_FALSE(ret);
-    mainWidth = 5;
-    mainHeight = 5;
+    sourceScreenWidth = 5;
+    sourceScreenHeight = 5;
     screenpointer->rotation_ = rotation_t::ROTATION_90;
-    ret = screenpointer->UpdatePadding(mainWidth, mainHeight);
+    ret = screenpointer->UpdatePadding(sourceScreenWidth, sourceScreenHeight);
     EXPECT_TRUE(ret);
     screenpointer->rotation_ = rotation_t::ROTATION_180;
-    ret = screenpointer->UpdatePadding(mainWidth, mainHeight);
+    ret = screenpointer->UpdatePadding(sourceScreenWidth, sourceScreenHeight);
     EXPECT_TRUE(ret);
     screenpointer->rotation_ = rotation_t::ROTATION_270;
-    ret = screenpointer->UpdatePadding(mainWidth, mainHeight);
+    ret = screenpointer->UpdatePadding(sourceScreenWidth, sourceScreenHeight);
     EXPECT_TRUE(ret);
 }
 
@@ -1219,14 +1219,13 @@ HWTEST_F(ScreenPointerTest, ScreenPointerTest_UpdatePadding_002, TestSize.Level1
     ASSERT_NE(hwcmgr, nullptr);
     handler_ptr_t handler = nullptr;
     OLD::DisplayInfo di;
-    ScreenPointer* screenpointer = new ScreenPointer(hwcmgr, handler, di);
+    std::shared_ptr<ScreenPointer> screenpointer = std::make_shared<ScreenPointer>(hwcmgr, handler, di);
     ASSERT_NE(screenpointer, nullptr);
     screenpointer->mode_ = mode_t::SCREEN_MAIN;
-    uint32_t mainWidth = 1920;
-    uint32_t mainHeight = 1080;
-    bool ret = screenpointer->UpdatePadding(mainWidth, mainHeight);
+    uint32_t sourceScreenWidth = 1920;
+    uint32_t sourceScreenHeight = 1080;
+    bool ret = screenpointer->UpdatePadding(sourceScreenWidth, sourceScreenHeight);
     EXPECT_FALSE(ret);
-    delete screenpointer;
 }
 
 /**
@@ -1949,6 +1948,239 @@ HWTEST_F(ScreenPointerTest, ScreenPointerTest_CalculateHwcPositionForExtend_008,
     screenpointer->CalculateHwcPositionForExtend(x, y);
     EXPECT_EQ(x, 1870);
     EXPECT_EQ(y, 980);
+}
+
+/**
+ * @tc.name: ScreenPointerTest_UpdatePadding_003
+ * @tc.desc: Test UpdatePadding with SCREEN_MAIN mode and ROTATION_90
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(ScreenPointerTest, ScreenPointerTest_UpdatePadding_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    hwcmgr_ptr_t hwcmgr = std::make_shared<HardwareCursorPointerManager>();
+    ASSERT_NE(hwcmgr, nullptr);
+    handler_ptr_t handler = nullptr;
+    OLD::DisplayInfo di;
+    di.width = 1080;
+    di.height = 1920;
+    std::shared_ptr<ScreenPointer> screenpointer = std::make_shared<ScreenPointer>(hwcmgr, handler, di);
+    ASSERT_NE(screenpointer, nullptr);
+    screenpointer->mode_ = mode_t::SCREEN_MIRROR;
+    screenpointer->rotation_ = rotation_t::ROTATION_90;
+    screenpointer->width_ = 1920;
+    screenpointer->height_ = 1080;
+    uint32_t sourceScreenWidth = 1080;
+    uint32_t sourceScreenHeight = 1920;
+    bool ret = screenpointer->UpdatePadding(sourceScreenWidth, sourceScreenHeight);
+    EXPECT_TRUE(ret);
+}
+
+/**
+ * @tc.name: ScreenPointerTest_UpdatePadding_004
+ * @tc.desc: Test UpdatePadding with SCREEN_MAIN mode and ROTATION_270
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(ScreenPointerTest, ScreenPointerTest_UpdatePadding_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    hwcmgr_ptr_t hwcmgr = std::make_shared<HardwareCursorPointerManager>();
+    ASSERT_NE(hwcmgr, nullptr);
+    handler_ptr_t handler = nullptr;
+    OLD::DisplayInfo di;
+    di.width = 1080;
+    di.height = 1920;
+    std::shared_ptr<ScreenPointer> screenpointer = std::make_shared<ScreenPointer>(hwcmgr, handler, di);
+    ASSERT_NE(screenpointer, nullptr);
+    screenpointer->mode_ = mode_t::SCREEN_MIRROR;
+    screenpointer->rotation_ = rotation_t::ROTATION_270;
+    screenpointer->width_ = 1920;
+    screenpointer->height_ = 1080;
+    uint32_t sourceScreenWidth = 1080;
+    uint32_t sourceScreenHeight = 1920;
+    bool ret = screenpointer->UpdatePadding(sourceScreenWidth, sourceScreenHeight);
+    EXPECT_TRUE(ret);
+}
+
+/**
+ * @tc.name: ScreenPointerTest_UpdatePadding_005
+ * @tc.desc: Test UpdatePadding with SCREEN_MAIN mode and ROTATION_0
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(ScreenPointerTest, ScreenPointerTest_UpdatePadding_005, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    hwcmgr_ptr_t hwcmgr = std::make_shared<HardwareCursorPointerManager>();
+    ASSERT_NE(hwcmgr, nullptr);
+    handler_ptr_t handler = nullptr;
+    OLD::DisplayInfo di;
+    std::shared_ptr<ScreenPointer> screenpointer = std::make_shared<ScreenPointer>(hwcmgr, handler, di);
+    ASSERT_NE(screenpointer, nullptr);
+    screenpointer->mode_ = mode_t::SCREEN_MIRROR;
+    screenpointer->rotation_ = rotation_t::ROTATION_0;
+    screenpointer->width_ = 1920;
+    screenpointer->height_ = 1080;
+    uint32_t sourceScreenWidth = 1920;
+    uint32_t sourceScreenHeight = 1080;
+    bool ret = screenpointer->UpdatePadding(sourceScreenWidth, sourceScreenHeight);
+    EXPECT_TRUE(ret);
+}
+
+/**
+ * @tc.name: ScreenPointerTest_UpdatePadding_006
+ * @tc.desc: Test UpdatePadding with SCREEN_MIRROR mode and sourceScreenRotation_ ROTATION_90
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(ScreenPointerTest, ScreenPointerTest_UpdatePadding_006, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    hwcmgr_ptr_t hwcmgr = std::make_shared<HardwareCursorPointerManager>();
+    ASSERT_NE(hwcmgr, nullptr);
+    handler_ptr_t handler = nullptr;
+    OLD::DisplayInfo di;
+    std::shared_ptr<ScreenPointer> screenpointer = std::make_shared<ScreenPointer>(hwcmgr, handler, di);
+    ASSERT_NE(screenpointer, nullptr);
+    screenpointer->mode_ = mode_t::SCREEN_MIRROR;
+    screenpointer->SetSourceScreenRotation(rotation_t::ROTATION_90);
+    screenpointer->width_ = 1920;
+    screenpointer->height_ = 1080;
+    uint32_t sourceScreenWidth = 1080;
+    uint32_t sourceScreenHeight = 1920;
+    bool ret = screenpointer->UpdatePadding(sourceScreenWidth, sourceScreenHeight);
+    EXPECT_TRUE(ret);
+}
+
+/**
+ * @tc.name: ScreenPointerTest_UpdatePadding_007
+ * @tc.desc: Test UpdatePadding with SCREEN_MIRROR mode and sourceScreenRotation_ ROTATION_270
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(ScreenPointerTest, ScreenPointerTest_UpdatePadding_007, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    hwcmgr_ptr_t hwcmgr = std::make_shared<HardwareCursorPointerManager>();
+    ASSERT_NE(hwcmgr, nullptr);
+    handler_ptr_t handler = nullptr;
+    OLD::DisplayInfo di;
+    std::shared_ptr<ScreenPointer> screenpointer = std::make_shared<ScreenPointer>(hwcmgr, handler, di);
+    ASSERT_NE(screenpointer, nullptr);
+    screenpointer->mode_ = mode_t::SCREEN_MIRROR;
+    screenpointer->SetSourceScreenRotation(rotation_t::ROTATION_270);
+    screenpointer->width_ = 1920;
+    screenpointer->height_ = 1080;
+    uint32_t sourceScreenWidth = 1080;
+    uint32_t sourceScreenHeight = 1920;
+    bool ret = screenpointer->UpdatePadding(sourceScreenWidth, sourceScreenHeight);
+    EXPECT_TRUE(ret);
+}
+
+/**
+ * @tc.name: ScreenPointerTest_UpdatePadding_008
+ * @tc.desc: Test UpdatePadding with SCREEN_MIRROR mode and sourceScreenRotation_ ROTATION_0
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(ScreenPointerTest, ScreenPointerTest_UpdatePadding_008, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    hwcmgr_ptr_t hwcmgr = std::make_shared<HardwareCursorPointerManager>();
+    ASSERT_NE(hwcmgr, nullptr);
+    handler_ptr_t handler = nullptr;
+    OLD::DisplayInfo di;
+    std::shared_ptr<ScreenPointer> screenpointer = std::make_shared<ScreenPointer>(hwcmgr, handler, di);
+    ASSERT_NE(screenpointer, nullptr);
+    screenpointer->mode_ = mode_t::SCREEN_MIRROR;
+    screenpointer->SetSourceScreenRotation(rotation_t::ROTATION_0);
+    screenpointer->width_ = 1920;
+    screenpointer->height_ = 1080;
+    uint32_t sourceScreenWidth = 1920;
+    uint32_t sourceScreenHeight = 1080;
+    bool ret = screenpointer->UpdatePadding(sourceScreenWidth, sourceScreenHeight);
+    EXPECT_TRUE(ret);
+}
+
+/**
+ * @tc.name: ScreenPointerTest_UpdatePadding_010
+ * @tc.desc: Test UpdatePadding with different screen dimensions to verify scale and padding calculation
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(ScreenPointerTest, ScreenPointerTest_UpdatePadding_010, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    hwcmgr_ptr_t hwcmgr = std::make_shared<HardwareCursorPointerManager>();
+    ASSERT_NE(hwcmgr, nullptr);
+    handler_ptr_t handler = nullptr;
+    OLD::DisplayInfo di;
+    std::shared_ptr<ScreenPointer> screenpointer = std::make_shared<ScreenPointer>(hwcmgr, handler, di);
+    ASSERT_NE(screenpointer, nullptr);
+    screenpointer->mode_ = mode_t::SCREEN_MIRROR;
+    screenpointer->width_ = 1920;
+    screenpointer->height_ = 1080;
+    screenpointer->SetSourceScreenRotation(rotation_t::ROTATION_0);
+    uint32_t sourceScreenWidth = 3840;
+    uint32_t sourceScreenHeight = 2160;
+    bool ret = screenpointer->UpdatePadding(sourceScreenWidth, sourceScreenHeight);
+    EXPECT_TRUE(ret);
+    float expectedScale = fmin(float(1920) / 3840, float(1080) / 2160);
+    EXPECT_FLOAT_EQ(screenpointer->GetScale(), expectedScale);
+}
+
+/**
+ * @tc.name: ScreenPointerTest_UpdatePadding_011
+ * @tc.desc: Test UpdatePadding with SCREEN_MIRROR mode and sourceScreenRotation_ ROTATION_180
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(ScreenPointerTest, ScreenPointerTest_UpdatePadding_011, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    hwcmgr_ptr_t hwcmgr = std::make_shared<HardwareCursorPointerManager>();
+    ASSERT_NE(hwcmgr, nullptr);
+    handler_ptr_t handler = nullptr;
+    OLD::DisplayInfo di;
+    std::shared_ptr<ScreenPointer> screenpointer = std::make_shared<ScreenPointer>(hwcmgr, handler, di);
+    ASSERT_NE(screenpointer, nullptr);
+    screenpointer->mode_ = mode_t::SCREEN_MIRROR;
+    screenpointer->SetSourceScreenRotation(rotation_t::ROTATION_180);
+    screenpointer->width_ = 1920;
+    screenpointer->height_ = 1080;
+    uint32_t sourceScreenWidth = 1920;
+    uint32_t sourceScreenHeight = 1080;
+    bool ret = screenpointer->UpdatePadding(sourceScreenWidth, sourceScreenHeight);
+    EXPECT_TRUE(ret);
+}
+
+/**
+ * @tc.name: ScreenPointerTest_UpdatePadding_012
+ * @tc.desc: Test UpdatePadding with SCREEN_MIRROR mode and rotation_ ROTATION_90
+ *           to verify rotation_ does not affect mirror screen logic
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(ScreenPointerTest, ScreenPointerTest_UpdatePadding_012, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    hwcmgr_ptr_t hwcmgr = std::make_shared<HardwareCursorPointerManager>();
+    ASSERT_NE(hwcmgr, nullptr);
+    handler_ptr_t handler = nullptr;
+    OLD::DisplayInfo di;
+    std::shared_ptr<ScreenPointer> screenpointer = std::make_shared<ScreenPointer>(hwcmgr, handler, di);
+    ASSERT_NE(screenpointer, nullptr);
+    screenpointer->mode_ = mode_t::SCREEN_MIRROR;
+    screenpointer->rotation_ = rotation_t::ROTATION_90;
+    screenpointer->SetSourceScreenRotation(rotation_t::ROTATION_0);
+    screenpointer->width_ = 1920;
+    screenpointer->height_ = 1080;
+    uint32_t sourceScreenWidth = 1920;
+    uint32_t sourceScreenHeight = 1080;
+    bool ret = screenpointer->UpdatePadding(sourceScreenWidth, sourceScreenHeight);
+    EXPECT_TRUE(ret);
 }
 } // namespace MMI
 } // namespace OHOS
