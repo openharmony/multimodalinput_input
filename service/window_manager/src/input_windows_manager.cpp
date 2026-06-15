@@ -1461,6 +1461,10 @@ GlobalCoords InputWindowsManager::DisplayCoords2GlobalCoords(const Coordinate2D 
 void InputWindowsManager::ResetPointerPosition(const OLD::DisplayGroupInfo &displayGroupInfo)
 {
     CALL_DEBUG_ENTER;
+    if (IsInPointerLockMode()) {
+        MMI_HILOGI("Pointer is in lock mode, skip reset to center");
+        return;
+    }
     if (displayGroupInfo.displaysInfo.empty()) {
         return;
     }
@@ -2350,6 +2354,10 @@ void InputWindowsManager::UpdateDisplayMode(int32_t groupId)
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
 void InputWindowsManager::DrawPointer(bool isDisplayChanged)
 {
+    if (isDisplayChanged && IsInPointerLockMode()) {
+        MMI_HILOGI("Pointer is in lock mode, skip draw center pointer");
+        return;
+    }
     if (!isDisplayChanged) {
         CursorDrawingComponent::GetInstance().DrawPointerStyle(dragPointerStyle_);
     } else {
@@ -6604,7 +6612,7 @@ bool InputWindowsManager::IsFirstTouch(int32_t pointerId, int32_t itemSize)
     return false;
 }
 
-bool InputWindowsManager::IsInPointereLockMode()
+bool InputWindowsManager::IsInPointerLockMode()
 {
     return (pointerLockedWindow_.flags & WindowInputPolicy::FLAG_POINTER_LOCKED) ==
                 WindowInputPolicy::FLAG_POINTER_LOCKED ||
@@ -7632,7 +7640,7 @@ void InputWindowsManager::UpdateAndAdjustMouseLocation(int32_t& displayId, doubl
     int32_t lastDisplayId = displayId;
 
     // 2. Handle pointer lock mode
-    if (IsInPointereLockMode()) {
+    if (IsInPointerLockMode()) {
         displayInfo = AdjustDisplayIdForPointerLock(displayId);
     } else {
         // 3. Handle cross-display boundary

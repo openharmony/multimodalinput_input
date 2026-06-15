@@ -15171,61 +15171,154 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetCursorWindowInfo_01
 }
 
 /**
- * @tc.name: InputWindowsManagerTest_IsInPointereLockMode_001
- * @tc.desc: Test IsInPointereLockMode with FLAG_POINTER_LOCKED
+ * @tc.name: InputWindowsManagerTest_IsInPointerLockMode_001
+ * @tc.desc: Test IsInPointerLockMode with FLAG_POINTER_LOCKED
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsInPointereLockMode_001, TestSize.Level1)
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsInPointerLockMode_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     InputWindowsManager inputWindowsMgr;
     inputWindowsMgr.pointerLockedWindow_.flags = WindowInputPolicy::FLAG_POINTER_LOCKED;
-    EXPECT_TRUE(inputWindowsMgr.IsInPointereLockMode());
+    EXPECT_TRUE(inputWindowsMgr.IsInPointerLockMode());
 }
 
 /**
- * @tc.name: InputWindowsManagerTest_IsInPointereLockMode_002
- * @tc.desc: Test IsInPointereLockMode with FLAG_POINTER_CONFINED
+ * @tc.name: InputWindowsManagerTest_IsInPointerLockMode_002
+ * @tc.desc: Test IsInPointerLockMode with FLAG_POINTER_CONFINED
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsInPointereLockMode_002, TestSize.Level1)
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsInPointerLockMode_002, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     InputWindowsManager inputWindowsMgr;
     inputWindowsMgr.pointerLockedWindow_.flags = WindowInputPolicy::FLAG_POINTER_CONFINED;
-    EXPECT_TRUE(inputWindowsMgr.IsInPointereLockMode());
+    EXPECT_TRUE(inputWindowsMgr.IsInPointerLockMode());
 }
 
 /**
- * @tc.name: InputWindowsManagerTest_IsInPointereLockMode_003
- * @tc.desc: Test IsInPointereLockMode with no flags set
+ * @tc.name: InputWindowsManagerTest_IsInPointerLockMode_003
+ * @tc.desc: Test IsInPointerLockMode with no flags set
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsInPointereLockMode_003, TestSize.Level1)
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsInPointerLockMode_003, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     InputWindowsManager inputWindowsMgr;
     inputWindowsMgr.pointerLockedWindow_.flags = 0;
-    EXPECT_FALSE(inputWindowsMgr.IsInPointereLockMode());
+    EXPECT_FALSE(inputWindowsMgr.IsInPointerLockMode());
 }
 
 /**
- * @tc.name: InputWindowsManagerTest_IsInPointereLockMode_004
- * @tc.desc: Test IsInPointereLockMode with both flags set
+ * @tc.name: InputWindowsManagerTest_IsInPointerLockMode_004
+ * @tc.desc: Test IsInPointerLockMode with both flags set
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsInPointereLockMode_004, TestSize.Level1)
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsInPointerLockMode_004, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     InputWindowsManager inputWindowsMgr;
     inputWindowsMgr.pointerLockedWindow_.flags =
         WindowInputPolicy::FLAG_POINTER_LOCKED | WindowInputPolicy::FLAG_POINTER_CONFINED;
-    EXPECT_TRUE(inputWindowsMgr.IsInPointereLockMode());
+    EXPECT_TRUE(inputWindowsMgr.IsInPointerLockMode());
 }
+
+/**
+ * @tc.name: InputWindowsManagerTest_ResetPointerPosition_002
+ * @tc.desc: Test ResetPointerPosition with pointer lock mode active returns early
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_ResetPointerPosition_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsMgr;
+    inputWindowsMgr.pointerLockedWindow_.flags = WindowInputPolicy::FLAG_POINTER_LOCKED;
+    EXPECT_TRUE(inputWindowsMgr.IsInPointerLockMode());
+    OLD::DisplayGroupInfo displayGroupInfo;
+    inputWindowsMgr.ResetPointerPosition(displayGroupInfo);
+    EXPECT_TRUE(inputWindowsMgr.IsInPointerLockMode());
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_ResetPointerPosition_005
+ * @tc.desc: Test ResetPointerPosition with pointer confined mode active returns early
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_ResetPointerPosition_005, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsMgr;
+    inputWindowsMgr.pointerLockedWindow_.flags = WindowInputPolicy::FLAG_POINTER_CONFINED;
+    EXPECT_TRUE(inputWindowsMgr.IsInPointerLockMode());
+    OLD::DisplayGroupInfo displayGroupInfo;
+    inputWindowsMgr.ResetPointerPosition(displayGroupInfo);
+    EXPECT_TRUE(inputWindowsMgr.IsInPointerLockMode());
+}
+
+#if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
+/**
+ * @tc.name: InputWindowsManagerTest_DrawPointer_004
+ * @tc.desc: Test DrawPointer with isDisplayChanged=true and pointer lock mode returns early
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_DrawPointer_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsMgr;
+    inputWindowsMgr.pointerLockedWindow_.flags = WindowInputPolicy::FLAG_POINTER_LOCKED;
+    EXPECT_TRUE(inputWindowsMgr.IsInPointerLockMode());
+    bool isDisplayChanged = true;
+    bool expectEarlyReturn = isDisplayChanged && inputWindowsMgr.IsInPointerLockMode();
+    EXPECT_TRUE(expectEarlyReturn);
+    inputWindowsMgr.DrawPointer(isDisplayChanged);
+    EXPECT_TRUE(inputWindowsMgr.IsInPointerLockMode());
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_DrawPointer_005
+ * @tc.desc: Test DrawPointer with isDisplayChanged=true and pointer confined mode returns early
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_DrawPointer_005, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsMgr;
+    inputWindowsMgr.pointerLockedWindow_.flags = WindowInputPolicy::FLAG_POINTER_CONFINED;
+    EXPECT_TRUE(inputWindowsMgr.IsInPointerLockMode());
+    bool isDisplayChanged = true;
+    bool expectEarlyReturn = isDisplayChanged && inputWindowsMgr.IsInPointerLockMode();
+    EXPECT_TRUE(expectEarlyReturn);
+    inputWindowsMgr.DrawPointer(isDisplayChanged);
+    EXPECT_TRUE(inputWindowsMgr.IsInPointerLockMode());
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_DrawPointer_006
+ * @tc.desc: Test DrawPointer with isDisplayChanged=false and pointer lock mode does not return early
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_DrawPointer_006, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsMgr;
+    inputWindowsMgr.pointerLockedWindow_.flags = WindowInputPolicy::FLAG_POINTER_LOCKED;
+    EXPECT_TRUE(inputWindowsMgr.IsInPointerLockMode());
+    bool isDisplayChanged = false;
+    bool expectEarlyReturn = isDisplayChanged && inputWindowsMgr.IsInPointerLockMode();
+    EXPECT_FALSE(expectEarlyReturn);
+    inputWindowsMgr.DrawPointer(isDisplayChanged);
+    EXPECT_TRUE(inputWindowsMgr.IsInPointerLockMode());
+}
+#endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
 
 /**
  * @tc.name: InputWindowsManagerTest_ConvertToPhysicalCoordinates_001
