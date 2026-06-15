@@ -115,7 +115,7 @@ void TimerManager::ProcessTimers()
 {
     std::list<std::function<void()>> callbacks;
     ProcessTimersInternal(callbacks);
-    for (const auto & callback : callbacks) {
+    for (const auto &callback : callbacks) {
         callback();
     }
 }
