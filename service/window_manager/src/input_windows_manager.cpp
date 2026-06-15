@@ -1491,6 +1491,9 @@ void InputWindowsManager::ResetPointerPosition(const OLD::DisplayGroupInfo &disp
 
 void InputWindowsManager::SupplementPointerMoveEvent()
 {
+    if (!CursorDrawingComponent::GetInstance().IsCursorShowing()) {
+        return;
+    }
     auto lastPointerEvent = GetLastPointerEvent();
     if (lastPointerEvent == nullptr) {
         return;
