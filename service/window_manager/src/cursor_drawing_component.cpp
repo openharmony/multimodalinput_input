@@ -214,6 +214,11 @@ void CursorDrawingComponent::UnLoad()
     MMI_HILOGI("UnLoad %{public}s is succeeded", MULTIMODAL_PATH_NAME);
 }
 
+bool CursorDrawingComponent::IsCursorShowing() const
+{
+    return POINTER_DEV_MGR.isPointerVisible;
+}
+
 void CursorDrawingComponent::DrawPointer(uint64_t displayId, int32_t physicalX, int32_t physicalY,
     const PointerStyle pointerStyle, Direction direction)
 {

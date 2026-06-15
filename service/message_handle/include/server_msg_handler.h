@@ -152,6 +152,7 @@ public:
     int32_t RegisterWindowStateErrorCallback(SessionPtr sess, NetPacket &pkt);
     int32_t EnableInputExtension(int32_t uid, const std::string &uuid, bool enabled);
     bool IsApplicationType(int32_t pid);
+    int32_t UpdateCursorVisibility(int32_t pid, bool visible, int32_t priority, bool isHap);
 
 protected:
     int32_t OnRegisterMsgHandler(SessionPtr sess, NetPacket& pkt);

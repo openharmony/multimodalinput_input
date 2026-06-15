@@ -1469,12 +1469,12 @@ void InputWindowsManager::ResetPointerPosition(const OLD::DisplayGroupInfo &disp
     for (auto &currentDisplay : displayGroupInfo.displaysInfo) {
         if ((currentDisplay.displaySourceMode == OHOS::MMI::DisplaySourceMode::SCREEN_MAIN)) {
             auto displayInfo = GetPhysicalDisplay(oldPtrPos.displayId);
-            CHKPV(displayInfo);
-            MMI_HILOGI("CurDisplayId:%{public}" PRIu64 ", oldDisplayId:%{public}" PRIu64,
-                currentDisplay.rsId, displayInfo->rsId);
-            if ((displayInfo->rsId != currentDisplay.rsId) || (!IsPointerOnCenter(oldPtrPos, currentDisplay))) {
+            if ((displayInfo == nullptr) ||
+                (displayInfo->rsId != currentDisplay.rsId) ||
+                (!IsPointerOnCenter(oldPtrPos, currentDisplay))) {
                 cursorPos = ResetCursorPos(displayGroupInfo);
                 UpdateAndAdjustMouseLocation(cursorPos.displayId, cursorPos.cursorPos.x, cursorPos.cursorPos.y);
+                SupplementPointerMoveEvent();
             }
             break;
         }
@@ -1487,6 +1487,37 @@ void InputWindowsManager::ResetPointerPosition(const OLD::DisplayGroupInfo &disp
         return;
     }
     (void)SendBackCenterPointerEvent(cursorPos);
+}
+
+void InputWindowsManager::SupplementPointerMoveEvent()
+{
+    auto lastPointerEvent = GetLastPointerEvent();
+    if (lastPointerEvent == nullptr) {
+        return;
+    }
+    auto pointerEvent = std::make_shared<PointerEvent>(*lastPointerEvent);
+    PointerEvent::PointerItem item {};
+    if (!pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), item)) {
+        return;
+    }
+    const auto mouseInfo = GetMouseInfo();
+    item.SetDisplayX(mouseInfo.physicalX);
+    item.SetDisplayY(mouseInfo.physicalY);
+    item.SetDisplayXPos(mouseInfo.physicalX);
+    item.SetDisplayYPos(mouseInfo.physicalY);
+    pointerEvent->UpdatePointerItem(pointerEvent->GetPointerId(), item);
+    const auto time = GetSysClockTime();
+    pointerEvent->SetActionTime(time);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
+    pointerEvent->SetTargetDisplayId(mouseInfo.displayId);
+    pointerEvent->SetTargetWindowId(-1);
+    pointerEvent->SetAgentWindowId(-1);
+    pointerEvent->UpdateId();
+
+    auto norm = InputHandler->GetEventNormalizeHandler();
+    if (norm != nullptr) {
+        norm->HandlePointerEvent(pointerEvent);
+    }
 }
 
 void InputWindowsManager::OnScreenModeChangeForMirrorScreen(size_t screenCount)
@@ -2108,6 +2139,11 @@ void InputWindowsManager::UpdateDisplayInfo(OLD::DisplayGroupInfo &displayGroupI
     bFlag = (!Rosen::SceneBoardJudgement::IsSceneBoardEnabled() || action == WINDOW_UPDATE_ACTION::ADD_END)
         && (displayGroupInfo.userState == UserState::USER_ACTIVE);
     if (bFlag) {
+        PrintChangedWindowBySync(displayGroupInfo);
+        CleanInvalidPixelMap(groupId);
+        HandleValidDisplayChange(displayGroupInfo);
+        displayGroupInfoMap_[groupId] = displayGroupInfo;
+        displayGroupInfo_ = displayGroupInfo;
 #ifdef OHOS_BUILD_ENABLE_EXTERNAL_SCREEN
         bool isDisplayUpdate = needBackCenter;
         const auto backCenterIter = backCenterDisplayChangeMap_.find(displayGroupInfo.groupId);
@@ -2119,11 +2155,6 @@ void InputWindowsManager::UpdateDisplayInfo(OLD::DisplayGroupInfo &displayGroupI
             ResetPointerPosition(displayGroupInfo);
         }
 #endif // OHOS_BUILD_ENABLE_EXTERNAL_SCREEN
-        PrintChangedWindowBySync(displayGroupInfo);
-        CleanInvalidPixelMap(groupId);
-        HandleValidDisplayChange(displayGroupInfo);
-        displayGroupInfoMap_[groupId] = displayGroupInfo;
-        displayGroupInfo_ = displayGroupInfo;
         UpdateWindowsInfoPerDisplay(displayGroupInfo);
         HandleWindowPositionChange(displayGroupInfo);
         EnterMouseCaptureMode(displayGroupInfo);
