@@ -258,7 +258,7 @@ void TimerManager::ProcessTimersInternal(std::list<std::function<void()>>& callb
         timers_.erase(it);
         ++curTimer->callbackCount;
         if ((curTimer->repeatCount >= 1) && (curTimer->callbackCount >= curTimer->repeatCount)) {
-            curTimer->callback();
+            callbacks.emplace_back(curTimer->callback());
             BytraceAdapter::MMIServiceTraceStop();
             continue;
         }
