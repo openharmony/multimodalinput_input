@@ -415,7 +415,8 @@ HWTEST_F(TimerManagerTest, TimerManagerTest_ProcessTimersInternal_001, TestSize.
 {
     CALL_TEST_DEBUG;
     TimerManager timermanager;
-    ASSERT_NO_FATAL_FAILURE(timermanager.ProcessTimersInternal());
+    std::list<std::function<void()>> callbacks;
+    ASSERT_NO_FATAL_FAILURE(timermanager.ProcessTimersInternal(callbacks));
 }
 
 /**
@@ -430,7 +431,8 @@ HWTEST_F(TimerManagerTest, TimerManagerTest_ProcessTimersInternal, TestSize.Leve
     auto timer = std::make_unique<TimerManager::TimerItem>();
     timer->nextCallTime = 10000000000;
     tMgr.InsertTimerInternal(timer);
-    ASSERT_NO_FATAL_FAILURE(tMgr.ProcessTimersInternal());
+    std::list<std::function<void()>> callbacks;
+    ASSERT_NO_FATAL_FAILURE(timermanager.ProcessTimersInternal(callbacks));
 }
 
 /**
@@ -662,7 +664,8 @@ HWTEST_F(TimerManagerTest, TimerManagerTest_ProcessTimersInternal_002, TestSize.
     auto callback = [&callbackExecuted]() { callbackExecuted = true; };
     int32_t timerId = timermanager.AddTimerInternal(0, 1, callback, "test_timer");
     ASSERT_GE(timerId, 0);
-    timermanager.ProcessTimersInternal();
+    std::list<std::function<void()>> callbacks;
+    timermanager.ProcessTimersInternal(callbacks);
     EXPECT_TRUE(callbackExecuted);
 }
 
@@ -679,7 +682,8 @@ HWTEST_F(TimerManagerTest, TimerManagerTest_ProcessTimersInternal_003, TestSize.
     auto callback = [&callCount]() { callCount++; };
     int32_t timerId = timermanager.AddTimerInternal(0, 1, callback, "single_shot");
     ASSERT_GE(timerId, 0);
-    timermanager.ProcessTimersInternal();
+    std::list<std::function<void()>> callbacks;
+    timermanager.ProcessTimersInternal(callbacks);
     EXPECT_EQ(callCount, 1);
 }
 
@@ -698,7 +702,8 @@ HWTEST_F(TimerManagerTest, TimerManagerTest_ProcessTimersInternal_004, TestSize.
     auto cb2 = [&callCount2]() { callCount2++; };
     timermanager.AddTimerInternal(0, 1, cb1, "t1");
     timermanager.AddTimerInternal(0, 1, cb2, "t2");
-    timermanager.ProcessTimersInternal();
+    std::list<std::function<void()>> callbacks;
+    timermanager.ProcessTimersInternal(callbacks);
     EXPECT_EQ(callCount1, 1);
     EXPECT_EQ(callCount2, 1);
 }
@@ -716,7 +721,8 @@ HWTEST_F(TimerManagerTest, TimerManagerTest_ProcessTimersInternal_005, TestSize.
     auto callback = [&callbackExecuted]() { callbackExecuted = true; };
     int32_t timerId = timermanager.AddTimerInternal(5000, 1, callback, "future_timer");
     ASSERT_GE(timerId, 0);
-    timermanager.ProcessTimersInternal();
+    std::list<std::function<void()>> callbacks;
+    timermanager.ProcessTimersInternal(callbacks);
     EXPECT_FALSE(callbackExecuted);
 }
 } // namespace MMI
