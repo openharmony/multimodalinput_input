@@ -60,7 +60,7 @@ private:
     bool IsExistInternal(int32_t timerId);
     void InsertTimerInternal(std::unique_ptr<TimerItem>& timer);
     int32_t CalcNextDelayInternal();
-    void ProcessTimersInternal();
+    void ProcessTimersInternal(std::list<std::function<void()>>& callbacks);
 
 private:
     static std::once_flag initFlag_;

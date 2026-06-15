@@ -113,7 +113,11 @@ int32_t TimerManager::CalcNextDelay()
 
 void TimerManager::ProcessTimers()
 {
-    ProcessTimersInternal();
+    std::list<std::function<void()>> callbacks;
+    ProcessTimersInternal(callbacks);
+    for (const auto &callback : callbacks) {
+        callback();
+    }
 }
 
 int32_t TimerManager::TakeNextTimerId()
@@ -231,7 +235,7 @@ int32_t TimerManager::CalcNextDelayInternal()
     return delay;
 }
 
-void TimerManager::ProcessTimersInternal()
+void TimerManager::ProcessTimersInternal(std::list<std::function<void()>>& callbacks)
 {
     std::lock_guard<std::recursive_mutex> lock(timerMutex_);
     if (timers_.empty()) {
@@ -265,7 +269,7 @@ void TimerManager::ProcessTimersInternal()
         }
         auto callback = curTimer->callback;
         InsertTimerInternal(curTimer);
-        callback();
+        callbacks.emplace_back(callback);
         BytraceAdapter::MMIServiceTraceStop();
     }
 }
