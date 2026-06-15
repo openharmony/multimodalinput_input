@@ -48,7 +48,7 @@ public:
     bool Init(PointerRenderer &render, bool needDrawPointer = true);
     bool InitSurface(bool needDrawPointer);
     void UpdateScreenInfo(screen_info_ptr_t si, bool needDrawPointer);
-    bool UpdatePadding(uint32_t mainWidth, uint32_t mainHeight);
+    bool UpdatePadding(uint32_t sourceScreenWidth, uint32_t sourceScreenHeight);
     void OnDisplayInfo(const OLD::DisplayInfo &di);
 
     buffer_ptr_t GetDefaultBuffer();

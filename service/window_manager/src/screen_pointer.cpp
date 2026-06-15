@@ -47,7 +47,10 @@ constexpr uint32_t POINTER_SIZE_FOLD_PC { 2 };
 constexpr int32_t ANGLE_90 { 90 };
 constexpr int32_t ANGLE_360 { 360 };
 
-
+/*
+ * 获取当前屏幕宽，该宽不跟随屏幕旋转
+ * 使用"hidumper -s 10 -a screen"查看GetModes值
+ */
 uint32_t GetScreenInfoWidth(screen_info_ptr_t si)
 {
     uint32_t width = 0;
@@ -58,6 +61,11 @@ uint32_t GetScreenInfoWidth(screen_info_ptr_t si)
     }
     return modes[modeId]->width_;
 }
+
+/*
+ * 获取当前屏幕高，该高不跟随屏幕旋转
+ * 使用"hidumper -s 10 -a screen"查看GetModes值
+ */
 uint32_t GetScreenInfoHeight(screen_info_ptr_t si)
 {
     uint32_t height = 0;
@@ -336,7 +344,7 @@ bool ScreenPointer::InitSurface(bool needDrawPointer)
     return true;
 }
 
-void ScreenPointer::UpdateScreenInfo(const sptr<OHOS::Rosen::ScreenInfo> si, bool needDrawPointer)
+void ScreenPointer::UpdateScreenInfo(sptr<OHOS::Rosen::ScreenInfo> si, bool needDrawPointer)
 {
     CHKPV(si);
     CHKPV(surfaceNode_);
@@ -393,11 +401,26 @@ void ScreenPointer::OnDisplayInfo(const OLD::DisplayInfo &di)
     }
 }
 
-bool ScreenPointer::UpdatePadding(uint32_t mainWidth, uint32_t mainHeight)
+/*
+ * 镜像模式下，计算主屏或镜像屏的屏幕黑边，此接口仅主屏或镜像屏调用
+ * 注意：width_、height_不跟随屏幕旋转
+ *
+ * 单显示器模式: sourceScreenWidth、sourceScreenHeight为主屏宽高，跟随屏幕旋转
+ * 扩展模式：sourceScreenWidth、sourceScreenHeight为主屏宽高，跟随主屏旋转
+ * 仅第二屏模式：sourceScreenWidth、sourceScreenHeight为主屏宽高，跟随主屏旋转
+ * 镜像模式：镜像模式下，主屏可以旋转，镜像屏不旋转
+ * （1）满屏显示：主屏
+ *      主屏ScreenPointer：sourceScreenWidth、sourceScreenHeight为主屏宽高，跟随主屏旋转
+ *      镜像屏ScreenPointer: sourceScreenWidth、sourceScreenHeight为主屏宽高，跟随主屏旋转
+ * （2）满屏显示：镜像屏
+ *      主屏ScreenPointer：sourceScreenWidth、sourceScreenHeight为镜像屏宽高，跟随主屏旋转
+ *      镜像屏ScreenPointer: sourceScreenWidth、sourceScreenHeight为镜像屏宽高，跟随主屏旋转
+ */
+bool ScreenPointer::UpdatePadding(uint32_t sourceScreenWidth, uint32_t sourceScreenHeight)
 {
 #ifndef OHOS_BUILD_EXTERNAL_SCREEN
     if (!IsMirror()) {
-        MMI_HILOGI("UpdatePadidng, reset padding, screenId=%{public}" PRIu64 ", scale=%{public}f, "
+        MMI_HILOGI("UpdatePadding, reset padding, screenId=%{public}" PRIu64 ", scale=%{public}f, "
             "paddingTop_=%{public}u, paddingLeft_=%{public}u", screenId_, scale_, paddingTop_, paddingLeft_);
         scale_ = 1.0;
         paddingTop_ = 0;
@@ -405,26 +428,36 @@ bool ScreenPointer::UpdatePadding(uint32_t mainWidth, uint32_t mainHeight)
         return false;
     }
 #endif // OHOS_BUILD_EXTERNAL_SCREEN
-    if (mainWidth == 0 || mainHeight == 0) {
-        MMI_HILOGE("Invalid parameters, mainWidth=%{public}u, mainHeight=%{public}u", mainWidth, mainHeight);
+    if (sourceScreenWidth == 0 || sourceScreenHeight == 0) {
+        MMI_HILOGE("Invalid parameters, sourceScreenWidth=%{public}u, sourceScreenHeight=%{public}u",
+            sourceScreenWidth, sourceScreenHeight);
         return false;
     }
-    if ((sourceScreenRotation_  == rotation_t::ROTATION_90 || sourceScreenRotation_  == rotation_t::ROTATION_270)
-        && IsMirror()) {
-        std::swap(mainWidth, mainHeight);
-    }
 
-    // caculate padding for mirror screens
-    scale_ = fmin(float(width_) / mainWidth, float(height_) / mainHeight);
-    paddingTop_ = (height_ - mainHeight * scale_) / NUM_TWO;
-    paddingLeft_ = (width_ - mainWidth * scale_) / NUM_TWO;
+    uint32_t curScreenWidth = width_;
+    uint32_t curScreenHeight = height_;
+    if (IsMain()) {
+        if ((rotation_ == rotation_t::ROTATION_90 || rotation_ == rotation_t::ROTATION_270)) {
+            std::swap(curScreenWidth, curScreenHeight);
+        }
+    } else if (IsMirror()) {
+        if ((sourceScreenRotation_  == rotation_t::ROTATION_90 || sourceScreenRotation_  == rotation_t::ROTATION_270)) {
+            std::swap(sourceScreenWidth, sourceScreenHeight);
+        }
+    }
+    // caculate padding for main screen or mirror screen
+    scale_ = fmin(float(curScreenWidth) / sourceScreenWidth, float(curScreenHeight) / sourceScreenHeight);
+    paddingTop_ = (curScreenHeight - sourceScreenHeight * scale_) / NUM_TWO;
+    paddingLeft_ = (curScreenWidth - sourceScreenWidth * scale_) / NUM_TWO;
 #ifdef OHOS_BUILD_EXTERNAL_SCREEN
     if (IsMain()) {
         scale_ = 1.0;
     }
 #endif // OHOS_BUILD_EXTERNAL_SCREEN
     MMI_HILOGI("UpdatePadding, screenId=%{public}" PRIu64 ", scale=%{public}f, paddingTop_=%{public}u,"
-               " paddingLeft_=%{public}u", screenId_, scale_, paddingTop_, paddingLeft_);
+               " paddingLeft_=%{public}u, curScreen=(%{public}u, %{public}u), sourceScreen=(%{public}u, %{public}u)",
+               screenId_, scale_, paddingTop_, paddingLeft_, curScreenWidth, curScreenHeight, sourceScreenWidth,
+               sourceScreenHeight);
     return true;
 }
 
