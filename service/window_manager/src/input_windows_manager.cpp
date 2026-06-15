@@ -1473,6 +1473,8 @@ void InputWindowsManager::ResetPointerPosition(const OLD::DisplayGroupInfo &disp
                 (displayInfo->rsId != currentDisplay.rsId) ||
                 (!IsPointerOnCenter(oldPtrPos, currentDisplay))) {
                 cursorPos = ResetCursorPos(displayGroupInfo);
+                CursorDrawingComponent::GetInstance().SetPointerLocation(
+                    cursorPos.cursorPos.x, cursorPos.cursorPos.y, cursorPos.displayId);
                 UpdateAndAdjustMouseLocation(cursorPos.displayId, cursorPos.cursorPos.x, cursorPos.cursorPos.y);
                 SupplementPointerMoveEvent();
             }
