@@ -259,9 +259,15 @@ void EventStatistic::PushPointerRecord(std::shared_ptr<PointerEvent> eventPtr)
 {
     CHKPV(eventPtr);
     int32_t pointerAction = eventPtr->GetPointerAction();
-    if (pointerAction == PointerEvent::POINTER_ACTION_MOVE ||
-        pointerAction == PointerEvent::POINTER_ACTION_PULL_MOVE) {
-        return;
+    switch (pointerAction) {
+        case PointerEvent::POINTER_ACTION_CANCEL:
+        case PointerEvent::POINTER_ACTION_DOWN:
+        case PointerEvent::POINTER_ACTION_UP:
+        case PointerEvent::POINTER_ACTION_PULL_DOWN:
+        case PointerEvent::POINTER_ACTION_PULL_UP:
+            break;
+        default:
+            return;
     }
     std::list<PointerEvent::PointerItem> pointerItems = eventPtr->GetAllPointerItems();
     auto& record = pointerRecordRingBuffer_[ringTail_];
