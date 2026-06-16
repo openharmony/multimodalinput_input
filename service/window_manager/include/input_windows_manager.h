@@ -559,7 +559,7 @@ private:
     void ProcessOtherTouchHit(std::shared_ptr<PointerEvent> pointerEvent,
         PointerEvent::PointerItem& pointerItem, const WindowInfo* touchWindow);
     bool IsFirstTouch(int32_t pointerId, int32_t itemSize);
-    bool IsInPointereLockMode();
+    bool IsInPointerLockMode();
 
     // Helper functions for UpdateAndAdjustMouseLocation refactoring
     void ConvertToPhysicalCoordinates(const OLD::DisplayInfo& displayInfo, double& x, double& y, bool& isRealData);
