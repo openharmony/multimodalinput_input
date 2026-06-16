@@ -707,11 +707,12 @@ HWTEST_F(JoystickEventProcessorTest, JoystickEventProcessorTest_UpdateButtonStat
 {
     CALL_TEST_DEBUG;
     auto joystickEvent = std::make_shared<JoystickEventProcessor>(&env_, 2);
+    int32_t rawCode { BTN_A };
     KeyEvent::KeyItem keyItem {};
     keyItem.SetPressed(true);
     keyItem.SetKeyCode(KeyEvent::KEYCODE_BUTTON_A);
 
-    ASSERT_NO_FATAL_FAILURE(joystickEvent->UpdateButtonState(keyItem));
+    ASSERT_NO_FATAL_FAILURE(joystickEvent->UpdateButtonState(keyItem, rawCode));
 }
 
 /**
@@ -724,6 +725,7 @@ HWTEST_F(JoystickEventProcessorTest, JoystickEventProcessorTest_UpdateButtonStat
 {
     CALL_TEST_DEBUG;
     auto joystickEvent = std::make_shared<JoystickEventProcessor>(&env_, 2);
+    int32_t rawCode { BTN_A };
     KeyEvent::KeyItem keyItem {};
     keyItem.SetPressed(false);
     keyItem.SetKeyCode(KeyEvent::KEYCODE_BUTTON_A);
@@ -731,9 +733,9 @@ HWTEST_F(JoystickEventProcessorTest, JoystickEventProcessorTest_UpdateButtonStat
     KeyEvent::KeyItem pressedKey {};
     pressedKey.SetPressed(true);
     pressedKey.SetKeyCode(KeyEvent::KEYCODE_BUTTON_A);
-    joystickEvent->UpdateButtonState(pressedKey);
+    joystickEvent->UpdateButtonState(pressedKey, rawCode);
 
-    ASSERT_NO_FATAL_FAILURE(joystickEvent->UpdateButtonState(keyItem));
+    ASSERT_NO_FATAL_FAILURE(joystickEvent->UpdateButtonState(keyItem, rawCode));
 }
 
 /**
@@ -883,5 +885,126 @@ HWTEST_F(JoystickEventProcessorTest, JoystickEventProcessorTest_DumpJoystickAxis
     std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
     ASSERT_NE(joystick.DumpJoystickAxisEvent(pointerEvent), "");
 }
+
+/**
+ * @tc.name: JoystickEventProcessorTest_MapAxisName_001
+ * @tc.desc: Test MapAxisName with known axis types
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(JoystickEventProcessorTest, JoystickEventProcessorTest_MapAxisName_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EXPECT_EQ(JoystickEventProcessor::MapAxisName(PointerEvent::AXIS_TYPE_ABS_X), "X");
+    EXPECT_EQ(JoystickEventProcessor::MapAxisName(PointerEvent::AXIS_TYPE_ABS_Y), "Y");
+    EXPECT_EQ(JoystickEventProcessor::MapAxisName(PointerEvent::AXIS_TYPE_ABS_Z), "Z");
+    EXPECT_EQ(JoystickEventProcessor::MapAxisName(PointerEvent::AXIS_TYPE_ABS_RX), "RX");
+    EXPECT_EQ(JoystickEventProcessor::MapAxisName(PointerEvent::AXIS_TYPE_ABS_RY), "RY");
+    EXPECT_EQ(JoystickEventProcessor::MapAxisName(PointerEvent::AXIS_TYPE_ABS_RZ), "RZ");
+}
+
+/**
+ * @tc.name: JoystickEventProcessorTest_MapAxisName_002
+ * @tc.desc: Test MapAxisName with HAT axes
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(JoystickEventProcessorTest, JoystickEventProcessorTest_MapAxisName_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EXPECT_EQ(JoystickEventProcessor::MapAxisName(PointerEvent::AXIS_TYPE_ABS_HAT0X), "HAT0X");
+    EXPECT_EQ(JoystickEventProcessor::MapAxisName(PointerEvent::AXIS_TYPE_ABS_HAT0Y), "HAT0Y");
+    EXPECT_EQ(JoystickEventProcessor::MapAxisName(PointerEvent::AXIS_TYPE_ABS_HAT1X), "HAT1X");
+    EXPECT_EQ(JoystickEventProcessor::MapAxisName(PointerEvent::AXIS_TYPE_ABS_HAT1Y), "HAT1Y");
+}
+
+/**
+ * @tc.name: JoystickEventProcessorTest_MapAxisName_003
+ * @tc.desc: Test MapAxisName with unknown axis returns empty string
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(JoystickEventProcessorTest, JoystickEventProcessorTest_MapAxisName_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EXPECT_EQ(JoystickEventProcessor::MapAxisName(PointerEvent::AXIS_TYPE_UNKNOWN), "UNKNOWN");
+    EXPECT_TRUE(JoystickEventProcessor::MapAxisName(static_cast<PointerEvent::AxisType>(9999)).empty());
+}
+
+/**
+ * @tc.name: JoystickEventProcessorTest_IsCentrosymmetric_001
+ * @tc.desc: Test IsCentrosymmetric with known centrosymmetric axes
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(JoystickEventProcessorTest, JoystickEventProcessorTest_IsCentrosymmetric_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EXPECT_TRUE(JoystickEventProcessor::IsCentrosymmetric(PointerEvent::AXIS_TYPE_ABS_X));
+    EXPECT_TRUE(JoystickEventProcessor::IsCentrosymmetric(PointerEvent::AXIS_TYPE_ABS_Y));
+    EXPECT_TRUE(JoystickEventProcessor::IsCentrosymmetric(PointerEvent::AXIS_TYPE_ABS_Z));
+    EXPECT_TRUE(JoystickEventProcessor::IsCentrosymmetric(PointerEvent::AXIS_TYPE_ABS_RX));
+    EXPECT_TRUE(JoystickEventProcessor::IsCentrosymmetric(PointerEvent::AXIS_TYPE_ABS_RY));
+    EXPECT_TRUE(JoystickEventProcessor::IsCentrosymmetric(PointerEvent::AXIS_TYPE_ABS_RZ));
+    EXPECT_TRUE(JoystickEventProcessor::IsCentrosymmetric(PointerEvent::AXIS_TYPE_ABS_RUDDER));
+    EXPECT_TRUE(JoystickEventProcessor::IsCentrosymmetric(PointerEvent::AXIS_TYPE_ABS_WHEEL));
+    EXPECT_TRUE(JoystickEventProcessor::IsCentrosymmetric(PointerEvent::AXIS_TYPE_ABS_HAT0X));
+    EXPECT_TRUE(JoystickEventProcessor::IsCentrosymmetric(PointerEvent::AXIS_TYPE_ABS_HAT0Y));
+}
+
+/**
+ * @tc.name: JoystickEventProcessorTest_IsCentrosymmetric_002
+ * @tc.desc: Test IsCentrosymmetric with non-centrosymmetric axes
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(JoystickEventProcessorTest, JoystickEventProcessorTest_IsCentrosymmetric_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EXPECT_FALSE(JoystickEventProcessor::IsCentrosymmetric(PointerEvent::AXIS_TYPE_ABS_THROTTLE));
+    EXPECT_FALSE(JoystickEventProcessor::IsCentrosymmetric(PointerEvent::AXIS_TYPE_ABS_GAS));
+    EXPECT_FALSE(JoystickEventProcessor::IsCentrosymmetric(PointerEvent::AXIS_TYPE_ABS_BRAKE));
+    EXPECT_FALSE(JoystickEventProcessor::IsCentrosymmetric(PointerEvent::AXIS_TYPE_UNKNOWN));
+}
+
+/**
+ * @tc.name: JoystickEventProcessorTest_OnDeviceEnabled_001
+ * @tc.desc: Test OnDeviceEnabled
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(JoystickEventProcessorTest, JoystickEventProcessorTest_OnDeviceEnabled_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t deviceId { 2 };
+    JoystickEventProcessor joystick(&env_, deviceId);
+    joystick.OnDeviceEnabled();
+    SUCCEED();
+}
+
+/**
+ * @tc.name: JoystickEventProcessorTest_OnDeviceDisabled_001
+ * @tc.desc: Test OnDeviceDisabled
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(JoystickEventProcessorTest, JoystickEventProcessorTest_OnDeviceDisabled_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t deviceId { 2 };
+    JoystickEventProcessor joystick(&env_, deviceId);
+    joystick.OnDeviceDisabled();
+    SUCCEED();
+}
+std::shared_ptr<ISettingManager> ISettingManager::instance_;
+std::once_flag ISettingManager::initFlag_;
+
+std::shared_ptr<ISettingManager> ISettingManager::GetInstance()
+{
+    return nullptr;
+}
+
+void ISettingManager::Create()
+{}
 } // namespace MMI
 } // namespace OHOS

@@ -22,7 +22,9 @@
 #include "i_input_event_consumer.h"
 #include "input_event_hook_handler.h"
 #include "input_event_stager.h"
+#include "input_manager.h"
 #include "mmi_log.h"
+#include "multimodal_event_handler.h"
 #include "multimodal_input_connect_manager.h"
 
 #undef MMI_LOG_TAG
@@ -33,8 +35,25 @@ namespace MMI {
 namespace {
 using namespace testing::ext;
 using namespace testing;
-std::shared_ptr<MultimodalInputConnectManager> g_instance = nullptr;
 } // namespace
+
+bool MultimodalEventHandler::InitClient(EventHandlerPtr eventHandler)
+{
+    return true;
+}
+
+MultimodalEventHandler::MultimodalEventHandler() {}
+MultimodalEventHandler::~MultimodalEventHandler() {}
+
+InputManager* InputManager::GetInstance()
+{
+    static InputManager instance;
+    return &instance;
+}
+
+void InputManager::RequestInjectionCallback(int32_t reqId, int32_t status) {}
+
+std::shared_ptr<MultimodalInputConnectManager> g_instance = nullptr;
 
 std::shared_ptr<MultimodalInputConnectManager> MultimodalInputConnectManager::GetInstance()
 {
@@ -704,6 +723,159 @@ HWTEST_F(InputEventHookHandlerTest, InputEventHookHandlerTest_RemoveInputEventHo
     hookEventType = 8;
     ret = INPUT_EVENT_HOOK_HANDLER.RemoveInputEventHookOfServer(hookEventType);
     EXPECT_EQ(ret, RET_ERR);
+    ClearData();
+}
+
+/**
+ * @tc.name: InputEventHookHandlerTest_OnKeyEvent_001
+ * @tc.desc: Test OnKeyEvent with valid keyEvent and keyHookCallback
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputEventHookHandlerTest, InputEventHookHandlerTest_OnKeyEvent_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto consumer = std::make_shared<HookConsumer>();
+    consumer->g_flag = 0;
+    auto keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    INPUT_EVENT_HOOK_HANDLER.currentHookStats_ = 1;
+    INPUT_EVENT_HOOK_HANDLER.hookConsumer_.keyHookCallback_ = [consumer](std::shared_ptr<KeyEvent> event) {
+        consumer->OnInputEvent(event);
+    };
+    INPUT_EVENT_HOOK_HANDLER.OnKeyEvent(keyEvent);
+    EXPECT_EQ(consumer->g_flag, 1);
+    ClearData();
+}
+
+/**
+ * @tc.name: InputEventHookHandlerTest_OnKeyEvent_002
+ * @tc.desc: Test OnKeyEvent with nullptr keyEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputEventHookHandlerTest, InputEventHookHandlerTest_OnKeyEvent_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto consumer = std::make_shared<HookConsumer>();
+    consumer->g_flag = 0;
+    INPUT_EVENT_HOOK_HANDLER.currentHookStats_ = 1;
+    INPUT_EVENT_HOOK_HANDLER.hookConsumer_.keyHookCallback_ = [consumer](std::shared_ptr<KeyEvent> event) {
+        consumer->OnInputEvent(event);
+    };
+    INPUT_EVENT_HOOK_HANDLER.OnKeyEvent(nullptr);
+    EXPECT_EQ(consumer->g_flag, 0);
+    ClearData();
+}
+
+/**
+ * @tc.name: InputEventHookHandlerTest_OnKeyEvent_003
+ * @tc.desc: Test OnKeyEvent when keyHookCallback is not set (nullptr callback branch)
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputEventHookHandlerTest, InputEventHookHandlerTest_OnKeyEvent_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    INPUT_EVENT_HOOK_HANDLER.currentHookStats_ = 0;
+    INPUT_EVENT_HOOK_HANDLER.hookConsumer_.keyHookCallback_ = nullptr;
+    INPUT_EVENT_HOOK_HANDLER.OnKeyEvent(keyEvent);
+    SUCCEED();
+    ClearData();
+}
+
+/**
+ * @tc.name: InputEventHookHandlerTest_DispatchToNextHandler_006
+ * @tc.desc: Test DispatchToNextHandler with valid eventId for KEY hook
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputEventHookHandlerTest, InputEventHookHandlerTest_DispatchToNextHandler_006, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t eventId = 1;
+    HookEventType hookEventType = 1;
+    INPUT_EVENT_HOOK_HANDLER.currentHookStats_ = 1;
+    auto ret = INPUT_EVENT_HOOK_HANDLER.DispatchToNextHandler(eventId, hookEventType);
+    EXPECT_EQ(ret, RET_OK);
+    ClearData();
+}
+
+/**
+ * @tc.name: InputEventHookHandlerTest_DispatchToNextHandler_007
+ * @tc.desc: Test DispatchToNextHandler with valid eventId for MOUSE hook
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputEventHookHandlerTest, InputEventHookHandlerTest_DispatchToNextHandler_007, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t eventId = 1;
+    HookEventType hookEventType = 4;
+    INPUT_EVENT_HOOK_HANDLER.currentHookStats_ = 4;
+    auto ret = INPUT_EVENT_HOOK_HANDLER.DispatchToNextHandler(eventId, hookEventType);
+    EXPECT_EQ(ret, RET_OK);
+    ClearData();
+}
+
+/**
+ * @tc.name: InputEventHookHandlerTest_DispatchToNextHandler_008
+ * @tc.desc: Test DispatchToNextHandler with valid eventId for TOUCH hook
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputEventHookHandlerTest, InputEventHookHandlerTest_DispatchToNextHandler_008, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t eventId = 1;
+    HookEventType hookEventType = 2;
+    INPUT_EVENT_HOOK_HANDLER.currentHookStats_ = 2;
+    auto ret = INPUT_EVENT_HOOK_HANDLER.DispatchToNextHandler(eventId, hookEventType);
+    EXPECT_EQ(ret, RET_OK);
+    ClearData();
+}
+
+/**
+ * @tc.name: InputEventHookHandlerTest_IsHookExisted_001
+ * @tc.desc: Test IsHookExisted with only TOUCH hook active
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputEventHookHandlerTest, InputEventHookHandlerTest_IsHookExisted_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto consumer = std::make_shared<HookConsumer>();
+    consumer->g_flag = 0;
+    INPUT_EVENT_HOOK_HANDLER.currentHookStats_ = 2;
+    INPUT_EVENT_HOOK_HANDLER.hookConsumer_.touchHookCallback_ = [consumer](std::shared_ptr<PointerEvent> event) {
+        consumer->OnInputEvent(event);
+    };
+    EXPECT_TRUE(INPUT_EVENT_HOOK_HANDLER.IsHookExisted(HOOK_EVENT_TYPE_TOUCH));
+    EXPECT_FALSE(INPUT_EVENT_HOOK_HANDLER.IsHookExisted(HOOK_EVENT_TYPE_KEY));
+    EXPECT_FALSE(INPUT_EVENT_HOOK_HANDLER.IsHookExisted(HOOK_EVENT_TYPE_MOUSE));
+    ClearData();
+}
+
+/**
+ * @tc.name: InputEventHookHandlerTest_IsHookExisted_002
+ * @tc.desc: Test IsHookExisted with only MOUSE hook active
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputEventHookHandlerTest, InputEventHookHandlerTest_IsHookExisted_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto consumer = std::make_shared<HookConsumer>();
+    consumer->g_flag = 0;
+    INPUT_EVENT_HOOK_HANDLER.currentHookStats_ = 4;
+    INPUT_EVENT_HOOK_HANDLER.hookConsumer_.mouseHookCallback_ = [consumer](std::shared_ptr<PointerEvent> event) {
+        consumer->OnInputEvent(event);
+    };
+    EXPECT_TRUE(INPUT_EVENT_HOOK_HANDLER.IsHookExisted(HOOK_EVENT_TYPE_MOUSE));
+    EXPECT_FALSE(INPUT_EVENT_HOOK_HANDLER.IsHookExisted(HOOK_EVENT_TYPE_KEY));
+    EXPECT_FALSE(INPUT_EVENT_HOOK_HANDLER.IsHookExisted(HOOK_EVENT_TYPE_TOUCH));
     ClearData();
 }
 } // namespace MMI

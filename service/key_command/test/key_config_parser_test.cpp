@@ -1401,6 +1401,40 @@ HWTEST_F(KeyConfigParserTest, KeyConfigParserTest_ConvertToExcludeKey_004, TestS
     EXPECT_FALSE(handler_->ConvertToExcludeKey(parser.Get(), exKey));
 }
 
+/**
+ * @tc.name: KeyConfigParserTest_ConvertToExcludeKey_005
+ * @tc.desc: Test ConvertToExcludeKey with keyAction not a number
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyConfigParserTest, KeyConfigParserTest_ConvertToExcludeKey_005, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    cJSON* jsonData = cJSON_CreateObject();
+    cJSON_AddNumberToObject(jsonData, "keyCode", 100);
+    cJSON_AddItemToObject(jsonData, "keyAction", cJSON_CreateString("not a number"));
+    ExcludeKey exKey;
+    EXPECT_FALSE(handler_->ConvertToExcludeKey(jsonData, exKey));
+    cJSON_Delete(jsonData);
+}
+
+/**
+ * @tc.name: KeyConfigParserTest_ConvertToExcludeKey_006
+ * @tc.desc: Test ConvertToExcludeKey with delay not a number
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyConfigParserTest, KeyConfigParserTest_ConvertToExcludeKey_006, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    cJSON* jsonData = cJSON_CreateObject();
+    cJSON_AddNumberToObject(jsonData, "keyCode", 100);
+    cJSON_AddNumberToObject(jsonData, "keyAction", 2);
+    cJSON_AddItemToObject(jsonData, "delay", cJSON_CreateString("not a number"));
+    ExcludeKey exKey;
+    EXPECT_FALSE(handler_->ConvertToExcludeKey(jsonData, exKey));
+    cJSON_Delete(jsonData);
+}
 
 /**
  * @tc.name: KeyConfigParserTest_GetRepeatTimes_005
@@ -1883,6 +1917,184 @@ HWTEST_F(KeyConfigParserTest, KeyConfigParserTest_ParseMultiFingersTap_002, Test
     JsonParser parser(jsonData.c_str());
     MultiFingersTap mulFingersTap;
     EXPECT_FALSE(handler_->ParseMultiFingersTap(parser, ability, mulFingersTap));
+}
+
+/**
+ * @tc.name: KeyConfigParserTest_PrintSeq_001
+ * @tc.desc: Test PrintSeq with empty sequences list
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyConfigParserTest, KeyConfigParserTest_PrintSeq_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    handler_->PrintSeq();
+}
+
+/**
+ * @tc.name: KeyConfigParserTest_PrintSeq_002
+ * @tc.desc: Test PrintSeq with sequences containing data
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyConfigParserTest, KeyConfigParserTest_PrintSeq_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    Sequence seq;
+    SequenceKey seqKey;
+    seqKey.keyCode = 1;
+    seqKey.keyAction = KeyEvent::KEY_ACTION_DOWN;
+    seqKey.delay = 100;
+    seq.sequenceKeys.push_back(seqKey);
+    Ability ability;
+    ability.bundleName = "testBundle";
+    ability.abilityName = "testAbility";
+    seq.ability = ability;
+    context_.sequences_->push_back(seq);
+    handler_->PrintSeq();
+}
+
+/**
+ * @tc.name: KeyConfigParserTest_PrintExcludeKeys_001
+ * @tc.desc: Test PrintExcludeKeys with empty list
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyConfigParserTest, KeyConfigParserTest_PrintExcludeKeys_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    handler_->PrintExcludeKeys();
+}
+
+/**
+ * @tc.name: KeyConfigParserTest_PrintExcludeKeys_002
+ * @tc.desc: Test PrintExcludeKeys with exclude keys
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyConfigParserTest, KeyConfigParserTest_PrintExcludeKeys_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ExcludeKey exKey;
+    exKey.keyCode = 100;
+    exKey.keyAction = KeyEvent::KEY_ACTION_DOWN;
+    exKey.delay = 200;
+    context_.excludeKeys_->push_back(exKey);
+    handler_->PrintExcludeKeys();
+}
+
+/**
+ * @tc.name: KeyConfigParserTest_GenerateKey_001
+ * @tc.desc: Test GenerateKey with simple preKeys
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyConfigParserTest, KeyConfigParserTest_GenerateKey_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ShortcutKey key;
+    key.preKeys.insert(2072);
+    key.finalKey = 2019;
+    key.triggerType = KeyEvent::KEY_ACTION_DOWN;
+    key.keyDownDuration = 100;
+    std::string result = handler_->GenerateKey(key);
+    EXPECT_FALSE(result.empty());
+    EXPECT_NE(result.find("2072"), std::string::npos);
+    EXPECT_NE(result.find("2019"), std::string::npos);
+}
+
+/**
+ * @tc.name: KeyConfigParserTest_GenerateKey_002
+ * @tc.desc: Test GenerateKey with empty preKeys
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyConfigParserTest, KeyConfigParserTest_GenerateKey_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ShortcutKey key;
+    key.finalKey = 100;
+    key.triggerType = KeyEvent::KEY_ACTION_UP;
+    key.keyDownDuration = 0;
+    std::string result = handler_->GenerateKey(key);
+    EXPECT_FALSE(result.empty());
+}
+
+/**
+ * @tc.name: KeyConfigParserTest_GetRepeatKeyDelay_001
+ * @tc.desc: Test GetRepeatKeyDelay with valid input returns converted delay
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyConfigParserTest, KeyConfigParserTest_GetRepeatKeyDelay_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    cJSON* jsonData = cJSON_CreateObject();
+    cJSON_AddNumberToObject(jsonData, "delay", 5);
+    int64_t delay = 0;
+    EXPECT_TRUE(handler_->GetRepeatKeyDelay(jsonData, delay));
+    EXPECT_EQ(delay, 5 * SECONDS_SYSTEM);
+    cJSON_Delete(jsonData);
+}
+
+/**
+ * @tc.name: KeyConfigParserTest_GetRepeatKeyDelay_002
+ * @tc.desc: Test GetRepeatKeyDelay with non-object returns false
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyConfigParserTest, KeyConfigParserTest_GetRepeatKeyDelay_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int64_t delay = 0;
+    EXPECT_FALSE(handler_->GetRepeatKeyDelay(nullptr, delay));
+}
+
+/**
+ * @tc.name: KeyConfigParserTest_GetRepeatKeyDelay_003
+ * @tc.desc: Test GetRepeatKeyDelay with missing delay key returns false
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyConfigParserTest, KeyConfigParserTest_GetRepeatKeyDelay_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    cJSON* jsonData = cJSON_CreateObject();
+    int64_t delay = 0;
+    EXPECT_FALSE(handler_->GetRepeatKeyDelay(jsonData, delay));
+    cJSON_Delete(jsonData);
+}
+
+/**
+ * @tc.name: KeyConfigParserTest_GetRepeatKeyDelay_004
+ * @tc.desc: Test GetRepeatKeyDelay with negative delay returns false
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyConfigParserTest, KeyConfigParserTest_GetRepeatKeyDelay_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    cJSON* jsonData = cJSON_CreateObject();
+    cJSON_AddNumberToObject(jsonData, "delay", -1);
+    int64_t delay = 0;
+    EXPECT_FALSE(handler_->GetRepeatKeyDelay(jsonData, delay));
+    cJSON_Delete(jsonData);
+}
+
+/**
+ * @tc.name: KeyConfigParserTest_GetRepeatKeyDelay_005
+ * @tc.desc: Test GetRepeatKeyDelay with delay exceeding max returns false
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyConfigParserTest, KeyConfigParserTest_GetRepeatKeyDelay_005, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    cJSON* jsonData = cJSON_CreateObject();
+    cJSON_AddNumberToObject(jsonData, "delay", 70001);
+    int64_t delay = 0;
+    EXPECT_FALSE(handler_->GetRepeatKeyDelay(jsonData, delay));
+    cJSON_Delete(jsonData);
 }
 } // namespace MMI
 } // namespace OHOS

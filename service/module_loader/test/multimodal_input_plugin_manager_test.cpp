@@ -2856,5 +2856,156 @@ HWTEST_F(MultimodalInputPluginManagerTest,
     EXPECT_CALL(libinputMock, GetEventType).WillRepeatedly(Return(LIBINPUT_EVENT_TABLET_TOOL_BUTTON));
     EXPECT_FALSE(InputPluginManager::GetInstance()->IntermediateEndEvent(&event));
 }
+/**
+ * @tc.name: MultimodalInputPluginManagerTest_InputPlugin_AddFlagForDevice_001
+ * @tc.desc: Test AddFlagForDevice with nullptr event
+ * @tc.require: test AddFlagForDevice
+ */
+HWTEST_F(MultimodalInputPluginManagerTest,
+    MultimodalInputPluginManagerTest_InputPlugin_AddFlagForDevice_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<InputPlugin> inputPluginContext = std::make_shared<InputPlugin>(nullptr);
+    EXPECT_NO_FATAL_FAILURE(inputPluginContext->AddFlagForDevice(nullptr));
+}
+
+/**
+ * @tc.name: MultimodalInputPluginManagerTest_InputPlugin_AddFlagForDevice_002
+ * @tc.desc: Test AddFlagForDevice with null input device
+ * @tc.require: test AddFlagForDevice
+ */
+HWTEST_F(MultimodalInputPluginManagerTest,
+    MultimodalInputPluginManagerTest_InputPlugin_AddFlagForDevice_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<InputPlugin> inputPluginContext = std::make_shared<InputPlugin>(nullptr);
+    libinput_event event;
+    NiceMock<LibinputInterfaceMock> libinputMock;
+    EXPECT_CALL(libinputMock, GetDevice).WillRepeatedly(Return(nullptr));
+    EXPECT_NO_FATAL_FAILURE(inputPluginContext->AddFlagForDevice(&event));
+}
+
+/**
+ * @tc.name: MultimodalInputPluginManagerTest_InputPlugin_RemoveFlagForDevice_001
+ * @tc.desc: Test RemoveFlagForDevice with nullptr event
+ * @tc.require: test RemoveFlagForDevice
+ */
+HWTEST_F(MultimodalInputPluginManagerTest,
+    MultimodalInputPluginManagerTest_InputPlugin_RemoveFlagForDevice_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<InputPlugin> inputPluginContext = std::make_shared<InputPlugin>(nullptr);
+    EXPECT_NO_FATAL_FAILURE(inputPluginContext->RemoveFlagForDevice(nullptr));
+}
+
+/**
+ * @tc.name: MultimodalInputPluginManagerTest_InputPlugin_RemoveFlagForDevice_002
+ * @tc.desc: Test RemoveFlagForDevice with null input device
+ * @tc.require: test RemoveFlagForDevice
+ */
+HWTEST_F(MultimodalInputPluginManagerTest,
+    MultimodalInputPluginManagerTest_InputPlugin_RemoveFlagForDevice_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<InputPlugin> inputPluginContext = std::make_shared<InputPlugin>(nullptr);
+    libinput_event event;
+    NiceMock<LibinputInterfaceMock> libinputMock;
+    EXPECT_CALL(libinputMock, GetDevice).WillRepeatedly(Return(nullptr));
+    EXPECT_NO_FATAL_FAILURE(inputPluginContext->RemoveFlagForDevice(&event));
+}
+
+/**
+ * @tc.name: MultimodalInputPluginManagerTest_InputPlugin_UnregisterSettingObserver_002
+ * @tc.desc: Test UnregisterSettingObserver when DataShare is not ready
+ * @tc.require: test UnregisterSettingObserver
+ */
+HWTEST_F(MultimodalInputPluginManagerTest,
+    MultimodalInputPluginManagerTest_InputPlugin_UnregisterSettingObserver_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<InputPlugin> inputPluginContext = std::make_shared<InputPlugin>(nullptr);
+    EXPECT_FALSE(inputPluginContext->UnregisterSettingObserver(1));
+}
+
+/**
+ * @tc.name: MultimodalInputPluginManagerTest_PluginConfig_IsValid_FileNotExist
+ * @tc.desc: Test PluginConfig IsValid when plugin file does not exist on filesystem
+ * @tc.require: test PluginConfig IsValid
+ */
+HWTEST_F(MultimodalInputPluginManagerTest,
+    MultimodalInputPluginManagerTest_PluginConfig_IsValid_FileNotExist, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputPluginManager::PluginConfig config;
+    config.uuid_ = "test-uuid-nonexistent";
+    config.name_ = "nonexistent_file.so";
+    config.mode_ = "dynamic";
+    EXPECT_FALSE(config.IsValid());
+}
+
+/**
+ * @tc.name: MultimodalInputPluginManagerTest_IntermediateEndEvent_TabletToolProximity_001
+ * @tc.desc: Verify IntermediateEndEvent for TABLET_TOOL_PROXIMITY out/in states
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputPluginManagerTest,
+    MultimodalInputPluginManagerTest_IntermediateEndEvent_TabletToolProximity_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    libinput_event event;
+    libinput_event_tablet_tool tabletEvent;
+    NiceMock<LibinputInterfaceMock> libinputMock;
+    EXPECT_CALL(libinputMock, GetEventType).WillRepeatedly(Return(LIBINPUT_EVENT_TABLET_TOOL_PROXIMITY));
+    EXPECT_CALL(libinputMock, GetTabletToolEvent).WillRepeatedly(Return(&tabletEvent));
+    EXPECT_CALL(libinputMock, TabletToolGetProximityState)
+        .WillRepeatedly(Return(LIBINPUT_TABLET_TOOL_PROXIMITY_STATE_OUT));
+    EXPECT_TRUE(InputPluginManager::GetInstance()->IntermediateEndEvent(&event));
+
+    EXPECT_CALL(libinputMock, TabletToolGetProximityState)
+        .WillRepeatedly(Return(LIBINPUT_TABLET_TOOL_PROXIMITY_STATE_IN));
+    EXPECT_FALSE(InputPluginManager::GetInstance()->IntermediateEndEvent(&event));
+}
+
+/**
+ * @tc.name: MultimodalInputPluginManagerTest_IntermediateEndEvent_TabletToolTip_001
+ * @tc.desc: Verify IntermediateEndEvent for TABLET_TOOL_TIP up/down states
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputPluginManagerTest,
+    MultimodalInputPluginManagerTest_IntermediateEndEvent_TabletToolTip_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    libinput_event event;
+    libinput_event_tablet_tool tabletEvent;
+    NiceMock<LibinputInterfaceMock> libinputMock;
+    EXPECT_CALL(libinputMock, GetEventType).WillRepeatedly(Return(LIBINPUT_EVENT_TABLET_TOOL_TIP));
+    EXPECT_CALL(libinputMock, GetTabletToolEvent).WillRepeatedly(Return(&tabletEvent));
+    EXPECT_CALL(libinputMock, TabletToolGetTipState).WillRepeatedly(Return(LIBINPUT_TABLET_TOOL_TIP_UP));
+    EXPECT_TRUE(InputPluginManager::GetInstance()->IntermediateEndEvent(&event));
+
+    EXPECT_CALL(libinputMock, TabletToolGetTipState).WillRepeatedly(Return(LIBINPUT_TABLET_TOOL_TIP_DOWN));
+    EXPECT_FALSE(InputPluginManager::GetInstance()->IntermediateEndEvent(&event));
+}
+
+/**
+ * @tc.name: MultimodalInputPluginManagerTest_IntermediateEndEvent_PointerButtonTouchpad_001
+ * @tc.desc: Verify IntermediateEndEvent for POINTER_BUTTON_TOUCHPAD released/pressed
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputPluginManagerTest,
+    MultimodalInputPluginManagerTest_IntermediateEndEvent_PointerButtonTouchpad_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    libinput_event event;
+    libinput_event_pointer pointerEvent;
+    pointerEvent.buttonState = LIBINPUT_BUTTON_STATE_RELEASED;
+    NiceMock<LibinputInterfaceMock> libinputMock;
+    EXPECT_CALL(libinputMock, GetEventType).WillRepeatedly(Return(LIBINPUT_EVENT_POINTER_BUTTON_TOUCHPAD));
+    EXPECT_CALL(libinputMock, LibinputGetPointerEvent).WillRepeatedly(Return(&pointerEvent));
+    EXPECT_TRUE(InputPluginManager::GetInstance()->IntermediateEndEvent(&event));
+
+    pointerEvent.buttonState = LIBINPUT_BUTTON_STATE_PRESSED;
+    EXPECT_FALSE(InputPluginManager::GetInstance()->IntermediateEndEvent(&event));
+}
 } // namespace MMI
 } // namespace OHOS

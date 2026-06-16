@@ -1048,5 +1048,153 @@ HWTEST_F(EventStatisticTest, EventStatisticTest_WriteEventFile_002, TestSize.Lev
     unlink(EVENT_FILE_NAME);
     unlink(EVENT_FILE_NAME_HISTORY);
 }
+/**
+ * @tc.name: EventStatisticTest_ConvertPointerActionToString_AxisBeginFallthrough
+ * @tc.desc: Verify AXIS_BEGIN without scroll or pinch falls through to map (returns "axis-begin")
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventStatisticTest, EventStatisticTest_ConvertPointerActionToString_AxisBeginFallthrough, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EventStatistic eventStatistic;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    pointerEvent->bitwise_ = 0x000040;
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_AXIS_BEGIN);
+    ASSERT_STREQ(eventStatistic.ConvertPointerActionToString(pointerEvent), "axis-begin");
+}
+
+/**
+ * @tc.name: EventStatisticTest_ConvertPointerActionToString_Unknown
+ * @tc.desc: Verify unknown pointer action returns "unknown"
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventStatisticTest, EventStatisticTest_ConvertPointerActionToString_Unknown, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EventStatistic eventStatistic;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    pointerEvent->bitwise_ = 0x000040;
+    pointerEvent->SetPointerAction(99999);
+    ASSERT_STREQ(eventStatistic.ConvertPointerActionToString(pointerEvent), "unknown");
+}
+
+/**
+ * @tc.name: EventStatisticTest_ConvertKeyActionToString_All
+ * @tc.desc: Verify all key action types return correct strings
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventStatisticTest, EventStatisticTest_ConvertKeyActionToString_All, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EventStatistic eventStatistic;
+    ASSERT_STREQ(eventStatistic.ConvertKeyActionToString(KeyEvent::KEY_ACTION_UNKNOWN), "key_action_unknown");
+    ASSERT_STREQ(eventStatistic.ConvertKeyActionToString(KeyEvent::KEY_ACTION_DOWN), "key_action_down");
+    ASSERT_STREQ(eventStatistic.ConvertKeyActionToString(KeyEvent::KEY_ACTION_UP), "key_action_up");
+}
+
+/**
+ * @tc.name: EventStatisticTest_PushPointerRecord_MoveEarlyReturn
+ * @tc.desc: Verify PushPointerRecord returns early for POINTER_ACTION_MOVE
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventStatisticTest, EventStatisticTest_PushPointerRecord_MoveEarlyReturn, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EventStatistic eventStatistic;
+    eventStatistic.ringHead_ = 0;
+    eventStatistic.ringTail_ = 0;
+    eventStatistic.ringSize_ = 0;
+    auto pointerEvent = PointerEvent::Create();
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
+    eventStatistic.PushPointerRecord(pointerEvent);
+    EXPECT_EQ(eventStatistic.ringSize_, 0);
+}
+
+/**
+ * @tc.name: EventStatisticTest_PushPointerRecord_PullMoveEarlyReturn
+ * @tc.desc: Verify PushPointerRecord returns early for POINTER_ACTION_PULL_MOVE
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventStatisticTest, EventStatisticTest_PushPointerRecord_PullMoveEarlyReturn, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EventStatistic eventStatistic;
+    eventStatistic.ringHead_ = 0;
+    eventStatistic.ringTail_ = 0;
+    eventStatistic.ringSize_ = 0;
+    auto pointerEvent = PointerEvent::Create();
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_PULL_MOVE);
+    eventStatistic.PushPointerRecord(pointerEvent);
+    EXPECT_EQ(eventStatistic.ringSize_, 0);
+}
+
+/**
+ * @tc.name: EventStatisticTest_PushSwitchEvent_Nullptr
+ * @tc.desc: Verify PushSwitchEvent with nullptr does not crash
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventStatisticTest, EventStatisticTest_PushSwitchEvent_Nullptr, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EventStatistic eventStatistic;
+    std::shared_ptr<SwitchEvent> nullEvent = nullptr;
+    eventStatistic.PushSwitchEvent(nullEvent);
+}
+
+/**
+ * @tc.name: EventStatisticTest_PushEventStr_Overflow
+ * @tc.desc: Verify PushEventStr pops front when dumperEventList_ exceeds EVENT_OUT_SIZE
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventStatisticTest, EventStatisticTest_PushEventStr_Overflow, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EventStatistic eventStatistic;
+    eventStatistic.writeFileEnabled_ = false;
+    eventStatistic.dumperEventList_.clear();
+    for (int32_t i = 0; i < EVENT_OUT_SIZE; i++) {
+        eventStatistic.dumperEventList_.push_back("fill_" + std::to_string(i));
+    }
+    EXPECT_EQ(eventStatistic.dumperEventList_.size(), static_cast<size_t>(EVENT_OUT_SIZE));
+    std::string firstItem = eventStatistic.dumperEventList_.front();
+    eventStatistic.PushEventStr("overflow_item");
+    EXPECT_EQ(eventStatistic.dumperEventList_.size(), static_cast<size_t>(EVENT_OUT_SIZE));
+    EXPECT_EQ(eventStatistic.dumperEventList_.back(), "overflow_item");
+    EXPECT_NE(eventStatistic.dumperEventList_.front(), firstItem);
+}
+
+/**
+ * @tc.name: EventStatisticTest_QueryPointerRecord_RingBufferWraparound
+ * @tc.desc: Verify QueryPointerRecord handles ring buffer wraparound correctly
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventStatisticTest, EventStatisticTest_QueryPointerRecord_RingBufferWraparound, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EventStatistic eventStatistic;
+    eventStatistic.ringHead_ = 0;
+    eventStatistic.ringTail_ = 0;
+    eventStatistic.ringSize_ = 0;
+    std::vector<std::shared_ptr<PointerEvent>> pointerList;
+    for (int i = 0; i < RING_BUFFER_SIZE; i++) {
+        auto pointerEvent = PointerEvent::Create();
+        pointerEvent->SetSourceType(InputEvent::SOURCE_TYPE_TOUCHSCREEN);
+        pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
+        pointerEvent->SetActionTime(static_cast<int64_t>(i));
+        pointerEvent->SetPointerId(i);
+        eventStatistic.PushPointerRecord(pointerEvent);
+    }
+    EXPECT_EQ(eventStatistic.ringSize_, RING_BUFFER_SIZE);
+    EXPECT_EQ(eventStatistic.QueryPointerRecord(RING_BUFFER_SIZE / 2, pointerList), RET_OK);
+    EXPECT_EQ(pointerList.size(), static_cast<size_t>(RING_BUFFER_SIZE / 2));
+}
 } // OHOS
 } // MMI

@@ -627,5 +627,63 @@ HWTEST_F(PullThrowSubscriberHandlerTest, PullThrowSubscriberHandlerTest_HandleFi
     double angle2{1e-1};
     ASSERT_NO_FATAL_FAILURE(PULL_THROW_EVENT_HANDLER->CheckThrowAngleValid(angle2));
 }
+
+/**
+ * @tc.name: PullThrowSubscriberHandlerTest_HandleFingerGestureUpEvent_001
+ * @tc.desc: Test HandleFingerGestureUpEvent with valid event
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PullThrowSubscriberHandlerTest, PullThrowSubscriberHandlerTest_HandleFingerGestureUpEvent_001,
+    testing::ext::TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto touchEvent = SetupSingleFingerDownEvent();
+    ASSERT_NE(touchEvent, nullptr);
+    PULL_THROW_EVENT_HANDLER->HandleFingerGestureUpEvent(touchEvent);
+}
+
+/**
+ * @tc.name: PullThrowSubscriberHandlerTest_HandleFingerGestureUpEvent_002
+ * @tc.desc: Test HandleFingerGestureUpEvent with nullptr
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PullThrowSubscriberHandlerTest, PullThrowSubscriberHandlerTest_HandleFingerGestureUpEvent_002,
+    testing::ext::TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PULL_THROW_EVENT_HANDLER->HandleFingerGestureUpEvent(nullptr);
+}
+
+/**
+ * @tc.name: PullThrowSubscriberHandlerTest_HandleFingerGestureDownEvent_003
+ * @tc.desc: Test HandleFingerGestureDownEvent happy path with single finger
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PullThrowSubscriberHandlerTest, PullThrowSubscriberHandlerTest_HandleFingerGestureDownEvent_003,
+    testing::ext::TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto touchEvent = SetupSingleFingerDownEvent();
+    ASSERT_NE(touchEvent, nullptr);
+    PULL_THROW_EVENT_HANDLER->HandleFingerGestureDownEvent(touchEvent);
+}
+
+/**
+ * @tc.name: PullThrowSubscriberHandlerTest_HandleFingerGestureDownEvent_004
+ * @tc.desc: Test HandleFingerGestureDownEvent with double finger (validation fails)
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PullThrowSubscriberHandlerTest, PullThrowSubscriberHandlerTest_HandleFingerGestureDownEvent_004,
+    testing::ext::TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto touchEvent = SetupDoubleFingerDownEvent();
+    ASSERT_NE(touchEvent, nullptr);
+    PULL_THROW_EVENT_HANDLER->HandleFingerGestureDownEvent(touchEvent);
+}
 } // namespace MMI
 } // namespace OHOS

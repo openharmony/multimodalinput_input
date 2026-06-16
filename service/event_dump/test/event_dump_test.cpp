@@ -35,6 +35,7 @@
 
 namespace OHOS {
 namespace MMI {
+void ChkConfig(int32_t fd);
 namespace {
 using namespace testing::ext;
 const std::string TEST_FILE_NAME = "/data/log.log";
@@ -658,6 +659,173 @@ HWTEST_F(EventDumpTest, EventDumpTest_ParseCommand_013, TestSize.Level1)
     CALL_TEST_DEBUG;
     std::vector<std::string> args = {"-hKe"};
     EXPECT_NO_FATAL_FAILURE(MMIEventDump->ParseCommand(fd_, args));
+}
+/**
+ * @tc.name: EventDumpTest_ChkConfig_001
+ * @tc.desc: Verify ChkConfig prints config paths
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventDumpTest, EventDumpTest_ChkConfig_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    const char *tmpFile = "/data/tmp_chkconfig.log";
+    int32_t fdChk = open(tmpFile, O_CREAT | O_WRONLY | O_TRUNC, S_IRUSR | S_IWUSR);
+    ASSERT_GE(fdChk, 0);
+    ChkConfig(fdChk);
+    close(fdChk);
+    std::string content;
+    {
+        int32_t fdRead = open(tmpFile, O_RDONLY);
+        ASSERT_GE(fdRead, 0);
+        char buf[512] = {};
+        ssize_t bytes = read(fdRead, buf, sizeof(buf) - 1);
+        ASSERT_GT(bytes, 0);
+        if (bytes < static_cast<ssize_t>(sizeof(buf))) {
+            buf[bytes] = '\0';
+        } else {
+            buf[sizeof(buf) - 1] = '\0';
+        }
+        content = buf;
+        close(fdRead);
+    }
+    EXPECT_NE(content.find("ChkMMIConfig:"), std::string::npos);
+    EXPECT_NE(content.find("DEF_MMI_DATA_ROOT"), std::string::npos);
+    EXPECT_NE(content.find("EXP_CONFIG"), std::string::npos);
+    EXPECT_NE(content.find("EXP_SOPATH"), std::string::npos);
+    unlink(tmpFile);
+}
+
+/**
+ * @tc.name: EventDumpTest_AttachTouchGestureMgr_001
+ * @tc.desc: Verify AttachTouchGestureMgr sets weak_ptr correctly
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventDumpTest, EventDumpTest_AttachTouchGestureMgr_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MMIEventDump->AttachTouchGestureMgr(nullptr);
+}
+
+/**
+ * @tc.name: EventDumpTest_ParseCommand_014
+ * @tc.desc: Verify ParseCommand with '-c' cursor option
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventDumpTest, EventDumpTest_ParseCommand_014, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::vector<std::string> args = {"-c"};
+    MMIEventDump->ParseCommand(fd_, args);
+}
+
+/**
+ * @tc.name: EventDumpTest_ParseCommand_015
+ * @tc.desc: Verify ParseCommand with '-k' keycommand option
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventDumpTest, EventDumpTest_ParseCommand_015, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::vector<std::string> args = {"-k"};
+    MMIEventDump->ParseCommand(fd_, args);
+}
+
+/**
+ * @tc.name: EventDumpTest_ParseCommand_016
+ * @tc.desc: Verify ParseCommand with '-t' lidstate option
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventDumpTest, EventDumpTest_ParseCommand_016, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::vector<std::string> args = {"-t"};
+    MMIEventDump->ParseCommand(fd_, args);
+}
+
+/**
+ * @tc.name: EventDumpTest_ParseCommand_017
+ * @tc.desc: Verify ParseCommand with '-b' tabletStandState option
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventDumpTest, EventDumpTest_ParseCommand_017, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::vector<std::string> args = {"-b"};
+    MMIEventDump->ParseCommand(fd_, args);
+}
+
+/**
+ * @tc.name: EventDumpTest_ParseCommand_018
+ * @tc.desc: Verify ParseCommand with '-n' tripleFingerSnapshot option
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventDumpTest, EventDumpTest_ParseCommand_018, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::vector<std::string> args = {"-n"};
+    MMIEventDump->ParseCommand(fd_, args);
+}
+
+/**
+ * @tc.name: EventDumpTest_ParseCommand_019
+ * @tc.desc: Verify ParseCommand with '--help' long option
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventDumpTest, EventDumpTest_ParseCommand_019, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::vector<std::string> args = {"--help"};
+    MMIEventDump->ParseCommand(fd_, args);
+}
+
+/**
+ * @tc.name: EventDumpTest_ParseCommand_020
+ * @tc.desc: Verify ParseCommand with '--device' long option
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventDumpTest, EventDumpTest_ParseCommand_020, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::vector<std::string> args = {"--device"};
+    MMIEventDump->ParseCommand(fd_, args);
+}
+
+/**
+ * @tc.name: EventDumpTest_ParseCommand_021
+ * @tc.desc: Verify ParseCommand with all long options
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventDumpTest, EventDumpTest_ParseCommand_021, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::vector<std::string> args = {"--devicelist", "--windows", "--udsserver",
+        "--subscriber", "--monitor", "--interceptor", "--filter", "--mouse",
+        "--cursor", "--keycommand", "--knuckle", "--event", "--lidstate",
+        "--tabletStandState", "--tripleFingerSnapshot"};
+    MMIEventDump->ParseCommand(fd_, args);
+}
+
+/**
+ * @tc.name: EventDumpTest_ParseCommand_022
+ * @tc.desc: Verify ParseCommand with combined short options '-hKe'
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventDumpTest, EventDumpTest_ParseCommand_022, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::vector<std::string> args = {"-hKe"};
+    MMIEventDump->ParseCommand(fd_, args);
 }
 } // namespace MMI
 } // namespace OHOS

@@ -153,5 +153,56 @@ HWTEST_F(KeyEventHookTest, KeyEventHookTest003, TestSize.Level0)
     bool result = hook.DispatchDirectly(keyEvent);
     EXPECT_FALSE(result);
 }
+
+/**
+ * @tc.name: KeyEventHookTest004
+ * @tc.desc: Test OnKeyEvent with nullptr event
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyEventHookTest, KeyEventHookTest004, TestSize.Level0)
+{
+    SessionPtr sess = std::make_shared<UDSSession>(PROGRAM_NAME, MODULE_TYPE, UDS_FD, UDS_UID, UDS_PID);
+    NextHookGetter nextHookGetter = [] (std::shared_ptr<InputEventHook> hook) -> std::shared_ptr<InputEventHook> {
+        return nullptr;
+    };
+    KeyEventHook hook(sess, nextHookGetter);
+    bool result = hook.OnKeyEvent(nullptr);
+    EXPECT_FALSE(result);
+}
+
+/**
+ * @tc.name: KeyEventHookTest005
+ * @tc.desc: Test DispatchToNextHandler with nullptr keyEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyEventHookTest, KeyEventHookTest005, TestSize.Level0)
+{
+    SessionPtr sess = std::make_shared<UDSSession>(PROGRAM_NAME, MODULE_TYPE, UDS_FD, UDS_UID, UDS_PID);
+    NextHookGetter nextHookGetter = [] (std::shared_ptr<InputEventHook> hook) -> std::shared_ptr<InputEventHook> {
+        return nullptr;
+    };
+    KeyEventHook hook(sess, nextHookGetter);
+    int32_t result = hook.DispatchToNextHandler(nullptr);
+    EXPECT_EQ(result, RET_ERR);
+}
+
+/**
+ * @tc.name: KeyEventHookTest006
+ * @tc.desc: Test DispatchDirectly with nullptr keyEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyEventHookTest, KeyEventHookTest006, TestSize.Level0)
+{
+    SessionPtr sess = std::make_shared<UDSSession>(PROGRAM_NAME, MODULE_TYPE, UDS_FD, UDS_UID, UDS_PID);
+    NextHookGetter nextHookGetter = [] (std::shared_ptr<InputEventHook> hook) -> std::shared_ptr<InputEventHook> {
+        return nullptr;
+    };
+    KeyEventHook hook(sess, nextHookGetter);
+    bool result = hook.DispatchDirectly(nullptr);
+    EXPECT_FALSE(result);
+}
 } // namespace MMI
 } // namespace OHOS
