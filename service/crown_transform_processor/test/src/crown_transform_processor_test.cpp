@@ -320,7 +320,9 @@ HWTEST_F(CrownTransformProcessorTest, CrownTransformProcessorTest_HandleCrownRot
     double degree = 30.0;
     int32_t action = PointerEvent::POINTER_ACTION_AXIS_BEGIN;
     processor->HandleCrownRotatePostInner(velocity, degree, action);
-    SUCCEED();
+    auto pointerEvent = processor->GetPointerEvent();
+    ASSERT_NE(pointerEvent, nullptr);
+    EXPECT_EQ(pointerEvent->GetPointerAction(), PointerEvent::POINTER_ACTION_AXIS_BEGIN);
 }
 
 /* *
@@ -336,7 +338,8 @@ HWTEST_F(CrownTransformProcessorTest, CrownTransformProcessorTest_Dump_002, Test
     int32_t fd = -1;
     std::vector<std::string> args;
     processor->Dump(fd, args);
-    SUCCEED();
+    auto pointerEvent = processor->GetPointerEvent();
+    ASSERT_NE(pointerEvent, nullptr);
 }
 } // namespace MMI
 } // namespace OHOS

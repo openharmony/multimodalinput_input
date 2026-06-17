@@ -317,7 +317,11 @@ HWTEST_F(PropertyNameMapperImplTest, PropertyNameMapperImpl_CreateInstance_002, 
 HWTEST_F(PropertyNameMapperImplTest, PropertyNameMapperImpl_DestroyInstance_001, TestSize.Level1)
 {
     DestroyInstance(nullptr);
-    SUCCEED();
+    IPropertyNameMapper* mapper = CreateInstance(nullptr);
+    ASSERT_NE(mapper, nullptr);
+    EXPECT_EQ(mapper->MapKey("A"), KeyEvent::KEYCODE_A);
+    EXPECT_EQ(mapper->MapAxis("X"), PointerEvent::AXIS_TYPE_ABS_X);
+    DestroyInstance(mapper);
 }
 
 /**

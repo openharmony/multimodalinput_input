@@ -653,7 +653,10 @@ HWTEST_F(PullThrowSubscriberHandlerTest, PullThrowSubscriberHandlerTest_HandleFi
     testing::ext::TestSize.Level1)
 {
     CALL_TEST_DEBUG;
+    PULL_THROW_EVENT_HANDLER->StartFingerGesture();
+    EXPECT_TRUE(PULL_THROW_EVENT_HANDLER->gestureInProgress_);
     PULL_THROW_EVENT_HANDLER->HandleFingerGestureUpEvent(nullptr);
+    EXPECT_TRUE(PULL_THROW_EVENT_HANDLER->gestureInProgress_);
 }
 
 /**
