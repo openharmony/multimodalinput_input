@@ -1776,6 +1776,77 @@ ohos_unittest("InputWindowsManagerOneTest") {
   ]
 }
 
+ohos_unittest("InputWindowsManagerDisplayChangeTest") {
+  module_out_path = module_output_path
+  use_exceptions = true
+  configs = [
+    "${mmi_path}:coverage_flags",
+    "${mmi_path}/service/filter:mmi_event_filter_config",
+  ]
+
+  cflags = [
+    "-Dprivate=public",
+    "-Dprotected=public",
+  ]
+
+  # input_windows_manager.h transitively pulls in window_manager_lite.h and other
+  # service headers, so mirror InputWindowsManagerOneTest's include_dirs.
+  include_dirs = [
+    "${mmi_path}/common/anco/comm/include",
+    "${mmi_path}/common/event_integrity/include",
+    "${mmi_path}/interfaces/native/innerkits/proxy/include",
+    "${mmi_path}/service/connect_manager/include",
+    "${mmi_path}/service/delegate_task/include",
+    "${mmi_path}/service/device_config/include",
+    "${mmi_path}/service/device_manager/include",
+    "${mmi_path}/service/event_dispatch/include",
+    "${mmi_path}/service/event_handler/include",
+    "${mmi_path}/service/filter/include",
+    "${mmi_path}/service/hardware_cursor_pointer_manager/include",
+    "${mmi_path}/service/interceptor/include",
+    "${mmi_path}/service/key_command/include",
+    "${mmi_path}/service/key_event_normalize/include",
+    "${mmi_path}/service/module_loader/include",
+    "${mmi_path}/service/monitor/include",
+    "${mmi_path}/service/mouse_event_normalize/include",
+    "${mmi_path}/service/nap_process/include",
+    "${mmi_path}/service/subscriber/include",
+    "${mmi_path}/service/common/timer_manager/include",
+    "${mmi_path}/service/touch_event_normalize/include",
+    "${mmi_path}/service/common/include",
+    "${mmi_path}/service/window_manager/include",
+    "${mmi_path}/util/common/include",
+    "${mmi_path}/service/setting_manager/include",
+  ]
+
+  sources = [
+    "window_manager/test/input_windows_manager_display_change_test.cpp",
+  ]
+
+  deps = [
+    "${mmi_path}/service:libmmi-server",
+    "${mmi_path}/service:libmmi-server-common",
+    "${mmi_path}/util:libmmi-util",
+    "${mmi_path}/frameworks/proxy:libmmi-common",
+  ]
+
+  external_deps = [
+    "c_utils:utilsbase",
+    "googletest:gmock_main",
+    "googletest:gtest_main",
+    "graphic_2d:2d_graphics",
+    "graphic_2d:librender_service_base",
+    "graphic_2d:librender_service_client",
+    "hilog:libhilog",
+    "init:libbegetutil",
+    "ipc:ipc_core",
+    "libinput:libinput-third-mmi",
+    "window_manager:libdm_lite",
+    "window_manager:libwm",
+    "window_manager:libwsutils",
+  ]
+}
+
 ohos_unittest("InputWindowsManagerEXTest") {
   module_out_path = module_output_path
 
@@ -2327,6 +2398,7 @@ ohos_unittest("ModuleLoaderTest") {
   sources = [
     "module_loader/src/app_debug_listener.cpp",
     "module_loader/src/input_screen_capture_agent.cpp",
+    "module_loader/test/multimodal_input_plugin_display_test.cpp",
     "module_loader/test/multimodal_input_plugin_manager_test.cpp",
     "module_loader/test/multimodal_input_preferences_manager_test.cpp",
     "module_loader/test/mmi_service_controller_test.cpp",

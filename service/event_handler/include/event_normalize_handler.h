@@ -18,6 +18,7 @@
 
 #include "i_input_event_handler.h"
 #include "key_event_normalize.h"
+#include "libinput.h"
 #include "plugin_stage.h"
 
 namespace OHOS {

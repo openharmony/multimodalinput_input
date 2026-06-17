@@ -94,6 +94,12 @@ public:
                 (const std::string& uri, const std::string& key, std::function<void(const std::string&)> callback),
                 (override));
     MOCK_METHOD(bool, UnregisterSettingObserver, (int32_t observerId), (override));
+    MOCK_METHOD(std::vector<PluginDisplayGroupInfo>, GetDisplayGroupInfos, (), (override, const));
+    MOCK_METHOD(std::vector<std::shared_ptr<InputDevice>>, GetInputDeviceInfos, (), (override, const));
+    MOCK_METHOD(int32_t, RegisterDisplayChangeCallback, (const DisplayChangeCallback &callback), (override));
+    MOCK_METHOD(bool, UnregisterDisplayChangeCallback, (int32_t callbackId), (override));
+    MOCK_METHOD(int32_t, EnableInputDeviceForPlugin, (int32_t deviceId), (override));
+    MOCK_METHOD(int32_t, DisableInputDeviceForPlugin, (int32_t deviceId), (override));
     MOCK_METHOD(bool, IsDataShareReady, ());
 #ifdef OHOS_BUILD_ENABLE_KEY_PRESSED_HANDLER
     MOCK_METHOD(std::vector<int32_t>, GetSubscribedKeysByPid, (int32_t pid), (override, const));
@@ -3007,5 +3013,6 @@ HWTEST_F(MultimodalInputPluginManagerTest,
     pointerEvent.buttonState = LIBINPUT_BUTTON_STATE_PRESSED;
     EXPECT_FALSE(InputPluginManager::GetInstance()->IntermediateEndEvent(&event));
 }
+
 } // namespace MMI
 } // namespace OHOS

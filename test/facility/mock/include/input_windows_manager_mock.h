@@ -194,6 +194,7 @@ public:
     MOCK_METHOD(int32_t, ControlMouseEventToAnco, (int32_t, bool, const std::string &));
 #endif // OHOS_BUILD_ENABLE_ANCO_GAME_EVENT_MAPPING
     MOCK_METHOD(OLD::DisplayGroupInfo&, GetDefaultDisplayGroupInfo, ());
+    MOCK_METHOD(std::vector<PluginDisplayGroupInfo>, GetDisplayGroupInfos, ());
     static std::shared_ptr<InputWindowsManagerMock> GetInstance();
     static void ReleaseInstance();
 

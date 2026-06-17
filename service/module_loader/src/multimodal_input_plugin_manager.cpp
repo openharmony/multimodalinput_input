@@ -27,6 +27,7 @@
 #include "input_event_handler.h"
 #include "input_windows_manager.h"
 #include "key_monitor_manager.h"
+#include "libinput.h"
 #include "touch_event_normalize.h"
 #include "mmi_log.h"
 #include "input_device_manager.h"
@@ -103,6 +104,13 @@ void InputPluginManager::AttachDelegateInterface(std::shared_ptr<IDelegateInterf
 {
     delegate_ = delegate;
     MMI_HILOGI("InputPluginManager attached delegate interface");
+}
+
+int32_t InputPluginManager::PostSyncTask(const DTaskCallback &cb)
+{
+    auto delegate = delegate_.lock();
+    CHKPR(delegate, RET_ERR);
+    return delegate->OnPostSyncTask(cb);
 }
 
 int32_t InputPluginManager::Init(UDSServer& udsServer)
@@ -600,11 +608,16 @@ int32_t InputPluginManager::UnloadDynamicPlugin(int32_t uid, const std::string &
 
 void InputPluginManager::RemovePluginFromStages(const std::shared_ptr<IPluginContext> &plugin)
 {
+    if (plugin == nullptr) {
+        MMI_HILOGE("Plugin is nullptr");
+        return;
+    }
     for (auto &[stage, pluginList] : plugins_) {
         pluginList.remove_if([&plugin](const std::shared_ptr<IPluginContext> &item) {
             return (item.get() == plugin.get());
         });
     }
+    RemoveDisplayCallbacksOf(plugin.get());
 }
 
 int32_t InputPluginManager::GetExternalObject(const std::string &pluginName, sptr<IRemoteObject> &pluginRemoteStub)
@@ -1316,6 +1329,140 @@ void InputPlugin::RemoveFlagForDevice(libinput_event *event)
         return;
     }
     INPUT_DEV_MGR->RemoveFlag(deviceId);
+}
+
+std::vector<PluginDisplayGroupInfo> InputPlugin::GetDisplayGroupInfos() const
+{
+    std::vector<PluginDisplayGroupInfo> result;
+    InputPluginManager::GetInstance()->PostSyncTask([&result]() {
+        if (WIN_MGR == nullptr) {
+            MMI_HILOGE("Window manager is null");
+            return RET_ERR;
+        }
+        result = WIN_MGR->GetDisplayGroupInfos();
+        return RET_OK;
+    });
+    return result;
+}
+
+std::vector<std::shared_ptr<InputDevice>> InputPlugin::GetInputDeviceInfos() const
+{
+    std::vector<std::shared_ptr<InputDevice>> result;
+    InputPluginManager::GetInstance()->PostSyncTask([&result]() {
+        if (INPUT_DEV_MGR == nullptr) {
+            MMI_HILOGE("Input device manager is null");
+            return RET_ERR;
+        }
+        result = INPUT_DEV_MGR->GetInputDeviceInfosForPlugin();
+        return RET_OK;
+    });
+    return result;
+}
+
+int32_t InputPlugin::RegisterDisplayChangeCallback(const DisplayChangeCallback &callback)
+{
+    return InputPluginManager::GetInstance()->RegisterDisplayChangeCallback(callback, this);
+}
+
+bool InputPlugin::UnregisterDisplayChangeCallback(int32_t callbackId)
+{
+    return InputPluginManager::GetInstance()->UnregisterDisplayChangeCallback(callbackId);
+}
+
+int32_t InputPluginManager::RegisterDisplayChangeCallback(
+    const IPluginContext::DisplayChangeCallback &callback, IPluginContext *owner)
+{
+    if (owner == nullptr) {
+        MMI_HILOGE("Plugin owner is nullptr");
+        return RET_ERR;
+    }
+    if (!callback) {
+        MMI_HILOGE("Callback is null");
+        return RET_ERR;
+    }
+    int32_t callbackId = RET_ERR;
+    {
+        std::lock_guard<std::mutex> lock(displayCallbacksMutex_);
+        if (nextDisplayCallbackId_ < 0) {
+            nextDisplayCallbackId_ = 1;
+        }
+        callbackId = nextDisplayCallbackId_++;
+        displayCallbacks_[callbackId] = {callback, owner};
+    }
+    MMI_HILOGI("Registered display callback, ID=%{public}d", callbackId);
+    return callbackId;
+}
+
+bool InputPluginManager::UnregisterDisplayChangeCallback(int32_t callbackId)
+{
+    if (callbackId < 0) {
+        MMI_HILOGE("Invalid callback ID: %{public}d", callbackId);
+        return false;
+    }
+    std::lock_guard<std::mutex> lock(displayCallbacksMutex_);
+    auto it = displayCallbacks_.find(callbackId);
+    if (it == displayCallbacks_.end()) {
+        MMI_HILOGW("Display callback ID not found: %{public}d", callbackId);
+        return false;
+    }
+    displayCallbacks_.erase(it);
+    return true;
+}
+
+void InputPluginManager::RemoveDisplayCallbacksOf(IPluginContext *owner)
+{
+    if (owner == nullptr) {
+        MMI_HILOGE("Plugin owner is nullptr");
+        return;
+    }
+    std::lock_guard<std::mutex> lock(displayCallbacksMutex_);
+    for (auto it = displayCallbacks_.begin(); it != displayCallbacks_.end();) {
+        if (it->second.owner == owner) {
+            it = displayCallbacks_.erase(it);
+        } else {
+            ++it;
+        }
+    }
+}
+
+int32_t InputPlugin::EnableInputDeviceForPlugin(int32_t deviceId)
+{
+    return InputPluginManager::GetInstance()->PostSyncTask([deviceId]() {
+        if (INPUT_DEV_MGR == nullptr) {
+            MMI_HILOGE("Input device manager is null");
+            return RET_ERR;
+        }
+        return INPUT_DEV_MGR->EnableInputDeviceForPlugin(deviceId);
+    });
+}
+
+int32_t InputPlugin::DisableInputDeviceForPlugin(int32_t deviceId)
+{
+    return InputPluginManager::GetInstance()->PostSyncTask([deviceId]() {
+        if (INPUT_DEV_MGR == nullptr) {
+            MMI_HILOGE("Input device manager is null");
+            return RET_ERR;
+        }
+        return INPUT_DEV_MGR->DisableInputDeviceForPlugin(deviceId);
+    });
+}
+
+void InputPluginManager::NotifyDisplayChange()
+{
+    std::vector<IPluginContext::DisplayChangeCallback> allCallbacks;
+    {
+        std::lock_guard<std::mutex> lock(displayCallbacksMutex_);
+        allCallbacks.reserve(displayCallbacks_.size());
+        for (auto &[id, entry] : displayCallbacks_) {
+            allCallbacks.push_back(entry.callback);
+        }
+    }
+    for (auto &callback : allCallbacks) {
+        if (callback) {
+            callback();
+        }
+    }
+    MMI_HILOGI("Notified %{public}zu display change callbacks", allCallbacks.size());
 }
 } // namespace MMI
 } // namespace OHOS

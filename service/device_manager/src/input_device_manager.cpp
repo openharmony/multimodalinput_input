@@ -1763,6 +1763,75 @@ int32_t InputDeviceManager::SetInputDeviceEnabled(
     return RET_OK;
 }
 
+std::vector<std::shared_ptr<InputDevice>> InputDeviceManager::GetInputDeviceInfosForPlugin() const
+{
+    std::vector<std::shared_ptr<InputDevice>> devices;
+    devices.reserve(inputDevice_.size() + virtualInputDevices_.size());
+    for (const auto &[deviceId, deviceInfo] : inputDevice_) {
+        if (deviceInfo.inputDeviceOrigin != nullptr) {
+            auto inputDevice = GetInputDevice(deviceId, false);
+            if (inputDevice != nullptr) {
+                devices.push_back(inputDevice);
+            }
+            continue;
+        }
+        auto inputDevice = std::make_shared<InputDevice>();
+        inputDevice->SetId(deviceId);
+        inputDevice->SetLocal(deviceInfo.isLocal);
+        uint32_t tags = 0;
+        if (deviceInfo.isPointerDevice) {
+            inputDevice->AddCapability(INPUT_DEV_CAP_POINTER);
+            tags |= CapabilityToTags(INPUT_DEV_CAP_POINTER);
+        }
+        if (deviceInfo.isTouchableDevice) {
+            inputDevice->AddCapability(INPUT_DEV_CAP_TOUCH);
+            tags |= CapabilityToTags(INPUT_DEV_CAP_TOUCH);
+        }
+        inputDevice->SetType(static_cast<int32_t>(tags));
+        devices.push_back(inputDevice);
+    }
+    for (const auto &item : virtualInputDevices_) {
+        CHKPC(item.second);
+        devices.push_back(item.second);
+    }
+    return devices;
+}
+
+int32_t InputDeviceManager::EnableInputDeviceForPlugin(int32_t deviceId)
+{
+    MMI_HILOGI("Plugin enable input device: %{public}d", deviceId);
+    auto item = inputDevice_.find(deviceId);
+    if (item == inputDevice_.end()) {
+        MMI_HILOGE("Invalid device id: %{public}d", deviceId);
+        return RET_ERR;
+    }
+    item->second.inputEnable = true;
+    DEVICE_STATE_MGR->EnableDevice(deviceId,
+        [](int32_t id) {
+            INPUT_DEV_MGR->EnableInputDevice(id);
+            return RET_OK;
+        });
+    return RET_OK;
+}
+
+int32_t InputDeviceManager::DisableInputDeviceForPlugin(int32_t deviceId)
+{
+    MMI_HILOGI("Plugin disable input device: %{public}d", deviceId);
+    auto item = inputDevice_.find(deviceId);
+    if (item == inputDevice_.end()) {
+        MMI_HILOGE("Invalid device id: %{public}d", deviceId);
+        return RET_ERR;
+    }
+    if (!item->second.inputEnable) {
+        MMI_HILOGI("Device %{public}d already disabled", deviceId);
+        return RET_OK;
+    }
+    item->second.inputEnable = false;
+    item->second.enable = false;
+    NotifyDeviceDisabled(deviceId);
+    return RET_OK;
+}
+
 int32_t InputDeviceManager::DisableInputEventDispatch(bool disabled, int32_t pid)
 {
     CALL_DEBUG_ENTER;

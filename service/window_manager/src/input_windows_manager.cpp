@@ -48,6 +48,7 @@
 #endif // OHOS_BUILD_ENABLE_DFX_RADAR
 #include "pointer_device_manager.h"
 #include "product_name_definition.h"
+#include "multimodal_input_plugin_manager.h"
 #include "product_type_parser.h"
 #include "bundle_name_parser.h"
 #include "timer_manager.h"
@@ -2115,6 +2116,11 @@ void InputWindowsManager::UpdateDisplayInfo(OLD::DisplayGroupInfo &displayGroupI
         backCenterDisplayChangeMap_[displayGroupInfo.groupId] = true;
     }
 #endif // OHOS_BUILD_ENABLE_EXTERNAL_SCREEN
+
+    // Check for plugin display changes
+    OLD::DisplayGroupInfo oldGroupInfo;
+    bool hasOldGroupInfo = GetCachedDisplayGroupInfo(displayGroupInfo.groupId, oldGroupInfo);
+    bool hasChanged = HasDisplayGroupInfoChanged(oldGroupInfo, displayGroupInfo, hasOldGroupInfo);
     InitDisplayGroupInfo(displayGroupInfo);
     if (!mainGroupExisted_ && displayGroupInfo.type == GroupType::GROUP_DEFAULT) {
         mainGroupExisted_ = true;
@@ -2167,6 +2173,16 @@ void InputWindowsManager::UpdateDisplayInfo(OLD::DisplayGroupInfo &displayGroupI
         UpdateWindowsInfoPerDisplay(displayGroupInfo);
         HandleWindowPositionChange(displayGroupInfo);
         EnterMouseCaptureMode(displayGroupInfo);
+
+        // Notify plugins about display changes (async notification)
+        if (hasChanged) {
+            auto pluginMgr = InputPluginManager::GetInstance();
+            if (pluginMgr != nullptr) {
+                pluginMgr->NotifyDisplayChange();
+                MMI_HILOGI("Notified display info changed to plugins");
+            }
+        }
+
         const auto iter = displayGroupInfoMap_.find(groupId);
         if (iter != displayGroupInfoMap_.end()) {
             displayGroupInfoTemp = iter->second;
@@ -3577,6 +3593,27 @@ const OLD::DisplayGroupInfo InputWindowsManager::GetDisplayGroupInfo(int32_t gro
         return iter->second;
     }
     return displayGroupInfo_;
+}
+
+std::vector<PluginDisplayGroupInfo> InputWindowsManager::GetDisplayGroupInfos()
+{
+    std::vector<PluginDisplayGroupInfo> result;
+    result.reserve(displayGroupInfoMap_.size());
+    for (const auto &[groupId, groupInfo] : displayGroupInfoMap_) {
+        PluginDisplayGroupInfo pluginGroupInfo;
+        pluginGroupInfo.groupId = groupId;
+        pluginGroupInfo.mainDisplayId = groupInfo.mainDisplayId;
+        pluginGroupInfo.displayInfos.reserve(groupInfo.displaysInfo.size());
+        for (const auto &displayInfo : groupInfo.displaysInfo) {
+            PluginDisplayInfo pluginDisplayInfo;
+            pluginDisplayInfo.displayId = displayInfo.id;
+            pluginDisplayInfo.rsId = displayInfo.rsId;
+            pluginDisplayInfo.mode = static_cast<int32_t>(displayInfo.displaySourceMode);
+            pluginGroupInfo.displayInfos.push_back(pluginDisplayInfo);
+        }
+        result.push_back(pluginGroupInfo);
+    }
+    return result;
 }
 
 const std::vector<OLD::DisplayInfo>& InputWindowsManager::GetDisplayInfoVector(int32_t groupId) const
@@ -8680,6 +8717,64 @@ bool InputWindowsManager::IsBackCenterDisplayChange(const OLD::DisplayGroupInfo 
         }
     }
     return false;
+}
+
+bool InputWindowsManager::HasDisplayGroupInfoChanged(const OLD::DisplayGroupInfo &oldGroupInfo,
+    const OLD::DisplayGroupInfo &newGroupInfo, bool hasOldGroupInfo) const
+{
+    if (!hasOldGroupInfo) {
+        MMI_HILOGD("No old display group info, skip plugin display change detection");
+        return false;
+    }
+
+    if (oldGroupInfo.mainDisplayId != newGroupInfo.mainDisplayId) {
+        MMI_HILOGI("Main display ID changed: old=%{public}d, new=%{public}d",
+            oldGroupInfo.mainDisplayId, newGroupInfo.mainDisplayId);
+        return true;
+    }
+
+    if (oldGroupInfo.displaysInfo.size() != newGroupInfo.displaysInfo.size()) {
+        MMI_HILOGI("Display count changed: old=%{public}zu, new=%{public}zu",
+            oldGroupInfo.displaysInfo.size(), newGroupInfo.displaysInfo.size());
+        return true;
+    }
+
+    for (const auto &oldDisplay : oldGroupInfo.displaysInfo) {
+        const auto *newDisplay = FindDisplayById(newGroupInfo.displaysInfo, oldDisplay.id);
+        if (newDisplay == nullptr) {
+            MMI_HILOGI("Display removed or replaced: displayId=%{public}d", oldDisplay.id);
+            return true;
+        }
+        if (HasPluginDisplayInfoChanged(oldDisplay, *newDisplay)) {
+            MMI_HILOGI("Plugin display info changed: displayId=%{public}d", oldDisplay.id);
+            return true;
+        }
+    }
+
+    return false;
+}
+
+bool InputWindowsManager::HasPluginDisplayInfoChanged(const OLD::DisplayInfo &oldDisplay,
+    const OLD::DisplayInfo &newDisplay) const
+{
+    return oldDisplay.rsId != newDisplay.rsId ||
+        oldDisplay.name != newDisplay.name ||
+        oldDisplay.uniq != newDisplay.uniq ||
+        oldDisplay.x != newDisplay.x ||
+        oldDisplay.y != newDisplay.y ||
+        oldDisplay.width != newDisplay.width ||
+        oldDisplay.height != newDisplay.height ||
+        oldDisplay.validWidth != newDisplay.validWidth ||
+        oldDisplay.validHeight != newDisplay.validHeight ||
+        oldDisplay.offsetX != newDisplay.offsetX ||
+        oldDisplay.offsetY != newDisplay.offsetY ||
+        oldDisplay.direction != newDisplay.direction ||
+        oldDisplay.displayDirection != newDisplay.displayDirection ||
+        oldDisplay.fixedDirection != newDisplay.fixedDirection ||
+        oldDisplay.displayMode != newDisplay.displayMode ||
+        oldDisplay.displaySourceMode != newDisplay.displaySourceMode ||
+        oldDisplay.pointerActiveWidth != newDisplay.pointerActiveWidth ||
+        oldDisplay.pointerActiveHeight != newDisplay.pointerActiveHeight;
 }
 
 bool InputWindowsManager::IsMainDisplayChanged(const OLD::DisplayGroupInfo &oldGroupInfo,

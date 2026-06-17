@@ -170,6 +170,9 @@ public:
     void AddFlag(int32_t deviceId, uint32_t flag);
     void RemoveFlag(int32_t deviceId);
     uint32_t GetFlag(int32_t deviceId);
+    std::vector<std::shared_ptr<InputDevice>> GetInputDeviceInfosForPlugin() const;
+    int32_t EnableInputDeviceForPlugin(int32_t deviceId);
+    int32_t DisableInputDeviceForPlugin(int32_t deviceId);
 
 private:
     int32_t ParseDeviceId(struct libinput_device *inputDevice);

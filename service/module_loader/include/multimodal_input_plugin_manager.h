@@ -108,6 +108,12 @@ public:
 #endif
     void AddFlagForDevice(libinput_event *event) override;
     void RemoveFlagForDevice(libinput_event *event) override;
+    std::vector<PluginDisplayGroupInfo> GetDisplayGroupInfos() const override;
+    std::vector<std::shared_ptr<InputDevice>> GetInputDeviceInfos() const override;
+    int32_t RegisterDisplayChangeCallback(const DisplayChangeCallback &callback) override;
+    bool UnregisterDisplayChangeCallback(int32_t callbackId) override;
+    int32_t EnableInputDeviceForPlugin(int32_t deviceId) override;
+    int32_t DisableInputDeviceForPlugin(int32_t deviceId) override;
 
     int32_t prio_ = 200;
     std::function<void(PluginEventType, int64_t)> callback_;
@@ -148,6 +154,9 @@ public:
     InputPluginManager &operator=(const InputPluginManager &) = delete;
     static InputPluginManager *GetInstance(const std::string &directory = "");
     void AttachDelegateInterface(std::shared_ptr<IDelegateInterface> delegate);
+    int32_t PostSyncTask(const DTaskCallback &cb);
+    int32_t RegisterDisplayChangeCallback(const IPluginContext::DisplayChangeCallback &callback, IPluginContext *owner);
+    bool UnregisterDisplayChangeCallback(int32_t callbackId);
     int32_t Init(UDSServer &udsServer);
     void Dump(int fd);
     void PluginAssignmentCallBack(std::function<void(PluginEventType, int64_t)> callback, InputPluginStage stage);
@@ -163,6 +172,7 @@ public:
     bool HandleShortcutKey(const ShortcutKey &key);
     bool HandleShortcutKey(const KeyOption &option);
     bool HandleSequenceKeys(const Sequence &sequence);
+    void NotifyDisplayChange();
 
     int32_t LoadDynamicPlugin(int32_t uid, const std::string &uuid);
     int32_t UnloadDynamicPlugin(int32_t uid, const std::string &uuid);
@@ -196,6 +206,14 @@ private:
     std::atomic_bool loading_ { false };
     inline static InputPluginManager* instance_ { nullptr };
     inline static std::once_flag init_flag_;
+    struct DisplayCallbackEntry {
+        IPluginContext::DisplayChangeCallback callback;
+        IPluginContext *owner { nullptr };
+    };
+    std::map<int32_t, DisplayCallbackEntry> displayCallbacks_;
+    std::mutex displayCallbacksMutex_;
+    int32_t nextDisplayCallbackId_ { 1 };
+    void RemoveDisplayCallbacksOf(IPluginContext *owner);
 };
 } // namespace MMI
 } // namespace OHOS
