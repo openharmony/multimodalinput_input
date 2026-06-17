@@ -89,7 +89,7 @@ constexpr int32_t TWOFOLD { 2 };
 constexpr int32_t COMMON_PARAMETER_ERROR { 401 };
 const std::string BIND_CFG_FILE_NAME { "/data/service/el1/public/multimodalinput/display_bind.cfg" };
 const std::string MOUSE_FILE_NAME { "mouse_settings.xml" };
-const std::string DEFAULT_ICON_PATH { "/system/etc/multimodalinput/mouse_icon/Default.svg" };
+const std::string DEFAULT_ICON_PATH { "/data/service/el1/public/multimodalinput/mouse_icon/Default.svg" };
 const std::string NAVIGATION_SWITCH_NAME { "settings.input.stylus_navigation_hint" };
 const std::string SYS_PRODUCT_TYPE = OHOS::system::GetParameter("const.build.product", SYS_GET_DEVICE_TYPE_PARAM);
 const std::string PRODUCT_TYPE = system::GetParameter("const.product.devicetype", "unknown");

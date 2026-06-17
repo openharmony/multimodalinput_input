@@ -118,7 +118,8 @@
         "libinput",
 	      "libuv",
         "os_account",
-        "openssl"
+        "openssl",
+        "zlib"
       ],
       "third_party": [
         "libuv",

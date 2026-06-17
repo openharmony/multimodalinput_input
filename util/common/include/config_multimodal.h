@@ -21,6 +21,8 @@ namespace MMI {
 #define DEF_MMI_EVENT_INJECTION "/system/bin/mmi-event-injection"
 #define DEF_MMI_VIRTUAL_DEVICE_MANAGER "/system/bin/mmi-virtual-device-manager"
 #define DEF_MMI_DATA_ROOT "/data/mmi/"
+#define DEF_MOUSE_ICONS_DAT_PATH "/system/etc/multimodalinput/mouse_icons.dat"
+#define DEF_JOYSTICK_LAYOUTS_DAT_PATH "/system/etc/multimodalinput/joystick_layouts.dat"
 #define DEF_EXP_CONFIG "/system/etc/mmi_device_config.ini"
 #ifdef __aarch64__
     #define DEF_EXP_SOPATH "/system/lib64/"

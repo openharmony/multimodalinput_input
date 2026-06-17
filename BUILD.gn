@@ -288,6 +288,7 @@ group("mmi_tests") {
     "tools/inject_event:InjectEventTest",
     "util:UdsClientTest",
     "util/common:InputEventDataTransformationTest",
+    "util/common:ResourceDecompressTest",
     "util/common:UtilCommonTest",
     "util/json_parser:JsonParserTest",
   ]

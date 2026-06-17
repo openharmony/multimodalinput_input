@@ -106,3 +106,35 @@ ohos_unittest("InputEventDataTransformationTest") {
     external_deps += [ "security_component_manager:libsecurity_component_sdk" ]
   }
 }
+
+ohos_unittest("ResourceDecompressTest") {
+  module_out_path = module_output_path
+
+  configs = [ "${mmi_path}:coverage_flags" ]
+
+  branch_protector_ret = "pac_ret"
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
+
+  defines = input_default_defines
+
+  include_dirs = [ "${mmi_path}/util/common/include" ]
+
+  sources = [
+    "${mmi_path}/util/common/test/resource_decompress_test.cpp",
+  ]
+
+  deps = [
+    "${mmi_path}/util:libmmi-util",
+  ]
+
+  external_deps = [
+    "c_utils:utils",
+    "googletest:gtest_main",
+    "hilog:libhilog",
+    "zlib:libz",
+  ]
+}
