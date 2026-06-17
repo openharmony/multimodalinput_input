@@ -706,6 +706,11 @@ HWTEST_F(EventDumpTest, EventDumpTest_AttachTouchGestureMgr_001, TestSize.Level1
 {
     CALL_TEST_DEBUG;
     MMIEventDump->AttachTouchGestureMgr(nullptr);
+    std::vector<std::string> args = {"-h"};
+    int32_t count = 0;
+    MMIEventDump->CheckCount(fd_, args, count);
+    MMIEventDump->ParseCommand(fd_, args);
+    EXPECT_EQ(count, 1);
 }
 
 /**
@@ -718,7 +723,10 @@ HWTEST_F(EventDumpTest, EventDumpTest_ParseCommand_014, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     std::vector<std::string> args = {"-c"};
+    int32_t count = 0;
+    MMIEventDump->CheckCount(fd_, args, count);
     MMIEventDump->ParseCommand(fd_, args);
+    EXPECT_EQ(count, 1);
 }
 
 /**
@@ -731,7 +739,10 @@ HWTEST_F(EventDumpTest, EventDumpTest_ParseCommand_015, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     std::vector<std::string> args = {"-k"};
+    int32_t count = 0;
+    MMIEventDump->CheckCount(fd_, args, count);
     MMIEventDump->ParseCommand(fd_, args);
+    EXPECT_EQ(count, 1);
 }
 
 /**
@@ -744,7 +755,10 @@ HWTEST_F(EventDumpTest, EventDumpTest_ParseCommand_016, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     std::vector<std::string> args = {"-t"};
+    int32_t count = 0;
+    MMIEventDump->CheckCount(fd_, args, count);
     MMIEventDump->ParseCommand(fd_, args);
+    EXPECT_EQ(count, 1);
 }
 
 /**
@@ -757,7 +771,10 @@ HWTEST_F(EventDumpTest, EventDumpTest_ParseCommand_017, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     std::vector<std::string> args = {"-b"};
+    int32_t count = 0;
+    MMIEventDump->CheckCount(fd_, args, count);
     MMIEventDump->ParseCommand(fd_, args);
+    EXPECT_EQ(count, 1);
 }
 
 /**
@@ -770,7 +787,10 @@ HWTEST_F(EventDumpTest, EventDumpTest_ParseCommand_018, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     std::vector<std::string> args = {"-n"};
+    int32_t count = 0;
+    MMIEventDump->CheckCount(fd_, args, count);
     MMIEventDump->ParseCommand(fd_, args);
+    EXPECT_EQ(count, 1);
 }
 
 /**
@@ -783,7 +803,10 @@ HWTEST_F(EventDumpTest, EventDumpTest_ParseCommand_019, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     std::vector<std::string> args = {"--help"};
+    int32_t count = 0;
+    MMIEventDump->CheckCount(fd_, args, count);
     MMIEventDump->ParseCommand(fd_, args);
+    EXPECT_EQ(count, 1);
 }
 
 /**
@@ -796,7 +819,10 @@ HWTEST_F(EventDumpTest, EventDumpTest_ParseCommand_020, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     std::vector<std::string> args = {"--device"};
+    int32_t count = 0;
+    MMIEventDump->CheckCount(fd_, args, count);
     MMIEventDump->ParseCommand(fd_, args);
+    EXPECT_EQ(count, 1);
 }
 
 /**
@@ -812,7 +838,10 @@ HWTEST_F(EventDumpTest, EventDumpTest_ParseCommand_021, TestSize.Level1)
         "--subscriber", "--monitor", "--interceptor", "--filter", "--mouse",
         "--cursor", "--keycommand", "--knuckle", "--event", "--lidstate",
         "--tabletStandState", "--tripleFingerSnapshot"};
+    int32_t count = 0;
+    MMIEventDump->CheckCount(fd_, args, count);
     MMIEventDump->ParseCommand(fd_, args);
+    EXPECT_EQ(count, 15);
 }
 
 /**
@@ -825,7 +854,10 @@ HWTEST_F(EventDumpTest, EventDumpTest_ParseCommand_022, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     std::vector<std::string> args = {"-hKe"};
+    int32_t count = 0;
+    MMIEventDump->CheckCount(fd_, args, count);
     MMIEventDump->ParseCommand(fd_, args);
+    EXPECT_EQ(count, 3);
 }
 } // namespace MMI
 } // namespace OHOS

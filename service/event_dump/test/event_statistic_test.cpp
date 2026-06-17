@@ -1181,8 +1181,14 @@ HWTEST_F(EventStatisticTest, EventStatisticTest_PushSwitchEvent_Nullptr, TestSiz
 {
     CALL_TEST_DEBUG;
     EventStatistic eventStatistic;
+    eventStatistic.dumperEventList_.clear();
     std::shared_ptr<SwitchEvent> nullEvent = nullptr;
     eventStatistic.PushSwitchEvent(nullEvent);
+    EXPECT_TRUE(eventStatistic.dumperEventList_.empty());
+    std::shared_ptr<SwitchEvent> switchEvent = std::make_shared<SwitchEvent>(0);
+    switchEvent->SetSwitchType(SwitchEvent::SWITCH_LID);
+    eventStatistic.PushSwitchEvent(switchEvent);
+    EXPECT_FALSE(eventStatistic.dumperEventList_.empty());
 }
 
 /**

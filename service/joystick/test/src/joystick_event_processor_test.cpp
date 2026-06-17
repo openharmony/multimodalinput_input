@@ -979,7 +979,12 @@ HWTEST_F(JoystickEventProcessorTest, JoystickEventProcessorTest_OnDeviceEnabled_
     int32_t deviceId { 2 };
     JoystickEventProcessor joystick(&env_, deviceId);
     joystick.OnDeviceEnabled();
-    SUCCEED();
+    KeyEvent::KeyItem keyItem {};
+    keyItem.SetKeyCode(KeyEvent::KEYCODE_BUTTON_A);
+    keyItem.SetPressed(true);
+    auto keyEvent = joystick.FormatButtonEvent(keyItem);
+    ASSERT_NE(keyEvent, nullptr);
+    EXPECT_EQ(keyEvent->GetKeyAction(), KeyEvent::KEY_ACTION_DOWN);
 }
 
 /**
@@ -994,7 +999,12 @@ HWTEST_F(JoystickEventProcessorTest, JoystickEventProcessorTest_OnDeviceDisabled
     int32_t deviceId { 2 };
     JoystickEventProcessor joystick(&env_, deviceId);
     joystick.OnDeviceDisabled();
-    SUCCEED();
+    KeyEvent::KeyItem keyItem {};
+    keyItem.SetKeyCode(KeyEvent::KEYCODE_BUTTON_A);
+    keyItem.SetPressed(false);
+    auto keyEvent = joystick.FormatButtonEvent(keyItem);
+    ASSERT_NE(keyEvent, nullptr);
+    EXPECT_EQ(keyEvent->GetKeyAction(), KeyEvent::KEY_ACTION_UP);
 }
 std::shared_ptr<ISettingManager> ISettingManager::instance_;
 std::once_flag ISettingManager::initFlag_;

@@ -1928,7 +1928,9 @@ HWTEST_F(KeyConfigParserTest, KeyConfigParserTest_ParseMultiFingersTap_002, Test
 HWTEST_F(KeyConfigParserTest, KeyConfigParserTest_PrintSeq_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
+    EXPECT_TRUE(context_.sequences_->empty());
     handler_->PrintSeq();
+    EXPECT_TRUE(context_.sequences_->empty());
 }
 
 /**
@@ -1951,7 +1953,10 @@ HWTEST_F(KeyConfigParserTest, KeyConfigParserTest_PrintSeq_002, TestSize.Level1)
     ability.abilityName = "testAbility";
     seq.ability = ability;
     context_.sequences_->push_back(seq);
+    EXPECT_EQ(context_.sequences_->size(), 1u);
     handler_->PrintSeq();
+    EXPECT_EQ(context_.sequences_->size(), 1u);
+    EXPECT_EQ(context_.sequences_->at(0).sequenceKeys.size(), 1u);
 }
 
 /**
@@ -1963,7 +1968,9 @@ HWTEST_F(KeyConfigParserTest, KeyConfigParserTest_PrintSeq_002, TestSize.Level1)
 HWTEST_F(KeyConfigParserTest, KeyConfigParserTest_PrintExcludeKeys_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
+    EXPECT_TRUE(context_.excludeKeys_->empty());
     handler_->PrintExcludeKeys();
+    EXPECT_TRUE(context_.excludeKeys_->empty());
 }
 
 /**
@@ -1980,7 +1987,10 @@ HWTEST_F(KeyConfigParserTest, KeyConfigParserTest_PrintExcludeKeys_002, TestSize
     exKey.keyAction = KeyEvent::KEY_ACTION_DOWN;
     exKey.delay = 200;
     context_.excludeKeys_->push_back(exKey);
+    EXPECT_EQ(context_.excludeKeys_->size(), 1u);
     handler_->PrintExcludeKeys();
+    EXPECT_EQ(context_.excludeKeys_->size(), 1u);
+    EXPECT_EQ(context_.excludeKeys_->at(0).keyCode, 100);
 }
 
 /**

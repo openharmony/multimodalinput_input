@@ -585,9 +585,12 @@ HWTEST_F(SettingDataMigratorTest, SettingDataMigrator_Integration_003, TestSize.
     SettingDataMigrator& migrator = SettingDataMigrator::GetInstance();
     migrator.Initialize(data);
 
-    migrator.MigratorUserData(TEST_USER_ID_DEFAULT);
-    migrator.MigratorUserData(TEST_USER_ID_SECONDARY);
-    migrator.MigratorUserData(TEST_USER_ID_DEFAULT + 2);
+    bool result1 = migrator.MigratorUserData(TEST_USER_ID_DEFAULT);
+    EXPECT_TRUE(result1);
+    bool result2 = migrator.MigratorUserData(TEST_USER_ID_SECONDARY);
+    EXPECT_TRUE(result2);
+    bool result3 = migrator.MigratorUserData(TEST_USER_ID_DEFAULT + 2);
+    EXPECT_TRUE(result3);
 }
 
 /**
