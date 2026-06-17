@@ -129,12 +129,14 @@ ohos_unittest("InputEventHookHandlerTest") {
     "${mmi_path}/interfaces/native/innerkits/event/include",
     "${mmi_path}/service/connect_manager/include",
     "${mmi_path}/frameworks/proxy/module_loader/include",
+    "${mmi_path}/service/filter/include",
   ]
 
   configs = [
     "${mmi_path}/service/connect_manager:mmi_connect_manager_config",
     "${mmi_path}/service/filter:mmi_event_filter_config",
     "${mmi_path}/common/anco/comm:mmi_anco_channel_config",
+    "${mmi_path}:coverage_flags",
   ]
 
   cflags = [
@@ -150,14 +152,24 @@ ohos_unittest("InputEventHookHandlerTest") {
   ]
 
   deps = [
-    "${mmi_path}/util:libmmi-util"
+    "${mmi_path}/test/facility/config_policy_utils_mock:config_policy_utils_mock",
+    "${mmi_path}/util:libmmi-util",
+    "${mmi_path}/frameworks/proxy:libmmi-common",
   ]
 
   external_deps = [
+    "cJSON:cjson",
+    "c_utils:utils",
     "c_utils:utilsbase",
+    "eventhandler:libeventhandler",
     "googletest:gmock_main",
+    "googletest:gtest_main",
     "graphic_2d:2d_graphics",
     "graphic_2d:librender_service_client",
+    "hilog:libhilog",
+    "image_framework:image_native",
+    "init:libbegetutil",
+    "ipc:ipc_single",
     "samgr:samgr_proxy",
   ]
 }
