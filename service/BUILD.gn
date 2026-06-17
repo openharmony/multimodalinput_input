@@ -247,6 +247,7 @@ ohos_shared_library("libcursor_drawing_adapter") {
     "preferences:native_preferences",
     "window_manager:libdm_lite",
     "window_manager:libwsutils",
+    "ability_runtime:dataobs_manager",
     "eventhandler:libeventhandler",
   ]
 
@@ -330,6 +331,7 @@ ohos_shared_library("libmmi-server-common") {
     "c_utils:utils",
     "samgr:samgr_proxy",
     "hilog:libhilog",
+    "ability_runtime:dataobs_manager",
     "ipc:ipc_single",
   ]
 
@@ -1560,6 +1562,7 @@ ohos_unittest("PointerDrawingManagerHardCursorTest") {
     "preferences:native_preferences",
     "window_manager:libdm_lite",
     "window_manager:libwmutil",
+    "ability_runtime:dataobs_manager",
     "window_manager:libwsutils",
   ]
 }
