@@ -1601,7 +1601,7 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_SetWindowInfo_001, TestSize.
     ServerMsgHandler handler;
     int32_t infoId = 1;
     WindowInfo info;
-    const std::string iconPath = "/system/etc/multimodalinput/mouse_icon/North_South.svg";
+    const std::string iconPath = "/data/service/el1/public/multimodalinput/mouse_icon/North_South.svg";
     handler.transparentWins_.insert(std::make_pair(1, SetMouseIconTest(iconPath)));
     EXPECT_NO_FATAL_FAILURE(handler.SetWindowInfo(infoId, info));
     infoId = 2;

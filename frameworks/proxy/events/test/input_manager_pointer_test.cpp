@@ -1257,7 +1257,7 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_SetMouseIcon_001, Test
     auto window = WindowUtilsTest::GetInstance()->GetWindow();
     CHKPV(window);
     uint32_t windowId = window->GetWindowId();
-    const std::string iconPath = "/system/etc/multimodalinput/mouse_icon/North_South.svg";
+    const std::string iconPath = "/data/service/el1/public/multimodalinput/mouse_icon/North_South.svg";
     PointerStyle pointerStyle;
     std::unique_ptr<OHOS::Media::PixelMap> pixelMap = InputManagerUtil::SetMouseIconTest(iconPath);
     ASSERT_NE(pixelMap, nullptr);
@@ -1283,7 +1283,7 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_SetMouseIcon_002, Test
     auto window = WindowUtilsTest::GetInstance()->GetWindow();
     CHKPV(window);
     uint32_t windowId = window->GetWindowId();
-    const std::string iconPath = "/system/etc/multimodalinput/mouse_icon/Zoom_Out.svg";
+    const std::string iconPath = "/data/service/el1/public/multimodalinput/mouse_icon/Zoom_Out.svg";
     PointerStyle pointerStyle;
     std::unique_ptr<OHOS::Media::PixelMap> pixelMap = InputManagerUtil::SetMouseIconTest(iconPath);
     ASSERT_NE(pixelMap, nullptr);
@@ -1313,7 +1313,7 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_SetMouseIcon_003, Test
     pointerStyle.id = MOUSE_ICON::DEFAULT;
     int32_t ret = InputManager::GetInstance()->SetPointerStyle(windowId, pointerStyle);
     ASSERT_TRUE(ret == RET_OK);
-    const std::string iconPath = "/system/etc/multimodalinput/mouse_icon/Zoom_Out.svg";
+    const std::string iconPath = "/data/service/el1/public/multimodalinput/mouse_icon/Zoom_Out.svg";
     std::unique_ptr<OHOS::Media::PixelMap> pixelMap = InputManagerUtil::SetMouseIconTest(iconPath);
     ASSERT_TRUE(pixelMap != nullptr);
     pointerStyle.id = MOUSE_ICON::DEVELOPER_DEFINED_ICON;
@@ -1356,7 +1356,7 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_SetMouseHotSpot_002, T
     auto window = WindowUtilsTest::GetInstance()->GetWindow();
     CHKPV(window);
     uint32_t windowId = window->GetWindowId();
-    const std::string iconPath = "/system/etc/multimodalinput/mouse_icon/Default.svg";
+    const std::string iconPath = "/data/service/el1/public/multimodalinput/mouse_icon/Default.svg";
     PointerStyle pointerStyle;
     std::unique_ptr<OHOS::Media::PixelMap> pixelMap = InputManagerUtil::SetMouseIconTest(iconPath);
     ASSERT_NE(pixelMap, nullptr);
@@ -1740,7 +1740,7 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_SetCustomCursor_001, T
     auto window = WindowUtilsTest::GetInstance()->GetWindow();
     CHKPV(window);
     uint32_t windowId = window->GetWindowId();
-    const std::string iconPath = "/system/etc/multimodalinput/mouse_icon/North_South.svg";
+    const std::string iconPath = "/data/service/el1/public/multimodalinput/mouse_icon/North_South.svg";
     PointerStyle pointerStyle;
     std::unique_ptr<OHOS::Media::PixelMap> pixelMap = InputManagerUtil::SetMouseIconTest(iconPath);
     ASSERT_NE(pixelMap, nullptr);
@@ -1766,7 +1766,7 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_SetCustomCursor_002, T
     auto window = WindowUtilsTest::GetInstance()->GetWindow();
     CHKPV(window);
     uint32_t windowId = window->GetWindowId();
-    const std::string iconPath = "/system/etc/multimodalinput/mouse_icon/Zoom_Out.svg";
+    const std::string iconPath = "/data/service/el1/public/multimodalinput/mouse_icon/Zoom_Out.svg";
     PointerStyle pointerStyle;
     std::unique_ptr<OHOS::Media::PixelMap> pixelMap = InputManagerUtil::SetMouseIconTest(iconPath);
     ASSERT_NE(pixelMap, nullptr);
@@ -1796,7 +1796,7 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_SetCustomCursor_003, T
     pointerStyle.id = MOUSE_ICON::DEFAULT;
     int32_t ret = InputManager::GetInstance()->SetPointerStyle(windowId, pointerStyle);
     ASSERT_TRUE(ret == RET_OK);
-    const std::string iconPath = "/system/etc/multimodalinput/mouse_icon/Zoom_Out.svg";
+    const std::string iconPath = "/data/service/el1/public/multimodalinput/mouse_icon/Zoom_Out.svg";
     std::unique_ptr<OHOS::Media::PixelMap> pixelMap = InputManagerUtil::SetMouseIconTest(iconPath);
     ASSERT_TRUE(pixelMap != nullptr);
     pointerStyle.id = MOUSE_ICON::DEVELOPER_DEFINED_ICON;
@@ -1818,7 +1818,7 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_SetCustomCursor_004, T
     auto window = WindowUtilsTest::GetInstance()->GetWindow();
     CHKPV(window);
     uint32_t windowId = window->GetWindowId();
-    const std::string iconPath = "/system/etc/multimodalinput/mouse_icon/Zoom_Out.svg";
+    const std::string iconPath = "/data/service/el1/public/multimodalinput/mouse_icon/Zoom_Out.svg";
     PointerStyle pointerStyle;
     std::unique_ptr<OHOS::Media::PixelMap> pixelMap = InputManagerUtil::SetMouseIconTest(iconPath);
     ASSERT_NE(pixelMap, nullptr);
@@ -1844,7 +1844,7 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_SetCustomCursor_005, T
     auto window = WindowUtilsTest::GetInstance()->GetWindow();
     CHKPV(window);
     uint32_t windowId = window->GetWindowId();
-    const std::string iconPath = "/system/etc/multimodalinput/mouse_icon/Zoom_Out.svg";
+    const std::string iconPath = "/data/service/el1/public/multimodalinput/mouse_icon/Zoom_Out.svg";
     PointerStyle pointerStyle;
     std::unique_ptr<OHOS::Media::PixelMap> pixelMap = InputManagerUtil::SetMouseIconTest(iconPath);
     ASSERT_NE(pixelMap, nullptr);

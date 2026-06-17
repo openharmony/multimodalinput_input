@@ -33,16 +33,16 @@ namespace MMI {
 namespace {
 char g_cfgName[] { "/data/test/joystick_layout_map_test.json" };
 constexpr char CONFIG_BASE_PATH[] {
-    "/system/etc/multimodalinput/joystick/layout"
+    "/data/service/el1/public/multimodalinput/joystick/layout"
 };
 constexpr char CONFIG_NAME[] {
-    "/system/etc/multimodalinput/joystick/layout/Vendor_054c_Product_05c4.json"
+    "/data/service/el1/public/multimodalinput/joystick/layout/Vendor_054c_Product_05c4.json"
 };
 constexpr char CONFIG_NAME_VERSION[] {
-    "/system/etc/multimodalinput/joystick/layout/Vendor_054c_Product_05c4_Version_8100.json"
+    "/data/service/el1/public/multimodalinput/joystick/layout/Vendor_054c_Product_05c4_Version_8100.json"
 };
 constexpr char CONFIG_NAME_DEVICE[] {
-    "/system/etc/multimodalinput/joystick/layout/BTP-A2P3A_NearLink.json"
+    "/data/service/el1/public/multimodalinput/joystick/layout/BTP-A2P3A_NearLink.json"
 };
 constexpr std::uintmax_t MAX_SIZE_OF_CONFIG { 4096 };
 } // namespace
@@ -347,7 +347,7 @@ HWTEST_F(JoystickLayoutMapTest, FormatConfigName_002, TestSize.Level1)
     EXPECT_CALL(libinputMock, DeviceGetName).WillRepeatedly(Return(nullptr));
 
     const std::string expected {
-        "/system/etc/multimodalinput/joystick/layout/Vendor_045e_Product_02e0.json" };
+        "/data/service/el1/public/multimodalinput/joystick/layout/Vendor_045e_Product_02e0.json" };
     struct libinput_device device {
         .vendor = 0x54c,
         .product = 0x5c4,
