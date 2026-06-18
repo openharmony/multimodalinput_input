@@ -417,8 +417,11 @@ bool PointerDrawingManager::SetCursorLocation(int32_t physicalX, int32_t physica
     if (GetHardCursorEnabled()) {
         if (GetCursorBlurEnabled()) {
             if (!vsyncStart_.load()) {
-                MMI_HILOGI("vsync stop, try render and move");
-                RenderAndMoveOnVsync(physicalX, physicalY, displayId_);
+                uint64_t displayId = displayId_;
+                PostTask([this, physicalX, physicalY, displayId]() -> void {
+                    std::lock_guard<std::recursive_mutex> lg(recursiveMtx_);
+                    RenderAndMoveOnVsync(physicalX, physicalY, displayId);
+                });
             }
             return vsyncStart_.load();
         }
@@ -559,6 +562,13 @@ void PointerDrawingManager::DrawMovePointer(uint64_t rsId, int32_t physicalX, in
         ((displayInfo_.direction - displayInfo_.displayDirection) * ANGLE_90 + ANGLE_360) % ANGLE_360) / ANGLE_90);
     AdjustMouseFocusToSoftRenderOrigin(direction, MOUSE_ICON(lastMouseStyle_.id), physicalX, physicalY);
     if (GetSurfaceNode() != nullptr) {
+        if (GetCursorBlurEnabled()) {
+            resample_.AddPoint(physicalX, physicalY, rsId);
+            if (!vsyncStart_.load()) {
+                InitVsync(MOUSE_ICON(lastMouseStyle_.id));
+            }
+            return;
+        }
         if (!SetCursorLocation(physicalX, physicalY)) {
             MMI_HILOGE("SetCursorLocation failed");
             return;
@@ -850,11 +860,11 @@ int32_t PointerDrawingManager::InitLayer(const MOUSE_ICON mouseStyle)
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
     if (GetHardCursorEnabled()) {
         MMI_HILOGI("mouseStyle:%{public}u", static_cast<uint32_t>(mouseStyle));
-        if (GetCursorBlurEnabled()) {
-            return RET_OK;
-        }
         if ((mouseStyle == MOUSE_ICON::LOADING) || (mouseStyle == MOUSE_ICON::RUNNING)) {
             return InitVsync(mouseStyle);
+        }
+        if (GetCursorBlurEnabled()) {
+            return resample_.HasCoords() ? InitVsync(mouseStyle) : RET_OK;
         }
         std::lock_guard<std::recursive_mutex> lg(recursiveMtx_);
         hardwareCanvasSize_ = g_hardwareCanvasSize;
@@ -1050,14 +1060,14 @@ std::shared_ptr<Rosen::Drawing::Image> PointerDrawingManager::ExtractDrawingImag
     return image;
 }
 
-void PointerDrawingManager::PostTask(std::function<void()> task)
+void PointerDrawingManager::PostTask(std::function<void()> task, int64_t offset)
 {
     CHKPV(hardwareCursorPointerManager_);
     if (g_isHdiRemoteDied) {
         hardwareCursorPointerManager_->SetHdiServiceState(false);
     }
     if (handler_ != nullptr) {
-        handler_->PostTask(task, VSYNC_CALIBRATION_TIME);
+        handler_->PostTask(task, offset);
     }
 }
 
@@ -1286,7 +1296,7 @@ void PointerDrawingManager::OnVsync(uint64_t timestamp)
     PostTask([this, x, y, displayId]() -> void {
         std::lock_guard<std::recursive_mutex> lg(recursiveMtx_);
         RenderAndMoveOnVsync(x, y, displayId);
-    });
+    }, VSYNC_CALIBRATION_TIME);
     RequestNextVSync();
 }
 
@@ -2791,19 +2801,15 @@ void PointerDrawingManager::UpdatePointerVisible()
 
 void PointerDrawingManager::ShowCursorWhenHardwareCursorEnabled()
 {
-    if (GetCursorBlurEnabled()) {
-        MMI_HILOGI("showCursor, init vsync");
-        InitVsync(MOUSE_ICON(lastMouseStyle_.id));
-    } else {
-        if (InitLayer(MOUSE_ICON(lastMouseStyle_.id)) != RET_OK) {
-            MMI_HILOGE("Init Layer failed");
-            return;
-        }
-        if (!SetCursorLocation(lastPhysicalX_, lastPhysicalY_)) {
-            MMI_HILOGE("SetCursorLocation fail");
-        }
+    if (InitLayer(MOUSE_ICON(lastMouseStyle_.id)) != RET_OK) {
+        MMI_HILOGE("Init Layer failed");
+        return;
+    }
+    if (!SetCursorLocation(lastPhysicalX_, lastPhysicalY_)) {
+        MMI_HILOGE("SetCursorLocation fail");
     }
 }
+
 void PointerDrawingManager::HideCursorWhenHardwareCursorEnabled()
 {
     if (GetCursorBlurEnabled()) {

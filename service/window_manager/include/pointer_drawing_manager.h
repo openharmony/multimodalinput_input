@@ -250,7 +250,7 @@ private:
     int32_t RequestNextVSync();
     void RenderAndMoveOnVsync(int32_t x, int32_t y, uint64_t displayId);
     void OnVsync(uint64_t timestamp);
-    void PostTask(std::function<void()> task);
+     void PostTask(std::function<void()> task, int64_t offset = 0);
     void PostSoftCursorTask(std::function<void()> task);
     void PostMoveRetryTask(std::function<void()> task);
     int32_t FlushBuffer();
