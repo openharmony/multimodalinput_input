@@ -510,7 +510,7 @@ int32_t PointerDrawingManager::DrawMovePointer(uint64_t rsId, int32_t physicalX,
     CursorDrawingInformation::GetInstance().SetMouseIconUpdate(false);
     offRenderScaleUpdate_ = false;
     mouseDirectionUpdate_ = false;
-    MMI_HILOGD("Leave, rsId:%{public}" PRIu64 ", physicalX:%{private}d, physicalY:%{private}d",
+    MMI_HILOGD("DrawMovePointer leave, rsId:%{public}" PRIu64 ", physicalX:%{private}d, physicalY:%{private}d",
         rsId, physicalX, physicalY);
     return RET_OK;
 }
@@ -573,6 +573,11 @@ void PointerDrawingManager::DrawPointer(uint64_t rsId, int32_t physicalX, int32_
     CALL_DEBUG_ENTER;
     MMI_HILOGD("rsId:%{public}" PRIu64 ", physicalX:%{private}d, physicalY:%{private}d, pointerStyle:%{public}d",
         rsId, physicalX, physicalY, pointerStyle.id);
+    if (GetHardCursorEnabled() && !initEventHandlerFlag_.load()) {
+        MMI_HILOGI("draw pointer but pointer thread has not start, start now");
+        InitRsCallback();
+        InitPointerThread();
+    }
     FixCursorPosition(physicalX, physicalY);
     lastPhysicalX_ = physicalX;
     lastPhysicalY_ = physicalY;
@@ -844,11 +849,6 @@ int32_t PointerDrawingManager::InitLayer(const MOUSE_ICON mouseStyle)
     }
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
     if (GetHardCursorEnabled()) {
-        if (!initEventHandlerFlag_.load()) {
-            MMI_HILOGI("pointer thread has not start, start now");
-            InitRsCallback();
-            InitPointerThread();
-        }
         MMI_HILOGI("mouseStyle:%{public}u", static_cast<uint32_t>(mouseStyle));
         if (GetCursorBlurEnabled()) {
             return RET_OK;
@@ -1305,6 +1305,8 @@ int32_t PointerDrawingManager::RequestNextVSync()
             return RET_OK;
         }
     }
+    MMI_HILOGD("handler is nullptr: %{public}d, receiver is nullptr:%{public}d",
+        handler_ == nullptr, receiver_ == nullptr);
     return RET_ERR;
 }
 
@@ -1325,7 +1327,7 @@ void PointerDrawingManager::RenderThreadLoop()
         return;
     }
     if (runner_ != nullptr) {
-        MMI_HILOGI("Runner is run");
+        MMI_HILOGI("Render thread runner is run");
         runner_->Run();
     }
 }
@@ -1347,7 +1349,7 @@ void PointerDrawingManager::SoftCursorRenderThreadLoop()
     softCursorHandler_ = std::make_shared<AppExecFwk::EventHandler>(softCursorRunner_);
     CHKPV(softCursorHandler_);
     if (softCursorRunner_ != nullptr) {
-        MMI_HILOGI("Runner is run");
+        MMI_HILOGI("SoftCurRender thread runner is run");
         softCursorRunner_->Run();
     }
 }
@@ -1360,7 +1362,7 @@ void PointerDrawingManager::MoveRetryThreadLoop()
     moveRetryHandler_ = std::make_shared<AppExecFwk::EventHandler>(moveRetryRunner_);
     CHKPV(moveRetryHandler_);
     if (moveRetryRunner_ != nullptr) {
-        MMI_HILOGI("Runner is run");
+        MMI_HILOGI("MoveRetry thread runner is run");
         moveRetryRunner_->Run();
     }
 }
@@ -2915,7 +2917,7 @@ void PointerDrawingManager::DrawPointerStyle(const PointerStyle& pointerStyle)
             if (displayInfo_.validWidth > 0 && displayInfo_.validHeight > 0) {
                 DrawPointer(displayInfo_.rsId, displayInfo_.validWidth / CALCULATE_MIDDLE,
                     displayInfo_.validHeight / CALCULATE_MIDDLE, pointerStyle, direction);
-                MMI_HILOGD("Draw pointer style, mouseStyle:%{public}d", pointerStyle.id);
+                MMI_HILOGD("Draw pointer style, screen center position, mouseStyle:%{public}d", pointerStyle.id);
             }
             return;
         }
