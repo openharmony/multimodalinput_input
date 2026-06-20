@@ -1191,8 +1191,7 @@ void PointerDrawingManager::SoftwareCursorDynamicRender(MOUSE_ICON mouseStyle, u
             .rotationAngle = currentFrame_ * DYNAMIC_ROTATION_ANGLE,
         };
         CHKPV(it.second);
-        Direction direction = CalculateRenderDirection(false);
-        cfg.direction = it.second->IsMirror() ? DIRECTION0 : direction;
+        cfg.direction = it.second->GetRenderDirection(false);
         auto sn = it.second->GetSurfaceNode();
         cfg.dpi = it.second->GetDPI();
         cfg.screenId = it.first;
@@ -3307,16 +3306,6 @@ void PointerDrawingManager::SetMainScreenTargetDevice(const std::vector<sptr<OHO
     }
 }
 
-Direction PointerDrawingManager::CalculateRenderDirection(bool isHard)
-{
-    if (isHard) {
-        return displayInfo_.direction;
-    } else {
-        return static_cast<Direction>((((displayInfo_.direction - displayInfo_.displayDirection) *
-            ANGLE_90 + ANGLE_360) % ANGLE_360) / ANGLE_90);
-    }
-}
-
 void PointerDrawingManager::CreateRenderConfig(RenderConfig& cfg, std::shared_ptr<ScreenPointer> sp,
     MOUSE_ICON mouseStyle, bool isHard, int32_t x, int32_t y, uint64_t screenId)
 {
@@ -3334,8 +3323,8 @@ void PointerDrawingManager::CreateRenderConfig(RenderConfig& cfg, std::shared_pt
     cfg.isBlur = mouseStyle == MOUSE_ICON::DEFAULT && GetCursorBlurEnabled();
     float scale = isHard ? sp->GetScale() : 1.0f;
     cfg.dpi = sp->GetDPI() * scale;
-    Direction direction = CalculateRenderDirection(isHard);
-    cfg.direction = sp->IsMirror() ? DIRECTION0 : direction;
+    Direction direction = sp->GetRenderDirection(isHard);
+    cfg.direction = direction;
     Direction displayDirection = sp->GetDisplayDirection();
     cfg.displayDirection = sp->IsMirror() ?
         (displayDirection - direction + DIRECTION_NUM) % DIRECTION_NUM : displayDirection;
