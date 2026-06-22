@@ -177,6 +177,12 @@
         {
             "preKeys": [],
             "finalKey": 18,
+            "longPressTime": 3500,
+            "triggerType": "down"
+        },
+        {
+            "preKeys": [],
+            "finalKey": 18,
             "longPressTime": 5000,
             "triggerType": "down"
         },
