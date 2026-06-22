@@ -2648,12 +2648,15 @@ HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_DrawMovePointer_002,
     int32_t physicalX = 1;
     int32_t physicalY = 2;
     uint64_t displayId = 3;
+    pointerDrawingManager.currentCursorBlurEnabled_ = true;
     ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.DrawMovePointer(displayId, physicalX, physicalY));
     Rosen::RSSurfaceNodeConfig surfaceNodeConfig;
     surfaceNodeConfig.SurfaceNodeName = "pointer window";
     Rosen::RSSurfaceNodeType surfaceNodeType = Rosen::RSSurfaceNodeType::SELF_DRAWING_WINDOW_NODE;
     pointerDrawingManager.surfaceNode_ = Rosen::RSSurfaceNode::Create(surfaceNodeConfig, surfaceNodeType, true, false,
         rsUIContext_);
+    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.DrawMovePointer(displayId, physicalX, physicalY));
+    pointerDrawingManager.currentCursorBlurEnabled_ = false;
     ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.DrawMovePointer(displayId, physicalX, physicalY));
 }
 
@@ -4545,6 +4548,48 @@ HWTEST_F(PointerDrawingManagerTest, PointerDrawingManagerTest_ScalePixelMap_04, 
     float scale = 1.0f;
     ASSERT_NO_FATAL_FAILURE(
         pointerDrawingManager.ScalePixelMap(pixelMap.get(), scale * INT32_BYTE, scale / INT32_BYTE));
+}
+
+/**
+ * @tc.name: PointerDrawingManagerTest_InitLayer_002
+ * @tc.desc: Test InitLayer wheather cursor blur enable
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerTest, PointerDrawingManagerTest_InitLayer_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerDrawingManager pointerDrawingManager;
+    pointerDrawingManager.hardwareCursorPointerManager_ = std::make_shared<HardwareCursorPointerManager>();
+    pointerDrawingManager.hardwareCursorPointerManager_->SetHdiServiceState(true);
+    pointerDrawingManager.hardwareCursorPointerManager_->isEnableState_ = true;
+    pointerDrawingManager.displayId_ = TEST_INVALID_DISPLAY_ID;
+    int32_t styleId = 0;
+    pointerDrawingManager.currentCursorBlurEnabled_ = true;
+    int32_t ret = pointerDrawingManager.InitLayer(MOUSE_ICON(styleId));
+    EXPECT_EQ(ret, RET_OK);
+    pointerDrawingManager.currentCursorBlurEnabled_ = false;
+    ret = pointerDrawingManager.InitLayer(MOUSE_ICON(styleId));
+    EXPECT_EQ(ret, RET_OK);
+}
+
+/**
+ * @tc.name: PointerDrawingManagerTest_ShowCursorWhenHardwareCursorEnabled_001
+ * @tc.desc: Test ShowCursorWhenHardwareCursorEnabled when hard cursor enabled
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerTest, PointerDrawingManagerTest_ShowCursorWhenHardwareCursorEnabled_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerDrawingManager pointerDrawingManager;
+    pointerDrawingManager.hardwareCursorPointerManager_ = std::make_shared<HardwareCursorPointerManager>();
+    pointerDrawingManager.hardwareCursorPointerManager_->SetHdiServiceState(true);
+    pointerDrawingManager.hardwareCursorPointerManager_->isEnableState_ = true;
+    pointerDrawingManager.displayId_ = TEST_INVALID_DISPLAY_ID;
+    pointerDrawingManager.currentCursorBlurEnabled_ = true;
+    EXPECT_NO_FATAL_FAILURE(pointerDrawingManager.ShowCursorWhenHardwareCursorEnabled());
+    pointerDrawingManager.currentCursorBlurEnabled_ = false;
+    EXPECT_NO_FATAL_FAILURE(pointerDrawingManager.ShowCursorWhenHardwareCursorEnabled());
 }
 } // namespace MMI
 } // namespace OHOS
