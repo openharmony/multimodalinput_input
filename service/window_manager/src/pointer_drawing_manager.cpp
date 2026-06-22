@@ -2149,7 +2149,7 @@ int32_t PointerDrawingManager::UpdateCursorProperty(CursorPixelMap curPixelMap,
     cursorHeight_ = cursorHeight_ < MIN_CURSOR_SIZE ? MIN_CURSOR_SIZE : cursorHeight_;
     float xAxis = (float)cursorWidth_ / (float)imageInfo.size.width;
     float yAxis = (float)cursorHeight_ / (float)imageInfo.size.height;
-    newPixelMap->scale(xAxis, yAxis, Media::AntiAliasingOption::LOW);
+    ScalePixelMap(newPixelMap, xAxis, yAxis);
     CursorDrawingInformation::GetInstance().SetUserIconPixelMap(newPixelMap);
     userIconHotSpotX_ = static_cast<int32_t>((float)newFocusX * xAxis);
     userIconHotSpotY_ = static_cast<int32_t>((float)newFocusY * yAxis);
@@ -3346,7 +3346,7 @@ void PointerDrawingManager::CreateRenderConfig(RenderConfig& cfg, std::shared_pt
         cfg.userIconHotSpotX = userIconHotSpotX_ * scale;
         cfg.userIconHotSpotY = userIconHotSpotY_ * scale;
         cfg.userIconFollowSystem = userIconFollowSystem_;
-        cfg.userIconPixelMap->scale(scale, scale, Media::AntiAliasingOption::LOW);
+        ScalePixelMap(cfg.userIconPixelMap.get(), scale, scale);
     }
 }
 
@@ -3802,7 +3802,7 @@ std::shared_ptr<OHOS::Media::PixelMap> PointerDrawingManager::GetUserIconCopy(bo
                 (float)std::max(imageInfo.size.width, imageInfo.size.height);
         }
     }
-    pixelMapPtr->scale(axis, axis, Media::AntiAliasingOption::LOW);
+    ScalePixelMap(pixelMapPtr.get(), axis, axis);
     cursorWidth_ = static_cast<int32_t>((float)imageInfo.size.width * axis);
     cursorHeight_ = static_cast<int32_t>((float)imageInfo.size.height * axis);
     userIconHotSpotX_ = static_cast<int32_t>((float)focusX_ * axis);
@@ -4292,5 +4292,25 @@ std::shared_ptr<Rosen::RSUIContext> PointerDrawingManager::GetRSUIContext()
         return rsUIContext_;
     }
 }
+
+void PointerDrawingManager::ScalePixelMap(Media::PixelMap* pixelMap, float xScale, float yScale)
+{
+    if (pixelMap == nullptr) {
+        MMI_HILOGE("scale pixel, but pixelMap is nullptr");
+        return;
+    }
+    Media::AntiAliasingOption scaleOption = Media::AntiAliasingOption::SLR;
+    if (xScale == yScale) {
+        scaleOption = xScale > 1.0f ? Media::AntiAliasingOption::HIGH : Media::AntiAliasingOption::SLR;
+        pixelMap->scale(xScale, yScale, scaleOption);
+        return;
+    }
+
+    scaleOption = xScale > 1.0f ? Media::AntiAliasingOption::HIGH : Media::AntiAliasingOption::SLR;
+    pixelMap->scale(xScale, 1.0f, scaleOption);
+    scaleOption = yScale > 1.0f ? Media::AntiAliasingOption::HIGH : Media::AntiAliasingOption::SLR;
+    pixelMap->scale(1.0f, yScale, scaleOption);
+}
+
 } // namespace MMI
 } // namespace OHOS
