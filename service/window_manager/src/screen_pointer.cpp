@@ -364,8 +364,9 @@ void ScreenPointer::UpdateScreenInfo(sptr<OHOS::Rosen::ScreenInfo> si, bool need
     }
     RsFlushImplicitTransaction();
     MMI_HILOGI("Update with ScreenInfo, id=%{public}" PRIu64 ", shape=(%{public}u, %{public}u), mode=%{public}u, "
-        "rotation=%{public}u, dpi=%{public}f, needDrawPointer=%{public}d", screenId_, width_, height_, mode_,
-        rotation_, dpi_, needDrawPointer);
+        "rotation=%{public}u, dpi=%{public}f, (mirrorWidth,mirrotHeight)=(%{public}u, %{public}u), "
+        "needDrawPointer=%{public}d",
+        screenId_, width_, height_, mode_, rotation_, dpi_, mirrorWidth_, mirrorHeight_, needDrawPointer);
 }
 
 void ScreenPointer::OnDisplayInfo(const OLD::DisplayInfo &di)
@@ -403,18 +404,18 @@ void ScreenPointer::OnDisplayInfo(const OLD::DisplayInfo &di)
 
 /*
  * 镜像模式下，计算主屏或镜像屏的屏幕黑边，此接口仅主屏或镜像屏调用
- * 注意：width_、height_不跟随屏幕旋转
+ * 注意：width_、height_不跟随屏幕旋转，sourceScreenWidth、sourceScreenHeight不跟随屏幕旋转
  *
- * 单显示器模式: sourceScreenWidth、sourceScreenHeight为主屏宽高，跟随屏幕旋转
- * 扩展模式：sourceScreenWidth、sourceScreenHeight为主屏宽高，跟随主屏旋转
- * 仅第二屏模式：sourceScreenWidth、sourceScreenHeight为主屏宽高，跟随主屏旋转
+ * 单显示器模式: sourceScreenWidth、sourceScreenHeight为主屏宽高
+ * 扩展模式：sourceScreenWidth、sourceScreenHeight为主屏宽高
+ * 仅第二屏模式：sourceScreenWidth、sourceScreenHeight为主屏宽高
  * 镜像模式：镜像模式下，主屏可以旋转，镜像屏不旋转
  * （1）满屏显示：主屏
- *      主屏ScreenPointer：sourceScreenWidth、sourceScreenHeight为主屏宽高，跟随主屏旋转
- *      镜像屏ScreenPointer: sourceScreenWidth、sourceScreenHeight为主屏宽高，跟随主屏旋转
+ *      主屏ScreenPointer：sourceScreenWidth、sourceScreenHeight为主屏宽高
+ *      镜像屏ScreenPointer: sourceScreenWidth、sourceScreenHeight为主屏宽高
  * （2）满屏显示：镜像屏
- *      主屏ScreenPointer：sourceScreenWidth、sourceScreenHeight为镜像屏宽高，跟随主屏旋转
- *      镜像屏ScreenPointer: sourceScreenWidth、sourceScreenHeight为镜像屏宽高，跟随主屏旋转
+ *      主屏ScreenPointer：sourceScreenWidth、sourceScreenHeight为镜像屏宽高
+ *      镜像屏ScreenPointer: sourceScreenWidth、sourceScreenHeight为镜像屏宽高
  */
 bool ScreenPointer::UpdatePadding(uint32_t sourceScreenWidth, uint32_t sourceScreenHeight)
 {
@@ -433,31 +434,25 @@ bool ScreenPointer::UpdatePadding(uint32_t sourceScreenWidth, uint32_t sourceScr
             sourceScreenWidth, sourceScreenHeight);
         return false;
     }
-
-    uint32_t curScreenWidth = width_;
-    uint32_t curScreenHeight = height_;
-    if (IsMain()) {
-        if ((rotation_ == rotation_t::ROTATION_90 || rotation_ == rotation_t::ROTATION_270)) {
-            std::swap(curScreenWidth, curScreenHeight);
-        }
-    } else if (IsMirror()) {
-        if ((sourceScreenRotation_  == rotation_t::ROTATION_90 || sourceScreenRotation_  == rotation_t::ROTATION_270)) {
-            std::swap(sourceScreenWidth, sourceScreenHeight);
-        }
+    // 镜像屏不会旋转，若主屏旋转90度或270度，则(sourceScreenHeight, sourceScreenWidth)为主屏实际分辨率
+    if (IsMirror() && (sourceScreenRotation_ == rotation_t::ROTATION_90 ||
+        sourceScreenRotation_ == rotation_t::ROTATION_270)) {
+        std::swap(sourceScreenWidth, sourceScreenHeight);
     }
     // caculate padding for main screen or mirror screen
-    scale_ = fmin(float(curScreenWidth) / sourceScreenWidth, float(curScreenHeight) / sourceScreenHeight);
-    paddingTop_ = (curScreenHeight - sourceScreenHeight * scale_) / NUM_TWO;
-    paddingLeft_ = (curScreenWidth - sourceScreenWidth * scale_) / NUM_TWO;
+    scale_ = fmin(float(width_) / sourceScreenWidth, float(height_) / sourceScreenHeight);
+    paddingTop_ = (height_ - sourceScreenHeight * scale_) / NUM_TWO;
+    paddingLeft_ = (width_ - sourceScreenWidth * scale_) / NUM_TWO;
 #ifdef OHOS_BUILD_EXTERNAL_SCREEN
     if (IsMain()) {
         scale_ = 1.0;
     }
 #endif // OHOS_BUILD_EXTERNAL_SCREEN
     MMI_HILOGI("UpdatePadding, screenId=%{public}" PRIu64 ", scale=%{public}f, paddingTop_=%{public}u,"
-               " paddingLeft_=%{public}u, curScreen=(%{public}u, %{public}u), sourceScreen=(%{public}u, %{public}u)",
-               screenId_, scale_, paddingTop_, paddingLeft_, curScreenWidth, curScreenHeight, sourceScreenWidth,
-               sourceScreenHeight);
+               " paddingLeft_=%{public}u, curScreen=(%{public}u, %{public}u), sourceScreen=(%{public}u, %{public}u)"
+               "sourceScreenRotation=%{public}d",
+               screenId_, scale_, paddingTop_, paddingLeft_, width_, height_, sourceScreenWidth,
+               sourceScreenHeight, sourceScreenRotation_);
     return true;
 }
 
