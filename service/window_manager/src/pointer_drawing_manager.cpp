@@ -341,15 +341,15 @@ void PointerDrawingManager::ClearResources()
     if (isCleared_) {
         return;
     }
+    if (commonEventSubscriber_ != nullptr) {
+        if (!OHOS::EventFwk::CommonEventManager::NewUnSubscribeCommonEventSync(commonEventSubscriber_)) {
+            MMI_HILOGW("UnSubscribeCommonEvent failed");
+        }
+        commonEventSubscriber_ = nullptr;
+    }
+    initDisplayStatusReceiverFlag_ = false;
     if (GetHardCursorEnabled()) {
         ClearRunnerAndHandler();
-        if (commonEventSubscriber_ != nullptr) {
-            if (!OHOS::EventFwk::CommonEventManager::NewUnSubscribeCommonEventSync(commonEventSubscriber_)) {
-                MMI_HILOGW("UnSubscribeCommonEvent failed");
-            }
-            commonEventSubscriber_ = nullptr;
-        }
-        initDisplayStatusReceiverFlag_ = false;
         UnsubscribeScreenModeChange();
     } else {
         auto surfaceNodePtr = GetSurfaceNode();
@@ -2999,7 +2999,7 @@ void PointerDrawingManager::UnsubscribeScreenModeChange()
 void PointerDrawingManager::RegisterDisplayStatusReceiver()
 {
     if (initDisplayStatusReceiverFlag_) {
-        MMI_HILOGE("Display status receiver has subscribed");
+        MMI_HILOGI("Display status receiver already subscribed");
         return;
     }
     EventFwk::MatchingSkills matchingSkills;
