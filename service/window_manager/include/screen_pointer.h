@@ -201,6 +201,8 @@ public:
 
     void DestroyPointerWindow();
 
+    Direction GetRenderDirection(bool isHard);
+
 private:
     bool InitSurfaceNode();
     bool FlushSerfaceBuffer();
@@ -224,9 +226,9 @@ private:
     uint32_t mirrorWidth_{0};
     uint32_t mirrorHeight_{0};
     mode_t mode_{mode_t::SCREEN_MAIN};
-    rotation_t rotation_{rotation_t::ROTATION_0};
+    std::atomic<rotation_t> rotation_{rotation_t::ROTATION_0};
     float dpi_{1.0f};
-    Direction displayDirection_{DIRECTION0};
+    std::atomic<Direction> displayDirection_{DIRECTION0};
 
     // screen scale and padding info for mirror mode
     float scale_{1.0f};
