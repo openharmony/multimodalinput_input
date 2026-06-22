@@ -4555,7 +4555,7 @@ HWTEST_F(PointerDrawingManagerTest, PointerDrawingManagerTest_ScalePixelMap_04, 
  * @tc.desc: Test InitLayer wheather cursor blur enable
  * @tc.require:
  */
-HWTEST_F(PointerDrawingManagerTest, PointerDrawingManagerTest_InitLayer_001, TestSize.Level1)
+HWTEST_F(PointerDrawingManagerTest, PointerDrawingManagerTest_InitLayer_002, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     PointerDrawingManager pointerDrawingManager;
