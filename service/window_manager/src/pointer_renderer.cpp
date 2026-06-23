@@ -39,7 +39,7 @@ constexpr float ROTATION_ANGLE90 {90.0f};
 constexpr float MAX_DPI {1.93f};   //1.93 is the max dpi for hardware cursor pointer to limit the image size within 256
 constexpr float EPSILON = 1e-6;
 constexpr uint32_t MAX_POINTER_SIZE {7};
-const std::string IMAGE_POINTER_DEFAULT_PATH = "/system/etc/multimodalinput/mouse_icon/";
+const std::string IMAGE_POINTER_DEFAULT_PATH = "/data/service/el1/public/multimodalinput/mouse_icon/";
 constexpr int32_t BLUR_NUM { 3 };
 constexpr int32_t BGRA_ALPHA_INDEX { 3 };
 constexpr int32_t DIRECTION_NUM { 4 };

@@ -58,6 +58,8 @@
             OHOS::MMI::EventNormalizeHandler::*;
             OHOS::MMI::StartLogTraceId*;
             OHOS::MMI::ReadFile*;
+            OHOS::MMI::DecompressToDisk*;
+            OHOS::MMI::CleanupDirectory*;
             OHOS::MMI::IntToHexRGB*;
             OHOS::MMI::StringReplace*;
             OHOS::MMI::IsInteger*;

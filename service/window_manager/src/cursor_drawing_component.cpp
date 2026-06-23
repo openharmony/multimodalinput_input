@@ -17,14 +17,17 @@
 
 #include <dlfcn.h>
 #include <securec.h>
+#include <unistd.h>
 
 #include "account_manager.h"
+#include "config_multimodal.h"
 #include "ffrt.h"
 #include "input_device_manager.h"
 #include "i_input_windows_manager.h"
 #include "i_preference_manager.h"
 #include "mmi_log.h"
 #include "pointer_device_manager.h"
+#include "resource_decompress.h"
 #include "timer_manager.h"
 #include "i_setting_manager.h"
 
@@ -78,7 +81,7 @@ constexpr int32_t DEFAULT_POINTER_STYLE { 0 };
 const char *POINTER_COLOR = "pointerColor";
 const char *POINTER_SIZE = "pointerSize";
 const std::string MOUSE_FILE_NAME { "mouse_settings.xml" };
-const std::string IMAGE_POINTER_DEFAULT_PATH = "/system/etc/multimodalinput/mouse_icon/";
+const std::string IMAGE_POINTER_DEFAULT_PATH = "/data/service/el1/public/multimodalinput/mouse_icon/";
 const std::string DefaultIconPath = IMAGE_POINTER_DEFAULT_PATH + "Default.svg";
 constexpr int32_t INVALID_USER { -1 };
 ffrt::mutex g_loadSoMutex;
@@ -146,6 +149,11 @@ bool CursorDrawingComponent::LoadLibrary()
         return false;
     }
 
+    DecompressToDisk(DEF_MOUSE_ICONS_DAT_PATH, IMAGE_POINTER_DEFAULT_PATH);
+#ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
+    CursorDrawingInformation::GetInstance().CheckMouseIconPath();
+#endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
+
     pointerInstance_ = reinterpret_cast<IPointerDrawingManager*>(getPointerInstance_());
     if (pointerInstance_ == nullptr) {
         MMI_HILOGE("pointerInstance_ is nullptr");
@@ -207,6 +215,7 @@ void CursorDrawingComponent::UnLoad()
             (errorMsg != nullptr) ? errorMsg : "");
         return;
     }
+    CleanupDirectory(IMAGE_POINTER_DEFAULT_PATH);
     isLoaded_ = false;
     soHandle_ = nullptr;
     getPointerInstance_ = nullptr;
@@ -744,6 +753,10 @@ void CursorDrawingInformation::InitDefaultMouseIconPath()
 
 void CursorDrawingInformation::CheckMouseIconPath()
 {
+    if (access(IMAGE_POINTER_DEFAULT_PATH.c_str(), F_OK) != 0) {
+        MMI_HILOGI("Icon directory not yet available, skipping check");
+        return;
+    }
     for (auto iter = mouseIcons_.begin(); iter != mouseIcons_.end();) {
         if ((ReadCursorStyleFile(iter->second.iconPath)) != RET_OK) {
             iter = mouseIcons_.erase(iter);

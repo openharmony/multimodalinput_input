@@ -130,7 +130,7 @@ bool ScreenPointer::Init(PointerRenderer &render, bool needDrawPointer)
     RenderConfig defaultCursorCfg {
         .style_ = MOUSE_ICON::DEFAULT,
         .align_ = ICON_TYPE::ANGLE_NW,
-        .path_ = "/system/etc/multimodalinput/mouse_icon/Default.svg",
+        .path_ = "/data/service/el1/public/multimodalinput/mouse_icon/Default.svg",
         .color = 0,
         .size = POINTER_SIZE_DEFAULT,
         .direction = Direction::DIRECTION0,

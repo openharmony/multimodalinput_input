@@ -315,6 +315,7 @@ declare_args() {
     "common/src/klog.cpp",
     "common/src/mmi_log.cpp",
     "common/src/util.cpp",
+    "common/src/resource_decompress.cpp",
     "network/src/circle_stream_buffer.cpp",
     "network/src/net_packet.cpp",
     "network/src/stream_buffer.cpp",
