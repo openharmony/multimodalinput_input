@@ -638,7 +638,7 @@ HWTEST_F(ScreenPointerTest, ScreenPointerTest_RequestBuffer_002, TestSize.Level1
     RenderConfig defaultCursorCfg {
         .style_ = MOUSE_ICON::DEFAULT,
         .align_ = ICON_TYPE::ANGLE_NW,
-        .path_ = "/system/etc/multimodalinput/mouse_icon/Default.svg",
+        .path_ = "/data/service/el1/public/multimodalinput/mouse_icon/Default.svg",
         .color = 0,
         .size = 1,
         .direction = Direction::DIRECTION0,

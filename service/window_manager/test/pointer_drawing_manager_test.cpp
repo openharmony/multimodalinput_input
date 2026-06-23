@@ -54,7 +54,7 @@ constexpr int32_t FOLDABLE_DEVICE { 2 };
 constexpr int32_t MIN_POINTER_COLOR { 0x000000 };
 const std::string MOUSE_FILE_NAME { "mouse_settings.xml" };
 const int32_t ROTATE_POLICY = system::GetIntParameter("const.window.device.rotate_policy", 0);
-const std::string IMAGE_POINTER_DEFAULT_PATH = "/system/etc/multimodalinput/mouse_icon/";
+const std::string IMAGE_POINTER_DEFAULT_PATH = "/data/service/el1/public/multimodalinput/mouse_icon/";
 const std::string CURSOR_ICON_PATH = IMAGE_POINTER_DEFAULT_PATH + "Cursor_Circle.png";
 const std::string CUSTOM_CURSOR_ICON_PATH = IMAGE_POINTER_DEFAULT_PATH + "Custom_Cursor_Circle.svg";
 const std::string DEFAULT_ICON_PATH = IMAGE_POINTER_DEFAULT_PATH + "Default.svg";
@@ -1511,7 +1511,7 @@ HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_DecodeImageToPixelMa
 {
     CALL_TEST_DEBUG;
     PointerDrawingManager pointerDrawingManager;
-    std::string iconPath = ("/system/etc/multimodalinput/mouse_icon/Loading_Left.svg");
+    std::string iconPath = ("/data/service/el1/public/multimodalinput/mouse_icon/Loading_Left.svg");
     pointerDrawingManager.tempPointerColor_ = 1;
     ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.DecodeImageToPixelMap(MOUSE_ICON::RUNNING));
 }
@@ -1727,7 +1727,7 @@ HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_SetCustomCursor_001,
 {
     CALL_TEST_DEBUG;
     PointerDrawingManager pointerDrawingManager;
-    const std::string iconPath = "/system/etc/multimodalinput/mouse_icon/North_South.svg";
+    const std::string iconPath = "/data/service/el1/public/multimodalinput/mouse_icon/North_South.svg";
     std::unique_ptr<OHOS::Media::PixelMap> pixelMap = SetMouseIconTest(iconPath);
     ASSERT_NE(pixelMap, nullptr);
     int32_t pid = -1;
@@ -1749,7 +1749,7 @@ HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_SetCustomCursor_001,
 HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_SetMouseIcon_002, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    const std::string iconPath = "/system/etc/multimodalinput/mouse_icon/North_South.svg";
+    const std::string iconPath = "/data/service/el1/public/multimodalinput/mouse_icon/North_South.svg";
     std::unique_ptr<OHOS::Media::PixelMap> pixelMap = SetMouseIconTest(iconPath);
     ASSERT_NE(pixelMap, nullptr);
     int32_t pid = -1;
@@ -1769,7 +1769,7 @@ HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_SetMouseIcon_002, Te
 HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_SetMouseIcon_004, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    const std::string iconPath = "/system/etc/multimodalinput/mouse_icon/North_South.svg";
+    const std::string iconPath = "/data/service/el1/public/multimodalinput/mouse_icon/North_South.svg";
     std::unique_ptr<OHOS::Media::PixelMap> pixelMap = SetMouseIconTest(iconPath);
     ASSERT_NE(pixelMap, nullptr);
     int32_t pid = 1;
@@ -1789,7 +1789,7 @@ HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_SetMouseIcon_004, Te
 HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_SetMouseIcon_005, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    const std::string iconPath = "/system/etc/multimodalinput/mouse_icon/North_South.svg";
+    const std::string iconPath = "/data/service/el1/public/multimodalinput/mouse_icon/North_South.svg";
     std::unique_ptr<OHOS::Media::PixelMap> pixelMap = SetMouseIconTest(iconPath);
     ASSERT_NE(pixelMap, nullptr);
     int32_t pid = 2;
@@ -2699,7 +2699,7 @@ HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_branchCoverage, Test
 {
     PointerDrawingManager pointerDrawingManager;
     MOUSE_ICON mouseStyle = EAST;
-    const std::string iconPath = "/system/etc/multimodalinput/mouse_icon/North_South.svg";
+    const std::string iconPath = "/data/service/el1/public/multimodalinput/mouse_icon/North_South.svg";
     std::unique_ptr<OHOS::Media::PixelMap> pixelMap = SetMouseIconTest(iconPath);
     ASSERT_NE(pixelMap, nullptr);
     CursorDrawingInformation::GetInstance().UpdateIconPath(mouseStyle, iconPath);

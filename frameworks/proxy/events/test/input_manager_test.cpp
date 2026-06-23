@@ -272,7 +272,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SetMouseIcon_01, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     int32_t windowId = 2;
-    const std::string iconPath = "/system/etc/multimodalinput/mouse_icon/North_South.svg";
+    const std::string iconPath = "/data/service/el1/public/multimodalinput/mouse_icon/North_South.svg";
     std::unique_ptr<OHOS::Media::PixelMap> pixelMap = InputManagerTest::SetMouseIconTest(iconPath);
     ASSERT_NE(pixelMap, nullptr);
 
@@ -2304,7 +2304,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SetCustomCursor, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     int32_t fakeWindowId = 100;
-    const std::string iconPath = "/system/etc/multimodalinput/mouse_icon/North_South.svg";
+    const std::string iconPath = "/data/service/el1/public/multimodalinput/mouse_icon/North_South.svg";
     PointerStyle pointerStyle;
     std::unique_ptr<OHOS::Media::PixelMap> pixelMap = InputManagerUtil::SetMouseIconTest(iconPath);
     ASSERT_NE(pixelMap, nullptr);
@@ -2323,7 +2323,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SetMouseIcon, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     int32_t fakeWindowId = 100;
-    const std::string iconPath = "/system/etc/multimodalinput/mouse_icon/North_South.svg";
+    const std::string iconPath = "/data/service/el1/public/multimodalinput/mouse_icon/North_South.svg";
     PointerStyle pointerStyle;
     std::unique_ptr<OHOS::Media::PixelMap> pixelMap = InputManagerUtil::SetMouseIconTest(iconPath);
     ASSERT_NE(pixelMap, nullptr);
@@ -5223,7 +5223,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SetCustomCursorEx_001, TestSize.Leve
 {
     CALL_TEST_DEBUG;
     int32_t fakeWindowId = 100;
-    const std::string iconPath = "/system/etc/multimodalinput/mouse_icon/North_South.svg";
+    const std::string iconPath = "/data/service/el1/public/multimodalinput/mouse_icon/North_South.svg";
     std::unique_ptr<OHOS::Media::PixelMap> pixelMap = InputManagerUtil::SetMouseIconTest(iconPath);
     ASSERT_NE(pixelMap, nullptr);
     CustomCursor cursor;
@@ -5246,7 +5246,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SetCustomCursorEx_002, TestSize.Leve
 {
     CALL_TEST_DEBUG;
     int32_t fakeWindowId = 100;
-    const std::string iconPath = "/system/etc/multimodalinput/mouse_icon/North_South.svg";
+    const std::string iconPath = "/data/service/el1/public/multimodalinput/mouse_icon/North_South.svg";
     std::unique_ptr<OHOS::Media::PixelMap> pixelMap = InputManagerUtil::SetMouseIconTest(iconPath);
     ASSERT_NE(pixelMap, nullptr);
     CustomCursor cursor;
@@ -5269,7 +5269,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SetCustomCursorEx_003, TestSize.Leve
 {
     CALL_TEST_DEBUG;
     int32_t fakeWindowId = 100;
-    const std::string iconPath = "/system/etc/multimodalinput/mouse_icon/North_South.svg";
+    const std::string iconPath = "/data/service/el1/public/multimodalinput/mouse_icon/North_South.svg";
     std::unique_ptr<OHOS::Media::PixelMap> pixelMap = InputManagerUtil::SetMouseIconTest(iconPath);
     ASSERT_NE(pixelMap, nullptr);
     CustomCursor cursor;
@@ -5292,7 +5292,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SetCustomCursorEx_004, TestSize.Leve
 {
     CALL_TEST_DEBUG;
     int32_t fakeWindowId = 100;
-    const std::string iconPath = "/system/etc/multimodalinput/mouse_icon/North_South.svg";
+    const std::string iconPath = "/data/service/el1/public/multimodalinput/mouse_icon/North_South.svg";
     std::unique_ptr<OHOS::Media::PixelMap> pixelMap = InputManagerUtil::SetMouseIconTest(iconPath);
     ASSERT_NE(pixelMap, nullptr);
     Media::ImageInfo imageInfo;
