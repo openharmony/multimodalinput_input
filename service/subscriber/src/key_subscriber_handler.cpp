@@ -714,7 +714,6 @@ bool KeySubscriberHandler::ProcessKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
 {
     keyEvent_ = KeyEvent::Clone(keyEvent);
     const int32_t keyAction = keyEvent->GetKeyAction();
-    MMI_HILOGD("keyAction:%{public}s", KeyEvent::ActionToString(keyAction));
     if (needSkipPowerKeyUp_ && keyEvent->GetKeyCode() == KeyEvent::KEYCODE_POWER
         && keyAction == KeyEvent::KEY_ACTION_UP) {
         MMI_HILOGI("Skip power key up");

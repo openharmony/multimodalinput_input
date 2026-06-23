@@ -40,6 +40,7 @@
 #include "multimodal_input_plugin_manager.h"
 #include "permission_helper.h"
 #include "pointer_device_manager.h"
+#include "pointer_motion_acceleration.h"
 #include "time_cost_chk.h"
 #ifdef OHOS_BUILD_ENABLE_TOUCH_DRAWING
 #include "touch_drawing_manager.h"
@@ -1920,28 +1921,6 @@ bool ServerMsgHandler::IsApplicationType(int32_t pid)
         return false;
     }
     return true;
-}
-
-int32_t ServerMsgHandler::UpdateCursorVisibility(int32_t pid, bool visible, int32_t priority, bool isHap)
-{
-    auto preShowing = CursorDrawingComponent::GetInstance().IsCursorShowing();
-    auto ret = CursorDrawingComponent::GetInstance().SetPointerVisible(pid, visible, priority, isHap);
-    if (ret != RET_OK) {
-        MMI_HILOGE("Failed to set pointer visibility, error:%{public}d", visible);
-        return ret;
-    }
-    auto postShowing = CursorDrawingComponent::GetInstance().IsCursorShowing();
-    if (preShowing) {
-        if (!postShowing) {
-            WIN_MGR->DispatchPointer(PointerEvent::POINTER_ACTION_LEAVE_WINDOW);
-        }
-    } else if (postShowing) {
-        auto mouseInfo = WIN_MGR->GetMouseInfo();
-        CursorDrawingComponent::GetInstance().SetPointerLocation(
-            mouseInfo.physicalX, mouseInfo.physicalY, mouseInfo.displayId);
-        WIN_MGR->DispatchPointer(PointerEvent::POINTER_ACTION_ENTER_WINDOW);
-    }
-    return RET_OK;
 }
 } // namespace MMI
 } // namespace OHOS
