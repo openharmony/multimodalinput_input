@@ -2959,26 +2959,6 @@ HWTEST_F(PointerDrawingManagerTest, RegisterDisplayStatusReceiver_002, TestSize.
 }
 
 /**
- * @tc.name: PointerDrawingManagerTest_CalculateRenderDirection_001
- * @tc.desc: Test CalculateRenderDirection
- * @tc.type: Function
- * @tc.require:
- */
-HWTEST_F(PointerDrawingManagerTest, CalculateRenderDirection_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    auto *pointerDrawingManager = static_cast<PointerDrawingManager *>(IPointerDrawingManager::GetInstance());
-    pointerDrawingManager->displayInfo_.displayDirection = DIRECTION270;
-    pointerDrawingManager->displayInfo_.direction = DIRECTION90;
-    bool isHard = true;
-    Direction ret = pointerDrawingManager->CalculateRenderDirection(isHard);
-    ASSERT_EQ(ret, DIRECTION90);
-    isHard = false;
-    ret = pointerDrawingManager->CalculateRenderDirection(isHard);
-    ASSERT_EQ(ret, DIRECTION180);
-}
-
-/**
  * @tc.name: PointerDrawingManagerTest_UpdateMirrorScreens_001
  * @tc.desc: Test UpdateMirrorScreens
  * @tc.type: Function

@@ -90,7 +90,7 @@ ScreenPointer::ScreenPointer(hwcmgr_ptr_t hwcMgr, handler_ptr_t handler, const O
     }
     dpi_ = float(di.dpi) / BASELINE_DENSITY;
     MMI_HILOGI("Construct with DisplayInfo, id=%{public}" PRIu64 ", shape=(%{public}u, %{public}u), mode=%{public}u, "
-        "rotation=%{public}u, dpi=%{public}f", screenId_, width_, height_, mode_, rotation_, dpi_);
+        "rotation=%{public}u, dpi=%{public}f", screenId_, width_, height_, mode_, rotation_.load(), dpi_);
 }
 
 ScreenPointer::ScreenPointer(hwcmgr_ptr_t hwcMgr, handler_ptr_t handler, screen_info_ptr_t si)
@@ -107,7 +107,7 @@ ScreenPointer::ScreenPointer(hwcmgr_ptr_t hwcMgr, handler_ptr_t handler, screen_
     mirrorHeight_ = si->GetMirrorHeight();
 #endif // OHOS_BUILD_EXTERNAL_SCREEN
     MMI_HILOGI("Construct with ScreenInfo, id=%{public}" PRIu64 ", shape=(%{public}u, %{public}u), mode=%{public}u, "
-        "rotation=%{public}u, dpi=%{public}f", screenId_, width_, height_, mode_, rotation_, dpi_);
+        "rotation=%{public}u, dpi=%{public}f", screenId_, width_, height_, mode_, rotation_.load(), dpi_);
 }
 
 ScreenPointer::~ScreenPointer()
@@ -337,7 +337,7 @@ bool ScreenPointer::InitSurface(bool needDrawPointer)
 
     canvasNode_->SetCornerRadius(1);
     canvasNode_->SetPositionZ(Rosen::RSSurfaceNode::POINTER_WINDOW_POSITION_Z);
-    canvasNode_->SetRotation(float(rotation_));
+    canvasNode_->SetRotation(float(rotation_.load()));
     surfaceNode_->AddChild(canvasNode_, RS_NODE_CANVAS_INDEX);
 
     MMI_HILOGI("InitSurface completed");
@@ -366,7 +366,7 @@ void ScreenPointer::UpdateScreenInfo(sptr<OHOS::Rosen::ScreenInfo> si, bool need
     MMI_HILOGI("Update with ScreenInfo, id=%{public}" PRIu64 ", shape=(%{public}u, %{public}u), mode=%{public}u, "
         "rotation=%{public}u, dpi=%{public}f, (mirrorWidth,mirrotHeight)=(%{public}u, %{public}u), "
         "needDrawPointer=%{public}d",
-        screenId_, width_, height_, mode_, rotation_, dpi_, mirrorWidth_, mirrorHeight_, needDrawPointer);
+        screenId_, width_, height_, mode_, rotation_.load(), dpi_, mirrorWidth_, mirrorHeight_, needDrawPointer);
 }
 
 void ScreenPointer::OnDisplayInfo(const OLD::DisplayInfo &di)
@@ -382,7 +382,7 @@ void ScreenPointer::OnDisplayInfo(const OLD::DisplayInfo &di)
     }
     displayDirection_ = di.displayDirection;
     MMI_HILOGD("Update with DisplayInfo, id=%{public}" PRIu64 ", shape=(%{public}u, %{public}u), mode=%{public}u, "
-        "rotation=%{public}u, dpi=%{public}f", screenId_, width_, height_, mode_, rotation_, dpi_);
+        "rotation=%{public}u, dpi=%{public}f", screenId_, width_, height_, mode_, rotation_.load(), dpi_);
     if (isCurrentOffScreenRendering_) {
         if (di.width == 0 || di.screenRealWidth == 0 || di.screenRealHeight == 0) {
             MMI_HILOGE("invalid data, width=%{public}u, screenRealWidth=%{public}u, screenRealHeight=%{public}u",
@@ -713,5 +713,19 @@ void ScreenPointer::DestroyPointerWindow()
     rsUIDirector_ = nullptr;
     rsUIContext_ = nullptr;
     MMI_HILOGI("Destroy pointer window, screenId=%{public}" PRIu64, screenId_);
+}
+
+Direction ScreenPointer::GetRenderDirection(bool isHard)
+{
+    if (IsMirror()) {
+        return Direction::DIRECTION0;
+    }
+
+    if (isHard) {
+        return static_cast<Direction>(rotation_.load());
+    } else {
+        return static_cast<Direction>((((static_cast<Direction>(rotation_.load()) - displayDirection_) *
+            ANGLE_90 + ANGLE_360) % ANGLE_360) / ANGLE_90);
+    }
 }
 } // namespace OHOS::MMI
