@@ -84,7 +84,6 @@ public:
     bool IsFingerPressed() const override;
     const ISessionHandlerCollection *GetMonitorCollection() const override;
     int32_t GetFocusedPid() const override;
-    bool HasLocalMouseDevice() const override;
     bool AttachDeviceObserver(const std::shared_ptr<IDeviceObserver> &observer) override;
     bool DetachDeviceObserver(const std::shared_ptr<IDeviceObserver> &observer) override;
     int32_t GetCurrentAccountId() const override;

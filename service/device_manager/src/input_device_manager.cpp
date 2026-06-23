@@ -656,35 +656,6 @@ bool InputDeviceManager::HasTouchDevice()
     // LCOV_EXCL_STOP
 }
 
-bool InputDeviceManager::HasLocalMouseDevice()
-{
-    // LCOV_EXCL_START
-    CALL_DEBUG_ENTER;
-    for (const auto &item : inputDevice_) {
-        auto inputDevice = item.second.inputDeviceOrigin;
-        if (inputDevice == nullptr) {
-            continue;
-        }
-        auto vendor = libinput_device_get_id_vendor(inputDevice);
-        auto product = libinput_device_get_id_product(inputDevice);
-        if (vendor == STYLUS_MOUSE_VENDOR_ID &&
-            (product == STYLUS_MOUSE_PRODUCT_ID_V1 || product == STYLUS_MOUSE_PRODUCT_ID_V2)) {
-            MMI_HILOGI("device:%{public}d is a stylus, vendor:%{public}d, product:%{public}d",
-                item.first, vendor, product);
-            continue;
-        }
-        enum evdev_device_udev_tags udevTags = libinput_device_get_tags(inputDevice);
-        auto bus = libinput_device_get_id_bustype(inputDevice);
-        if (item.second.isPointerDevice && (udevTags & EVDEV_UDEV_TAG_MOUSE) != 0 &&
-            (bus == BUS_BLUETOOTH || bus == BUS_USB) && item.second.isDeviceReportEvent) {
-            MMI_HILOGI("device:%{public}d is a reportevent mouse", item.first);
-            return true;
-        }
-    }
-    return false;
-    // LCOV_EXCL_STOP
-}
-
 std::string InputDeviceManager::GetInputIdentification(struct libinput_device *inputDevice)
 {
     // LCOV_EXCL_START

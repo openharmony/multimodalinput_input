@@ -1003,14 +1003,6 @@ int32_t InputPlugin::GetFocusedPid() const
     return WIN_MGR->GetFocusPid();
 }
 
-bool InputPlugin::HasLocalMouseDevice() const
-{
-    if (INPUT_DEV_MGR == nullptr) {
-        return false;
-    }
-    return INPUT_DEV_MGR->HasLocalMouseDevice();
-}
-
 bool InputPlugin::AttachDeviceObserver(const std::shared_ptr<IDeviceObserver> &observer)
 {
     if (INPUT_DEV_MGR == nullptr) {
