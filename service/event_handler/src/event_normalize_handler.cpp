@@ -376,9 +376,6 @@ int32_t EventNormalizeHandler::OnEventDeviceAdded(libinput_event *event)
     KeyMapMgr->ParseDeviceConfigFile(device);
     KeyRepeat->AddDeviceConfig(device);
 
-    // SyncLedStateFromKeyEvent returns RET_OK only when the device is NOT a keyboard with led
-    // (i.e., it did not take over the led sync). Only then do we reset keyEvent_ from device
-    // state; otherwise skip ResetKeyEvent to avoid overwriting the just-synced lock state.
     int32_t syncRet = KeyEventHdr->SyncLedStateFromKeyEvent(device);
 
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD

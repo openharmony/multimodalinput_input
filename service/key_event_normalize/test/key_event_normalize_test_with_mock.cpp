@@ -234,7 +234,6 @@ HWTEST_F(KeyEventNormalizeWithMockTest, KeyEventNormalizeWithMockTest_SyncLedSta
     // led off
     EXPECT_CALL(libinputMock, HasEventLedType).Times(testing::AtMost(1)).WillOnce(testing::Return(0));
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
-    // Non-keyboard device is not taken over by SyncLedStateFromKeyEvent, so it returns RET_OK.
     EXPECT_EQ(KeyEventHdr->SyncLedStateFromKeyEvent(&libDev), RET_OK);
     if (vKeyboardDeviceId > 0) {
         INPUT_DEV_MGR->RemoveVirtualInputDevice(vKeyboardDeviceId);
@@ -274,7 +273,6 @@ HWTEST_F(KeyEventNormalizeWithMockTest, KeyEventNormalizeWithMockTest_SyncLedSta
     // led off
     EXPECT_CALL(libinputMock, HasEventLedType).Times(testing::AtMost(1)).WillOnce(testing::Return(0));
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
-    // Keyboard without led is not taken over by SyncLedStateFromKeyEvent, so it returns RET_OK.
     EXPECT_EQ(KeyEventHdr->SyncLedStateFromKeyEvent(&libDev), RET_OK);
     if (vKeyboardDeviceId > 0) {
         INPUT_DEV_MGR->RemoveVirtualInputDevice(vKeyboardDeviceId);
@@ -314,7 +312,6 @@ HWTEST_F(KeyEventNormalizeWithMockTest, KeyEventNormalizeWithMockTest_SyncLedSta
     // led on
     EXPECT_CALL(libinputMock, HasEventLedType).Times(testing::AtMost(1)).WillOnce(testing::Return(1));
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
-    // The libinput_set_led_state test stub returns non-zero, exercising the failure branch (RET_ERR).
     EXPECT_EQ(KeyEventHdr->SyncLedStateFromKeyEvent(&libDev), RET_ERR);
     if (vKeyboardDeviceId > 0) {
         INPUT_DEV_MGR->RemoveVirtualInputDevice(vKeyboardDeviceId);
