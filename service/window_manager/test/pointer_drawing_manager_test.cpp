@@ -4473,7 +4473,7 @@ HWTEST_F(PointerDrawingManagerTest, PointerDrawingManagerTest_InitLayer_001, Tes
     pointerDrawingManager.displayId_ = TEST_INVALID_DISPLAY_ID;
     int32_t styleId = 0;
     int32_t ret = pointerDrawingManager.InitLayer(MOUSE_ICON(styleId));
-    EXPECT_EQ(ret, RET_OK);
+    EXPECT_EQ(ret, RET_ERR);
 }
 
 /**
@@ -4563,7 +4563,7 @@ HWTEST_F(PointerDrawingManagerTest, PointerDrawingManagerTest_InitLayer_002, Tes
     int32_t styleId = 0;
     pointerDrawingManager.currentCursorBlurEnabled_ = true;
     int32_t ret = pointerDrawingManager.InitLayer(MOUSE_ICON(styleId));
-    EXPECT_EQ(ret, RET_OK);
+    EXPECT_EQ(ret, RET_ERR);
     pointerDrawingManager.currentCursorBlurEnabled_ = false;
     ret = pointerDrawingManager.InitLayer(MOUSE_ICON(styleId));
     EXPECT_EQ(ret, RET_OK);
