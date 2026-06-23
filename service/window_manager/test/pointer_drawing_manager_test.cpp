@@ -2648,15 +2648,12 @@ HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_DrawMovePointer_002,
     int32_t physicalX = 1;
     int32_t physicalY = 2;
     uint64_t displayId = 3;
-    pointerDrawingManager.currentCursorBlurEnabled_ = true;
     ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.DrawMovePointer(displayId, physicalX, physicalY));
     Rosen::RSSurfaceNodeConfig surfaceNodeConfig;
     surfaceNodeConfig.SurfaceNodeName = "pointer window";
     Rosen::RSSurfaceNodeType surfaceNodeType = Rosen::RSSurfaceNodeType::SELF_DRAWING_WINDOW_NODE;
     pointerDrawingManager.surfaceNode_ = Rosen::RSSurfaceNode::Create(surfaceNodeConfig, surfaceNodeType, true, false,
         rsUIContext_);
-    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.DrawMovePointer(displayId, physicalX, physicalY));
-    pointerDrawingManager.currentCursorBlurEnabled_ = false;
     ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.DrawMovePointer(displayId, physicalX, physicalY));
 }
 
@@ -4570,6 +4567,31 @@ HWTEST_F(PointerDrawingManagerTest, PointerDrawingManagerTest_InitLayer_002, Tes
     pointerDrawingManager.currentCursorBlurEnabled_ = false;
     ret = pointerDrawingManager.InitLayer(MOUSE_ICON(styleId));
     EXPECT_EQ(ret, RET_OK);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_DrawMovePointer_004
+ * @tc.desc: Test the function DrawMovePointer wheather cursor blur is enabled
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_DrawMovePointer_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerDrawingManager pointerDrawingManager;
+    int32_t physicalX = 1;
+    int32_t physicalY = 2;
+    uint64_t displayId = 3;
+    pointerDrawingManager.currentCursorBlurEnabled_ = true;
+    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.DrawMovePointer(displayId, physicalX, physicalY));
+    Rosen::RSSurfaceNodeConfig surfaceNodeConfig;
+    surfaceNodeConfig.SurfaceNodeName = "pointer window";
+    Rosen::RSSurfaceNodeType surfaceNodeType = Rosen::RSSurfaceNodeType::SELF_DRAWING_WINDOW_NODE;
+    pointerDrawingManager.surfaceNode_ = Rosen::RSSurfaceNode::Create(surfaceNodeConfig, surfaceNodeType, true, false,
+        rsUIContext_);
+    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.DrawMovePointer(displayId, physicalX, physicalY));
+    pointerDrawingManager.currentCursorBlurEnabled_ = false;
+    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.DrawMovePointer(displayId, physicalX, physicalY));
 }
 
 /**
