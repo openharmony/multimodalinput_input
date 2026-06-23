@@ -72,9 +72,6 @@ std::vector<std::pair<enum libinput_device_capability, InputDeviceCapability>> d
 
 constexpr size_t EXPECTED_N_SUBMATCHES{ 2 };
 constexpr size_t EXPECTED_SUBMATCH{ 1 };
-constexpr uint32_t STYLUS_MOUSE_VENDOR_ID { 4817 };
-constexpr uint32_t STYLUS_MOUSE_PRODUCT_ID_V1 { 4361 };
-constexpr uint32_t STYLUS_MOUSE_PRODUCT_ID_V2 { 4261 };
 } // namespace
 
 std::shared_ptr<InputDeviceManager> InputDeviceManager::instance_ = nullptr;
