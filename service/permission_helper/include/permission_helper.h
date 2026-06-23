@@ -42,7 +42,7 @@ public:
     bool CheckDispatchControl();
     bool VerifySystemApp();
     bool CheckInfraredEmmit();
-    bool CheckInjectPermission();
+    bool CheckInjectPermission(uint32_t tokenId = 0);
     bool RequestFromShell();
     bool CheckMouseCursor();
     bool CheckInputEventFilter();
