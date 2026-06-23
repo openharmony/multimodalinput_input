@@ -55,7 +55,6 @@ public:
     MOCK_METHOD(void, Attach, (std::shared_ptr<IDeviceObserver>));
     MOCK_METHOD(void, Detach, (std::shared_ptr<IDeviceObserver>));
     MOCK_METHOD(void, GetMultiKeyboardDevice, (std::vector<struct libinput_device*>&));
-    MOCK_METHOD(bool, HasLocalMouseDevice, ());
     MOCK_METHOD(bool, HasPointerDevice, ());
     MOCK_METHOD(std::vector<libinput_device*>, GetTouchPadDeviceOrigins, ());
     MOCK_METHOD(bool, GetIsDeviceReportEvent, (int32_t));

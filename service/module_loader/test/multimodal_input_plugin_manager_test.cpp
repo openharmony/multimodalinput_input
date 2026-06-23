@@ -77,7 +77,6 @@ public:
     MOCK_METHOD(bool, IsFingerPressed, (), (override, const));
     MOCK_METHOD(const ISessionHandlerCollection *, GetMonitorCollection, (), (override, const));
     MOCK_METHOD(int32_t, GetFocusedPid, (), (override, const));
-    MOCK_METHOD(bool, HasLocalMouseDevice, (), (override, const));
     MOCK_METHOD(bool, AttachDeviceObserver, (const std::shared_ptr<IDeviceObserver> &observer), (override));
     MOCK_METHOD(bool, DetachDeviceObserver, (const std::shared_ptr<IDeviceObserver> &observer), (override));
     MOCK_METHOD(int32_t, GetCurrentAccountId, (), (override, const));
@@ -1310,18 +1309,6 @@ HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_GetF
     CALL_TEST_DEBUG;
     std::shared_ptr<InputPlugin> inputPluginContext = std::make_shared<InputPlugin>(nullptr);
     EXPECT_EQ(inputPluginContext->GetFocusedPid(), -1);
-}
-
-/**
- * @tc.name: MultimodalInputPluginManagerTest_HasLocalMouseDevice_001
- * @tc.desc: test INPUT_DEV_MGR == nullptr
- * @tc.require: test HasLocalMouseDevice
- */
-HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_HasLocalMouseDevice_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    std::shared_ptr<InputPlugin> inputPluginContext = std::make_shared<InputPlugin>(nullptr);
-    EXPECT_EQ(inputPluginContext->HasLocalMouseDevice(), false);
 }
 
 /**

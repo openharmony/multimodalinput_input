@@ -161,7 +161,6 @@ struct IPluginContext {
     virtual bool IsFingerPressed() const = 0;
     virtual const ISessionHandlerCollection *GetMonitorCollection() const = 0;
     virtual int32_t GetFocusedPid() const = 0;
-    virtual bool HasLocalMouseDevice() const = 0;
     virtual bool AttachDeviceObserver(const std::shared_ptr<IDeviceObserver> &observer) = 0;
     virtual bool DetachDeviceObserver(const std::shared_ptr<IDeviceObserver> &observer) = 0;
     virtual int32_t GetCurrentAccountId() const = 0;
