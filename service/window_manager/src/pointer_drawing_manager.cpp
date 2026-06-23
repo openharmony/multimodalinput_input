@@ -419,6 +419,7 @@ bool PointerDrawingManager::SetCursorLocation(int32_t physicalX, int32_t physica
             if (vsyncStart_.load()) {
                 return true;
             }
+            MMI_HILOGI("vsync stop, try render and move");
             uint64_t displayId = displayId_;
             PostTask([this, physicalX, physicalY, displayId]() -> void {
                 std::lock_guard<std::recursive_mutex> lg(recursiveMtx_);
