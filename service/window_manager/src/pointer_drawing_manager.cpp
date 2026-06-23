@@ -416,14 +416,15 @@ bool PointerDrawingManager::SetCursorLocation(int32_t physicalX, int32_t physica
     CHKPF(surfaceNodePtr);
     if (GetHardCursorEnabled()) {
         if (GetCursorBlurEnabled()) {
-            if (!vsyncStart_.load()) {
-                uint64_t displayId = displayId_;
-                PostTask([this, physicalX, physicalY, displayId]() -> void {
-                    std::lock_guard<std::recursive_mutex> lg(recursiveMtx_);
-                    RenderAndMoveOnVsync(physicalX, physicalY, displayId);
-                });
+            if (vsyncStart_.load()) {
+                return true;
             }
-            return vsyncStart_.load();
+            uint64_t displayId = displayId_;
+            PostTask([this, physicalX, physicalY, displayId]() -> void {
+                std::lock_guard<std::recursive_mutex> lg(recursiveMtx_);
+                RenderAndMoveOnVsync(physicalX, physicalY, displayId);
+            });
+            return false;
         }
         if (IsCursorBlurEnabledUpdate()) {
             MMI_HILOGI("Cursor blur enabled update, try render and move");
@@ -1296,7 +1297,7 @@ void PointerDrawingManager::OnVsync(uint64_t timestamp)
     PostTask([this, x, y, displayId]() -> void {
         std::lock_guard<std::recursive_mutex> lg(recursiveMtx_);
         RenderAndMoveOnVsync(x, y, displayId);
-    }, VSYNC_CALIBRATION_TIME);
+        }, VSYNC_CALIBRATION_TIME);
     RequestNextVSync();
 }
 
@@ -2341,9 +2342,7 @@ int32_t PointerDrawingManager::SetPointerColor(int32_t userId, int32_t color)
             return RET_ERR;
         }
     }
-    // Note: Similar to SetPointerSize, when the cursor blur function is enabled and the hard cursor
-    // is not moved, the cursor may need to be redrawn. However, there is currently no business
-    // scenario requiring this for SetPointerColor.
+
     UpdatePointerVisible();
     return RET_OK;
 }
@@ -2480,12 +2479,6 @@ int32_t PointerDrawingManager::SetPointerSize(int32_t userId, int32_t size)
     if (InitLayer(MOUSE_ICON(lastMouseStyle_.id)) != RET_OK) {
         MMI_HILOGE("Init layer failed");
         return RET_ERR;
-    }
-
-    // When mouse has not moved and cursor blur is enabled, directly trigger rendering
-    // to bypass OnVsync which returns early when resample_ has no coordinates
-    if (GetHardCursorEnabled() && GetCursorBlurEnabled()) {
-        RenderAndMoveOnVsync(lastPhysicalX_, lastPhysicalY_, displayId_);
     }
 
     UpdatePointerVisible();
