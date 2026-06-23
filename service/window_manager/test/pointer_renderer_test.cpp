@@ -16,9 +16,11 @@
 #include <fstream>
 #include <gtest/gtest.h>
 
+#include "config_multimodal.h"
 #include "image_source.h"
 #include "mmi_log.h"
 #include "pointer_renderer.h"
+#include "resource_decompress.h"
 
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "PointerRendererTest"
@@ -34,7 +36,9 @@ using namespace testing::ext;
 } // namespace
 class PointerRendererTest : public testing::Test {
 public:
-    static void SetUpTestCase(void) {};
+    static void SetUpTestCase(void) {
+        DecompressToDisk(DEF_MOUSE_ICONS_DAT_PATH, "/data/service/el1/public/multimodalinput/mouse_icon/");
+    };
     static void TearDownTestCase(void) {};
     void SetUp(void) {};
 };

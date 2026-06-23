@@ -24,6 +24,7 @@
 #include "sec_comp_enhance_kit.h"
 
 #include "authorize_helper.h"
+#include "config_multimodal.h"
 #include "define_multimodal.h"
 #include "event_log_helper.h"
 #include "image_source.h"
@@ -34,6 +35,7 @@
 #include "mmi_log.h"
 #include "pointer_device_manager.h"
 #include "pointer_event.h"
+#include "resource_decompress.h"
 #include "running_process_info.h"
 #include "server_msg_handler.h"
 #include "stream_buffer.h"
@@ -95,7 +97,9 @@ public:
 
 class ServerMsgHandlerTest : public testing::Test {
 public:
-    static void SetUpTestCase(void) {}
+    static void SetUpTestCase(void) {
+        DecompressToDisk(DEF_MOUSE_ICONS_DAT_PATH, "/data/service/el1/public/multimodalinput/mouse_icon/");
+    }
     static void TearDownTestCase(void) {}
     void SetUp() {}
     void TearDoen() {}

@@ -16,7 +16,9 @@
 #include <fstream>
 #include <gtest/gtest.h>
 
+#include "config_multimodal.h"
 #include "mmi_log.h"
+#include "resource_decompress.h"
 #include "screen_pointer.h"
 #include "product_name_definition.h"
 #include "product_type_parser.h"
@@ -34,7 +36,9 @@ using namespace testing::ext;
 } // namespace
 class ScreenPointerTest : public testing::Test {
 public:
-    static void SetUpTestCase(void) {};
+    static void SetUpTestCase(void) {
+        DecompressToDisk(DEF_MOUSE_ICONS_DAT_PATH, "/data/service/el1/public/multimodalinput/mouse_icon/");
+    };
     static void TearDownTestCase(void) {};
     void SetUp(void) {};
 };
