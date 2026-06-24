@@ -36,7 +36,8 @@ using namespace testing::ext;
 } // namespace
 class PointerRendererTest : public testing::Test {
 public:
-    static void SetUpTestCase(void) {
+    static void SetUpTestCase(void)
+    {
         DecompressToDisk(DEF_MOUSE_ICONS_DAT_PATH, "/data/service/el1/public/multimodalinput/mouse_icon/");
     };
     static void TearDownTestCase(void) {};
