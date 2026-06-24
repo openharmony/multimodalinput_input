@@ -1449,8 +1449,23 @@ HWTEST_F(InputDeviceManagerTestWithMock, EnableInputDeviceForPlugin_InvalidDevic
 HWTEST_F(InputDeviceManagerTestWithMock, GetInputDeviceInfosForPlugin_ReturnsDeviceFields_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
+    char devName[] { "pluginDevice" };
+    char phys[] { "pluginPhys" };
+    char uniq[] { "pluginUniq" };
+    struct libinput_device rawDev {};
+    NiceMock<LibinputInterfaceMock> libinputMock;
+    EXPECT_CALL(libinputMock, DeviceGetName).WillRepeatedly(Return(devName));
+    EXPECT_CALL(libinputMock, DeviceGetPhys).WillRepeatedly(Return(phys));
+    EXPECT_CALL(libinputMock, DeviceGetUniq).WillRepeatedly(Return(uniq));
+    EXPECT_CALL(libinputMock, DeviceGetAxisMin).WillRepeatedly(Return(-1));
+    EXPECT_CALL(libinputMock, DeviceHasCapability)
+        .WillRepeatedly([](libinput_device*, libinput_device_capability capability) {
+            return capability == LIBINPUT_DEVICE_CAP_KEYBOARD || capability == LIBINPUT_DEVICE_CAP_POINTER;
+        });
+
     InputDeviceManager::InputDeviceInfo info;
-    info.networkIdOrigin = "pluginDevice";
+    info.inputDeviceOrigin = &rawDev;
+    info.networkIdOrigin = devName;
     info.enable = true;
     info.inputEnable = true;
     info.isPointerDevice = true;
@@ -1464,6 +1479,7 @@ HWTEST_F(InputDeviceManagerTestWithMock, GetInputDeviceInfosForPlugin_ReturnsDev
     ASSERT_NE(devices[0], nullptr);
     EXPECT_EQ(devices[0]->GetId(), TEST_DEVICE_ID_1);
     EXPECT_TRUE(devices[0]->HasCapability(INPUT_DEV_CAP_POINTER));
+    EXPECT_TRUE(devices[0]->HasCapability(INPUT_DEV_CAP_KEYBOARD));
     EXPECT_FALSE(devices[0]->HasCapability(INPUT_DEV_CAP_TOUCH));
     EXPECT_TRUE(devices[0]->IsLocal());
 }

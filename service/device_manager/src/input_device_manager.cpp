@@ -1766,33 +1766,16 @@ int32_t InputDeviceManager::SetInputDeviceEnabled(
 std::vector<std::shared_ptr<InputDevice>> InputDeviceManager::GetInputDeviceInfosForPlugin() const
 {
     std::vector<std::shared_ptr<InputDevice>> devices;
-    devices.reserve(inputDevice_.size() + virtualInputDevices_.size());
+    devices.reserve(inputDevice_.size());
     for (const auto &[deviceId, deviceInfo] : inputDevice_) {
-        if (deviceInfo.inputDeviceOrigin != nullptr) {
-            auto inputDevice = GetInputDevice(deviceId, false);
-            if (inputDevice != nullptr) {
-                devices.push_back(inputDevice);
-            }
+        if (deviceInfo.inputDeviceOrigin == nullptr) {
+            MMI_HILOGW("Input device origin is null, deviceId:%{public}d", deviceId);
             continue;
         }
-        auto inputDevice = std::make_shared<InputDevice>();
-        inputDevice->SetId(deviceId);
-        inputDevice->SetLocal(deviceInfo.isLocal);
-        uint32_t tags = 0;
-        if (deviceInfo.isPointerDevice) {
-            inputDevice->AddCapability(INPUT_DEV_CAP_POINTER);
-            tags |= CapabilityToTags(INPUT_DEV_CAP_POINTER);
+        auto inputDevice = GetInputDevice(deviceId, false);
+        if (inputDevice != nullptr) {
+            devices.push_back(inputDevice);
         }
-        if (deviceInfo.isTouchableDevice) {
-            inputDevice->AddCapability(INPUT_DEV_CAP_TOUCH);
-            tags |= CapabilityToTags(INPUT_DEV_CAP_TOUCH);
-        }
-        inputDevice->SetType(static_cast<int32_t>(tags));
-        devices.push_back(inputDevice);
-    }
-    for (const auto &item : virtualInputDevices_) {
-        CHKPC(item.second);
-        devices.push_back(item.second);
     }
     return devices;
 }
