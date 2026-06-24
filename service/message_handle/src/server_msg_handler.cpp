@@ -1844,6 +1844,12 @@ int32_t ServerMsgHandler::NativeInjectCheck(int32_t pid)
         MMI_HILOGI("Native inject permitted by CONTROL_DEVICE permission, pid:%{public}d", pid);
         return RET_OK;
     }
+#ifdef OHOS_BUILD_ENABLE_VKEYBOARD
+    if (PER_HELPER->VerifySystemApp() && PER_HELPER->CheckInjectPermission()) {
+        MMI_HILOGI("Native inject permitted by system app and inject permission, pid:%{public}d", pid);
+        return RET_OK;
+    }
+#endif // OHOS_BUILD_ENABLE_VKEYBOARD
     auto state = AUTHORIZE_HELPER->GetAuthorizeState();
     MMI_HILOGI("The process is already being processed,s:%{public}d,pid:%{public}d,inputPid:%{public}d",
         state, AUTHORIZE_HELPER->GetAuthorizePid(), pid);
@@ -1858,11 +1864,9 @@ int32_t ServerMsgHandler::NativeInjectCheck(int32_t pid)
     }
 
     if (state == AuthorizeState::STATE_SELECTION_AUTHORIZE) {
-        if (pid == AUTHORIZE_HELPER->GetAuthorizePid()) {
-            MMI_HILOGI("The current PID is waiting for user authorization");
-        } else {
-            MMI_HILOGI("Another PID is waiting for user authorization");
-        }
+        MMI_HILOGI("%{public}s", pid == AUTHORIZE_HELPER->GetAuthorizePid()
+            ? "The current PID is waiting for user authorization"
+            : "Another PID is waiting for user authorization");
         return COMMON_PERMISSION_CHECK_ERROR;
     }
 
