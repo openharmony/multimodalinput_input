@@ -200,11 +200,15 @@ void EventDump::ParseCommand(int32_t fd, const std::vector<std::string> &args)
 #else
                 mprintf(fd, "Interceptor function does not support");
 #endif // OHOS_BUILD_ENABLE_INTERCEPTOR
+#ifdef OHOS_BUILD_ENABLE_INPUT_EVENT_HOOK
                 auto hookMgr = InputHandler->GetInputEventHook();
                 if (hookMgr == nullptr) {
                     goto RELEASE_RES;
                 }
                 hookMgr->Dump(fd, args);
+#else
+                mprintf(fd, "InputEventHook function does not support");
+#endif // OHOS_BUILD_ENABLE_INPUT_EVENT_HOOK
 #ifdef OHOS_BUILD_ENABLE_KEY_HOOK
                 KEY_EVENT_HOOK_MGR.Dump(fd, args);
 #else

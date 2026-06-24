@@ -121,7 +121,6 @@ declare_args() {
     "event_handler/src/input_active_subscribe_manager.cpp",
     "event_handler/src/input_device_consumer_proxy.cpp",
     "event_handler/src/input_device_impl.cpp",
-    "event_handler/src/input_event_hook_handler.cpp",
     "event_handler/src/input_event_stager.cpp",
     "event_handler/src/input_handler_manager.cpp",
     "event_handler/src/input_manager_impl.cpp",
@@ -156,14 +155,6 @@ declare_args() {
     "event_handler/src/key_event_value_transformation.cpp",
     "event_handler/src/key_map_manager.cpp",
     "event_handler/src/trigger_event_dispatcher.cpp",
-    "event_hook/src/checker/dispatch_order_checker.cpp",
-    "event_hook/src/checker/expiration_checker.cpp",
-    "event_hook/src/checker/key_loop_closure_checker.cpp",
-    "event_hook/src/checker/pointer_loop_closure_checker.cpp",
-    "event_hook/src/hook/input_event_hook.cpp",
-    "event_hook/src/hook/key_event_hook.cpp",
-    "event_hook/src/hook/pointer_event_hook.cpp",
-    "event_hook/src/input_event_hook_manager.cpp",
     "libinput_adapter/src/hotplug_detector.cpp",
     "libinput_adapter/src/libinput_adapter.cpp",
     "libinput_adapter/src/property_reader.cpp",
@@ -395,6 +386,20 @@ if (input_feature_key_hook) {
 
 if (input_feature_input_event_hook) {
   input_default_defines += [ "OHOS_BUILD_ENABLE_INPUT_EVENT_HOOK" ]
+
+  libmmi_client_sources +=
+      [ "event_handler/src/input_event_hook_handler.cpp" ]
+
+  libmmi_service_sources += [
+    "event_hook/src/input_event_hook_manager.cpp",
+    "event_hook/src/hook/input_event_hook.cpp",
+    "event_hook/src/hook/key_event_hook.cpp",
+    "event_hook/src/hook/pointer_event_hook.cpp",
+    "event_hook/src/checker/dispatch_order_checker.cpp",
+    "event_hook/src/checker/expiration_checker.cpp",
+    "event_hook/src/checker/key_loop_closure_checker.cpp",
+    "event_hook/src/checker/pointer_loop_closure_checker.cpp",
+  ]
 }
 
 if (input_feature_touchscreen) {
