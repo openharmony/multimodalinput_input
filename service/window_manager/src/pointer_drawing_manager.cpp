@@ -435,11 +435,7 @@ bool PointerDrawingManager::SetCursorLocation(int32_t physicalX, int32_t physica
             }
         }
         if (lastMouseStyle_.id != MOUSE_ICON::LOADING && lastMouseStyle_.id != MOUSE_ICON::RUNNING) {
-            ResetMoveRetryTimer();
-            std::unordered_set<uint64_t> failedScreens;
-            if (HardwareCursorMove(displayId_, physicalX, physicalY, failedScreens) != RET_OK) {
-                MoveRetryAsync(displayId_, physicalX, physicalY, failedScreens);
-            }
+            HardwareCursorMoveAsync(displayId_, physicalX, physicalY);
         }
         moveFinished_.store(true);
     } else {
@@ -1248,11 +1244,7 @@ void PointerDrawingManager::RenderAndMoveOnVsync(int32_t x, int32_t y, uint64_t 
         }
     }
     SoftwareCursorMoveAsync(displayId, x, y);
-    ResetMoveRetryTimer();
-    std::unordered_set<uint64_t> failedScreens;
-    if (HardwareCursorMove(displayId, x, y, failedScreens) != RET_OK) {
-        MoveRetryAsync(displayId, x, y, failedScreens);
-    }
+    HardwareCursorMoveAsync(displayId, x, y);
     moveFinished_.store(true);
 }
 
@@ -1313,6 +1305,15 @@ void PointerDrawingManager::RenderThreadLoop()
 {
     SetThreadName(std::string("Render"));
     isRenderRunning_.store(true);
+#ifdef OHOS_BUILD_PC_PRIORITY
+    struct sched_param param = { 0 };
+    param.sched_priority = PC_PRIORITY;
+    int32_t schRet = sched_setscheduler(0, SCHED_FIFO, &param);
+    if (schRet != 0) {
+        MMI_HILOGE("RenderThreadLoop set SCHED_FIFO failed, schRet:%{public}d, errno:%{public}d",
+            schRet, errno);
+    }
+#endif // OHOS_BUILD_PC_PRIORITY
     runner_ = AppExecFwk::EventRunner::Create(false);
     CHKPV(runner_);
     handler_ = std::make_shared<AppExecFwk::EventHandler>(runner_);
@@ -3562,7 +3563,18 @@ void PointerDrawingManager::ClearDisappearedScreenPointer(const std::set<uint64_
     }
 }
 
-int32_t PointerDrawingManager::HardwareCursorMove(uint64_t displayId, int32_t x, int32_t y,
+void PointerDrawingManager::HardwareCursorMoveAsync(uint64_t displayId, int32_t x, int32_t y)
+{
+    PostTask([this, displayId, x, y]() {
+        ResetMoveRetryTimer();
+        std::unordered_set<uint64_t> failedScreens;
+        if (HardwareCursorMoveInner(displayId, x, y, failedScreens) != RET_OK) {
+            MoveRetryAsync(displayId, x, y, failedScreens);
+        }
+    });
+}
+
+int32_t PointerDrawingManager::HardwareCursorMoveInner(uint64_t displayId, int32_t x, int32_t y,
     std::unordered_set<uint64_t>& failedScreens)
 {
     MMI_HILOGD("HardwareCursorMove loc: (%{private}d, %{private}d)", x, y);

@@ -1361,14 +1361,14 @@ HWTEST_F(PointerDrawingManagerSupTest, PointerDrawingManagerSupTest_HardwareCurs
     pointerDrawingManager.displayId_ = 100;
     uint64_t displayId = 100;
     std::unordered_set<uint64_t> failedScreens;
-    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.HardwareCursorMove(displayId, x, y, failedScreens));
+    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.HardwareCursorMoveInner(displayId, x, y, failedScreens));
     ASSERT_NO_FATAL_FAILURE(
         pointerDrawingManager.SoftwareCursorMove(pointerDrawingManager.displayId_, x, y));
     spMirror->mode_ = mode_t::SCREEN_EXTEND;
     pointerDrawingManager.displayId_ = 200;
     displayId = 200;
     failedScreens.clear();
-    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.HardwareCursorMove(displayId, x, y, failedScreens));
+    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.HardwareCursorMoveInner(displayId, x, y, failedScreens));
     ASSERT_NO_FATAL_FAILURE(
         pointerDrawingManager.SoftwareCursorMoveAsync(pointerDrawingManager.displayId_, x, y));
 }
