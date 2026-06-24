@@ -8746,7 +8746,7 @@ bool InputWindowsManager::HasDisplayGroupInfoChanged(const OLD::DisplayGroupInfo
             return true;
         }
         if (HasPluginDisplayInfoChanged(oldDisplay, *newDisplay)) {
-            MMI_HILOGI("Plugin display info changed: displayId=%{public}d", oldDisplay.id);
+            MMI_HILOGD("Plugin display info changed: displayId=%{public}d", oldDisplay.id);
             return true;
         }
     }
