@@ -764,9 +764,7 @@ void MMIService::OnDisconnected(SessionPtr s)
     }
 #endif // OHOS_BUILD_ENABLE_ANCO
 #ifdef OHOS_BUILD_ENABLE_POINTER
-    if (POINTER_DEV_MGR.isInit) {
-        CursorDrawingComponent::GetInstance().DeletePointerVisible(s->GetPid());
-    }
+    CursorDrawingComponent::GetInstance().DeletePointerVisible(s->GetPid());
 #endif // OHOS_BUILD_ENABLE_POINTER
 }
 
@@ -928,9 +926,6 @@ ErrCode MMIService::SetMouseHotSpot(int32_t pid, int32_t windowId, int32_t hotSp
     CursorDrawingComponent::GetInstance();
     ret = delegateTasks_.PostSyncTask(
         [pid, windowId, hotSpotX, hotSpotY] {
-            if (!POINTER_DEV_MGR.isInit) {
-                return RET_ERR;
-            }
             return CursorDrawingComponent::GetInstance().SetMouseHotSpot(pid, windowId, hotSpotX, hotSpotY);
         }
         );
@@ -1155,9 +1150,6 @@ ErrCode MMIService::SetPointerVisible(bool visible, int32_t priority)
     int32_t clientPid = GetCallingPid();
     int32_t ret = delegateTasks_.PostSyncTask(
         [clientPid, visible, priority, isHap] {
-            if (!POINTER_DEV_MGR.isInit) {
-                return RET_ERR;
-            }
             return CursorDrawingComponent::GetInstance().SetPointerVisible(clientPid, visible, priority, isHap);
         }
         );
@@ -1173,9 +1165,7 @@ ErrCode MMIService::SetPointerVisible(bool visible, int32_t priority)
 int32_t MMIService::CheckPointerVisible(bool &visible)
 {
     WIN_MGR->UpdatePointerDrawingManagerWindowInfo();
-    if (POINTER_DEV_MGR.isInit) {
-        visible = CursorDrawingComponent::GetInstance().IsPointerVisible();
-    }
+    visible = CursorDrawingComponent::GetInstance().IsPointerVisible();
     return RET_OK;
 }
 #endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
@@ -1249,9 +1239,7 @@ ErrCode MMIService::SetPointerColor(int32_t color)
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
 int32_t MMIService::ReadPointerColor(int32_t &color)
 {
-    if (POINTER_DEV_MGR.isInit) {
-        color = CursorDrawingComponent::GetInstance().GetPointerColor();
-    }
+    color = CursorDrawingComponent::GetInstance().GetPointerColor();
     return RET_OK;
 }
 #endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
@@ -1377,9 +1365,6 @@ ErrCode MMIService::SetPointerStyle(int32_t windowId, const PointerStyle& pointe
     int32_t clientPid = GetCallingPid();
     int32_t ret = delegateTasks_.PostSyncTask(
         [clientPid, windowId, pointerStyle, isUiExtension] {
-            if (!POINTER_DEV_MGR.isInit) {
-                return RET_ERR;
-            }
             return CursorDrawingComponent::GetInstance().SetPointerStyle(
                 clientPid, windowId, pointerStyle, isUiExtension);
         }
@@ -1408,9 +1393,6 @@ ErrCode MMIService::ClearWindowPointerStyle(int32_t pid, int32_t windowId)
     CursorDrawingComponent::GetInstance();
     ret = delegateTasks_.PostSyncTask(
         [pid, windowId] {
-            if (!POINTER_DEV_MGR.isInit) {
-                return RET_ERR;
-            }
             return CursorDrawingComponent::GetInstance().ClearWindowPointerStyle(pid, windowId);
         }
         );
@@ -1429,9 +1411,6 @@ ErrCode MMIService::GetPointerStyle(int32_t windowId, PointerStyle& pointerStyle
     int32_t clientPid = GetCallingPid();
     int32_t ret = delegateTasks_.PostSyncTask(
         [clientPid, windowId, &pointerStyle, isUiExtension] {
-            if (!POINTER_DEV_MGR.isInit) {
-                return RET_ERR;
-            }
             return CursorDrawingComponent::GetInstance().GetPointerStyle(
                 clientPid, windowId, pointerStyle, isUiExtension);
         }
@@ -1583,7 +1562,7 @@ int32_t MMIService::OnGetDevice(int32_t deviceId, std::shared_ptr<InputDevice> i
     inputDevice->SetAxisInfo(tmpDevice->GetAxisInfo());
     inputDevice->SetVirtual(tmpDevice->IsVirtual());
     inputDevice->SetLocal(tmpDevice->IsLocal());
-    
+
     return RET_OK;
 }
 
@@ -5107,9 +5086,6 @@ int32_t MMIService::SetCustomCursorInner(int32_t windowId,
     CursorDrawingComponent::GetInstance();
     ret = delegateTasks_.PostSyncTask(std::bind(
         [pid, windowId, cursor, options] {
-            if (!POINTER_DEV_MGR.isInit) {
-                return RET_ERR;
-            }
             return CursorDrawingComponent::GetInstance().SetCustomCursor(pid, windowId, cursor, options);
         }
         ));
