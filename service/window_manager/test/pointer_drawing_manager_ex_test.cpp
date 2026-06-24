@@ -18,6 +18,7 @@
 
 #include <gtest/gtest.h>
 
+#include "config_multimodal.h"
 #include "event_log_helper.h"
 #include "image_source.h"
 #include "input_device_manager.h"
@@ -31,6 +32,7 @@
 #include "pointer_event.h"
 #include "pointer_style.h"
 #include "preferences_manager_mock.h"
+#include "resource_decompress.h"
 #include "ui/rs_ui_context.h"
 #include "ui/rs_ui_director.h"
 #include "transaction/rs_interfaces.h"
@@ -78,6 +80,7 @@ public:
     }
     static void SetUpTestCase(void)
     {
+        DecompressToDisk(DEF_MOUSE_ICONS_DAT_PATH, "/data/service/el1/public/multimodalinput/mouse_icon/");
         rsUIContext_ = GetRSUIContext(0);
     }
     static void TearDownTestCase(void)

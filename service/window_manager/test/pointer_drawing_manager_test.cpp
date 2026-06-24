@@ -20,6 +20,7 @@
 
 #include "common_event_data.h"
 #include "common_event_subscribe_info.h"
+#include "config_multimodal.h"
 #include "image_source.h"
 #include "input_windows_manager_mock.h"
 #include "i_preference_manager.h"
@@ -27,6 +28,7 @@
 #include "mmi_log.h"
 #include "parameters.h"
 #include "pixel_map.h"
+#include "resource_decompress.h"
 #define private public
 #include "pointer_drawing_manager.h"
 #undef private
@@ -84,6 +86,7 @@ public:
     }
     static void SetUpTestCase(void)
     {
+        DecompressToDisk(DEF_MOUSE_ICONS_DAT_PATH, "/data/service/el1/public/multimodalinput/mouse_icon/");
         GetRSUIContext(0, rsUIDirector_, rsUIContext_);
     }
     static void TearDownTestCase(void)
@@ -4486,7 +4489,7 @@ HWTEST_F(PointerDrawingManagerTest, PointerDrawingManagerTest_ScalePixelMap_01, 
 {
     CALL_TEST_DEBUG;
     PointerDrawingManager pointerDrawingManager;
-    const std::string iconPath = "/system/etc/multimodalinput/mouse_icon/North_South.svg";
+    const std::string iconPath = "/data/service/el1/public/multimodalinput/mouse_icon/North_South.svg";
     std::unique_ptr<OHOS::Media::PixelMap> pixelMap = SetMouseIconTest(iconPath);
     ASSERT_NE(pixelMap, nullptr);
     float scale = 1.0f;
@@ -4503,7 +4506,7 @@ HWTEST_F(PointerDrawingManagerTest, PointerDrawingManagerTest_ScalePixelMap_02, 
 {
     CALL_TEST_DEBUG;
     PointerDrawingManager pointerDrawingManager;
-    const std::string iconPath = "/system/etc/multimodalinput/mouse_icon/North_South.svg";
+    const std::string iconPath = "/data/service/el1/public/multimodalinput/mouse_icon/North_South.svg";
     std::unique_ptr<OHOS::Media::PixelMap> pixelMap = SetMouseIconTest(iconPath);
     ASSERT_NE(pixelMap, nullptr);
     float scale = 1.0f;
@@ -4521,7 +4524,7 @@ HWTEST_F(PointerDrawingManagerTest, PointerDrawingManagerTest_ScalePixelMap_03, 
 {
     CALL_TEST_DEBUG;
     PointerDrawingManager pointerDrawingManager;
-    const std::string iconPath = "/system/etc/multimodalinput/mouse_icon/North_South.svg";
+    const std::string iconPath = "/data/service/el1/public/multimodalinput/mouse_icon/North_South.svg";
     std::unique_ptr<OHOS::Media::PixelMap> pixelMap = SetMouseIconTest(iconPath);
     ASSERT_NE(pixelMap, nullptr);
     float scale = 1.0f;
@@ -4539,7 +4542,7 @@ HWTEST_F(PointerDrawingManagerTest, PointerDrawingManagerTest_ScalePixelMap_04, 
 {
     CALL_TEST_DEBUG;
     PointerDrawingManager pointerDrawingManager;
-    const std::string iconPath = "/system/etc/multimodalinput/mouse_icon/North_South.svg";
+    const std::string iconPath = "/data/service/el1/public/multimodalinput/mouse_icon/North_South.svg";
     std::unique_ptr<OHOS::Media::PixelMap> pixelMap = SetMouseIconTest(iconPath);
     ASSERT_NE(pixelMap, nullptr);
     float scale = 1.0f;

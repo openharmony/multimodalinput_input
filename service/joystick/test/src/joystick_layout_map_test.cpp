@@ -19,11 +19,13 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
+#include "config_multimodal.h"
 #include "define_multimodal.h"
 #include "input_service_context.h"
 #include "joystick_event_processor.h"
 #include "joystick_layout_map_builder.h"
 #include "libinput_mock.h"
+#include "resource_decompress.h"
 
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "JoystickLayoutMapTest"
@@ -73,6 +75,7 @@ private:
 
 void JoystickLayoutMapTest::SetUpTestCase()
 {
+    DecompressToDisk(DEF_JOYSTICK_LAYOUTS_DAT_PATH, "/data/service/el1/public/multimodalinput/joystick/layout/");
     std::filesystem::path configPath { "/data/test" };
     if (!std::filesystem::exists(configPath)) {
         std::error_code ec {};

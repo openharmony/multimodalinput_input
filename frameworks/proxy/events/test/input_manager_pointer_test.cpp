@@ -13,10 +13,12 @@
  * limitations under the License.
  */
 
+#include "config_multimodal.h"
 #include "define_multimodal.h"
 #include "event_util_test.h"
 #include "input_manager_util.h"
 #include "pixel_map.h"
+#include "resource_decompress.h"
 
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "InputManagerPointerTest"
@@ -146,6 +148,7 @@ private:
 
 void InputManagerPointerTest::SetUpTestCase()
 {
+    DecompressToDisk(DEF_MOUSE_ICONS_DAT_PATH, "/data/service/el1/public/multimodalinput/mouse_icon/");
     ASSERT_TRUE(TestUtil->Init());
 }
 

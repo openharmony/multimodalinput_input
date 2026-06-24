@@ -20,6 +20,7 @@
 #include <cJSON.h>
 #include <config_policy_utils.h>
 
+#include "config_multimodal.h"
 #include "event_log_helper.h"
 #include "event_util_test.h"
 #include "input_manager.h"
@@ -29,6 +30,7 @@
 #include "error_multimodal.h"
 #include "mouse_controller_impl.h"
 #include "keyboard_controller_impl.h"
+#include "resource_decompress.h"
 
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "InputManagerTest"
@@ -146,6 +148,7 @@ int32_t MMIWindowChecker::CheckWindowId(int32_t windowId) const
 
 void InputManagerTest::SetUpTestCase()
 {
+    DecompressToDisk(DEF_MOUSE_ICONS_DAT_PATH, "/data/service/el1/public/multimodalinput/mouse_icon/");
     ASSERT_TRUE(TestUtil->Init());
 }
 
