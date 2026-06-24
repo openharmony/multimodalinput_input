@@ -1804,11 +1804,11 @@ int32_t PointerDrawingManager::CreatePointerWindowForScreenPointer(uint64_t rsId
     } else if (sp == nullptr) {
         sp = std::make_shared<ScreenPointer>(hardwareCursorPointerManager_, handler_, displayInfo_);
         CHKPR(sp, RET_ERR);
-        InsertScreenPointer(displayInfo_.rsId, sp);
         if (!sp->Init(pointerRenderer_)) {
             MMI_HILOGE("ScreenPointer %{public}" PRIu64 " init failed", displayInfo_.rsId);
             return RET_ERR;
         }
+        InsertScreenPointer(displayInfo_.rsId, sp);
         if (rsId == displayInfo_.rsId) {
             SetSurfaceNode(sp->GetSurfaceNode());
         }
