@@ -376,10 +376,11 @@ int32_t EventNormalizeHandler::OnEventDeviceAdded(libinput_event *event)
     KeyMapMgr->ParseDeviceConfigFile(device);
     KeyRepeat->AddDeviceConfig(device);
 
-    KeyEventHdr->SyncLedStateFromKeyEvent(device);
-
+    int32_t syncRet = KeyEventHdr->SyncLedStateFromKeyEvent(device);
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
-    KeyEventHdr->ResetKeyEvent(device);
+    if (syncRet == RET_OK) {
+        KeyEventHdr->ResetKeyEvent(device);
+    }
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
     return RET_OK;
 }

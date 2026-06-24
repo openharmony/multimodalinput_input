@@ -234,7 +234,7 @@ HWTEST_F(KeyEventNormalizeWithMockTest, KeyEventNormalizeWithMockTest_SyncLedSta
     // led off
     EXPECT_CALL(libinputMock, HasEventLedType).Times(testing::AtMost(1)).WillOnce(testing::Return(0));
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
-    EXPECT_NO_FATAL_FAILURE(KeyEventHdr->SyncLedStateFromKeyEvent(&libDev));
+    EXPECT_EQ(KeyEventHdr->SyncLedStateFromKeyEvent(&libDev), RET_OK);
     if (vKeyboardDeviceId > 0) {
         INPUT_DEV_MGR->RemoveVirtualInputDevice(vKeyboardDeviceId);
     }
@@ -273,7 +273,7 @@ HWTEST_F(KeyEventNormalizeWithMockTest, KeyEventNormalizeWithMockTest_SyncLedSta
     // led off
     EXPECT_CALL(libinputMock, HasEventLedType).Times(testing::AtMost(1)).WillOnce(testing::Return(0));
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
-    EXPECT_NO_FATAL_FAILURE(KeyEventHdr->SyncLedStateFromKeyEvent(&libDev));
+    EXPECT_EQ(KeyEventHdr->SyncLedStateFromKeyEvent(&libDev), RET_OK);
     if (vKeyboardDeviceId > 0) {
         INPUT_DEV_MGR->RemoveVirtualInputDevice(vKeyboardDeviceId);
     }
@@ -312,7 +312,7 @@ HWTEST_F(KeyEventNormalizeWithMockTest, KeyEventNormalizeWithMockTest_SyncLedSta
     // led on
     EXPECT_CALL(libinputMock, HasEventLedType).Times(testing::AtMost(1)).WillOnce(testing::Return(1));
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
-    EXPECT_NO_FATAL_FAILURE(KeyEventHdr->SyncLedStateFromKeyEvent(&libDev));
+    EXPECT_EQ(KeyEventHdr->SyncLedStateFromKeyEvent(&libDev), RET_ERR);
     if (vKeyboardDeviceId > 0) {
         INPUT_DEV_MGR->RemoveVirtualInputDevice(vKeyboardDeviceId);
     }
