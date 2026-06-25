@@ -1006,14 +1006,18 @@ void LibinputAdapter::ProcessEventAsVKeyboardEvent(libinput_event *event, int64_
             libinput_event_keyboard_get_key(keyboardEvent) == KEY_CAPSLOCK && keyEvent != nullptr) {
             bool oldCapsLockOn = keyEvent->GetFunctionKey(MMI::KeyEvent::CAPS_LOCK_FUNCTION_KEY);
             HandleHWKeyEventForVKeyboard(event);
-            funInputEvent_(event, frameTime);
+            if (!ProcessEventBeforeLibinputStage(event, frameTime)) {
+                funInputEvent_(event, frameTime);
+            }
             libinput_event_destroy(event);
             MultiKeyboardSetLedState(!oldCapsLockOn);
             keyEvent->SetFunctionKey(MMI::KeyEvent::CAPS_LOCK_FUNCTION_KEY, !oldCapsLockOn);
             libinput_toggle_caps_key();
         } else {
             HandleHWKeyEventForVKeyboard(event);
-            funInputEvent_(event, frameTime);
+            if (!ProcessEventBeforeLibinputStage(event, frameTime)) {
+                funInputEvent_(event, frameTime);
+            }
             libinput_event_destroy(event);
         }
     } else {
