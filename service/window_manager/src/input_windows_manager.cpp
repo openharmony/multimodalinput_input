@@ -2069,7 +2069,7 @@ void InputWindowsManager::PrintWindowNavbar(int32_t groupId)
                 dump += StringPrintf("%f,", it);
             }
             dump += StringPrintf("]\n");
-            MMI_HILOGI("%{public}s", dump.c_str());
+            MMI_HILOGD("%{public}s", dump.c_str());
         }
     }
 }
@@ -3164,7 +3164,7 @@ void InputWindowsManager::PrintWindowInfo(const std::vector<WindowInfo> &windows
         }
     }
     window += StringPrintf("]\n");
-    MMI_HILOGI("%{public}s", window.c_str());
+    MMI_HILOGD("%{public}s", window.c_str());
 }
 
 void InputWindowsManager::PrintWindowGroupInfo(const WindowGroupInfo &windowGroupInfo)

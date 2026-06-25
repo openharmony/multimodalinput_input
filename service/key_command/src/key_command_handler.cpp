@@ -520,7 +520,7 @@ bool KeyCommandHandler::IsEnableCombineKey(const std::shared_ptr<KeyEvent> key)
 int32_t KeyCommandHandler::EnableCombineKey(bool enable)
 {
     enableCombineKey_ = enable;
-    MMI_HILOGI("Enable combineKey is successful in keyCommand handler, enable:%{public}d", enable);
+    MMI_HILOGD("Enable combineKey is successful in keyCommand handler, enable:%{public}d", enable);
     return RET_OK;
 }
 

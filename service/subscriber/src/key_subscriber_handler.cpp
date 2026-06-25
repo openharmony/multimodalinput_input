@@ -457,7 +457,7 @@ void KeySubscriberHandler::GetForegroundPids(std::set<int32_t> &pids)
 int32_t KeySubscriberHandler::EnableCombineKey(bool enable)
 {
     enableCombineKey_ = enable;
-    MMI_HILOGI("Enable combineKey is successful in subscribe handler, enable:%{public}d", enable);
+    MMI_HILOGD("Enable combineKey is successful in subscribe handler, enable:%{public}d", enable);
     return RET_OK;
 }
 
