@@ -1921,7 +1921,7 @@ void InputWindowsManager::CancelMouseEvent()
             item.SetCanceled(true);
             lastPointerEventCopy->UpdatePointerItem(pointerId, item);
         }
-        MMI_HILOGI("Cancel mouse event for valid display change,pointerId:%{public}d action:%{public}d->%{public}d "
+        MMI_HILOGD("Cancel mouse event for valid display change,pointerId:%{public}d action:%{public}d->%{public}d "
             "isItemExist=%{public}d",
             pointerId,
             originAction,
@@ -2006,7 +2006,7 @@ void InputWindowsManager::HandleWindowPositionChange(const OLD::DisplayGroupInfo
             return windowId == windowInfo.id && windowInfo.rectChangeBySystem;
         });
         if (iter != WindowInfo.end()) {
-            MMI_HILOGI("Dispatch cancel event pointerId:%{public}d", pointerId);
+            MMI_HILOGD("Dispatch cancel event pointerId:%{public}d", pointerId);
             CHKPV(TouchLastPointerEventForWindowChangeMap()[groupId]);
             PointerEvent::PointerItem pointerItem;
             if (!TouchLastPointerEventForWindowChangeMap()[groupId]->GetPointerItem(pointerId, pointerItem)) {
@@ -2305,7 +2305,7 @@ void InputWindowsManager::AdjustDragPosition(int32_t groupId)
     auto filterHandler = InputHandler->GetFilterHandler();
     CHKPV(filterHandler);
     filterHandler->HandlePointerEvent(pointerEvent);
-    MMI_HILOGI("pointerEvent: %{private}s", pointerEvent->ToString().c_str());
+    MMI_HILOGD("pointerEvent: %{private}s", pointerEvent->ToString().c_str());
 }
 #endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
 
@@ -2500,7 +2500,7 @@ void InputWindowsManager::PointerDrawingManagerOnDisplayInfo(const OLD::DisplayG
             (PRODUCT_TYPE == PRODUCT_TYPE_PC) && isDragBorder_;
         if (isCursopRestoredFlag) {
             dragPointerStyle_ = pointerStyle;
-            MMI_HILOGI("Window is changed, pointerStyle is:%{public}d", dragPointerStyle_.id);
+            MMI_HILOGD("Window is changed, pointerStyle is:%{public}d", dragPointerStyle_.id);
         }
         if (lastPointerStyle_ == pointerStyle) {
             MMI_HILOGD("The cursor style does not change");
@@ -3479,7 +3479,7 @@ void InputWindowsManager::TriggerTouchUpOnInvalidAreaEntry(int32_t pointerId)
         auto eventDispatchHandler = InputHandler->GetEventDispatchHandler();
         CHKPV(eventDispatchHandler);
         eventDispatchHandler->HandleTouchEvent(pointerEvent);
-        MMI_HILOGI("Trigger touch up, pointerId:%{public}d, pointerAction:%{public}d", pointerId, action);
+        MMI_HILOGD("Trigger touch up, pointerId:%{public}d, pointerAction:%{public}d", pointerId, action);
 
         // Flag event have been cleaned up
         item.SetCanceled(true);
@@ -4696,10 +4696,10 @@ void InputWindowsManager::HandlePullEvent(std::shared_ptr<PointerEvent> pointerE
     static int32_t originPullId { -1 };
     if (action == PointerEvent::POINTER_ACTION_PULL_CANCEL) {
         originPullId = pullId;
-        MMI_HILOGI("Set originPullId:%{public}d", originPullId);
+        MMI_HILOGD("Set originPullId:%{public}d", originPullId);
         if (pointerEvent->HasFlag(InputEvent::EVENT_FLAG_ACCESSIBILITY)) {
             pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_CANCEL);
-            MMI_HILOGI("Convert PULL_CANCEL to CANCEL When in accessibility");
+            MMI_HILOGD("Convert PULL_CANCEL to CANCEL When in accessibility");
         }
         return;
     }
@@ -4716,7 +4716,7 @@ void InputWindowsManager::HandlePullEvent(std::shared_ptr<PointerEvent> pointerE
     pointerItem.SetCanceled(true);
     pointerItem.SetPressed(false);
     pointerEvent->UpdatePointerItem(pointerId, pointerItem);
-    MMI_HILOGI("SetCanceled true, SetPressed false, pointerId:%{public}d, originPullId:%{public}d",
+    MMI_HILOGD("SetCanceled true, SetPressed false, pointerId:%{public}d, originPullId:%{public}d",
         pointerId, originPullId);
     originPullId = -1;
 }
@@ -4728,7 +4728,7 @@ void InputWindowsManager::UpdatePointerEvent(int32_t logicalX, int32_t logicalY,
 {
     CHKPV(pointerEvent);
     if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_TOUCHPAD_ACTIVE) {
-        MMI_HILOGI("Skip refresh lastPointerEvent_ for TOUCHPAD_ACTIVE");
+        MMI_HILOGD("Skip refresh lastPointerEvent_ for TOUCHPAD_ACTIVE");
         return;
     }
     if (pointerEvent->HasFlag(InputEvent::EVENT_FLAG_REDISPATCH)) {
@@ -4945,7 +4945,7 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
         }
     }
     if (!touchWindow) {
-        MMI_HILOGI("UpdateMouseTarget rsId:%{public}" PRIu64 ", logicalX:%{private}d, logicalY:%{private}d,"
+        MMI_HILOGD("UpdateMouseTarget rsId:%{public}" PRIu64 ", logicalX:%{private}d, logicalY:%{private}d,"
             "displayX:%{private}d, displayY:%{private}d", physicalDisplayInfo->rsId, logicalX, logicalY,
             physicalX, physicalY);
         bool followWindowIsNull = dispatchEventFlag
@@ -4977,13 +4977,13 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
             }
             CursorDrawingComponent::GetInstance().UpdatePointerItemCursorInfo(pointerItem);
             pointerEvent->UpdatePointerItem(pointerId, pointerItem);
-            MMI_HILOGI("UpdateMouseTarget id:%{public}" PRIu64 ", logicalX:%{private}d, logicalY:%{private}d,"
+            MMI_HILOGD("UpdateMouseTarget id:%{public}" PRIu64 ", logicalX:%{private}d, logicalY:%{private}d,"
                 "displayX:%{private}d, displayY:%{private}d", physicalDisplayInfo->rsId, logicalX, logicalY,
                 physicalX, physicalY);
 #ifdef OHOS_BUILD_ENABLE_DFX_RADAR
             int64_t timeDT = GetTimeToMilli(GetSysClockTime() - pointerEvent->GetActionTime());
             if (timeDT > SIMULATE_EVENT_LATENCY) {
-                MMI_HILOGI("Not touchWindow simulate event latency, pointerId:%{public}d, timeDT:%{public}" PRId64,
+                MMI_HILOGD("Not touchWindow simulate event latency, pointerId:%{public}d, timeDT:%{public}" PRId64,
                     pointerEvent->GetId(), timeDT);
                 DfxHisyseventDevice::ReportSimulateToRsLatecyBehavior(pointerEvent->GetId(), timeDT);
             }
@@ -5019,7 +5019,7 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
         }
         pointerEvent->SetOriginPointerAction(pointerAction);
         if (touchWindow) {
-            MMI_HILOGI("Mouse event send cancel, window:%{public}d, pid:%{public}d", touchWindow->id, touchWindow->pid);
+            MMI_HILOGD("Mouse event send cancel, window:%{public}d, pid:%{public}d", touchWindow->id, touchWindow->pid);
         }
     }
 
@@ -5146,7 +5146,7 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
 #ifdef OHOS_BUILD_ENABLE_DFX_RADAR
         int64_t timeDT = GetTimeToMilli(GetSysClockTime() - pointerEvent->GetActionTime());
         if (timeDT > SIMULATE_EVENT_LATENCY) {
-            MMI_HILOGI("simulate event latency, pointerId:%{public}d, timeDT:%{public}" PRId64,
+            MMI_HILOGD("simulate event latency, pointerId:%{public}d, timeDT:%{public}" PRId64,
                 pointerEvent->GetId(), timeDT);
             DfxHisyseventDevice::ReportSimulateToRsLatecyBehavior(pointerEvent->GetId(), timeDT);
         }
@@ -8328,7 +8328,7 @@ void InputWindowsManager::PrintChangedWindowByEvent(int32_t eventType, const Win
 {
     auto iter = lastMatchedWindow_.find(eventType);
     if (iter != lastMatchedWindow_.end() && iter->second.id != newWindowInfo.id) {
-        MMI_HILOGI("Target window changed %{public}d %{public}d %{public}d %{public}f "
+        MMI_HILOGD("Target window changed %{public}d %{public}d %{public}d %{public}f "
             "%{public}d %{public}d %{public}f", eventType, iter->second.id, iter->second.pid,
             iter->second.zOrder, newWindowInfo.id, newWindowInfo.pid, newWindowInfo.zOrder);
     }
@@ -8883,7 +8883,7 @@ int32_t InputWindowsManager::ShiftAppMousePointerEvent(const ShiftWindowInfo &sh
     firstBtnDownWindowInfo_.first = targetWindowInfo.id;
     firstBtnDownWindowInfo_.second = targetWindowInfo.displayId;
     mouseDownInfo_ = targetWindowInfo;
-    MMI_HILOGI("shift pointer event success for mouse");
+    MMI_HILOGD("shift pointer event success for mouse");
     return RET_OK;
 }
 
@@ -8972,19 +8972,19 @@ int32_t InputWindowsManager::ShiftAppTouchPointerEvent(const ShiftWindowInfo &sh
     int32_t deviceId = touchEvent->GetDeviceId();
     auto& infos = TouchItemDownInfos();
     if (infos.find(deviceId) == infos.end()) {
-        MMI_HILOGI("touch event deviceId not found deviceId:%{public}d", deviceId);
+        MMI_HILOGD("touch event deviceId not found deviceId:%{public}d", deviceId);
         infos[deviceId] = {};
     }
     windowInfoEX.window = shiftWindowInfo.targetWindowInfo;
     windowInfoEX.flag = true;
     infos[deviceId][shiftWindowInfo.fingerId] = windowInfoEX;
-    MMI_HILOGI("Shift pointer event success for touch");
+    MMI_HILOGD("Shift pointer event success for touch");
     return RET_OK;
 }
 
 int32_t InputWindowsManager::ShiftAppPointerEvent(const ShiftWindowParam &param, bool autoGenDown)
 {
-    MMI_HILOGI("Start shift pointer event, sourceWindowId:%{public}d, targetWindowId:%{public}d,"
+    MMI_HILOGD("Start shift pointer event, sourceWindowId:%{public}d, targetWindowId:%{public}d,"
         "x:%{private}d, y:%{private}d, autoGenDown:%{public}d",
         param.sourceWindowId, param.targetWindowId, param.x, param.y, static_cast<int32_t>(autoGenDown));
     std::optional<WindowInfo> sourceWindowInfo = GetWindowInfoById(param.sourceWindowId);
@@ -9061,7 +9061,7 @@ void InputWindowsManager::CancelAllTouches(std::shared_ptr<PointerEvent> event, 
         if (AdjustFingerFlag(pointerEvent)) {
             continue;
         }
-        MMI_HILOGI("Cancel touch, pointerId:%{public}d, action:%{public}d", pointerId, action);
+        MMI_HILOGD("Cancel touch, pointerId:%{public}d, action:%{public}d", pointerId, action);
         auto now = GetSysClockTime();
         pointerEvent->SetActionTime(now);
         pointerEvent->SetTargetWindowId(item.GetTargetWindowId());
@@ -9223,7 +9223,7 @@ int32_t InputWindowsManager::ClearMouseHideFlag(int32_t eventId)
     auto pointerEvent = GetLastPointerEvent();
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
     int32_t lastEventId = pointerEvent->GetId();
-    MMI_HILOGI("eventId=%{public}d, lastEventId=%{public}d", eventId, lastEventId);
+    MMI_HILOGD("eventId=%{public}d, lastEventId=%{public}d", eventId, lastEventId);
     if (lastEventId == eventId) {
         DispatchPointer(PointerEvent::POINTER_ACTION_LEAVE_WINDOW);
         pointerEvent->ClearFlag(InputEvent::EVENT_FLAG_HIDE_POINTER);
