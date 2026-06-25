@@ -243,7 +243,7 @@ bool EventPreMonitorHandler::MonitorCollection::HandleEvent(std::shared_ptr<Poin
 
 void EventPreMonitorHandler::MonitorCollection::OnSessionLost(SessionPtr session)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     for (auto iter = sessionHandlers_.begin(); iter != sessionHandlers_.end();) {
         auto &handlers = iter->second;
         for (auto inner = handlers.begin(); inner != handlers.end();) {

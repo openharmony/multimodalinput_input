@@ -407,7 +407,7 @@ int32_t InputManagerImpl::SetWindowInputEventConsumer(std::shared_ptr<IInputEven
 int32_t InputManagerImpl::SubscribeKeyEvent(std::shared_ptr<KeyOption> keyOption,
     std::function<void(std::shared_ptr<KeyEvent>)> callback)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     CHK_PID_AND_TID();
     std::string msg = "SubscribeKeyEvent";
     BytraceAdapter::MMIClientTraceStart(BytraceAdapter::MMI_THREAD_LOOP_DEPTH_THREE, msg);
@@ -440,7 +440,7 @@ int32_t InputManagerImpl::SubscribeKeyEvent(std::shared_ptr<KeyOption> keyOption
 
 void InputManagerImpl::UnsubscribeKeyEvent(int32_t subscriberId)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     CHK_PID_AND_TID();
     std::string msg = "UnsubscribeKeyEvent, id:";
     msg += std::to_string(subscriberId);
@@ -1383,7 +1383,7 @@ int32_t InputManagerImpl::SimulateInputEvent(std::shared_ptr<PointerEvent> point
         pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_SWIPE_UPDATE &&
         pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_ROTATE_UPDATE &&
         pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_FINGERPRINT_SLIDE) {
-        MMI_HILOGI("Pointer event action:%{public}d", pointerEvent->GetPointerAction());
+        MMI_HILOGD("Pointer event action:%{public}d", pointerEvent->GetPointerAction());
     }
 
     if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_MOUSE ||
@@ -2831,7 +2831,7 @@ int32_t InputManagerImpl::SetNapStatus(int32_t pid, int32_t uid, const std::stri
 
 void InputManagerImpl::NotifyBundleName(int32_t pid, int32_t uid, const std::string &bundleName, int32_t syncStatus)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(eventObserverMtx_);
     CHKPV(eventObserver_);
     eventObserver_->SyncBundleName(pid, uid, bundleName, syncStatus);
@@ -3206,7 +3206,7 @@ int32_t InputManagerImpl::SetCustomCursor(int32_t windowId, CustomCursor cursor,
 
 int32_t InputManagerImpl::CheckKnuckleEvent(float pointX, float pointY, bool &isKnuckleType)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
 #ifdef OHOS_BUILD_ENABLE_ANCO
     if (MULTIMODAL_INPUT_CONNECT_MGR->CheckKnuckleEvent(pointX, pointY, isKnuckleType) != RET_OK) {
         MMI_HILOGE("CheckKnuckleEvent failed");
@@ -3271,7 +3271,7 @@ void InputManagerImpl::OnDeviceConsumerEvent(std::shared_ptr<PointerEvent> point
 int32_t InputManagerImpl::SubscribeInputActive(
     std::shared_ptr<IInputEventConsumer> inputEventConsumer, int64_t interval)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     CHK_PID_AND_TID();
     CHKPR(inputEventConsumer, RET_ERR);
     if (interval < 0) {
@@ -3293,7 +3293,7 @@ int32_t InputManagerImpl::SubscribeInputActive(
 
 void InputManagerImpl::UnsubscribeInputActive(int32_t subscribeId)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     CHK_PID_AND_TID();
     INPUT_ACTIVE_SUBSCRIBE_MGR.UnsubscribeInputActive(subscribeId);
 }

@@ -112,7 +112,7 @@ int32_t EventFilterHandler::AddInputEventFilter(sptr<IEventFilter> filter,
 
 int32_t EventFilterHandler::RemoveInputEventFilter(int32_t filterId, int32_t clientPid)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(lockFilter_);
     if (filters_.empty()) {
         MMI_HILOGD("Filter is empty");

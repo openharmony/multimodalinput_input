@@ -825,7 +825,7 @@ void InputDeviceManager::NotifyDevCallback(int32_t deviceId, struct InputDeviceI
     NotifyDevCallbackExt(deviceId, inDevice.inputDeviceOrigin);
 #endif // OHOS_BUILD_ENABLE_KEYBOARD_EXT_FLAG
     if (!inDevice.isTouchableDevice || (deviceId < 0)) {
-        MMI_HILOGI("The device is not touchable device already existent");
+        MMI_HILOGD("The device is not touchable device already existent");
         return;
     }
     std::string name = "null";

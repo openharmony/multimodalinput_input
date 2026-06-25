@@ -129,7 +129,7 @@ int32_t KeySubscriberHandler::SubscribeKeyEvent(
     SessionPtr sess, int32_t subscribeId, std::shared_ptr<KeyOption> keyOption)
 {
     CALL_DEBUG_ENTER;
-    MMI_HILOGI("SubscribeKeyEvent enter, subscribeId:%{public}d", subscribeId);
+    MMI_HILOGD("SubscribeKeyEvent enter, subscribeId:%{public}d", subscribeId);
     if (subscribeId < 0) {
         MMI_HILOGE("Invalid subscribe");
         return RET_ERR;
@@ -224,7 +224,7 @@ int32_t KeySubscriberHandler::RemoveSubscriber(SessionPtr sess, int32_t subscrib
 int32_t KeySubscriberHandler::AddKeyGestureSubscriber(
     std::shared_ptr<Subscriber> subscriber, std::shared_ptr<KeyOption> keyOption)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     CHKPR(subscriber, RET_ERR);
     CHKPR(subscriber->sess_, RET_ERR);
     subscriber->timerId_ = keyGestureMgr_.AddKeyGesture(subscriber->sess_->GetPid(), keyOption,
@@ -249,7 +249,7 @@ int32_t KeySubscriberHandler::AddKeyGestureSubscriber(
 
 int32_t KeySubscriberHandler::RemoveKeyGestureSubscriber(SessionPtr sess, int32_t subscribeId)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     for (auto iter = keyGestures_.begin(); iter != keyGestures_.end(); ++iter) {
         auto &subscribers = iter->second;
 
@@ -586,7 +586,7 @@ bool KeySubscriberHandler::InterceptByVm(const std::shared_ptr<KeyEvent> keyEvt)
 
 void KeySubscriberHandler::PublishKeyPressCommonEvent(std::shared_ptr<KeyEvent> keyEvent)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     OHOS::AAFwk::Want want;
     want.SetAction("multimodal.event.MUTE_KEY_PRESS");
     want.SetParam("keyCode", keyEvent->GetKeyCode());
@@ -1265,7 +1265,7 @@ bool KeySubscriberHandler::HandleKeyUp(const std::shared_ptr<KeyEvent> &keyEvent
             return false;
         }
     }
-    MMI_HILOGI("Handle key up:%{public}s", handled ? "true" : "false");
+    MMI_HILOGD("Handle key up:%{public}s", handled ? "true" : "false");
     return handled;
 }
 

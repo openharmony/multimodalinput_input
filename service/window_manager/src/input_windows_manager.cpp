@@ -184,7 +184,7 @@ void InputWindowsManager::InitWindowInfo(WindowInfo& info)
 
 InputWindowsManager::InputWindowsManager() : bindInfo_(BIND_CFG_FILE_NAME)
 {
-    MMI_HILOGI("Bind cfg file name:%{private}s", BIND_CFG_FILE_NAME.c_str());
+    MMI_HILOGD("Bind cfg file name:%{private}s", BIND_CFG_FILE_NAME.c_str());
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     InitWindowInfo(lastWindowInfo_);
     InitWindowInfo(mouseDownInfo_);
@@ -1031,7 +1031,7 @@ void InputWindowsManager::UpdateDisplayIdAndName()
     }
     for (const auto &item : newInfo) {
         if (item.first >= HICAR_MIN_DISPLAY_ID) {
-            MMI_HILOGI("Displayinfo id:%{public}" PRIu64 ", name:%{public}s", item.first, item.second.c_str());
+            MMI_HILOGD("Displayinfo id:%{public}" PRIu64 ", name:%{public}s", item.first, item.second.c_str());
             continue;
         }
         if (!bindInfo_.IsDisplayAdd(item.first, item.second)) {
@@ -1049,7 +1049,7 @@ int32_t InputWindowsManager::GetDisplayBindInfo(DisplayBindInfos &infos)
 int32_t InputWindowsManager::SetDisplayBind(int32_t deviceId, int32_t displayId, std::string &msg)
 {
     CALL_DEBUG_ENTER;
-    MMI_HILOGI("deviceId:%{public}d, displayId:%{public}d", deviceId, displayId);
+    MMI_HILOGD("deviceId:%{public}d, displayId:%{public}d", deviceId, displayId);
     return bindInfo_.SetDisplayBind(deviceId, displayId, msg);
 }
 
@@ -1440,7 +1440,7 @@ CursorPosition InputWindowsManager::ResetCursorPos(const OLD::DisplayGroupInfo &
         cursorPosMap_[groupId].cursorPos.x = 0;
         cursorPosMap_[groupId].cursorPos.y = 0;
     }
-    MMI_HILOGI("ResetCursorPos cursorPosMap_[groupId].displayId:%{public}d", cursorPosMap_[groupId].displayId);
+    MMI_HILOGD("ResetCursorPos cursorPosMap_[groupId].displayId:%{public}d", cursorPosMap_[groupId].displayId);
     return cursorPosMap_[groupId];
 }
 
@@ -1532,7 +1532,7 @@ void InputWindowsManager::SupplementPointerMoveEvent()
 void InputWindowsManager::OnScreenModeChangeForMirrorScreen(size_t screenCount)
 {
     CALL_DEBUG_ENTER;
-    MMI_HILOGI("OnScreenModeChangeForMirrorScreen enter, screenCount:%{public}zu", screenCount);
+    MMI_HILOGD("OnScreenModeChangeForMirrorScreen enter, screenCount:%{public}zu", screenCount);
  
 #ifdef OHOS_BUILD_ENABLE_EXTERNAL_SCREEN
     if (screenCount == lastScreenCount_) {
@@ -1540,13 +1540,13 @@ void InputWindowsManager::OnScreenModeChangeForMirrorScreen(size_t screenCount)
         return;
     }
  
-    MMI_HILOGI("Screen count changed from %{public}zu to %{public}zu, triggering cursor center reset",
+    MMI_HILOGD("Screen count changed from %{public}zu to %{public}zu, triggering cursor center reset",
         lastScreenCount_, screenCount);
     lastScreenCount_ = screenCount;
  
     const auto iter = displayGroupInfoMap_.find(MAIN_GROUPID);
     if (iter != displayGroupInfoMap_.end() && !iter->second.displaysInfo.empty()) {
-        MMI_HILOGI("Triggering ResetPointerPosition due to screen change");
+        MMI_HILOGD("Triggering ResetPointerPosition due to screen change");
         ResetPointerPosition(iter->second);
     } else {
         MMI_HILOGW("DisplayGroupInfo not available for cursor center reset");
@@ -2226,7 +2226,7 @@ void InputWindowsManager::AdjustDisplayRotation(int32_t groupId)
     CHKPV(displayInfo);
     if (cursorPosCur.displayDirection != displayInfo->displayDirection ||
         cursorPosCur.direction != displayInfo->direction) {
-        MMI_HILOGI("displayId:%{public}d, cursorPosX:%{private}.2f, cursorPosY:%{private}.2f, direction:%{public}d, "
+        MMI_HILOGD("displayId:%{public}d, cursorPosX:%{private}.2f, cursorPosY:%{private}.2f, direction:%{public}d, "
             "physicalDisplay id:%{public}d, x:%{private}d, y:%{private}d, width:%{public}d, height:%{public}d, "
             "dpi:%{public}d, name:%{public}s, uniq:%{public}s, direction:%{public}d, displayDirection:%{public}d",
             cursorPosCur.displayId, cursorPosCur.cursorPos.x,
@@ -6634,7 +6634,7 @@ void InputWindowsManager::ClearFirstTouchWindowInfos(int32_t deviceId)
     CALL_DEBUG_ENTER;
     auto& firstTouchInfos = TouchFirstTouchInfos();
     if (firstTouchInfos.find(deviceId) == firstTouchInfos.end()) {
-        MMI_HILOGI("TouchFirstTouchInfos() not found, deviceId:%{public}d", deviceId);
+        MMI_HILOGD("TouchFirstTouchInfos() not found, deviceId:%{public}d", deviceId);
         return;
     }
     firstTouchInfos.erase(deviceId);
@@ -7370,7 +7370,7 @@ void InputWindowsManager::TransformCoordToAdjacentDisplay(const OLD::DisplayInfo
             continue;
         }
         acrossDirection = CalculateAcrossDirection(displayInfo, layout);
-        MMI_HILOGI("acrossDirection :%{public}d, current displayId:%{public}d, target displayId:%{public}d",
+        MMI_HILOGD("acrossDirection :%{public}d, current displayId:%{public}d, target displayId:%{public}d",
             acrossDirection, displayInfo.id, item.id);
         if (acrossDirection == AcrossDirection::ACROSS_ERROR) {
             return;
@@ -7779,7 +7779,7 @@ CursorPosition InputWindowsManager::ResetCursorPos()
     if (iter != cursorPosMap_.end()) {
         cursorPos = iter->second;
     }
-    MMI_HILOGI("ResetCursorPos cursorPosMap_[mainGroupId].displayId:%{public}d",
+    MMI_HILOGD("ResetCursorPos cursorPosMap_[mainGroupId].displayId:%{public}d",
         cursorPos.displayId);
     return cursorPos;
 }
@@ -8198,7 +8198,7 @@ void InputWindowsManager::ClearTargetDeviceWindowId(int32_t deviceId)
     CALL_DEBUG_ENTER;
     auto& targetWinIds = TouchTargetWinIds();
     if (targetWinIds.find(deviceId) == targetWinIds.end()) {
-        MMI_HILOGI("Target device's windowId not found, deviceId:%{public}d", deviceId);
+        MMI_HILOGD("Target device's windowId not found, deviceId:%{public}d", deviceId);
         return;
     }
     targetWinIds.erase(deviceId);
@@ -8269,7 +8269,7 @@ void InputWindowsManager::ReverseXY(int32_t &x, int32_t &y)
 
 void InputWindowsManager::SendCancelEventWhenLock()
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     auto& lastTouchEventOnBackGesture = TouchLastTouchEventOnBackGesture();
     CHKPV(lastTouchEventOnBackGesture);
     int32_t deviceId = lastTouchEventOnBackGesture->GetDeviceId();
@@ -8342,7 +8342,7 @@ void InputWindowsManager::PrintChangedWindowBySync(const OLD::DisplayGroupInfo &
     auto &newWindows = newDisplayInfo.windowsInfo;
     if (!oldWindows.empty() && !newWindows.empty()) {
         if (oldWindows[0].id != newWindows[0].id) {
-            MMI_HILOGI("Window sync changed %{public}d %{public}d %{public}f %{public}d %{public}d %{public}f",
+            MMI_HILOGD("Window sync changed %{public}d %{public}d %{public}f %{public}d %{public}d %{public}f",
                 oldWindows[0].id, oldWindows[0].pid, oldWindows[0].zOrder, newWindows[0].id,
                 newWindows[0].pid, newWindows[0].zOrder);
         }
@@ -8362,7 +8362,7 @@ void InputWindowsManager::PrintChangedWindowBySync(const OLD::DisplayGroupInfo &
             continue;
         }
         if (item.direction != iter->direction || item.displayDirection != iter->displayDirection) {
-            MMI_HILOGI("displayInfos,id:%{public}d,x:%{private}d,y:%{private}d,width:%{public}d,height:%{public}d,"
+            MMI_HILOGD("displayInfos,id:%{public}d,x:%{private}d,y:%{private}d,width:%{public}d,height:%{public}d,"
                 "name:%{public}s,uniq:%{public}s,direction:%{public}d,displayDirection:%{public}d,"
                 "oldDirection:%{public}d,oldDisplayDirection:%{public}d", item.id, item.x, item.y, item.width,
                 item.height, item.name.c_str(), item.uniq.c_str(), item.direction, item.displayDirection,
@@ -8663,7 +8663,7 @@ bool InputWindowsManager::IsBackCenterDisplayChange(const OLD::DisplayGroupInfo 
     if (oldGroupInfo.displaysInfo.size() != newGroupInfo.displaysInfo.size()) {
         const char *reason = oldGroupInfo.displaysInfo.size() > newGroupInfo.displaysInfo.size() ?
             "DISPLAY_REMOVED" : "DISPLAY_ADDED";
-        MMI_HILOGI("Pointer back center triggered, reason:%{public}s, oldSize:%{public}zu, "
+        MMI_HILOGD("Pointer back center triggered, reason:%{public}s, oldSize:%{public}zu, "
             "newSize:%{public}zu", reason, oldGroupInfo.displaysInfo.size(), newGroupInfo.displaysInfo.size());
         return true;
     }
@@ -8675,7 +8675,7 @@ bool InputWindowsManager::IsBackCenterDisplayChange(const OLD::DisplayGroupInfo 
     for (const auto &oldDisplay : oldGroupInfo.displaysInfo) {
         const auto *newDisplay = FindDisplayById(newGroupInfo.displaysInfo, oldDisplay.id);
         if (newDisplay == nullptr) {
-            MMI_HILOGI("Pointer back center triggered, reason:DISPLAY_REMOVED_OR_REPLACED, "
+            MMI_HILOGD("Pointer back center triggered, reason:DISPLAY_REMOVED_OR_REPLACED, "
                 "displayId:%{public}d", oldDisplay.id);
             return true;
         }
@@ -8690,7 +8690,7 @@ bool InputWindowsManager::IsMainDisplayChanged(const OLD::DisplayGroupInfo &oldG
     const OLD::DisplayGroupInfo &newGroupInfo) const
 {
     if (oldGroupInfo.mainDisplayId != newGroupInfo.mainDisplayId) {
-        MMI_HILOGI("Pointer back center triggered, reason:MAIN_DISPLAY_ID_CHANGED, old:%{public}d, new:%{public}d",
+        MMI_HILOGD("Pointer back center triggered, reason:MAIN_DISPLAY_ID_CHANGED, old:%{public}d, new:%{public}d",
             oldGroupInfo.mainDisplayId, newGroupInfo.mainDisplayId);
         return true;
     }
@@ -8699,13 +8699,13 @@ bool InputWindowsManager::IsMainDisplayChanged(const OLD::DisplayGroupInfo &oldG
     OLD::DisplayInfo newMainDisplayInfo;
     if (GetMainScreenDisplayInfo(oldGroupInfo.displaysInfo, oldMainDisplayInfo) != RET_OK ||
         GetMainScreenDisplayInfo(newGroupInfo.displaysInfo, newMainDisplayInfo) != RET_OK) {
-        MMI_HILOGI("Pointer back center triggered, reason:MAIN_DISPLAY_INFO_UNAVAILABLE");
+        MMI_HILOGD("Pointer back center triggered, reason:MAIN_DISPLAY_INFO_UNAVAILABLE");
         return true;
     }
 
     if (oldMainDisplayInfo.id != newMainDisplayInfo.id ||
         oldMainDisplayInfo.displaySourceMode != newMainDisplayInfo.displaySourceMode) {
-        MMI_HILOGI("Pointer back center triggered, reason:MAIN_DISPLAY_CHANGED, "
+        MMI_HILOGD("Pointer back center triggered, reason:MAIN_DISPLAY_CHANGED, "
             "oldRsId:%{public}" PRIu64 ", newRsId:%{public}" PRIu64
             ", oldId:%{public}d, newId:%{public}d, oldMode:%{public}d, newMode:%{public}d",
             oldMainDisplayInfo.rsId, newMainDisplayInfo.rsId, oldMainDisplayInfo.id, newMainDisplayInfo.id,
@@ -8720,7 +8720,7 @@ bool InputWindowsManager::IsDisplayDirectionChanged(const OLD::DisplayInfo &oldD
     const OLD::DisplayInfo &newDisplay) const
 {
     if (oldDisplay.displayDirection != newDisplay.displayDirection) {
-        MMI_HILOGI("Pointer back center triggered, reason:DISPLAY_DIRECTION_CHANGED, "
+        MMI_HILOGD("Pointer back center triggered, reason:DISPLAY_DIRECTION_CHANGED, "
             "displayId:%{public}d, old:%{public}d, new:%{public}d",
             newDisplay.id, static_cast<int32_t>(oldDisplay.displayDirection),
             static_cast<int32_t>(newDisplay.displayDirection));
@@ -8736,7 +8736,7 @@ bool InputWindowsManager::IsDisplayResolutionChanged(const OLD::DisplayInfo &old
         oldDisplay.validHeight != newDisplay.validHeight ||
         oldDisplay.width != newDisplay.width ||
         oldDisplay.height != newDisplay.height) {
-        MMI_HILOGI("Pointer back center triggered, reason:DISPLAY_RESOLUTION_CHANGED, "
+        MMI_HILOGD("Pointer back center triggered, reason:DISPLAY_RESOLUTION_CHANGED, "
             "displayId:%{public}d, oldValid:%{public}dx%{public}d, "
             "newValid:%{public}dx%{public}d, oldSize:%{public}dx%{public}d, newSize:%{public}dx%{public}d",
             newDisplay.id, oldDisplay.validWidth, oldDisplay.validHeight, newDisplay.validWidth,
@@ -8753,7 +8753,7 @@ bool InputWindowsManager::IsDisplayLayoutChanged(const OLD::DisplayInfo &oldDisp
         oldDisplay.y != newDisplay.y ||
         oldDisplay.offsetX != newDisplay.offsetX ||
         oldDisplay.offsetY != newDisplay.offsetY) {
-        MMI_HILOGI("Pointer back center triggered, reason:DISPLAY_LAYOUT_CHANGED, "
+        MMI_HILOGD("Pointer back center triggered, reason:DISPLAY_LAYOUT_CHANGED, "
             "displayId:%{public}d, oldXY:%{public}d,%{public}d, "
             "newXY:%{public}d,%{public}d, oldOffset:%{public}d,%{public}d, newOffset:%{public}d,%{public}d",
             newDisplay.id, oldDisplay.x, oldDisplay.y, newDisplay.x, newDisplay.y, oldDisplay.offsetX,
@@ -8772,7 +8772,7 @@ bool InputWindowsManager::IsDisplayPropertyChanged(const OLD::DisplayInfo &oldDi
         return true;
     }
     if (oldDisplay.displaySourceMode != newDisplay.displaySourceMode) {
-        MMI_HILOGI("Pointer back center triggered, reason:DISPLAY_SOURCE_MODE_CHANGED, "
+        MMI_HILOGD("Pointer back center triggered, reason:DISPLAY_SOURCE_MODE_CHANGED, "
             "displayId:%{public}d, old:%{public}d, new:%{public}d",
             newDisplay.id, static_cast<int32_t>(oldDisplay.displaySourceMode),
             static_cast<int32_t>(newDisplay.displaySourceMode));

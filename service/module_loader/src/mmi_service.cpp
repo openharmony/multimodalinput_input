@@ -315,7 +315,7 @@ int32_t MMIService::AddEpoll(EpollEventType type, int32_t fd, bool readOnly)
     auto eventData = std::make_shared<mmi_epoll_event>();
     eventData->fd = fd;
     eventData->event_type = type;
-    MMI_HILOGI("The userdata:[fd:%{public}d, type:%{public}d]", eventData->fd, eventData->event_type);
+    MMI_HILOGD("The userdata:[fd:%{public}d, type:%{public}d]", eventData->fd, eventData->event_type);
 
     struct epoll_event ev = {};
     if (readOnly) {
@@ -1173,7 +1173,7 @@ ErrCode MMIService::GetMousePrimaryButton(int32_t &primaryButton)
 
 ErrCode MMIService::SetPointerVisible(bool visible, int32_t priority)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     if (priority < 0) {
         MMI_HILOGE("Invalid priority:%{public}d", priority);
         return RET_ERR;
@@ -1907,7 +1907,7 @@ int32_t MMIService::CheckInputHandlerVaild(InputHandlerType handlerType)
 ErrCode MMIService::AddInputHandler(int32_t handlerType, uint32_t eventType, int32_t priority,
     uint32_t deviceTags, const std::vector<int32_t>& actionsType)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     bool isRegisterCaptureCb = false;
     InputHandlerType hType = static_cast<InputHandlerType>(handlerType);
     HandleEventType eType = static_cast<HandleEventType>(eventType);
@@ -2065,7 +2065,7 @@ int32_t MMIService::CheckRemoveInputHandlerVaild(InputHandlerType handlerType)
 ErrCode MMIService::RemoveInputHandler(int32_t handlerType, uint32_t eventType, int32_t priority,
     uint32_t deviceTags, const std::vector<int32_t>& actionsType)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     InputHandlerType hType = static_cast<InputHandlerType>(handlerType);
     HandleEventType eType = static_cast<HandleEventType>(eventType);
     int32_t res = CheckRemoveInputHandlerVaild(hType);
@@ -2749,7 +2749,7 @@ ErrCode MMIService::SubscribeKeyEvent(int32_t subscribeId, const KeyOption& keyO
 
 ErrCode MMIService::UnsubscribeKeyEvent(int32_t subscribeId)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     if (!IsRunning()) {
         MMI_HILOGE("Service is not running");
         return MMISERVICE_NOT_RUNNING;
@@ -5158,7 +5158,7 @@ ErrCode MMIService::TransferBinderClientSrv(const sptr<IRemoteObject> &binderCli
                 return sMsgHandler_.OnTransferBinderClientSrv(binderClientObject, pid);
             }
         );
-    MMI_HILOGI("TransferBinderClientSrv result:%{public}d", ret);
+    MMI_HILOGD("TransferBinderClientSrv result:%{public}d", ret);
     return ret;
 }
 
@@ -5287,7 +5287,7 @@ void MMIService::InitPrintClientInfo()
 
 ErrCode MMIService::GetIntervalSinceLastInput(int64_t &timeInterval)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     timeInterval = 0;
     int32_t ret = delegateTasks_.PostSyncTask(std::bind(&InputEventHandler::GetIntervalSinceLastInput,
         InputHandler, std::ref(timeInterval)));
@@ -5561,7 +5561,7 @@ int32_t MMIService::SetCustomCursorInner(int32_t windowId, const CustomCursorPar
 #ifdef OHOS_BUILD_ENABLE_ANCO
 ErrCode MMIService::CheckKnuckleEvent(float pointX, float pointY, bool &isKnuckleType)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     if (!PER_HELPER->VerifySystemApp()) {
         MMI_HILOGE("Verify system APP failed");
         return ERROR_NOT_SYSAPI;
@@ -5631,7 +5631,7 @@ ErrCode MMIService::SetMultiWindowScreenId(uint64_t screenId, uint64_t displayNo
 
 ErrCode MMIService::SetKnuckleSwitch(bool knuckleSwitch)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     int32_t callingUid = GetCallingUid();
     if ((callingUid != GAME_UID && callingUid != USS_UID && callingUid != STYLUS_UID) ||
         !PER_HELPER->VerifySystemApp()) {
@@ -5834,7 +5834,7 @@ ErrCode MMIService::InitCustomConfig()
 
 ErrCode MMIService::SubscribeInputActive(int32_t subscribeId, int64_t interval)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     if (!PER_HELPER->VerifySystemApp()) {
         MMI_HILOGE("Verify system APP failed");
         return ERROR_NOT_SYSAPI;
@@ -5863,7 +5863,7 @@ ErrCode MMIService::SubscribeInputActive(int32_t subscribeId, int64_t interval)
 
 ErrCode MMIService::UnsubscribeInputActive(int32_t subscribeId)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     if (!PER_HELPER->VerifySystemApp()) {
         MMI_HILOGE("Verify system APP failed");
         return ERROR_NOT_SYSAPI;
@@ -5914,7 +5914,7 @@ ErrCode MMIService::SetMouseAccelerateMotionSwitch(int32_t deviceId, bool enable
 
 ErrCode MMIService::SwitchScreenCapturePermission(uint32_t permissionType, bool enable)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     int32_t callingUid = GetCallingUid();
     if (!PER_HELPER->VerifySystemApp()) {
         MMI_HILOGE("Verify system APP failed");

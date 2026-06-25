@@ -601,7 +601,7 @@ void MouseEventInterface::OnDeviceRemoved(std::shared_ptr<MouseEventInterface> s
     }
     mouse->OnDeviceRemoved(deviceId);
     if (mouse->HasMouse()) {
-        MMI_HILOGI("Mouse existed yet, do not unload");
+        MMI_HILOGD("Mouse existed yet, do not unload");
         return;
     }
     ScheduleUnloadingTimer();
@@ -643,7 +643,7 @@ void MouseEventInterface::LoadMouse()
         MMI_HILOGE("No input service context");
         return;
     }
-    MMI_HILOGI("Start loading Mouse");
+    MMI_HILOGD("Start loading Mouse");
     auto mouse = ComponentManager::LoadLibrary<IMouseEventNormalize>(
         env.get(), LIB_MOUSE_EVENT_NORMALIZATION_NAME);
     if (mouse == nullptr) {
@@ -654,7 +654,7 @@ void MouseEventInterface::LoadMouse()
         std::lock_guard guard { mutex_ };
         mouse_ = std::move(mouse);
     }
-    MMI_HILOGI("Mouse loaded");
+    MMI_HILOGD("Mouse loaded");
     OnMouseLoaded();
 }
 
@@ -710,7 +710,7 @@ void MouseEventInterface::OnMouseLoaded()
 
 void MouseEventInterface::UnloadMouse()
 {
-    MMI_HILOGI("Unload Mouse");
+    MMI_HILOGD("Unload Mouse");
     std::lock_guard guard { mutex_ };
     unloadTimerId_ = -1;
     mouse_ = { nullptr, ComponentManager::Component<IMouseEventNormalize>() };
@@ -724,7 +724,7 @@ void MouseEventInterface::ScheduleUnloadingTimer()
             return;
         }
     }
-    MMI_HILOGI("Schedule unloading Mouse");
+    MMI_HILOGD("Schedule unloading Mouse");
     auto timerId = TimerMgr->AddLongTimer(DEFAULT_UNLOAD_DELAY_TIME, REPEAT_ONCE,
         [this]() {
             this->UnloadMouse();

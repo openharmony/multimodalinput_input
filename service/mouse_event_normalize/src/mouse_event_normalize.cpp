@@ -51,7 +51,7 @@ void MouseEventNormalize::OnDeviceAdded(int32_t deviceId)
                 return;
             }
             processors_.emplace(deviceId, std::make_shared<MouseTransformProcessor>(env_, deviceId));
-            MMI_HILOGI("Emplace processor for device(%{public}d)", deviceId);
+            MMI_HILOGD("Emplace processor for device(%{public}d)", deviceId);
         });
 }
 
@@ -63,7 +63,7 @@ void MouseEventNormalize::OnDeviceRemoved(int32_t deviceId)
             return ((item.first == deviceId));
         });
     if (iter != processors_.end()) {
-        MMI_HILOGI("Clear processor attached to device(%{public}d)", deviceId);
+        MMI_HILOGD("Clear processor attached to device(%{public}d)", deviceId);
         processors_.erase(iter);
     }
 }

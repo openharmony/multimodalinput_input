@@ -1159,7 +1159,7 @@ int32_t MultimodalInputConnectManager::AncoRemoveChannel(sptr<IAncoChannel> chan
 
 int32_t MultimodalInputConnectManager::CheckKnuckleEvent(float pointX, float pointY, bool &touchType)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(lock_);
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
     return multimodalInputConnectService_->CheckKnuckleEvent(pointX, pointY, touchType);

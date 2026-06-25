@@ -369,7 +369,7 @@ int32_t AccountManager::QueryCurrentAccountId()
         MMI_HILOGE("GetForegroundOsAccountLocalId failed");
         return DEFAULT_USER_ID;
     }
-    MMI_HILOGI("GetForegroundOsAccountLocalId localId: %{private}d", localId);
+    MMI_HILOGD("GetForegroundOsAccountLocalId localId: %{private}d", localId);
     return localId;
 }
 

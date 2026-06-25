@@ -1789,7 +1789,7 @@ void JsInputMonitor::OnPointerEventInJsThread(const std::string &typeName, int32
             if (pointerEventItem->GetPointerAction() != PointerEvent::POINTER_ACTION_SWIPE_UPDATE &&
                 pointerEventItem->GetPointerAction() != PointerEvent::POINTER_ACTION_PULL_MOVE &&
                 pointerEventItem->GetPointerAction() != PointerEvent::POINTER_ACTION_MOVE) {
-                MMI_HILOGI("PointerId:%{public}d, PointerAction:%{public}s", pointerEventItem->GetPointerId(),
+                MMI_HILOGD("PointerId:%{public}d, PointerAction:%{public}s", pointerEventItem->GetPointerId(),
                     pointerEventItem->DumpPointerAction());
             }
             bool retValue = false;

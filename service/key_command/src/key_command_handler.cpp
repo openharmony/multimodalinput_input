@@ -794,7 +794,7 @@ bool KeyCommandHandler::HandleMulFingersTap(const std::shared_ptr<PointerEvent> 
 
 void KeyCommandHandler::HandleSpecialKeys(int32_t keyCode, int32_t keyAction)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     auto iter = context_.specialKeys_.find(keyCode);
     if (keyAction == KeyEvent::KEY_ACTION_UP) {
         if (iter != context_.specialKeys_.end()) {
@@ -1087,7 +1087,7 @@ int32_t KeyCommandHandler::SwitchScreenCapturePermission(uint32_t permissionType
     }
 #endif // OHOS_BUILD_ENABLE_TRIPLE_FINGER_SNAPSHOT
 
-    MMI_HILOGW("SwitchScreenCapturePermission is successful in keyCommand handler, "
+    MMI_HILOGD("SwitchScreenCapturePermission is successful in keyCommand handler, "
                "screenCapturePermission_:%{public}d, permissionType:%{public}d, "
                "enable:%{public}d", screenCapturePermission_, permissionType, enable);
     return RET_OK;

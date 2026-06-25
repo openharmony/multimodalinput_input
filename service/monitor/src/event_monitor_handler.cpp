@@ -836,7 +836,7 @@ bool EventMonitorHandler::MonitorCollection::CheckIfNeedSendToClient(
 
 void EventMonitorHandler::MonitorCollection::OnSessionLost(SessionPtr session)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     std::set<SessionHandler>::const_iterator cItr = monitors_.cbegin();
     while (cItr != monitors_.cend()) {
         if (cItr->session_ != session) {

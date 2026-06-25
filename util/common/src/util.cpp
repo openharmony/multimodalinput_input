@@ -669,7 +669,7 @@ void SetAccessTokenReady()
 
 std::string GetProcessName(uint32_t tokenId, int32_t pid)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     if (!g_isAccessTokenReady.load()) {
         MMI_HILOGW("access token is not ready");
         return "";
