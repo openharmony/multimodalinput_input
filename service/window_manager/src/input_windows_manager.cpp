@@ -4699,7 +4699,7 @@ void InputWindowsManager::HandlePullEvent(std::shared_ptr<PointerEvent> pointerE
         MMI_HILOGD("Set originPullId:%{public}d", originPullId);
         if (pointerEvent->HasFlag(InputEvent::EVENT_FLAG_ACCESSIBILITY)) {
             pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_CANCEL);
-            MMI_HILOGD("Convert PULL_CANCEL to CANCEL When in accessibility");
+            MMI_HILOGD("Convert PULL_CANCEL to CANCEL when the event flag is set");
         }
         return;
     }
