@@ -1207,9 +1207,10 @@ ErrCode MMIService::SetPointerVisible(bool visible, int32_t priority)
     }
     int32_t clientPid = GetCallingPid();
     int32_t ret = delegateTasks_.PostSyncTask(
-        [this, clientPid, visible, priority, isHap] {
-            return sMsgHandler_.UpdateCursorVisibility(clientPid, visible, priority, isHap);
-        });
+        [clientPid, visible, priority, isHap] {
+            return CursorDrawingComponent::GetInstance().SetPointerVisible(clientPid, visible, priority, isHap);
+        }
+        );
     if (ret != RET_OK) {
         MMI_HILOGE("Set pointer visible failed, return:%{public}d", ret);
         return ret;
