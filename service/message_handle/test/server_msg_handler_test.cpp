@@ -113,7 +113,8 @@ public:
 
     MOCK_METHOD(int32_t, AddSocketPairInfo,
         (const std::string &programName, const int32_t moduleType, const int32_t uid, const int32_t pid,
-            int32_t &serverFd, int32_t &toReturnClientFd, int32_t &tokenType, uint32_t tokenId, bool isRealProcessName),
+            int32_t &serverFd, int32_t &toReturnClientFd, int32_t &tokenType, uint32_t tokenId, bool isRealProcessName,
+            std::shared_ptr<SocketPairFlag> socketPairClosedFlag),
         (override));
 
     MOCK_METHOD(SessionPtr, GetSessionByPid, (int32_t pid), (const, override));

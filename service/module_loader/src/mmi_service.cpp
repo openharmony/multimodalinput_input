@@ -637,35 +637,53 @@ ErrCode MMIService::AllocSocketFd(const std::string &programName, const int32_t 
     int32_t uid = GetCallingUid();
     MMI_HILOGI("Enter, programName:{%{public}s:%{public}d}, moduleType:%{public}d, pid:%{public}d",
         processName.c_str(), isRealProcessName, moduleType, pid);
+    std::shared_ptr<SocketPairFlag> socketPairClosedFlag = std::make_shared<SocketPairFlag>();
     int32_t ret = delegateTasks_.PostSyncTask(
         [this, processName, moduleType, uid, pid, &serverFd, &toReturnClientFd, &tokenType,
-            tokenId, isRealProcessName] {
+            tokenId, isRealProcessName, socketPairClosedFlag] {
             if (GetSessionByPid(pid) != nullptr) {
                 MMI_HILOGW("%{public}d has session already", pid);
             }
             return this->AddSocketPairInfo(processName, moduleType, uid, pid, serverFd, toReturnClientFd,
-                tokenType, tokenId, isRealProcessName);
+                tokenType, tokenId, isRealProcessName, socketPairClosedFlag);
         }
         );
+    AllocSocketFdResult(ret, pid, uid, moduleType, processName, socketPairClosedFlag);
+    return ret;
+}
+
+void MMIService::AllocSocketFdResult(int32_t ret, const int32_t pid, const int32_t uid,
+    const int32_t moduleType, const std::string& processName,
+    std::shared_ptr<SocketPairFlag> socketPairClosedFlag)
+{
     DfxHisysevent::ClientConnectData data = {
         .pid = pid,
         .uid = uid,
         .moduleType = moduleType,
         .programName = processName,
-        .serverFd = serverFd
+        .serverFd = socketPairClosedFlag->serverFd
     };
     if (ret != RET_OK) {
         MMI_HILOGE("Call AddSocketPairInfo failed, return:%{public}d", ret);
         DfxHisysevent::OnClientConnect(data, OHOS::HiviewDFX::HiSysEvent::EventType::FAULT);
-        if (toReturnClientFd >= 0) {
-            fdsan_close_with_tag(toReturnClientFd, TAG);
+        if (ret != ETASKS_WAIT_TIMEOUT_BUT_RUNNING) {
+            return;
         }
-        return ret;
+        TimerMgr->AddTimer(WATCHDOG_INTERVAL_TIME, -1, [socketPairClosedFlag]() {
+            if (socketPairClosedFlag->executeClosed) {
+                return;
+            }
+            if (socketPairClosedFlag->serverFd >= 0) {
+                fdsan_close_with_tag(socketPairClosedFlag->serverFd, TAG);
+            }
+            if (socketPairClosedFlag->toReturnClientFd >= 0) {
+                fdsan_close_with_tag(socketPairClosedFlag->toReturnClientFd, TAG);
+            }
+        }, "MMIService-AllocSocketFd");
     }
     MMI_HILOGIK("Leave, programName:%{public}s, moduleType:%{public}d, alloc success", processName.c_str(),
                 moduleType);
     DfxHisysevent::OnClientConnect(data, OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR);
-    return RET_OK;
 }
 
 ErrCode MMIService::AddInputEventFilter(const sptr<IEventFilter>& filter, int32_t filterId, int32_t priority,

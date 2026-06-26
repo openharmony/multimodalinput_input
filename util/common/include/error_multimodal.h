@@ -126,6 +126,8 @@ enum {
     ERROR_FILTER_ADD_FAIL,
     // buffer过长失败
     ERROR_OVER_SIZE_BUFFER,
+    // 委托任务wait超时但已经执行
+    ETASKS_WAIT_TIMEOUT_BUT_RUNNING,
 };
 
 enum {
