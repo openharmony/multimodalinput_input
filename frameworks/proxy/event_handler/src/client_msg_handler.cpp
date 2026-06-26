@@ -622,7 +622,9 @@ int32_t ClientMsgHandler::OnHookKey(const UDSClient &client, NetPacket &pkt)
         return RET_ERR;
     }
     BytraceAdapter::StartBytrace(keyEvent, BytraceAdapter::TRACE_START, BytraceAdapter::KEY_HOOK_EVENT);
+#ifdef OHOS_BUILD_ENABLE_INPUT_EVENT_HOOK
     INPUT_EVENT_HOOK_HANDLER.OnKeyEvent(keyEvent);
+#endif // OHOS_BUILD_ENABLE_INPUT_EVENT_HOOK
     return RET_OK;
 }
 
@@ -634,7 +636,9 @@ int32_t ClientMsgHandler::OnHookTouch(const UDSClient &client, NetPacket &pkt)
         MMI_HILOGE("Read net packet failed");
         return PACKET_READ_FAIL;
     }
+#ifdef OHOS_BUILD_ENABLE_INPUT_EVENT_HOOK
     INPUT_EVENT_HOOK_HANDLER.OnPointerEvent(pointerEvent);
+#endif // OHOS_BUILD_ENABLE_INPUT_EVENT_HOOK
     return RET_OK;
 }
 
@@ -646,7 +650,9 @@ int32_t ClientMsgHandler::OnHookMouse(const UDSClient &client, NetPacket &pkt)
         MMI_HILOGE("Read net packet failed");
         return PACKET_READ_FAIL;
     }
+#ifdef OHOS_BUILD_ENABLE_INPUT_EVENT_HOOK
     INPUT_EVENT_HOOK_HANDLER.OnPointerEvent(pointerEvent);
+#endif // OHOS_BUILD_ENABLE_INPUT_EVENT_HOOK
     return RET_OK;
 }
 } // namespace MMI

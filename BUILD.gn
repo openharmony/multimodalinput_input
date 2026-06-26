@@ -241,19 +241,15 @@ group("mmi_tests") {
     "service:InfraredEmitterTest",
     "service:InputDisplayBindHelperTest",
     "service:InputEventHandlerTest",
-    "service:InputEventHookTest",
-    "service:InputEventHookManagerTest",
     "service:InputWindowsManagerOneTest",
     "service:InputWindowsManagerTest",
     "service:InputWindowsManagerCoverageTest",
     "service:InterceptorTest",
     "service:KeyAutoRepeatExTest",
     "service/key_command/test:KeyCommandTest",
-    "service:KeyEventHookTest",
     "service:KeyEventHookManagerTest",
     "service:KeyEventNormalizeTest",
     "service:KeyEventValueTransformationTest",
-    "service:KeyLoopClosureCheckerTest",
     "service:KeyShortcutManagerTest",
     "service:KeyUnicodeTransformationTest",
     "service:KeymapMgrTest",
@@ -262,8 +258,6 @@ group("mmi_tests") {
     "service:ModuleLoaderTest",
     "service:MonitorTest",
     "service:NapProcessTest",
-    "service:PointerLoopClosureCheckerTest",
-    "service:PointerEventHookTest",
     "service:ProductTypeParserTest",
     "service:PropertyNameMapperTest",
     "service:ServerMsgHandlerTest",
@@ -294,6 +288,17 @@ group("mmi_tests") {
     "util/common:UtilCommonTest",
     "util/json_parser:JsonParserTest",
   ]
+
+  if (input_feature_input_event_hook) {
+    deps += [
+      "service:InputEventHookTest",
+      "service:InputEventHookManagerTest",
+      "service:KeyEventHookTest",
+      "service:KeyLoopClosureCheckerTest",
+      "service:PointerLoopClosureCheckerTest",
+      "service:PointerEventHookTest",
+    ]
+  }
 
   if (input_feature_pointer_drawing) {
     deps += [

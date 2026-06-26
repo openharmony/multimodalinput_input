@@ -47,7 +47,9 @@
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
 #include "display_event_monitor.h"
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
+#ifdef OHOS_BUILD_ENABLE_INPUT_EVENT_HOOK
 #include "input_event_hook_manager.h"
+#endif // OHOS_BUILD_ENABLE_INPUT_EVENT_HOOK
 #include "event_dump.h"
 #include "event_statistic.h"
 #include "event_log_helper.h"
