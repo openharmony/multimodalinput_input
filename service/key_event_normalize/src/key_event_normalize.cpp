@@ -516,7 +516,7 @@ void KeyEventNormalize::HandleSimulatedModifierKeyActionFromShell(const std::sha
 
 void KeyEventNormalize::UpdateSimulatedEventModifierState(const std::shared_ptr<KeyEvent> &keyEvent)
 {
-    if (keyEvent == nullptr) {
+    if (keyEvent == nullptr || keyEvent_ == nullptr) {
         MMI_HILOGE("KeyEvent is null");
         return;
     }
