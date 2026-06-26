@@ -398,7 +398,7 @@ void KeyMonitorManager::NotifyKeyMonitor(std::shared_ptr<KeyEvent> keyEvent,
 
 void KeyMonitorManager::SetMeeTimeSubcriber(bool status, std::string monitorType)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     isMeeTimeSubcriber_ = status;
     auto manager = InputPluginManager::GetInstance();
     CHKPV(manager);

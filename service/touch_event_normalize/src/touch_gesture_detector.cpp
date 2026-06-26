@@ -73,7 +73,7 @@ bool TouchGestureDetector::OnTouchEvent(std::shared_ptr<PointerEvent> event)
 
 void TouchGestureDetector::HandleDownEvent(std::shared_ptr<PointerEvent> event)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     if (isRecognized_) {
         if (haveGestureWinEmerged_) {
             return;
@@ -221,7 +221,7 @@ bool TouchGestureDetector::InOppositeDirections(const std::unordered_set<SlideSt
 
 void TouchGestureDetector::HandleUpEvent(std::shared_ptr<PointerEvent> event)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     downPoint_.erase(event->GetPointerId());
     movePoint_.erase(event->GetPointerId());
     MMI_HILOGI("The gestureType:%{public}d, touches:%{public}s, isFingerReady:%{public}d, pointerId:%{public}d",
@@ -275,7 +275,7 @@ bool TouchGestureDetector::IsPhysicalPointer(std::shared_ptr<PointerEvent> event
 
 void TouchGestureDetector::ReleaseData()
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     if (gestureTimer_ >= 0) {
         auto timerMgr = TouchGestureAdapter::GetTimerManager(env_);
         if (timerMgr == nullptr) {
@@ -764,7 +764,7 @@ bool TouchGestureDetector::IsLastTouchUp(std::shared_ptr<PointerEvent> event) co
 
 void TouchGestureDetector::OnGestureSendEvent(std::shared_ptr<PointerEvent> event) const
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     CHKPV(event);
     event->SetTargetWindowId(-1);
     auto pointerEvent = std::make_shared<PointerEvent>(*event);

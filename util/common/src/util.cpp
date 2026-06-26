@@ -669,7 +669,7 @@ void SetAccessTokenReady()
 
 std::string GetProcessName(uint32_t tokenId, int32_t pid)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     if (!g_isAccessTokenReady.load()) {
         MMI_HILOGW("access token is not ready");
         return "";
@@ -712,7 +712,7 @@ std::string GetProcessName(uint32_t tokenId, int32_t pid)
 
 std::string GetBundleName(uint32_t tokenId)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     std::string bundleName = "";
     int32_t tokenType = Security::AccessToken::AccessTokenKit::GetTokenTypeFlag(tokenId);
     if (tokenType == Security::AccessToken::ATokenTypeEnum::TOKEN_HAP) {

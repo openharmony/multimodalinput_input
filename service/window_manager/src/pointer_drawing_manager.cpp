@@ -195,7 +195,7 @@ static bool IsSingleDisplayFoldDevice()
 
 void PointerDrawingManager::RsRemoteDiedCallback()
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     isRsRemoteDied_ = true;
     g_isHdiRemoteDied = true;
     g_isReStartVsync = true;
@@ -250,7 +250,7 @@ void PointerDrawingManager::InitPointerCallback()
 
 void PointerDrawingManager::DestroyPointerWindow()
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     CHKPV(delegateProxy_);
     delegateProxy_->OnPostSyncTask([this] {
         if (GetHardCursorEnabled()) {
@@ -724,7 +724,7 @@ void PointerDrawingManager::UpdateStyleOptions()
 
 void PointerDrawingManager::InitPointerObserver()
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     if (hasInitObserver_) {
         MMI_HILOGI("Settingdata observer has init");
         return;
@@ -1869,7 +1869,7 @@ int32_t PointerDrawingManager::CreatePointerWindowForNoScreenPointer(uint64_t rs
 void PointerDrawingManager::CreatePointerWindow(uint64_t rsId, int32_t physicalX, int32_t physicalY,
     Direction direction)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     BytraceAdapter::StartRsSurfaceNode(rsId);
 
     if (GetHardCursorEnabled()) {
@@ -3025,7 +3025,7 @@ void PointerDrawingManager::RotateDegree(Direction direction)
 
 int32_t PointerDrawingManager::SkipPointerLayer(bool isSkip)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     auto surfaceNodePtr = GetSurfaceNode();
     if (surfaceNodePtr != nullptr) {
         surfaceNodePtr->SetSkipLayer(isSkip);

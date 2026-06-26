@@ -63,7 +63,7 @@ DeviceManager::DeviceManager()
 
 int32_t DeviceManager::Init(IContext *context)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     CHKPR(context, RET_ERR);
     int32_t ret = context->GetDelegateTasks().PostSyncTask([this, context] {
         return this->OnInit(context);
@@ -76,7 +76,7 @@ int32_t DeviceManager::Init(IContext *context)
 
 int32_t DeviceManager::OnInit(IContext *context)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     CHKPR(context, RET_ERR);
     context_ = context;
     monitor_.SetDeviceMgr(&hotplug_);
@@ -86,7 +86,7 @@ int32_t DeviceManager::OnInit(IContext *context)
 
 int32_t DeviceManager::Enable()
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     CHKPR(context_, RET_ERR);
     int32_t ret = context_->GetDelegateTasks().PostSyncTask([this] {
         return this->OnEnable();
@@ -126,7 +126,7 @@ CLOSE_EPOLL:
 
 int32_t DeviceManager::Disable()
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     CHKPR(context_, RET_ERR);
     int32_t ret = context_->GetDelegateTasks().PostSyncTask([this] {
         return this->OnDisable();
@@ -171,7 +171,7 @@ int32_t DeviceManager::ParseDeviceId(const std::string &devNode)
 
 std::shared_ptr<IDevice> DeviceManager::AddDevice(const std::string &devNode)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     const std::string SYS_INPUT_PATH { "/sys/class/input/" };
     const std::string devPath { DEV_INPUT_PATH + devNode };
     struct stat statbuf;
@@ -221,7 +221,7 @@ std::shared_ptr<IDevice> DeviceManager::AddDevice(const std::string &devNode)
 
 std::shared_ptr<IDevice> DeviceManager::RemoveDevice(const std::string &devNode)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     const std::string devPath { DEV_INPUT_PATH + devNode };
 
     for (auto devIter = devices_.begin(); devIter != devices_.end(); ++devIter) {
@@ -329,7 +329,7 @@ int32_t DeviceManager::RunGetDevice(std::packaged_task<std::shared_ptr<IDevice>(
 
 void DeviceManager::RetriggerHotplug(std::weak_ptr<IDeviceObserver> observer)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     CHKPV(context_);
     int32_t ret = context_->GetDelegateTasks().PostSyncTask([this, observer] {
         return this->OnRetriggerHotplug(observer);
@@ -341,7 +341,7 @@ void DeviceManager::RetriggerHotplug(std::weak_ptr<IDeviceObserver> observer)
 
 int32_t DeviceManager::OnRetriggerHotplug(std::weak_ptr<IDeviceObserver> observer)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     CHKPR(observer, RET_ERR);
     std::shared_ptr<IDeviceObserver> ptr = observer.lock();
     CHKPR(ptr, RET_ERR);
@@ -369,7 +369,7 @@ int32_t DeviceManager::AddDeviceObserver(std::weak_ptr<IDeviceObserver> observer
 
 int32_t DeviceManager::OnAddDeviceObserver(std::weak_ptr<IDeviceObserver> observer)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     CHKPR(observer, RET_ERR);
     auto ret = observers_.insert(observer);
     if (!ret.second) {
@@ -380,7 +380,7 @@ int32_t DeviceManager::OnAddDeviceObserver(std::weak_ptr<IDeviceObserver> observ
 
 void DeviceManager::RemoveDeviceObserver(std::weak_ptr<IDeviceObserver> observer)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     CHKPV(context_);
     int32_t ret = context_->GetDelegateTasks().PostSyncTask([this, observer] {
         return this->OnRemoveDeviceObserver(observer);
@@ -392,7 +392,7 @@ void DeviceManager::RemoveDeviceObserver(std::weak_ptr<IDeviceObserver> observer
 
 int32_t DeviceManager::OnRemoveDeviceObserver(std::weak_ptr<IDeviceObserver> observer)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     CHKPR(observer, RET_ERR);
     observers_.erase(observer);
     return RET_OK;

@@ -318,7 +318,7 @@ void KeyEventNormalize::ReadProductConfig(InputProductConfig &config) const
         MMI_HILOGE("No '%{private}s' was found", cfgName);
         return;
     }
-    MMI_HILOGI("Input product config:%{private}s", cfgPath);
+    MMI_HILOGD("Input product config:%{private}s", cfgPath);
     ReadProductConfig(std::string(cfgPath), config);
 }
 

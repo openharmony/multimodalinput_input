@@ -31,7 +31,7 @@ MouseLocation::MouseLocation(IContext *context) : context_(context) { }
 
 void MouseLocation::AddListener(const RegisterEventListenerEvent &event)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(mutex_);
     localNetworkId_ = IDSoftbusAdapter::GetLocalNetworkId();
     if (event.networkId == localNetworkId_) {
@@ -50,7 +50,7 @@ void MouseLocation::AddListener(const RegisterEventListenerEvent &event)
 
 void MouseLocation::RemoveListener(const UnregisterEventListenerEvent &event)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(mutex_);
     localNetworkId_ = IDSoftbusAdapter::GetLocalNetworkId();
     if (event.networkId == localNetworkId_) {
@@ -100,7 +100,7 @@ void MouseLocation::ProcessData(std::shared_ptr<MMI::PointerEvent> pointerEvent)
 
 void MouseLocation::OnSubscribeMouseLocation(const DSoftbusSubscribeMouseLocation &notice)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(mutex_);
     CHKPV(context_);
     remoteSubscribers_.insert(notice.networkId);
@@ -117,7 +117,7 @@ void MouseLocation::OnSubscribeMouseLocation(const DSoftbusSubscribeMouseLocatio
 
 void MouseLocation::OnUnSubscribeMouseLocation(const DSoftbusUnSubscribeMouseLocation &notice)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(mutex_);
     localNetworkId_ = IDSoftbusAdapter::GetLocalNetworkId();
     if (remoteSubscribers_.find(notice.networkId) == remoteSubscribers_.end()) {
@@ -138,7 +138,7 @@ void MouseLocation::OnUnSubscribeMouseLocation(const DSoftbusUnSubscribeMouseLoc
 
 void MouseLocation::OnReplySubscribeMouseLocation(const DSoftbusReplySubscribeMouseLocation &notice)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(mutex_);
     if (notice.result) {
         FI_HILOGI("SubscribeMouseLocation of networkId:%{public}s successfully, localNetworkId:%{public}s",
@@ -151,7 +151,7 @@ void MouseLocation::OnReplySubscribeMouseLocation(const DSoftbusReplySubscribeMo
 
 void MouseLocation::OnReplyUnSubscribeMouseLocation(const DSoftbusReplyUnSubscribeMouseLocation &notice)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(mutex_);
     if (notice.result) {
         FI_HILOGI("UnSubscribeMouseLocation of networkId:%{public}s successfully, localNetworkId:%{public}s",
@@ -182,7 +182,7 @@ void MouseLocation::OnRemoteMouseLocation(const DSoftbusSyncMouseLocation &notic
 
 void MouseLocation::OnClientDied(const ClientDiedEvent &event)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(mutex_);
     localNetworkId_ = IDSoftbusAdapter::GetLocalNetworkId();
     FI_HILOGI("Remove client died listener, pid:%{public}d", event.pid);
@@ -204,7 +204,7 @@ void MouseLocation::OnClientDied(const ClientDiedEvent &event)
 
 int32_t MouseLocation::SubscribeMouseLocation(const DSoftbusSubscribeMouseLocation &event)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     NetPacket packet(MessageId::DSOFTBUS_SUBSCRIBE_MOUSE_LOCATION);
     packet << event.networkId << event.remoteNetworkId;
     if (packet.ChkRWError()) {
@@ -220,7 +220,7 @@ int32_t MouseLocation::SubscribeMouseLocation(const DSoftbusSubscribeMouseLocati
 
 int32_t MouseLocation::UnSubscribeMouseLocation(const DSoftbusUnSubscribeMouseLocation &event)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     NetPacket packet(MessageId::DSOFTBUS_UNSUBSCRIBE_MOUSE_LOCATION);
     packet << event.networkId << event.remoteNetworkId;
     if (packet.ChkRWError()) {
@@ -253,7 +253,7 @@ int32_t MouseLocation::SyncMouseLocation(const DSoftbusSyncMouseLocation &event)
 
 int32_t MouseLocation::ReplySubscribeMouseLocation(const DSoftbusReplySubscribeMouseLocation &event)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     NetPacket packet(MessageId::DSOFTBUS_REPLY_SUBSCRIBE_MOUSE_LOCATION);
     packet << event.networkId << event.remoteNetworkId << event.result;
     if (packet.ChkRWError()) {
@@ -269,7 +269,7 @@ int32_t MouseLocation::ReplySubscribeMouseLocation(const DSoftbusReplySubscribeM
 
 int32_t MouseLocation::ReplyUnSubscribeMouseLocation(const DSoftbusReplyUnSubscribeMouseLocation &event)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     NetPacket packet(MessageId::DSOFTBUS_REPLY_UNSUBSCRIBE_MOUSE_LOCATION);
     packet << event.networkId << event.remoteNetworkId << event.result;
     if (packet.ChkRWError()) {

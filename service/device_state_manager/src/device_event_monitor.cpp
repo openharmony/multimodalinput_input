@@ -112,7 +112,7 @@ void DeviceEventMonitor::SetCallState(const EventFwk::CommonEventData &eventData
         hasHandleRingMute_ = false;
     }
     callState_ = callState;
-    MMI_HILOGI("The callState:%{public}d, hasHandleRingMute_:%{public}d", callState, hasHandleRingMute_);
+    MMI_HILOGD("The callState:%{public}d, hasHandleRingMute_:%{public}d", callState, hasHandleRingMute_);
     if (callState_ == StateType::CALL_STATUS_DISCONNECTED) {
         auto subscriberHandler = InputHandler->GetSubscriberHandler();
         CHKPV(subscriberHandler);
@@ -152,7 +152,7 @@ int32_t DeviceEventMonitor::GetCallType()
 {
     CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> lock(stateMutex_);
-    MMI_HILOGI("The callState:%{public}d", callType_);
+    MMI_HILOGD("The callState:%{public}d", callType_);
     return callType_;
 }
 
@@ -160,7 +160,7 @@ int32_t DeviceEventMonitor::GetCallState()
 {
     CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> lock(stateMutex_);
-    MMI_HILOGI("The callState:%{public}d", callState_);
+    MMI_HILOGD("The callState:%{public}d", callState_);
     return callState_;
 }
 
@@ -168,19 +168,19 @@ int32_t DeviceEventMonitor::GetVoipCallState()
 {
     CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> lock(stateMutex_);
-    MMI_HILOGI("The voipCallState_:%{public}d", voipCallState_);
+    MMI_HILOGD("The voipCallState_:%{public}d", voipCallState_);
     return voipCallState_;
 }
 
 void DeviceEventMonitor::SetHasHandleRingMute(bool hasHandleRingMute)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     hasHandleRingMute_ = hasHandleRingMute;
 }
 
 bool DeviceEventMonitor::GetHasHandleRingMute()
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     return hasHandleRingMute_;
 }
 } // namespace MMI

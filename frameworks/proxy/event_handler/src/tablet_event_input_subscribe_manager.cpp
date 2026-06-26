@@ -36,7 +36,7 @@ TabletEventInputSubscribeManager::~TabletEventInputSubscribeManager() {}
 int32_t TabletEventInputSubscribeManager::SubscribeTabletProximity(
     std::function<void(std::shared_ptr<PointerEvent>)> callback)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     CHKPR(callback, ERROR_NULL_POINTER);
     if (!MMIEventHdl.InitClient()) {
         MMI_HILOGE("Client init failed");
@@ -62,7 +62,7 @@ int32_t TabletEventInputSubscribeManager::SubscribeTabletProximity(
 
 int32_t TabletEventInputSubscribeManager::UnsubscribetabletProximity(int32_t subscribeId)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     if (subscribeId < 0) {
         MMI_HILOGE("The subscribe id is less than 0");
         return RET_ERR;

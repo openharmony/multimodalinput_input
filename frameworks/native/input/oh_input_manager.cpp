@@ -3334,7 +3334,7 @@ Input_Result OH_Input_GetPointerLocation(int32_t *displayId, double *displayX, d
 static void TransformTouchActionDown(std::shared_ptr<OHOS::MMI::PointerEvent> pointerEvent,
     OHOS::MMI::PointerEvent::PointerItem &item, int64_t time)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     CHKPV(pointerEvent);
     auto pointIds = pointerEvent->GetPointerIds();
     if (pointIds.empty()) {
@@ -3350,7 +3350,7 @@ static void TransformTouchActionDown(std::shared_ptr<OHOS::MMI::PointerEvent> po
 static int32_t TransformTouchAction(const struct Input_TouchEvent *touchEvent,
     std::shared_ptr<OHOS::MMI::PointerEvent> pointerEvent, OHOS::MMI::PointerEvent::PointerItem &item)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     CHKPR(touchEvent, INPUT_PARAMETER_ERROR);
     CHKPR(pointerEvent, INPUT_PARAMETER_ERROR);
     int64_t time = touchEvent->actionTime;
@@ -3392,7 +3392,7 @@ static int32_t TransformTouchProperty(const struct Input_TouchEvent *touchEvent,
     std::shared_ptr<OHOS::MMI::PointerEvent> pointerEvent,
     OHOS::MMI::PointerEvent::PointerItem &item, int32_t windowX, int32_t windowY)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     CHKPR(touchEvent, INPUT_PARAMETER_ERROR);
     CHKPR(pointerEvent, INPUT_PARAMETER_ERROR);
     int32_t screenX = touchEvent->displayX;
@@ -3446,7 +3446,7 @@ static int32_t TransformTouchProperty(const struct Input_TouchEvent *touchEvent,
 std::shared_ptr<OHOS::MMI::PointerEvent> OH_Input_TouchEventToPointerEvent(Input_TouchEvent *touchEvent,
     int32_t windowX, int32_t windowY)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     if (touchEvent == nullptr) {
         MMI_HILOGE("touchEvent is null");
         return nullptr;
@@ -3485,7 +3485,7 @@ Input_Result OH_Input_GetKeyEventId(const struct Input_KeyEvent* keyEvent, int32
 
 Input_Result OH_Input_AddKeyEventHook(Input_KeyEventCallback callback)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     MMI_HISTOGRAM_BOOLEAN("InputKit.OH_Input_AddKeyEventHook.Call", true);
     CHKPR(callback, INPUT_PARAMETER_ERROR);
     if (auto hookCallback = GetHookCallback(); callback == hookCallback) {
@@ -3528,7 +3528,7 @@ Input_Result OH_Input_AddKeyEventHook(Input_KeyEventCallback callback)
 
 Input_Result OH_Input_RemoveKeyEventHook(Input_KeyEventCallback callback)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     MMI_HISTOGRAM_BOOLEAN("InputKit.OH_Input_RemoveKeyEventHook.Call", true);
     CHKPR(callback, INPUT_PARAMETER_ERROR);
     if (auto hookCallback = GetHookCallback(); hookCallback != callback) {

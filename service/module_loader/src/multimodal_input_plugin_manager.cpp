@@ -657,7 +657,7 @@ UDSServer* InputPluginManager::GetUdsServer()
 
 void InputPluginManager::HandleMonitorStatus(bool monitorStatus, const std::string &monitorType)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     MMI_HILOGI("The monitorStatus:%{public}d, monitorType:%{public}s",
         monitorStatus, monitorType.c_str());
     auto it = plugins_.find(InputPluginStage::INPUT_BEFORE_KEYCOMMAND);
@@ -674,7 +674,7 @@ void InputPluginManager::HandleMonitorStatus(bool monitorStatus, const std::stri
 
 bool InputPluginManager::HandleShortcutKey(const ShortcutKey &key)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     IShortcutKey shortcutKey {
         .preKeys = key.preKeys,
         .finalKey = key.finalKey,
@@ -686,7 +686,7 @@ bool InputPluginManager::HandleShortcutKey(const ShortcutKey &key)
 
 bool InputPluginManager::HandleShortcutKey(const KeyOption &option)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     IShortcutKey shortcutKey {
         .preKeys = option.GetPreKeys(),
         .finalKey = option.GetFinalKey(),
@@ -698,7 +698,7 @@ bool InputPluginManager::HandleShortcutKey(const KeyOption &option)
 
 bool InputPluginManager::ProcessShortcutKey(const IShortcutKey &shortcutKey)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     for (const auto &[pluginStage, inputPluginList] : plugins_) {
         bool isConsumed = std::any_of(inputPluginList.begin(), inputPluginList.end(),
             [&shortcutKey](const std::shared_ptr<IPluginContext> &pluginContext) {
@@ -722,7 +722,7 @@ bool InputPluginManager::ProcessShortcutKey(const IShortcutKey &shortcutKey)
 
 bool InputPluginManager::HandleSequenceKeys(const Sequence &sequence)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     std::vector<ISequenceKey> sequenceKeys;
     sequenceKeys.reserve(sequence.sequenceKeys.size());
     for (const auto &key : sequence.sequenceKeys) {
@@ -738,7 +738,7 @@ bool InputPluginManager::HandleSequenceKeys(const Sequence &sequence)
 
 bool InputPluginManager::ProcessSequenceKeys(const std::vector<ISequenceKey> &sequenceKeys)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     for (const auto &[pluginStage, inputPluginList] : plugins_) {
         bool isConsumed = std::any_of(inputPluginList.begin(), inputPluginList.end(),
             [&sequenceKeys](const std::shared_ptr<IPluginContext> &pluginContext) {

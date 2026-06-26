@@ -90,7 +90,7 @@ static void SensorDataCallbackImpl(SensorEvent *event)
     ProximityData* proximityData = reinterpret_cast<ProximityData*>(event->data);
     CHKPV(proximityData);
     int32_t distance = static_cast<int32_t>(proximityData->distance);
-    MMI_HILOGI("Proximity distance %{public}d", distance);
+    MMI_HILOGD("Proximity distance %{public}d", distance);
     g_distance = distance;
 }
 
@@ -153,7 +153,7 @@ void KeyCommandHandler::HandleKeyEvent(const std::shared_ptr<KeyEvent> keyEvent)
     }
 
     if (keyEvent->IsExtendedFunctionKey()) {
-        MMI_HILOGI("Extended function key not consumed by KeyCommandHandler, forward to subscriber");
+        MMI_HILOGD("Extended function key not consumed by KeyCommandHandler, forward to subscriber");
         auto keySubscriberHandler = InputHandler->GetSubscriberHandler();
         if (keySubscriberHandler != nullptr) {
             keySubscriberHandler->HandleKeyEvent(keyEvent);
@@ -492,7 +492,7 @@ bool KeyCommandHandler::IsEnableCombineKey(const std::shared_ptr<KeyEvent> key)
         MMI_HILOGD("ExcludekeyCode:%{private}d, ExcludekeyAction:%{public}d",
             key->GetKeyCode(), key->GetKeyAction());
         auto items = key->GetKeyItems();
-        MMI_HILOGI("KeyItemsSize:%{public}zu", items.size());
+        MMI_HILOGD("KeyItemsSize:%{public}zu", items.size());
         if (items.size() != 1) {
             return enableCombineKey_;
         }
@@ -503,7 +503,7 @@ bool KeyCommandHandler::IsEnableCombineKey(const std::shared_ptr<KeyEvent> key)
             int32_t keyCode = item.GetKeyCode();
             if (keyCode != KeyEvent::KEYCODE_L && keyCode != KeyEvent::KEYCODE_META_LEFT &&
                 keyCode != KeyEvent::KEYCODE_META_RIGHT) {
-                MMI_HILOGI("GetKeyCode:%{private}d", keyCode);
+                MMI_HILOGD("GetKeyCode:%{private}d", keyCode);
                 return enableCombineKey_;
             }
         }
@@ -511,7 +511,7 @@ bool KeyCommandHandler::IsEnableCombineKey(const std::shared_ptr<KeyEvent> key)
     }
     if (key->GetKeyCode() == KeyEvent::KEYCODE_SYSRQ) {
         auto iterms = key->GetKeyItems();
-        MMI_HILOGI("Recording response VM");
+        MMI_HILOGD("Recording response VM");
         return iterms.size() != 1 ? enableCombineKey_ : true;
     }
     return enableCombineKey_;
@@ -520,7 +520,7 @@ bool KeyCommandHandler::IsEnableCombineKey(const std::shared_ptr<KeyEvent> key)
 int32_t KeyCommandHandler::EnableCombineKey(bool enable)
 {
     enableCombineKey_ = enable;
-    MMI_HILOGI("Enable combineKey is successful in keyCommand handler, enable:%{public}d", enable);
+    MMI_HILOGD("Enable combineKey is successful in keyCommand handler, enable:%{public}d", enable);
     return RET_OK;
 }
 
@@ -559,7 +559,7 @@ void KeyCommandHandler::CreateStatusConfigObserver(T& item)
             MMI_HILOGE("Get value from setting date fail");
             return;
         }
-        MMI_HILOGI("Config changed key:%s, value:%{public}d", key.c_str(), statusValue);
+        MMI_HILOGD("Config changed key:%s, value:%{public}d", key.c_str(), statusValue);
         item.statusConfigValue = statusValue;
     };
     sptr<SettingObserver> statusObserver = SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID)
@@ -576,7 +576,7 @@ void KeyCommandHandler::CreateStatusConfigObserver(T& item)
         MMI_HILOGE("Get value from setting date fail");
         return;
     }
-    MMI_HILOGI("Get value success key:%s, value:%{public}d", item.statusConfig.c_str(), configVlaue);
+    MMI_HILOGD("Get value success key:%s, value:%{public}d", item.statusConfig.c_str(), configVlaue);
     item.statusConfigValue = configVlaue;
 }
 
@@ -589,7 +589,7 @@ bool KeyCommandHandler::PreHandleEvent(const std::shared_ptr<KeyEvent> key)
         DfxHisysevent::ReportKeyEvent("screen on");
     }
     if (!IsEnableCombineKey(key)) {
-        MMI_HILOGI("Combine key is taken over in key command");
+        MMI_HILOGD("Combine key is taken over in key command");
         return false;
     }
     InitParse("PreHandleEvent", key);
@@ -605,7 +605,7 @@ bool KeyCommandHandler::PreHandleEvent(const std::shared_ptr<KeyEvent> key)
 
 bool KeyCommandHandler::PreHandleEvent()
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     InitParse();
     if (!isParseMaxCount_) {
         ParseRepeatKeyMaxCount();
@@ -750,7 +750,7 @@ bool KeyCommandHandler::OnHandleEvent(const std::shared_ptr<PointerEvent> pointe
 
 int32_t KeyCommandHandler::SetIsFreezePowerKey(const std::string pageName)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> lock(mutex_);
     if (pageName != "SosCountdown") {
         context_.isFreezePowerKey_ = false;
@@ -782,7 +782,7 @@ bool KeyCommandHandler::HandleMulFingersTap(const std::shared_ptr<PointerEvent> 
 {
     CALL_DEBUG_ENTER;
     if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_TRIPTAP) {
-        MMI_HILOGI("The touchpad trip tap will launch ability");
+        MMI_HILOGD("The touchpad trip tap will launch ability");
         BytraceAdapter::StartLaunchAbility(KeyCommandType::TYPE_MULTI_FINGERS,
             context_.threeFingersTap_.ability.bundleName);
         LAUNCHER_ABILITY->LaunchAbility(context_.threeFingersTap_.ability, NO_DELAY);
@@ -794,7 +794,7 @@ bool KeyCommandHandler::HandleMulFingersTap(const std::shared_ptr<PointerEvent> 
 
 void KeyCommandHandler::HandleSpecialKeys(int32_t keyCode, int32_t keyAction)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     auto iter = context_.specialKeys_.find(keyCode);
     if (keyAction == KeyEvent::KEY_ACTION_UP) {
         if (iter != context_.specialKeys_.end()) {
@@ -819,7 +819,7 @@ void KeyCommandHandler::HandlePointerVisibleKeys(const std::shared_ptr<KeyEvent>
     CALL_DEBUG_ENTER;
     CHKPV(keyEvent);
     if (keyEvent->GetKeyCode() == KeyEvent::KEYCODE_F9 && lastKeyEventCode_ == KeyEvent::KEYCODE_CTRL_LEFT) {
-        MMI_HILOGI("Force make pointer visible");
+        MMI_HILOGD("Force make pointer visible");
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
     if (POINTER_DEV_MGR.isInit) {
         CursorDrawingComponent::GetInstance().ForceClearPointerVisibleStatus();
@@ -944,7 +944,7 @@ bool KeyCommandHandler::TouchPadKnuckleDoubleClickHandle(std::shared_ptr<KeyEven
     CHKPF(event);
     auto actionType = event->GetKeyAction();
     if (actionType == KNUCKLE_1F_DOUBLE_CLICK || actionType == KNUCKLE_2F_DOUBLE_CLICK) {
-        MMI_HILOGI("Knuckle in TouchPadKnuckleDoubleClickHandle, actionType is %{public}d, "
+        MMI_HILOGD("Knuckle in TouchPadKnuckleDoubleClickHandle, actionType is %{public}d, "
                    "screenCapturePermission_ is %{public}d",
             actionType,
             screenCapturePermission_);
@@ -970,7 +970,7 @@ void KeyCommandHandler::TouchPadKnuckleDoubleClickProcess(const std::string bund
     std::string screenStatus = DISPLAY_MONITOR->GetScreenStatus();
     bool isScreenLocked = DISPLAY_MONITOR->GetScreenLocked();
     if (screenStatus == EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_OFF || isScreenLocked) {
-        MMI_HILOGI("The current screen is not in the unlocked state with the screen on");
+        MMI_HILOGD("The current screen is not in the unlocked state with the screen on");
         return;
     }
     Ability ability;
@@ -1003,7 +1003,7 @@ bool KeyCommandHandler::CheckBundleName(const std::shared_ptr<PointerEvent> touc
 
 void KeyCommandHandler::RegisterProximitySensor()
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     if (hasRegisteredSensor_) {
         MMI_HILOGE("Has SubscribeSensor %{public}d", SENSOR_TYPE_ID_PROXIMITY);
         return;
@@ -1048,7 +1048,7 @@ int32_t KeyCommandHandler::LaunchAiScreenAbility(int32_t pid)
 void KeyCommandHandler::UnregisterProximitySensor()
 {
     if (!hasRegisteredSensor_) {
-        MMI_HILOGI("Has registered sensor: %{public}d", SENSOR_TYPE_ID_PROXIMITY);
+        MMI_HILOGD("Has registered sensor: %{public}d", SENSOR_TYPE_ID_PROXIMITY);
         return;
     }
     hasRegisteredSensor_ = false;
@@ -1087,7 +1087,7 @@ int32_t KeyCommandHandler::SwitchScreenCapturePermission(uint32_t permissionType
     }
 #endif // OHOS_BUILD_ENABLE_TRIPLE_FINGER_SNAPSHOT
 
-    MMI_HILOGW("SwitchScreenCapturePermission is successful in keyCommand handler, "
+    MMI_HILOGD("SwitchScreenCapturePermission is successful in keyCommand handler, "
                "screenCapturePermission_:%{public}d, permissionType:%{public}d, "
                "enable:%{public}d", screenCapturePermission_, permissionType, enable);
     return RET_OK;

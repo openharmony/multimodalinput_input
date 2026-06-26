@@ -1159,7 +1159,7 @@ void EventNormalizeHandler::HandleSwitchEvent(const std::shared_ptr<SwitchEvent>
 
 void EventNormalizeHandler::RestoreTouchPadStatus()
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
 #ifdef OHOS_BUILD_ENABLE_TOUCHPAD
     auto ids = INPUT_DEV_MGR->GetTouchPadIds();
     for (auto id : ids) {

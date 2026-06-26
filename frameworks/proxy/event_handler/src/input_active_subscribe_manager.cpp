@@ -63,13 +63,13 @@ int32_t InputActiveSubscribeManager::SubscribeInputActive(
         return ERROR_ONE_PROCESS_ONLY_SUPPORT_ONE;
     }
     subscribeInfo_ = subscribeInfo;
-    MMI_HILOGI("The subscribeId:%{public}d, inputActiveInterval:%{public}" PRId64, CURRENT_SUBSCRIBE_ID, interval);
+    MMI_HILOGD("The subscribeId:%{public}d, inputActiveInterval:%{public}" PRId64, CURRENT_SUBSCRIBE_ID, interval);
     return CURRENT_SUBSCRIBE_ID;
 }
 
 int32_t InputActiveSubscribeManager::UnsubscribeInputActive(int32_t subscribeId)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     CHKPR(MULTIMODAL_INPUT_CONNECT_MGR, RET_ERR);
     if (subscribeId != CURRENT_SUBSCRIBE_ID) {
         MMI_HILOGE("The subscribeId(%{public}d) is invalid", subscribeId);

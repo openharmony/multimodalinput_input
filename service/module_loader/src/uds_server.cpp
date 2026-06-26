@@ -439,7 +439,7 @@ bool UDSServer::AddSession(SessionPtr ses)
         return false;
     }
     DumpSession("AddSession");
-    MMI_HILOGI("AddSession end");
+    MMI_HILOGD("AddSession end");
     return true;
 }
 

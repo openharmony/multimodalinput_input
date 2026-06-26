@@ -56,7 +56,7 @@ void Monitor::SetDeviceMgr(IDeviceMgr *devMgr)
 
 int32_t Monitor::Enable()
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     int32_t ret = OpenConnection();
     if (ret == RET_OK) {
         ret = EnableReceiving();
@@ -70,7 +70,7 @@ int32_t Monitor::Enable()
 
 void Monitor::Disable()
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     if (devWd_ >= 0) {
         int32_t ret = inotify_rm_watch(inotifyFd_, devWd_);
         if (ret != 0) {

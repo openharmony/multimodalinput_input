@@ -793,7 +793,7 @@ void InputDeviceManager::NotifyDevCallback(int32_t deviceId, struct InputDeviceI
     NotifyDevCallbackExt(deviceId, inDevice.inputDeviceOrigin);
 #endif // OHOS_BUILD_ENABLE_KEYBOARD_EXT_FLAG
     if (!inDevice.isTouchableDevice || (deviceId < 0)) {
-        MMI_HILOGI("The device is not touchable device already existent");
+        MMI_HILOGD("The device is not touchable device already existent");
         return;
     }
     std::string name = "null";
@@ -1252,7 +1252,7 @@ int32_t InputDeviceManager::OnEnableInputDevice(bool enable)
 int32_t InputDeviceManager::AddVirtualInputDevice(std::shared_ptr<InputDevice> device, int32_t &deviceId)
 {
     // LCOV_EXCL_START
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     CHKPR(device, RET_ERR);
     if (CheckDuplicateInputDevice(device)) {
         return RET_ERR;
@@ -1511,7 +1511,7 @@ void InputDeviceManager::NotifyRemovePointerDevice(bool removePointerDevice)
 
 int32_t InputDeviceManager::RemoveVirtualInputDevice(int32_t deviceId)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     InputDeviceInfo deviceInfo;
     if (RemoveVirtualInputDeviceInner(deviceId, deviceInfo) == RET_ERR) {
         return RET_ERR;
@@ -1531,7 +1531,7 @@ int32_t InputDeviceManager::RemoveVirtualInputDevice(int32_t deviceId)
 int32_t InputDeviceManager::MakeVirtualDeviceInfo(std::shared_ptr<InputDevice> device, InputDeviceInfo &deviceInfo)
 {
     // LCOV_EXCL_START
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     CHKPR(device, ERROR_NULL_POINTER);
     deviceInfo.isRemote = false;
     deviceInfo.isPointerDevice = device->HasCapability(InputDeviceCapability::INPUT_DEV_CAP_POINTER);
@@ -1543,7 +1543,7 @@ int32_t InputDeviceManager::MakeVirtualDeviceInfo(std::shared_ptr<InputDevice> d
 
 int32_t InputDeviceManager::GenerateVirtualDeviceId(int32_t &deviceId)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     static int32_t virtualDeviceId { MIN_VIRTUAL_INPUT_DEVICE_ID };
     if (virtualInputDevices_.size() >= MAX_VIRTUAL_INPUT_DEVICE_NUM) {
         MMI_HILOGE("Virtual device num exceeds limit:%{public}d", MAX_VIRTUAL_INPUT_DEVICE_NUM);
