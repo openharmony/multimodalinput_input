@@ -94,11 +94,14 @@ public:
 
     float GetScale() const
     {
-        if (GetIsCurrentOffScreenRendering() && (IsExtend() || IsMain())) {
+        if (IsMain()) {
+            return GetIsCurrentOffScreenRendering() ? offRenderScale_ : scale_;
+        } else if (IsExtend()) {
             return offRenderScale_;
-        } else {
+        } else if (IsMirror()) {
             return scale_;
         }
+        return 1.0f;
     }
 
     uint32_t GetMode() const
