@@ -350,7 +350,6 @@ void PointerDrawingManager::ClearResources()
     initDisplayStatusReceiverFlag_ = false;
     if (GetHardCursorEnabled()) {
         ClearRunnerAndHandler();
-        UnsubscribeScreenModeChange();
     } else {
         auto surfaceNodePtr = GetSurfaceNode();
         if (surfaceNodePtr != nullptr) {
@@ -360,6 +359,7 @@ void PointerDrawingManager::ClearResources()
             RsFlushImplicitTransaction();
         }
     }
+    UnsubscribeScreenModeChange();
     INPUT_DEV_MGR->Detach(self_);
     Rosen::RSInterfaces::GetInstance().SetOnRemoteDiedCallback(nullptr);
     ResetMoveRetryTimer();
