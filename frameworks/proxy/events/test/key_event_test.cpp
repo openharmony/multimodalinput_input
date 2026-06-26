@@ -829,5 +829,182 @@ HWTEST_F(KeyEventTest, Test_RemoveReleasedKeyItems_WhenMixedStates_ExpectKeepPre
     EXPECT_NO_FATAL_FAILURE(keyEvent->RemoveReleasedKeyItems());
     ASSERT_EQ(keyEvent->keys_.size(), 1);
 }
+
+/**
+ * @tc.name: KeyEventTest_AddPressedKeyItems_CombinationSequence_001
+ * @tc.desc: Verify the pressed-key state accumulates across successive KEY_ACTION_DOWN calls so
+ *           that the main key's DOWN event carries the still-pressed modifier. Regression guard
+ *           for the Ctrl+V injection failure fixed in GetInjectionEventData (js_register_module.cpp).
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyEventTest, KeyEventTest_AddPressedKeyItems_CombinationSequence_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+
+    const int32_t ctrlKeyCode = 2051; // KEYCODE_CTRL_LEFT
+    const int32_t vKeyCode = 2012;    // KEYCODE_V
+
+    // Simulate "Ctrl-Down": add modifier into the persistent pressed-key state.
+    KeyEvent::KeyItem ctrlItem;
+    ctrlItem.SetKeyCode(ctrlKeyCode);
+    ctrlItem.SetPressed(true);
+    keyEvent->AddPressedKeyItems(ctrlItem);
+
+    // Simulate "V-Down": add main key while modifier is still pressed.
+    KeyEvent::KeyItem vItem;
+    vItem.SetKeyCode(vKeyCode);
+    vItem.SetPressed(true);
+    keyEvent->AddPressedKeyItems(vItem);
+
+    // The main key's event MUST carry both modifier and main key, otherwise the combination
+    // cannot be recognized (the root cause of the Ctrl+V injection failure).
+    auto items = keyEvent->GetKeyItems();
+    ASSERT_EQ(items.size(), 2u);
+    EXPECT_EQ(items[0].GetKeyCode(), ctrlKeyCode);
+    EXPECT_EQ(items[1].GetKeyCode(), vKeyCode);
+
+    auto pressedKeys = keyEvent->GetPressedKeys();
+    ASSERT_EQ(pressedKeys.size(), 2u);
+    bool hasCtrl = false;
+    bool hasV = false;
+    for (int32_t code : pressedKeys) {
+        if (code == ctrlKeyCode) hasCtrl = true;
+        if (code == vKeyCode) hasV = true;
+    }
+    EXPECT_TRUE(hasCtrl);
+    EXPECT_TRUE(hasV);
+}
+
+/**
+ * @tc.name: KeyEventTest_AddPressedKeyItems_Dedup_001
+ * @tc.desc: Verify AddPressedKeyItems does not duplicate an already-pressed key, so the
+ *           combination context stays exactly one entry per modifier.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyEventTest, KeyEventTest_AddPressedKeyItems_Dedup_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+
+    const int32_t ctrlKeyCode = 2051; // KEYCODE_CTRL_LEFT
+    KeyEvent::KeyItem ctrlItem;
+    ctrlItem.SetKeyCode(ctrlKeyCode);
+    ctrlItem.SetPressed(true);
+    keyEvent->AddPressedKeyItems(ctrlItem);
+    // Pressing the same modifier again must not create a duplicate entry.
+    keyEvent->AddPressedKeyItems(ctrlItem);
+
+    EXPECT_EQ(keyEvent->GetKeyItems().size(), 1u);
+    EXPECT_EQ(keyEvent->GetPressedKeys().size(), 1u);
+}
+
+/**
+ * @tc.name: KeyEventTest_RemoveReleasedKeyItems_ReleaseSequence_001
+ * @tc.desc: Verify that on KEY_ACTION_UP the released key is removed from the pressed set and
+ *           re-added as a released item, while still-pressed modifiers are kept. This mirrors
+ *           the UP branch of HandleKeyAction that GetInjectionEventData relies on.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyEventTest, KeyEventTest_RemoveReleasedKeyItems_ReleaseSequence_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+
+    const int32_t ctrlKeyCode = 2051; // KEYCODE_CTRL_LEFT
+    const int32_t vKeyCode = 2012;    // KEYCODE_V
+
+    // Setup: Ctrl + V both pressed (combination context).
+    KeyEvent::KeyItem ctrlItem;
+    ctrlItem.SetKeyCode(ctrlKeyCode);
+    ctrlItem.SetPressed(true);
+    keyEvent->AddPressedKeyItems(ctrlItem);
+    KeyEvent::KeyItem vItemDown;
+    vItemDown.SetKeyCode(vKeyCode);
+    vItemDown.SetPressed(true);
+    keyEvent->AddPressedKeyItems(vItemDown);
+    ASSERT_EQ(keyEvent->GetKeyItems().size(), 2u);
+
+    // Simulate "V-Up": remove then re-add as released (the UP branch of HandleKeyAction).
+    KeyEvent::KeyItem vItemUp;
+    vItemUp.SetKeyCode(vKeyCode);
+    vItemUp.SetPressed(false);
+    keyEvent->RemoveReleasedKeyItems(vItemUp);
+    keyEvent->AddPressedKeyItems(vItemUp);
+
+    // The modifier MUST remain pressed; V transitions to released state in the event list.
+    auto items = keyEvent->GetKeyItems();
+    ASSERT_EQ(items.size(), 2u);
+    EXPECT_EQ(items[0].GetKeyCode(), ctrlKeyCode);
+    EXPECT_TRUE(items[0].IsPressed());
+    EXPECT_EQ(items[1].GetKeyCode(), vKeyCode);
+    EXPECT_FALSE(items[1].IsPressed());
+
+    auto pressedKeys = keyEvent->GetPressedKeys();
+    ASSERT_EQ(pressedKeys.size(), 1u);
+    EXPECT_EQ(pressedKeys[0], ctrlKeyCode);
+}
+
+/**
+ * @tc.name: KeyEventTest_AddPressedKeyItems_RepeatedCombinationNoResidue_001
+ * @tc.desc: Verify that after a full Ctrl+V DOWN/UP sequence, a second sequence does not carry
+ *           stale released items from the first. Regression guard for the residue-accumulation
+ *           bug fixed by the entry RemoveReleasedKeyItems() cleanup in GetInjectionEventData.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyEventTest, KeyEventTest_AddPressedKeyItems_RepeatedCombinationNoResidue_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+
+    const int32_t ctrlKeyCode = 2051; // KEYCODE_CTRL_LEFT
+    const int32_t vKeyCode = 2012;    // KEYCODE_V
+
+    // Mimic GetInjectionEventData's state maintenance, including the entry cleanup that drops
+    // stale released items before each injection.
+    auto maintain = [&](int32_t keyCode, bool isPressed) {
+        keyEvent->RemoveReleasedKeyItems();
+        KeyEvent::KeyItem item;
+        item.SetKeyCode(keyCode);
+        item.SetPressed(isPressed);
+        if (isPressed) {
+            keyEvent->AddPressedKeyItems(item);
+        } else {
+            keyEvent->RemoveReleasedKeyItems(item);
+            keyEvent->AddPressedKeyItems(item);
+        }
+    };
+
+    // First combination: Ctrl-Down, V-Down, V-Up, Ctrl-Up.
+    maintain(ctrlKeyCode, true);
+    maintain(vKeyCode, true);
+    maintain(vKeyCode, false);
+    maintain(ctrlKeyCode, false);
+
+    // Second combination starts: entry cleanup must have dropped all released items, so the
+    // second Ctrl-Down leaves keys_ = [Ctrl(pressed)] only, with no stale V/Ctrl released item.
+    maintain(ctrlKeyCode, true);
+    auto items = keyEvent->GetKeyItems();
+    ASSERT_EQ(items.size(), 1u);
+    EXPECT_EQ(items[0].GetKeyCode(), ctrlKeyCode);
+    EXPECT_TRUE(items[0].IsPressed());
+
+    // Second V-Down: keys_ = [Ctrl(pressed), V(pressed)], no stale released item carried over.
+    maintain(vKeyCode, true);
+    items = keyEvent->GetKeyItems();
+    ASSERT_EQ(items.size(), 2u);
+    EXPECT_EQ(items[0].GetKeyCode(), ctrlKeyCode);
+    EXPECT_TRUE(items[0].IsPressed());
+    EXPECT_EQ(items[1].GetKeyCode(), vKeyCode);
+    EXPECT_TRUE(items[1].IsPressed());
+}
 } // namespace MMI
 } // namespace OHOS
