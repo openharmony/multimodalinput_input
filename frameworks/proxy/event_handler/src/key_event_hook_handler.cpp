@@ -37,7 +37,7 @@ KeyEventHookHandler &KeyEventHookHandler::GetInstance()
 
 int32_t KeyEventHookHandler::AddKeyEventHook(std::function<void(std::shared_ptr<KeyEvent>)> callback, int32_t &hookId)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     CHKPR(callback, INVALID_HANDLER_ID);
     if (!MMIEventHdl.InitClient()) {
         MMI_HILOGE("Client init failed");
@@ -58,7 +58,7 @@ int32_t KeyEventHookHandler::AddKeyEventHook(std::function<void(std::shared_ptr<
 
 int32_t KeyEventHookHandler::RemoveKeyEventHook(int32_t hookId)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     if (int32_t ret = MULTIMODAL_INPUT_CONNECT_MGR->RemoveKeyEventHook(hookId); ret != RET_OK) {
         MMI_HILOGE("RemoveKeyEventHook failed, ret:%{public}d", ret);
         return ret;
@@ -189,7 +189,7 @@ bool KeyEventHookHandler::IsValidEvent(int32_t eventId)
 
 void KeyEventHookHandler::UpdateGlobalHookId(int32_t hookId)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     auto hookIdUpdater = GetHookIdUpdater();
     CHKPV(hookIdUpdater);
     hookIdUpdater(hookId);
@@ -197,7 +197,7 @@ void KeyEventHookHandler::UpdateGlobalHookId(int32_t hookId)
 
 void KeyEventHookHandler::OnConnected()
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     if (auto hookCallback = GetHookCallback(); hookCallback == nullptr) {
         MMI_HILOGW("No hook added before");
         return;

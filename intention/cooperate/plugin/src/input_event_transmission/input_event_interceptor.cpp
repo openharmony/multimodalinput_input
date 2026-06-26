@@ -50,7 +50,7 @@ InputEventInterceptor::~InputEventInterceptor()
 
 void InputEventInterceptor::Enable(Context &context)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     if (interceptorId_ > 0) {
         return;
     }
@@ -72,7 +72,7 @@ void InputEventInterceptor::Enable(Context &context)
 
 void InputEventInterceptor::Disable()
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     if (interceptorId_ > 0) {
         env_->GetInput().RemoveInterceptor(interceptorId_);
         interceptorId_ = -1;

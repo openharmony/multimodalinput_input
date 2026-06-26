@@ -157,7 +157,7 @@ int32_t DSoftbusAdapterImpl::OpenSession(const std::string &networkId)
 
 void DSoftbusAdapterImpl::CloseSession(const std::string &networkId)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     std::lock_guard guard(lock_);
     if (auto iter = sessions_.find(networkId); iter != sessions_.end()) {
         ::Shutdown(iter->second.socket_);
@@ -169,7 +169,7 @@ void DSoftbusAdapterImpl::CloseSession(const std::string &networkId)
 
 void DSoftbusAdapterImpl::CloseAllSessions()
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     std::lock_guard guard(lock_);
     CloseAllSessionsLocked();
 }
@@ -226,7 +226,7 @@ int32_t DSoftbusAdapterImpl::SendParcel(const std::string &networkId, Parcel &pa
 
 int32_t DSoftbusAdapterImpl::BroadcastPacket(NetPacket &packet)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     std::lock_guard guard(lock_);
     if (sessions_.empty()) {
         FI_HILOGE("No session connected");
@@ -273,7 +273,7 @@ static void OnBytesAvailable(int32_t socket, const void *data, uint32_t dataLen)
 
 void DSoftbusAdapterImpl::OnBind(int32_t socket, PeerSocketInfo info)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     std::lock_guard guard(lock_);
     std::string networkId = info.networkId;
     FI_HILOGI("Bind session(%{public}d, %{public}s)", socket, Utility::Anonymize(networkId).c_str());
@@ -300,7 +300,7 @@ void DSoftbusAdapterImpl::OnBind(int32_t socket, PeerSocketInfo info)
 
 void DSoftbusAdapterImpl::OnShutdown(int32_t socket, ShutdownReason reason)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     std::lock_guard guard(lock_);
     auto iter = std::find_if(sessions_.cbegin(), sessions_.cend(), [socket](const auto &item) {
         return (item.second.socket_ == socket);
@@ -350,7 +350,7 @@ void DSoftbusAdapterImpl::OnBytes(int32_t socket, const void *data, uint32_t dat
 
 int32_t DSoftbusAdapterImpl::InitSocket(SocketInfo info, int32_t socketType, int32_t &socket)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     socket = ::Socket(info);
     if (socket < 0) {
         FI_HILOGE("DSOFTBUS::Socket failed");
@@ -389,7 +389,7 @@ int32_t DSoftbusAdapterImpl::InitSocket(SocketInfo info, int32_t socketType, int
 
 int32_t DSoftbusAdapterImpl::SetupServer()
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     if (socketFd_ > 0) {
         return RET_OK;
     }
@@ -408,7 +408,7 @@ int32_t DSoftbusAdapterImpl::SetupServer()
 
 void DSoftbusAdapterImpl::ShutdownServer()
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     CloseAllSessionsLocked();
     if (socketFd_ > 0) {
         ::Shutdown(socketFd_);
@@ -418,7 +418,7 @@ void DSoftbusAdapterImpl::ShutdownServer()
 
 int32_t DSoftbusAdapterImpl::OpenSessionLocked(const std::string &networkId)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     if (sessions_.find(networkId) != sessions_.end()) {
         FI_HILOGD("InputSoftbus session has already opened");
         return RET_OK;
@@ -461,7 +461,7 @@ int32_t DSoftbusAdapterImpl::OpenSessionLocked(const std::string &networkId)
 
 void DSoftbusAdapterImpl::OnConnectedLocked(const std::string &networkId)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     for (const auto &item : observers_) {
         std::shared_ptr<IDSoftbusObserver> observer = item.Lock();
         CHKPC(observer);

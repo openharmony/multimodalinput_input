@@ -74,7 +74,7 @@ void EventPreMonitorHandler::HandleTouchEvent(const std::shared_ptr<PointerEvent
 int32_t EventPreMonitorHandler::AddInputHandler(
     SessionPtr session, int32_t handlerId, HandleEventType eventType, std::vector<int32_t> keys)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     CHKPR(session, RET_ERR);
     if ((eventType & HANDLE_EVENT_TYPE_ALL) == HANDLE_EVENT_TYPE_NONE) {
         MMI_HILOGE("Invalid event type");
@@ -87,7 +87,7 @@ int32_t EventPreMonitorHandler::AddInputHandler(
 
 void EventPreMonitorHandler::RemoveInputHandler(SessionPtr sess, int32_t handlerId)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     monitors_.RemoveMonitor(sess, handlerId);
 }
 

@@ -270,7 +270,7 @@ int32_t KeyEventInputSubscribeManager::SubscribeHotkey(std::shared_ptr<KeyOption
 
 int32_t KeyEventInputSubscribeManager::UnsubscribeHotkey(int32_t subscribeId)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     if (subscribeId < 0) {
         MMI_HILOGE("Subscribe id is less than 0");
         return RET_ERR;

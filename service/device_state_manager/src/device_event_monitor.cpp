@@ -174,13 +174,13 @@ int32_t DeviceEventMonitor::GetVoipCallState()
 
 void DeviceEventMonitor::SetHasHandleRingMute(bool hasHandleRingMute)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     hasHandleRingMute_ = hasHandleRingMute;
 }
 
 bool DeviceEventMonitor::GetHasHandleRingMute()
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     return hasHandleRingMute_;
 }
 } // namespace MMI

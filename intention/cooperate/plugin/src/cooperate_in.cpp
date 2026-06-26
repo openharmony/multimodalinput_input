@@ -45,13 +45,13 @@ void CooperateIn::OnEvent(Context &context, const CooperateEvent &event)
 
 void CooperateIn::OnEnterState(Context &context)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     env_->GetInput().SetPointerVisibility(!context.NeedHideCursor());
 }
 
 void CooperateIn::OnLeaveState(Context &context)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     UpdateCooperateFlagEvent event {
         .mask = COOPERATE_FLAG_HIDE_CURSOR,
         .flag = COOPERATE_FLAG_HIDE_CURSOR,
@@ -131,7 +131,7 @@ void CooperateIn::Initial::OnDisable(Context &context, const CooperateEvent &eve
 
 void CooperateIn::Initial::OnStart(Context &context, const CooperateEvent &event)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     StartCooperateEvent startEvent = std::get<StartCooperateEvent>(event.event);
 
     if (context.IsLocal(startEvent.remoteNetworkId)) {
@@ -153,7 +153,7 @@ void CooperateIn::Initial::OnStart(Context &context, const CooperateEvent &event
 
 void CooperateIn::Initial::OnComeBack(Context &context, const CooperateEvent &event)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     context.inputEventBuilder_.Disable();
     FI_HILOGI("[come back] To \'%{public}s\'", Utility::Anonymize(context.Peer()).c_str());
     DSoftbusComeBack notice {
@@ -174,7 +174,7 @@ void CooperateIn::Initial::OnComeBack(Context &context, const CooperateEvent &ev
 
 void CooperateIn::Initial::OnRelay(Context &context, const CooperateEvent &event)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     StartCooperateEvent startEvent = std::get<StartCooperateEvent>(event.event);
     parent_.process_.StartCooperate(context, startEvent);
     FI_HILOGI("[relay cooperate] To \'%{public}s\'", Utility::Anonymize(parent_.process_.Peer()).c_str());
@@ -187,7 +187,7 @@ void CooperateIn::Initial::OnRelay(Context &context, const CooperateEvent &event
 
 void CooperateIn::Initial::OnStop(Context &context, const CooperateEvent &event)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     StopCooperateEvent param = std::get<StopCooperateEvent>(event.event);
 
     context.eventMgr_.StopCooperate(param);
@@ -203,7 +203,7 @@ void CooperateIn::Initial::OnStop(Context &context, const CooperateEvent &event)
 
 void CooperateIn::Initial::OnRemoteStart(Context &context, const CooperateEvent &event)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     DSoftbusStartCooperate notice = std::get<DSoftbusStartCooperate>(event.event);
 
     if (context.IsPeer(notice.networkId) || context.IsLocal(notice.networkId)) {
@@ -297,7 +297,7 @@ void CooperateIn::Initial::OnSoftbusSessionClosed(Context &context, const Cooper
 
 void CooperateIn::Initial::OnRemoteInputDevice(Context &context, const CooperateEvent &event)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     DSoftbusSyncInputDevice notice = std::get<DSoftbusSyncInputDevice>(event.event);
     if (!context.IsPeer(notice.networkId)) {
         return;
@@ -390,7 +390,7 @@ void CooperateIn::RelayConfirmation::OnStop(Context &context, const CooperateEve
 
 void CooperateIn::RelayConfirmation::OnRemoteStart(Context &context, const CooperateEvent &event)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     DSoftbusStartCooperate notice = std::get<DSoftbusStartCooperate>(event.event);
 
     if (context.IsPeer(notice.networkId) || context.IsLocal(notice.networkId)) {

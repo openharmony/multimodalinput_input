@@ -70,7 +70,7 @@ void EventFilterHandler::HandleTouchEvent(const std::shared_ptr<PointerEvent> po
 int32_t EventFilterHandler::AddInputEventFilter(sptr<IEventFilter> filter,
     int32_t filterId, int32_t priority, uint32_t deviceTags, int32_t clientPid)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(lockFilter_);
     CHKPR(filter, ERROR_NULL_POINTER);
     MMI_HILOGI("Add filter, filterId:%{public}d, priority:%{public}d, clientPid:%{public}d, filters_ size:%{public}zu",

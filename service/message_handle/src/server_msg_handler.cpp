@@ -171,7 +171,7 @@ int32_t ServerMsgHandler::OnInjectKeyEvent(const std::shared_ptr<KeyEvent> keyEv
 
 int32_t ServerMsgHandler::OnGetFunctionKeyState(int32_t funcKey, bool &state)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     bool hasVirtualKeyboard = false;
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
     hasVirtualKeyboard = INPUT_DEV_MGR->HasVirtualKeyboardDevice();
@@ -191,7 +191,7 @@ int32_t ServerMsgHandler::OnGetFunctionKeyState(int32_t funcKey, bool &state)
 
 int32_t ServerMsgHandler::OnSetFunctionKeyState(int32_t pid, int32_t funcKey, bool enable)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     AppExecFwk::RunningProcessInfo processInfo;
     auto appMgrClient = DelayedSingleton<AppExecFwk::AppMgrClient>::GetInstance();
     CHKPR(appMgrClient, ERROR_NULL_POINTER);
@@ -1906,7 +1906,7 @@ int32_t ServerMsgHandler::EnableInputExtension(int32_t uid, const std::string &u
 
 bool ServerMsgHandler::IsApplicationType(int32_t pid)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     AppExecFwk::RunningProcessInfo processInfo;
     auto appMgrClient = DelayedSingleton<AppExecFwk::AppMgrClient>::GetInstance();
     CHKPF(appMgrClient);

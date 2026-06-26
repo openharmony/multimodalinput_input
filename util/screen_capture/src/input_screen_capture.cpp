@@ -59,7 +59,7 @@ extern "C" void RegisterListener(ScreenCaptureCallback callback)
 
 extern "C" bool IsMusicActivate()
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     std::vector<std::shared_ptr<AudioStandard::AudioRendererChangeInfo>> rendererChangeInfo;
 #ifdef OHOS_BUILD_ENABLE_DFX_RADAR
     auto begin = std::chrono::high_resolution_clock::now();
@@ -92,7 +92,7 @@ extern "C" bool IsMusicActivate()
 
 extern "C" void CleanUpScreenCaptureResources()
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     AudioStandard::AudioSystemManager::GetInstance()->CleanUpResource();
 }
 #endif

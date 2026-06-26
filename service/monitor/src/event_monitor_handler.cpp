@@ -110,7 +110,7 @@ bool EventMonitorHandler::CheckHasInputHandler(HandleEventType eventType)
 int32_t EventMonitorHandler::AddInputHandler(InputHandlerType handlerType, HandleEventType eventType,
     std::shared_ptr<IInputEventConsumer> callback, TouchGestureType gestureType, int32_t fingers)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     CHKPR(callback, RET_ERR);
     if ((eventType & HANDLE_EVENT_TYPE_ALL) == HANDLE_EVENT_TYPE_NONE) {
         MMI_HILOGE("Invalid event type");
@@ -124,7 +124,7 @@ int32_t EventMonitorHandler::AddInputHandler(InputHandlerType handlerType, Handl
 int32_t EventMonitorHandler::AddInputHandler(InputHandlerType handlerType,
     HandleEventType eventType, SessionPtr session, TouchGestureType gestureType, int32_t fingers)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     CHKPR(session, RET_ERR);
     if ((eventType & HANDLE_EVENT_TYPE_ALL) == HANDLE_EVENT_TYPE_NONE) {
         MMI_HILOGE("Invalid event type");
@@ -138,7 +138,7 @@ int32_t EventMonitorHandler::AddInputHandler(InputHandlerType handlerType,
 int32_t EventMonitorHandler::AddInputHandler(InputHandlerType handlerType,
     std::vector<int32_t> actionsType, SessionPtr session)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     CHKPR(session, RET_ERR);
     InitSessionLostCallback();
     SessionHandler mon { handlerType, HANDLE_EVENT_TYPE_NONE, session, actionsType };
@@ -148,7 +148,7 @@ int32_t EventMonitorHandler::AddInputHandler(InputHandlerType handlerType,
 void EventMonitorHandler::RemoveInputHandler(InputHandlerType handlerType, HandleEventType eventType,
     std::shared_ptr<IInputEventConsumer> callback, TouchGestureType gestureType, int32_t fingers)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     CHKPV(callback);
     if (handlerType == InputHandlerType::MONITOR) {
         SessionHandler monitor { handlerType, eventType, callback, gestureType, fingers };
@@ -159,7 +159,7 @@ void EventMonitorHandler::RemoveInputHandler(InputHandlerType handlerType, Handl
 void EventMonitorHandler::RemoveInputHandler(InputHandlerType handlerType, std::vector<int32_t> actionsType,
     SessionPtr session)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     if (handlerType == InputHandlerType::MONITOR) {
         SessionHandler monitor { handlerType, HANDLE_EVENT_TYPE_NONE, session, actionsType };
         monitors_.RemoveMonitor(monitor);
@@ -169,7 +169,7 @@ void EventMonitorHandler::RemoveInputHandler(InputHandlerType handlerType, std::
 void EventMonitorHandler::RemoveInputHandler(InputHandlerType handlerType, HandleEventType eventType,
     SessionPtr session, TouchGestureType gestureType, int32_t fingers)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     if (handlerType == InputHandlerType::MONITOR) {
         SessionHandler monitor { handlerType, eventType, session, gestureType, fingers };
         monitors_.RemoveMonitor(monitor);

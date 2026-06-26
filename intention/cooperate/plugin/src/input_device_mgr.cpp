@@ -32,7 +32,7 @@ InputDeviceMgr::InputDeviceMgr(IContext *context) : env_(context) { }
 
 void InputDeviceMgr::Enable()
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     if (enable_) {
         return;
     }
@@ -42,7 +42,7 @@ void InputDeviceMgr::Enable()
 
 void InputDeviceMgr::Disable()
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     if (enable_) {
         enable_ = false;
     }
@@ -51,25 +51,25 @@ void InputDeviceMgr::Disable()
 
 void InputDeviceMgr::OnSoftbusSessionOpened(const DSoftbusSessionOpened &notice)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     NotifyInputDeviceToRemote(notice.networkId);
 }
 
 void InputDeviceMgr::OnSoftbusSessionClosed(const DSoftbusSessionClosed &notice)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     RemoveAllRemoteInputDevice(notice.networkId);
 }
 
 void InputDeviceMgr::OnLocalHotPlug(const InputHotplugEvent &notice)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     BroadcastHotPlugToRemote(notice);
 }
 
 void InputDeviceMgr::AddVirtualInputDevice(const std::string &networkId)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     FI_HILOGI("Add virtual device from %{public}s", Utility::Anonymize(networkId).c_str());
     for (const auto &device : remoteDevices_[networkId]) {
         CHKPC(device);
@@ -79,7 +79,7 @@ void InputDeviceMgr::AddVirtualInputDevice(const std::string &networkId)
 
 void InputDeviceMgr::RemoveVirtualInputDevice(const std::string &networkId)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     FI_HILOGI("Remove virtual device from %{public}s", Utility::Anonymize(networkId).c_str());
     for (const auto &device : remoteDevices_[networkId]) {
         CHKPC(device);
@@ -89,7 +89,7 @@ void InputDeviceMgr::RemoveVirtualInputDevice(const std::string &networkId)
 
 void InputDeviceMgr::HandleRemoteHotPlug(const DSoftbusHotPlugEvent &notice)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     CHKPV(notice.device);
     auto remoteDeviceId = notice.device->GetId();
     if (notice.type == InputHotplugType::UNPLUG) {
@@ -106,7 +106,7 @@ void InputDeviceMgr::HandleRemoteHotPlug(const DSoftbusHotPlugEvent &notice)
 
 void InputDeviceMgr::OnRemoteInputDevice(const DSoftbusSyncInputDevice &notice)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     std::string networkId = notice.networkId;
     for (const auto &device : notice.devices) {
         DispDeviceInfo(device);
@@ -116,12 +116,12 @@ void InputDeviceMgr::OnRemoteInputDevice(const DSoftbusSyncInputDevice &notice)
 
 void InputDeviceMgr::OnRemoteHotPlug(const DSoftbusHotPlugEvent &notice)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
 }
 
 void InputDeviceMgr::NotifyInputDeviceToRemote(const std::string &remoteNetworkId)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     if (!env_->GetDeviceManager().HasKeyboard()) {
         FI_HILOGE("Local device have no keyboard, skip");
         return;
@@ -147,7 +147,7 @@ void InputDeviceMgr::NotifyInputDeviceToRemote(const std::string &remoteNetworkI
 
 void InputDeviceMgr::BroadcastHotPlugToRemote(const InputHotplugEvent &notice)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     FI_HILOGI("HotplugType%{public}d deviceId:%{public}d", static_cast<int32_t>(notice.type), notice.deviceId);
     if (!notice.isKeyboard) {
         FI_HILOGI("Not keyboard, skip");
@@ -179,7 +179,7 @@ void InputDeviceMgr::BroadcastHotPlugToRemote(const InputHotplugEvent &notice)
 
 void InputDeviceMgr::AddRemoteInputDevice(const std::string &networkId, std::shared_ptr<IDevice> device)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     DispDeviceInfo(device);
     if (remoteDevices_.find(networkId) != remoteDevices_.end() &&
         remoteDevices_[networkId].size() >= MAX_INPUT_DEV_PER_DEVICE) {
@@ -191,7 +191,7 @@ void InputDeviceMgr::AddRemoteInputDevice(const std::string &networkId, std::sha
 
 void InputDeviceMgr::RemoveRemoteInputDevice(const std::string &networkId, std::shared_ptr<IDevice> device)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     if (remoteDevices_.find(networkId) == remoteDevices_.end()) {
         FI_HILOGE("NetworkId:%{public}s have no device existed", Utility::Anonymize(networkId).c_str());
         return;
@@ -202,7 +202,7 @@ void InputDeviceMgr::RemoveRemoteInputDevice(const std::string &networkId, std::
 
 void InputDeviceMgr::RemoveAllRemoteInputDevice(const std::string &networkId)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     if (remoteDevices_.find(networkId) == remoteDevices_.end()) {
         FI_HILOGE("NetworkId:%{public}s have no device existed", Utility::Anonymize(networkId).c_str());
         return;
@@ -212,7 +212,7 @@ void InputDeviceMgr::RemoveAllRemoteInputDevice(const std::string &networkId)
 
 void InputDeviceMgr::DumpRemoteInputDevice(const std::string &networkId)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     if (remoteDevices_.find(networkId) == remoteDevices_.end()) {
         FI_HILOGE("NetworkId:%{public}s have no device existed", Utility::Anonymize(networkId).c_str());
         return;
@@ -226,7 +226,7 @@ void InputDeviceMgr::DumpRemoteInputDevice(const std::string &networkId)
 
 int32_t InputDeviceMgr::SerializeDevice(std::shared_ptr<IDevice> device, NetPacket &packet)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     packet << device->GetId() << device->GetDevPath() << device->GetSysPath() << device->GetBus() << device->GetVendor()
            << device->GetProduct() << device->GetVersion() << device->GetName() << device->GetPhys()
            << device->GetUniq() << device->IsPointerDevice() << device->IsKeyboard()
@@ -262,7 +262,7 @@ std::shared_ptr<MMI::InputDevice> InputDeviceMgr::Transform(std::shared_ptr<IDev
 
 void InputDeviceMgr::AddVirtualInputDevice(const std::string &networkId, int32_t remoteDeviceId)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     if (remote2VirtualIds_.find(remoteDeviceId) != remote2VirtualIds_.end()) {
         FI_HILOGW("Remote device:%{public}d already added as virtual device:%{public}d", remoteDeviceId,
             remote2VirtualIds_[remoteDeviceId]);
@@ -283,7 +283,7 @@ void InputDeviceMgr::AddVirtualInputDevice(const std::string &networkId, int32_t
 
 void InputDeviceMgr::RemoveVirtualInputDevice(const std::string &networkId, int32_t remoteDeviceId)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     if (remote2VirtualIds_.find(remoteDeviceId) == remote2VirtualIds_.end()) {
         FI_HILOGE("No remote device from networkId%{public}s with id:%{public}d", Utility::Anonymize(networkId).c_str(),
             remoteDeviceId);

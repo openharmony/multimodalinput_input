@@ -95,7 +95,7 @@ MouseTransformProcessor::MouseTransformProcessor(IInputServiceContext *env, int3
 
 MouseTransformProcessor::~MouseTransformProcessor()
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     auto timerMgr = GetTimerManager();
     if (timerMgr == nullptr) {
         MMI_HILOGE("timerMgr is nullptr");
@@ -1222,7 +1222,7 @@ bool MouseTransformProcessor::HandlePostInner(struct libinput_event_pointer* dat
 
 bool MouseTransformProcessor::CheckAndPackageAxisEvent()
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     if (!isAxisBegin_) {
         return false;
     }

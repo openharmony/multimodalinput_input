@@ -45,7 +45,7 @@ void TabletSubscriberHandler::HandleTabletEvent(const std::shared_ptr<PointerEve
 
 int32_t TabletSubscriberHandler::SubscribeTabletProximity(SessionPtr sess, int32_t subscribeId)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     if (subscribeId < 0) {
         MMI_HILOGE("Invalid subscribeId");
         return RET_ERR;
@@ -60,7 +60,7 @@ int32_t TabletSubscriberHandler::SubscribeTabletProximity(SessionPtr sess, int32
 
 int32_t TabletSubscriberHandler::UnsubscribetabletProximity(SessionPtr sess, int32_t subscribeId)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     MMI_HILOGD("subscribeId:%{public}d", subscribeId);
     for (auto it = subscribers_.begin(); it != subscribers_.end(); ++it) {
         if ((*it)->id_ == subscribeId && (*it)->sess_ == sess) {

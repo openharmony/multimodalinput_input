@@ -605,7 +605,7 @@ bool KeyCommandHandler::PreHandleEvent(const std::shared_ptr<KeyEvent> key)
 
 bool KeyCommandHandler::PreHandleEvent()
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     InitParse();
     if (!isParseMaxCount_) {
         ParseRepeatKeyMaxCount();
@@ -750,7 +750,7 @@ bool KeyCommandHandler::OnHandleEvent(const std::shared_ptr<PointerEvent> pointe
 
 int32_t KeyCommandHandler::SetIsFreezePowerKey(const std::string pageName)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> lock(mutex_);
     if (pageName != "SosCountdown") {
         context_.isFreezePowerKey_ = false;
@@ -1003,7 +1003,7 @@ bool KeyCommandHandler::CheckBundleName(const std::shared_ptr<PointerEvent> touc
 
 void KeyCommandHandler::RegisterProximitySensor()
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     if (hasRegisteredSensor_) {
         MMI_HILOGE("Has SubscribeSensor %{public}d", SENSOR_TYPE_ID_PROXIMITY);
         return;

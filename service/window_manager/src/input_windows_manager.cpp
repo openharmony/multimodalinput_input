@@ -211,13 +211,13 @@ InputWindowsManager::InputWindowsManager() : bindInfo_(BIND_CFG_FILE_NAME)
 
 InputWindowsManager::~InputWindowsManager()
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
 }
 
 void InputWindowsManager::DeviceStatusChanged(int32_t deviceId, const std::string &name, const std::string &sysUid,
     const std::string devStatus)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     if (devStatus == "add") {
         bindInfo_.AddInputDevice(deviceId, name, sysUid);
     } else {
@@ -277,7 +277,7 @@ bool InputWindowsManager::IgnoreTouchEvent(std::shared_ptr<PointerEvent> pointer
 
 void InputWindowsManager::ReissueCancelTouchEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
 #ifdef OHOS_BUILD_ENABLE_TOUCH
     auto items = pointerEvent->GetAllPointerItems();
     for (const auto &item : items) {
@@ -2677,7 +2677,7 @@ bool InputWindowsManager::NeedUpdatePointDrawFlag(const std::vector<WindowInfo> 
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
 void InputWindowsManager::SendPointerEvent(int32_t pointerAction)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     CHKPV(udsServer_);
     auto pointerEvent = PointerEvent::Create();
     CHKPV(pointerEvent);
@@ -2746,7 +2746,7 @@ void InputWindowsManager::SendPointerEvent(int32_t pointerAction)
 
 void InputWindowsManager::DispatchPointer(int32_t pointerAction, int32_t windowId)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     CHKPV(udsServer_);
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
     if (!CursorDrawingComponent::GetInstance().GetMouseDisplayState() && !HasMouseHideFlag()) {
@@ -2886,7 +2886,7 @@ void InputWindowsManager::DispatchPointer(int32_t pointerAction, int32_t windowI
 
 void InputWindowsManager::DispatchPointerRedispatch(int32_t pointerAction, const WindowInfo& windowInfo)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     auto lastPointerEvent = mouseRedispatchStore_.GetLastEvent();
     if (lastPointerEvent == nullptr) {
         return;
@@ -2939,7 +2939,7 @@ void InputWindowsManager::DispatchPointerRedispatch(int32_t pointerAction, const
 void InputWindowsManager::DispatchTouchRedispatch(int32_t pointerAction, float zOrder,
     int32_t deviceId, int32_t pointerId, const WindowInfo& windowInfo)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     auto fingerEvent = touchRedispatchStore_.GetFingerEvent(zOrder, deviceId, pointerId);
     if (fingerEvent == nullptr) {
         MMI_HILOGW("No finger event for zOrder:%{public}f deviceId:%{public}d pointerId:%{public}d",
@@ -6922,7 +6922,7 @@ void InputWindowsManager::UpdateStashTouchEventInfo(int32_t logicalX, int32_t lo
 
 void InputWindowsManager::DispatchTouch(int32_t pointerAction, int32_t groupId, int32_t toolType)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     if (udsServer_ == nullptr) {
         MMI_HILOGE("udsServer_ is nullptr");
         return;
@@ -7153,7 +7153,7 @@ void InputWindowsManager::DrawTouchGraphic(std::shared_ptr<PointerEvent> pointer
 template <class T>
 void InputWindowsManager::CreateAntiMisTakeObserver(T& item)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     SettingObserver::UpdateFunc updateFunc = [&item](const std::string& key) {
         if (SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID).GetBoolValue(key, item.isOpen) != RET_OK) {
             MMI_HILOGE("Get settingdata failed, key:%{public}s", key.c_str());
@@ -7173,7 +7173,7 @@ void InputWindowsManager::CreateAntiMisTakeObserver(T& item)
 template <class T>
 void InputWindowsManager::CreatePrivacyProtectionObserver(T& item)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     SettingObserver::UpdateFunc updateFunc = [&item](const std::string& key) {
         if (SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID).GetBoolValue(key, item.isOpen) != RET_OK) {
             MMI_HILOGE("Get settingdata failed, key:%{public}s", key.c_str());

@@ -39,7 +39,7 @@ MouseEventInterface::InputDeviceObserver::InputDeviceObserver(std::shared_ptr<Mo
 
 void MouseEventInterface::InputDeviceObserver::OnDeviceAdded(int32_t deviceId)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     if (auto parent = parent_.lock(); parent != nullptr) {
         parent->OnDeviceAdded(parent, deviceId);
     }
@@ -47,7 +47,7 @@ void MouseEventInterface::InputDeviceObserver::OnDeviceAdded(int32_t deviceId)
 
 void MouseEventInterface::InputDeviceObserver::OnDeviceRemoved(int32_t deviceId)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     if (auto parent = parent_.lock(); parent != nullptr) {
         parent->OnDeviceRemoved(parent, deviceId);
     }
@@ -55,7 +55,7 @@ void MouseEventInterface::InputDeviceObserver::OnDeviceRemoved(int32_t deviceId)
 
 void MouseEventInterface::InputDeviceObserver::OnDeviceEnabled(int32_t deviceId)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     if (auto parent = parent_.lock(); parent != nullptr) {
         parent->OnDeviceEnabled(parent, deviceId);
     }
@@ -63,7 +63,7 @@ void MouseEventInterface::InputDeviceObserver::OnDeviceEnabled(int32_t deviceId)
 
 void MouseEventInterface::InputDeviceObserver::OnDeviceDisabled(int32_t deviceId)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     if (auto parent = parent_.lock(); parent != nullptr) {
         parent->OnDeviceDisabled(parent, deviceId);
     }
@@ -593,7 +593,7 @@ void MouseEventInterface::OnDeviceAdded(std::shared_ptr<MouseEventInterface> sel
 
 void MouseEventInterface::OnDeviceRemoved(std::shared_ptr<MouseEventInterface> self, int32_t deviceId)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     auto mouse = GetMouse();
     if (mouse == nullptr) {
         MMI_HILOGI("Mouse is nullptr");
@@ -609,7 +609,7 @@ void MouseEventInterface::OnDeviceRemoved(std::shared_ptr<MouseEventInterface> s
 
 void MouseEventInterface::OnDeviceEnabled(std::shared_ptr<MouseEventInterface> self, int32_t deviceId)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     auto mouse = GetMouse();
     if (mouse == nullptr) {
         MMI_HILOGI("Mouse is nullptr");
@@ -620,7 +620,7 @@ void MouseEventInterface::OnDeviceEnabled(std::shared_ptr<MouseEventInterface> s
 
 void MouseEventInterface::OnDeviceDisabled(std::shared_ptr<MouseEventInterface> self, int32_t deviceId)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     auto mouse = GetMouse();
     if (mouse == nullptr) {
         MMI_HILOGI("Mouse is nullptr");
@@ -681,7 +681,7 @@ void MouseEventInterface::LoadMouseExplicitly()
 
 void MouseEventInterface::OnMouseLoaded()
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     auto mouse = GetMouse();
     if (mouse == nullptr) {
         MMI_HILOGE("Mouse module not loaded");

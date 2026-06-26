@@ -28,7 +28,7 @@ namespace MMI {
 
 void MouseEventNormalize::OnDeviceAdded(int32_t deviceId)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     CHKPV(env_);
     auto devMgr = env_->GetDeviceManager();
     if (devMgr == nullptr) {
@@ -57,7 +57,7 @@ void MouseEventNormalize::OnDeviceAdded(int32_t deviceId)
 
 void MouseEventNormalize::OnDeviceRemoved(int32_t deviceId)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     auto iter = std::find_if(processors_.cbegin(), processors_.cend(),
         [deviceId](const auto &item) {
             return ((item.first == deviceId));
@@ -70,7 +70,7 @@ void MouseEventNormalize::OnDeviceRemoved(int32_t deviceId)
 
 void MouseEventNormalize::OnDeviceEnabled(int32_t deviceId)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     auto processor = GetProcessor(deviceId);
     if (processor != nullptr) {
         processor->OnDeviceEnabled();
@@ -79,7 +79,7 @@ void MouseEventNormalize::OnDeviceEnabled(int32_t deviceId)
 
 void MouseEventNormalize::OnDeviceDisabled(int32_t deviceId)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     auto processor = GetProcessor(deviceId);
     if (processor != nullptr) {
         processor->OnDeviceDisabled();

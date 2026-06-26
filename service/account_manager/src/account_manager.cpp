@@ -178,7 +178,7 @@ sptr<SettingObserver> AccountManager::AccountSetting::RegisterSettingObserver(
 
 void AccountManager::AccountSetting::InitializeSetting()
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     if (switchObserver_ == nullptr) {
         switchObserver_ = RegisterSettingObserver(ACC_SHORTCUT_ENABLED,
             [accountId = accountId_](const std::string &key) {
@@ -431,7 +431,7 @@ void AccountManager::InitializeScreenLockStatus()
 void AccountManager::SubscribeCommonEvent()
 {
     // LCOV_EXCL_START
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     EventFwk::MatchingSkills matchingSkills;
 
     for (auto &item : handlers_) {
@@ -461,7 +461,7 @@ void AccountManager::SubscribeCommonEvent()
 void AccountManager::UnsubscribeCommonEvent()
 {
     // LCOV_EXCL_START
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     if (subscriber_ != nullptr) {
         if (!EventFwk::CommonEventManager::UnSubscribeCommonEvent(subscriber_)) {
             MMI_HILOGE("UnSubscribeCommonEvent fail");
