@@ -20,8 +20,7 @@
 <configuration>
     <oatconfig>
         <licensefile>
-            <policyitem type="copyright" name="Hunan OpenValley Digital Industry Development Co." path=".*" rule="may" group="defaultGroup" filefilter="copyrightPolicyFilter" desc="Developed by Hunan OpenValley Digital Industry Development Co."/>
-        </licensefile>
+            <policyitem type="copyright" name="Hunan OpenValley Digital Industry Development Co., Ltd." path=".*" rule="may" group="defaultGroup" filefilter="copyrightPolicyFilter" desc="Developed by Hunan OpenValley Digital Industry Development Co."/>
         <filefilterlist>
             <filefilter name="defaultFilter" desc="Files not to check">
                 <filteritem type="filename" name="*.gif" desc="GIF file for README"/>
