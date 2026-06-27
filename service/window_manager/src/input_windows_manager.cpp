@@ -309,6 +309,7 @@ void InputWindowsManager::ReissueCancelTouchEvent(std::shared_ptr<PointerEvent> 
             iter->second.flag = false;
         }
     }
+    TouchLastPointerEventForGesture() = nullptr;
 #endif // OHOS_BUILD_ENABLE_TOUCH
 }
 
