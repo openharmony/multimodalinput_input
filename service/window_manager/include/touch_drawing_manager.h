@@ -57,6 +57,8 @@ private:
     template <class T>
     void CreateBubbleObserver(T& item);
     template <class T>
+    void CreateBubbleObserverByApp(T& item);
+    template <class T>
     void CreatePointerObserver(T& item);
     ITouchDrawingHandler* LoadTouchDrawingHandler();
     ITouchDrawingHandler* GetTouchDrawingHandler() const;
@@ -65,6 +67,7 @@ private:
 private:
     OLD::DisplayInfo displayInfo_ {};
     DevMode bubbleMode_;
+    DevMode bubbleModeByApp_;
     DevMode pointerMode_;
     bool hasBubbleObserver_{ false };
     bool hasPointerObserver_{ false };
@@ -74,6 +77,7 @@ private:
     ComponentManager::Handle<ITouchDrawingHandler> touchDrawingHandler_ {
         nullptr, ComponentManager::Component<ITouchDrawingHandler>() };
     int32_t timerId_ { -1 };
+    std::string screenRecondingBubbleStatus_ = "";
 };
 
 #define TOUCH_DRAWING_MGR ::OHOS::DelayedSingleton<TouchDrawingManager>::GetInstance()
