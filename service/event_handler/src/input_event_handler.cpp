@@ -319,6 +319,9 @@ bool InputEventHandler::IsTouchpadTapMistouch(libinput_event* event)
         if (libinput_device_get_size(touchpadDevice, &touchpadSizeX, &touchpadSizeY) != 0) {
             return false;
         }
+        if (touchpadSizeX < TOUCHPAD_MIN_X_SIZE_FOR_DWT) {
+            return false;
+        }
         double coordX = touchpadEventDownAbsX_;
         if (isDwtEdgeAreaForTouchpadTapActing_ &&
             (coordX <= TOUCHPAD_EDGE_WIDTH_FOR_TAP || coordX >= touchpadSizeX - TOUCHPAD_EDGE_WIDTH_FOR_TAP)) {

@@ -116,6 +116,7 @@ private:
     static constexpr double TOUCHPAD_EDGE_WIDTH_RELEASE = 20.0;
     static constexpr double TOUCHPAD_EDGE_WIDTH_FOR_BUTTON = 8.0;
     static constexpr double TOUCHPAD_EDGE_WIDTH_FOR_TAP = 25.0;
+    static constexpr double TOUCHPAD_MIN_X_SIZE_FOR_DWT = 52.0;
 };
 #define InputHandler ::OHOS::DelayedSingleton<InputEventHandler>::GetInstance()
 } // namespace MMI
