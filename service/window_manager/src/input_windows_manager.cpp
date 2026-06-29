@@ -2112,6 +2112,11 @@ void InputWindowsManager::UpdateDisplayInfo(OLD::DisplayGroupInfo &displayGroupI
     bFlag = (!Rosen::SceneBoardJudgement::IsSceneBoardEnabled() || action == WINDOW_UPDATE_ACTION::ADD_END)
         && (displayGroupInfo.userState == UserState::USER_ACTIVE);
     if (bFlag) {
+        PrintChangedWindowBySync(displayGroupInfo);
+        CleanInvalidPixelMap(groupId);
+        HandleValidDisplayChange(displayGroupInfo);
+        displayGroupInfoMap_[groupId] = displayGroupInfo;
+        displayGroupInfo_ = displayGroupInfo;
 #ifdef OHOS_BUILD_ENABLE_EXTERNAL_SCREEN
         bool isDisplayUpdate = needBackCenter;
         const auto backCenterIter = backCenterDisplayChangeMap_.find(displayGroupInfo.groupId);
@@ -2123,11 +2128,6 @@ void InputWindowsManager::UpdateDisplayInfo(OLD::DisplayGroupInfo &displayGroupI
             ResetPointerPosition(displayGroupInfo);
         }
 #endif // OHOS_BUILD_ENABLE_EXTERNAL_SCREEN
-        PrintChangedWindowBySync(displayGroupInfo);
-        CleanInvalidPixelMap(groupId);
-        HandleValidDisplayChange(displayGroupInfo);
-        displayGroupInfoMap_[groupId] = displayGroupInfo;
-        displayGroupInfo_ = displayGroupInfo;
         UpdateWindowsInfoPerDisplay(displayGroupInfo);
         HandleWindowPositionChange(displayGroupInfo);
         EnterMouseCaptureMode(displayGroupInfo);
