@@ -132,6 +132,8 @@ static void GetInjectionEventDataNative(napi_env env, struct Input_KeyEvent* key
     }
 }
 #else
+static std::shared_ptr<KeyEvent> g_injectKeyState = KeyEvent::Create();
+
 static void GetInjectionEventData(napi_env env, std::shared_ptr<KeyEvent> keyEvent, napi_value keyHandle,
     std::function<void(int32_t)> histogramError)
 {
@@ -171,7 +173,20 @@ static void GetInjectionEventData(napi_env env, std::shared_ptr<KeyEvent> keyEve
     item.SetKeyCode(keyCode);
     item.SetPressed(isPressed);
     item.SetDownTime(static_cast<int64_t>(keyDownDuration));
-    keyEvent->AddKeyItem(item);
+    if (g_injectKeyState != nullptr) {
+        g_injectKeyState->RemoveReleasedKeyItems();
+        if (isPressed) {
+            g_injectKeyState->AddPressedKeyItems(item);
+        } else {
+            g_injectKeyState->RemoveReleasedKeyItems(item);
+            g_injectKeyState->AddPressedKeyItems(item);
+        }
+        for (const auto &pressedItem : g_injectKeyState->GetKeyItems()) {
+            keyEvent->AddKeyItem(pressedItem);
+        }
+    } else {
+        keyEvent->AddKeyItem(item);
+    }
     InputManager::GetInstance()->SimulateInputEvent(keyEvent);
     std::this_thread::sleep_for(std::chrono::milliseconds(keyDownDuration));
 }
