@@ -3949,7 +3949,7 @@ void PointerDrawingManager::RecordCursorIdAndImageAddress()
 {
     const auto id = lastMouseStyle_.id;
     auto mouseIcons = CursorDrawingInformation::GetInstance().GetMouseIconsMap();
-    auto iter = mouseIcons.find(id);
+    auto iter = mouseIcons.find(MOUSE_ICON(id));
     if (iter == mouseIcons.end()) {
         MMI_HILOGE("Invalid cursor id: %{public}d", id);
         return;
