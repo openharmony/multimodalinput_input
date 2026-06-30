@@ -686,9 +686,9 @@ int32_t CursorDrawingInformation::UpdateDefaultPointerStyle(int32_t pid, int32_t
     PointerStyle style;
     WIN_MGR->GetPointerStyle(pid, GLOBAL_WINDOW_ID, style);
     if (pointerStyle.id != style.id) {
-        auto iconPath = GetMouseIconPath();
-        auto it = iconPath.find(MOUSE_ICON(MOUSE_ICON::DEFAULT));
-        if (it == iconPath.end()) {
+        auto iconPaths = GetMouseIconPath();
+        auto it = iconPaths.find(MOUSE_ICON(MOUSE_ICON::DEFAULT));
+        if (it == iconPaths.end()) {
             MMI_HILOGE("Cannot find the default style");
             return RET_ERR;
         }
@@ -696,7 +696,13 @@ int32_t CursorDrawingInformation::UpdateDefaultPointerStyle(int32_t pid, int32_t
         if (pointerStyle.id == MOUSE_ICON::DEFAULT) {
             newIconPath = DefaultIconPath;
         } else {
-            newIconPath = iconPath.at(MOUSE_ICON(pointerStyle.id)).iconPath;
+            auto iter = iconPaths.find(MOUSE_ICON(pointerStyle.id));
+            if (iter == iconPaths.end()) {
+                MMI_HILOGE("id:%{public}d is not in iconPaths", pointerStyle.id);
+                newIconPath = DefaultIconPath;
+            } else {
+                newIconPath = iter->second.iconPath;
+            }
         }
         MMI_HILOGD("Default path has changed from %{private}s to %{private}s",
             it->second.iconPath.c_str(), newIconPath.c_str());
@@ -754,6 +760,7 @@ void CursorDrawingInformation::CheckMouseIconPath()
     }
     for (auto iter = mouseIcons_.begin(); iter != mouseIcons_.end();) {
         if ((ReadCursorStyleFile(iter->second.iconPath)) != RET_OK) {
+            MMI_HILOGI("invalid iconPath");
             iter = mouseIcons_.erase(iter);
             continue;
         }
