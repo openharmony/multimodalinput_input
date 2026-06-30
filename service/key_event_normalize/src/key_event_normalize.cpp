@@ -202,16 +202,16 @@ void KeyEventNormalize::HandleKeyAction(struct libinput_device* device, KeyEvent
     }
 }
 
-int32_t KeyEventNormalize::SyncLedStateFromKeyEvent(struct libinput_device* device)
+bool KeyEventNormalize::SyncLedStateFromKeyEvent(struct libinput_device* device)
 {
-    CHKPR(device, RET_ERR);
+    CHKPR(device, false);
     bool isKeyboardWithLed = INPUT_DEV_MGR->IsKeyboardDevice(device) &&
         libinput_has_event_led_type(device);
     if (isKeyboardWithLed) {
         if (keyEvent_ == nullptr) {
             keyEvent_ = KeyEvent::Create();
         }
-        CHKPR(keyEvent_, RET_ERR);
+        CHKPR(keyEvent_, false);
         const std::vector<int32_t> funcKeys = {
             KeyEvent::NUM_LOCK_FUNCTION_KEY,
             KeyEvent::CAPS_LOCK_FUNCTION_KEY,
@@ -221,7 +221,7 @@ int32_t KeyEventNormalize::SyncLedStateFromKeyEvent(struct libinput_device* devi
             if (LibinputAdapter::DeviceLedUpdate(device, funcKey,
                 keyEvent_->GetFunctionKey(funcKey)) != RET_OK) {
                 MMI_HILOGE("Failed to set led state for funcKey:%{public}d", funcKey);
-                return RET_ERR;
+                return false;
             }
         }
         MMI_HILOGI("Sync led state of added device from keyEvent");
