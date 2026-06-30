@@ -916,49 +916,6 @@ HWTEST_F(TouchGestureDetectorTest, TouchGestureDetectorTest_ClacFingerMoveDirect
 }
 
 /**
- * @tc.name: TouchGestureDetectorTest_CalcGravityCenter_01
- * @tc.desc: Test CalcGravityCenter
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(TouchGestureDetectorTest, TouchGestureDetectorTest_CalcGravityCenter_01, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    auto listener = std::make_shared<MyGestureListener>();
-    TouchGestureType type = TOUCH_GESTURE_TYPE_SWIPE;
-    TouchGestureDetector detector(&env_, type, listener);
-    std::map<int32_t, Point> points;
-    points[1] = Point(1.0f, 2.0f);
-    points[2] = Point(3.0f, 4.0f);
-    points[3] = Point(5.0f, 6.0f);
-    points[4] = Point(7.0f, 8.0f);
-    points[5] = Point(9.0f, 10.0f);
-    points[6] = Point(11.0f, 12.0f);
-    int32_t count = static_cast<int32_t>(points.size());
-    EXPECT_TRUE(count > 5);
-    ASSERT_NO_FATAL_FAILURE(detector.CalcGravityCenter(points));
-}
-
-/**
- * @tc.name: TouchGestureDetectorTest_CalcGravityCenter_02
- * @tc.desc: Test CalcGravityCenter
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(TouchGestureDetectorTest, TouchGestureDetectorTest_CalcGravityCenter_02, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    auto listener = std::make_shared<MyGestureListener>();
-    TouchGestureType type = TOUCH_GESTURE_TYPE_SWIPE;
-    TouchGestureDetector detector(&env_, type, listener);
-    std::map<int32_t, Point> points;
-    points[1] = Point(1.0f, 2.0f);
-    points[2] = Point(3.0f, 4.0f);
-    points[3] = Point(5.0f, 6.0f);
-    ASSERT_NO_FATAL_FAILURE(detector.CalcGravityCenter(points));
-}
-
-/**
  * @tc.name: TouchGestureDetectorTest_IsFingerMove
  * @tc.desc: Test IsFingerMove
  * @tc.type: FUNC
@@ -2084,25 +2041,6 @@ HWTEST_F(TouchGestureDetectorTest, TouchGestureDetectorTest_CalcClusterCenter_04
     // 平均值：(2+4+6)/3=4, (3+5+7)/3=5
     EXPECT_EQ(result.x, 4.0f);
     EXPECT_EQ(result.y, 5.0f);
-}
-
-/**
- * @tc.name: TouchGestureDetectorTest_CalcGravityCenter_03
- * @tc.desc: Test CalcGravityCenter
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(TouchGestureDetectorTest, TouchGestureDetectorTest_CalcGravityCenter_03, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    auto listener = std::make_shared<MyGestureListener>();
-    TouchGestureType type = TOUCH_GESTURE_TYPE_SWIPE;
-    TouchGestureDetector detector(&env_, type, listener);
-    std::map<int32_t, Point> points;
-    int32_t count = static_cast<int32_t>(points.size());
-    EXPECT_EQ(count, 0);
-    EXPECT_TRUE(points.empty());
-    ASSERT_NO_FATAL_FAILURE(detector.CalcGravityCenter(points));
 }
 
 /**

@@ -2668,8 +2668,9 @@ static int32_t AddHotkeySubscribe(Input_HotkeyInfo* hotkeyInfo)
                 return INPUT_PARAMETER_ERROR;
             }
         }
+
+        it->second.push_back(hotkeyInfo);
     }
-    it->second.push_back(hotkeyInfo);
     return INPUT_SUCCESS;
 }
 

@@ -142,7 +142,17 @@ int32_t InputPluginManager::Init(UDSServer& udsServer)
 std::shared_ptr<InputPlugin> InputPluginManager::LoadPlugin(const std::string &path)
 {
     CALL_DEBUG_ENTER;
-    void *handle = dlopen(path.c_str(), RTLD_LAZY);
+    std::filesystem::path realPath { path };
+    if (realPath.has_parent_path()) {
+        std::error_code ec {};
+        realPath = std::filesystem::canonical(realPath, ec);
+        if (ec) {
+            MMI_HILOGE("'%{private}s' is not real", path.c_str());
+            return nullptr;
+        }
+    }
+
+    void *handle = dlopen(realPath.string().c_str(), RTLD_LAZY);
     if (!handle) {
         MMI_HILOGE("Failed to load directory: %{private}s", dlerror());
         return nullptr;
