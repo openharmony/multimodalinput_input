@@ -3949,12 +3949,13 @@ void PointerDrawingManager::RecordCursorIdAndImageAddress()
 {
     const auto id = lastMouseStyle_.id;
     auto mouseIcons = CursorDrawingInformation::GetInstance().GetMouseIconsMap();
-    if (id < 0 || id >= static_cast<int32_t>(mouseIcons.size())) {
+    auto iter = mouseIcons.find(MOUSE_ICON(id));
+    if (iter == mouseIcons.end()) {
         MMI_HILOGE("Invalid cursor id: %{public}d", id);
         return;
     }
     POINTER_DEV_MGR.mouseId_ = id;
-    POINTER_DEV_MGR.mouseIcons_ = mouseIcons.at(MOUSE_ICON(id)).iconPath;
+    POINTER_DEV_MGR.mouseIcons_ = iter->second.iconPath;
 }
 
 void PointerDrawingManager::RecordCursorVisibleStatus(bool status)
