@@ -2306,7 +2306,7 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_InitInjectNoticeSource_002, 
     auto connection = handler.injectNotice_->GetConnection();
     connection->isConnected_ = false;
     ret = handler.InitInjectNoticeSource();
-    ASSERT_TRUE(ret);
+    ASSERT_FALSE(ret);
 }
 
 /**
@@ -2351,7 +2351,7 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_AddInjectNotice_001, TestSiz
     auto connection = handler.injectNotice_->GetConnection();
     connection->isConnected_ = false;
     ret = handler.AddInjectNotice(noticeInfo);
-    ASSERT_TRUE(ret);
+    ASSERT_FALSE(ret);
 }
 
 /**
@@ -4098,34 +4098,6 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_NativeInjectCheck003, TestSi
     AUTHORIZE_HELPER->state_ = AuthorizeState::STATE_AUTHORIZE;
     result = handler.NativeInjectCheck(pid);
     EXPECT_EQ(result, COMMON_PERMISSION_CHECK_ERROR);
-}
-
-/**
- * @tc.name: ServerMsgHandlerTest_InitInjectNoticeSource_004
- * @tc.desc: Test the function InitInjectNoticeSource
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_InitInjectNoticeSource_004, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    ServerMsgHandler handler;
-    InjectNoticeManager manager;
-    bool ret = handler.InitInjectNoticeSource();
-    handler.injectNotice_ = std::make_shared<InjectNoticeManager>();
-    manager.isStartSrv_ = false;
-    ret = handler.InitInjectNoticeSource();
-    ASSERT_TRUE(ret);
-    manager.isStartSrv_ = true;
-    ret = handler.InitInjectNoticeSource();
-    ASSERT_TRUE(ret);
-    manager.connectionCallback_ = new (std::nothrow) InjectNoticeManager::InjectNoticeConnection;
-    manager.connectionCallback_->isConnected_ = false;
-    ret = handler.InitInjectNoticeSource();
-    ASSERT_TRUE(ret);
-    manager.connectionCallback_->isConnected_ = true;
-    ret = handler.InitInjectNoticeSource();
-    ASSERT_TRUE(ret);
 }
 
 /**

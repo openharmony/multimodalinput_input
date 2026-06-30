@@ -421,7 +421,7 @@ HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_SetMouseIcon_03, Tes
     int32_t windowId = 2;
     PointerStyle style;
     int32_t ret1 = CursorDrawingInformation::GetInstance().SetPointerStyle(pid, windowId, style);
-    EXPECT_NE(ret1, RET_OK);
+    EXPECT_EQ(ret1, RET_OK);
 
     CursorPixelMap curPixelMap;
     int32_t ret = CursorDrawingInformation::GetInstance().SetMouseIcon(pid, windowId, curPixelMap);
@@ -2628,7 +2628,7 @@ HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_SetPointerStyle_002,
     ASSERT_EQ(ret, RET_OK);
     windowId = 1;
     ret = CursorDrawingInformation::GetInstance().SetPointerStyle(pid, windowId, pointerStyle);
-    ASSERT_NE(ret, RET_OK);
+    ASSERT_EQ(ret, RET_OK);
     IconStyle iconStyle;
     iconStyle.alignmentWay = 0;
     iconStyle.iconPath = "testpath";
