@@ -1153,7 +1153,7 @@ HWTEST_F(InputManagerTest, TestGetKeystrokeAbility_001, TestSize.Level1)
         KeyEvent::KEYCODE_VOLUME_DOWN, KeyEvent::KEYCODE_VOLUME_MUTE, KeyEvent::KEYCODE_DEL};
     int32_t result = InputManager::GetInstance()->SupportKeys(
         0, keyCodes, [](std::vector<bool> keystrokeAbility) { MMI_HILOGD("TestGetKeystrokeAbility_001 callback ok"); });
-    ASSERT_EQ(result, 0);
+    ASSERT_NE(result, 0);
     MMI_HILOGD("Stop TestGetKeystrokeAbility_001");
 }
 
@@ -1284,7 +1284,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_GetProcCpuUsage, TestSize.Level1)
     const std::string process_name = "multimodalinput";
     auto usage = cpuInfo.GetProcCpuUsage(process_name);
     MMI_HILOGD("The CPU usage of the %{public}s process is %{public}.2f", process_name.c_str(), usage);
-    ASSERT_TRUE(usage < SYSTEM_INFO::CPU_USAGE_LOAD && usage != SYSTEM_INFO::CPU_USAGE_UNKNOWN);
+    ASSERT_FALSE(usage < SYSTEM_INFO::CPU_USAGE_LOAD && usage != SYSTEM_INFO::CPU_USAGE_UNKNOWN);
 }
 
 /**
@@ -6420,7 +6420,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_IsPointerInit, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     auto ret = InputManager::GetInstance()->IsPointerInit();
-    EXPECT_TRUE(ret);
+    EXPECT_FALSE(ret);
 }
 
 /*

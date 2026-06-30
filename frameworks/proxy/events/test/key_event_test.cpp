@@ -29,6 +29,7 @@ namespace OHOS {
 namespace MMI {
 namespace {
 using namespace testing::ext;
+constexpr int32_t TIME_WAIT_MS { 100 };
 } // namespace
 
 class KeyEventTest : public testing::Test {
@@ -785,6 +786,7 @@ HWTEST_F(KeyEventTest, KeyEventTest_Hash_001, TestSize.Level1)
     CALL_TEST_DEBUG;
     auto KeyEvent = KeyEvent::Create();
     CHKPV(KeyEvent);
+    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_MS));
     auto KeyEvent2 = KeyEvent::Create();
     CHKPV(KeyEvent2);
     EXPECT_NE(KeyEvent->Hash(), KeyEvent2->Hash());

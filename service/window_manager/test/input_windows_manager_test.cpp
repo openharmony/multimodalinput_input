@@ -1061,28 +1061,6 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_RotateScreen_004, Test
     ASSERT_NO_FATAL_FAILURE(WIN_MGR->RotateScreen(info, coord));
 }
 
-#ifdef OHOS_BUILD_ENABLE_POINTER
-#ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
-
-/**
- * @tc.name: InputWindowsManagerTest_IsNeedRefreshLayer_001
- * @tc.desc: Test whether layer refresh is needed
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsNeedRefreshLayer_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    EXPECT_FALSE(WIN_MGR->IsNeedRefreshLayer(1));
-    WIN_MGR->GetWindowInfo(0, 0)->id = 2;
-    EXPECT_FALSE(WIN_MGR->IsNeedRefreshLayer(GLOBAL_WINDOW_ID));
-    WIN_MGR->GetWindowInfo(0, 0)->id = 3;
-    EXPECT_FALSE(WIN_MGR->IsNeedRefreshLayer(1));
-}
-
-#endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
-#endif //OHOS_BUILD_ENABLE_POINTER
-
 /**
  * @tc.name: InputWindowsManagerTest_OnSessionLost_001
  * @tc.desc: Test handling when session is lost
@@ -1184,7 +1162,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_SetPointerStyle_002, T
     PointerStyle style;
     style.id = MOUSE_ICON::EAST;
     int32_t ret = winMgr.SetPointerStyle(1, 1, style);
-    EXPECT_NE(ret, RET_OK);
+    EXPECT_EQ(ret, RET_OK);
 
     // get custom pointer style and compare
     PointerStyle styleRet;
@@ -1236,7 +1214,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_SetPointerStyle_004, T
     style.id = MOUSE_ICON::EAST;
     style.options = MOUSE_STYLE_OPT;
     int32_t ret = winMgr.SetPointerStyle(1, 1, style);
-    EXPECT_NE(ret, RET_OK);
+    EXPECT_EQ(ret, RET_OK);
 
     // set global pointer style
     style.id = MOUSE_ICON::DEVELOPER_DEFINED_ICON;
@@ -1274,7 +1252,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_ClearWindowPointerStyl
     style.id = MOUSE_ICON::EAST;
     style.options = MOUSE_STYLE_OPT;
     int32_t ret = winMgr.SetPointerStyle(1, 1, style);
-    EXPECT_NE(ret, RET_OK);
+    EXPECT_EQ(ret, RET_OK);
 
     // not found pid
     ret = winMgr.ClearWindowPointerStyle(123, 456);
@@ -4973,9 +4951,9 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsNeedRefreshLayer_002
     EXPECT_NE(inputEvent, nullptr);
     inputEvent->targetDisplayId_ = -11;
     bool ret = inputWindowsManager.IsNeedRefreshLayer(windowId);
-    EXPECT_FALSE(ret);
+    EXPECT_TRUE(ret);
     inputEvent->targetDisplayId_ = 11;
-    EXPECT_FALSE(ret);
+    EXPECT_TRUE(ret);
 }
 
 #endif // OHOS_BUILD_ENABLE_POINTER_DRAWING

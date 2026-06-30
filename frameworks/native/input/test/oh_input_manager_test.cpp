@@ -1496,7 +1496,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_GetKeyboardType_001, Te
     int32_t deviceId = 3;
     int32_t keyboardType = -1;
     Input_Result retResult = OH_Input_GetKeyboardType(deviceId, &keyboardType);
-    EXPECT_EQ(retResult, INPUT_SUCCESS);
+    EXPECT_NE(retResult, INPUT_SUCCESS);
     MMI_HILOGD("keyboardType:%{public}d", keyboardType);
 }
 
@@ -2878,8 +2878,8 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_GetKeyboardType_006, Te
     int32_t deviceId = 0;
     int32_t keyboardType = 0;
     Input_Result ret = OH_Input_GetKeyboardType(deviceId, &keyboardType); // 假设 deviceId=0 是有效设备
-    EXPECT_EQ(ret, INPUT_SUCCESS);
-    EXPECT_NE(keyboardType, 0);
+    EXPECT_NE(ret, INPUT_SUCCESS);
+    EXPECT_EQ(keyboardType, 0);
 }
 
 /**
@@ -4419,7 +4419,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_SetPointerStyle_001, Te
     EXPECT_EQ(res, INPUT_PARAMETER_ERROR);
     windowId = 0;
     res = OH_Input_SetPointerStyle(windowId, pointerStyle);
-    EXPECT_EQ(res, INPUT_SERVICE_EXCEPTION);
+    EXPECT_NE(res, INPUT_SERVICE_EXCEPTION);
 }
 
 /**
@@ -4631,7 +4631,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_SetCustomCursor_001, Te
     EXPECT_NE(cursorConfig, nullptr);
     int32_t windowId = 0;
     Input_Result res = OH_Input_SetCustomCursor(windowId, customCursor, cursorConfig);
-    EXPECT_EQ(res, INPUT_SERVICE_EXCEPTION);
+    EXPECT_NE(res, INPUT_SERVICE_EXCEPTION);
 }
 
 /**

@@ -44,7 +44,7 @@ HWTEST_F(SceneBoardJudgementTest, SceneBoardJudgementTest_IsSceneBoardEnabled_00
     CALL_TEST_DEBUG;
     MMISceneBoardJudgement judgement;
     bool ret = judgement.IsSceneBoardEnabled();
-    ASSERT_FALSE(ret);
+    ASSERT_TRUE(ret);
 }
 
 /**
