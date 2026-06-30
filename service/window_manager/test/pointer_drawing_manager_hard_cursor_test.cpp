@@ -150,7 +150,7 @@ HWTEST_F(PointerDrawingManagerHardCursorTest, PointerDrawingManagerHardCursorTes
     pointerDrawingManager.screenPointers_.insert({2, extendSp});
     pointerDrawingManager.displayId_ = 0;
     std::unordered_set<uint64_t> failedScreens;
-    int32_t ret = pointerDrawingManager.HardwareCursorMove(0, 10, 20, failedScreens);
+    int32_t ret = pointerDrawingManager.HardwareCursorMoveInner(0, 10, 20, failedScreens);
     EXPECT_EQ(ret, RET_OK);
 }
 
@@ -185,7 +185,7 @@ HWTEST_F(PointerDrawingManagerHardCursorTest, PointerDrawingManagerHardCursorTes
     pointerDrawingManager.screenPointers_.insert({2, extendSp});
     pointerDrawingManager.displayId_ = 0;
     std::unordered_set<uint64_t> failedScreens;
-    int32_t ret = pointerDrawingManager.HardwareCursorMove(0, 10, 20, failedScreens);
+    int32_t ret = pointerDrawingManager.HardwareCursorMoveInner(0, 10, 20, failedScreens);
     EXPECT_EQ(ret, RET_ERR);
 }
 
@@ -220,7 +220,7 @@ HWTEST_F(PointerDrawingManagerHardCursorTest, PointerDrawingManagerHardCursorTes
     pointerDrawingManager.screenPointers_.insert({2, extendSp});
     pointerDrawingManager.displayId_ = 0;
     std::unordered_set<uint64_t> failedScreens;
-    int32_t ret = pointerDrawingManager.HardwareCursorMove(0, 10, 20, failedScreens);
+    int32_t ret = pointerDrawingManager.HardwareCursorMoveInner(0, 10, 20, failedScreens);
     EXPECT_EQ(ret, RET_ERR);
     EXPECT_EQ(failedScreens.size(), 3u);
     EXPECT_TRUE(failedScreens.find(0) != failedScreens.end());

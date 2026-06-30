@@ -285,7 +285,8 @@ private:
     void MoveRetryAsync(uint64_t displayId, int32_t x, int32_t y,
         const std::unordered_set<uint64_t>& failedScreens);
     void ResetMoveRetryTimer();
-    int32_t HardwareCursorMove(uint64_t displayId, int32_t x, int32_t y,
+    void HardwareCursorMoveAsync(uint64_t displayId, int32_t x, int32_t y);
+    int32_t HardwareCursorMoveInner(uint64_t displayId, int32_t x, int32_t y,
         std::unordered_set<uint64_t>& failedScreens);
     int32_t HardwareCursorMoveRetry(uint64_t displayId, int32_t x, int32_t y,
         const std::unordered_set<uint64_t>& failedScreens, std::unordered_set<uint64_t>& stillFailedScreens);
