@@ -131,7 +131,7 @@ static void GetInjectionEventDataNative(napi_env env, struct Input_KeyEvent* key
         histogramError(result);
     }
 }
-#else
+#endif // OHOS_BUILD_ENABLE_VKEYBOARD
 static std::shared_ptr<KeyEvent> g_injectKeyState = KeyEvent::Create();
 
 static void GetInjectionEventData(napi_env env, std::shared_ptr<KeyEvent> keyEvent, napi_value keyHandle,
@@ -190,7 +190,6 @@ static void GetInjectionEventData(napi_env env, std::shared_ptr<KeyEvent> keyEve
     InputManager::GetInstance()->SimulateInputEvent(keyEvent);
     std::this_thread::sleep_for(std::chrono::milliseconds(keyDownDuration));
 }
-#endif // OHOS_BUILD_ENABLE_VKEYBOARD
 
 static napi_value InjectEvent(napi_env env, napi_callback_info info)
 {
@@ -286,16 +285,9 @@ static napi_value InjectKeyEvent(napi_env env, napi_callback_info info)
     auto histogramError = [](int32_t errorCode) {
         MMI_HISTOGRAM_ERROR("InputKit.inputEventClient.injectKeyEvent.Error", errorCode);
     };
-#ifdef OHOS_BUILD_ENABLE_VKEYBOARD
-    Input_KeyEvent* keyEventNative = OH_Input_CreateKeyEvent();
-    CHKPP(keyEventNative);
-    GetInjectionEventDataNative(env, keyEventNative, keyHandle, histogramError);
-    OH_Input_DestroyKeyEvent(&keyEventNative);
-#else
     auto keyEvent = KeyEvent::Create();
     CHKPP(keyEvent);
     GetInjectionEventData(env, keyEvent, keyHandle, histogramError);
-#endif // OHOS_BUILD_ENABLE_VKEYBOARD
     CHKRP(napi_create_int32(env, 0, &result), CREATE_INT32);
     return result;
 }
