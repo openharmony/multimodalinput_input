@@ -44,7 +44,8 @@ private:
     int32_t GetTouchToolType(struct libinput_device *device);
 #ifdef OHOS_BUILD_KNUCKLE
     void TransformTouchProperties(int32_t displayId, const PointerEvent::PointerItem &pointerItem, TouchType &rawTouch);
-    void NotifyFingersenseProcess(int32_t displayId, const PointerEvent::PointerItem &pointerItem, int32_t &toolType);
+    void NotifyFingersenseProcess(int32_t displayId, const PointerEvent::PointerItem &pointerItem,
+        const EventTouch &touchInfo, int32_t &toolType);
 #endif // OHOS_BUILD_KNUCKLE
     void UpdatePointerItemByTouchInfo(PointerEvent::PointerItem &item, EventTouch &touchInfo);
     void InitToolTypes();
