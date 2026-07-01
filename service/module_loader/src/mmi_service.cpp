@@ -133,6 +133,7 @@ MMIService* g_MMIService;
 const std::string DEF_INPUT_SEAT { "seat0" };
 const char* THREAD_NAME { "mmi_service" };
 constexpr int32_t WATCHDOG_INTERVAL_TIME { 30000 };
+constexpr int32_t CLOSE_SOCKETFD_WAIT { 30000 };
 [[ maybe_unused ]] constexpr int32_t WATCHDOG_DELAY_TIME { 40000 };
 constexpr int32_t RELOAD_DEVICE_TIME { 2000 };
 [[ maybe_unused ]] constexpr int32_t WATCHDOG_WARNTIME { 6000 };
@@ -540,7 +541,7 @@ void MMIService::OnStart()
         CursorDrawingComponent::GetInstance().InitDefaultMouseIconPath();
     }
 #endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
-    TimerMgr->AddTimer(WATCHDOG_INTERVAL_TIME, -1, [this]() {
+    TimerMgr->AddTimer(CLOSE_SOCKETFD_WAIT, -1, [this]() {
         MMI_HILOGI("Set thread status flag to true");
         threadStatusFlag_ = true;
     }, "MMIService-OnStart");
@@ -669,16 +670,19 @@ void MMIService::AllocSocketFdResult(int32_t ret, const int32_t pid, const int32
         if (ret != ETASKS_WAIT_TIMEOUT_BUT_RUNNING) {
             return;
         }
-        TimerMgr->AddTimer(WATCHDOG_INTERVAL_TIME, -1, [socketPairClosedFlag]() {
+        TimerMgr->AddTimer(WATCHDOG_INTERVAL_TIME, 1, [socketPairClosedFlag]() {
             if (socketPairClosedFlag->executeClosed) {
                 return;
             }
             if (socketPairClosedFlag->serverFd >= 0) {
                 fdsan_close_with_tag(socketPairClosedFlag->serverFd, TAG);
+                socketPairClosedFlag->serverFd = 0;
             }
             if (socketPairClosedFlag->toReturnClientFd >= 0) {
                 fdsan_close_with_tag(socketPairClosedFlag->toReturnClientFd, TAG);
+                socketPairClosedFlag->toReturnClientFd = 0;
             }
+            socketPairClosedFlag->executeClosed = true;
         }, "MMIService-AllocSocketFd");
     }
     MMI_HILOGIK("Leave, programName:%{public}s, moduleType:%{public}d, alloc success", processName.c_str(),
