@@ -541,7 +541,7 @@ void MMIService::OnStart()
         CursorDrawingComponent::GetInstance().InitDefaultMouseIconPath();
     }
 #endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
-    TimerMgr->AddTimer(CLOSE_SOCKETFD_WAIT, -1, [this]() {
+    TimerMgr->AddTimer(WATCHDOG_INTERVAL_TIME, -1, [this]() {
         MMI_HILOGI("Set thread status flag to true");
         threadStatusFlag_ = true;
     }, "MMIService-OnStart");
@@ -670,7 +670,7 @@ void MMIService::AllocSocketFdResult(int32_t ret, const int32_t pid, const int32
         if (ret != ETASKS_WAIT_TIMEOUT_BUT_RUNNING) {
             return;
         }
-        TimerMgr->AddTimer(WATCHDOG_INTERVAL_TIME, 1, [socketPairClosedFlag]() {
+        TimerMgr->AddTimer(CLOSE_SOCKETFD_WAIT, 1, [socketPairClosedFlag]() {
             if (socketPairClosedFlag->executeClosed) {
                 return;
             }
