@@ -43,6 +43,7 @@
 namespace OHOS {
 namespace MMI {
 namespace {
+using namespace testing;
 using namespace testing::ext;
 constexpr int32_t MOUSE_ICON_SIZE = 64;
 constexpr uint32_t DEFAULT_ICON_COLOR { 0xFF };
@@ -4615,6 +4616,139 @@ HWTEST_F(PointerDrawingManagerTest, PointerDrawingManagerTest_ShowCursorWhenHard
     EXPECT_NO_FATAL_FAILURE(pointerDrawingManager.ShowCursorWhenHardwareCursorEnabled());
     pointerDrawingManager.currentCursorBlurEnabled_ = false;
     EXPECT_NO_FATAL_FAILURE(pointerDrawingManager.ShowCursorWhenHardwareCursorEnabled());
+}
+
+/**
+ * @tc.name: PointerDrawingManagerTest_DeleteScreenPointer_002
+ * @tc.desc: Test DeleteScreenPointer when surfaceNode matches
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerTest, PointerDrawingManagerTest_DeleteScreenPointer_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerDrawingManager pointerDrawingManager;
+    pointerDrawingManager.hardwareCursorPointerManager_ = std::make_shared<HardwareCursorPointerManager>();
+    ASSERT_NE(pointerDrawingManager.hardwareCursorPointerManager_, nullptr);
+    
+    sptr<Rosen::ScreenInfo> screenInfo = new Rosen::ScreenInfo();
+    ASSERT_NE(screenInfo, nullptr);
+    sptr<Rosen::SupportedScreenModes> mode = new Rosen::SupportedScreenModes();
+    ASSERT_NE(mode, nullptr);
+    mode->width_ = 100;
+    mode->height_ = 200;
+    screenInfo->SetRsId(0);
+    screenInfo->SetType(Rosen::ScreenType::REAL);
+    screenInfo->SetModeId(0);
+    screenInfo->modes_ = { { mode } };
+    screenInfo->SetSourceMode(Rosen::ScreenSourceMode::SCREEN_MAIN);
+    
+    auto screenPointer = std::make_shared<ScreenPointer>(
+        pointerDrawingManager.hardwareCursorPointerManager_,
+        pointerDrawingManager.handler_, screenInfo);
+    ASSERT_NE(screenPointer, nullptr);
+    screenPointer->Init(pointerDrawingManager.pointerRenderer_);
+    
+    pointerDrawingManager.screenPointers_.insert(std::make_pair(0, screenPointer));
+    ASSERT_EQ(pointerDrawingManager.screenPointers_.size(), 1);
+    
+    auto surfaceNode = screenPointer->GetSurfaceNode();
+    ASSERT_NE(surfaceNode, nullptr);
+    pointerDrawingManager.SetSurfaceNode(surfaceNode);
+    ASSERT_NE(pointerDrawingManager.GetSurfaceNode(), nullptr);
+    
+    pointerDrawingManager.DeleteScreenPointer(0);
+    ASSERT_EQ(pointerDrawingManager.screenPointers_.size(), 0);
+    ASSERT_EQ(pointerDrawingManager.GetSurfaceNode(), nullptr);
+}
+
+/**
+ * @tc.name: PointerDrawingManagerTest_ClearScreenPointer_002
+ * @tc.desc: Test ClearScreenPointer when surfaceNode matches
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerTest, PointerDrawingManagerTest_ClearScreenPointer_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerDrawingManager pointerDrawingManager;
+    pointerDrawingManager.hardwareCursorPointerManager_ = std::make_shared<HardwareCursorPointerManager>();
+    ASSERT_NE(pointerDrawingManager.hardwareCursorPointerManager_, nullptr);
+    
+    sptr<Rosen::ScreenInfo> screenInfo = new Rosen::ScreenInfo();
+    ASSERT_NE(screenInfo, nullptr);
+    sptr<Rosen::SupportedScreenModes> mode = new Rosen::SupportedScreenModes();
+    ASSERT_NE(mode, nullptr);
+    mode->width_ = 100;
+    mode->height_ = 200;
+    screenInfo->SetRsId(0);
+    screenInfo->SetType(Rosen::ScreenType::REAL);
+    screenInfo->SetModeId(0);
+    screenInfo->modes_ = { { mode } };
+    screenInfo->SetSourceMode(Rosen::ScreenSourceMode::SCREEN_MAIN);
+    
+    auto screenPointer = std::make_shared<ScreenPointer>(
+        pointerDrawingManager.hardwareCursorPointerManager_,
+        pointerDrawingManager.handler_, screenInfo);
+    ASSERT_NE(screenPointer, nullptr);
+    screenPointer->Init(pointerDrawingManager.pointerRenderer_);
+    
+    pointerDrawingManager.screenPointers_.insert(std::make_pair(0, screenPointer));
+    ASSERT_EQ(pointerDrawingManager.screenPointers_.size(), 1);
+    
+    auto surfaceNode = screenPointer->GetSurfaceNode();
+    ASSERT_NE(surfaceNode, nullptr);
+    pointerDrawingManager.SetSurfaceNode(surfaceNode);
+    ASSERT_NE(pointerDrawingManager.GetSurfaceNode(), nullptr);
+    
+    pointerDrawingManager.ClearScreenPointer();
+    ASSERT_EQ(pointerDrawingManager.screenPointers_.size(), 0);
+    ASSERT_EQ(pointerDrawingManager.GetSurfaceNode(), nullptr);
+}
+
+/**
+ * @tc.name: PointerDrawingManagerTest_ClearDisappearedScreenPointer_003
+ * @tc.desc: Test ClearDisappearedScreenPointer when surfaceNode matches
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerTest, PointerDrawingManagerTest_ClearDisappearedScreenPointer_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerDrawingManager pointerDrawingManager;
+    pointerDrawingManager.hardwareCursorPointerManager_ = std::make_shared<HardwareCursorPointerManager>();
+    ASSERT_NE(pointerDrawingManager.hardwareCursorPointerManager_, nullptr);
+    
+    sptr<Rosen::ScreenInfo> screenInfo = new Rosen::ScreenInfo();
+    ASSERT_NE(screenInfo, nullptr);
+    sptr<Rosen::SupportedScreenModes> mode = new Rosen::SupportedScreenModes();
+    ASSERT_NE(mode, nullptr);
+    mode->width_ = 100;
+    mode->height_ = 200;
+    screenInfo->SetRsId(0);
+    screenInfo->SetType(Rosen::ScreenType::REAL);
+    screenInfo->SetModeId(0);
+    screenInfo->modes_ = { { mode } };
+    screenInfo->SetSourceMode(Rosen::ScreenSourceMode::SCREEN_MAIN);
+    
+    auto screenPointer = std::make_shared<ScreenPointer>(
+        pointerDrawingManager.hardwareCursorPointerManager_,
+        pointerDrawingManager.handler_, screenInfo);
+    ASSERT_NE(screenPointer, nullptr);
+    screenPointer->Init(pointerDrawingManager.pointerRenderer_);
+    
+    pointerDrawingManager.screenPointers_.insert(std::make_pair(0, screenPointer));
+    ASSERT_EQ(pointerDrawingManager.screenPointers_.size(), 1);
+    
+    auto surfaceNode = screenPointer->GetSurfaceNode();
+    ASSERT_NE(surfaceNode, nullptr);
+    pointerDrawingManager.SetSurfaceNode(surfaceNode);
+    ASSERT_NE(pointerDrawingManager.GetSurfaceNode(), nullptr);
+    
+    std::set<uint64_t> screenIds = {1};
+    pointerDrawingManager.ClearDisappearedScreenPointer(screenIds);
+    ASSERT_EQ(pointerDrawingManager.screenPointers_.size(), 0);
+    ASSERT_EQ(pointerDrawingManager.GetSurfaceNode(), nullptr);
 }
 } // namespace MMI
 } // namespace OHOS

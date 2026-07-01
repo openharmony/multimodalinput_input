@@ -3537,13 +3537,32 @@ std::pair<ScreenPointersIter, bool> PointerDrawingManager::UpdateScreenPointer(u
 bool PointerDrawingManager::DeleteScreenPointer(uint64_t screenId)
 {
     std::unique_lock<std::shared_mutex> lock(screenPointersMtx_);
-    size_t result = screenPointers_.erase(screenId);
-    return (result == 1);
+    auto it = screenPointers_.find(screenId);
+    if (it == screenPointers_.end()) {
+        return false;
+    }
+    if (it->second != nullptr && it->second->GetSurfaceNode() == GetSurfaceNode()) {
+        // Ensure that the RSSurfaceNode object is destructed before the RSUIDirector object in ScreenPointer.
+        // Otherwise, the command for destructing the RSSurfaceNode object cannot be sent to the RS service.
+        SetSurfaceNode(nullptr);
+        MMI_HILOGD("SetSurfaceNode null, screenId=%{public}" PRIu64, screenId);
+    }
+    screenPointers_.erase(it);
+    return true;
 }
 
 void PointerDrawingManager::ClearScreenPointer()
 {
     std::unique_lock<std::shared_mutex> lock(screenPointersMtx_);
+    for (auto [screenId, sp] : screenPointers_) {
+        if (sp != nullptr && sp->GetSurfaceNode() == GetSurfaceNode()) {
+            // Ensure that the RSSurfaceNode object is destructed before the RSUIDirector object in ScreenPointer.
+            // Otherwise, the command for destructing the RSSurfaceNode object cannot be sent to the RS service.
+            SetSurfaceNode(nullptr);
+            MMI_HILOGD("SetSurfaceNode null, screenId=%{public}" PRIu64, screenId);
+            break;
+        }
+    }
     screenPointers_.clear();
 }
 
@@ -3553,6 +3572,12 @@ void PointerDrawingManager::ClearDisappearedScreenPointer(const std::set<uint64_
     for (auto it = screenPointers_.begin(); it != screenPointers_.end();) {
         if (screenIds.count(it->first) == 0) {
             MMI_HILOGI("OnScreenModeChange, delete screen %{public}" PRIu64, it->first);
+            if (it->second != nullptr && it->second->GetSurfaceNode() == GetSurfaceNode()) {
+                // Ensure that the RSSurfaceNode object is destructed before the RSUIDirector object in ScreenPointer.
+                // Otherwise, the command for destructing the RSSurfaceNode object cannot be sent to the RS service.
+                SetSurfaceNode(nullptr);
+                MMI_HILOGD("SetSurfaceNode null, screenId=%{public}" PRIu64, it->first);
+            }
             it = screenPointers_.erase(it);
         } else {
             ++it;
