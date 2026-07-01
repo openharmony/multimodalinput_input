@@ -676,11 +676,11 @@ void MMIService::AllocSocketFdResult(int32_t ret, const int32_t pid, const int32
             }
             if (socketPairClosedFlag->serverFd >= 0) {
                 fdsan_close_with_tag(socketPairClosedFlag->serverFd, TAG);
-                socketPairClosedFlag->serverFd = 0;
+                socketPairClosedFlag->serverFd = -1;
             }
             if (socketPairClosedFlag->toReturnClientFd >= 0) {
                 fdsan_close_with_tag(socketPairClosedFlag->toReturnClientFd, TAG);
-                socketPairClosedFlag->toReturnClientFd = 0;
+                socketPairClosedFlag->toReturnClientFd = -1;
             }
             socketPairClosedFlag->executeClosed = true;
         }, "MMIService-AllocSocketFd");
