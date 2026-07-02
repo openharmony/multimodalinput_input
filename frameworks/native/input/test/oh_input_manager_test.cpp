@@ -31,6 +31,7 @@
 #define MMI_LOG_TAG "OHInputManagerTest"
 
 void SetCursorInfo(OHOS::MMI::PointerEvent::PointerItem& item, Input_MouseEvent* mouseEvent);
+Input_TouchEvent  *OH_Input_PointerEventToTouchEvent(const OHOS::MMI::PointerEvent &event);
 
 struct Input_KeyState {
     int32_t keyCode;
@@ -6419,6 +6420,113 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_SetGetTouchEventDownTim
     int64_t downTime = 123456789;
     OH_Input_SetTouchEventDownTime(&touchEvent, downTime);
     EXPECT_EQ(OH_Input_GetTouchEventDownTime(&touchEvent), downTime);
+}
+
+/**
+ * @tc.name: OHInputManagerTest_OH_Input_PointerEventToTouchEvent_001
+ * @tc.desc: Test OH_Input_PointerEventToTouchEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_PointerEventToTouchEvent_001, TestSize.Level1)
+{
+    // no pointer item fail
+    auto pointerEvent = OHOS::MMI::PointerEvent::Create();
+    auto ret = OH_Input_PointerEventToTouchEvent(*pointerEvent);
+    EXPECT_EQ(ret, nullptr);
+}
+ 
+/**
+ * @tc.name: OHInputManagerTest_OH_Input_PointerEventToTouchEvent_002
+ * @tc.desc: Test OH_Input_PointerEventToTouchEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_PointerEventToTouchEvent_002, TestSize.Level1)
+{
+    std::shared_ptr<OHOS::MMI::PointerEvent> event = OHOS::MMI::PointerEvent::Create();
+    ASSERT_NE(event, nullptr);
+ 
+    OHOS::MMI::PointerEvent::PointerItem item;
+    auto pointerId = 1;
+    auto pointerAction = -1;
+ 
+    item.SetPointerId(pointerId);
+    event->AddPointerItem(item);
+    event->SetPointerAction(pointerAction);
+ 
+    // action type is invalid
+    auto touchEvent = OH_Input_PointerEventToTouchEvent(*event);
+    EXPECT_EQ(touchEvent, nullptr);
+ 
+    // action type is invalid
+    pointerAction = 5;
+    touchEvent = OH_Input_PointerEventToTouchEvent(*event);
+    EXPECT_EQ(touchEvent, nullptr);
+ 
+ 
+    // pointer id is invalid
+    pointerAction = OHOS::MMI::PointerEvent::POINTER_ACTION_DOWN;
+    event->SetPointerAction(pointerAction);
+    event->SetPointerId(-1);
+    touchEvent = OH_Input_PointerEventToTouchEvent(*event);
+    EXPECT_EQ(touchEvent, nullptr);
+ 
+    // pointer action & pointer id is OK
+    event->SetPointerId(pointerId);
+    touchEvent = OH_Input_PointerEventToTouchEvent(*event);
+    EXPECT_EQ(TOUCH_ACTION_DOWN, OH_Input_GetTouchEventAction(touchEvent));
+}
+ 
+/**
+ * @tc.name: OHInputManagerTest_OH_Input_PointerEventToTouchEvent_003
+ * @tc.desc: Test OH_Input_PointerEventToTouchEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_PointerEventToTouchEvent_003, TestSize.Level1)
+{
+    std::shared_ptr<OHOS::MMI::PointerEvent> event = OHOS::MMI::PointerEvent::Create();
+    ASSERT_NE(event, nullptr);
+ 
+    OHOS::MMI::PointerEvent::PointerItem item;
+    auto pointerId = 1;
+    auto displayX = 100;
+    auto displayY = 200;
+    auto downTime = 20;
+    auto actionTime = 20;
+    auto toolType = 0;
+    auto windowX = 100;
+    auto windowY = 200;
+    double pressure = 0.5;
+ 
+    item.SetPointerId(pointerId);
+    item.SetDisplayX(displayX);
+    item.SetDisplayY(displayY);
+    item.SetDownTime(downTime);
+    item.SetToolType(toolType);
+    item.SetWindowX(windowX);
+    item.SetWindowY(windowY);
+    item.SetPressure(pressure);
+ 
+    event->AddPointerItem(item);
+    event->SetActionTime(actionTime);
+    event->SetPointerId(pointerId);
+    event->SetPointerAction(OHOS::MMI::PointerEvent::POINTER_ACTION_DOWN);
+    event->SetSourceType(OHOS::MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+ 
+    auto touchEvent = OH_Input_PointerEventToTouchEvent(*event);
+    ASSERT_NE(touchEvent, nullptr);
+ 
+    EXPECT_EQ(pointerId, OH_Input_GetTouchEventFingerId(touchEvent));
+    EXPECT_EQ(windowX, OH_Input_GetTouchEventWindowX(touchEvent));
+    EXPECT_EQ(windowY, OH_Input_GetTouchEventWindowY(touchEvent));
+    EXPECT_EQ(displayX, OH_Input_GetTouchEventDisplayX(touchEvent));
+    EXPECT_EQ(displayY, OH_Input_GetTouchEventDisplayY(touchEvent));
+    EXPECT_EQ(downTime, OH_Input_GetTouchEventDownTime(touchEvent));
+    EXPECT_EQ(actionTime, OH_Input_GetTouchEventActionTime(touchEvent));
+    EXPECT_EQ(toolType, OH_Input_GetTouchEventToolType(touchEvent));
+    EXPECT_EQ(pressure, OH_Input_GetTouchEventPressure(touchEvent));
 }
 
 } // namespace MMI
