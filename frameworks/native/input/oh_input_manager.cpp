@@ -3474,6 +3474,39 @@ std::shared_ptr<OHOS::MMI::PointerEvent> OH_Input_TouchEventToPointerEvent(Input
     return pointerEvent;
 }
 
+Input_TouchEvent  *OH_Input_PointerEventToTouchEvent(const OHOS::MMI::PointerEvent &event)
+{
+    Input_TouchEvent* touchEvent = OH_Input_CreateTouchEvent();
+    if (touchEvent == nullptr) {
+        MMI_HILOGE("touchevent is null");
+        return nullptr;
+    }
+    OHOS::MMI::PointerEvent::PointerItem item;
+    if (!(event.GetPointerItem(event.GetPointerId(), item))) {
+        MMI_HILOGE("Can not get pointerItem for the pointer event");
+        OH_Input_DestroyTouchEvent(&touchEvent);
+        return nullptr;
+    }
+    if (!SetTouchEventAction(touchEvent, event.GetPointerAction())) {
+        OH_Input_DestroyTouchEvent(&touchEvent);
+        return nullptr;
+    }
+    touchEvent->id = event.GetPointerId();
+    touchEvent->displayX = item.GetDisplayX();
+    touchEvent->displayY = item.GetDisplayY();
+    touchEvent->actionTime = event.GetActionTime();
+    touchEvent->windowId = event.GetTargetWindowId();
+    touchEvent->displayId = event.GetTargetDisplayId();
+    touchEvent->globalX = item.GetGlobalX();
+    touchEvent->globalY = item.GetGlobalY();
+    touchEvent->pressure = item.GetPressure();
+    touchEvent->windowX = item.GetWindowX();
+    touchEvent->windowY = item.GetWindowY();
+    touchEvent->downTime = item.GetDownTime();
+    touchEvent->toolType = static_cast<Input_TouchEventToolType>(item.GetToolType());
+    return touchEvent;
+}
+
 Input_Result OH_Input_GetKeyEventId(const struct Input_KeyEvent* keyEvent, int32_t* eventId)
 {
     MMI_HISTOGRAM_BOOLEAN("InputKit.OH_Input_GetKeyEventId.Call", true);
