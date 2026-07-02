@@ -22,5 +22,6 @@
 
 std::shared_ptr<OHOS::MMI::PointerEvent> OH_Input_TouchEventToPointerEvent(Input_TouchEvent *touchEvent,
     int32_t windowX, int32_t windowY);
+Input_TouchEvent *OH_Input_PointerEventToTouchEvent(const OHOS::MMI::PointerEvent &event);
 
 #endif // POINTER_EVENT_NDK_H
