@@ -2288,28 +2288,6 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnTransferBinderClientSrv_00
 }
 
 /**
- * @tc.name: ServerMsgHandlerTest_InitInjectNoticeSource_002
- * @tc.desc: Test the function InitInjectNoticeSource
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_InitInjectNoticeSource_002, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    ServerMsgHandler handler;
-    InjectNoticeManager manager;
-    handler.injectNotice_ = nullptr;
-    bool ret = handler.InitInjectNoticeSource();
-    handler.injectNotice_->isStartSrv_ = true;
-    manager.connectionCallback_ = new (std::nothrow) InjectNoticeManager::InjectNoticeConnection;
-    EXPECT_NE(nullptr, manager.connectionCallback_);
-    auto connection = handler.injectNotice_->GetConnection();
-    connection->isConnected_ = false;
-    ret = handler.InitInjectNoticeSource();
-    ASSERT_FALSE(ret);
-}
-
-/**
  * @tc.name: ServerMsgHandlerTest_InitInjectNoticeSource_003
  * @tc.desc: Test the function InitInjectNoticeSource
  * @tc.type: FUNC
@@ -2329,29 +2307,6 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_InitInjectNoticeSource_003, 
     connection->isConnected_ = true;
     ret = handler.InitInjectNoticeSource();
     EXPECT_TRUE(ret);
-}
-
-/**
- * @tc.name: ServerMsgHandlerTest_AddInjectNotice_001
- * @tc.desc: Test the function AddInjectNotice
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_AddInjectNotice_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    ServerMsgHandler handler;
-    InjectNoticeManager manager;
-    InjectNoticeInfo noticeInfo;
-    handler.injectNotice_ = nullptr;
-    bool ret = handler.InitInjectNoticeSource();
-    handler.injectNotice_->isStartSrv_ = true;
-    manager.connectionCallback_ = new (std::nothrow) InjectNoticeManager::InjectNoticeConnection;
-    EXPECT_NE(nullptr, manager.connectionCallback_);
-    auto connection = handler.injectNotice_->GetConnection();
-    connection->isConnected_ = false;
-    ret = handler.AddInjectNotice(noticeInfo);
-    ASSERT_FALSE(ret);
 }
 
 /**

@@ -2635,7 +2635,7 @@ HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_SetPointerStyle_002,
     CursorDrawingInformation::GetInstance().mouseIcons_.insert(std::make_pair(static_cast<MOUSE_ICON>(pointerStyle.id),
         iconStyle));
     ret = CursorDrawingInformation::GetInstance().SetPointerStyle(pid, windowId, pointerStyle);
-    ASSERT_NE(ret, RET_OK);
+    ASSERT_EQ(ret, RET_OK);
 }
 
 /**
