@@ -1491,21 +1491,6 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_GetDeviceIds_004, TestS
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_GetKeyboardType_001, TestSize.Level1)
-{
-    int32_t deviceId = 3;
-    int32_t keyboardType = -1;
-    Input_Result retResult = OH_Input_GetKeyboardType(deviceId, &keyboardType);
-    EXPECT_NE(retResult, INPUT_SUCCESS);
-    MMI_HILOGD("keyboardType:%{public}d", keyboardType);
-}
-
-/**
- * @tc.name: OHInputManagerTest_OH_Input_GetKeyboardType
- * @tc.desc: Test the function OH_Input_GetKeyboardType
- * @tc.type: FUNC
- * @tc.require:
- */
 HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_GetKeyboardType_002, TestSize.Level2)
 {
     int32_t deviceId = 3;
