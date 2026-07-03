@@ -2324,10 +2324,6 @@ void InputWindowsManager::UpdateDisplayMode(int32_t groupId)
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
 void InputWindowsManager::DrawPointer(bool isDisplayChanged)
 {
-    if (isDisplayChanged && IsInPointerLockMode()) {
-        MMI_HILOGI("Pointer is in lock mode, skip draw center pointer");
-        return;
-    }
     if (!isDisplayChanged) {
         CursorDrawingComponent::GetInstance().DrawPointerStyle(dragPointerStyle_);
     } else {
@@ -2343,6 +2339,10 @@ void InputWindowsManager::PointerDrawingManagerOnDisplayInfo(const OLD::DisplayG
         return;
     }
     auto currentDisplayInfo = CursorDrawingComponent::GetInstance().GetCurrentDisplayInfo();
+    if (IsInPointerLockMode()) {
+        MMI_HILOGI("Pointer is in lock mode, skip draw center pointer");
+        isDisplayChanged = false;
+    }
     CursorDrawingComponent::GetInstance().OnDisplayInfo(displayGroupInfo, isDisplayChanged);
     int32_t groupId = displayGroupInfo.groupId;
     int32_t newId = 0;
@@ -2466,10 +2466,6 @@ void InputWindowsManager::PointerDrawingManagerOnDisplayInfo(const OLD::DisplayG
         if (isCursopRestoredFlag) {
             dragPointerStyle_ = pointerStyle;
             MMI_HILOGD("Window is changed, pointerStyle is:%{public}d", dragPointerStyle_.id);
-        }
-        if (lastPointerStyle_ == pointerStyle) {
-            MMI_HILOGD("The cursor style does not change");
-            return;
         }
         DrawPointer(isDisplayChanged);
     }
