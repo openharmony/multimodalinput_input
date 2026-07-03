@@ -266,14 +266,13 @@ void InputActiveSubscriberHandler::OnSessionDelete(SessionPtr sess)
 {
     CALL_DEBUG_ENTER;
     CHKPV(sess);
-    auto newEnd = std::remove_if(
+    subscribers_.erase(std::remove_if(
         subscribers_.begin(), subscribers_.end(), [sess](std::shared_ptr<Subscriber> subscribe) {
             if (subscribe && subscribe->sess_ == sess) {
                 return true;
             }
             return false;
-        });
-    subscribers_.erase(newEnd, subscribers_.end());
+        }), subscribers_.end());
 }
 
 void InputActiveSubscriberHandler::NotifySubscriber(

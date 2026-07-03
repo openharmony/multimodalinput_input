@@ -649,6 +649,13 @@ bool PointerMotionAcceleration::CalcAxisGainTouchpad(const AxisCurve &curve, dou
         return false;
     }
 
+    if ((curve.speeds.empty()) ||
+        (curve.slopes.size() < curve.speeds.size()) ||
+        (curve.diffNums.size() < curve.speeds.size())) {
+        MMI_HILOGE("Invalid axis-gain-touchpad curve");
+        return false;
+    }
+
     const auto absAxisSpeed = std::fabs(axisSpeed);
     const auto len = curve.speeds.size();
 
