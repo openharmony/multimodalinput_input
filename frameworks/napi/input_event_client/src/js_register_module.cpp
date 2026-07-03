@@ -172,7 +172,7 @@ static void GetInjectionEventData(napi_env env, std::shared_ptr<KeyEvent> keyEve
     KeyEvent::KeyItem item;
     item.SetKeyCode(keyCode);
     item.SetPressed(isPressed);
-    item.SetDownTime(static_cast<int64_t>(keyDownDuration));
+    item.SetDownTime(OHOS::MMI::GetSysClockTime());
     if (g_injectKeyState != nullptr) {
         g_injectKeyState->RemoveReleasedKeyItems();
         if (isPressed) {
