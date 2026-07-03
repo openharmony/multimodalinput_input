@@ -1011,5 +1011,109 @@ HWTEST_F(InputWindowsManagerOneTest, CancelTouch_ValidEntry_003, TestSize.Level1
     EXPECT_FALSE(inputWindowsManager_->touchItemDownInfos_[deviceId][touch].flag);
 }
 
+/**
+ * @tc.name: IsDirectionChanged_DirectionSame_001
+ * @tc.desc: Test IsDirectionChanged when direction is the same
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerOneTest, IsDirectionChanged_DirectionSame_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+
+    // Given: Two DisplayInfo with same direction
+    OLD::DisplayInfo oldDisplay;
+    oldDisplay.id = 0;
+    oldDisplay.direction = Direction::DIRECTION0;
+
+    OLD::DisplayInfo newDisplay;
+    newDisplay.id = 0;
+    newDisplay.direction = Direction::DIRECTION0;
+
+    // When: Call IsDirectionChanged with same direction
+    bool result = inputWindowsManager_->IsDirectionChanged(oldDisplay, newDisplay);
+
+    // Then: Should return false
+    EXPECT_FALSE(result);
+}
+
+/**
+ * @tc.name: IsDirectionChanged_DirectionDifferent_002
+ * @tc.desc: Test IsDirectionChanged when direction is different
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerOneTest, IsDirectionChanged_DirectionDifferent_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+
+    // Given: Two DisplayInfo with different direction
+    OLD::DisplayInfo oldDisplay;
+    oldDisplay.id = 0;
+    oldDisplay.direction = Direction::DIRECTION0;
+
+    OLD::DisplayInfo newDisplay;
+    newDisplay.id = 0;
+    newDisplay.direction = Direction::DIRECTION90;
+
+    // When: Call IsDirectionChanged with different direction
+    bool result = inputWindowsManager_->IsDirectionChanged(oldDisplay, newDisplay);
+
+    // Then: Should return true
+    EXPECT_TRUE(result);
+}
+
+/**
+ * @tc.name: IsDirectionChanged_DirectionDifferent_003
+ * @tc.desc: Test IsDirectionChanged when direction changes from DIRECTION0 to DIRECTION180
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerOneTest, IsDirectionChanged_DirectionDifferent_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+
+    // Given: Two DisplayInfo with direction change from 0 to 180
+    OLD::DisplayInfo oldDisplay;
+    oldDisplay.id = 0;
+    oldDisplay.direction = Direction::DIRECTION0;
+
+    OLD::DisplayInfo newDisplay;
+    newDisplay.id = 0;
+    newDisplay.direction = Direction::DIRECTION180;
+
+    // When: Call IsDirectionChanged with direction change
+    bool result = inputWindowsManager_->IsDirectionChanged(oldDisplay, newDisplay);
+
+    // Then: Should return true
+    EXPECT_TRUE(result);
+}
+
+/**
+ * @tc.name: IsDirectionChanged_DirectionDifferent_004
+ * @tc.desc: Test IsDirectionChanged when direction changes from DIRECTION90 to DIRECTION270
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerOneTest, IsDirectionChanged_DirectionDifferent_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+
+    // Given: Two DisplayInfo with direction change from 90 to 270
+    OLD::DisplayInfo oldDisplay;
+    oldDisplay.id = 0;
+    oldDisplay.direction = Direction::DIRECTION90;
+
+    OLD::DisplayInfo newDisplay;
+    newDisplay.id = 0;
+    newDisplay.direction = Direction::DIRECTION270;
+
+    // When: Call IsDirectionChanged with direction change
+    bool result = inputWindowsManager_->IsDirectionChanged(oldDisplay, newDisplay);
+
+    // Then: Should return true
+    EXPECT_TRUE(result);
+}
+
 } // namespace MMI
 } // namespace OHOS

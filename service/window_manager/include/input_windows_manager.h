@@ -497,6 +497,8 @@ void HandleOneHandMode(const OLD::DisplayInfo &displayInfo, std::shared_ptr<Poin
         const OLD::DisplayGroupInfo &newGroupInfo) const;
     bool IsDisplayDirectionChanged(const OLD::DisplayInfo &oldDisplay,
         const OLD::DisplayInfo &newDisplay) const;
+    bool IsDirectionChanged(const OLD::DisplayInfo &oldDisplay,
+        const OLD::DisplayInfo &newDisplay) const;
     bool IsDisplayResolutionChanged(const OLD::DisplayInfo &oldDisplay,
         const OLD::DisplayInfo &newDisplay) const;
     bool IsDisplayLayoutChanged(const OLD::DisplayInfo &oldDisplay,
