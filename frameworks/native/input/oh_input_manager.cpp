@@ -3022,12 +3022,7 @@ Input_Result OH_Input_GetDeviceIds(int32_t *deviceIds, int32_t inSize, int32_t *
     CHKPR(outSize, INPUT_PARAMETER_ERROR);
     auto nativeCallback = [&](std::vector<int32_t> &ids) {
         auto deviceIdslength = static_cast<int32_t>(ids.size());
-        if (inSize > deviceIdslength) {
-            *outSize = deviceIdslength;
-        }
-        if (inSize < deviceIdslength) {
-            *outSize = inSize;
-        }
+        *outSize = std::min(inSize, deviceIdslength);
         for (int32_t i = 0; i < *outSize; ++i) {
             *(deviceIds + i) = ids[i];
         }
