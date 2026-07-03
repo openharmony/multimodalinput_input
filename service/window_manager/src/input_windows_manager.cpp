@@ -8593,6 +8593,19 @@ bool InputWindowsManager::IsDisplayDirectionChanged(const OLD::DisplayInfo &oldD
     return false;
 }
 
+bool InputWindowsManager::IsDirectionChanged(const OLD::DisplayInfo &oldDisplay,
+    const OLD::DisplayInfo &newDisplay) const
+{
+    if (oldDisplay.direction != newDisplay.direction) {
+        MMI_HILOGD("Pointer back center triggered, reason:PHYSICAL_DIRECTION_CHANGED, "
+            "displayId:%{public}d, old:%{public}d, new:%{public}d",
+            newDisplay.id, static_cast<int32_t>(oldDisplay.direction),
+            static_cast<int32_t>(newDisplay.direction));
+        return true;
+    }
+    return false;
+}
+
 bool InputWindowsManager::IsDisplayResolutionChanged(const OLD::DisplayInfo &oldDisplay,
     const OLD::DisplayInfo &newDisplay) const
 {
@@ -8630,7 +8643,8 @@ bool InputWindowsManager::IsDisplayLayoutChanged(const OLD::DisplayInfo &oldDisp
 bool InputWindowsManager::IsDisplayPropertyChanged(const OLD::DisplayInfo &oldDisplay,
     const OLD::DisplayInfo &newDisplay) const
 {
-    if (IsDisplayDirectionChanged(oldDisplay, newDisplay) ||
+    if (IsDirectionChanged(oldDisplay, newDisplay) ||
+        IsDisplayDirectionChanged(oldDisplay, newDisplay) ||
         IsDisplayResolutionChanged(oldDisplay, newDisplay) ||
         IsDisplayLayoutChanged(oldDisplay, newDisplay)) {
         return true;
