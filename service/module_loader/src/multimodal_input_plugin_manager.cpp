@@ -1335,30 +1335,20 @@ void InputPlugin::RemoveFlagForDevice(libinput_event *event)
 
 std::vector<PluginDisplayGroupInfo> InputPlugin::GetDisplayGroupInfos() const
 {
-    std::vector<PluginDisplayGroupInfo> result;
-    InputPluginManager::GetInstance()->PostSyncTask([&result]() {
-        if (WIN_MGR == nullptr) {
-            MMI_HILOGE("Window manager is null");
-            return RET_ERR;
-        }
-        result = WIN_MGR->GetDisplayGroupInfos();
-        return RET_OK;
-    });
-    return result;
+    if (WIN_MGR == nullptr) {
+        MMI_HILOGE("Window manager is null");
+        return {};
+    }
+    return WIN_MGR->GetDisplayGroupInfos();
 }
 
 std::vector<std::shared_ptr<InputDevice>> InputPlugin::GetInputDeviceInfos() const
 {
-    std::vector<std::shared_ptr<InputDevice>> result;
-    InputPluginManager::GetInstance()->PostSyncTask([&result]() {
-        if (INPUT_DEV_MGR == nullptr) {
-            MMI_HILOGE("Input device manager is null");
-            return RET_ERR;
-        }
-        result = INPUT_DEV_MGR->GetInputDeviceInfosForPlugin();
-        return RET_OK;
-    });
-    return result;
+    if (INPUT_DEV_MGR == nullptr) {
+        MMI_HILOGE("Input device manager is null");
+        return {};
+    }
+    return INPUT_DEV_MGR->GetInputDeviceInfosForPlugin();
 }
 
 int32_t InputPlugin::RegisterDisplayChangeCallback(const DisplayChangeCallback &callback)
@@ -1429,24 +1419,20 @@ void InputPluginManager::RemoveDisplayCallbacksOf(IPluginContext *owner)
 
 int32_t InputPlugin::EnableInputDeviceForPlugin(int32_t deviceId)
 {
-    return InputPluginManager::GetInstance()->PostSyncTask([deviceId]() {
-        if (INPUT_DEV_MGR == nullptr) {
-            MMI_HILOGE("Input device manager is null");
-            return RET_ERR;
-        }
-        return INPUT_DEV_MGR->EnableInputDeviceForPlugin(deviceId);
-    });
+    if (INPUT_DEV_MGR == nullptr) {
+        MMI_HILOGE("Input device manager is null");
+        return RET_ERR;
+    }
+    return INPUT_DEV_MGR->EnableInputDeviceForPlugin(deviceId);
 }
 
 int32_t InputPlugin::DisableInputDeviceForPlugin(int32_t deviceId)
 {
-    return InputPluginManager::GetInstance()->PostSyncTask([deviceId]() {
-        if (INPUT_DEV_MGR == nullptr) {
-            MMI_HILOGE("Input device manager is null");
-            return RET_ERR;
-        }
-        return INPUT_DEV_MGR->DisableInputDeviceForPlugin(deviceId);
-    });
+    if (INPUT_DEV_MGR == nullptr) {
+        MMI_HILOGE("Input device manager is null");
+        return RET_ERR;
+    }
+    return INPUT_DEV_MGR->DisableInputDeviceForPlugin(deviceId);
 }
 
 void InputPluginManager::NotifyDisplayChange()
