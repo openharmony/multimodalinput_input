@@ -1329,8 +1329,12 @@ bool JsPointerManager::CreateAsyncWork(napi_env env, sptr<CustomCursorAsyncConte
         ExecuteSetCustomCursorWork,
         HandleSetCustomCursorCompletion,
         asyncContext.GetRefPtr(), &asyncContext->work);
-    if (status != napi_ok ||
-        napi_queue_async_work_with_qos(env, asyncContext->work, napi_qos_t::napi_qos_user_initiated) != napi_ok) {
+    if (status != napi_ok) {
+        return false;
+    }
+    if (napi_queue_async_work_with_qos(env, asyncContext->work, napi_qos_t::napi_qos_user_initiated) != napi_ok) {
+        napi_delete_async_work(env, asyncContext->work);
+        asyncContext->work = nullptr;
         return false;
     }
     return true;
@@ -1363,9 +1367,9 @@ void JsPointerManager::HandleSetCustomCursorCompletion(napi_env env, napi_status
     results[1] = asyncContext->resultValue;
     if (asyncContext->deferred) {
         if (asyncContext->errorCode == RET_OK) {
-            CHKRV(napi_resolve_deferred(env, asyncContext->deferred, results[1]), RESOLVE_DEFERRED);
+            napi_resolve_deferred(env, asyncContext->deferred, results[1]);
         } else {
-            CHKRV(napi_reject_deferred(env, asyncContext->deferred, results[0]), REJECT_DEFERRED);
+            napi_reject_deferred(env, asyncContext->deferred, results[0]);
         }
     }
     asyncContext->DecStrongRef(nullptr);

@@ -225,10 +225,7 @@ bool BindInfos::Add(const BindInfo &info)
             break;
         }
     }
-    auto it2 = infos_.emplace(it, std::move(info));
-    if (it2 == infos_.end()) {
-        MMI_HILOGE("Duplicate %{public}s", info.GetDesc().c_str());
-    }
+    infos_.emplace(it, info);
     return true;
 }
 

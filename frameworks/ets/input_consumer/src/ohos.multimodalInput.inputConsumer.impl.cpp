@@ -332,7 +332,10 @@ void SubscribeKeyMonitor(KeyPressedConfig const& options,
         } else {
             MMI_HILOGE("SubscribeKeyMonitor fail, error:%{public}d", subscriberId);
         }
-        jsCbMap_.erase(std::to_string(keyMonitorId));
+        {
+            std::lock_guard<std::mutex> lock(jsCbMapMutex);
+            jsCbMap_.erase(std::to_string(keyMonitorId));
+        }
         return;
     }
     MMI_HILOGI("[ETS] Subscribe key monitor(ID:%{public}zu, subscriberId:%{public}d)", keyMonitorId, subscriberId);
