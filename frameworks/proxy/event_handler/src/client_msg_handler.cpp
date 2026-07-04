@@ -25,7 +25,9 @@
 #ifdef OHOS_BUILD_ENABLE_KEY_HOOK
 #include "key_event_hook_handler.h"
 #endif // OHOS_BUILD_ENABLE_KEY_HOOK
+#ifdef OHOS_BUILD_ENABLE_INPUT_EVENT_HOOK
 #include "input_event_hook_handler.h"
+#endif // OHOS_BUILD_ENABLE_INPUT_EVENT_HOOK
 #include "long_press_event_subscribe_manager.h"
 #include "mmi_client.h"
 #include "multimodal_event_handler.h"

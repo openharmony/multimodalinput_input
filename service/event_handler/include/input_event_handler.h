@@ -26,7 +26,9 @@
 #include "input_active_subscriber_handler.h"
 #include "key_command_handler.h"
 #include "key_subscriber_handler.h"
+#ifdef OHOS_BUILD_ENABLE_INPUT_EVENT_HOOK
 #include "input_event_hook_manager.h"
+#endif // OHOS_BUILD_ENABLE_INPUT_EVENT_HOOK
 #ifdef OHOS_BUILD_ENABLE_POINTER
 #include "mouse_event_interface.h"
 #endif // OHOS_BUILD_ENABLE_POINTER
@@ -60,7 +62,9 @@ public:
     std::shared_ptr<EventDispatchHandler> GetEventDispatchHandler() const;
     std::shared_ptr<EventPreMonitorHandler> GetEventPreMonitorHandler() const;
     std::shared_ptr<InputActiveSubscriberHandler> GetInputActiveSubscriberHandler() const;
+#ifdef OHOS_BUILD_ENABLE_INPUT_EVENT_HOOK
     std::shared_ptr<InputEventHookManager> GetInputEventHook() const;
+#endif // OHOS_BUILD_ENABLE_INPUT_EVENT_HOOK
 
 private:
     int32_t BuildInputHandlerChain();
@@ -89,7 +93,9 @@ private:
     std::shared_ptr<EventDispatchHandler> eventDispatchHandler_ { nullptr };
     std::shared_ptr<EventPreMonitorHandler> eventPreMonitorHandler_ { nullptr };
     std::shared_ptr<InputActiveSubscriberHandler> inputActiveSubscriberHandler_ { nullptr };
+#ifdef OHOS_BUILD_ENABLE_INPUT_EVENT_HOOK
     std::shared_ptr<InputEventHookManager> inputEventHookMgr_ { nullptr };
+#endif // OHOS_BUILD_ENABLE_INPUT_EVENT_HOOK
 
     uint64_t idSeed_ { 0 };
     

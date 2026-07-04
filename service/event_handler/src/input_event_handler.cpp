@@ -520,9 +520,11 @@ std::shared_ptr<InputActiveSubscriberHandler> InputEventHandler::GetInputActiveS
     return inputActiveSubscriberHandler_;
 }
 
+#ifdef OHOS_BUILD_ENABLE_INPUT_EVENT_HOOK
 std::shared_ptr<InputEventHookManager> InputEventHandler::GetInputEventHook() const
 {
     return inputEventHookMgr_;
 }
+#endif // OHOS_BUILD_ENABLE_INPUT_EVENT_HOOK
 } // namespace MMI
 } // namespace OHOS
