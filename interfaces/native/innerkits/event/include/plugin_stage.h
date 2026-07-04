@@ -16,6 +16,8 @@
 #ifndef PLUGIN_STAGE_H
 #define PLUGIN_STAGE_H
 
+#include <cstdint>
+
 #include "key_event.h"
 #include "pointer_event.h"
 #include "axis_event.h"
@@ -140,7 +142,20 @@ struct IInputPlugin {
     virtual bool HandleSequenceKeys(const std::vector<ISequenceKey> &sequenceKeys) { return false; }
 };
 
+struct PluginDisplayInfo {
+    int32_t displayId { -1 };
+    uint64_t rsId { 0 };
+    int32_t mode { 0 };
+};
+
+struct PluginDisplayGroupInfo {
+    int32_t groupId { -1 };
+    int32_t mainDisplayId { -1 };
+    std::vector<PluginDisplayInfo> displayInfos;
+};
+
 struct IPluginContext {
+    using DisplayChangeCallback = std::function<void()>;
     virtual ~IPluginContext() = default;
     virtual std::string GetName() = 0;
     virtual int32_t GetPriority() = 0;
@@ -187,6 +202,12 @@ struct IPluginContext {
 #endif
     virtual void AddFlagForDevice(libinput_event *event) = 0;
     virtual void RemoveFlagForDevice(libinput_event *event) = 0;
+    virtual std::vector<PluginDisplayGroupInfo> GetDisplayGroupInfos() const = 0;
+    virtual std::vector<std::shared_ptr<InputDevice>> GetInputDeviceInfos() const = 0;
+    virtual int32_t RegisterDisplayChangeCallback(const DisplayChangeCallback &callback) = 0;
+    virtual bool UnregisterDisplayChangeCallback(int32_t callbackId) = 0;
+    virtual int32_t EnableInputDeviceForPlugin(int32_t deviceId) = 0;
+    virtual int32_t DisableInputDeviceForPlugin(int32_t deviceId) = 0;
 };
 
 inline bool checkPluginEventNull(PluginEventType &event)

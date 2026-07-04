@@ -120,6 +120,7 @@ public:
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 #ifdef OHOS_BUILD_ENABLE_POINTER
     const OLD::DisplayGroupInfo GetDisplayGroupInfo(int32_t groupId = DEFAULT_GROUP_ID);
+    std::vector<PluginDisplayGroupInfo> GetDisplayGroupInfos();
     int32_t SetHoverScrollState(int32_t userId, bool state);
     bool GetHoverScrollState(int32_t userId) const;
     bool SelectPointerChangeArea(int32_t windowId, int32_t logicalX, int32_t logicalY);
@@ -492,6 +493,10 @@ void HandleOneHandMode(const OLD::DisplayInfo &displayInfo, std::shared_ptr<Poin
     bool OnDisplayRemovedOrCombinationChanged(const OLD::DisplayGroupInfo &displayGroupInfo);
     bool IsBackCenterDisplayChange(const OLD::DisplayGroupInfo &oldGroupInfo,
         const OLD::DisplayGroupInfo &newGroupInfo, bool hasOldGroupInfo) const;
+    bool HasDisplayGroupInfoChanged(const OLD::DisplayGroupInfo &oldGroupInfo,
+        const OLD::DisplayGroupInfo &newGroupInfo, bool hasOldGroupInfo) const;
+    bool HasPluginDisplayInfoChanged(const OLD::DisplayInfo &oldDisplay,
+        const OLD::DisplayInfo &newDisplay) const;
     bool GetCachedDisplayGroupInfo(int32_t groupId, OLD::DisplayGroupInfo &displayGroupInfo) const;
     bool IsMainDisplayChanged(const OLD::DisplayGroupInfo &oldGroupInfo,
         const OLD::DisplayGroupInfo &newGroupInfo) const;

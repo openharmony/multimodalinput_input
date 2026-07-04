@@ -1426,5 +1426,218 @@ HWTEST_F(InputDeviceManagerTestWithMock, EnableInputDevice_005, TestSize.Level1)
 
     INPUT_DEV_MGR->Detach(observer);
 }
+
+/**
+ * @tc.name: EnableInputDeviceForPlugin_InvalidDeviceId_001
+ * @tc.desc: Test EnableInputDeviceForPlugin with an invalid device id.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTestWithMock, EnableInputDeviceForPlugin_InvalidDeviceId_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t ret = INPUT_DEV_MGR->EnableInputDeviceForPlugin(TEST_DEVICE_ID_INVALID);
+    EXPECT_EQ(ret, RET_ERR);
+}
+
+/**
+ * @tc.name: GetInputDeviceInfosForPlugin_ReturnsDeviceFields_001
+ * @tc.desc: GetInputDeviceInfosForPlugin returns input device objects used by disable/enable APIs.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTestWithMock, GetInputDeviceInfosForPlugin_ReturnsDeviceFields_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    char devName[] { "pluginDevice" };
+    char phys[] { "pluginPhys" };
+    char uniq[] { "pluginUniq" };
+    struct libinput_device rawDev {};
+    NiceMock<LibinputInterfaceMock> libinputMock;
+    EXPECT_CALL(libinputMock, DeviceGetName).WillRepeatedly(Return(devName));
+    EXPECT_CALL(libinputMock, DeviceGetPhys).WillRepeatedly(Return(phys));
+    EXPECT_CALL(libinputMock, DeviceGetUniq).WillRepeatedly(Return(uniq));
+    EXPECT_CALL(libinputMock, DeviceGetAxisMin).WillRepeatedly(Return(-1));
+    EXPECT_CALL(libinputMock, DeviceHasCapability)
+        .WillRepeatedly([](libinput_device*, libinput_device_capability capability) {
+            return capability == LIBINPUT_DEVICE_CAP_KEYBOARD || capability == LIBINPUT_DEVICE_CAP_POINTER;
+        });
+
+    InputDeviceManager::InputDeviceInfo info;
+    info.inputDeviceOrigin = &rawDev;
+    info.networkIdOrigin = devName;
+    info.enable = true;
+    info.inputEnable = true;
+    info.isPointerDevice = true;
+    info.isTouchableDevice = false;
+    info.isRemote = false;
+    info.isLocal = true;
+    INPUT_DEV_MGR->inputDevice_[TEST_DEVICE_ID_1] = info;
+
+    auto devices = INPUT_DEV_MGR->GetInputDeviceInfosForPlugin();
+    ASSERT_EQ(devices.size(), 1u);
+    ASSERT_NE(devices[0], nullptr);
+    EXPECT_EQ(devices[0]->GetId(), TEST_DEVICE_ID_1);
+    EXPECT_TRUE(devices[0]->HasCapability(INPUT_DEV_CAP_POINTER));
+    EXPECT_TRUE(devices[0]->HasCapability(INPUT_DEV_CAP_KEYBOARD));
+    EXPECT_FALSE(devices[0]->HasCapability(INPUT_DEV_CAP_TOUCH));
+    EXPECT_TRUE(devices[0]->IsLocal());
+}
+
+/**
+ * @tc.name: DisableInputDeviceForPlugin_InvalidDeviceId_001
+ * @tc.desc: Test DisableInputDeviceForPlugin with an invalid device id.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTestWithMock, DisableInputDeviceForPlugin_InvalidDeviceId_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t ret = INPUT_DEV_MGR->DisableInputDeviceForPlugin(TEST_DEVICE_ID_INVALID);
+    EXPECT_EQ(ret, RET_ERR);
+}
+
+/**
+ * @tc.name: DisableInputDeviceForPlugin_Success_002
+ * @tc.desc: DisableInputDeviceForPlugin sets inputEnable/enable to false and notifies observers.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTestWithMock, DisableInputDeviceForPlugin_Success_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputDeviceManager::InputDeviceInfo info;
+    info.networkIdOrigin = "pluginDevice";
+    info.enable = true;
+    info.inputEnable = true;
+    INPUT_DEV_MGR->inputDevice_[TEST_DEVICE_ID_1] = info;
+
+    auto observer = std::make_shared<InputDeviceObserver>();
+    EXPECT_CALL(*observer, OnDeviceDisabled).Times(testing::Exactly(EXPECTED_NOTIFY_COUNT));
+    INPUT_DEV_MGR->Attach(observer);
+
+    int32_t ret = INPUT_DEV_MGR->DisableInputDeviceForPlugin(TEST_DEVICE_ID_1);
+    EXPECT_EQ(ret, RET_OK);
+
+    auto it = INPUT_DEV_MGR->inputDevice_.find(TEST_DEVICE_ID_1);
+    ASSERT_NE(it, INPUT_DEV_MGR->inputDevice_.end());
+    EXPECT_FALSE(it->second.enable);
+    EXPECT_FALSE(it->second.inputEnable);
+
+    INPUT_DEV_MGR->Detach(observer);
+}
+
+/**
+ * @tc.name: DisableInputDeviceForPlugin_AlreadyDisabled_003
+ * @tc.desc: Disabling an already-disabled device is idempotent and does not notify again.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTestWithMock, DisableInputDeviceForPlugin_AlreadyDisabled_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputDeviceManager::InputDeviceInfo info;
+    info.networkIdOrigin = "pluginDevice";
+    info.enable = false;
+    info.inputEnable = false;
+    INPUT_DEV_MGR->inputDevice_[TEST_DEVICE_ID_1] = info;
+
+    auto observer = std::make_shared<InputDeviceObserver>();
+    EXPECT_CALL(*observer, OnDeviceDisabled).Times(testing::Exactly(0));
+    INPUT_DEV_MGR->Attach(observer);
+
+    int32_t ret = INPUT_DEV_MGR->DisableInputDeviceForPlugin(TEST_DEVICE_ID_1);
+    EXPECT_EQ(ret, RET_OK);
+
+    INPUT_DEV_MGR->Detach(observer);
+}
+
+/**
+ * @tc.name: EnableInputDeviceForPlugin_Success_002
+ * @tc.desc: EnableInputDeviceForPlugin sets inputEnable/enable to true and notifies observers.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTestWithMock, EnableInputDeviceForPlugin_Success_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputDeviceManager::InputDeviceInfo info;
+    info.networkIdOrigin = "pluginDevice";
+    info.enable = false;
+    info.inputEnable = false;
+    INPUT_DEV_MGR->inputDevice_[TEST_DEVICE_ID_1] = info;
+
+    auto observer = std::make_shared<InputDeviceObserver>();
+    EXPECT_CALL(*observer, OnDeviceEnabled).Times(testing::Exactly(EXPECTED_NOTIFY_COUNT));
+    INPUT_DEV_MGR->Attach(observer);
+
+    int32_t ret = INPUT_DEV_MGR->EnableInputDeviceForPlugin(TEST_DEVICE_ID_1);
+    EXPECT_EQ(ret, RET_OK);
+
+    auto it = INPUT_DEV_MGR->inputDevice_.find(TEST_DEVICE_ID_1);
+    ASSERT_NE(it, INPUT_DEV_MGR->inputDevice_.end());
+    EXPECT_TRUE(it->second.enable);
+    EXPECT_TRUE(it->second.inputEnable);
+
+    INPUT_DEV_MGR->Detach(observer);
+}
+
+/**
+ * @tc.name: EnableDisable_LaterOverwrite_001
+ * @tc.desc: A later enable after disable wins (later-overwrite rule, BR-3).
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTestWithMock, EnableDisable_LaterOverwrite_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputDeviceManager::InputDeviceInfo info;
+    info.networkIdOrigin = "pluginDevice";
+    info.enable = true;
+    info.inputEnable = true;
+    INPUT_DEV_MGR->inputDevice_[TEST_DEVICE_ID_1] = info;
+
+    auto observer = std::make_shared<InputDeviceObserver>();
+    INPUT_DEV_MGR->Attach(observer);
+
+    EXPECT_NO_FATAL_FAILURE(INPUT_DEV_MGR->DisableInputDeviceForPlugin(TEST_DEVICE_ID_1));
+    EXPECT_NO_FATAL_FAILURE(INPUT_DEV_MGR->EnableInputDeviceForPlugin(TEST_DEVICE_ID_1));
+
+    auto it = INPUT_DEV_MGR->inputDevice_.find(TEST_DEVICE_ID_1);
+    ASSERT_NE(it, INPUT_DEV_MGR->inputDevice_.end());
+    EXPECT_TRUE(it->second.enable);
+    EXPECT_TRUE(it->second.inputEnable);
+
+    INPUT_DEV_MGR->Detach(observer);
+}
+
+/**
+ * @tc.name: DisableEnable_LaterOverwrite_002
+ * @tc.desc: A later disable after enable wins (later-overwrite rule, BR-3).
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTestWithMock, DisableEnable_LaterOverwrite_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputDeviceManager::InputDeviceInfo info;
+    info.networkIdOrigin = "pluginDevice";
+    info.enable = false;
+    info.inputEnable = false;
+    INPUT_DEV_MGR->inputDevice_[TEST_DEVICE_ID_1] = info;
+
+    auto observer = std::make_shared<InputDeviceObserver>();
+    INPUT_DEV_MGR->Attach(observer);
+
+    EXPECT_NO_FATAL_FAILURE(INPUT_DEV_MGR->EnableInputDeviceForPlugin(TEST_DEVICE_ID_1));
+    EXPECT_NO_FATAL_FAILURE(INPUT_DEV_MGR->DisableInputDeviceForPlugin(TEST_DEVICE_ID_1));
+
+    auto it = INPUT_DEV_MGR->inputDevice_.find(TEST_DEVICE_ID_1);
+    ASSERT_NE(it, INPUT_DEV_MGR->inputDevice_.end());
+    EXPECT_FALSE(it->second.enable);
+    EXPECT_FALSE(it->second.inputEnable);
+
+    INPUT_DEV_MGR->Detach(observer);
+}
 } // namespace MMI
 } // namespace OHOS

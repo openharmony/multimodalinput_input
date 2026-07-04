@@ -188,8 +188,8 @@ void DisplayEventMonitor::InitCommonEventSubscriber()
     matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_UNLOCKED);
     matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_DATA_SHARE_READY);
     EventFwk::CommonEventSubscribeInfo commonEventSubscribeInfo(matchingSkills);
-    hasInit_ = OHOS::EventFwk::CommonEventManager::SubscribeCommonEvent(
-        std::make_shared<DisplayChangedReceiver>(commonEventSubscribeInfo));
+    CommonEventSubscriber_ = std::make_shared<DisplayChangedReceiver>(commonEventSubscribeInfo);
+    hasInit_ = OHOS::EventFwk::CommonEventManager::SubscribeCommonEvent(CommonEventSubscriber_);
 }
 
 void DisplayEventMonitor::SendCancelEventWhenLock()

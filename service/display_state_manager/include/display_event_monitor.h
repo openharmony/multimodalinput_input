@@ -34,6 +34,7 @@
 namespace OHOS {
 namespace MMI {
 class DelegateInterface;
+class DisplayChangedReceiver;
 class DisplayEventMonitor final {
 DECLARE_DELAYED_SINGLETON(DisplayEventMonitor);
 public:
@@ -71,6 +72,7 @@ private:
     std::string screenStatus_;
     bool isScreenLocked_ { true };
     std::shared_ptr<DelegateInterface> delegateProxy_ { nullptr };
+    std::shared_ptr<DisplayChangedReceiver> CommonEventSubscriber_ { nullptr };
 };
 
 #define DISPLAY_MONITOR ::OHOS::DelayedSingleton<DisplayEventMonitor>::GetInstance()

@@ -30,6 +30,7 @@
 #include "struct_multimodal.h"
 #include "uds_server.h"
 #include "old_display_info.h"
+#include "plugin_stage.h"
 #include "shift_info.h"
 
 struct libinput_device;
@@ -233,6 +234,7 @@ public:
     virtual int32_t ControlMouseEventToAnco(int32_t windowId, bool enable, const std::string &callingTokenName) = 0;
 #endif // OHOS_BUILD_ENABLE_ANCO_GAME_EVENT_MAPPING
     virtual const OLD::DisplayGroupInfo& GetDefaultDisplayGroupInfo() = 0;
+    virtual std::vector<PluginDisplayGroupInfo> GetDisplayGroupInfos() = 0;
 private:
     static std::mutex mutex_;
     static std::shared_ptr<IInputWindowsManager> instance_;
