@@ -516,14 +516,27 @@ void KeyEventNormalize::HandleSimulatedModifierKeyActionFromShell(const std::sha
 
 void KeyEventNormalize::UpdateSimulatedEventModifierState(const std::shared_ptr<KeyEvent> &keyEvent)
 {
-    if (keyEvent == nullptr || keyEvent_ == nullptr) {
+    if (keyEvent == nullptr) {
         MMI_HILOGE("KeyEvent is null");
         return;
     }
 
-    int32_t capsState = static_cast<int32_t>(keyEvent_->GetFunctionKey(KeyEvent::CAPS_LOCK_FUNCTION_KEY));
-    int32_t numState = static_cast<int32_t>(keyEvent_->GetFunctionKey(KeyEvent::NUM_LOCK_FUNCTION_KEY));
-    int32_t scrollState = static_cast<int32_t>(keyEvent_->GetFunctionKey(KeyEvent::SCROLL_LOCK_FUNCTION_KEY));
+    int32_t capsState = static_cast<int32_t>(keyEvent->GetFunctionKey(KeyEvent::CAPS_LOCK_FUNCTION_KEY));
+    int32_t numState = static_cast<int32_t>(keyEvent->GetFunctionKey(KeyEvent::NUM_LOCK_FUNCTION_KEY));
+    int32_t scrollState = static_cast<int32_t>(keyEvent->GetFunctionKey(KeyEvent::SCROLL_LOCK_FUNCTION_KEY));
+
+    std::vector<struct libinput_device*> input_devices;
+    INPUT_DEV_MGR->GetMultiKeyboardDevice(input_devices);
+    if (input_devices.empty()) {
+        return;
+    }
+
+    for (auto& device : input_devices) {
+        capsState = libinput_get_funckey_state(device, KeyEvent::CAPS_LOCK_FUNCTION_KEY);
+        numState = libinput_get_funckey_state(device, KeyEvent::NUM_LOCK_FUNCTION_KEY);
+        scrollState = libinput_get_funckey_state(device, KeyEvent::SCROLL_LOCK_FUNCTION_KEY);
+    }
+
     keyEvent->SetFunctionKey(KeyEvent::CAPS_LOCK_FUNCTION_KEY, capsState);
     keyEvent->SetFunctionKey(KeyEvent::NUM_LOCK_FUNCTION_KEY, numState);
     keyEvent->SetFunctionKey(KeyEvent::SCROLL_LOCK_FUNCTION_KEY, scrollState);
