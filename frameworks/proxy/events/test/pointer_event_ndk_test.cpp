@@ -247,5 +247,112 @@ HWTEST_F(PointerEventNdkTest, PointerEventNdkTest_OH_Input_TouchEventToPointerEv
     EXPECT_EQ(item.GetWindowX(), windowX);
     EXPECT_EQ(item.GetWindowY(), windowY);
 }
+
+/**
+ * @tc.name: PointerEventNdkTest_OH_Input_TouchEventToPointerEvent_NullTouchEvent
+ * @tc.desc: Test the function OH_Input_TouchEventToPointerEvent with null touchEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerEventNdkTest, PointerEventNdkTest_OH_Input_TouchEventToPointerEvent_009, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t windowX = 10;
+    int32_t windowY = 20;
+    std::shared_ptr<OHOS::MMI::PointerEvent> result
+        = OH_Input_TouchEventToPointerEvent(nullptr, windowX, windowY);
+    EXPECT_EQ(result, nullptr);
+}
+
+/**
+ * @tc.name: PointerEventNdkTest_OH_Input_TouchEventToPointerEvent_InvalidId
+ * @tc.desc: Test the function OH_Input_TouchEventToPointerEvent with invalid id (less than 0)
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerEventNdkTest, PointerEventNdkTest_OH_Input_TouchEventToPointerEvent_010, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    Input_TouchEvent inputTouchEvent;
+    inputTouchEvent.actionTime = 100;
+    inputTouchEvent.action = TOUCH_ACTION_DOWN;
+    inputTouchEvent.id = -1;
+    inputTouchEvent.displayX = 100;
+    inputTouchEvent.displayY = 200;
+    int32_t windowX = 10;
+    int32_t windowY = 20;
+    std::shared_ptr<OHOS::MMI::PointerEvent> result
+        = OH_Input_TouchEventToPointerEvent(&inputTouchEvent, windowX, windowY);
+    EXPECT_EQ(result, nullptr);
+}
+
+/**
+ * @tc.name: PointerEventNdkTest_OH_Input_TouchEventToPointerEvent_MoveAction
+ * @tc.desc: Test the function OH_Input_TouchEventToPointerEvent with TOUCH_ACTION_MOVE
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerEventNdkTest, PointerEventNdkTest_OH_Input_TouchEventToPointerEvent_011, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    Input_TouchEvent inputTouchEvent;
+    inputTouchEvent.actionTime = 100;
+    inputTouchEvent.action = TOUCH_ACTION_MOVE;
+    inputTouchEvent.id = 1;
+    inputTouchEvent.displayX = 100;
+    inputTouchEvent.displayY = 200;
+    int32_t windowX = 10;
+    int32_t windowY = 20;
+    std::shared_ptr<OHOS::MMI::PointerEvent> result
+        = OH_Input_TouchEventToPointerEvent(&inputTouchEvent, windowX, windowY);
+    EXPECT_NE(result, nullptr);
+    EXPECT_EQ(result->GetPointerAction(), OHOS::MMI::PointerEvent::POINTER_ACTION_MOVE);
+}
+
+/**
+ * @tc.name: PointerEventNdkTest_OH_Input_TouchEventToPointerEvent_UpAction
+ * @tc.desc: Test the function OH_Input_TouchEventToPointerEvent with TOUCH_ACTION_UP
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerEventNdkTest, PointerEventNdkTest_OH_Input_TouchEventToPointerEvent_012, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    Input_TouchEvent inputTouchEvent;
+    inputTouchEvent.actionTime = 100;
+    inputTouchEvent.action = TOUCH_ACTION_UP;
+    inputTouchEvent.id = 1;
+    inputTouchEvent.displayX = 100;
+    inputTouchEvent.displayY = 200;
+    int32_t windowX = 10;
+    int32_t windowY = 20;
+    std::shared_ptr<OHOS::MMI::PointerEvent> result
+        = OH_Input_TouchEventToPointerEvent(&inputTouchEvent, windowX, windowY);
+    EXPECT_NE(result, nullptr);
+    EXPECT_EQ(result->GetPointerAction(), OHOS::MMI::PointerEvent::POINTER_ACTION_UP);
+}
+
+/**
+ * @tc.name: PointerEventNdkTest_OH_Input_TouchEventToPointerEvent_CancelAction
+ * @tc.desc: Test the function OH_Input_TouchEventToPointerEvent with TOUCH_ACTION_CANCEL
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerEventNdkTest, PointerEventNdkTest_OH_Input_TouchEventToPointerEvent_013, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    Input_TouchEvent inputTouchEvent;
+    inputTouchEvent.actionTime = 100;
+    inputTouchEvent.action = TOUCH_ACTION_CANCEL;
+    inputTouchEvent.id = 1;
+    inputTouchEvent.displayX = 100;
+    inputTouchEvent.displayY = 200;
+    int32_t windowX = 10;
+    int32_t windowY = 20;
+    std::shared_ptr<OHOS::MMI::PointerEvent> result
+        = OH_Input_TouchEventToPointerEvent(&inputTouchEvent, windowX, windowY);
+    EXPECT_NE(result, nullptr);
+    EXPECT_EQ(result->GetPointerAction(), OHOS::MMI::PointerEvent::POINTER_ACTION_CANCEL);
+}
 } // namespace MMI
 } // namespace OHOS

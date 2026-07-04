@@ -189,7 +189,6 @@ group("mmi_tests") {
   deps = [
     "frameworks/ets/common/test:AniCommonTest",
     "frameworks/native/input:OHInputManagerEXTest",
-    "frameworks/native/input:OHInputManagerTest",
     "frameworks/proxy:InputDeviceImplTest",
     "frameworks/proxy:InputHandlerManagerTest",
     "frameworks/proxy:InputManagerFilterManualTest",
@@ -203,7 +202,6 @@ group("mmi_tests") {
     "frameworks/proxy:KeyEventTest",
     "frameworks/proxy:LongPressEventSubscribeManagerTest",
     "frameworks/proxy:PointerEventExTest",
-    "frameworks/proxy:PointerEventNdkTest",
     "frameworks/proxy:PointerEventTest",
     "frameworks/proxy:PointerStyleTest",
     "frameworks/proxy:ut-mmi-proxy-out",

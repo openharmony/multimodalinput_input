@@ -4953,5 +4953,78 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_GetMouseEventCursorInfo
     ret = OH_Input_GetMouseEventCursorInfo(&mouseEvent, &cursorInfo);
     ASSERT_EQ(ret, INPUT_SUCCESS);
 }
+
+/**
+ * @tc.name: OHInputManagerTest_OH_Input_GetKeyEventId_002
+ * @tc.desc: Test OH_Input_GetKeyEventId with null parameters
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_GetKeyEventId_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    Input_KeyEvent keyEvent;
+    int32_t eventId { -1 };
+    EXPECT_EQ(OH_Input_GetKeyEventId(nullptr, &eventId), INPUT_PARAMETER_ERROR);
+    EXPECT_EQ(OH_Input_GetKeyEventId(&keyEvent, nullptr), INPUT_PARAMETER_ERROR);
+    EXPECT_EQ(OH_Input_GetKeyEventId(nullptr, nullptr), INPUT_PARAMETER_ERROR);
+}
+
+/**
+ * @tc.name: OHInputManagerTest_OH_Input_GetPointerLocation_001
+ * @tc.desc: Test OH_Input_GetPointerLocation with null parameters
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_GetPointerLocation_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t displayId = 0;
+    double displayX = 0.0;
+    double displayY = 0.0;
+    EXPECT_EQ(OH_Input_GetPointerLocation(nullptr, &displayX, &displayY), INPUT_PARAMETER_ERROR);
+    EXPECT_EQ(OH_Input_GetPointerLocation(&displayId, nullptr, &displayY), INPUT_PARAMETER_ERROR);
+    EXPECT_EQ(OH_Input_GetPointerLocation(&displayId, &displayX, nullptr), INPUT_PARAMETER_ERROR);
+}
+
+/**
+ * @tc.name: OHInputManagerTest_OH_Input_GetCursorInfo_001
+ * @tc.desc: Test OH_Input_GetCursorInfo with null cursorInfo
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_GetCursorInfo_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    OH_PixelmapNative *pixelmap = nullptr;
+    EXPECT_EQ(OH_Input_GetCursorInfo(nullptr, &pixelmap), INPUT_PARAMETER_ERROR);
+}
+
+/**
+ * @tc.name: OHInputManagerTest_OH_Input_CancelInjection_001
+ * @tc.desc: Test OH_Input_CancelInjection does not crash
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_CancelInjection_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EXPECT_NO_FATAL_FAILURE(OH_Input_CancelInjection());
+}
+
+/**
+ * @tc.name: OHInputManagerTest_OH_Input_DestroyDeviceInfo_002
+ * @tc.desc: Test OH_Input_DestroyDeviceInfo with a created deviceInfo object
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_DestroyDeviceInfo_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    Input_DeviceInfo *deviceInfo = OH_Input_CreateDeviceInfo();
+    ASSERT_NE(deviceInfo, nullptr);
+    EXPECT_NO_FATAL_FAILURE(OH_Input_DestroyDeviceInfo(&deviceInfo));
+    EXPECT_EQ(deviceInfo, nullptr);
+}
 } // namespace MMI
 } // namespace OHOS
