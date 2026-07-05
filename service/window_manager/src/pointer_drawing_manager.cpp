@@ -265,15 +265,22 @@ void PointerDrawingManager::DestroyPointerWindow()
 
 void PointerDrawingManager::DestroyPointerWindowOfHardCursor()
 {
-    SetSurfaceNode(nullptr);
-    auto screenPointers = CopyScreenPointers();
-    for (auto &[screenId, sp] : screenPointers) {
+    std::unique_lock<std::shared_mutex> lock(screenPointersMtx_);
+    for (auto [screenId, sp] : screenPointers_) {
         if (sp == nullptr) {
-            MMI_HILOGE("ScreenPointer is null, screenId=%{public}" PRIu64, screenId);
             continue;
         }
-        sp->DestroyPointerWindow();
+        auto surfaceNode = sp->GetSurfaceNode();
+        if (surfaceNode != nullptr && surfaceNode == GetSurfaceNode()) {
+            // Ensure that the RSSurfaceNode object is destructed before the RSUIDirector object in ScreenPointer.
+            // Otherwise, the command for destructing the RSSurfaceNode object cannot be sent to the RS service.
+            surfaceNode = nullptr;
+            SetSurfaceNode(nullptr);
+            MMI_HILOGD("SetSurfaceNode null, screenId=%{public}" PRIu64, screenId);
+            break;
+        }
     }
+    screenPointers_.clear();
 }
 
 void PointerDrawingManager::DestroyPointerWindowOfSoftCursor()
@@ -284,7 +291,9 @@ void PointerDrawingManager::DestroyPointerWindowOfSoftCursor()
         SetSurfaceNode(nullptr);
         surfaceNodePtr->DetachToDisplay(screenId_);
         surfaceNodePtr = nullptr;
-        RsFlushImplicitTransaction();
+        if (rsUIDirector_ != nullptr) {
+            rsUIDirector_->SendMessages();
+        }
     }
     // The RSUIDirector and RSUIContext is invalid after the render_service dies.
     rsUIDirector_ = nullptr;
@@ -3276,7 +3285,16 @@ void PointerDrawingManager::OnScreenModeChange(const std::vector<sptr<OHOS::Rose
 
         bool isHardCursorEnabled = this->GetHardCursorEnabled();
         if (!isHardCursorEnabled) {
+            // 软光标场景下，清理掉硬光标节点
+            DestroyPointerWindowOfHardCursor();
             return RET_OK;
+        } else {
+            // 硬光标场景下，清理掉软光标节点
+            auto surfaceNode = GetSurfaceNode();
+            if (surfaceNode != nullptr && surfaceNode->GetRSUIContext() == rsUIContext_) {
+                surfaceNode = nullptr;
+                DestroyPointerWindowOfSoftCursor();
+            }
         }
 
         auto mainScreen = this->UpdateScreenPointerAndFindMainScreenInfo(screens);
@@ -3549,21 +3567,6 @@ bool PointerDrawingManager::DeleteScreenPointer(uint64_t screenId)
     }
     screenPointers_.erase(it);
     return true;
-}
-
-void PointerDrawingManager::ClearScreenPointer()
-{
-    std::unique_lock<std::shared_mutex> lock(screenPointersMtx_);
-    for (auto [screenId, sp] : screenPointers_) {
-        if (sp != nullptr && sp->GetSurfaceNode() == GetSurfaceNode()) {
-            // Ensure that the RSSurfaceNode object is destructed before the RSUIDirector object in ScreenPointer.
-            // Otherwise, the command for destructing the RSSurfaceNode object cannot be sent to the RS service.
-            SetSurfaceNode(nullptr);
-            MMI_HILOGD("SetSurfaceNode null, screenId=%{public}" PRIu64, screenId);
-            break;
-        }
-    }
-    screenPointers_.clear();
 }
 
 void PointerDrawingManager::ClearDisappearedScreenPointer(const std::set<uint64_t> &screenIds)
@@ -4015,7 +4018,7 @@ void PointerDrawingManager::UpdatePointerItemCursorInfo(PointerEvent::PointerIte
 void PointerDrawingManager::AllPointerDeviceRemoved()
 {
     UnsubscribeScreenModeChange();
-    ClearScreenPointer();
+    DestroyPointerWindowOfHardCursor();
 }
 
 void PointerDrawingManager::OnSwitchUser(int32_t userId)

@@ -112,12 +112,8 @@ ScreenPointer::ScreenPointer(hwcmgr_ptr_t hwcMgr, handler_ptr_t handler, screen_
 
 ScreenPointer::~ScreenPointer()
 {
-    if (surfaceNode_ != nullptr) {
-        surfaceNode_->DetachToDisplay(screenId_);
-        surfaceNode_ = nullptr;
-        MMI_HILOGI("Detach screenId:%{public}" PRIu64, screenId_);
-        RsFlushImplicitTransaction();
-    }
+    DestroyPointerWindow();
+    MMI_HILOGI("Destruct ScreenPointer, id:%{public}" PRIu64, screenId_);
 }
 
 bool ScreenPointer::Init(PointerRenderer &render, bool needDrawPointer)
