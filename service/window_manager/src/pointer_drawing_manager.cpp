@@ -3337,7 +3337,7 @@ void PointerDrawingManager::CreateRenderConfig(RenderConfig& cfg, std::shared_pt
     }
 }
 
-void PointerDrawingManager::HardwareCursorRender(MOUSE_ICON mouseStyle, int32_t x, int32_t y, uint64_t displayId
+void PointerDrawingManager::HardwareCursorRender(MOUSE_ICON mouseStyle, int32_t x, int32_t y, uint64_t displayId,
     bool isBlur)
 {
     auto screenPointers = CopyScreenPointers();
