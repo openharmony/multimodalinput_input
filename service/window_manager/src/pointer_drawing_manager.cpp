@@ -862,7 +862,7 @@ int32_t PointerDrawingManager::InitLayer(const MOUSE_ICON mouseStyle)
             return InitVsync(mouseStyle);
         }
         if (GetCursorBlurEnabled()) {
-            return resample_.HasCoords() ? InitVsync(mouseStyle) : RET_OK;
+            return resample_.HasCoords(false) ? InitVsync(mouseStyle) : RET_OK;
         }
         std::lock_guard<std::recursive_mutex> lg(recursiveMtx_);
         hardwareCanvasSize_ = g_hardwareCanvasSize;
@@ -4167,11 +4167,14 @@ bool ResampleAlgorithm::CheckDifferentDisplayId()
     return checkCurrent && checkHistory;
 }
 
-bool ResampleAlgorithm::HasCoords()
+bool ResampleAlgorithm::HasCoords(bool isResample)
 {
     std::lock_guard<std::mutex> lock(bufferMutex_);
     if (!currentBuffer_.empty()) {
         return true;
+    }
+    if (!isResample) {
+        return false;
     }
     if (keepResample_ <= 0) {
         return false;

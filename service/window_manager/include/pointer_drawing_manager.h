@@ -96,7 +96,7 @@ public:
     ResampleAlgorithm() = default;
     ~ResampleAlgorithm() = default;
     void AddPoint(int32_t physicalX, int32_t physicalY, uint64_t displayId);
-    bool HasCoords();
+    bool HasCoords(bool isResample = true);
     bool GetResampledPoint(int32_t &outX, int32_t &outY, uint64_t &displayId, uint64_t timestamp);
 private:
     bool CheckDifferentDisplayId();

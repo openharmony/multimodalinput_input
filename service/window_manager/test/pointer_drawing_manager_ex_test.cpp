@@ -2107,6 +2107,8 @@ HWTEST_F(PointerDrawingManagerExTest, PointerDrawingManagerExTest_RA_HasCoords00
     pointerDrawMgr.resample_.keepResample_ = 2;
     ret = pointerDrawMgr.resample_.HasCoords();
     EXPECT_EQ(ret, true);
+    ret = pointerDrawMgr.resample_.HasCoords(false);
+    EXPECT_EQ(ret, false);
     pointerDrawMgr.resample_.keepResample_ = 0;
     ret = pointerDrawMgr.resample_.HasCoords();
     EXPECT_EQ(ret, false);
