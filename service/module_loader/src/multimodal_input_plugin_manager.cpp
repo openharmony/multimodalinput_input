@@ -55,6 +55,7 @@ const char PLUGIN_CONFIG_FILE[] { "etc/multimodalinput/multimodal_input_plugins_
 const int32_t TIMEOUT_US = 300;
 const int32_t TIMEOUT_USE_EVENT_US = 2500;
 const int32_t MAX_TIMER = 3;
+const std::string EDM_ADMIN_PLUGIN_NAME { "libedm_customize.z.so" };
 } // namespace
 
 bool InputPluginManager::PluginConfig::IsValid() const
@@ -494,7 +495,7 @@ int32_t InputPluginManager::LoadDynamicPlugin(int32_t uid, const std::string &uu
         MMI_HILOGE("Plugin config not found for uuid: %{private}s", uuid.c_str());
         return PARAM_INPUT_INVALID;
     }
-    if (config->uid_ != uid) {
+    if (config->name_ != EDM_ADMIN_PLUGIN_NAME && config->uid_ != uid) {
         MMI_HILOGE("Permission denied: uid=%{private}d, required=%{private}d", uid, config->uid_);
         return ERROR_NO_PERMISSION;
     }
@@ -598,7 +599,7 @@ int32_t InputPluginManager::UnloadDynamicPlugin(int32_t uid, const std::string &
         MMI_HILOGE("Plugin config not found for uuid: %{private}s", uuid.c_str());
         return PARAM_INPUT_INVALID;
     }
-    if (config->uid_ != uid) {
+    if (config->name_ != EDM_ADMIN_PLUGIN_NAME && config->uid_ != uid) {
         MMI_HILOGE("Permission denied: uid=%{private}d, required=%{private}d", uid, config->uid_);
         return ERROR_NO_PERMISSION;
     }

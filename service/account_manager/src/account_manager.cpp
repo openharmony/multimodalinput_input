@@ -34,6 +34,8 @@
 #endif // OHOS_BUILD_ENABLE_DFX_RADAR
 
 #include "i_setting_manager.h"
+#include "multimodal_input_plugin_manager.h"
+#include "parameters.h"
 
 #ifdef OHOS_BUILD_ENABLE_TOUCHPAD
 #include "touchpad_settings_handler.h"
@@ -61,6 +63,10 @@ const std::string ACC_SHORTCUT_TIMEOUT { "accessibility_shortcut_timeout" };
 const std::string SECURE_SETTING_URI_PROXY {
     "datashare:///com.ohos.settingsdata/entry/settingsdata/USER_SETTINGSDATA_SECURE_%d?Proxy=true" };
 constexpr int32_t INVALID_USER_ID { -1 };
+const std::string EDM_ADMIN_ENABLED_EVENT { "com.ohos.edm.edmadminenabled" };
+const std::string EDM_ADMIN_DISABLED_EVENT { "com.ohos.edm.edmadmindisabled" };
+const std::string EDM_ADMIN_PLUGIN_UUID { "A1B2C3D4-E5F6-7890-ABCD-EF1234567890" };
+const std::string PARAM_EDM_ENABLE { "persist.edm.edm_enable" };
 }
 
 std::shared_ptr<AccountManager> AccountManager::instance_;
@@ -82,6 +88,11 @@ void AccountManager::CommonEventSubscriber::OnReceiveEvent(const EventFwk::Commo
 {
     AccountManager::GetInstance()->OnCommonEvent(data);
     AccountManager::GetInstance()->TriggerObserverCallback(data);
+}
+
+void AccountManager::EdmEventSubscriber::OnReceiveEvent(const EventFwk::CommonEventData &data)
+{
+    AccountManager::GetInstance()->OnEdmCommonEvent(data);
 }
 
 AccountManager::AccountSetting::AccountSetting(int32_t accountId)
@@ -377,6 +388,7 @@ void AccountManager::AccountManagerUnregister()
 {
     // LCOV_EXCL_START
     UnsubscribeCommonEvent();
+    UnsubscribeEdmCommonEvent();
     std::lock_guard<std::mutex> guard { lock_ };
     if (timerId_ >= 0) {
         TimerMgr->RemoveTimer(timerId_);
@@ -393,9 +405,17 @@ void AccountManager::Initialize()
     std::lock_guard<std::mutex> guard { lock_ };
     SetupMainAccount();
     SubscribeCommonEvent();
+    SubscribeEdmCommonEvent();
 #ifdef SCREENLOCK_MANAGER_ENABLED
     InitializeScreenLockStatus();
 #endif // SCREENLOCK_MANAGER_ENABLED
+    if (OHOS::system::GetBoolParameter(PARAM_EDM_ENABLE, false)) {
+        MMI_HILOGI("EDM Admin is enabled at startup, loading libedm_customize plugin");
+        auto pluginMgr = InputPluginManager::GetInstance();
+        if (pluginMgr != nullptr) {
+            pluginMgr->LoadDynamicPlugin(0, EDM_ADMIN_PLUGIN_UUID);
+        }
+    }
 }
 
 AccountManager::AccountSetting AccountManager::GetCurrentAccountSetting()
@@ -469,6 +489,52 @@ void AccountManager::UnsubscribeCommonEvent()
         subscriber_ = nullptr;
     }
     // LCOV_EXCL_STOP
+}
+
+void AccountManager::OnEdmCommonEvent(const EventFwk::CommonEventData &data)
+{
+    const auto &action = data.GetWant().GetAction();
+    if (action == EDM_ADMIN_ENABLED_EVENT) {
+        MMI_HILOGI("EDM Admin enabled, loading libedm_customize plugin");
+        auto pluginMgr = InputPluginManager::GetInstance();
+        if (pluginMgr != nullptr) {
+            pluginMgr->LoadDynamicPlugin(0, EDM_ADMIN_PLUGIN_UUID);
+        }
+    } else if (action == EDM_ADMIN_DISABLED_EVENT) {
+        MMI_HILOGI("EDM Admin disabled, unloading libedm_customize plugin");
+        auto pluginMgr = InputPluginManager::GetInstance();
+        if (pluginMgr != nullptr) {
+            pluginMgr->UnloadDynamicPlugin(0, EDM_ADMIN_PLUGIN_UUID);
+        }
+    }
+}
+ 
+void AccountManager::SubscribeEdmCommonEvent()
+{
+    CALL_DEBUG_ENTER;
+    EventFwk::MatchingSkills matchingSkills;
+    matchingSkills.AddEvent(EDM_ADMIN_ENABLED_EVENT);
+    matchingSkills.AddEvent(EDM_ADMIN_DISABLED_EVENT);
+    EventFwk::CommonEventSubscribeInfo subscribeInfo(matchingSkills);
+    subscribeInfo.SetPermission("ohos.permission.MANAGE_EDM_POLICY");
+    edmSubscriber_ = std::make_shared<EdmEventSubscriber>(subscribeInfo);
+ 
+    if (EventFwk::CommonEventManager::SubscribeCommonEvent(edmSubscriber_)) {
+        MMI_HILOGI("SubscribeEdmCommonEvent succeed");
+        return;
+    }
+    edmSubscriber_ = nullptr;
+    MMI_HILOGE("SubscribeEdmCommonEvent fail");
+}
+ 
+void AccountManager::UnsubscribeEdmCommonEvent()
+{
+    if (edmSubscriber_ != nullptr) {
+        if (!EventFwk::CommonEventManager::UnSubscribeCommonEvent(edmSubscriber_)) {
+            MMI_HILOGE("UnSubscribeEdmCommonEvent fail");
+        }
+        edmSubscriber_ = nullptr;
+    }
 }
 
 void AccountManager::SetupMainAccount()
