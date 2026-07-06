@@ -32,6 +32,15 @@ class AccountManager final {
         void OnReceiveEvent(const EventFwk::CommonEventData &data);
     };
 
+    class EdmEventSubscriber : public EventFwk::CommonEventSubscriber {
+    public:
+        EdmEventSubscriber(const EventFwk::CommonEventSubscribeInfo &subscribeInfo)
+            : EventFwk::CommonEventSubscriber(subscribeInfo) {}
+        ~EdmEventSubscriber() = default;
+ 
+        void OnReceiveEvent(const EventFwk::CommonEventData &data);
+    };
+
 public:
     class AccountSetting final {
     public:
@@ -90,8 +99,11 @@ private:
 #endif // SCREENLOCK_MANAGER_ENABLED
     void SubscribeCommonEvent();
     void UnsubscribeCommonEvent();
+    void SubscribeEdmCommonEvent();
+    void UnsubscribeEdmCommonEvent();
     void SetupMainAccount();
     void OnCommonEvent(const EventFwk::CommonEventData &data);
+    void OnEdmCommonEvent(const EventFwk::CommonEventData &data);
     void OnAddUser(const EventFwk::CommonEventData &data);
     void OnRemoveUser(const EventFwk::CommonEventData &data);
     void OnSwitchUser(const EventFwk::CommonEventData &data);
@@ -104,6 +116,7 @@ private:
     int32_t timerId_ { -1 };
     int32_t currentAccountId_ { -1 };
     std::shared_ptr<CommonEventSubscriber> subscriber_;
+    std::shared_ptr<EdmEventSubscriber> edmSubscriber_;
     std::map<int32_t, std::unique_ptr<AccountSetting>> accounts_;
     std::map<std::string, std::function<void(const EventFwk::CommonEventData &)>> handlers_;
     std::unordered_map<int32_t, std::function<void(const EventFwk::CommonEventData &)>> observerCallbacks_;
