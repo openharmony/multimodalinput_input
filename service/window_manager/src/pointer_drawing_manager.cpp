@@ -1260,10 +1260,17 @@ void PointerDrawingManager::RenderAndMoveOnVsync(int32_t x, int32_t y, uint64_t 
             });
             HardwareCursorRender(mouseStyle, x, y, displayId);
             mouseStylePending_.fetch_sub(1);
+        } else if (lastRenderDisplayId_.load() != displayId) {
+            MMI_HILOGD("display update, render");
+            PostSoftCursorTask([this, mouseStyle, x, y, displayId]() {
+                SoftwareCursorRender(mouseStyle, x, y, displayId);
+            });
+            HardwareCursorRender(mouseStyle, x, y, displayId);
         } else if (mouseStyle == MOUSE_ICON::DEFAULT) {
             HardwareCursorRender(mouseStyle, x, y, displayId);
         }
     }
+    lastRenderDisplayId_.store(displayId);
     SoftwareCursorMoveAsync(displayId, x, y);
     HardwareCursorMoveAsync(displayId, x, y);
     moveFinished_.store(true);

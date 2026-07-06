@@ -409,6 +409,7 @@ private:
     std::atomic<uint64_t> workerThreadId_ { 0 };
     std::atomic<bool> vsyncStart_ { false };
     std::atomic<int32_t> mouseStylePending_ { 0 };
+    std::atomic<uint64_t> lastRenderDisplayId_ { 0 };
     ResampleAlgorithm resample_;
     bool currentCursorBlurEnabled_ { true };
     bool lastCursorBlurEnabled_ { true };
