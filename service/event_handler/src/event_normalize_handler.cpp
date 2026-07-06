@@ -454,6 +454,12 @@ void EventNormalizeHandler::HandlePointerEvent(const std::shared_ptr<PointerEven
         pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_TOUCHPAD_ACTIVE) {
         WIN_MGR->UpdateTargetPointer(pointerEvent);
     }
+    if (pointerEvent->HasFlag(InputEvent::EVENT_FLAG_INJECT_UNDER_LOCK) &&
+        !WIN_MGR->IsWindowInjectableUnderLock(pointerEvent->GetTargetWindowId(),
+            pointerEvent->GetTargetDisplayId())) {
+        MMI_HILOGI("Injected pointer event under lock dropped, target window not injectable");
+        return;
+    }
     if (IsAccessibilityEventWithZOrder(pointerEvent)) {
         BypassChainAndDispatchDirectly(pointerEvent);
     } else if (!item.IsCanceled()) {
@@ -472,6 +478,12 @@ void EventNormalizeHandler::HandleTouchEvent(const std::shared_ptr<PointerEvent>
     DfxHisysevent::GetDispStartTime();
     CHKPV(pointerEvent);
     WIN_MGR->UpdateTargetPointer(pointerEvent);
+    if (pointerEvent->HasFlag(InputEvent::EVENT_FLAG_INJECT_UNDER_LOCK) &&
+        !WIN_MGR->IsWindowInjectableUnderLock(pointerEvent->GetTargetWindowId(),
+            pointerEvent->GetTargetDisplayId())) {
+        MMI_HILOGI("Injected touch event under lock dropped, target window not injectable");
+        return;
+    }
     BytraceAdapter::StartTouchEvent(pointerEvent->GetId());
     PointerEvent::PointerItem item;
     if (!pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), item)) {
@@ -564,6 +576,11 @@ void EventNormalizeHandler::UpdateKeyEventHandlerChain(const std::shared_ptr<Key
     MMI_HILOGD("Handle event (KC:%{private}d, KA:%{public}d, KEYS:%{private}s)",
         keyEvent->GetKeyCode(), keyEvent->GetKeyAction(), DumpVec(keyEvent->GetPressedKeys()).c_str());
     WIN_MGR->HandleKeyEventWindowId(keyEvent);
+    if (keyEvent->HasFlag(InputEvent::EVENT_FLAG_INJECT_UNDER_LOCK) &&
+        !WIN_MGR->IsWindowInjectableUnderLock(keyEvent->GetTargetWindowId(), keyEvent->GetTargetDisplayId())) {
+        MMI_HILOGI("Injected key event under lock dropped, focus window not injectable");
+        return;
+    }
     currentHandleKeyCode_ = keyEvent->GetKeyCode();
 
     int32_t currentShieldMode = KeyEventHdr->GetCurrentShieldMode();

@@ -138,6 +138,7 @@ public:
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 
     MOCK_METHOD(std::optional<WindowInfo>, GetWindowAndDisplayInfo, (int32_t, int32_t));
+    MOCK_METHOD(bool, IsWindowInjectableUnderLock, (int32_t, int32_t));
     void SetWindowStateNotifyPid(int32_t userId, int32_t pid) override {}
     int32_t GetWindowStateNotifyPid(int32_t userId) override { return 0; }
     int32_t GetPidByDisplayIdAndWindowId(int32_t displayId, int32_t windowId) override { return 0; }

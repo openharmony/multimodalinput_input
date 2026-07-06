@@ -8037,6 +8037,16 @@ std::optional<WindowInfo> InputWindowsManager::GetWindowAndDisplayInfo(int32_t w
     return std::nullopt;
 }
 
+bool InputWindowsManager::IsWindowInjectableUnderLock(int32_t windowId, int32_t displayId)
+{
+    auto windowInfo = GetWindowAndDisplayInfo(windowId, displayId);
+    if (!windowInfo) {
+        return false;
+    }
+    return (windowInfo->flags & WindowInputPolicy::FLAG_INJECTABLE_UNDER_LOCK)
+        == WindowInputPolicy::FLAG_INJECTABLE_UNDER_LOCK;
+}
+
 void InputWindowsManager::GetTargetWindowIds(int32_t pointerItemId, int32_t sourceType,
     std::set<int32_t> &windowIds, int32_t deviceId)
 {

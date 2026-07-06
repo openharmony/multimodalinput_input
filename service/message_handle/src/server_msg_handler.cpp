@@ -158,6 +158,9 @@ int32_t ServerMsgHandler::OnInjectKeyEvent(const std::shared_ptr<KeyEvent> keyEv
         if (checkReturn != RET_OK) {
             return checkReturn;
         }
+        if (DISPLAY_MONITOR->GetScreenLocked()) {
+            keyEvent->AddFlag(InputEvent::EVENT_FLAG_INJECT_UNDER_LOCK);
+        }
     }
     keyEvent->SetKeyIntention(KeyItemsTransKeyIntention(keyEvent->GetKeyItems()));
     auto inputEventNormalizeHandler = InputHandler->GetEventNormalizeHandler();
@@ -265,6 +268,9 @@ int32_t ServerMsgHandler::OnInjectPointerEvent(int32_t userId, const std::shared
         if (checkReturn != RET_OK) {
             return checkReturn;
         }
+        if (DISPLAY_MONITOR->GetScreenLocked()) {
+            pointerEvent->AddFlag(InputEvent::EVENT_FLAG_INJECT_UNDER_LOCK);
+        }
     }
     return OnInjectPointerEventExt(userId, pointerEvent, isShell, useCoordinate);
 }
@@ -279,6 +285,9 @@ int32_t ServerMsgHandler::OnInjectTouchPadEvent(int32_t userId, const std::share
         int32_t checkReturn = NativeInjectCheck(pid);
         if (checkReturn != RET_OK) {
             return checkReturn;
+        }
+        if (DISPLAY_MONITOR->GetScreenLocked()) {
+            pointerEvent->AddFlag(InputEvent::EVENT_FLAG_INJECT_UNDER_LOCK);
         }
     }
     return OnInjectTouchPadEventExt(userId, pointerEvent, touchpadCDG, isShell);
@@ -1832,11 +1841,6 @@ int32_t ServerMsgHandler::NativeInjectCheck(int32_t pid)
         MMI_HILOGW("Current device has no permission");
         return COMMON_PERMISSION_CHECK_ERROR;
     }
-    bool screenLocked = DISPLAY_MONITOR->GetScreenLocked();
-    if (screenLocked) {
-        MMI_HILOGW("Screen locked, no permission");
-        return COMMON_PERMISSION_CHECK_ERROR;
-    }
     if (pid <= 0) {
         MMI_HILOGW("Invalid process id pid:%{public}d", pid);
         return COMMON_PERMISSION_CHECK_ERROR;
@@ -1844,6 +1848,11 @@ int32_t ServerMsgHandler::NativeInjectCheck(int32_t pid)
     if (PER_HELPER->CheckControlDevicePermission()) {
         MMI_HILOGI("Native inject permitted by CONTROL_DEVICE permission, pid:%{public}d", pid);
         return RET_OK;
+    }
+    bool screenLocked = DISPLAY_MONITOR->GetScreenLocked();
+    if (screenLocked) {
+        MMI_HILOGW("Screen locked, no permission");
+        return COMMON_PERMISSION_CHECK_ERROR;
     }
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
     if (PER_HELPER->VerifySystemApp() && PER_HELPER->CheckInjectPermission()) {
