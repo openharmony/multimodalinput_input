@@ -1901,6 +1901,7 @@ HWTEST_F(PointerDrawingManagerExTest, PointerDrawingManagerExTest_RenderAndMoveO
     pointerDrawMgr.mouseStylePending_.store(0);
     pointerDrawMgr.lastRenderDisplayId_.store(0);
     ASSERT_NO_FATAL_FAILURE(pointerDrawMgr.RenderAndMoveOnVsync(0, 0, 0));
+    pointerDrawMgr.mouseStylePending_.store(0);
     pointerDrawMgr.lastRenderDisplayId_.store(1);
     ASSERT_NO_FATAL_FAILURE(pointerDrawMgr.RenderAndMoveOnVsync(0, 0, 0));
 }

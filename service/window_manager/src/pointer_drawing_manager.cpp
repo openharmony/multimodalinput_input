@@ -1244,13 +1244,19 @@ void PointerDrawingManager::RenderAndMoveOnVsync(int32_t x, int32_t y, uint64_t 
         }
         CursorDrawingInformation::GetInstance().SetMouseIconUpdate(false);
     } else {
-        if (mouseStylePending_.load() > 0 || lastRenderDisplayId_.load() != displayId) {
+        if (mouseStylePending_.load() > 0) {
             MMI_HILOGD("cursor style update, mouseStylePending_:%{public}d", mouseStylePending_.load());
             PostSoftCursorTask([this, mouseStyle, x, y, displayId]() {
                 SoftwareCursorRender(mouseStyle, x, y, displayId);
             });
             HardwareCursorRender(mouseStyle, x, y, displayId);
             mouseStylePending_.fetch_sub(1);
+        } else if (lastRenderDisplayId_.load() != displayId) {
+            MMI_HILOGD("display update, render");
+            PostSoftCursorTask([this, mouseStyle, x, y, displayId]() {
+                SoftwareCursorRender(mouseStyle, x, y, displayId);
+            });
+            HardwareCursorRender(mouseStyle, x, y, displayId);
         } else if (mouseStyle == MOUSE_ICON::DEFAULT) {
             HardwareCursorRender(mouseStyle, x, y, displayId);
         }
