@@ -274,7 +274,6 @@ private:
     std::pair<ScreenPointersIter, bool> UpdateScreenPointer(uint64_t screenId,
         std::shared_ptr<ScreenPointer> screenPointer);
     bool DeleteScreenPointer(uint64_t screenId);
-    void ClearScreenPointer();
     void ClearDisappearedScreenPointer(const std::set<uint64_t> &screenIds);
     void CreateRenderConfig(RenderConfig& cfg, std::shared_ptr<ScreenPointer> sp, MOUSE_ICON mouseStyle, bool isHard,
         int32_t x, int32_t y, uint64_t screenId);

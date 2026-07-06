@@ -4064,22 +4064,6 @@ HWTEST_F(PointerDrawingManagerTest, PointerDrawingManagerTest_ClearDisappearedSc
 }
 
 /**
- * @tc.name: PointerDrawingManagerTest_ClearScreenPointer_001
- * @tc.desc: Test ClearScreenPointer
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(PointerDrawingManagerTest, PointerDrawingManagerTest_ClearScreenPointer_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    PointerDrawingManager pointerDrawingManager;
-    auto screenPointer = std::make_shared<ScreenPointer>(nullptr, nullptr, pointerDrawingManager.displayInfo_);
-    pointerDrawingManager.screenPointers_.insert(std::make_pair(0, screenPointer));
-    pointerDrawingManager.ClearScreenPointer();
-    ASSERT_EQ(pointerDrawingManager.screenPointers_.size(), 0);
-}
-
-/**
  * @tc.name: CreatePointerWindowForScreenPointer_006
  * @tc.desc: Test CreatePointerWindowForScreenPointer with isHardCursorSurfaceNodeInited_=true and screenPointers
  * @tc.type: FUNC
@@ -4663,50 +4647,6 @@ HWTEST_F(PointerDrawingManagerTest, PointerDrawingManagerTest_DeleteScreenPointe
 }
 
 /**
- * @tc.name: PointerDrawingManagerTest_ClearScreenPointer_002
- * @tc.desc: Test ClearScreenPointer when surfaceNode matches
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(PointerDrawingManagerTest, PointerDrawingManagerTest_ClearScreenPointer_002, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    PointerDrawingManager pointerDrawingManager;
-    pointerDrawingManager.hardwareCursorPointerManager_ = std::make_shared<HardwareCursorPointerManager>();
-    ASSERT_NE(pointerDrawingManager.hardwareCursorPointerManager_, nullptr);
-    
-    sptr<Rosen::ScreenInfo> screenInfo = new Rosen::ScreenInfo();
-    ASSERT_NE(screenInfo, nullptr);
-    sptr<Rosen::SupportedScreenModes> mode = new Rosen::SupportedScreenModes();
-    ASSERT_NE(mode, nullptr);
-    mode->width_ = 100;
-    mode->height_ = 200;
-    screenInfo->SetRsId(0);
-    screenInfo->SetType(Rosen::ScreenType::REAL);
-    screenInfo->SetModeId(0);
-    screenInfo->modes_ = { { mode } };
-    screenInfo->SetSourceMode(Rosen::ScreenSourceMode::SCREEN_MAIN);
-    
-    auto screenPointer = std::make_shared<ScreenPointer>(
-        pointerDrawingManager.hardwareCursorPointerManager_,
-        pointerDrawingManager.handler_, screenInfo);
-    ASSERT_NE(screenPointer, nullptr);
-    screenPointer->Init(pointerDrawingManager.pointerRenderer_);
-    
-    pointerDrawingManager.screenPointers_.insert(std::make_pair(0, screenPointer));
-    ASSERT_EQ(pointerDrawingManager.screenPointers_.size(), 1);
-    
-    auto surfaceNode = screenPointer->GetSurfaceNode();
-    ASSERT_NE(surfaceNode, nullptr);
-    pointerDrawingManager.SetSurfaceNode(surfaceNode);
-    ASSERT_NE(pointerDrawingManager.GetSurfaceNode(), nullptr);
-    
-    pointerDrawingManager.ClearScreenPointer();
-    ASSERT_EQ(pointerDrawingManager.screenPointers_.size(), 0);
-    ASSERT_EQ(pointerDrawingManager.GetSurfaceNode(), nullptr);
-}
-
-/**
  * @tc.name: PointerDrawingManagerTest_ClearDisappearedScreenPointer_003
  * @tc.desc: Test ClearDisappearedScreenPointer when surfaceNode matches
  * @tc.type: FUNC
@@ -4749,6 +4689,104 @@ HWTEST_F(PointerDrawingManagerTest, PointerDrawingManagerTest_ClearDisappearedSc
     pointerDrawingManager.ClearDisappearedScreenPointer(screenIds);
     ASSERT_EQ(pointerDrawingManager.screenPointers_.size(), 0);
     ASSERT_EQ(pointerDrawingManager.GetSurfaceNode(), nullptr);
+}
+
+/**
+ * @tc.name: PointerDrawingManagerTest_DestroyPointerWindowOfHardCursor_004
+ * @tc.desc: Test DestroyPointerWindowOfHardCursor with surfaceNode match
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerTest, PointerDrawingManagerTest_DestroyPointerWindowOfHardCursor_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerDrawingManager pointerDrawingManager;
+    pointerDrawingManager.hardwareCursorPointerManager_ = std::make_shared<HardwareCursorPointerManager>();
+    ASSERT_NE(pointerDrawingManager.hardwareCursorPointerManager_, nullptr);
+
+    sptr<Rosen::ScreenInfo> screenInfo = new Rosen::ScreenInfo();
+    ASSERT_NE(screenInfo, nullptr);
+    sptr<Rosen::SupportedScreenModes> mode = new Rosen::SupportedScreenModes();
+    ASSERT_NE(mode, nullptr);
+    mode->width_ = 100;
+    mode->height_ = 200;
+    screenInfo->SetRsId(0);
+    screenInfo->SetType(Rosen::ScreenType::REAL);
+    screenInfo->SetModeId(0);
+    screenInfo->modes_ = { { mode } };
+    screenInfo->SetSourceMode(Rosen::ScreenSourceMode::SCREEN_MAIN);
+
+    auto screenPointer = std::make_shared<ScreenPointer>(
+        pointerDrawingManager.hardwareCursorPointerManager_,
+        pointerDrawingManager.handler_, screenInfo);
+    ASSERT_NE(screenPointer, nullptr);
+    screenPointer->Init(pointerDrawingManager.pointerRenderer_);
+
+    pointerDrawingManager.screenPointers_.insert(std::make_pair(0, screenPointer));
+    ASSERT_EQ(pointerDrawingManager.screenPointers_.size(), 1);
+
+    auto surfaceNode = screenPointer->GetSurfaceNode();
+    ASSERT_NE(surfaceNode, nullptr);
+    pointerDrawingManager.SetSurfaceNode(surfaceNode);
+    ASSERT_NE(pointerDrawingManager.GetSurfaceNode(), nullptr);
+
+    pointerDrawingManager.DestroyPointerWindowOfHardCursor();
+    ASSERT_EQ(pointerDrawingManager.screenPointers_.size(), 0);
+    ASSERT_EQ(pointerDrawingManager.GetSurfaceNode(), nullptr);
+}
+
+/**
+ * @tc.name: PointerDrawingManagerTest_DestroyPointerWindowOfSoftCursor_003
+ * @tc.desc: Test DestroyPointerWindowOfSoftCursor with rsUIDirector_ not null
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerTest, PointerDrawingManagerTest_DestroyPointerWindowOfSoftCursor_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerDrawingManager pointerDrawingManager;
+
+    Rosen::RSSurfaceNodeConfig surfaceNodeConfig;
+    surfaceNodeConfig.SurfaceNodeName = "pointer window";
+    Rosen::RSSurfaceNodeType surfaceNodeType = Rosen::RSSurfaceNodeType::SELF_DRAWING_WINDOW_NODE;
+    auto surfaceNode = Rosen::RSSurfaceNode::Create(surfaceNodeConfig, surfaceNodeType, true, false, rsUIContext_);
+    ASSERT_NE(surfaceNode, nullptr);
+    pointerDrawingManager.SetSurfaceNode(surfaceNode);
+    pointerDrawingManager.screenId_ = 0;
+    pointerDrawingManager.rsUIDirector_ = rsUIDirector_;
+    pointerDrawingManager.rsUIContext_ = rsUIContext_;
+
+    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.DestroyPointerWindowOfSoftCursor());
+    EXPECT_EQ(pointerDrawingManager.GetSurfaceNode(), nullptr);
+    EXPECT_EQ(pointerDrawingManager.rsUIDirector_, nullptr);
+    EXPECT_EQ(pointerDrawingManager.rsUIContext_, nullptr);
+}
+
+/**
+ * @tc.name: PointerDrawingManagerTest_DestroyPointerWindowOfSoftCursor_004
+ * @tc.desc: Test DestroyPointerWindowOfSoftCursor with null rsUIDirector_
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerTest, PointerDrawingManagerTest_DestroyPointerWindowOfSoftCursor_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerDrawingManager pointerDrawingManager;
+
+    Rosen::RSSurfaceNodeConfig surfaceNodeConfig;
+    surfaceNodeConfig.SurfaceNodeName = "pointer window";
+    Rosen::RSSurfaceNodeType surfaceNodeType = Rosen::RSSurfaceNodeType::SELF_DRAWING_WINDOW_NODE;
+    auto surfaceNode = Rosen::RSSurfaceNode::Create(surfaceNodeConfig, surfaceNodeType, true, false, rsUIContext_);
+    ASSERT_NE(surfaceNode, nullptr);
+    pointerDrawingManager.SetSurfaceNode(surfaceNode);
+    pointerDrawingManager.screenId_ = 0;
+    pointerDrawingManager.rsUIDirector_ = nullptr;
+    pointerDrawingManager.rsUIContext_ = rsUIContext_;
+
+    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.DestroyPointerWindowOfSoftCursor());
+    EXPECT_EQ(pointerDrawingManager.GetSurfaceNode(), nullptr);
+    EXPECT_EQ(pointerDrawingManager.rsUIDirector_, nullptr);
+    EXPECT_EQ(pointerDrawingManager.rsUIContext_, nullptr);
 }
 } // namespace MMI
 } // namespace OHOS
