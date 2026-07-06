@@ -1884,6 +1884,28 @@ HWTEST_F(PointerDrawingManagerExTest, PointerDrawingManagerExTest_RenderAndMoveO
 }
 
 /**
+@tc.name: PointerDrawingManagerExTest_RenderAndMoveOnVsync_002
+@tc.desc: Test the function RenderAndMoveOnVsync
+@tc.type: FUNC
+@tc.require:
+*/
+HWTEST_F(PointerDrawingManagerExTest, PointerDrawingManagerExTest_RenderAndMoveOnVsync_002,
+    TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerDrawingManager pointerDrawMgr;
+    PointerStyle style;
+    pointerDrawMgr.mouseDisplayState_ = true;
+    pointerDrawMgr.currentMouseStyle_ = style;
+    pointerDrawMgr.currentMouseStyle_.id = MOUSE_ICON::DEFAULT;
+    pointerDrawMgr.mouseStylePending_.store(0);
+    pointerDrawMgr.lastRenderDisplayId_.store(0);
+    ASSERT_NO_FATAL_FAILURE(pointerDrawMgr.RenderAndMoveOnVsync(0, 0, 0));
+    pointerDrawMgr.lastRenderDisplayId_.store(1);
+    ASSERT_NO_FATAL_FAILURE(pointerDrawMgr.RenderAndMoveOnVsync(0, 0, 0));
+}
+
+/**
 @tc.name: PointerDrawingManagerExTest_OnVsync_001
 @tc.desc: Test the function OnVsync
 @tc.type: FUNC
