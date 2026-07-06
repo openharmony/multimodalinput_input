@@ -96,7 +96,7 @@ public:
     ResampleAlgorithm() = default;
     ~ResampleAlgorithm() = default;
     void AddPoint(int32_t physicalX, int32_t physicalY, uint64_t displayId);
-    bool HasCoords();
+    bool HasCoords(bool isResample = true);
     bool GetResampledPoint(int32_t &outX, int32_t &outY, uint64_t &displayId, uint64_t timestamp);
 private:
     bool CheckDifferentDisplayId();
@@ -248,7 +248,7 @@ private:
     void SoftCursorRenderThreadLoop();
     void MoveRetryThreadLoop();
     int32_t RequestNextVSync();
-    void RenderAndMoveOnVsync(int32_t x, int32_t y, uint64_t displayId);
+    void RenderAndMoveOnVsync(int32_t x, int32_t y, uint64_t displayId, bool isBlur = true);
     void OnVsync(uint64_t timestamp);
     void PostTask(std::function<void()> task, int64_t offset = 0);
     void PostSoftCursorTask(std::function<void()> task);
@@ -276,9 +276,9 @@ private:
     bool DeleteScreenPointer(uint64_t screenId);
     void ClearDisappearedScreenPointer(const std::set<uint64_t> &screenIds);
     void CreateRenderConfig(RenderConfig& cfg, std::shared_ptr<ScreenPointer> sp, MOUSE_ICON mouseStyle, bool isHard,
-        int32_t x, int32_t y, uint64_t screenId);
+        int32_t x, int32_t y, uint64_t screenId, bool isBlur = true);
     void SoftwareCursorRender(MOUSE_ICON mouseStyle, int32_t x, int32_t y, uint64_t displayId);
-    void HardwareCursorRender(MOUSE_ICON mouseStyle, int32_t x, int32_t y, uint64_t displayId);
+    void HardwareCursorRender(MOUSE_ICON mouseStyle, int32_t x, int32_t y, uint64_t displayId, bool isBlur = true);
     void SoftwareCursorMove(uint64_t displayId, int32_t x, int32_t y);
     void SoftwareCursorMoveAsync(uint64_t displayId, int32_t x, int32_t y);
     void MoveRetryAsync(uint64_t displayId, int32_t x, int32_t y,

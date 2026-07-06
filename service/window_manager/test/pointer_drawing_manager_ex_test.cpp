@@ -1879,6 +1879,8 @@ HWTEST_F(PointerDrawingManagerExTest, PointerDrawingManagerExTest_RenderAndMoveO
     pointerDrawMgr.currentMouseStyle_.id = MOUSE_ICON::DEFAULT;
     pointerDrawMgr.mouseStylePending_.store(1);
     ASSERT_NO_FATAL_FAILURE(pointerDrawMgr.RenderAndMoveOnVsync(0, 0, 0));
+    pointerDrawMgr.mouseStylePending_.store(1);
+    ASSERT_NO_FATAL_FAILURE(pointerDrawMgr.RenderAndMoveOnVsync(0, 0, 0, false));
     pointerDrawMgr.mouseStylePending_.store(0);
     ASSERT_NO_FATAL_FAILURE(pointerDrawMgr.RenderAndMoveOnVsync(0, 0, 0));
 }
@@ -2130,6 +2132,8 @@ HWTEST_F(PointerDrawingManagerExTest, PointerDrawingManagerExTest_RA_HasCoords00
     pointerDrawMgr.resample_.keepResample_ = 2;
     ret = pointerDrawMgr.resample_.HasCoords();
     EXPECT_EQ(ret, true);
+    ret = pointerDrawMgr.resample_.HasCoords(false);
+    EXPECT_EQ(ret, false);
     pointerDrawMgr.resample_.keepResample_ = 0;
     ret = pointerDrawMgr.resample_.HasCoords();
     EXPECT_EQ(ret, false);
