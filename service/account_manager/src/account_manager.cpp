@@ -405,7 +405,6 @@ void AccountManager::Initialize()
     std::lock_guard<std::mutex> guard { lock_ };
     SetupMainAccount();
     SubscribeCommonEvent();
-    SubscribeEdmCommonEvent();
 #ifdef SCREENLOCK_MANAGER_ENABLED
     InitializeScreenLockStatus();
 #endif // SCREENLOCK_MANAGER_ENABLED
@@ -518,7 +517,7 @@ void AccountManager::SubscribeEdmCommonEvent()
     EventFwk::CommonEventSubscribeInfo subscribeInfo(matchingSkills);
     subscribeInfo.SetPermission("ohos.permission.MANAGE_EDM_POLICY");
     edmSubscriber_ = std::make_shared<EdmEventSubscriber>(subscribeInfo);
- 
+
     if (EventFwk::CommonEventManager::SubscribeCommonEvent(edmSubscriber_)) {
         MMI_HILOGI("SubscribeEdmCommonEvent succeed");
         return;
@@ -526,7 +525,7 @@ void AccountManager::SubscribeEdmCommonEvent()
     edmSubscriber_ = nullptr;
     MMI_HILOGE("SubscribeEdmCommonEvent fail");
 }
- 
+
 void AccountManager::UnsubscribeEdmCommonEvent()
 {
     if (edmSubscriber_ != nullptr) {
@@ -535,6 +534,12 @@ void AccountManager::UnsubscribeEdmCommonEvent()
         }
         edmSubscriber_ = nullptr;
     }
+}
+
+void AccountManager::InitEdmCommonEventSubscriber()
+{
+    CALL_DEBUG_ENTER;
+    SubscribeEdmCommonEvent();
 }
 
 void AccountManager::SetupMainAccount()

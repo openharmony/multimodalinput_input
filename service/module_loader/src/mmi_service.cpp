@@ -2653,6 +2653,7 @@ void MMIService::OnAddSystemAbility(int32_t systemAbilityId, const std::string &
     if (systemAbilityId == COMMON_EVENT_SERVICE_ID) {
         DEVICE_MONITOR->InitCommonEventSubscriber();
         ACCOUNT_MGR->GetCurrentAccountSetting();
+        ACCOUNT_MGR->InitEdmCommonEventSubscriber();
         DISPLAY_MONITOR->InitCommonEventSubscriber();
         SwitchSubscriberHandler::isCesReady_.store(true, std::memory_order_release);
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
