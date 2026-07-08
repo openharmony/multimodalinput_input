@@ -488,7 +488,7 @@ bool InputDeviceManager::IsMatchDeviceKeys(
     }
     for (const auto &item : keyCodes) {
         for (const auto &it : KeyMapMgr->InputTransferKeyValue(deviceId, item)) {
-            if (libinput_device_has_key(iter->second.inputDeviceOrigin, it) == SUPPORT_KEY) {
+            if (libinput_device_has_key(device, it) == SUPPORT_KEY) {
                 return true;
             }
         }
