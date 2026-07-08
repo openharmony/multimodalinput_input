@@ -357,9 +357,8 @@ void PointerDrawingManager::ClearResources()
         commonEventSubscriber_ = nullptr;
     }
     initDisplayStatusReceiverFlag_ = false;
-    if (GetHardCursorEnabled()) {
-        ClearRunnerAndHandler();
-    } else {
+    ClearRunnerAndHandler();
+    if (!GetHardCursorEnabled()) {
         auto surfaceNodePtr = GetSurfaceNode();
         if (surfaceNodePtr != nullptr) {
             surfaceNodePtr->DetachToDisplay(screenId_);
