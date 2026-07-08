@@ -845,6 +845,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsNeedRefreshLayer_005
 #endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
 #endif //OHOS_BUILD_ENABLE_POINTER
 
+#ifdef MMI_DEBUG_ENABLE_SEND_UI_EXTENSION_POINTER_EVENT
 /**
  * @tc.name: InputWindowsManagerTest_SendUIExtentionPointerEvent_01
  * @tc.desc: Cover if (!pointerEvent->GetPointerItem(pointerId, pointerItem)) branch
@@ -876,6 +877,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_SendUIExtentionPointer
     EXPECT_FALSE(windowInfo.transform.empty());
     EXPECT_NO_FATAL_FAILURE(inputWindowsMgr->SendUIExtentionPointerEvent(logicalX, logicalY, windowInfo, pointer));
 }
+#endif // MMI_DEBUG_ENABLE_SEND_UI_EXTENSION_POINTER_EVENT
 
 /**
  * @tc.name: InputWindowsManagerTest_GetPhysicalDisplayCoord_01
@@ -2522,6 +2524,7 @@ HWTEST_F(InputWindowsManagerTest, DrawTouchGraphic_001, TestSize.Level1)
 }
 
 
+#ifdef MMI_DEBUG_ENABLE_SEND_UI_EXTENSION_POINTER_EVENT
 /**
  * @tc.name: InputWindowsManagerTest_SendUIExtentionPointerEvent
  * @tc.desc: Cover if (!pointerEvent->GetPointerItem(pointerId, pointerItem)) branch
@@ -2545,6 +2548,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_SendUIExtentionPointer
     pointer->AddPointerItem(item);
     EXPECT_NO_FATAL_FAILURE(inputWindowsMgr->SendUIExtentionPointerEvent(logicalX, logicalY, windowInfo, pointer));
 }
+#endif // MMI_DEBUG_ENABLE_SEND_UI_EXTENSION_POINTER_EVENT
 
 /**
  * @tc.name: InputWindowsManagerTest_GetPhysicalDisplayCoord_001
@@ -2653,6 +2657,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateTransformDisplay
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager->UpdateTransformDisplayXY(pointerEvent, windowsInfo, displayInfo));
 }
 
+#ifdef MMI_DEBUG_ENABLE_SEND_UI_EXTENSION_POINTER_EVENT
 /**
  * @tc.name: InputWindowsManagerTest_SendUIExtentionPointerEvent_001
  * @tc.desc: Test the function SendUIExtentionPointerEvent
@@ -2686,6 +2691,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_SendUIExtentionPointer
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager->SendUIExtentionPointerEvent
         (logicalX, logicalY, windowInfo, pointerEvent));
 }
+#endif // MMI_DEBUG_ENABLE_SEND_UI_EXTENSION_POINTER_EVENT
 
 /**
  * @tc.name: InputWindowsManagerTest_DispatchUIExtentionPointerEvent_001
@@ -4393,6 +4399,7 @@ HWTEST_F(InputWindowsManagerTest, SetWindowStateNotifyPid_001, TestSize.Level1)
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager->SetWindowStateNotifyPid(userId, pid));
 }
 
+#ifdef MMI_DEBUG_ENABLE_SEND_UI_EXTENSION_POINTER_EVENT
 /**
  * @tc.name: InputWindowsManagerTest_SendUIExtentionPointerEvent_002
  * @tc.desc: Test the function SendUIExtentionPointerEvent
@@ -4436,7 +4443,9 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_SendUIExtentionPointer
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager->SendUIExtentionPointerEvent
         (logicalX, logicalY, windowInfo, pointerEvent));
 }
+#endif // MMI_DEBUG_ENABLE_SEND_UI_EXTENSION_POINTER_EVENT
 
+#ifdef MMI_DEBUG_ENABLE_SEND_UI_EXTENSION_POINTER_EVENT
 /**
  * @tc.name: InputWindowsManagerTest_SendUIExtentionPointerEvent_003
  * @tc.desc: Test the function SendUIExtentionPointerEvent
@@ -4481,6 +4490,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_SendUIExtentionPointer
         (logicalX, logicalY, windowInfo, pointerEvent));
     it->second.displaysInfo.clear();
 }
+#endif // MMI_DEBUG_ENABLE_SEND_UI_EXTENSION_POINTER_EVENT
 
 /**
  * @tc.name: InputWindowsManagerTest_SelectWindowInfo_003
