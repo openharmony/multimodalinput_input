@@ -3233,7 +3233,7 @@ const OLD::DisplayInfo *InputWindowsManager::FindPhysicalDisplayInfo(const std::
         }
     }
     MMI_HILOGD("Failed to search for Physical,uniq:%{public}s", uniq.c_str());
-    OLD::DisplayGroupInfo displayGroupInfo;
+
     auto iter = displayGroupInfoMap_.find(MAIN_GROUPID);
     if (iter != displayGroupInfoMap_.end()) {
         if (iter->second.displaysInfo.size() > 0) {
@@ -3478,9 +3478,8 @@ bool InputWindowsManager::TouchPointToDisplayPoint(int32_t deviceId, struct libi
     EventTouch& touchInfo, int32_t& physicalDisplayId, bool isNeedClear, bool hasValidAreaDowned)
 {
     CHKPF(touch);
-    int32_t toolType = libinput_event_touch_get_tool_type(touch);
     std::string screenId = bindInfo_.GetBindDisplayNameByInputDevice(deviceId);
-    if (screenId.empty() || toolType == PointerEvent::TOOL_TYPE_THP_FEATURE) {
+    if (screenId.empty()) {
         screenId = "default0";
     }
     auto info = FindPhysicalDisplayInfo(screenId);
