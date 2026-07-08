@@ -1475,10 +1475,8 @@ void InputWindowsManager::ResetPointerPosition(const OLD::DisplayGroupInfo &disp
     for (auto &currentDisplay : displayGroupInfo.displaysInfo) {
         if ((currentDisplay.displaySourceMode == OHOS::MMI::DisplaySourceMode::SCREEN_MAIN)) {
             auto displayInfo = GetPhysicalDisplay(oldPtrPos.displayId);
-            CHKPV(displayInfo);
-            MMI_HILOGI("CurDisplayId:%{public}" PRIu64 ", oldDisplayId:%{public}" PRIu64,
-                currentDisplay.rsId, displayInfo->rsId);
-            if ((displayInfo->rsId != currentDisplay.rsId) || (!IsPointerOnCenter(oldPtrPos, currentDisplay))) {
+            if (displayInfo == nullptr ||
+                (displayInfo->rsId != currentDisplay.rsId) || (!IsPointerOnCenter(oldPtrPos, currentDisplay))) {
                 cursorPos = ResetCursorPos(displayGroupInfo);
                 UpdateAndAdjustMouseLocation(cursorPos.displayId, cursorPos.cursorPos.x, cursorPos.cursorPos.y);
             }
