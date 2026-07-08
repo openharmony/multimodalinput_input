@@ -72,6 +72,33 @@ std::vector<std::pair<enum libinput_device_capability, InputDeviceCapability>> d
 
 constexpr size_t EXPECTED_N_SUBMATCHES{ 2 };
 constexpr size_t EXPECTED_SUBMATCH{ 1 };
+
+static const std::vector<int32_t> DPAD_REQUIRED_KEYCODES = {
+    KeyEvent::KEYCODE_DPAD_UP,
+    KeyEvent::KEYCODE_DPAD_DOWN,
+    KeyEvent::KEYCODE_DPAD_LEFT,
+    KeyEvent::KEYCODE_DPAD_RIGHT,
+    KeyEvent::KEYCODE_DPAD_CENTER
+};
+
+static const std::vector<int32_t> GAMEPAD_KEYCODES = {
+    KeyEvent::KEYCODE_BUTTON_A,
+    KeyEvent::KEYCODE_BUTTON_B,
+    KeyEvent::KEYCODE_BUTTON_C,
+    KeyEvent::KEYCODE_BUTTON_X,
+    KeyEvent::KEYCODE_BUTTON_Y,
+    KeyEvent::KEYCODE_BUTTON_Z,
+    KeyEvent::KEYCODE_BUTTON_L1,
+    KeyEvent::KEYCODE_BUTTON_R1,
+    KeyEvent::KEYCODE_BUTTON_L2,
+    KeyEvent::KEYCODE_BUTTON_R2,
+    KeyEvent::KEYCODE_BUTTON_THUMBL,
+    KeyEvent::KEYCODE_BUTTON_THUMBR,
+    KeyEvent::KEYCODE_BUTTON_START,
+    KeyEvent::KEYCODE_BUTTON_SELECT,
+    KeyEvent::KEYCODE_BUTTON_MODE
+};
+
 } // namespace
 
 std::shared_ptr<InputDeviceManager> InputDeviceManager::instance_ = nullptr;
@@ -452,6 +479,23 @@ int32_t InputDeviceManager::SupportKeys(int32_t deviceId, std::vector<int32_t> &
     return RET_OK;
 }
 
+bool InputDeviceManager::IsMatchDeviceKeys(
+    int32_t deviceId, struct libinput_device *device, const std::vector<int32_t> &keyCodes) const
+{
+    if (device == nullptr) {
+        MMI_HILOGE("Input device is nullptr");
+        return false;
+    }
+    for (const auto &item : keyCodes) {
+        for (const auto &it : KeyMapMgr->InputTransferKeyValue(deviceId, item)) {
+            if (libinput_device_has_key(iter->second.inputDeviceOrigin, it) == SUPPORT_KEY) {
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
 bool InputDeviceManager::IsMatchKeys(struct libinput_device *device, const std::vector<int32_t> &keyCodes) const
 {
     // LCOV_EXCL_START
@@ -490,6 +534,40 @@ int32_t InputDeviceManager::GetKeyboardBusMode(int32_t deviceId)
     std::shared_ptr dev = GetInputDevice(deviceId);
     CHKPR(dev, ERROR_NULL_POINTER);
     return dev->GetBus();
+}
+
+std::vector<int32_t> InputDeviceManager::GetInputDeviceClassKeyCodes(InputDeviceClass deviceClass)
+{
+    switch (deviceClass) {
+        case InputDeviceClass::GAMEPAD:
+            return GAMEPAD_KEYCODES;
+        case InputDeviceClass::DPAD:
+            return DPAD_REQUIRED_KEYCODES;
+        case InputDeviceClass::ALPHAKEY:
+            return { KeyEvent::KEYCODE_Q };
+        default:
+            return std::vector<int32_t>();
+    }
+}
+
+bool InputDeviceManager::HasInputDeviceClass(int32_t deviceId, InputDeviceClass deviceClass)
+{
+    CALL_DEBUG_ENTER;
+    auto iter = inputDevice_.find(deviceId);
+    if (iter == inputDevice_.end()) {
+        MMI_HILOGD("Failed to search for the deviceID");
+        return false;
+    }
+    if (!iter->second.enable) {
+        MMI_HILOGE("The current device has been disabled");
+        return false;
+    }
+    std::vector<int32_t> keyCodes = GetInputDeviceClassKeyCodes(deviceClass);
+    if (keyCodes.empty()) {
+        MMI_HILOGE("Invalid device class");
+        return false;
+    }
+    return IsMatchDeviceKeys(deviceId, iter->second.inputDeviceOrigin, keyCodes);
 }
 
 int32_t InputDeviceManager::GetDeviceSupportKey(int32_t deviceId, int32_t &keyboardType)
