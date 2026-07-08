@@ -140,13 +140,6 @@ void KeyCommandHandler::HandleKeyEvent(const std::shared_ptr<KeyEvent> keyEvent)
                 subscriberHandler->ResetSkipPowerKeyUpFlag();
             }
         }
-        if (keyEvent->GetKeyCode() == KeyEvent::KEYCODE_POWER &&
-            keyEvent->GetKeyAction() == KeyEvent::KEY_ACTION_UP) {
-            auto subscriberHandler = InputHandler->GetSubscriberHandler();
-            if (subscriberHandler != nullptr) {
-                subscriberHandler->ResetCallEndKeyUpFlag();
-            }
-        }
         MMI_HILOGD("The keyEvent start launch an ability:%{private}d", keyEvent->GetKeyCode());
         BytraceAdapter::StartBytrace(keyEvent, BytraceAdapter::KEY_LAUNCH_EVENT);
         return;
