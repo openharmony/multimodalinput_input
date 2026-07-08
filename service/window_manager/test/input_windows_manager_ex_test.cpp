@@ -4479,6 +4479,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_SendUIExtentionPointer
 
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager->SendUIExtentionPointerEvent
         (logicalX, logicalY, windowInfo, pointerEvent));
+    it->second.displaysInfo.clear();
 }
 
 /**
