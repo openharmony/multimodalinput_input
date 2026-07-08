@@ -16,6 +16,7 @@
 #include "cursor_drawing_component.h"
 
 #include <dlfcn.h>
+#include <filesystem>
 #include <securec.h>
 #include <unistd.h>
 
@@ -754,8 +755,11 @@ void CursorDrawingInformation::InitDefaultMouseIconPath()
 
 void CursorDrawingInformation::CheckMouseIconPath()
 {
-    if (access(IMAGE_POINTER_DEFAULT_PATH.c_str(), F_OK) != 0) {
-        MMI_HILOGI("Icon directory not yet available, skipping check");
+    namespace fs = std::filesystem;
+    std::error_code ec;
+    if (!fs::exists(IMAGE_POINTER_DEFAULT_PATH, ec) ||
+        fs::is_empty(IMAGE_POINTER_DEFAULT_PATH, ec)) {
+        MMI_HILOGI("Icon directory not ready, skipping check");
         return;
     }
     for (auto iter = mouseIcons_.begin(); iter != mouseIcons_.end();) {
