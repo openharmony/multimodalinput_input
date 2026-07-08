@@ -366,13 +366,14 @@ static bool ParseTriggerTypeParameter(napi_env env, napi_value argv, std::shared
     }
     std::optional<int32_t> tempTriggerType = GetNamedPropertyInt32(env, argv, "triggerType");
     if (!tempTriggerType) {
-        // triggerType is optional, keep default value 0 (not set)
-        MMI_HILOGD("triggerType not specified, will use legacy parameters");
-        return true;
+        MMI_HILOGE("triggerType is required for onKey/offKey API");
+        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "triggerType", "KeyCommandTriggerType");
+        return false;
     }
     int32_t triggerType = tempTriggerType.value();
     if (triggerType < TRIGGER_TYPE_MIN || triggerType > TRIGGER_TYPE_MAX) {
         MMI_HILOGE("triggerType:%{public}d is invalid, must be [1, 3]", triggerType);
+        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "triggerType", "KeyCommandTriggerType");
         return false;
     }
     keyOption->SetTriggerType(triggerType);
