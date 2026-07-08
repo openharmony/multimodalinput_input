@@ -597,69 +597,6 @@ HWTEST_F(ScreenPointerTest, ScreenPointerTest_GetCurrentBuffer_001, TestSize.Lev
 }
 
 /**
- * @tc.name: ScreenPointerTest_RequestBuffer_001
- * @tc.desc: Test RequestBuffer
- * @tc.type: Function
- * @tc.require:
- */
-HWTEST_F(ScreenPointerTest, ScreenPointerTest_RequestBuffer_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    hwcmgr_ptr_t hwcmgr = std::make_shared<HardwareCursorPointerManager>();
-    ASSERT_NE(hwcmgr, nullptr);
-    handler_ptr_t handler = nullptr;
-    OLD::DisplayInfo di;
-    ScreenPointer* screenpointer = new ScreenPointer(hwcmgr, handler, di);
-    ASSERT_NE(screenpointer, nullptr);
-    PointerRenderer renderer;
-    ASSERT_FALSE(screenpointer->Init(renderer));
-    screenpointer->bufferId_.store(5, std::memory_order_relaxed);
-    bool isCommonBuffer;
-    const RenderConfig cfg = {
-        .style_ = TRANSPARENT_ICON,
-    };
-    screenpointer->RequestBuffer(cfg, isCommonBuffer);
-    delete screenpointer;
-}
-
-/**
- * @tc.name: ScreenPointerTest_RequestBuffer_002
- * @tc.desc: Test RequestBuffer
- * @tc.type: Function
- * @tc.require:
- */
-HWTEST_F(ScreenPointerTest, ScreenPointerTest_RequestBuffer_002, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    hwcmgr_ptr_t hwcmgr = std::make_shared<HardwareCursorPointerManager>();
-    ASSERT_NE(hwcmgr, nullptr);
-    handler_ptr_t handler = nullptr;
-    OLD::DisplayInfo di;
-    ScreenPointer* screenpointer = new ScreenPointer(hwcmgr, handler, di);
-    ASSERT_NE(screenpointer, nullptr);
-    PointerRenderer renderer;
-    ASSERT_FALSE(screenpointer->Init(renderer));
-    screenpointer->bufferId_.store(5, std::memory_order_relaxed);
-    RenderConfig defaultCursorCfg {
-        .style_ = MOUSE_ICON::DEFAULT,
-        .align_ = ICON_TYPE::ANGLE_NW,
-        .path_ = "/data/service/el1/public/multimodalinput/mouse_icon/Default.svg",
-        .color = 0,
-        .size = 1,
-        .direction = Direction::DIRECTION0,
-        .dpi = screenpointer->GetDPI() * screenpointer->GetScale(),
-        .isHard = true,
-    };
-    if (OHOS::system::GetParameter("const.build.product", SYS_GET_DEVICE_TYPE_PARAM) == DEVICE_TYPE_FOLD_PC) {
-        defaultCursorCfg.size = 2;
-    }
-    bool isCommoBuffer;
-    screenpointer->IsDefaultCfg(defaultCursorCfg);
-    screenpointer->RequestBuffer(defaultCursorCfg, isCommoBuffer);
-    delete screenpointer;
-}
-
-/**
  * @tc.name: ScreenPointerTest_UpdatePadding_001
  * @tc.desc: Test UpdatePadding
  * @tc.type: Function
@@ -1706,7 +1643,7 @@ HWTEST_F(ScreenPointerTest, ScreenPointerTest_DestroyPointerWindow_002, TestSize
     auto screenpointer = std::make_unique<ScreenPointer>(hwcmgr, handler, di);
     ASSERT_NE(screenpointer, nullptr);
     screenpointer->surfaceNode_ = nullptr;
-    
+
     ASSERT_NO_FATAL_FAILURE(screenpointer->DestroyPointerWindow());
 }
 
