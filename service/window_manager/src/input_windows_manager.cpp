@@ -296,6 +296,7 @@ void InputWindowsManager::ReissueCancelTouchEvent(std::shared_ptr<PointerEvent> 
             tPointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_CANCEL);
         }
         tPointerEvent->SetActionTime(GetSysClockTime());
+        tPointerEvent->SetTargetWindowId(item.GetTargetWindowId());
         tPointerEvent->UpdateId();
         auto inputEventNormalizeHandler = InputHandler->GetEventNormalizeHandler();
         CHKPV(inputEventNormalizeHandler);
@@ -3387,7 +3388,7 @@ bool InputWindowsManager::GetPhysicalDisplayCoord(int32_t deviceId, struct libin
     Coordinate2D pos = { .x = coord.x, .y = coord.y };
     if (IsPositionOutValidDisplay(pos, info, true, hasValidAreaDowned)) {
         if (INPUT_DEV_MGR->GetVendorConfig(deviceId).enableOutScreen != ENABLE_OUT_SCREEN_TOUCH) {
-            MMI_HILOGW("Position out valid display width:%{private}d, height:%{private}d, "
+            MMI_HILOGW("Position out valid display width:%{public}d, height:%{public}d, "
                 "physicalX:%{private}f, physicalY:%{private}f", width, height, pos.x, pos.y);
             if (isNeedClear) {
                 int32_t seatSlot = libinput_event_touch_get_seat_slot(touch);
