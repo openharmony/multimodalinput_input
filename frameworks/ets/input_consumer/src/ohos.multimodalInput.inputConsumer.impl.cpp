@@ -1191,11 +1191,6 @@ void onKeyImpl(KeyOptions const& keyOptions, callback_view<void(KeyOptions const
 void offKeyImpl(KeyOptions const& keyOptions, optional_view<uintptr_t> opq)
 {
     MMI_HISTOGRAM_BOOLEAN("InputKit.inputConsumer.off_key.Call", true);
-    if (!opq.has_value() || opq.value() == 0) {
-        MMI_HILOGE("callback cannot be null or undefined");
-        taihe::set_business_error(COMMON_PARAMETER_ERROR, "callback cannot be null or undefined");
-        return;
-    }
     UnsubscribeKey(keyOptions, opq);
 }
 
