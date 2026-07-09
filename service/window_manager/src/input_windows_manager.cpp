@@ -8447,7 +8447,7 @@ void InputWindowsManager::CleanInvalidPixelMap(int32_t groupId)
 
 void InputWindowsManager::SimulateKeyEventIfNeeded(std::shared_ptr<KeyEvent> keyEvent)
 {
-    if (ShouldUseNonDirectPath()) {
+    if (ShouldUseNonDirectPath() && NeedSendToAnco(keyEvent->GetDeviceId())) {
         SimulateKeyExt(keyEvent);
         return;
     }

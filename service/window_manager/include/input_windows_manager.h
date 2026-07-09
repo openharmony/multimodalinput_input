@@ -200,6 +200,7 @@ public:
     bool IsAncoGameActive();
     bool IsShouldSendToAnco(std::shared_ptr<PointerEvent> pointerEvent, bool isFirstSpecialWindow);
     bool ShouldUseNonDirectPath();
+    bool NeedSendToAnco(int32_t deviceId);
 #endif // OHOS_BUILD_ENABLE_ANCO
 
 #ifdef OHOS_BUILD_ENABLE_ANCO_GAME_EVENT_MAPPING
