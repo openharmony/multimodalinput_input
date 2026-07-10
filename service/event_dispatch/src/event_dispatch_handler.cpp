@@ -35,6 +35,9 @@
 #ifdef OHOS_BUILD_ENABLE_DRAG_SECURITY
 #include "drag_security_manager.h"
 #endif // OHOS_BUILD_ENABLE_DRAG_SECURITY
+#ifdef OHOS_SUSPEND_STATE_MANAGER
+#include "suspend_state_manager.h"
+#endif //OHOS_SUSPEND_STATE_MANAGER
 
 #undef MMI_LOG_DOMAIN
 #define MMI_LOG_DOMAIN MMI_LOG_DISPATCH
@@ -525,6 +528,18 @@ void EventDispatchHandler::DispatchPointerEventInner(std::shared_ptr<PointerEven
     if (sess == nullptr) {
         return;
     }
+#ifdef OHOS_SUSPEND_STATE_MANAGER
+    if (SuspendStateManager::GetInstance().IsFrozen(sess->GetPid())) {
+        int32_t pointerAc = point->GetPointerAction();
+        if (pointerAc != PointerEvent::POINTER_ACTION_MOVE && pointerAc != PointerEvent::POINTER_ACTION_AXIS_UPDATE &&
+            pointerAc != PointerEvent::POINTER_ACTION_ROTATE_UPDATE &&
+            pointerAc != PointerEvent::POINTER_ACTION_PULL_MOVE) {
+            MMI_HILOG_FREEZEI("Pointer event is in frozen pid. Pid:%{public}d, pointerAc:%{public}d, PI:%{public}d",
+                sess->GetPid(), pointerAc, point->GetPointerId());
+        }
+        return;
+    }
+#endif //OHOS_SUSPEND_STATE_MANAGER
     auto currentTime = GetSysClockTime();
     BytraceAdapter::StartBytrace(point, BytraceAdapter::TRACE_STOP);
     if (ANRMgr->TriggerANR(ANR_DISPATCH, currentTime, sess)) {
@@ -610,6 +625,11 @@ int32_t EventDispatchHandler::DispatchKeyEvent(int32_t fd, UDSServer& udsServer,
         "Fd:%{public}d", key->GetKeyCode(), key->GetAction(), key->GetEventType(), fd);
     auto session = udsServer.GetSession(fd);
     CHKPR(session, RET_ERR);
+#ifdef OHOS_SUSPEND_STATE_MANAGER
+    if (SuspendStateManager::GetInstance().IsFrozen(session->GetPid())) {
+        return RET_OK;
+    }
+#endif //OHOS_SUSPEND_STATE_MANAGER
     auto currentTime = GetSysClockTime();
     if (ANRMgr->TriggerANR(ANR_DISPATCH, currentTime, session)) {
         if (!EventLogHelper::IsBetaVersion()) {

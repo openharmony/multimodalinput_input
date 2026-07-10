@@ -329,6 +329,10 @@ group("mmi_tests") {
   if (input_feature_triple_finger_snapshot) {
     deps += [ "service:TripleFingerSnapshotManagerTest" ]
   }
+
+  if (input_feature_product == "pc") {
+    deps += [ "service:SuspendStateManagerTest" ]
+  }
 }
 
 group("examples_group") {

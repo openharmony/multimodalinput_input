@@ -119,6 +119,9 @@
 #ifdef OHOS_BUILD_ENABLE_TRIPLE_FINGER_SNAPSHOT
 #include "triple_finger_snapshot_manager.h"
 #endif // OHOS_BUILD_ENABLE_TRIPLE_FINGER_SNAPSHOT
+#ifdef OHOS_SUSPEND_STATE_MANAGER
+#include "suspend_state_manager.h"
+#endif //OHOS_SUSPEND_STATE_MANAGER
 
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "MMIService"
@@ -532,6 +535,9 @@ void MMIService::OnStart()
     AddSystemAbilityListener(SENSOR_SERVICE_ABILITY_ID);
 #endif // OHOS_BUILD_ENABLE_COMBINATION_KEY
     AddSystemAbilityListener(ACCESS_TOKEN_MANAGER_SERVICE_ID);
+#ifdef OHOS_SUSPEND_STATE_MANAGER
+    AddSystemAbilityListener(SUSPEND_MANAGER_SYSTEM_ABILITY_ID);
+#endif //OHOS_SUSPEND_STATE_MANAGER
 #ifdef OHOS_BUILD_ENABLE_ANCO
     InitAncoUds();
 #endif // OHOS_BUILD_ENABLE_ANCO
@@ -575,6 +581,9 @@ void MMIService::OnStop()
     RemoveAppDebugListener();
     RemoveSystemAbilityListener(DISPLAY_MANAGER_SERVICE_SA_ID);
     RemoveSystemAbilityListener(ACCESS_TOKEN_MANAGER_SERVICE_ID);
+#ifdef OHOS_SUSPEND_STATE_MANAGER
+    RemoveSystemAbilityListener(SUSPEND_MANAGER_SYSTEM_ABILITY_ID);
+#endif //OHOS_SUSPEND_STATE_MANAGER
 #ifdef OHOS_BUILD_ENABLE_ANCO
     StopAncoUds();
 #endif // OHOS_BUILD_ENABLE_ANCO
@@ -2645,6 +2654,9 @@ void MMIService::OnAddSystemAbility(int32_t systemAbilityId, const std::string &
             return RET_OK;
         });
 #endif // OHOS_BUILD_ENABLE_TOUCH_DRAWING
+#ifdef OHOS_SUSPEND_STATE_MANAGER
+        SuspendStateManager::GetInstance().SetRssSaReady();
+#endif //OHOS_SUSPEND_STATE_MANAGER
     }
 #endif // OHOS_RSS_CLIENT
     if (systemAbilityId == APP_MGR_SERVICE_ID) {
@@ -2703,6 +2715,11 @@ void MMIService::OnAddSystemAbility(int32_t systemAbilityId, const std::string &
     if (systemAbilityId == ACCESS_TOKEN_MANAGER_SERVICE_ID) {
         SetAccessTokenReady();
     }
+#ifdef OHOS_SUSPEND_STATE_MANAGER
+    if (systemAbilityId == SUSPEND_MANAGER_SYSTEM_ABILITY_ID) {
+        SuspendStateManager::GetInstance().SetSuspendSaReady();
+    }
+#endif //OHOS_SUSPEND_STATE_MANAGER
 }
 
 #if defined(OHOS_BUILD_ENABLE_MONITOR) && defined(PLAYER_FRAMEWORK_EXISTS)
