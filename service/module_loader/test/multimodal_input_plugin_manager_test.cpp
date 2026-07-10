@@ -3001,5 +3001,143 @@ HWTEST_F(MultimodalInputPluginManagerTest,
     EXPECT_FALSE(InputPluginManager::GetInstance()->IntermediateEndEvent(&event));
 }
 
+/**
+ * @tc.name: MultimodalInputPluginManagerTest_RegisterDisplayChangeCallback_001
+ * @tc.desc: Test RegisterDisplayChangeCallback/NotifyDisplayChange/UnregisterDisplayChangeCallback lifecycle
+ * @tc.require: test display change callback lifecycle
+ */
+HWTEST_F(MultimodalInputPluginManagerTest,
+    MultimodalInputPluginManagerTest_RegisterDisplayChangeCallback_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MockInputPluginContext ctx;
+    bool called = false;
+    IPluginContext::DisplayChangeCallback callback = [&called]() { called = true; };
+    int32_t id = InputPluginManager::GetInstance()->RegisterDisplayChangeCallback(callback, &ctx);
+    EXPECT_GT(id, 0);
+
+    InputPluginManager::GetInstance()->NotifyDisplayChange();
+    EXPECT_TRUE(called);
+
+    bool ret = InputPluginManager::GetInstance()->UnregisterDisplayChangeCallback(id);
+    EXPECT_TRUE(ret);
+}
+
+/**
+ * @tc.name: MultimodalInputPluginManagerTest_UnregisterDisplayChangeCallback_001
+ * @tc.desc: Test UnregisterDisplayChangeCallback with invalid ID returns false
+ * @tc.require: test UnregisterDisplayChangeCallback
+ */
+HWTEST_F(MultimodalInputPluginManagerTest,
+    MultimodalInputPluginManagerTest_UnregisterDisplayChangeCallback_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    bool ret = InputPluginManager::GetInstance()->UnregisterDisplayChangeCallback(999);
+    EXPECT_FALSE(ret);
+}
+
+/**
+ * @tc.name: MultimodalInputPluginManagerTest_RegisterDisplayChangeCallback_002
+ * @tc.desc: Test multiple display change callbacks registered and notified
+ * @tc.require: test multiple callbacks
+ */
+HWTEST_F(MultimodalInputPluginManagerTest,
+    MultimodalInputPluginManagerTest_RegisterDisplayChangeCallback_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MockInputPluginContext ctx1;
+    MockInputPluginContext ctx2;
+    int32_t callCount = 0;
+    IPluginContext::DisplayChangeCallback cb1 = [&callCount]() { callCount++; };
+    IPluginContext::DisplayChangeCallback cb2 = [&callCount]() { callCount++; };
+
+    int32_t id1 = InputPluginManager::GetInstance()->RegisterDisplayChangeCallback(cb1, &ctx1);
+    int32_t id2 = InputPluginManager::GetInstance()->RegisterDisplayChangeCallback(cb2, &ctx2);
+    EXPECT_GT(id1, 0);
+    EXPECT_GT(id2, 0);
+    EXPECT_NE(id1, id2);
+
+    InputPluginManager::GetInstance()->NotifyDisplayChange();
+    EXPECT_EQ(callCount, 2);
+
+    EXPECT_TRUE(InputPluginManager::GetInstance()->UnregisterDisplayChangeCallback(id1));
+    EXPECT_TRUE(InputPluginManager::GetInstance()->UnregisterDisplayChangeCallback(id2));
+}
+
+/**
+ * @tc.name: MultimodalInputPluginManagerTest_InputPlugin_HandleEvent_libinput_001
+ * @tc.desc: Test InputPlugin HandleEvent(libinput_event*) with null plugin_
+ * @tc.require: test HandleEvent
+ */
+HWTEST_F(MultimodalInputPluginManagerTest,
+    MultimodalInputPluginManagerTest_InputPlugin_HandleEvent_libinput_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<InputPlugin> inputPluginContext = std::make_shared<InputPlugin>(nullptr);
+    libinput_event event;
+    std::shared_ptr<IPluginData> data = nullptr;
+    PluginResult result = inputPluginContext->HandleEvent(&event, data);
+    EXPECT_EQ(result, PluginResult::NotUse);
+}
+
+/**
+ * @tc.name: MultimodalInputPluginManagerTest_InputPlugin_EnableInputDeviceForPlugin_001
+ * @tc.desc: Test InputPlugin EnableInputDeviceForPlugin with null plugin_
+ * @tc.require: test EnableInputDeviceForPlugin
+ */
+HWTEST_F(MultimodalInputPluginManagerTest,
+    MultimodalInputPluginManagerTest_InputPlugin_EnableInputDeviceForPlugin_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<InputPlugin> inputPluginContext = std::make_shared<InputPlugin>(nullptr);
+    int32_t ret = inputPluginContext->EnableInputDeviceForPlugin(1);
+    EXPECT_EQ(ret, RET_ERR);
+}
+
+/**
+ * @tc.name: MultimodalInputPluginManagerTest_InputPlugin_DisableInputDeviceForPlugin_001
+ * @tc.desc: Test InputPlugin DisableInputDeviceForPlugin with null plugin_
+ * @tc.require: test DisableInputDeviceForPlugin
+ */
+HWTEST_F(MultimodalInputPluginManagerTest,
+    MultimodalInputPluginManagerTest_InputPlugin_DisableInputDeviceForPlugin_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<InputPlugin> inputPluginContext = std::make_shared<InputPlugin>(nullptr);
+    int32_t ret = inputPluginContext->DisableInputDeviceForPlugin(2);
+    EXPECT_EQ(ret, RET_ERR);
+}
+
+/**
+ * @tc.name: MultimodalInputPluginManagerTest_InputPlugin_HandleEvent_KeyEvent_001
+ * @tc.desc: Test InputPlugin HandleEvent(KeyEvent) with null plugin_
+ * @tc.require: test HandleEvent
+ */
+HWTEST_F(MultimodalInputPluginManagerTest,
+    MultimodalInputPluginManagerTest_InputPlugin_HandleEvent_KeyEvent_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<InputPlugin> inputPluginContext = std::make_shared<InputPlugin>(nullptr);
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    std::shared_ptr<IPluginData> data = nullptr;
+    PluginResult result = inputPluginContext->HandleEvent(keyEvent, data);
+    EXPECT_EQ(result, PluginResult::NotUse);
+}
+
+/**
+ * @tc.name: MultimodalInputPluginManagerTest_InputPlugin_HandleEvent_AxisEvent_001
+ * @tc.desc: Test InputPlugin HandleEvent(AxisEvent) with null plugin_
+ * @tc.require: test HandleEvent
+ */
+HWTEST_F(MultimodalInputPluginManagerTest,
+    MultimodalInputPluginManagerTest_InputPlugin_HandleEvent_AxisEvent_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<InputPlugin> inputPluginContext = std::make_shared<InputPlugin>(nullptr);
+    std::shared_ptr<AxisEvent> axisEvent = AxisEvent::Create();
+    std::shared_ptr<IPluginData> data = nullptr;
+    PluginResult result = inputPluginContext->HandleEvent(axisEvent, data);
+    EXPECT_EQ(result, PluginResult::NotUse);
+}
 } // namespace MMI
 } // namespace OHOS

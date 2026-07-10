@@ -1618,5 +1618,121 @@ HWTEST_F(UDSServerTest, UDSServerTest_GetClientPid_001, TestSize.Level1)
     udsServer.sessionsMap_.insert(std::make_pair(fd, session));
     ASSERT_EQ(udsServer.GetClientPid(fd), UDS_PID);
 }
+
+/**
+ * @tc.name: AddSessionDeletedCallback_002
+ * @tc.desc: Test AddSessionDeletedCallback with valid callback and NotifySessionDeleted invocation
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(UDSServerTest, AddSessionDeletedCallback_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    UDSServer udsServer;
+    bool called = false;
+    std::function<void(SessionPtr)> callback = [&called](SessionPtr) { called = true; };
+    udsServer.AddSessionDeletedCallback(callback);
+
+    SessionPtr session = std::make_shared<UDSSession>(PROGRAM_NAME, MODULE_TYPE, UDS_FD, UDS_UID, UDS_PID);
+    udsServer.NotifySessionDeleted(session);
+    EXPECT_TRUE(called);
+}
+
+/**
+ * @tc.name: AddSessionDeletedCallback_003
+ * @tc.desc: Test multiple AddSessionDeletedCallback callbacks
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(UDSServerTest, AddSessionDeletedCallback_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    UDSServer udsServer;
+    int32_t callCount = 0;
+    std::function<void(SessionPtr)> cb1 = [&callCount](SessionPtr) { callCount++; };
+    std::function<void(SessionPtr)> cb2 = [&callCount](SessionPtr) { callCount++; };
+    udsServer.AddSessionDeletedCallback(cb1);
+    udsServer.AddSessionDeletedCallback(cb2);
+
+    SessionPtr session = std::make_shared<UDSSession>(PROGRAM_NAME, MODULE_TYPE, UDS_FD, UDS_UID, UDS_PID);
+    udsServer.NotifySessionDeleted(session);
+    EXPECT_EQ(callCount, 2);
+}
+
+/**
+ * @tc.name: ClearSessionMap_001
+ * @tc.desc: Test ClearSessionMap clears all sessions
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(UDSServerTest, ClearSessionMap_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    UDSServer udsServer;
+    int32_t fd = 150;
+    SessionPtr session = std::make_shared<UDSSession>(PROGRAM_NAME, MODULE_TYPE, UDS_FD, UDS_UID, UDS_PID);
+    udsServer.sessionsMap_.insert(std::make_pair(fd, session));
+    EXPECT_EQ(udsServer.GetSessionSize(), 1);
+
+    udsServer.ClearSessionMap();
+    EXPECT_EQ(udsServer.GetSessionSize(), 0);
+}
+
+/**
+ * @tc.name: GetSessionSize_001
+ * @tc.desc: Test GetSessionSize returns 0 when map is empty
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(UDSServerTest, GetSessionSize_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    UDSServer udsServer;
+    EXPECT_EQ(udsServer.GetSessionSize(), 0);
+}
+
+/**
+ * @tc.name: GetSessionSize_002
+ * @tc.desc: Test GetSessionSize returns correct count with sessions
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(UDSServerTest, GetSessionSize_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    UDSServer udsServer;
+    int32_t fd1 = 150;
+    int32_t fd2 = 200;
+    SessionPtr session1 = std::make_shared<UDSSession>(PROGRAM_NAME, MODULE_TYPE, UDS_FD, UDS_UID, UDS_PID);
+    SessionPtr session2 = std::make_shared<UDSSession>(PROGRAM_NAME, MODULE_TYPE, UDS_FD, UDS_UID, UDS_PID);
+    udsServer.sessionsMap_.insert(std::make_pair(fd1, session1));
+    udsServer.sessionsMap_.insert(std::make_pair(fd2, session2));
+    EXPECT_EQ(udsServer.GetSessionSize(), 2);
+}
+
+/**
+ * @tc.name: OnPacket_002
+ * @tc.desc: Test OnPacket with valid recvFun and session in map
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(UDSServerTest, OnPacket_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    UDSServer udsServer;
+    bool called = false;
+    MsgServerFunCallback fun = [&called](SessionPtr, NetPacket&) { called = true; };
+    udsServer.SetRecvFun(fun);
+
+    int32_t fd = 1;
+    SessionPtr session = std::make_shared<UDSSession>(PROGRAM_NAME, MODULE_TYPE, UDS_FD, UDS_UID, UDS_PID);
+    udsServer.sessionsMap_.insert(std::make_pair(fd, session));
+
+    MmiMessageId msgId = MmiMessageId::INVALID;
+    NetPacket pkt(msgId);
+    ASSERT_NO_FATAL_FAILURE(udsServer.OnPacket(fd, pkt));
+    EXPECT_TRUE(called);
+}
+
 } // namespace MMI
 } // namespace OHOS
