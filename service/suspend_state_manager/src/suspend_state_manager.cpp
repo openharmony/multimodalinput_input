@@ -110,7 +110,7 @@ int32_t SuspendStateManager::RegisterSuspendStateChanged()
         return RET_OK;
     }
     ErrCode code = ResourceSchedule::SuspendManagerBaseClient::GetInstance().RegisterSuspendObserver(
-    suspendStateObserver_);
+        suspendStateObserver_);
     if (code != ERR_OK) {
         MMI_HILOGE("RegisterSuspendStateChanged failed, err code:%{public}d", code);
         hasRegisteredObserver_.store(false);

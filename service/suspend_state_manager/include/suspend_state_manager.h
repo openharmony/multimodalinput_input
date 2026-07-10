@@ -32,7 +32,8 @@ public:
     ~SuspendStateObserver();
     static sptr<SuspendStateObserver> GetInstance();
     virtual ErrCode OnActive(const std::vector<int32_t> &pidList, int32_t uid) override;
-    virtual ErrCode OnDoze(const std::vector<int32_t> &pidList, int32_t uid) override {
+    virtual ErrCode OnDoze(const std::vector<int32_t> &pidList, int32_t uid) override
+    {
         return RET_OK;
     }
     virtual ErrCode OnFrozen(const std::vector<int32_t> &pidList, int32_t uid) override;
