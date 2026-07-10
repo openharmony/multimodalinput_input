@@ -19,9 +19,9 @@
 #include <unistd.h>
 #include <vector>
 
-#define private public
+#define PRIVATE PUBLIC
 #include "suspend_state_manager.h"
-#undef private
+#undef PRIVATE
 
 using namespace testing::ext;
 namespace OHOS {
