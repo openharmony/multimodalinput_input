@@ -877,7 +877,9 @@ void LibinputAdapter::ProcessTouchEventAsVKeyboardEvent(
     } else {
         bool bDropEventFlag = IsVKeyboardActivationDropEvent(touch, eventType);
         if (!bDropEventFlag) {
-            funInputEvent_(event, frameTime);
+            if (!ProcessEventBeforeLibinputStage(event, frameTime)) {
+                funInputEvent_(event, frameTime);
+            }
         }
         libinput_event_destroy(event);
     }
