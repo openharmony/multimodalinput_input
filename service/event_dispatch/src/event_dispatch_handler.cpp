@@ -530,10 +530,14 @@ void EventDispatchHandler::DispatchPointerEventInner(std::shared_ptr<PointerEven
     }
 #ifdef OHOS_SUSPEND_STATE_MANAGER
     if (SuspendStateManager::GetInstance().IsFrozen(sess->GetPid())) {
-        int32_t pointerAc = point->GetPointerAction();
-        if (pointerAc != PointerEvent::POINTER_ACTION_MOVE && pointerAc != PointerEvent::POINTER_ACTION_AXIS_UPDATE &&
-            pointerAc != PointerEvent::POINTER_ACTION_ROTATE_UPDATE &&
-            pointerAc != PointerEvent::POINTER_ACTION_PULL_MOVE) {
+        const int32_t pointerAc = point->GetPointerAction();
+        const auto shouldLogFreezeEvent = [](int32_t action) {
+            return action != PointerEvent::POINTER_ACTION_MOVE &&
+                action != PointerEvent::POINTER_ACTION_AXIS_UPDATE &&
+                action != PointerEvent::POINTER_ACTION_ROTATE_UPDATE &&
+                action != PointerEvent::POINTER_ACTION_PULL_MOVE;
+        };
+        if (shouldLogFreezeEvent(pointerAc)) {
             MMI_HILOG_FREEZEI("Pointer event is in frozen pid. Pid:%{public}d, pointerAc:%{public}d, PI:%{public}d",
                 sess->GetPid(), pointerAc, point->GetPointerId());
         }
