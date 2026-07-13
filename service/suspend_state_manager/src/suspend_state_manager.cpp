@@ -104,6 +104,11 @@ int32_t SuspendStateManager::RegisterSuspendStateChanged()
         MMI_HILOGE("RegisterSuspendStateChanged failed, suspend manager sa is not ready");
         return RET_ERR;
     }
+    if (suspendStateObserver_ == nullptr) {
+        MMI_HILOGE("RegisterSuspendStateChanged failed, suspend state observer is nullptr");
+        hasRegisteredObserver_.store(false);
+        return RET_ERR;
+    }
     bool expected = false;
     if (!hasRegisteredObserver_.compare_exchange_strong(expected, true)) {
         MMI_HILOGI("RegisterSuspendStateChanged, observer has been registered");
@@ -126,19 +131,32 @@ int32_t SuspendStateManager::UnRegisterSuspendStateChanged()
         MMI_HILOGI("product is not support register suspend state observer");
         return RET_OK;
     }
-    if (!hasRegisteredObserver_.load()) {
+    bool expected = true;
+    if (!hasRegisteredObserver_.compare_exchange_strong(expected, false)) {
+        MMI_HILOGI("UnRegisterSuspendStateChanged, observer has not been registered");
         return RET_OK;
     }
     if (suspendStateObserver_ == nullptr) {
+        MMI_HILOGE("UnRegisterSuspendStateChanged failed, suspend state observer is nullptr");
+        hasRegisteredObserver_.store(false);
         return RET_ERR;
     }
-    ResourceSchedule::SuspendManagerBaseClient::GetInstance().UnregisterSuspendObserver(suspendStateObserver_);
-    hasRegisteredObserver_.store(false);
+    ErrCode code = ResourceSchedule::SuspendManagerBaseClient::GetInstance().UnregisterSuspendObserver(suspendStateObserver_);
+    if (code != ERR_OK) {
+        MMI_HILOGE("UnRegisterSuspendStateChanged failed, err code:%{public}d", code);
+        hasRegisteredObserver_.store(true);
+        return code;
+    }
+    MMI_HILOGI("UnRegisterSuspendStateChanged success");
     return RET_OK;
 }
 
 bool SuspendStateManager::IsFrozen(int32_t pid)
 {
+    if (suspendStateObserver_ == nullptr) {
+        MMI_HILOGE("IsFrozen failed, suspend state observer is nullptr");
+        return false;
+    }
     return suspendStateObserver_->IsFrozenPid(pid);
 }
 
