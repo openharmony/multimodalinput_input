@@ -96,8 +96,10 @@ private:
     image_ptr_t ExtractDrawingImage(pixelmap_ptr_t pixelMap);
     int32_t DrawImage(OHOS::Rosen::Drawing::Canvas &canvas, const RenderConfig &cfg);
     std::vector<std::tuple<RenderConfig, image_ptr_t>> imgMaps_;
+    std::shared_mutex imgMapsMtx_;
     image_ptr_t FindImg(const RenderConfig &cfg)
     {
+        std::shared_lock lock(imgMapsMtx_);
         for (auto& data : imgMaps_) {
             if (std::get<0>(data) == cfg) {
                 return std::get<1>(data);
@@ -107,6 +109,7 @@ private:
     }
     void PushImg(const RenderConfig &cfg, image_ptr_t img)
     {
+        std::unique_lock lock(imgMapsMtx_);
         if (imgMaps_.size() >= DEFAULT_IMG_SIZE) {
             imgMaps_.erase(imgMaps_.begin());
         }
