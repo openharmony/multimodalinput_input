@@ -2357,6 +2357,19 @@ void InputWindowsManager::PointerDrawingManagerOnDisplayInfo(const OLD::DisplayG
     if (IsInPointerLockMode()) {
         MMI_HILOGI("Pointer is in lock mode, skip draw center pointer");
         isDisplayChanged = false;
+        bool oldDisplayRemoved = std::none_of(displayGroupInfo.displaysInfo.begin(),
+            displayGroupInfo.displaysInfo.end(),
+            [&currentDisplayInfo](const auto &it) { return it.rsId == currentDisplayInfo.rsId; });
+        if (oldDisplayRemoved) {
+            auto mouseInfo = GetMouseInfo();
+            auto curDisplay = GetPhysicalDisplay(mouseInfo.displayId);
+            if (curDisplay != nullptr) {
+                CursorDrawingComponent::GetInstance().UpdateDisplayInfo(*curDisplay);
+                CursorDrawingComponent::GetInstance().DrawPointer(curDisplay->rsId,
+                    mouseInfo.physicalX, mouseInfo.physicalY, dragPointerStyle_,
+                    GetDisplayDirection(curDisplay));
+            }
+        }
     }
     CursorDrawingComponent::GetInstance().OnDisplayInfo(displayGroupInfo, isDisplayChanged);
     int32_t groupId = displayGroupInfo.groupId;
@@ -9352,11 +9365,18 @@ void InputWindowsManager::EnterMouseCaptureMode(const OLD::DisplayGroupInfo &dis
         mouseIt = mouseLocationMap_.find(groupId);
     }
     auto cursorIt = cursorPosMap_.find(groupId);
-    if (cursorIt == cursorPosMap_.end()) {
-        MMI_HILOGD("failed to find groupId in cursorPosMap: %{public}d", groupId);
-        cursorPosMap_[groupId].displayId = 0;
+    if (cursorIt == cursorPosMap_.end() ||
+        GetPhysicalDisplay(cursorIt->second.displayId) == nullptr) {
+        MMI_HILOGD("init cursor pos for groupId: %{public}d", groupId);
+        cursorPosMap_[groupId].displayId = focusWindow.displayId;
         cursorPosMap_[groupId].cursorPos.x = windowArea.x + windowArea.width / 2;
         cursorPosMap_[groupId].cursorPos.y = windowArea.y + windowArea.height / 2;
+        mouseLocationMap_[groupId].displayId = focusWindow.displayId;
+        auto dispInfo = GetPhysicalDisplay(focusWindow.displayId);
+        if (dispInfo != nullptr) {
+            cursorPosMap_[groupId].direction = dispInfo->direction;
+            cursorPosMap_[groupId].displayDirection = dispInfo->displayDirection;
+        }
         cursorIt = cursorPosMap_.find(groupId);
     }
     PhysicalCoordinate coord {
