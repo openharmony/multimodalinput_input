@@ -1624,6 +1624,19 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetWindowInfo_001, Tes
 }
 
 /**
+ * @tc.name: InputWindowsManagerTest_IsWindowInjectableUnderLock_001
+ * @tc.desc: Test IsWindowInjectableUnderLock with no matching window
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsWindowInjectableUnderLock_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    bool ret = WIN_MGR->IsWindowInjectableUnderLock(TEST_WINDOW_ID, 0);
+    EXPECT_FALSE(ret);
+}
+
+/**
  * @tc.name: InputWindowsManagerTest_SelectPointerChangeArea_001
  * @tc.desc: Test selecting pointer change area
  * @tc.type: FUNC

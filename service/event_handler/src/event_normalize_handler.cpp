@@ -81,6 +81,18 @@ constexpr int64_t FREETOUCH_GES_BLOCK_THRETHOLD { MS2US(800) };
 constexpr uint32_t TOUCHPAD_FEATURE_SWIPEINWARD { 1 << 3 };
 #endif // OHOS_BUILD_ENABLE_TOUCHPAD
 const std::string TOUCHPAD_TYPE = OHOS::system::GetParameter("const.settings.clickpad_type", "0");
+
+void LogNonFrequentPointerEvent(const std::shared_ptr<PointerEvent>& pointerEvent, const char* scenario)
+{
+    auto pointerAc = pointerEvent->GetPointerAction();
+    if (pointerAc != PointerEvent::POINTER_ACTION_MOVE &&
+        pointerAc != PointerEvent::POINTER_ACTION_AXIS_UPDATE &&
+        pointerAc != PointerEvent::POINTER_ACTION_ROTATE_UPDATE &&
+        pointerAc != PointerEvent::POINTER_ACTION_PULL_MOVE) {
+        MMI_HILOG_FREEZEI("Injected %{public}s event under lock dropped, pointerAc:%{public}d, PI:%{public}d",
+            scenario, pointerAc, pointerEvent->GetPointerId());
+    }
+}
 #ifdef OHOS_BUILD_ENABLE_TOUCHPAD
 double g_touchPadDeviceWidth { 1 }; // physic size
 double g_touchPadDeviceHeight { 1 };
@@ -454,6 +466,12 @@ void EventNormalizeHandler::HandlePointerEvent(const std::shared_ptr<PointerEven
         pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_TOUCHPAD_ACTIVE) {
         WIN_MGR->UpdateTargetPointer(pointerEvent);
     }
+    if (pointerEvent->HasFlag(InputEvent::EVENT_FLAG_INJECT_UNDER_LOCK) &&
+        !WIN_MGR->IsWindowInjectableUnderLock(pointerEvent->GetTargetWindowId(),
+            pointerEvent->GetTargetDisplayId())) {
+        LogNonFrequentPointerEvent(pointerEvent, "pointer");
+        return;
+    }
     if (IsAccessibilityEventWithZOrder(pointerEvent)) {
         BypassChainAndDispatchDirectly(pointerEvent);
     } else if (!item.IsCanceled()) {
@@ -472,6 +490,12 @@ void EventNormalizeHandler::HandleTouchEvent(const std::shared_ptr<PointerEvent>
     DfxHisysevent::GetDispStartTime();
     CHKPV(pointerEvent);
     WIN_MGR->UpdateTargetPointer(pointerEvent);
+    if (pointerEvent->HasFlag(InputEvent::EVENT_FLAG_INJECT_UNDER_LOCK) &&
+        !WIN_MGR->IsWindowInjectableUnderLock(pointerEvent->GetTargetWindowId(),
+            pointerEvent->GetTargetDisplayId())) {
+        LogNonFrequentPointerEvent(pointerEvent, "touch");
+        return;
+    }
     BytraceAdapter::StartTouchEvent(pointerEvent->GetId());
     PointerEvent::PointerItem item;
     if (!pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), item)) {
@@ -564,6 +588,11 @@ void EventNormalizeHandler::UpdateKeyEventHandlerChain(const std::shared_ptr<Key
     MMI_HILOGD("Handle event (KC:%{private}d, KA:%{public}d, KEYS:%{private}s)",
         keyEvent->GetKeyCode(), keyEvent->GetKeyAction(), DumpVec(keyEvent->GetPressedKeys()).c_str());
     WIN_MGR->HandleKeyEventWindowId(keyEvent);
+    if (keyEvent->HasFlag(InputEvent::EVENT_FLAG_INJECT_UNDER_LOCK) &&
+        !WIN_MGR->IsWindowInjectableUnderLock(keyEvent->GetTargetWindowId(), keyEvent->GetTargetDisplayId())) {
+        MMI_HILOG_FREEZEI("Injected key event under lock dropped, focus window not injectable");
+        return;
+    }
     currentHandleKeyCode_ = keyEvent->GetKeyCode();
 
     int32_t currentShieldMode = KeyEventHdr->GetCurrentShieldMode();
