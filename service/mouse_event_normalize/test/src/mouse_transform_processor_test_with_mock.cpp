@@ -22,6 +22,7 @@
 #include "preferences_manager_mock.h"
 #include "mouse_transform_processor.h"
 #include "input_device_manager.h"
+#include "input_event_handler.h"
 #include "input_service_context.h"
 #include "mouse_device_state.h"
 #include "i_input_windows_manager.h"
@@ -470,6 +471,37 @@ HWTEST_F(MouseTransformProcessorTestWithMock, MouseTransformProcessorMockTest_Se
 
     processor.Normalize(&event);
     EXPECT_NO_FATAL_FAILURE(processor.SendButtonUpEvents());
+}
+
+/**
+ * @tc.name: MouseTransformProcessorMockTest_SendButtonUpEvents_003
+ * @tc.desc: Test SendButtonUpEvents uses buttonMapping when pressed buttons were cleared
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MouseTransformProcessorTestWithMock, MouseTransformProcessorMockTest_SendButtonUpEvents_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t deviceId { TEST_DEVICE_ID_1 };
+    MouseTransformProcessor processor(&env_, deviceId);
+    auto inputHandler = InputHandler;
+    auto normalizeHandler = inputHandler->eventNormalizeHandler_;
+    inputHandler->eventNormalizeHandler_ = std::make_shared<EventNormalizeHandler>();
+
+    int32_t originButton = MouseDeviceState::LIBINPUT_BUTTON_CODE::LIBINPUT_LEFT_BUTTON_CODE;
+    processor.buttonMapping_[originButton] = MouseTransformProcessor::ButtonMappingData {
+        .eventType_ = LIBINPUT_EVENT_POINTER_BUTTON_TOUCHPAD,
+        .buttonCode_ = MouseDeviceState::LIBINPUT_BUTTON_CODE::LIBINPUT_LEFT_BUTTON_CODE,
+        .buttonId_ = PointerEvent::MOUSE_BUTTON_LEFT,
+    };
+    processor.pointerEvent_->ClearButtonPressed();
+    EXPECT_TRUE(processor.pointerEvent_->GetPressedButtons().empty());
+
+    processor.SendButtonUpEvents();
+    EXPECT_TRUE(processor.buttonMapping_.empty());
+    EXPECT_EQ(processor.pointerEvent_->GetPointerAction(), PointerEvent::POINTER_ACTION_BUTTON_UP);
+
+    inputHandler->eventNormalizeHandler_ = normalizeHandler;
 }
 
 /**

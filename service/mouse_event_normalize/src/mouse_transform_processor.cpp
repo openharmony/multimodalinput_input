@@ -1924,7 +1924,15 @@ void MouseTransformProcessor::SendButtonUpEvents()
 
     auto pressedButtons = pointerEvent_->GetPressedButtons();
     if (pressedButtons.empty()) {
-        return;
+        for (const auto &item : buttonMapping_) {
+            const auto &mappingData = item.second;
+            if (mappingData.buttonId_ != PointerEvent::BUTTON_NONE) {
+                pressedButtons.emplace(mappingData.buttonId_);
+            }
+        }
+        if (pressedButtons.empty()) {
+            return;
+        }
     }
     MMI_HILOGI("Mouse[%{public}d] has pressed buttons, sending BUTTON_UP", deviceId_);
 
@@ -1945,8 +1953,9 @@ void MouseTransformProcessor::SendButtonUpEvents()
             continue;
         }
 
+        const int32_t mappedButtonId = iter->second.buttonId_;
         HandleButtonReleased(iter->second.buttonCode_, iter->first, iter->second.eventType_);
-        pointerEvent_->SetButtonId(iter->second.buttonId_);
+        pointerEvent_->SetButtonId(mappedButtonId);
         pointerEvent_->UpdateId();
 
         LogTracer lt(pointerEvent_->GetId(), pointerEvent_->GetEventType(), pointerEvent_->GetPointerAction());
