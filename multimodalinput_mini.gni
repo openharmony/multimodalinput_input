@@ -539,7 +539,7 @@ if (input_shortcut_key_rules_enabled) {
 if (defined(global_parts_info) &&
     defined(global_parts_info.telephony_call_manager)) {
   call_manager_service_enabled = true
-  input_default_defines += [ "CALL_MANAGER_SERVICE_ENABLED" ]
+  input_default_defines += [ "OHOS_BUILD_ENABLE_CALL_MANAGER" ]
 }
 
 if (defined(global_parts_info) &&
