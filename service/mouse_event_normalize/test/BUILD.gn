@@ -94,6 +94,7 @@ ohos_unittest("MouseEventNormalizeTestWithMock") {
     "ability_runtime:ability_manager",
     "image_framework:image_native",
     "image_framework:pixelmap",
+    "icu:shared_icuuc",
   ]
 }
 
