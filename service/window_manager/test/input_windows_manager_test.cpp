@@ -10353,6 +10353,101 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_PointerDrawingManagerO
     bool isDisplayChanged = false;
     EXPECT_NO_FATAL_FAILURE(WIN_MGR->PointerDrawingManagerOnDisplayInfo(displayGroupInfo, isDisplayChanged));
 }
+
+/**
+ * @tc.name: InputWindowsManagerTest_PointerDrawingManagerOnDisplayInfo007
+ * @tc.desc: Test lock mode and old display removed, cursor display valid
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_PointerDrawingManagerOnDisplayInfo007, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<InputWindowsManager> inputWindowsManager = std::make_shared<InputWindowsManager>();
+    inputWindowsManager->pointerLockedWindow_.id = 1;
+    inputWindowsManager->pointerLockedWindow_.flags = WindowInputPolicy::FLAG_POINTER_CONFINED;
+    OLD::DisplayInfo mapDisplayInfo;
+    mapDisplayInfo.id = 0;
+    auto mapIt = inputWindowsManager->displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
+    if (mapIt != inputWindowsManager->displayGroupInfoMap_.end()) {
+        mapIt->second.displaysInfo.push_back(mapDisplayInfo);
+    }
+    inputWindowsManager->mouseLocationMap_[DEFAULT_GROUP_ID].displayId = 0;
+    OLD::DisplayGroupInfo displayGroupInfo;
+    displayGroupInfo.groupId = DEFAULT_GROUP_ID;
+    OLD::DisplayInfo displayInfo;
+    displayInfo.id = 521;
+    displayInfo.rsId = 521;
+    displayGroupInfo.displaysInfo.push_back(displayInfo);
+    int32_t deviceId = 1;
+    InputDeviceManager::InputDeviceInfo inputDeviceInfo;
+    inputDeviceInfo.isPointerDevice = true;
+    INPUT_DEV_MGR->inputDevice_.insert(std::make_pair(deviceId, inputDeviceInfo));
+    bool isDisplayChanged = true;
+    inputWindowsManager->PointerDrawingManagerOnDisplayInfo(displayGroupInfo, isDisplayChanged);
+    EXPECT_EQ(inputWindowsManager->pointerLockedWindow_.id, 1);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_PointerDrawingManagerOnDisplayInfo008
+ * @tc.desc: Test lock mode and old display removed, cursor display invalid (curDisplay null)
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_PointerDrawingManagerOnDisplayInfo008, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<InputWindowsManager> inputWindowsManager = std::make_shared<InputWindowsManager>();
+    inputWindowsManager->pointerLockedWindow_.id = 1;
+    inputWindowsManager->pointerLockedWindow_.flags = WindowInputPolicy::FLAG_POINTER_CONFINED;
+    OLD::DisplayInfo mapDisplayInfo;
+    mapDisplayInfo.id = 0;
+    auto mapIt = inputWindowsManager->displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
+    if (mapIt != inputWindowsManager->displayGroupInfoMap_.end()) {
+        mapIt->second.displaysInfo.push_back(mapDisplayInfo);
+    }
+    inputWindowsManager->mouseLocationMap_[DEFAULT_GROUP_ID].displayId = 999;
+    OLD::DisplayGroupInfo displayGroupInfo;
+    displayGroupInfo.groupId = DEFAULT_GROUP_ID;
+    OLD::DisplayInfo displayInfo;
+    displayInfo.id = 521;
+    displayInfo.rsId = 521;
+    displayGroupInfo.displaysInfo.push_back(displayInfo);
+    int32_t deviceId = 1;
+    InputDeviceManager::InputDeviceInfo inputDeviceInfo;
+    inputDeviceInfo.isPointerDevice = true;
+    INPUT_DEV_MGR->inputDevice_.insert(std::make_pair(deviceId, inputDeviceInfo));
+    bool isDisplayChanged = true;
+    inputWindowsManager->PointerDrawingManagerOnDisplayInfo(displayGroupInfo, isDisplayChanged);
+    EXPECT_EQ(inputWindowsManager->pointerLockedWindow_.id, 1);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_PointerDrawingManagerOnDisplayInfo009
+ * @tc.desc: Test lock mode and old display not removed (rotation-like)
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_PointerDrawingManagerOnDisplayInfo009, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<InputWindowsManager> inputWindowsManager = std::make_shared<InputWindowsManager>();
+    inputWindowsManager->pointerLockedWindow_.id = 1;
+    inputWindowsManager->pointerLockedWindow_.flags = WindowInputPolicy::FLAG_POINTER_CONFINED;
+    OLD::DisplayGroupInfo displayGroupInfo;
+    displayGroupInfo.groupId = DEFAULT_GROUP_ID;
+    OLD::DisplayInfo displayInfo;
+    displayInfo.id = 521;
+    displayInfo.rsId = 0;
+    displayGroupInfo.displaysInfo.push_back(displayInfo);
+    int32_t deviceId = 1;
+    InputDeviceManager::InputDeviceInfo inputDeviceInfo;
+    inputDeviceInfo.isPointerDevice = true;
+    INPUT_DEV_MGR->inputDevice_.insert(std::make_pair(deviceId, inputDeviceInfo));
+    bool isDisplayChanged = true;
+    inputWindowsManager->PointerDrawingManagerOnDisplayInfo(displayGroupInfo, isDisplayChanged);
+    EXPECT_EQ(inputWindowsManager->pointerLockedWindow_.id, 1);
+}
 #endif // OHOS_BUILD_ENABLE_EXTERNAL_SCREEN
 #endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
 
