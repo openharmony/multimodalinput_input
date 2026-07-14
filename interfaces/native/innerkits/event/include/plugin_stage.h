@@ -166,6 +166,8 @@ struct IPluginContext {
     virtual void DispatchEvent(PluginEventType pluginEvent, int64_t frameTime) = 0;
     virtual void DispatchEvent(PluginEventType pluginEvent, InputDispatchStage stage) = 0;
     virtual void DispatchEvent(NetPacket &pkt, int32_t pid) = 0;
+    virtual void NotifyInputActive(std::shared_ptr<KeyEvent> keyEvent) = 0;
+    virtual void NotifyInputActive(std::shared_ptr<PointerEvent> pointerEvent) = 0;
     virtual PluginResult HandleEvent(libinput_event *event, std::shared_ptr<IPluginData> data) =  0;
     virtual PluginResult HandleEvent(
         std::shared_ptr<PointerEvent> pointerEvent, std::shared_ptr<IPluginData> data) =  0;

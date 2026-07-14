@@ -427,5 +427,82 @@ HWTEST_F(InputActiveSubscriberHandlerTest, KeyGestureManagerTest_Run, TestSize.L
     ASSERT_NO_FATAL_FAILURE(handler.Run(keyEvent));
     ASSERT_NO_FATAL_FAILURE(handler.RunPending());
 }
+
+/**
+ * @tc.name: InputActiveSubscriberHandlerTest_NotifyInputActive_001
+ * @tc.desc: Test NotifyInputActive with null keyEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputActiveSubscriberHandlerTest, InputActiveSubscriberHandlerTest_NotifyInputActive_001, TestSize.Level1)
+{
+    InputActiveSubscriberHandler handler;
+    auto session = std::make_shared<UDSSession>("test_program", 1, 123, 1000, 2000);
+    ASSERT_NE(session, nullptr);
+    auto ret = handler.SubscribeInputActive(session, 0, 0);
+    EXPECT_EQ(ret, RET_OK);
+    handler.NotifyInputActive(std::shared_ptr<KeyEvent>());
+    ret = handler.UnsubscribeInputActive(session, 0);
+    EXPECT_EQ(ret, RET_OK);
+}
+
+/**
+ * @tc.name: InputActiveSubscriberHandlerTest_NotifyInputActive_002
+ * @tc.desc: Test NotifyInputActive with valid keyEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputActiveSubscriberHandlerTest, InputActiveSubscriberHandlerTest_NotifyInputActive_002, TestSize.Level1)
+{
+    InputActiveSubscriberHandler handler;
+    auto session = std::make_shared<UDSSession>("test_program", 1, 123, 1000, 2000);
+    ASSERT_NE(session, nullptr);
+    auto ret = handler.SubscribeInputActive(session, 0, 0);
+    EXPECT_EQ(ret, RET_OK);
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    handler.NotifyInputActive(keyEvent);
+    ret = handler.UnsubscribeInputActive(session, 0);
+    EXPECT_EQ(ret, RET_OK);
+}
+
+/**
+ * @tc.name: InputActiveSubscriberHandlerTest_NotifyInputActive_003
+ * @tc.desc: Test NotifyInputActive with null pointerEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputActiveSubscriberHandlerTest, InputActiveSubscriberHandlerTest_NotifyInputActive_003, TestSize.Level1)
+{
+    InputActiveSubscriberHandler handler;
+    auto session = std::make_shared<UDSSession>("test_program", 1, 123, 1000, 2000);
+    ASSERT_NE(session, nullptr);
+    auto ret = handler.SubscribeInputActive(session, 0, 0);
+    EXPECT_EQ(ret, RET_OK);
+    handler.NotifyInputActive(std::shared_ptr<PointerEvent>());
+    ret = handler.UnsubscribeInputActive(session, 0);
+    EXPECT_EQ(ret, RET_OK);
+}
+
+/**
+ * @tc.name: InputActiveSubscriberHandlerTest_NotifyInputActive_004
+ * @tc.desc: Test NotifyInputActive with valid pointerEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputActiveSubscriberHandlerTest, InputActiveSubscriberHandlerTest_NotifyInputActive_004, TestSize.Level1)
+{
+    InputActiveSubscriberHandler handler;
+    auto session = std::make_shared<UDSSession>("test_program", 1, 123, 1000, 2000);
+    ASSERT_NE(session, nullptr);
+    auto ret = handler.SubscribeInputActive(session, 0, 0);
+    EXPECT_EQ(ret, RET_OK);
+    std::shared_ptr<PointerEvent> pointerEvent =
+        std::make_shared<PointerEvent>(PointerEvent::POINTER_ACTION_DOWN);
+    ASSERT_NE(pointerEvent, nullptr);
+    handler.NotifyInputActive(pointerEvent);
+    ret = handler.UnsubscribeInputActive(session, 0);
+    EXPECT_EQ(ret, RET_OK);
+}
 } // namespace MMI
 } // namespace OHOS

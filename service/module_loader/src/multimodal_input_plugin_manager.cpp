@@ -877,6 +877,34 @@ void InputPlugin::DispatchEvent(NetPacket& pkt, int32_t pid)
     }
 }
 
+void InputPlugin::NotifyInputActive(std::shared_ptr<KeyEvent> keyEvent)
+{
+    if (keyEvent == nullptr) {
+        MMI_HILOGE("keyEvent is null");
+        return;
+    }
+    auto handler = InputHandler->GetInputActiveSubscriberHandler();
+    if (handler == nullptr) {
+        MMI_HILOGE("handler is null");
+        return;
+    }
+    handler->NotifyInputActive(keyEvent);
+}
+
+void InputPlugin::NotifyInputActive(std::shared_ptr<PointerEvent> pointerEvent)
+{
+    if (pointerEvent == nullptr) {
+        MMI_HILOGE("pointerEvent is null");
+        return;
+    }
+    auto handler = InputHandler->GetInputActiveSubscriberHandler();
+    if (handler == nullptr) {
+        MMI_HILOGE("handler is null");
+        return;
+    }
+    handler->NotifyInputActive(pointerEvent);
+}
+
 PluginResult InputPlugin::HandleEvent(libinput_event *event, std::shared_ptr<IPluginData> data)
 {
     CHKPR(plugin_, PluginResult::NotUse);

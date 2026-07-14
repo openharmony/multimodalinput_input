@@ -117,6 +117,24 @@ int32_t InputActiveSubscriberHandler::UnsubscribeInputActive(SessionPtr sess, in
     return RET_OK;
 }
 
+void InputActiveSubscriberHandler::NotifyInputActive(const std::shared_ptr<KeyEvent> keyEvent)
+{
+    if (keyEvent == nullptr) {
+        MMI_HILOGE("keyEvent is null");
+        return;
+    }
+    OnSubscribeInputActive(keyEvent);
+}
+
+void InputActiveSubscriberHandler::NotifyInputActive(const std::shared_ptr<PointerEvent> pointerEvent)
+{
+    if (pointerEvent == nullptr) {
+        MMI_HILOGE("pointerEvent is null");
+        return;
+    }
+    OnSubscribeInputActive(pointerEvent);
+}
+
 bool InputActiveSubscriberHandler::IsImmediateNotifySubscriber(
     std::shared_ptr<Subscriber> subscriber, int64_t eventTime)
 {
