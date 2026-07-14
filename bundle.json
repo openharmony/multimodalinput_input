@@ -119,7 +119,8 @@
 	      "libuv",
         "os_account",
         "openssl",
-        "zlib"
+        "zlib",
+        "taihe_ffi_gen"
       ],
       "third_party": [
         "libuv",
