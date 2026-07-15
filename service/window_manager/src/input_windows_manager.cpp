@@ -3943,7 +3943,9 @@ int32_t InputWindowsManager::GetPointerStyle(int32_t pid, int32_t windowId, Poin
     CALL_DEBUG_ENTER;
 
 #ifdef OHOS_SUSPEND_STATE_MANAGER
-    if (SuspendStateManager::GetInstance().IsFrozen(pid)) {
+    auto &cursorComponent = CursorDrawingComponent::GetInstance();
+    bool isPointerVisible = cursorComponent.GetMouseDisplayState() && cursorComponent.IsPointerVisible();
+    if (isPointerVisible &&SuspendStateManager::GetInstance().IsFrozen(pid)) {
         pointerStyle.id = MOUSE_ICON::LOADING;
         MMI_HILOG_CURSORD("Getting frozen pointer style:%{public}d", pointerStyle.id);
         return RET_OK;
