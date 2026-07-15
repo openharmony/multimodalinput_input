@@ -131,15 +131,15 @@ int32_t SuspendStateManager::UnRegisterSuspendStateChanged()
         MMI_HILOGI("product is not support register suspend state observer");
         return RET_OK;
     }
-    bool expected = true;
-    if (!hasRegisteredObserver_.compare_exchange_strong(expected, false)) {
-        MMI_HILOGI("UnRegisterSuspendStateChanged, observer has not been registered");
-        return RET_OK;
-    }
     if (suspendStateObserver_ == nullptr) {
         MMI_HILOGE("UnRegisterSuspendStateChanged failed, suspend state observer is nullptr");
         hasRegisteredObserver_.store(false);
         return RET_ERR;
+    }
+    bool expected = true;
+    if (!hasRegisteredObserver_.compare_exchange_strong(expected, false)) {
+        MMI_HILOGI("UnRegisterSuspendStateChanged, observer has not been registered");
+        return RET_OK;
     }
     ErrCode code = ResourceSchedule::SuspendManagerBaseClient::GetInstance().UnregisterSuspendObserver(
         suspendStateObserver_);
