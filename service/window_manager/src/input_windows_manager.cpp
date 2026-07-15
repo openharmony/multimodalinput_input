@@ -53,6 +53,10 @@
 #include "bundle_name_parser.h"
 #include "timer_manager.h"
 #include "i_setting_manager.h"
+#ifdef OHOS_SUSPEND_STATE_MANAGER
+#include "suspend_state_manager.h"
+#endif //OHOS_SUSPEND_STATE_MANAGER
+
 #undef MMI_LOG_DOMAIN
 #define MMI_LOG_DOMAIN MMI_LOG_WINDOW
 #undef MMI_LOG_TAG
@@ -3937,6 +3941,17 @@ int32_t InputWindowsManager::GetPointerStyle(int32_t pid, int32_t windowId, Poin
     const sptr<IRemoteObject> &token) const
 {
     CALL_DEBUG_ENTER;
+
+#ifdef OHOS_SUSPEND_STATE_MANAGER
+    auto &cursorComponent = CursorDrawingComponent::GetInstance();
+    bool isPointerVisible = cursorComponent.GetMouseDisplayState() && cursorComponent.IsPointerVisible();
+    if (isPointerVisible &&SuspendStateManager::GetInstance().IsFrozen(pid)) {
+        pointerStyle.id = MOUSE_ICON::LOADING;
+        MMI_HILOG_CURSORD("Getting frozen pointer style:%{public}d", pointerStyle.id);
+        return RET_OK;
+    }
+#endif //OHOS_SUSPEND_STATE_MANAGER
+
     if (windowId == GLOBAL_WINDOW_ID) {
         pointerStyle = globalStyle_;
         MMI_HILOG_CURSORD("GetPointerStyle, getting global pointer style:%{public}d", pointerStyle.options);

@@ -41,6 +41,9 @@
 #endif // OHOS_BUILD_ENABLE_TRIPLE_FINGER_SNAPSHOT
 #include "cursor_drawing_component.h"
 #include "util_ex.h"
+#ifdef OHOS_SUSPEND_STATE_MANAGER
+#include "suspend_state_manager.h"
+#endif //OHOS_SUSPEND_STATE_MANAGER
 
 #undef MMI_LOG_DOMAIN
 #define MMI_LOG_DOMAIN MMI_LOG_SERVER
@@ -108,6 +111,7 @@ void EventDump::ParseCommand(int32_t fd, const std::vector<std::string> &args)
         { "lidstate", no_argument, 0, 't' },
         { "tabletStandState", no_argument, 0, 'b' },
         { "tripleFingerSnapshot", no_argument, 0, 'n' },
+        { "frozenPid", no_argument, 0, 'p' },
         { nullptr, 0, 0, 0 }
     };
     if (args.empty()) {
@@ -135,7 +139,7 @@ void EventDump::ParseCommand(int32_t fd, const std::vector<std::string> &args)
     }
     optind = 1;
     int32_t c;
-    while ((c = getopt_long (args.size(), argv, "hdlwusoifmckKetbn", dumpOptions, &optionIndex)) != -1) {
+    while ((c = getopt_long (args.size(), argv, "hdlwusoifmckKetbnp", dumpOptions, &optionIndex)) != -1) {
         switch (c) {
             case 'h': {
                 DumpEventHelp(fd, args);
@@ -303,6 +307,14 @@ void EventDump::ParseCommand(int32_t fd, const std::vector<std::string> &args)
 #endif // OHOS_BUILD_ENABLE_TRIPLE_FINGER_SNAPSHOT
                 break;
             }
+            case 'p': {
+#ifdef OHOS_SUSPEND_STATE_MANAGER
+                SuspendStateManager::GetInstance().Dump(fd);
+#else
+                mprintf(fd, "frozen pid list does not support");
+#endif // OHOS_SUSPEND_STATE_MANAGER
+                break;
+            }
             default: {
                 mprintf(fd, "cmd param is error\n");
                 DumpHelp(fd);
@@ -344,6 +356,7 @@ void EventDump::DumpHelp(int32_t fd)
     mprintf(fd, "      -t, --lidstate: dump the status of the laptop cover\t");
     mprintf(fd, "      -b, --tabletStandState: dump the status of the tablet stand\t");
     mprintf(fd, "      -n, --triple finger snapshot: dump the triple finger snapshot information\t");
+    mprintf(fd, "      -p, --frozen pid: dump frozen pid list\t");
 }
 
 void EventDump::AttachTouchGestureMgr(std::shared_ptr<ITouchGestureManager> touchGestureMgr)

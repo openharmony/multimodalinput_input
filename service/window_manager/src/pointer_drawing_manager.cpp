@@ -1279,12 +1279,10 @@ void PointerDrawingManager::OnVsync(uint64_t timestamp)
 {
     if (!CursorDrawingInformation::GetInstance().IsPointerVisible() || !mouseDisplayState_) {
         MMI_HILOGE("Mouse is hide, stop request vsync");
-        if (currentMouseStyle_.id != MOUSE_ICON::LOADING && currentMouseStyle_.id != MOUSE_ICON::RUNNING) {
-            PostSoftCursorTask([this]() {
-                SoftwareCursorRender(MOUSE_ICON::TRANSPARENT_ICON, lastPhysicalX_, lastPhysicalY_, displayId_);
-            });
-            HideHardwareCursors();
-        }
+        PostSoftCursorTask([this]() {
+            SoftwareCursorRender(MOUSE_ICON::TRANSPARENT_ICON, lastPhysicalX_, lastPhysicalY_, displayId_);
+        });
+        HideHardwareCursors();
         vsyncStart_.store(false);
         return;
     }
