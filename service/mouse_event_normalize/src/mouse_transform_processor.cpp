@@ -1460,7 +1460,7 @@ DeviceType MouseTransformProcessor::CheckDeviceType(int32_t width, int32_t heigh
             ret = DeviceType::DEVICE_HARD_PC_PRO;
         } else if (width == SOFT_PC_PRO_DEVICE_WIDTH && height == SOFT_PC_PRO_DEVICE_HEIGHT) {
             ret = DeviceType::DEVICE_SOFT_PC_PRO;
-        } else if (EventLogHelper::IsBetaVersion()) {
+        } else {
             MMI_HILOGD("Undefined width:%{private}d, height:%{private}d", width, height);
         }
         MMI_HILOGD("Device width:%{private}d, height:%{private}d", width, height);

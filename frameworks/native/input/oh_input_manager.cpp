@@ -218,11 +218,7 @@ Input_Result OH_Input_GetKeyState(struct Input_KeyState* keyState)
     MMI_HISTOGRAM_BOOLEAN("InputKit.OH_Input_GetKeyState.Call", true);
     CHKPR(keyState, INPUT_PARAMETER_ERROR);
     if (keyState->keyCode < 0 || keyState->keyCode > KEYCODE_NUMPAD_RIGHT_PAREN) {
-        if (!OHOS::MMI::EventLogHelper::IsBetaVersion()) {
-            MMI_HILOGE("Invaild");
-        } else {
-            MMI_HILOGE("Invaild");
-        }
+        MMI_HILOGE("Invaild");
         return INPUT_PARAMETER_ERROR;
     }
     if (g_keyCodeValueSet.find(keyState->keyCode) == g_keyCodeValueSet.end()) {
@@ -274,11 +270,7 @@ void OH_Input_SetKeyCode(struct Input_KeyState* keyState, int32_t keyCode)
     CHKPV(keyState);
     MMI_HISTOGRAM_BOOLEAN("InputKit.OH_Input_SetKeyCode.Call", true);
     if (keyCode < 0 || keyState->keyCode > KEYCODE_NUMPAD_RIGHT_PAREN) {
-        if (!OHOS::MMI::EventLogHelper::IsBetaVersion()) {
-            MMI_HILOGE("Invaild");
-        } else {
-            MMI_HILOGE("Invaild");
-        }
+        MMI_HILOGE("Invaild");
         return;
     }
     keyState->keyCode = keyCode;
@@ -328,8 +320,6 @@ static void HandleKeyAction(const struct Input_KeyEvent* keyEvent, OHOS::MMI::Ke
         std::optional<OHOS::MMI::KeyEvent::KeyItem> pressedKeyItem = g_keyEvent->GetKeyItem(keyEvent->keyCode);
         if (pressedKeyItem) {
             item.SetDownTime(pressedKeyItem->GetDownTime());
-        } else if (!OHOS::MMI::EventLogHelper::IsBetaVersion()) {
-            MMI_HILOGW("Find pressed key failed");
         } else {
             MMI_HILOGW("Find pressed key failed");
         }
@@ -344,11 +334,7 @@ int32_t OH_Input_InjectKeyEvent(const struct Input_KeyEvent* keyEvent)
     MMI_HISTOGRAM_BOOLEAN("InputKit.OH_Input_InjectKeyEvent.Call", true);
     CHKPR(keyEvent, INPUT_PARAMETER_ERROR);
     if (keyEvent->keyCode < 0) {
-        if (!OHOS::MMI::EventLogHelper::IsBetaVersion()) {
-            MMI_HILOGE("code is less 0, can not process");
-        } else {
-            MMI_HILOGE("code is less 0, can not process");
-        }
+        MMI_HILOGE("code is less 0, can not process");
         MMI_HISTOGRAM_ERROR("InputKit.OH_Input_InjectKeyEvent.Error", INPUT_PARAMETER_ERROR);
         return INPUT_PARAMETER_ERROR;
     }

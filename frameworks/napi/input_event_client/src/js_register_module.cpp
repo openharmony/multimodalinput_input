@@ -112,11 +112,7 @@ static void GetInjectionEventDataNative(napi_env env, struct Input_KeyEvent* key
         MMI_HILOGE("Get keyCode failed");
     }
     if (keyCode < 0) {
-        if (!EventLogHelper::IsBetaVersion()) {
-            MMI_HILOGE("keyCode is less 0, can not process");
-        } else {
-            MMI_HILOGE("keyCode:%{private}d is less 0, can not process", keyCode);
-        }
+        MMI_HILOGE("keyCode is less 0, can not process");
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "keyCode must be greater than or equal to 0");
         histogramError(COMMON_PARAMETER_ERROR);
     }

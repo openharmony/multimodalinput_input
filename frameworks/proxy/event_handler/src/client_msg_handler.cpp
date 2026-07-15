@@ -162,7 +162,10 @@ int32_t ClientMsgHandler::OnKeyEvent(const UDSClient& client, NetPacket& pkt)
         MMI_HILOG_DISPATCHE("Packet read fd failed");
         return PACKET_READ_FAIL;
     }
-    MMI_HILOG_DISPATCHW("The client receives a key, Fd:%{public}d", fd);
+    MMI_HILOG_DISPATCHW("The client receives a key, NL:%{public}d, CL:%{public}d, SL:%{public}d, Fd:%{public}d",
+        key->GetFunctionKey(KeyEvent::NUM_LOCK_FUNCTION_KEY),
+        key->GetFunctionKey(KeyEvent::CAPS_LOCK_FUNCTION_KEY),
+        key->GetFunctionKey(KeyEvent::SCROLL_LOCK_FUNCTION_KEY), fd);
     BytraceAdapter::StartBytrace(key, BytraceAdapter::TRACE_START, BytraceAdapter::KEY_DISPATCH_EVENT);
     key->SetProcessedCallback(dispatchCallback_);
     InputMgrImpl.OnKeyEvent(key);
@@ -319,17 +322,10 @@ int32_t ClientMsgHandler::OnSubscribeKeyEventCallback(const UDSClient &client, N
         return PACKET_READ_FAIL;
     }
     if (keyEvent->GetKeyCode() == KeyEvent::KEYCODE_POWER) {
-        if (!EventLogHelper::IsBetaVersion()) {
-            MMI_HILOGI("Subscribe:%{public}d,Fd:%{public}d,KeyEvent:%{public}d, "
-                "Action:%{public}d, KeyAction:%{public}d, EventType:%{public}d,Flag:%{public}u",
-                subscribeId, fd, keyEvent->GetId(), keyEvent->GetAction(), keyEvent->GetKeyAction(),
-                keyEvent->GetEventType(), keyEvent->GetFlag());
-        } else {
-            MMI_HILOGW("Subscribe:%{public}d,Fd:%{public}d,KeyEvent:%{public}d, "
-                "Action:%{public}d, KeyAction:%{public}d, EventType:%{public}d,Flag:%{public}u",
-                subscribeId, fd, keyEvent->GetId(), keyEvent->GetAction(), keyEvent->GetKeyAction(),
-                keyEvent->GetEventType(), keyEvent->GetFlag());
-        }
+        MMI_HILOGI("Subscribe:%{public}d,Fd:%{public}d,KeyEvent:%{public}d, "
+            "Action:%{public}d, KeyAction:%{public}d, EventType:%{public}d,Flag:%{public}u",
+            subscribeId, fd, keyEvent->GetId(), keyEvent->GetAction(), keyEvent->GetKeyAction(),
+            keyEvent->GetEventType(), keyEvent->GetFlag());
     } else {
         MMI_HILOGD("Subscribe:%{public}d,Fd:%{public}d,KeyEvent:%{public}d,"
             "KeyCode:%{private}d,ActionTime:%{public}" PRId64 ",ActionStartTime:%{public}" PRId64 ","

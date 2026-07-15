@@ -392,7 +392,7 @@ void EventDispatchHandler::HandlePointerEventInner(const std::shared_ptr<Pointer
     int32_t pointerId = point->GetPointerId();
     PointerEvent::PointerItem pointerItem;
     if (!point->GetPointerItem(pointerId, pointerItem)) {
-        MMI_HILOGE("Can't find pointer item, pointer:%{public}d", pointerId);
+        MMI_HILOGD("Can't find pointer item, pointer:%{public}d", pointerId);
         return;
     }
     UpdateDisplayXY(point);
@@ -610,15 +610,9 @@ int32_t EventDispatchHandler::DispatchKeyEvent(int32_t fd, UDSServer& udsServer,
     CHKPR(session, RET_ERR);
     auto currentTime = GetSysClockTime();
     if (ANRMgr->TriggerANR(ANR_DISPATCH, currentTime, session)) {
-        if (!EventLogHelper::IsBetaVersion()) {
-            MMI_HILOGW("The key event does not report normally, application not response."
-                "KeyEvent(deviceid:%{public}d, key action:%{public}d)",
-                key->GetDeviceId(), key->GetKeyAction());
-        } else {
-            MMI_HILOGW("The key event does not report normally, application not response."
-                "KeyEvent(deviceid:%{public}d, keycode:%{private}d, key action:%{public}d)",
-                key->GetDeviceId(), key->GetKeyCode(), key->GetKeyAction());
-        }
+        MMI_HILOGW("The key event does not report normally, application not response."
+            "KeyEvent(deviceid:%{public}d, key action:%{public}d)",
+            key->GetDeviceId(), key->GetKeyAction());
         ANRMgr->HandleAnrState(session, ANR_DISPATCH, currentTime);
     }
     auto keyHandler = InputHandler->GetEventNormalizeHandler();

@@ -988,12 +988,8 @@ void KeySubscriberHandler::NotifySubscriber(std::shared_ptr<KeyEvent> keyEvent,
     CHKPV(sess);
     int32_t fd = sess->GetFd();
     pkt << fd << subscriber->id_;
-    if (!EventLogHelper::IsBetaVersion()) {
-        MMI_HILOGD("Notify subscriber id:%{public}d, pid:%{public}d", subscriber->id_, sess->GetPid());
-    } else {
-        MMI_HILOGW("Notify subscriber id:%{public}d, code:%{private}d, pid:%{public}d",
-            subscriber->id_, keyEvent->GetKeyCode(), sess->GetPid());
-    }
+    MMI_HILOGW("Notify subscriber id:%{public}d, code:%{private}d, pid:%{public}d",
+        subscriber->id_, keyEvent->GetKeyCode(), sess->GetPid());
     if (pkt.ChkRWError()) {
         MMI_HILOGE("Packet write dispatch subscriber failed");
         return;
