@@ -141,7 +141,7 @@ bool TouchTransformProcessor::OnEventTouchDown(struct libinput_event *event)
 #ifdef OHOS_BUILD_KNUCKLE
     if (!KnuckleHandlerComponent::GetInstance().SkipKnuckleDetect() &&
         toolType != PointerEvent::TOOL_TYPE_THP_FEATURE) {
-        NotifyFingersenseProcess(pointerEvent_->GetTargetDisplayId(), item, toolType);
+        NotifyFingersenseProcess(pointerEvent_->GetTargetDisplayId(), item, touchInfo, toolType);
     } else {
         MMI_HILOGD("Skip fingersense detect");
     }
@@ -174,7 +174,7 @@ void TouchTransformProcessor::UpdatePointerItemByTouchInfo(PointerEvent::Pointer
 #ifdef OHOS_BUILD_KNUCKLE
 __attribute__((no_sanitize("cfi")))
 void TouchTransformProcessor::NotifyFingersenseProcess(int32_t displayId, const PointerEvent::PointerItem &pointerItem,
-    int32_t &toolType)
+    const EventTouch &touchInfo, int32_t &toolType)
 {
     CALL_DEBUG_ENTER;
     TransformTouchProperties(displayId, pointerItem, rawTouch_);
@@ -190,7 +190,9 @@ void TouchTransformProcessor::NotifyFingersenseProcess(int32_t displayId, const 
     BytraceAdapter::StartToolType(toolType);
     KnuckleHandlerComponent::GetInstance().SetCurrentToolType(rawTouchTmp, toolType);
     BytraceAdapter::StopToolType();
-    KnuckleHandlerComponent::GetInstance().SaveTouchInfo(rawTouchTmp.x, rawTouchTmp.y, toolType);
+    KnuckleHandlerComponent::GetInstance().SaveTouchInfo(touchInfo.absCoord.x, touchInfo.absCoord.y, toolType);
+    MMI_HILOGD("display coordinate:(%{private}f, %{private}f), absolute coordinate:(%{private}f, %{private}f)",
+        rawTouchTmp.x, rawTouchTmp.y, touchInfo.absCoord.x, touchInfo.absCoord.y);
 }
 
 void TouchTransformProcessor::TransformTouchProperties(int32_t displayId, const PointerEvent::PointerItem &pointerItem,

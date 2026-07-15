@@ -3395,7 +3395,6 @@ bool InputWindowsManager::GetPhysicalDisplayCoord(int32_t deviceId, struct libin
             height = info.width;
         }
     }
-
     PhysicalCoordinate coord {
         .x = libinput_event_touch_get_x_transformed(touch, width),
         .y = libinput_event_touch_get_y_transformed(touch, height - info.expandHeight),
@@ -3422,10 +3421,8 @@ bool InputWindowsManager::GetPhysicalDisplayCoord(int32_t deviceId, struct libin
     touchInfo.coordF = coord;
     touchInfo.point.x = static_cast<int32_t>(coord.x);
     touchInfo.point.y = static_cast<int32_t>(coord.y);
-
     touchInfo.globalCoord.x =  info.x + touchInfo.point.x;
     touchInfo.globalCoord.y =  info.y + touchInfo.point.y;
-
     touchInfo.toolRect.point.x = static_cast<int32_t>(libinput_event_touch_get_tool_x_transformed(touch, width));
     touchInfo.toolRect.point.y =
         static_cast<int32_t>(libinput_event_touch_get_tool_y_transformed(touch, height - info.expandHeight));
@@ -3433,6 +3430,8 @@ bool InputWindowsManager::GetPhysicalDisplayCoord(int32_t deviceId, struct libin
         libinput_event_touch_get_tool_width_transformed(touch, width));
     touchInfo.toolRect.height = static_cast<int32_t>(
         libinput_event_touch_get_tool_height_transformed(touch, height));
+    touchInfo.absCoord.x = libinput_event_touch_get_x(touch);
+    touchInfo.absCoord.y = libinput_event_touch_get_y(touch);
     return true;
 }
 
