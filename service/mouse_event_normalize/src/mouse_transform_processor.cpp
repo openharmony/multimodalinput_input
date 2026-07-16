@@ -1929,9 +1929,6 @@ void MouseTransformProcessor::SendButtonUpEvents()
             return;
         }
         pressedButtons = pointerEvent_->GetPressedButtons();
-        if (pressedButtons.empty()) {
-            return;
-        }
     }
     MMI_HILOGI("Mouse[%{public}d] has pressed buttons, sending BUTTON_UP", deviceId_);
 
