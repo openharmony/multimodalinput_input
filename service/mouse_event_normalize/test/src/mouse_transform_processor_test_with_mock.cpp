@@ -475,7 +475,7 @@ HWTEST_F(MouseTransformProcessorTestWithMock, MouseTransformProcessorMockTest_Se
 
 /**
  * @tc.name: MouseTransformProcessorMockTest_SendButtonUpEvents_003
- * @tc.desc: Test SendButtonUpEvents uses buttonMapping when pressed buttons were cleared
+ * @tc.desc: Test SendButtonUpEvents returns when pressed buttons were cleared without last pointer event
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -498,8 +498,55 @@ HWTEST_F(MouseTransformProcessorTestWithMock, MouseTransformProcessorMockTest_Se
     EXPECT_TRUE(processor.pointerEvent_->GetPressedButtons().empty());
 
     processor.SendButtonUpEvents();
+    EXPECT_FALSE(processor.buttonMapping_.empty());
+    EXPECT_EQ(processor.pointerEvent_->GetPointerAction(), PointerEvent::POINTER_ACTION_UNKNOWN);
+
+    inputHandler->eventNormalizeHandler_ = normalizeHandler;
+}
+
+/**
+ * @tc.name: MouseTransformProcessorMockTest_SendButtonUpEvents_004
+ * @tc.desc: Test SendButtonUpEvents restores last pointer event when pointer event was reset
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MouseTransformProcessorTestWithMock, MouseTransformProcessorMockTest_SendButtonUpEvents_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t deviceId { TEST_DEVICE_ID_1 };
+    MouseTransformProcessor processor(&env_, deviceId);
+    auto inputHandler = InputHandler;
+    auto normalizeHandler = inputHandler->eventNormalizeHandler_;
+    inputHandler->eventNormalizeHandler_ = std::make_shared<EventNormalizeHandler>();
+
+    int32_t originButton = MouseDeviceState::LIBINPUT_BUTTON_CODE::LIBINPUT_LEFT_BUTTON_CODE;
+    processor.buttonMapping_[originButton] = MouseTransformProcessor::ButtonMappingData {
+        .eventType_ = LIBINPUT_EVENT_POINTER_BUTTON_TOUCHPAD,
+        .buttonCode_ = MouseDeviceState::LIBINPUT_BUTTON_CODE::LIBINPUT_LEFT_BUTTON_CODE,
+        .buttonId_ = PointerEvent::MOUSE_BUTTON_LEFT,
+    };
+    processor.pointerEvent_->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
+    processor.pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_DOWN);
+    processor.pointerEvent_->SetPointerId(0);
+    processor.pointerEvent_->SetButtonId(PointerEvent::MOUSE_BUTTON_LEFT);
+    processor.pointerEvent_->SetButtonPressed(PointerEvent::MOUSE_BUTTON_LEFT);
+    PointerEvent::PointerItem pointerItem;
+    pointerItem.SetPointerId(0);
+    pointerItem.SetPressed(true);
+    processor.pointerEvent_->AddPointerItem(pointerItem);
+    processor.RefreshLastPointerEvent();
+
+    auto pointerEvent = processor.pointerEvent_.get();
+    processor.pointerEvent_->Reset();
+    EXPECT_TRUE(processor.pointerEvent_->GetPressedButtons().empty());
+    EXPECT_EQ(processor.pointerEvent_->GetPointerCount(), 0);
+
+    processor.SendButtonUpEvents();
+    EXPECT_EQ(processor.pointerEvent_.get(), pointerEvent);
     EXPECT_TRUE(processor.buttonMapping_.empty());
+    EXPECT_EQ(processor.pointerEvent_->GetSourceType(), PointerEvent::SOURCE_TYPE_MOUSE);
     EXPECT_EQ(processor.pointerEvent_->GetPointerAction(), PointerEvent::POINTER_ACTION_BUTTON_UP);
+    EXPECT_EQ(processor.pointerEvent_->GetPointerCount(), 1);
 
     inputHandler->eventNormalizeHandler_ = normalizeHandler;
 }
