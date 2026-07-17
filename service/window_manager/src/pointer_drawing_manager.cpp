@@ -2591,6 +2591,7 @@ void PointerDrawingManager::OnDisplayInfo(const OLD::DisplayGroupInfo &displayGr
     (void)GetMainScreenDisplayInfo(displayGroupInfo, displayInfo);
 #endif // OHOS_BUILD_ENABLE_EXTERNAL_SCREEN
     UpdateDisplayInfo(displayInfo);
+    displayId_ = displayInfo_.rsId; // Set the main screen to the screen where the current cursor is located
     lastPhysicalX_ = displayInfo.validWidth / CALCULATE_MIDDLE;
     lastPhysicalY_ = displayInfo.validHeight / CALCULATE_MIDDLE;
     MouseEventHdr->OnDisplayLost(displayInfo_.rsId);
