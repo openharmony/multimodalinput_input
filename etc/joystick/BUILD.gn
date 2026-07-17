@@ -165,6 +165,7 @@ action("pack_joystick_layouts") {
     "layout/Vendor_1bad_Product_fd00.json",
     "layout/Vendor_1bad_Product_fd01.json",
     "layout/Vendor_1d79_Product_0009.json",
+    "layout/Vendor_20bc_Product_5126.json",
     "layout/Vendor_22b8_Product_093d.json",
     "layout/Vendor_2378_Product_1008.json",
     "layout/Vendor_2378_Product_100a.json",
