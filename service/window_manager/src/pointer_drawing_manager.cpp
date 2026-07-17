@@ -3171,14 +3171,29 @@ void PointerDrawingManager::UpdateBindDisplayId(uint64_t rsId)
 bool PointerDrawingManager::ShouldSkipScreen(const sptr<OHOS::Rosen::ScreenInfo> &screen)
 {
     if (screen == nullptr) {
-        MMI_HILOGW("Screen is null");
+        MMI_HILOGW("ShouldSkipScreen, Screen is null");
         return true;
     }
     if (screen->GetType() == OHOS::Rosen::ScreenType::UNDEFINED) {
+        MMI_HILOGD("ShouldSkipScreen, rsId=%{public}" PRIu64 ", ScreenType=%{public}u",
+            screen->GetRsId(), screen->GetType());
         return true;
     }
     if (screen->GetType() == OHOS::Rosen::ScreenType::VIRTUAL &&
         screen->GetSourceMode() != OHOS::Rosen::ScreenSourceMode::SCREEN_EXTEND) {
+        MMI_HILOGD("ShouldSkipScreen, rsId=%{public}" PRIu64 ", ScreenType=%{public}u, ScreenSourceMode=%{public}u",
+            screen->GetRsId(), screen->GetType(), screen->GetSourceMode());
+        return true;
+    }
+    if (screen->GetSourceMode() == OHOS::Rosen::ScreenSourceMode::SCREEN_ALONE ||
+        screen->GetSourceMode() == OHOS::Rosen::ScreenSourceMode::SCREEN_UNIQUE) {
+        MMI_HILOGD("ShouldSkipScreen, rsId=%{public}" PRIu64 ", ScreenSourceMode=%{public}u",
+            screen->GetRsId(), screen->GetSourceMode());
+        return true;
+    }
+    if (!screen->GetIsInUse()) {
+        MMI_HILOGD("ShouldSkipScreen, rsId=%{public}" PRIu64 ", IsInUse=%{public}d",
+            screen->GetRsId(), screen->GetIsInUse());
         return true;
     }
     return false;
@@ -3317,7 +3332,14 @@ void PointerDrawingManager::OnScreenModeChange(const std::vector<sptr<OHOS::Rose
 void PointerDrawingManager::SetMainScreenTargetDevice(const std::vector<sptr<OHOS::Rosen::ScreenInfo>> &screens)
 {
     for (const auto &screen : screens) {
-        if (screen == nullptr || screen->GetSourceMode() != OHOS::Rosen::ScreenSourceMode::SCREEN_MAIN) {
+        if (screen == nullptr) {
+            MMI_HILOGW("SetMainScreenTargetDevice, screen is null");
+            continue;
+        }
+        if (screen->GetSourceMode() != OHOS::Rosen::ScreenSourceMode::SCREEN_MAIN || !screen->GetIsInUse()) {
+            MMI_HILOGD("SetMainScreenTargetDevice, rsId=%{public}" PRIu64
+                ", ScreenSourceMode=%{public}u, IsInUse=%{public}d",
+                screen->GetRsId(), screen->GetSourceMode(), screen->GetIsInUse());
             continue;
         }
         hardwareCursorPointerManager_->SetTargetDevice(static_cast<uint32_t>(screen->GetRsId()));

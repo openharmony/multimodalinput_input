@@ -3651,7 +3651,215 @@ HWTEST_F(PointerDrawingManagerTest, ShouldSkipScreen, TestSize.Level1)
 
     screen->SetType(OHOS::Rosen::ScreenType::VIRTUAL);
     screen->SetSourceMode(OHOS::Rosen::ScreenSourceMode::SCREEN_EXTEND);
+    screen->SetIsInUse(true);
     EXPECT_FALSE(pointerDrawingManager.ShouldSkipScreen(screen));
+}
+
+/**
+ * @tc.name: ShouldSkipScreen_ScreenAlone
+ * @tc.desc: Test ShouldSkipScreen function.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerTest, ShouldSkipScreen_ScreenAlone, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerDrawingManager pointerDrawingManager;
+
+    sptr<OHOS::Rosen::ScreenInfo> screen = new OHOS::Rosen::ScreenInfo();
+    ASSERT_NE(screen, nullptr);
+    screen->SetRsId(1);
+    screen->SetType(OHOS::Rosen::ScreenType::REAL);
+    screen->SetSourceMode(OHOS::Rosen::ScreenSourceMode::SCREEN_ALONE);
+    screen->SetIsInUse(true);
+
+    EXPECT_TRUE(pointerDrawingManager.ShouldSkipScreen(screen));
+}
+
+/**
+ * @tc.name: ShouldSkipScreen_ScreenAlone
+ * @tc.desc: Test ShouldSkipScreen function.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerTest, ShouldSkipScreen_ScreenUnique, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerDrawingManager pointerDrawingManager;
+
+    sptr<OHOS::Rosen::ScreenInfo> screen = new OHOS::Rosen::ScreenInfo();
+    ASSERT_NE(screen, nullptr);
+    screen->SetRsId(2);
+    screen->SetType(OHOS::Rosen::ScreenType::REAL);
+    screen->SetSourceMode(OHOS::Rosen::ScreenSourceMode::SCREEN_UNIQUE);
+    screen->SetIsInUse(true);
+
+    EXPECT_TRUE(pointerDrawingManager.ShouldSkipScreen(screen));
+}
+
+/**
+ * @tc.name: ShouldSkipScreen_NotInUse
+ * @tc.desc: Test ShouldSkipScreen function.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerTest, ShouldSkipScreen_NotInUse, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerDrawingManager pointerDrawingManager;
+
+    sptr<OHOS::Rosen::ScreenInfo> screen = new OHOS::Rosen::ScreenInfo();
+    ASSERT_NE(screen, nullptr);
+    screen->SetRsId(3);
+    screen->SetType(OHOS::Rosen::ScreenType::REAL);
+    screen->SetSourceMode(OHOS::Rosen::ScreenSourceMode::SCREEN_MAIN);
+    screen->SetIsInUse(false);
+
+    EXPECT_TRUE(pointerDrawingManager.ShouldSkipScreen(screen));
+}
+
+/**
+ * @tc.name: ShouldSkipScreen_NormalCase
+ * @tc.desc: Test ShouldSkipScreen function.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerTest, ShouldSkipScreen_NormalCase, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerDrawingManager pointerDrawingManager;
+
+    sptr<OHOS::Rosen::ScreenInfo> screen = new OHOS::Rosen::ScreenInfo();
+    ASSERT_NE(screen, nullptr);
+    screen->SetRsId(4);
+    screen->SetType(OHOS::Rosen::ScreenType::REAL);
+    screen->SetSourceMode(OHOS::Rosen::ScreenSourceMode::SCREEN_MAIN);
+    screen->SetIsInUse(true);
+
+    EXPECT_FALSE(pointerDrawingManager.ShouldSkipScreen(screen));
+}
+
+/**
+ * @tc.name: SetMainScreenTargetDevice_NullScreen
+ * @tc.desc: Test SetMainScreenTargetDevice function.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerTest, SetMainScreenTargetDevice_NullScreen, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerDrawingManager pointerDrawingManager;
+    ASSERT_NE(pointerDrawingManager.hardwareCursorPointerManager_, nullptr);
+
+    std::vector<sptr<OHOS::Rosen::ScreenInfo>> screens;
+    screens.push_back(nullptr);
+
+    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.SetMainScreenTargetDevice(screens));
+}
+
+/**
+ * @tc.name: SetMainScreenTargetDevice_NotMainScreen
+ * @tc.desc: Test SetMainScreenTargetDevice function.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerTest, SetMainScreenTargetDevice_NotMainScreen, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerDrawingManager pointerDrawingManager;
+    ASSERT_NE(pointerDrawingManager.hardwareCursorPointerManager_, nullptr);
+
+    std::vector<sptr<OHOS::Rosen::ScreenInfo>> screens;
+    sptr<OHOS::Rosen::ScreenInfo> screen = new OHOS::Rosen::ScreenInfo();
+    ASSERT_NE(screen, nullptr);
+    screen->SetRsId(1);
+    screen->SetType(OHOS::Rosen::ScreenType::REAL);
+    screen->SetSourceMode(OHOS::Rosen::ScreenSourceMode::SCREEN_MIRROR);
+    screen->SetIsInUse(true);
+    screens.push_back(screen);
+
+    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.SetMainScreenTargetDevice(screens));
+}
+
+/**
+ * @tc.name: SetMainScreenTargetDevice_NotInUse
+ * @tc.desc: Test SetMainScreenTargetDevice function.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerTest, SetMainScreenTargetDevice_NotInUse, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerDrawingManager pointerDrawingManager;
+    ASSERT_NE(pointerDrawingManager.hardwareCursorPointerManager_, nullptr);
+
+    std::vector<sptr<OHOS::Rosen::ScreenInfo>> screens;
+    sptr<OHOS::Rosen::ScreenInfo> screen = new OHOS::Rosen::ScreenInfo();
+    ASSERT_NE(screen, nullptr);
+    screen->SetRsId(1);
+    screen->SetType(OHOS::Rosen::ScreenType::REAL);
+    screen->SetSourceMode(OHOS::Rosen::ScreenSourceMode::SCREEN_MAIN);
+    screen->SetIsInUse(false);
+    screens.push_back(screen);
+
+    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.SetMainScreenTargetDevice(screens));
+}
+
+/**
+ * @tc.name: SetMainScreenTargetDevice_Success
+ * @tc.desc: Test SetMainScreenTargetDevice function.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerTest, SetMainScreenTargetDevice_Success, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerDrawingManager pointerDrawingManager;
+    ASSERT_NE(pointerDrawingManager.hardwareCursorPointerManager_, nullptr);
+
+    std::vector<sptr<OHOS::Rosen::ScreenInfo>> screens;
+    sptr<OHOS::Rosen::ScreenInfo> screen = new OHOS::Rosen::ScreenInfo();
+    ASSERT_NE(screen, nullptr);
+    screen->SetRsId(1);
+    screen->SetType(OHOS::Rosen::ScreenType::REAL);
+    screen->SetSourceMode(OHOS::Rosen::ScreenSourceMode::SCREEN_MAIN);
+    screen->SetIsInUse(true);
+    screens.push_back(screen);
+
+    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.SetMainScreenTargetDevice(screens));
+}
+
+/**
+ * @tc.name: SetMainScreenTargetDevice_MultipleScreens
+ * @tc.desc: Test SetMainScreenTargetDevice function.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerTest, SetMainScreenTargetDevice_MultipleScreens, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerDrawingManager pointerDrawingManager;
+    ASSERT_NE(pointerDrawingManager.hardwareCursorPointerManager_, nullptr);
+
+    std::vector<sptr<OHOS::Rosen::ScreenInfo>> screens;
+    
+    sptr<OHOS::Rosen::ScreenInfo> mirrorScreen = new OHOS::Rosen::ScreenInfo();
+    ASSERT_NE(mirrorScreen, nullptr);
+    mirrorScreen->SetRsId(2);
+    mirrorScreen->SetType(OHOS::Rosen::ScreenType::REAL);
+    mirrorScreen->SetSourceMode(OHOS::Rosen::ScreenSourceMode::SCREEN_MIRROR);
+    mirrorScreen->SetIsInUse(true);
+    screens.push_back(mirrorScreen);
+
+    sptr<OHOS::Rosen::ScreenInfo> mainScreen = new OHOS::Rosen::ScreenInfo();
+    ASSERT_NE(mainScreen, nullptr);
+    mainScreen->SetRsId(1);
+    mainScreen->SetType(OHOS::Rosen::ScreenType::REAL);
+    mainScreen->SetSourceMode(OHOS::Rosen::ScreenSourceMode::SCREEN_MAIN);
+    mainScreen->SetIsInUse(true);
+    screens.push_back(mainScreen);
+
+    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.SetMainScreenTargetDevice(screens));
 }
 
 /**
@@ -3709,6 +3917,7 @@ HWTEST_F(PointerDrawingManagerTest, UpdateScreenPointerAndFindMainScreenInfo_003
     screen->SetRsId(0);
     screen->SetType(OHOS::Rosen::ScreenType::REAL);
     screen->SetSourceMode(OHOS::Rosen::ScreenSourceMode::SCREEN_MAIN);
+    screen->SetIsInUse(true);
     screens.push_back(screen);
 
     auto mainScreen = pointerDrawingManager.UpdateScreenPointerAndFindMainScreenInfo(screens);
@@ -3733,6 +3942,7 @@ HWTEST_F(PointerDrawingManagerTest, UpdateScreenPointerAndFindMainScreenInfo_004
     screen->SetRsId(0);
     screen->SetType(OHOS::Rosen::ScreenType::REAL);
     screen->SetSourceMode(OHOS::Rosen::ScreenSourceMode::SCREEN_MAIN);
+    screen->SetIsInUse(true);
     screens.push_back(screen);
 
     auto sp = std::make_shared<ScreenPointer>(nullptr, nullptr, pointerDrawingManager.displayInfo_);
@@ -3761,6 +3971,7 @@ HWTEST_F(PointerDrawingManagerTest, UpdateScreenPointerAndFindMainScreenInfo_005
     screen1->SetRsId(0);
     screen1->SetType(OHOS::Rosen::ScreenType::REAL);
     screen1->SetSourceMode(OHOS::Rosen::ScreenSourceMode::SCREEN_MAIN);
+    screen1->SetIsInUse(true);
     screens.push_back(screen1);
 
     sptr<OHOS::Rosen::ScreenInfo> screen2 = new OHOS::Rosen::ScreenInfo();
@@ -3768,6 +3979,7 @@ HWTEST_F(PointerDrawingManagerTest, UpdateScreenPointerAndFindMainScreenInfo_005
     screen2->SetRsId(1);
     screen2->SetType(OHOS::Rosen::ScreenType::VIRTUAL);
     screen2->SetSourceMode(OHOS::Rosen::ScreenSourceMode::SCREEN_EXTEND);
+    screen2->SetIsInUse(true);
     screens.push_back(screen2);
 
     auto sp1 = std::make_shared<ScreenPointer>(nullptr, nullptr, pointerDrawingManager.displayInfo_);
@@ -3803,6 +4015,7 @@ HWTEST_F(PointerDrawingManagerTest, UpdateScreenPointerAndFindMainScreenInfo_006
     screen->SetRsId(0);
     screen->SetType(OHOS::Rosen::ScreenType::REAL);
     screen->SetSourceMode(OHOS::Rosen::ScreenSourceMode::SCREEN_MAIN);
+    screen->SetIsInUse(true);
     screens.push_back(screen);
 
     auto sp1 = std::make_shared<ScreenPointer>(nullptr, nullptr, pointerDrawingManager.displayInfo_);
