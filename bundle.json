@@ -117,6 +117,7 @@
         "runtime_core",
         "libinput",
 	      "libuv",
+        "node",
         "os_account",
         "openssl",
         "zlib",

@@ -178,6 +178,7 @@ ohos_unittest("TouchEventNormalizeTest") {
     "image_framework:image_native",
     "image_framework:pixelmap",
     "napi:ace_napi",
+    "node:node_header_notice",
     "icu:shared_icuuc",
   ]
 }
@@ -334,6 +335,7 @@ ohos_unittest("GestureTransformTest") {
     "init:libbegetutil",
     "ipc:ipc_single",
     "napi:ace_napi",
+    "node:node_header_notice",
     "preferences:native_preferences",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
@@ -486,6 +488,7 @@ ohos_unittest("TabletToolTransformTest") {
     "init:libbegetutil",
     "ipc:ipc_single",
     "napi:ace_napi",
+    "node:node_header_notice",
     "preferences:native_preferences",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
@@ -680,6 +683,7 @@ ohos_unittest("TouchTransformProcessorTestWithMock") {
     "init:libbegetutil",
     "ipc:ipc_single",
     "napi:ace_napi",
+    "node:node_header_notice",
     "preferences:native_preferences",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
@@ -844,6 +848,7 @@ ohos_unittest("TouchpadGestureTest") {
     "init:libbegetutil",
     "ipc:ipc_single",
     "napi:ace_napi",
+    "node:node_header_notice",
     "preferences:native_preferences",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
@@ -1001,6 +1006,7 @@ ohos_unittest("TouchPadTransformProcessorMockTest") {
     "init:libbegetutil",
     "ipc:ipc_single",
     "napi:ace_napi",
+    "node:node_header_notice",
     "preferences:native_preferences",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
@@ -1086,6 +1092,7 @@ ohos_unittest("TouchGestureAdapterTest") {
     "image_framework:image_native",
     "image_framework:pixelmap",
     "napi:ace_napi",
+    "node:node_header_notice",
     "icu:shared_icuuc",
   ]
 
@@ -1156,6 +1163,7 @@ ohos_unittest("TouchGestureManagerTest") {
     "image_framework:image_native",
     "image_framework:pixelmap",
     "napi:ace_napi",
+    "node:node_header_notice",
     "icu:shared_icuuc",
   ]
 

@@ -1945,6 +1945,7 @@ ohos_unittest("InputWindowsManagerEXTest") {
     "init:libbegetutil",
     "ipc:ipc_single",
     "napi:ace_napi",
+    "node:node_header_notice",
     "preferences:native_preferences",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
@@ -3408,6 +3409,7 @@ ohos_unittest("ServerMsgHandlerTest") {
     "ipc:ipc_single",
     "libinput:libinput-third-mmi",
     "napi:ace_napi",
+    "node:node_header_notice",
     "preferences:native_preferences",
     "window_manager:libwm",
   ]
@@ -3749,6 +3751,7 @@ ohos_unittest("DelegateTaskTest") {
     "hilog:libhilog",
     "init:libbegetutil",
     "napi:ace_napi",
+    "node:node_header_notice",
   ]
 }
 

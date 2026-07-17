@@ -120,6 +120,7 @@ ohos_fuzztest("InjecteventSetPointerIdFuzzTest") {
     "ipc:ipc_single",
     "libinput:libinput-third-mmi",
     "napi:ace_napi",
+    "node:node_header_notice",
     "preferences:native_preferences",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",

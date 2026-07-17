@@ -173,6 +173,7 @@ ohos_unittest("ut-mmi-util-out") {
     "hilog:libhilog",
     "image_framework:image_native",
     "napi:ace_napi",
+    "node:node_header_notice",
   ]
 }
 
@@ -230,5 +231,6 @@ ohos_unittest("UdsClientTest") {
     "hilog:libhilog",
     "image_framework:image_native",
     "napi:ace_napi",
+    "node:node_header_notice",
   ]
 }

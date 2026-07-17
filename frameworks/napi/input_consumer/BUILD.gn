@@ -55,6 +55,8 @@ ohos_shared_library("inputconsumer") {
     "hilog:libhilog",
     "ipc:ipc_single",
     "napi:ace_napi",
+    "node:node_header_notice",
+    "libuv:uv",
   ]
 
   if (input_feature_api_metrics_histogram) {

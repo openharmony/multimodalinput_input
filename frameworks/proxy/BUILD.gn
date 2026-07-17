@@ -330,6 +330,7 @@ ohos_unittest("InputHandlerManagerTest") {
     "init:libbegetutil",
     "ipc:ipc_single",
     "napi:ace_napi",
+    "node:node_header_notice",
     "preferences:native_preferences",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
@@ -948,6 +949,7 @@ ohos_unittest("PointerEventNdkTest") {
     "image_framework:image_native",
     "image_framework:pixelmap",
     "napi:ace_napi",
+    "node:node_header_notice",
   ]
 
   if (enable_player_framework) {
