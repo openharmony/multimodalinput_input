@@ -485,6 +485,7 @@ int32_t MMIService::Init()
     SetRecvFun([this] (SessionPtr sess, NetPacket& pkt) {sMsgHandler_.OnMsgHandler(sess, pkt);});
     KeyMapMgr->GetConfigKeyValue("default_keymap", KeyMapMgr->GetDefaultKeyId());
     OHOS::system::SetParameter(INPUT_POINTER_DEVICES, "false");
+    AccountManager::GetInstance();
     if (!InitService()) {
         MMI_HILOGE("Saservice init failed");
         return SASERVICE_INIT_FAIL;
