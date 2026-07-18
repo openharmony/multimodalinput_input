@@ -168,19 +168,11 @@ void TripleFingerSnapshotManager::Dump(int32_t fd)
     if (impl == nullptr) {
         return;
     }
-    auto delegateProxy = GetDelegateProxy();
-    if (delegateProxy == nullptr) {
-        MMI_HILOGE("delegateProxy is nullptr");
-        return;
+    mprintf(fd, "Triple Finger Snapshot Info:\t");
+    for (const auto& [uid, enabled] : appPermissions_) {
+        mprintf(fd, "App uid:%d, enabled:%s\t", uid, enabled ? "true" : "false");
     }
-    delegateProxy->OnPostSyncTask([this, impl, fd] {
-        mprintf(fd, "Triple Finger Snapshot Info:\t");
-        for (const auto& [uid, enabled] : appPermissions_) {
-            mprintf(fd, "App uid:%d, enabled:%s\t", uid, enabled ? "true" : "false");
-        }
-        impl->Dump(fd);
-        return RET_OK;
-    });
+    impl->Dump(fd);
 }
 
 void TripleFingerSnapshotManager::SetDelegateProxy(std::shared_ptr<IDelegateInterface> proxy)
