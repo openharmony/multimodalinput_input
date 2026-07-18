@@ -156,18 +156,44 @@ inline std::shared_ptr<PointerEvent> MakeMouseMoveEvent(int32_t deviceId, int32_
 
 // Register a display group (one display + N windows) into the manager in one call.
 // Requires -Dprivate=public (test build) to reach UpdateDisplayInfo via the public API.
-inline void AddDisplayGroup(InputWindowsManager &mgr, int32_t groupId, GroupType type, int32_t focusWindowId,
+struct GroupHeader {
+    int32_t groupId = 0;
+    GroupType type = GroupType::GROUP_DEFAULT;
+    int32_t focusWindowId = 0;
+};
+
+inline void AddDisplayGroup(InputWindowsManager &mgr, const GroupHeader &hdr,
     const DisplaySpec &disp, const std::vector<WindowSpec> &wins)
 {
     OLD::DisplayGroupInfo group;
-    group.groupId = groupId;
-    group.type = type;
-    group.focusWindowId = focusWindowId;
+    group.groupId = hdr.groupId;
+    group.type = hdr.type;
+    group.focusWindowId = hdr.focusWindowId;
     group.displaysInfo.push_back(MakeDisplay(disp));
     for (const auto &w : wins) {
         group.windowsInfo.push_back(MakeWindow(w));
     }
     mgr.UpdateDisplayInfo(group);
+}
+
+// Append a display to an already-registered group in displayGroupInfoMap_ (private map, test build only).
+inline void AddDisplayToExistingGroup(InputWindowsManager &mgr, int32_t groupId, const DisplaySpec &disp)
+{
+    auto it = mgr.displayGroupInfoMap_.find(groupId);
+    if (it != mgr.displayGroupInfoMap_.end()) {
+        it->second.displaysInfo.push_back(MakeDisplay(disp));
+    }
+}
+
+// Seed windowsPerDisplayMap_[groupId][displayId] with a single-window WindowGroupInfo.
+inline void SetWindowsPerDisplay(InputWindowsManager &mgr, int32_t groupId, int32_t displayId,
+    int32_t focusWindowId, const WindowInfo &win)
+{
+    WindowGroupInfo wgInfo;
+    wgInfo.displayId = displayId;
+    wgInfo.focusWindowId = focusWindowId;
+    wgInfo.windowsInfo.push_back(win);
+    mgr.windowsPerDisplayMap_[groupId] = {{displayId, wgInfo}};
 }
 
 // Bind a device to a display via the runtime bindInfo_ + BindDeviceToDisplayGroupByDisplay path.
@@ -20027,11 +20053,8 @@ HWTEST_F(InputWindowsManagerTest, HardCursor_TwoGroups_NoStateOverwrite_001, Tes
     constexpr int32_t mainDisplayId = 1;
 
     // Set up main group
-    auto mainIt = mgr.displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
-    if (mainIt != mgr.displayGroupInfoMap_.end()) {
-        mainIt->second.displaysInfo.push_back(MakeDisplay({.id = mainDisplayId, .width = 1920, .height = 1080,
-            .validWidth = 1920, .validHeight = 1080}));
-    }
+    AddDisplayToExistingGroup(mgr, DEFAULT_GROUP_ID, {.id = mainDisplayId, .width = 1920, .height = 1080,
+        .validWidth = 1920, .validHeight = 1080});
 
     // Set up group A and group B (display-only, inserted directly)
     InsertGroupWithDisplay(mgr, groupA, {.id = displayAConst, .width = 1920, .height = 1080,
@@ -20170,13 +20193,13 @@ HWTEST_F(InputWindowsManagerTest, DualMouse_BoundIsolation_PositionAndStyle_001,
     constexpr int32_t windowB = 60;
 
     // Set up main group (group A = 0)
-    AddDisplayGroup(*mgr, groupA, GroupType::GROUP_DEFAULT, windowA,
+    AddDisplayGroup(*mgr, {groupA, GroupType::GROUP_DEFAULT, windowA},
         {.id = displayA, .width = 1920, .height = 1080, .validWidth = 1920, .validHeight = 1080, .dpi = 240,
          .name = "main", .uniq = "main0", .direction = DIRECTION0},
         {{.id = windowA, .pid = 100, .agentWindowId = windowA, .area = {0, 0, 1920, 1080}}});
 
     // Set up secondary group (group B = 5)
-    AddDisplayGroup(*mgr, groupB, GroupType::GROUP_SPECIAL, windowB,
+    AddDisplayGroup(*mgr, {groupB, GroupType::GROUP_SPECIAL, windowB},
         {.id = displayB, .width = 1280, .height = 720, .validWidth = 1280, .validHeight = 720, .dpi = 160,
          .name = "ext", .uniq = "ext0", .direction = DIRECTION0},
         {{.id = windowB, .pid = 200, .agentWindowId = windowB, .area = {0, 0, 1280, 720}}});
@@ -20435,7 +20458,7 @@ HWTEST_F(InputWindowsManagerTest, DualKeyboard_BoundIsolation_IndependentFocus_0
     constexpr int32_t focusWinB = 200;
 
     // Set up group A (main)
-    AddDisplayGroup(*mgr, groupA, GroupType::GROUP_DEFAULT, focusWinA,
+    AddDisplayGroup(*mgr, {groupA, GroupType::GROUP_DEFAULT, focusWinA},
         {.id = displayA, .width = 1920, .height = 1080, .validWidth = 1920, .validHeight = 1080, .dpi = 240,
          .name = "main", .uniq = "main0", .direction = DIRECTION0},
         {{.id = focusWinA, .pid = 10, .agentWindowId = focusWinA, .agentPid = 10}});
@@ -20454,11 +20477,7 @@ HWTEST_F(InputWindowsManagerTest, DualKeyboard_BoundIsolation_IndependentFocus_0
     mgr->UpdateDisplayInfo(secGroup);
 
     // Set up windowsPerDisplayMap_ for group B's display
-    WindowGroupInfo wgInfo;
-    wgInfo.displayId = displayB;
-    wgInfo.focusWindowId = focusWinB;
-    wgInfo.windowsInfo.push_back(winB);
-    mgr->windowsPerDisplayMap_[groupB] = {{displayB, wgInfo}};
+    SetWindowsPerDisplay(*mgr, groupB, displayB, focusWinB, winB);
 
     // Bind keyboards
     mgr->bindInfo_.AddRuntimeBinding(kbdA, displayA, groupA);
