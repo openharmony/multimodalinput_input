@@ -17378,59 +17378,59 @@ HWTEST_F(InputWindowsManagerTest, HandleKeyEventWindowId_BoundKeyboard_UsesBindG
     CALL_TEST_DEBUG;
     InputWindowsManager mgr;
 
-    constexpr int32_t BOUND_GROUP_ID = 3;
-    constexpr int32_t BOUND_DISPLAY_ID = 10;
-    constexpr int32_t DEFAULT_FOCUS_WIN = 100;
-    constexpr int32_t BOUND_FOCUS_WIN = 200;
-    constexpr int32_t DEVICE_ID = 42;
+    constexpr int32_t boundGroupId = 3;
+    constexpr int32_t boundDisplayId = 10;
+    constexpr int32_t defaultFocusWin = 100;
+    constexpr int32_t boundFocusWin = 200;
+    constexpr int32_t deviceId = 42;
 
     // Set up default group (group 0) with focus window 100
     auto it = mgr.displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
     ASSERT_NE(it, mgr.displayGroupInfoMap_.end());
-    it->second.focusWindowId = DEFAULT_FOCUS_WIN;
+    it->second.focusWindowId = defaultFocusWin;
     WindowInfo defaultWin;
-    defaultWin.id = DEFAULT_FOCUS_WIN;
+    defaultWin.id = defaultFocusWin;
     defaultWin.pid = 1;
-    defaultWin.agentWindowId = DEFAULT_FOCUS_WIN;
+    defaultWin.agentWindowId = defaultFocusWin;
     it->second.windowsInfo.push_back(defaultWin);
 
     // Set up bound group (group 3) with focus window 200
     OLD::DisplayGroupInfo boundGroupInfo;
-    boundGroupInfo.groupId = BOUND_GROUP_ID;
-    boundGroupInfo.focusWindowId = BOUND_FOCUS_WIN;
+    boundGroupInfo.groupId = boundGroupId;
+    boundGroupInfo.focusWindowId = boundFocusWin;
     boundGroupInfo.type = GroupType::GROUP_SPECIAL;
     OLD::DisplayInfo boundDisplay;
-    boundDisplay.id = BOUND_DISPLAY_ID;
+    boundDisplay.id = boundDisplayId;
     boundGroupInfo.displaysInfo.push_back(boundDisplay);
     WindowInfo boundWin;
-    boundWin.id = BOUND_FOCUS_WIN;
+    boundWin.id = boundFocusWin;
     boundWin.pid = 2;
-    boundWin.agentWindowId = BOUND_FOCUS_WIN;
+    boundWin.agentWindowId = boundFocusWin;
     boundGroupInfo.windowsInfo.push_back(boundWin);
-    mgr.displayGroupInfoMap_[BOUND_GROUP_ID] = boundGroupInfo;
+    mgr.displayGroupInfoMap_[boundGroupId] = boundGroupInfo;
 
     // Set up windowsPerDisplayMap_ for the bound group's display
     WindowGroupInfo wgInfo;
-    wgInfo.displayId = BOUND_DISPLAY_ID;
-    wgInfo.focusWindowId = BOUND_FOCUS_WIN;
+    wgInfo.displayId = boundDisplayId;
+    wgInfo.focusWindowId = boundFocusWin;
     wgInfo.windowsInfo.push_back(boundWin);
     std::map<int32_t, WindowGroupInfo> boundMap;
-    boundMap[BOUND_DISPLAY_ID] = wgInfo;
-    mgr.windowsPerDisplayMap_[BOUND_GROUP_ID] = boundMap;
+    boundMap[boundDisplayId] = wgInfo;
+    mgr.windowsPerDisplayMap_[boundGroupId] = boundMap;
 
     // Bind device 42 to group 3
-    mgr.bindInfo_.AddRuntimeBinding(DEVICE_ID, BOUND_DISPLAY_ID, BOUND_GROUP_ID);
+    mgr.bindInfo_.AddRuntimeBinding(deviceId, boundDisplayId, boundGroupId);
 
     // Create key event from bound device
     auto keyEvent = KeyEvent::Create();
     ASSERT_NE(keyEvent, nullptr);
-    keyEvent->SetDeviceId(DEVICE_ID);
-    keyEvent->SetTargetDisplayId(BOUND_DISPLAY_ID);
+    keyEvent->SetDeviceId(deviceId);
+    keyEvent->SetTargetDisplayId(boundDisplayId);
 
     mgr.HandleKeyEventWindowId(keyEvent);
 
     // Key event should target the BOUND group's focus window, not the default
-    EXPECT_EQ(keyEvent->GetTargetWindowId(), BOUND_FOCUS_WIN);
+    EXPECT_EQ(keyEvent->GetTargetWindowId(), boundFocusWin);
 }
 
 /**
@@ -17444,30 +17444,30 @@ HWTEST_F(InputWindowsManagerTest, HandleKeyEventWindowId_UnboundKeyboard_UsesDef
     CALL_TEST_DEBUG;
     InputWindowsManager mgr;
 
-    constexpr int32_t DEFAULT_FOCUS_WIN = 100;
-    constexpr int32_t UNBOUND_DEVICE = 77;
+    constexpr int32_t defaultFocusWin = 100;
+    constexpr int32_t unboundDevice = 77;
 
     // Set up default group with focus window
     auto it = mgr.displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
     ASSERT_NE(it, mgr.displayGroupInfoMap_.end());
-    it->second.focusWindowId = DEFAULT_FOCUS_WIN;
+    it->second.focusWindowId = defaultFocusWin;
     WindowInfo defaultWin;
-    defaultWin.id = DEFAULT_FOCUS_WIN;
+    defaultWin.id = defaultFocusWin;
     defaultWin.pid = 1;
-    defaultWin.agentWindowId = DEFAULT_FOCUS_WIN;
+    defaultWin.agentWindowId = defaultFocusWin;
     it->second.windowsInfo.push_back(defaultWin);
 
     // No runtime binding for device 77
 
     auto keyEvent = KeyEvent::Create();
     ASSERT_NE(keyEvent, nullptr);
-    keyEvent->SetDeviceId(UNBOUND_DEVICE);
+    keyEvent->SetDeviceId(unboundDevice);
     keyEvent->SetTargetDisplayId(-1);
 
     mgr.HandleKeyEventWindowId(keyEvent);
 
     // Should use default group's focus window
-    EXPECT_EQ(keyEvent->GetTargetWindowId(), DEFAULT_FOCUS_WIN);
+    EXPECT_EQ(keyEvent->GetTargetWindowId(), defaultFocusWin);
 }
 
 /**
@@ -17481,58 +17481,58 @@ HWTEST_F(InputWindowsManagerTest, GetPidAndUpdateTarget_BoundKeyboard_UsesBoundG
     CALL_TEST_DEBUG;
     InputWindowsManager mgr;
 
-    constexpr int32_t BOUND_GROUP_ID = 5;
-    constexpr int32_t BOUND_DISPLAY_ID = 20;
-    constexpr int32_t DEFAULT_FOCUS_WIN = 300;
-    constexpr int32_t BOUND_FOCUS_WIN = 400;
-    constexpr int32_t DEVICE_ID = 55;
-    constexpr int32_t BOUND_WIN_PID = 10;
+    constexpr int32_t boundGroupId = 5;
+    constexpr int32_t boundDisplayId = 20;
+    constexpr int32_t defaultFocusWin = 300;
+    constexpr int32_t boundFocusWin = 400;
+    constexpr int32_t deviceId = 55;
+    constexpr int32_t boundWinPid = 10;
 
     // Set up default group with different focus window
     auto it = mgr.displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
     ASSERT_NE(it, mgr.displayGroupInfoMap_.end());
-    it->second.focusWindowId = DEFAULT_FOCUS_WIN;
+    it->second.focusWindowId = defaultFocusWin;
 
     // Set up bound group
     OLD::DisplayGroupInfo boundGroupInfo;
-    boundGroupInfo.groupId = BOUND_GROUP_ID;
-    boundGroupInfo.focusWindowId = BOUND_FOCUS_WIN;
+    boundGroupInfo.groupId = boundGroupId;
+    boundGroupInfo.focusWindowId = boundFocusWin;
     boundGroupInfo.type = GroupType::GROUP_SPECIAL;
     OLD::DisplayInfo boundDisplay;
-    boundDisplay.id = BOUND_DISPLAY_ID;
+    boundDisplay.id = boundDisplayId;
     boundGroupInfo.displaysInfo.push_back(boundDisplay);
     WindowInfo boundWin;
-    boundWin.id = BOUND_FOCUS_WIN;
-    boundWin.pid = BOUND_WIN_PID;
-    boundWin.agentPid = BOUND_WIN_PID;
-    boundWin.agentWindowId = BOUND_FOCUS_WIN;
+    boundWin.id = boundFocusWin;
+    boundWin.pid = boundWinPid;
+    boundWin.agentPid = boundWinPid;
+    boundWin.agentWindowId = boundFocusWin;
     boundGroupInfo.windowsInfo.push_back(boundWin);
-    mgr.displayGroupInfoMap_[BOUND_GROUP_ID] = boundGroupInfo;
+    mgr.displayGroupInfoMap_[boundGroupId] = boundGroupInfo;
 
     // Set up windowsPerDisplayMap_ for the bound group's display
     WindowGroupInfo wgInfo;
-    wgInfo.displayId = BOUND_DISPLAY_ID;
-    wgInfo.focusWindowId = BOUND_FOCUS_WIN;
+    wgInfo.displayId = boundDisplayId;
+    wgInfo.focusWindowId = boundFocusWin;
     wgInfo.windowsInfo.push_back(boundWin);
     std::map<int32_t, WindowGroupInfo> boundMap;
-    boundMap[BOUND_DISPLAY_ID] = wgInfo;
-    mgr.windowsPerDisplayMap_[BOUND_GROUP_ID] = boundMap;
+    boundMap[boundDisplayId] = wgInfo;
+    mgr.windowsPerDisplayMap_[boundGroupId] = boundMap;
 
     // Bind device
-    mgr.bindInfo_.AddRuntimeBinding(DEVICE_ID, BOUND_DISPLAY_ID, BOUND_GROUP_ID);
+    mgr.bindInfo_.AddRuntimeBinding(deviceId, boundDisplayId, boundGroupId);
 
     // Create key event from bound device
     auto keyEvent = KeyEvent::Create();
     ASSERT_NE(keyEvent, nullptr);
-    keyEvent->SetDeviceId(DEVICE_ID);
-    keyEvent->SetTargetDisplayId(BOUND_DISPLAY_ID);
+    keyEvent->SetDeviceId(deviceId);
+    keyEvent->SetTargetDisplayId(boundDisplayId);
 
     auto result = mgr.GetPidAndUpdateTarget(keyEvent);
 
     // Should resolve to bound group's focus window PID
     ASSERT_FALSE(result.empty());
-    EXPECT_EQ(result[0].second.id, BOUND_FOCUS_WIN);
-    EXPECT_EQ(result[0].first, BOUND_WIN_PID);
+    EXPECT_EQ(result[0].second.id, boundFocusWin);
+    EXPECT_EQ(result[0].first, boundWinPid);
 }
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 
@@ -17547,24 +17547,24 @@ HWTEST_F(InputWindowsManagerTest, GetDisplayId_BoundDevice_ResolvesBoundDisplay_
     CALL_TEST_DEBUG;
     InputWindowsManager mgr;
 
-    constexpr int32_t DEVICE_ID = 60;
-    constexpr int32_t BOUND_DISPLAY_ID = 15;
-    constexpr int32_t BOUND_GROUP_ID = 4;
+    constexpr int32_t deviceId = 60;
+    constexpr int32_t boundDisplayId = 15;
+    constexpr int32_t boundGroupId = 4;
 
     // Bind device to a specific display
-    mgr.bindInfo_.AddRuntimeBinding(DEVICE_ID, BOUND_DISPLAY_ID, BOUND_GROUP_ID);
+    mgr.bindInfo_.AddRuntimeBinding(deviceId, boundDisplayId, boundGroupId);
 
     // Create an input event with no target display (displayId < 0)
     auto inputEvent = InputEvent::Create();
     ASSERT_NE(inputEvent, nullptr);
-    inputEvent->SetDeviceId(DEVICE_ID);
+    inputEvent->SetDeviceId(deviceId);
     inputEvent->SetTargetDisplayId(-1);
 
     int32_t displayId = mgr.GetDisplayId(inputEvent);
 
     // Should resolve to the bound display
-    EXPECT_EQ(displayId, BOUND_DISPLAY_ID);
-    EXPECT_EQ(inputEvent->GetTargetDisplayId(), BOUND_DISPLAY_ID);
+    EXPECT_EQ(displayId, boundDisplayId);
+    EXPECT_EQ(inputEvent->GetTargetDisplayId(), boundDisplayId);
 }
 
 /**
@@ -17578,13 +17578,13 @@ HWTEST_F(InputWindowsManagerTest, GetDisplayId_UnboundDevice_FallsBackToDefault_
     CALL_TEST_DEBUG;
     InputWindowsManager mgr;
 
-    constexpr int32_t DEFAULT_DISPLAY_ID = 1;
+    constexpr int32_t defaultDisplayId = 1;
 
     // Set up default group with a display
     auto it = mgr.displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
     ASSERT_NE(it, mgr.displayGroupInfoMap_.end());
     OLD::DisplayInfo display;
-    display.id = DEFAULT_DISPLAY_ID;
+    display.id = defaultDisplayId;
     it->second.displaysInfo.push_back(display);
 
     // Create input event with no target display, no binding
@@ -17596,7 +17596,7 @@ HWTEST_F(InputWindowsManagerTest, GetDisplayId_UnboundDevice_FallsBackToDefault_
     int32_t displayId = mgr.GetDisplayId(inputEvent);
 
     // Should fall back to the default group's display
-    EXPECT_EQ(displayId, DEFAULT_DISPLAY_ID);
+    EXPECT_EQ(displayId, defaultDisplayId);
 }
 
 /**
@@ -18017,52 +18017,52 @@ HWTEST_F(InputWindowsManagerTest, TouchpadGroupRouting_BoundSwipeUsesBoundGroup_
     CALL_TEST_DEBUG;
     InputWindowsManager mgr;
 
-    constexpr int32_t DEVICE_ID = 42;
-    constexpr int32_t BOUND_GROUP_ID = 3;
-    constexpr int32_t BOUND_DISPLAY_ID = 10;
-    constexpr int32_t DEFAULT_FOCUS_WIN = 100;
-    constexpr int32_t BOUND_FOCUS_WIN = 200;
+    constexpr int32_t deviceId = 42;
+    constexpr int32_t boundGroupId = 3;
+    constexpr int32_t boundDisplayId = 10;
+    constexpr int32_t defaultFocusWin = 100;
+    constexpr int32_t boundFocusWin = 200;
 
     // Set up default group with focus window
     auto it = mgr.displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
     ASSERT_NE(it, mgr.displayGroupInfoMap_.end());
-    it->second.focusWindowId = DEFAULT_FOCUS_WIN;
+    it->second.focusWindowId = defaultFocusWin;
 
     // Set up bound group with its own focus window
     OLD::DisplayGroupInfo boundGroupInfo;
-    boundGroupInfo.groupId = BOUND_GROUP_ID;
-    boundGroupInfo.focusWindowId = BOUND_FOCUS_WIN;
+    boundGroupInfo.groupId = boundGroupId;
+    boundGroupInfo.focusWindowId = boundFocusWin;
     boundGroupInfo.type = GroupType::GROUP_SPECIAL;
     OLD::DisplayInfo boundDisplay;
-    boundDisplay.id = BOUND_DISPLAY_ID;
+    boundDisplay.id = boundDisplayId;
     boundGroupInfo.displaysInfo.push_back(boundDisplay);
     WindowInfo boundWin;
-    boundWin.id = BOUND_FOCUS_WIN;
+    boundWin.id = boundFocusWin;
     boundWin.pid = 10;
-    boundWin.agentWindowId = BOUND_FOCUS_WIN;
-    boundWin.displayId = BOUND_DISPLAY_ID;
+    boundWin.agentWindowId = boundFocusWin;
+    boundWin.displayId = boundDisplayId;
     boundGroupInfo.windowsInfo.push_back(boundWin);
-    mgr.displayGroupInfoMap_[BOUND_GROUP_ID] = boundGroupInfo;
+    mgr.displayGroupInfoMap_[boundGroupId] = boundGroupInfo;
 
     // Set up windowsPerDisplayMap_ for the bound group's display
     WindowGroupInfo wgInfo;
-    wgInfo.displayId = BOUND_DISPLAY_ID;
-    wgInfo.focusWindowId = BOUND_FOCUS_WIN;
+    wgInfo.displayId = boundDisplayId;
+    wgInfo.focusWindowId = boundFocusWin;
     wgInfo.windowsInfo.push_back(boundWin);
     std::map<int32_t, WindowGroupInfo> boundMap;
-    boundMap[BOUND_DISPLAY_ID] = wgInfo;
-    mgr.windowsPerDisplayMap_[BOUND_GROUP_ID] = boundMap;
+    boundMap[boundDisplayId] = wgInfo;
+    mgr.windowsPerDisplayMap_[boundGroupId] = boundMap;
 
     // Bind touchpad device to the bound group
-    mgr.bindInfo_.AddRuntimeBinding(DEVICE_ID, BOUND_DISPLAY_ID, BOUND_GROUP_ID);
+    mgr.bindInfo_.AddRuntimeBinding(deviceId, boundDisplayId, boundGroupId);
 
     // Create a touchpad swipe gesture event
     auto pointerEvent = PointerEvent::Create();
     ASSERT_NE(pointerEvent, nullptr);
-    pointerEvent->SetDeviceId(DEVICE_ID);
+    pointerEvent->SetDeviceId(deviceId);
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHPAD);
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_SWIPE_BEGIN);
-    pointerEvent->SetTargetDisplayId(BOUND_DISPLAY_ID);
+    pointerEvent->SetTargetDisplayId(boundDisplayId);
     pointerEvent->SetPointerId(0);
     PointerEvent::PointerItem item;
     item.SetPointerId(0);
@@ -18074,7 +18074,7 @@ HWTEST_F(InputWindowsManagerTest, TouchpadGroupRouting_BoundSwipeUsesBoundGroup_
     EXPECT_EQ(ret, RET_OK);
 
     // The event should be targeted to the BOUND group's focus window
-    EXPECT_EQ(pointerEvent->GetTargetWindowId(), BOUND_FOCUS_WIN)
+    EXPECT_EQ(pointerEvent->GetTargetWindowId(), boundFocusWin)
         << "Bound touchpad gesture should route to bound group's focus window";
 
     // Source type should remain TOUCHPAD (not converted to MOUSE)
@@ -18094,47 +18094,47 @@ HWTEST_F(InputWindowsManagerTest, TouchpadGroupRouting_UnboundTouchpadUsesDefaul
     CALL_TEST_DEBUG;
     InputWindowsManager mgr;
 
-    constexpr int32_t UNBOUND_DEVICE = 77;
-    constexpr int32_t DEFAULT_FOCUS_WIN = 100;
-    constexpr int32_t DEFAULT_DISPLAY_ID = 0;
+    constexpr int32_t unboundDevice = 77;
+    constexpr int32_t defaultFocusWin = 100;
+    constexpr int32_t defaultDisplayId = 0;
 
     // Set up default group with focus window and a window matching that focus
     auto it = mgr.displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
     ASSERT_NE(it, mgr.displayGroupInfoMap_.end());
-    it->second.focusWindowId = DEFAULT_FOCUS_WIN;
+    it->second.focusWindowId = defaultFocusWin;
     OLD::DisplayInfo defaultDisplay;
-    defaultDisplay.id = DEFAULT_DISPLAY_ID;
+    defaultDisplay.id = defaultDisplayId;
     it->second.displaysInfo.push_back(defaultDisplay);
     WindowInfo defaultWin;
-    defaultWin.id = DEFAULT_FOCUS_WIN;
+    defaultWin.id = defaultFocusWin;
     defaultWin.pid = 1;
-    defaultWin.agentWindowId = DEFAULT_FOCUS_WIN;
-    defaultWin.displayId = DEFAULT_DISPLAY_ID;
+    defaultWin.agentWindowId = defaultFocusWin;
+    defaultWin.displayId = defaultDisplayId;
     it->second.windowsInfo.push_back(defaultWin);
 
     // Set up windowsPerDisplayMap_ for the default group
     WindowGroupInfo wgInfo;
-    wgInfo.displayId = DEFAULT_DISPLAY_ID;
-    wgInfo.focusWindowId = DEFAULT_FOCUS_WIN;
+    wgInfo.displayId = defaultDisplayId;
+    wgInfo.focusWindowId = defaultFocusWin;
     wgInfo.windowsInfo.push_back(defaultWin);
     std::map<int32_t, WindowGroupInfo> defaultMap;
-    defaultMap[DEFAULT_DISPLAY_ID] = wgInfo;
+    defaultMap[defaultDisplayId] = wgInfo;
     mgr.windowsPerDisplayMap_[DEFAULT_GROUP_ID] = defaultMap;
 
     // No runtime binding for this device
 
     // Verify ResolveGroupIdForDevice returns MAIN_GROUPID for unbound touchpad
-    int32_t groupId = mgr.ResolveGroupIdForDevice(UNBOUND_DEVICE);
+    int32_t groupId = mgr.ResolveGroupIdForDevice(unboundDevice);
     EXPECT_EQ(groupId, 0) <<
         "Unbound touchpad should resolve to MAIN_GROUPID";
 
     // Create a touchpad gesture event from unbound device
     auto pointerEvent = PointerEvent::Create();
     ASSERT_NE(pointerEvent, nullptr);
-    pointerEvent->SetDeviceId(UNBOUND_DEVICE);
+    pointerEvent->SetDeviceId(unboundDevice);
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHPAD);
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_SWIPE_BEGIN);
-    pointerEvent->SetTargetDisplayId(DEFAULT_DISPLAY_ID);
+    pointerEvent->SetTargetDisplayId(defaultDisplayId);
     pointerEvent->SetPointerId(0);
     PointerEvent::PointerItem item;
     item.SetPointerId(0);
@@ -18145,7 +18145,7 @@ HWTEST_F(InputWindowsManagerTest, TouchpadGroupRouting_UnboundTouchpadUsesDefaul
     EXPECT_EQ(ret, RET_OK);
 
     // Should route to default group's focus window
-    EXPECT_EQ(pointerEvent->GetTargetWindowId(), DEFAULT_FOCUS_WIN)
+    EXPECT_EQ(pointerEvent->GetTargetWindowId(), defaultFocusWin)
         << "Unbound touchpad gesture should route to default group's focus window";
 }
 
@@ -18163,7 +18163,7 @@ HWTEST_F(InputWindowsManagerTest, TouchpadGroupRouting_BoundPointerDerivedEventU
     auto mgr = std::make_shared<InputWindowsManager>();
     ASSERT_NE(mgr, nullptr);
 
-    constexpr int32_t TOUCHPAD_DEVICE_ID = 88;
+    constexpr int32_t touchpadDeviceId = 88;
 
     // Register main group
     OLD::DisplayGroupInfo mainGroup;
@@ -18204,13 +18204,13 @@ HWTEST_F(InputWindowsManagerTest, TouchpadGroupRouting_BoundPointerDerivedEventU
     mgr->UpdateDisplayInfo(secGroup);
 
     // Bind touchpad device to secondary group
-    mgr->bindInfo_.AddInputDevice(TOUCHPAD_DEVICE_ID, "touchpad0", "touchpad0");
+    mgr->bindInfo_.AddInputDevice(touchpadDeviceId, "touchpad0", "touchpad0");
     mgr->bindInfo_.AddDisplay(2, "secondary0");
     std::string msg;
-    mgr->BindDeviceToDisplayGroupByDisplay(TOUCHPAD_DEVICE_ID, 2, msg);
+    mgr->BindDeviceToDisplayGroupByDisplay(touchpadDeviceId, 2, msg);
 
     // Verify the touchpad device resolves to secondary group
-    int32_t resolvedGroupId = mgr->ResolveGroupIdForDevice(TOUCHPAD_DEVICE_ID);
+    int32_t resolvedGroupId = mgr->ResolveGroupIdForDevice(touchpadDeviceId);
     EXPECT_EQ(resolvedGroupId, 1) <<
         "Bound touchpad device should resolve to group 1";
 
@@ -18302,45 +18302,45 @@ HWTEST_F(InputWindowsManagerTest, TouchpadGroupRouting_SwipeEndBoundGroup_001, T
     CALL_TEST_DEBUG;
     InputWindowsManager mgr;
 
-    constexpr int32_t DEVICE_ID = 50;
-    constexpr int32_t BOUND_GROUP_ID = 2;
-    constexpr int32_t BOUND_DISPLAY_ID = 5;
-    constexpr int32_t BOUND_FOCUS_WIN = 300;
+    constexpr int32_t deviceId = 50;
+    constexpr int32_t boundGroupId = 2;
+    constexpr int32_t boundDisplayId = 5;
+    constexpr int32_t boundFocusWin = 300;
 
     // Set up bound group
     OLD::DisplayGroupInfo boundGroupInfo;
-    boundGroupInfo.groupId = BOUND_GROUP_ID;
-    boundGroupInfo.focusWindowId = BOUND_FOCUS_WIN;
+    boundGroupInfo.groupId = boundGroupId;
+    boundGroupInfo.focusWindowId = boundFocusWin;
     boundGroupInfo.type = GroupType::GROUP_SPECIAL;
     OLD::DisplayInfo boundDisplay;
-    boundDisplay.id = BOUND_DISPLAY_ID;
+    boundDisplay.id = boundDisplayId;
     boundGroupInfo.displaysInfo.push_back(boundDisplay);
     WindowInfo boundWin;
-    boundWin.id = BOUND_FOCUS_WIN;
+    boundWin.id = boundFocusWin;
     boundWin.pid = 20;
-    boundWin.agentWindowId = BOUND_FOCUS_WIN;
-    boundWin.displayId = BOUND_DISPLAY_ID;
+    boundWin.agentWindowId = boundFocusWin;
+    boundWin.displayId = boundDisplayId;
     boundGroupInfo.windowsInfo.push_back(boundWin);
-    mgr.displayGroupInfoMap_[BOUND_GROUP_ID] = boundGroupInfo;
+    mgr.displayGroupInfoMap_[boundGroupId] = boundGroupInfo;
 
     WindowGroupInfo wgInfo;
-    wgInfo.displayId = BOUND_DISPLAY_ID;
-    wgInfo.focusWindowId = BOUND_FOCUS_WIN;
+    wgInfo.displayId = boundDisplayId;
+    wgInfo.focusWindowId = boundFocusWin;
     wgInfo.windowsInfo.push_back(boundWin);
     std::map<int32_t, WindowGroupInfo> boundMap;
-    boundMap[BOUND_DISPLAY_ID] = wgInfo;
-    mgr.windowsPerDisplayMap_[BOUND_GROUP_ID] = boundMap;
+    boundMap[boundDisplayId] = wgInfo;
+    mgr.windowsPerDisplayMap_[boundGroupId] = boundMap;
 
     // Bind device
-    mgr.bindInfo_.AddRuntimeBinding(DEVICE_ID, BOUND_DISPLAY_ID, BOUND_GROUP_ID);
+    mgr.bindInfo_.AddRuntimeBinding(deviceId, boundDisplayId, boundGroupId);
 
     // Test SWIPE_UPDATE
     auto swipeUpdate = PointerEvent::Create();
     ASSERT_NE(swipeUpdate, nullptr);
-    swipeUpdate->SetDeviceId(DEVICE_ID);
+    swipeUpdate->SetDeviceId(deviceId);
     swipeUpdate->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHPAD);
     swipeUpdate->SetPointerAction(PointerEvent::POINTER_ACTION_SWIPE_UPDATE);
-    swipeUpdate->SetTargetDisplayId(BOUND_DISPLAY_ID);
+    swipeUpdate->SetTargetDisplayId(boundDisplayId);
     swipeUpdate->SetPointerId(0);
     PointerEvent::PointerItem itemUpdate;
     itemUpdate.SetPointerId(0);
@@ -18349,16 +18349,16 @@ HWTEST_F(InputWindowsManagerTest, TouchpadGroupRouting_SwipeEndBoundGroup_001, T
 
     int32_t ret = mgr.UpdateTouchPadGestureTarget(swipeUpdate);
     EXPECT_EQ(ret, RET_OK);
-    EXPECT_EQ(swipeUpdate->GetTargetWindowId(), BOUND_FOCUS_WIN)
+    EXPECT_EQ(swipeUpdate->GetTargetWindowId(), boundFocusWin)
         << "SWIPE_UPDATE should route to bound group's focus window";
 
     // Test SWIPE_END
     auto swipeEnd = PointerEvent::Create();
     ASSERT_NE(swipeEnd, nullptr);
-    swipeEnd->SetDeviceId(DEVICE_ID);
+    swipeEnd->SetDeviceId(deviceId);
     swipeEnd->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHPAD);
     swipeEnd->SetPointerAction(PointerEvent::POINTER_ACTION_SWIPE_END);
-    swipeEnd->SetTargetDisplayId(BOUND_DISPLAY_ID);
+    swipeEnd->SetTargetDisplayId(boundDisplayId);
     swipeEnd->SetPointerId(0);
     PointerEvent::PointerItem itemEnd;
     itemEnd.SetPointerId(0);
@@ -18367,7 +18367,7 @@ HWTEST_F(InputWindowsManagerTest, TouchpadGroupRouting_SwipeEndBoundGroup_001, T
 
     ret = mgr.UpdateTouchPadGestureTarget(swipeEnd);
     EXPECT_EQ(ret, RET_OK);
-    EXPECT_EQ(swipeEnd->GetTargetWindowId(), BOUND_FOCUS_WIN)
+    EXPECT_EQ(swipeEnd->GetTargetWindowId(), boundFocusWin)
         << "SWIPE_END should route to bound group's focus window";
 
     // Verify source type is preserved as TOUCHPAD (not folded to MOUSE)
@@ -18762,18 +18762,18 @@ HWTEST_F(InputWindowsManagerTest, GroupStateIsolation_SequenceClosure_KeyDown_00
     CALL_TEST_DEBUG;
     InputWindowsManager mgr;
 
-    constexpr int32_t DEVICE_ID = 33;
-    constexpr int32_t KEY_CODE_A = 29;   // KeyEvent::KEYCODE_A
-    constexpr int32_t GROUP_A = 0;
-    constexpr int32_t WINDOW_A = 10;
+    constexpr int32_t deviceId = 33;
+    constexpr int32_t keyCodeA = 29;   // KeyEvent::KEYCODE_A
+    constexpr int32_t groupA = 0;
+    constexpr int32_t windowA = 10;
 
     // Simulate key-down while unbound (group A = main)
     InputSequenceKey seqKey;
-    seqKey.deviceId = DEVICE_ID;
-    seqKey.itemId = KEY_CODE_A;
+    seqKey.deviceId = deviceId;
+    seqKey.itemId = keyCodeA;
     seqKey.type = InputSequenceType::KEY;
 
-    mgr.RecordSequenceBegin(seqKey, GROUP_A, WINDOW_A);
+    mgr.RecordSequenceBegin(seqKey, groupA, windowA);
 
     // Verify snapshot count
     EXPECT_EQ(mgr.GetSequenceSnapshotCount(), 1u)
@@ -18785,9 +18785,9 @@ HWTEST_F(InputWindowsManagerTest, GroupStateIsolation_SequenceClosure_KeyDown_00
     auto snap = mgr.ConsumeSequenceSnapshot(seqKey);
     ASSERT_TRUE(snap.has_value())
         << "Sequence snapshot should be present for the key-down sequence";
-    EXPECT_EQ(snap->groupId, GROUP_A)
+    EXPECT_EQ(snap->groupId, groupA)
         << "Release should target original group A, not current group B";
-    EXPECT_EQ(snap->windowId, WINDOW_A)
+    EXPECT_EQ(snap->windowId, windowA)
         << "Release should target original window A";
 
     // After consuming, snapshot should be gone
@@ -18872,13 +18872,13 @@ HWTEST_F(InputWindowsManagerTest, GroupStateIsolation_DualUnboundMice_SharedStat
     InputWindowsManager mgr;
 
     // Two unbound mice
-    constexpr int32_t MOUSE_A = 100;
-    constexpr int32_t MOUSE_B = 200;
+    constexpr int32_t mouseA = 100;
+    constexpr int32_t mouseB = 200;
 
     // Both should resolve to MAIN_GROUPID
-    EXPECT_EQ(mgr.ResolveGroupIdForDevice(MOUSE_A), 0)
+    EXPECT_EQ(mgr.ResolveGroupIdForDevice(mouseA), 0)
         << "Unbound mouse A should resolve to main group";
-    EXPECT_EQ(mgr.ResolveGroupIdForDevice(MOUSE_B), 0)
+    EXPECT_EQ(mgr.ResolveGroupIdForDevice(mouseB), 0)
         << "Unbound mouse B should resolve to main group";
 
     // Both share the same mouse location (group 0)
@@ -19006,13 +19006,13 @@ HWTEST_F(InputWindowsManagerTest, GroupStateIsolation_DualUnboundKeyboards_Share
     CALL_TEST_DEBUG;
     InputWindowsManager mgr;
 
-    constexpr int32_t KBD_A = 150;
-    constexpr int32_t KBD_B = 250;
+    constexpr int32_t kbdA = 150;
+    constexpr int32_t kbdB = 250;
 
     // Both unbound keyboards resolve to main group
-    EXPECT_EQ(mgr.ResolveGroupIdForDevice(KBD_A), 0)
+    EXPECT_EQ(mgr.ResolveGroupIdForDevice(kbdA), 0)
         << "Unbound keyboard A resolves to main group";
-    EXPECT_EQ(mgr.ResolveGroupIdForDevice(KBD_B), 0)
+    EXPECT_EQ(mgr.ResolveGroupIdForDevice(kbdB), 0)
         << "Unbound keyboard B resolves to main group";
 
     // Both use the same focus window from group 0
@@ -19581,13 +19581,13 @@ HWTEST_F(InputWindowsManagerTest, SoftCursorRS_GetCursorPos_GroupAware_001, Test
     CALL_TEST_DEBUG;
     InputWindowsManager mgr;
 
-    constexpr int32_t BOUND_GROUP = 5;
-    constexpr int32_t BOUND_DISPLAY_ID = 20;
-    constexpr int32_t MAIN_DISPLAY_ID = 1;
+    constexpr int32_t boundGroupConst = 5;
+    constexpr int32_t boundDisplayId = 20;
+    constexpr int32_t mainDisplayId = 1;
 
     // Set up main group with a display
     OLD::DisplayInfo mainDisplay;
-    mainDisplay.id = MAIN_DISPLAY_ID;
+    mainDisplay.id = mainDisplayId;
     mainDisplay.width = 1920;
     mainDisplay.height = 1080;
     mainDisplay.validWidth = 1920;
@@ -19599,46 +19599,46 @@ HWTEST_F(InputWindowsManagerTest, SoftCursorRS_GetCursorPos_GroupAware_001, Test
 
     // Set up bound group with its own display
     OLD::DisplayGroupInfo boundGroupInfo;
-    boundGroupInfo.groupId = BOUND_GROUP;
+    boundGroupInfo.groupId = boundGroupConst;
     OLD::DisplayInfo boundDisplay;
-    boundDisplay.id = BOUND_DISPLAY_ID;
+    boundDisplay.id = boundDisplayId;
     boundDisplay.width = 3840;
     boundDisplay.height = 2160;
     boundDisplay.validWidth = 3840;
     boundDisplay.validHeight = 2160;
     boundGroupInfo.displaysInfo.push_back(boundDisplay);
-    mgr.displayGroupInfoMap_[BOUND_GROUP] = boundGroupInfo;
+    mgr.displayGroupInfoMap_[boundGroupConst] = boundGroupInfo;
 
     // Ensure group state for bound group
-    mgr.EnsureGroupState(BOUND_GROUP);
+    mgr.EnsureGroupState(boundGroupConst);
 
     // Set cursor position for main group
-    mgr.cursorPosMap_[DEFAULT_GROUP_ID].displayId = MAIN_DISPLAY_ID;
+    mgr.cursorPosMap_[DEFAULT_GROUP_ID].displayId = mainDisplayId;
     mgr.cursorPosMap_[DEFAULT_GROUP_ID].cursorPos.x = 100;
     mgr.cursorPosMap_[DEFAULT_GROUP_ID].cursorPos.y = 200;
 
     // Set cursor position for bound group
-    mgr.cursorPosMap_[BOUND_GROUP].displayId = BOUND_DISPLAY_ID;
-    mgr.cursorPosMap_[BOUND_GROUP].cursorPos.x = 500;
-    mgr.cursorPosMap_[BOUND_GROUP].cursorPos.y = 600;
+    mgr.cursorPosMap_[boundGroupConst].displayId = boundDisplayId;
+    mgr.cursorPosMap_[boundGroupConst].cursorPos.x = 500;
+    mgr.cursorPosMap_[boundGroupConst].cursorPos.y = 600;
 
     // GetCursorPos with default should return main group cursor
     CursorPosition mainCursor = mgr.GetCursorPos();
-    EXPECT_EQ(mainCursor.displayId, MAIN_DISPLAY_ID)
+    EXPECT_EQ(mainCursor.displayId, mainDisplayId)
         << "Default GetCursorPos should return main group display";
     EXPECT_EQ(mainCursor.cursorPos.x, 100);
     EXPECT_EQ(mainCursor.cursorPos.y, 200);
 
     // GetCursorPos with bound group should return bound group cursor
-    CursorPosition boundCursor = mgr.GetCursorPos(BOUND_GROUP);
-    EXPECT_EQ(boundCursor.displayId, BOUND_DISPLAY_ID)
+    CursorPosition boundCursor = mgr.GetCursorPos(boundGroupConst);
+    EXPECT_EQ(boundCursor.displayId, boundDisplayId)
         << "GetCursorPos(boundGroup) should return bound group display";
     EXPECT_EQ(boundCursor.cursorPos.x, 500);
     EXPECT_EQ(boundCursor.cursorPos.y, 600);
 
     // Verify they are independent - modifying one does not affect the other
     mgr.cursorPosMap_[DEFAULT_GROUP_ID].cursorPos.x = 999;
-    CursorPosition boundAfter = mgr.GetCursorPos(BOUND_GROUP);
+    CursorPosition boundAfter = mgr.GetCursorPos(boundGroupConst);
     EXPECT_EQ(boundAfter.cursorPos.x, 500)
         << "Modifying main group cursor must not affect bound group";
 }
@@ -19655,13 +19655,13 @@ HWTEST_F(InputWindowsManagerTest, SoftCursorRS_ResetCursorPos_GroupAware_001, Te
     CALL_TEST_DEBUG;
     InputWindowsManager mgr;
 
-    constexpr int32_t BOUND_GROUP = 6;
-    constexpr int32_t BOUND_DISPLAY_ID = 30;
-    constexpr int32_t MAIN_DISPLAY_ID = 2;
+    constexpr int32_t boundGroup = 6;
+    constexpr int32_t boundDisplayId = 30;
+    constexpr int32_t mainDisplayId = 2;
 
     // Set up main group with a display
     OLD::DisplayInfo mainDisplay;
-    mainDisplay.id = MAIN_DISPLAY_ID;
+    mainDisplay.id = mainDisplayId;
     mainDisplay.width = 800;
     mainDisplay.height = 600;
     mainDisplay.validWidth = 800;
@@ -19673,30 +19673,30 @@ HWTEST_F(InputWindowsManagerTest, SoftCursorRS_ResetCursorPos_GroupAware_001, Te
 
     // Set up bound group with a different-sized display
     OLD::DisplayGroupInfo boundGroupInfo;
-    boundGroupInfo.groupId = BOUND_GROUP;
+    boundGroupInfo.groupId = boundGroup;
     OLD::DisplayInfo boundDisplay;
-    boundDisplay.id = BOUND_DISPLAY_ID;
+    boundDisplay.id = boundDisplayId;
     boundDisplay.width = 1280;
     boundDisplay.height = 720;
     boundDisplay.validWidth = 1280;
     boundDisplay.validHeight = 720;
     boundGroupInfo.displaysInfo.push_back(boundDisplay);
-    mgr.displayGroupInfoMap_[BOUND_GROUP] = boundGroupInfo;
+    mgr.displayGroupInfoMap_[boundGroup] = boundGroupInfo;
 
     // Ensure group state for bound group
-    mgr.EnsureGroupState(BOUND_GROUP);
+    mgr.EnsureGroupState(boundGroup);
 
     // Set both cursors to non-center positions
-    mgr.cursorPosMap_[DEFAULT_GROUP_ID].displayId = MAIN_DISPLAY_ID;
+    mgr.cursorPosMap_[DEFAULT_GROUP_ID].displayId = mainDisplayId;
     mgr.cursorPosMap_[DEFAULT_GROUP_ID].cursorPos.x = 10;
     mgr.cursorPosMap_[DEFAULT_GROUP_ID].cursorPos.y = 10;
-    mgr.cursorPosMap_[BOUND_GROUP].displayId = BOUND_DISPLAY_ID;
-    mgr.cursorPosMap_[BOUND_GROUP].cursorPos.x = 10;
-    mgr.cursorPosMap_[BOUND_GROUP].cursorPos.y = 10;
+    mgr.cursorPosMap_[boundGroup].displayId = boundDisplayId;
+    mgr.cursorPosMap_[boundGroup].cursorPos.x = 10;
+    mgr.cursorPosMap_[boundGroup].cursorPos.y = 10;
 
     // ResetCursorPos for bound group should reset to center of bound display
-    CursorPosition boundReset = mgr.ResetCursorPos(BOUND_GROUP);
-    EXPECT_EQ(boundReset.displayId, BOUND_DISPLAY_ID)
+    CursorPosition boundReset = mgr.ResetCursorPos(boundGroup);
+    EXPECT_EQ(boundReset.displayId, boundDisplayId)
         << "Reset should use bound group's display";
     EXPECT_EQ(boundReset.cursorPos.x, 1280 * HALF_RATIO)
         << "Cursor X should be center of bound display";
@@ -19705,7 +19705,7 @@ HWTEST_F(InputWindowsManagerTest, SoftCursorRS_ResetCursorPos_GroupAware_001, Te
 
     // Main group cursor should not have been affected
     CursorPosition mainCursor = mgr.GetCursorPos();
-    EXPECT_EQ(mainCursor.displayId, MAIN_DISPLAY_ID)
+    EXPECT_EQ(mainCursor.displayId, mainDisplayId)
         << "Main group display should not be affected by bound group reset";
     EXPECT_EQ(mainCursor.cursorPos.x, 10)
         << "Main group cursor X should be unchanged";
@@ -19725,14 +19725,14 @@ HWTEST_F(InputWindowsManagerTest, SoftCursorRS_TwoGroupsIndependentCursorState_0
     CALL_TEST_DEBUG;
     InputWindowsManager mgr;
 
-    constexpr int32_t GROUP_A = 0;  // main group
-    constexpr int32_t GROUP_B = 4;
-    constexpr int32_t DISPLAY_A = 1;
-    constexpr int32_t DISPLAY_B = 15;
+    constexpr int32_t groupA = 0;  // main group
+    constexpr int32_t groupB = 4;
+    constexpr int32_t displayAConst = 1;
+    constexpr int32_t displayBConst = 15;
 
     // Set up main group display
     OLD::DisplayInfo displayA;
-    displayA.id = DISPLAY_A;
+    displayA.id = displayAConst;
     displayA.width = 1920;
     displayA.height = 1080;
     displayA.validWidth = 1920;
@@ -19746,9 +19746,9 @@ HWTEST_F(InputWindowsManagerTest, SoftCursorRS_TwoGroupsIndependentCursorState_0
 
     // Set up group B display
     OLD::DisplayGroupInfo groupBInfo;
-    groupBInfo.groupId = GROUP_B;
+    groupBInfo.groupId = groupB;
     OLD::DisplayInfo displayB;
-    displayB.id = DISPLAY_B;
+    displayB.id = displayBConst;
     displayB.width = 2560;
     displayB.height = 1440;
     displayB.validWidth = 2560;
@@ -19756,51 +19756,51 @@ HWTEST_F(InputWindowsManagerTest, SoftCursorRS_TwoGroupsIndependentCursorState_0
     displayB.direction = Direction::DIRECTION90;
     displayB.displayDirection = Direction::DIRECTION90;
     groupBInfo.displaysInfo.push_back(displayB);
-    mgr.displayGroupInfoMap_[GROUP_B] = groupBInfo;
+    mgr.displayGroupInfoMap_[groupB] = groupBInfo;
 
     // Ensure group state
-    mgr.EnsureGroupState(GROUP_B);
+    mgr.EnsureGroupState(groupB);
 
     // Set independent cursor positions
-    mgr.cursorPosMap_[GROUP_A].displayId = DISPLAY_A;
-    mgr.cursorPosMap_[GROUP_A].cursorPos.x = 100;
-    mgr.cursorPosMap_[GROUP_A].cursorPos.y = 200;
-    mgr.cursorPosMap_[GROUP_A].direction = Direction::DIRECTION0;
-    mgr.cursorPosMap_[GROUP_A].displayDirection = Direction::DIRECTION0;
+    mgr.cursorPosMap_[groupA].displayId = displayAConst;
+    mgr.cursorPosMap_[groupA].cursorPos.x = 100;
+    mgr.cursorPosMap_[groupA].cursorPos.y = 200;
+    mgr.cursorPosMap_[groupA].direction = Direction::DIRECTION0;
+    mgr.cursorPosMap_[groupA].displayDirection = Direction::DIRECTION0;
 
-    mgr.cursorPosMap_[GROUP_B].displayId = DISPLAY_B;
-    mgr.cursorPosMap_[GROUP_B].cursorPos.x = 300;
-    mgr.cursorPosMap_[GROUP_B].cursorPos.y = 400;
-    mgr.cursorPosMap_[GROUP_B].direction = Direction::DIRECTION90;
-    mgr.cursorPosMap_[GROUP_B].displayDirection = Direction::DIRECTION90;
+    mgr.cursorPosMap_[groupB].displayId = displayBConst;
+    mgr.cursorPosMap_[groupB].cursorPos.x = 300;
+    mgr.cursorPosMap_[groupB].cursorPos.y = 400;
+    mgr.cursorPosMap_[groupB].direction = Direction::DIRECTION90;
+    mgr.cursorPosMap_[groupB].displayDirection = Direction::DIRECTION90;
 
     // Verify isolation: each group reads its own state
-    CursorPosition posA = mgr.GetCursorPos(GROUP_A);
-    CursorPosition posB = mgr.GetCursorPos(GROUP_B);
+    CursorPosition posA = mgr.GetCursorPos(groupA);
+    CursorPosition posB = mgr.GetCursorPos(groupB);
 
-    EXPECT_EQ(posA.displayId, DISPLAY_A);
+    EXPECT_EQ(posA.displayId, displayAConst);
     EXPECT_EQ(posA.cursorPos.x, 100);
     EXPECT_EQ(posA.cursorPos.y, 200);
     EXPECT_EQ(posA.direction, Direction::DIRECTION0);
 
-    EXPECT_EQ(posB.displayId, DISPLAY_B);
+    EXPECT_EQ(posB.displayId, displayBConst);
     EXPECT_EQ(posB.cursorPos.x, 300);
     EXPECT_EQ(posB.cursorPos.y, 400);
     EXPECT_EQ(posB.direction, Direction::DIRECTION90);
 
     // Now update group A position - group B must not change
-    mgr.cursorPosMap_[GROUP_A].cursorPos.x = 999;
-    mgr.cursorPosMap_[GROUP_A].cursorPos.y = 888;
-    mgr.cursorPosMap_[GROUP_A].direction = Direction::DIRECTION270;
+    mgr.cursorPosMap_[groupA].cursorPos.x = 999;
+    mgr.cursorPosMap_[groupA].cursorPos.y = 888;
+    mgr.cursorPosMap_[groupA].direction = Direction::DIRECTION270;
 
-    CursorPosition posB_after = mgr.GetCursorPos(GROUP_B);
+    CursorPosition posB_after = mgr.GetCursorPos(groupB);
     EXPECT_EQ(posB_after.cursorPos.x, 300)
         << "Group B cursor X must not change when group A is updated";
     EXPECT_EQ(posB_after.cursorPos.y, 400)
         << "Group B cursor Y must not change when group A is updated";
     EXPECT_EQ(posB_after.direction, Direction::DIRECTION90)
         << "Group B direction must not change when group A is updated";
-    EXPECT_EQ(posB_after.displayId, DISPLAY_B)
+    EXPECT_EQ(posB_after.displayId, displayBConst)
         << "Group B displayId must not change when group A is updated";
 }
 
@@ -19817,14 +19817,14 @@ HWTEST_F(InputWindowsManagerTest, SoftCursorRS_BoundMouseUsesGroupDisplay_001, T
     CALL_TEST_DEBUG;
     InputWindowsManager mgr;
 
-    constexpr int32_t MOUSE_DEVICE = 77;
-    constexpr int32_t BOUND_GROUP = 3;
-    constexpr int32_t BOUND_DISPLAY_ID = 10;
-    constexpr int32_t MAIN_DISPLAY_ID = 1;
+    constexpr int32_t mouseDevice = 77;
+    constexpr int32_t boundGroup = 3;
+    constexpr int32_t boundDisplayId = 10;
+    constexpr int32_t mainDisplayId = 1;
 
     // Set up main group
     OLD::DisplayInfo mainDisplay;
-    mainDisplay.id = MAIN_DISPLAY_ID;
+    mainDisplay.id = mainDisplayId;
     mainDisplay.width = 1920;
     mainDisplay.height = 1080;
     mainDisplay.validWidth = 1920;
@@ -19836,45 +19836,45 @@ HWTEST_F(InputWindowsManagerTest, SoftCursorRS_BoundMouseUsesGroupDisplay_001, T
 
     // Set up bound group
     OLD::DisplayGroupInfo boundGroupInfo;
-    boundGroupInfo.groupId = BOUND_GROUP;
+    boundGroupInfo.groupId = boundGroup;
     OLD::DisplayInfo boundDisplay;
-    boundDisplay.id = BOUND_DISPLAY_ID;
+    boundDisplay.id = boundDisplayId;
     boundDisplay.width = 3840;
     boundDisplay.height = 2160;
     boundDisplay.validWidth = 3840;
     boundDisplay.validHeight = 2160;
     boundDisplay.rsId = 0xABCD;
     boundGroupInfo.displaysInfo.push_back(boundDisplay);
-    mgr.displayGroupInfoMap_[BOUND_GROUP] = boundGroupInfo;
+    mgr.displayGroupInfoMap_[boundGroup] = boundGroupInfo;
 
     // Create runtime binding
-    mgr.bindInfo_.AddRuntimeBinding(MOUSE_DEVICE, BOUND_DISPLAY_ID, BOUND_GROUP);
-    mgr.EnsureGroupState(BOUND_GROUP);
+    mgr.bindInfo_.AddRuntimeBinding(mouseDevice, boundDisplayId, boundGroup);
+    mgr.EnsureGroupState(boundGroup);
 
     // Resolve group for the bound mouse
-    int32_t resolvedGroup = mgr.ResolveGroupIdForDevice(MOUSE_DEVICE);
-    ASSERT_EQ(resolvedGroup, BOUND_GROUP) <<
+    int32_t resolvedGroup = mgr.ResolveGroupIdForDevice(mouseDevice);
+    ASSERT_EQ(resolvedGroup, boundGroup) <<
         "Bound mouse should resolve to bound group";
 
     // Set cursor state for each group independently
-    mgr.cursorPosMap_[DEFAULT_GROUP_ID].displayId = MAIN_DISPLAY_ID;
+    mgr.cursorPosMap_[DEFAULT_GROUP_ID].displayId = mainDisplayId;
     mgr.cursorPosMap_[DEFAULT_GROUP_ID].cursorPos.x = 50;
     mgr.cursorPosMap_[DEFAULT_GROUP_ID].cursorPos.y = 60;
 
-    mgr.cursorPosMap_[BOUND_GROUP].displayId = BOUND_DISPLAY_ID;
-    mgr.cursorPosMap_[BOUND_GROUP].cursorPos.x = 700;
-    mgr.cursorPosMap_[BOUND_GROUP].cursorPos.y = 800;
+    mgr.cursorPosMap_[boundGroup].displayId = boundDisplayId;
+    mgr.cursorPosMap_[boundGroup].cursorPos.x = 700;
+    mgr.cursorPosMap_[boundGroup].cursorPos.y = 800;
 
     // GetCursorPos with the resolved group should return the bound display's state
     CursorPosition boundCursor = mgr.GetCursorPos(resolvedGroup);
-    EXPECT_EQ(boundCursor.displayId, BOUND_DISPLAY_ID)
+    EXPECT_EQ(boundCursor.displayId, boundDisplayId)
         << "Bound mouse cursor must use bound display, not default";
     EXPECT_EQ(boundCursor.cursorPos.x, 700);
     EXPECT_EQ(boundCursor.cursorPos.y, 800);
 
     // GetCursorPos without group (default) must NOT return bound display state
     CursorPosition defaultCursor = mgr.GetCursorPos();
-    EXPECT_EQ(defaultCursor.displayId, MAIN_DISPLAY_ID)
+    EXPECT_EQ(defaultCursor.displayId, mainDisplayId)
         << "Default GetCursorPos must not return bound display";
     EXPECT_NE(defaultCursor.cursorPos.x, 700)
         << "Default cursor must not have bound group's X position";
@@ -19892,13 +19892,13 @@ HWTEST_F(InputWindowsManagerTest, SoftCursorRS_ResetCursorPosIndependent_001, Te
     CALL_TEST_DEBUG;
     InputWindowsManager mgr;
 
-    constexpr int32_t GROUP_B = 8;
-    constexpr int32_t DISPLAY_MAIN = 1;
-    constexpr int32_t DISPLAY_B = 25;
+    constexpr int32_t groupB = 8;
+    constexpr int32_t displayMain = 1;
+    constexpr int32_t displayBConst = 25;
 
     // Set up main group display (800x600)
     OLD::DisplayInfo mainDisplay;
-    mainDisplay.id = DISPLAY_MAIN;
+    mainDisplay.id = displayMain;
     mainDisplay.width = 800;
     mainDisplay.height = 600;
     mainDisplay.validWidth = 800;
@@ -19910,28 +19910,28 @@ HWTEST_F(InputWindowsManagerTest, SoftCursorRS_ResetCursorPosIndependent_001, Te
 
     // Set up group B display (1024x768)
     OLD::DisplayGroupInfo groupBInfo;
-    groupBInfo.groupId = GROUP_B;
+    groupBInfo.groupId = groupB;
     OLD::DisplayInfo displayB;
-    displayB.id = DISPLAY_B;
+    displayB.id = displayBConst;
     displayB.width = 1024;
     displayB.height = 768;
     displayB.validWidth = 1024;
     displayB.validHeight = 768;
     groupBInfo.displaysInfo.push_back(displayB);
-    mgr.displayGroupInfoMap_[GROUP_B] = groupBInfo;
-    mgr.EnsureGroupState(GROUP_B);
+    mgr.displayGroupInfoMap_[groupB] = groupBInfo;
+    mgr.EnsureGroupState(groupB);
 
     // Reset both groups
     CursorPosition resetMain = mgr.ResetCursorPos(DEFAULT_GROUP_ID);
-    CursorPosition resetB = mgr.ResetCursorPos(GROUP_B);
+    CursorPosition resetB = mgr.ResetCursorPos(groupB);
 
     // Main should reset to center of 800x600
-    EXPECT_EQ(resetMain.displayId, DISPLAY_MAIN);
+    EXPECT_EQ(resetMain.displayId, displayMain);
     EXPECT_EQ(resetMain.cursorPos.x, 800 * HALF_RATIO);
     EXPECT_EQ(resetMain.cursorPos.y, 600 * HALF_RATIO);
 
     // Group B should reset to center of 1024x768
-    EXPECT_EQ(resetB.displayId, DISPLAY_B);
+    EXPECT_EQ(resetB.displayId, displayBConst);
     EXPECT_EQ(resetB.cursorPos.x, 1024 * HALF_RATIO);
     EXPECT_EQ(resetB.cursorPos.y, 768 * HALF_RATIO);
 
@@ -19957,14 +19957,14 @@ HWTEST_F(InputWindowsManagerTest, HardCursor_BoundDevice_DisplayIdOverride_001, 
     CALL_TEST_DEBUG;
     InputWindowsManager mgr;
 
-    constexpr int32_t MOUSE_DEVICE = 90;
-    constexpr int32_t BOUND_GROUP = 4;
-    constexpr int32_t BOUND_DISPLAY_ID = 15;
-    constexpr int32_t MAIN_DISPLAY_ID = 1;
+    constexpr int32_t mouseDevice = 90;
+    constexpr int32_t boundGroup = 4;
+    constexpr int32_t boundDisplayId = 15;
+    constexpr int32_t mainDisplayId = 1;
 
     // Set up main group with a display
     OLD::DisplayInfo mainDisplay;
-    mainDisplay.id = MAIN_DISPLAY_ID;
+    mainDisplay.id = mainDisplayId;
     mainDisplay.width = 1920;
     mainDisplay.height = 1080;
     mainDisplay.validWidth = 1920;
@@ -19977,26 +19977,26 @@ HWTEST_F(InputWindowsManagerTest, HardCursor_BoundDevice_DisplayIdOverride_001, 
 
     // Set up bound group with its own display
     OLD::DisplayGroupInfo boundGroupInfo;
-    boundGroupInfo.groupId = BOUND_GROUP;
+    boundGroupInfo.groupId = boundGroup;
     OLD::DisplayInfo boundDisplay;
-    boundDisplay.id = BOUND_DISPLAY_ID;
+    boundDisplay.id = boundDisplayId;
     boundDisplay.width = 3840;
     boundDisplay.height = 2160;
     boundDisplay.validWidth = 3840;
     boundDisplay.validHeight = 2160;
     boundDisplay.rsId = 200;
     boundGroupInfo.displaysInfo.push_back(boundDisplay);
-    mgr.displayGroupInfoMap_[BOUND_GROUP] = boundGroupInfo;
+    mgr.displayGroupInfoMap_[boundGroup] = boundGroupInfo;
 
     // Create runtime binding for the mouse
-    mgr.bindInfo_.AddRuntimeBinding(MOUSE_DEVICE, BOUND_DISPLAY_ID, BOUND_GROUP);
-    mgr.EnsureGroupState(BOUND_GROUP);
+    mgr.bindInfo_.AddRuntimeBinding(mouseDevice, boundDisplayId, boundGroup);
+    mgr.EnsureGroupState(boundGroup);
 
     // Create a pointer event with displayId = -1 (unresolved) from the bound device
     auto pointerEvent = PointerEvent::Create();
     ASSERT_NE(pointerEvent, nullptr);
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
-    pointerEvent->SetDeviceId(MOUSE_DEVICE);
+    pointerEvent->SetDeviceId(mouseDevice);
     pointerEvent->SetTargetDisplayId(-1);
     pointerEvent->SetPointerId(0);
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
@@ -20011,7 +20011,7 @@ HWTEST_F(InputWindowsManagerTest, HardCursor_BoundDevice_DisplayIdOverride_001, 
     mgr.UpdateMouseTarget(pointerEvent);
 
     // After UpdateMouseTarget, the pointer event's target display should be the bound display
-    EXPECT_EQ(pointerEvent->GetTargetDisplayId(), BOUND_DISPLAY_ID)
+    EXPECT_EQ(pointerEvent->GetTargetDisplayId(), boundDisplayId)
         << "Bound device must override targetDisplayId to bound display for HW cursor";
 }
 
@@ -20028,24 +20028,24 @@ HWTEST_F(InputWindowsManagerTest, HardCursor_HandleHardwareCursor_BoundDisplay_0
     CALL_TEST_DEBUG;
     InputWindowsManager mgr;
 
-    constexpr int32_t BOUND_DISPLAY_ID = 25;
-    constexpr int32_t BOUND_GROUP = 7;
+    constexpr int32_t boundDisplayId = 25;
+    constexpr int32_t boundGroup = 7;
 
     // Set up bound group display
     OLD::DisplayGroupInfo boundGroupInfo;
-    boundGroupInfo.groupId = BOUND_GROUP;
+    boundGroupInfo.groupId = boundGroup;
     OLD::DisplayInfo boundDisplay;
-    boundDisplay.id = BOUND_DISPLAY_ID;
+    boundDisplay.id = boundDisplayId;
     boundDisplay.width = 2560;
     boundDisplay.height = 1440;
     boundDisplay.validWidth = 2560;
     boundDisplay.validHeight = 1440;
     boundDisplay.rsId = 0xBEEF;
     boundGroupInfo.displaysInfo.push_back(boundDisplay);
-    mgr.displayGroupInfoMap_[BOUND_GROUP] = boundGroupInfo;
+    mgr.displayGroupInfoMap_[boundGroup] = boundGroupInfo;
 
     // Get the bound display's physical info
-    const OLD::DisplayInfo *physInfo = mgr.GetPhysicalDisplay(BOUND_DISPLAY_ID);
+    const OLD::DisplayInfo *physInfo = mgr.GetPhysicalDisplay(boundDisplayId);
     ASSERT_NE(physInfo, nullptr);
     EXPECT_EQ(physInfo->rsId, static_cast<uint64_t>(0xBEEF))
         << "GetPhysicalDisplay for bound display must return bound display info";
@@ -20073,14 +20073,14 @@ HWTEST_F(InputWindowsManagerTest, HardCursor_CursorPosMap_GroupIsolation_001, Te
     CALL_TEST_DEBUG;
     InputWindowsManager mgr;
 
-    constexpr int32_t MOUSE_DEVICE = 55;
-    constexpr int32_t BOUND_GROUP = 8;
-    constexpr int32_t BOUND_DISPLAY_ID = 50;
-    constexpr int32_t MAIN_DISPLAY_ID = 1;
+    constexpr int32_t mouseDevice = 55;
+    constexpr int32_t boundGroup = 8;
+    constexpr int32_t boundDisplayId = 50;
+    constexpr int32_t mainDisplayId = 1;
 
     // Set up main group
     OLD::DisplayInfo mainDisplay;
-    mainDisplay.id = MAIN_DISPLAY_ID;
+    mainDisplay.id = mainDisplayId;
     mainDisplay.width = 1920;
     mainDisplay.height = 1080;
     mainDisplay.validWidth = 1920;
@@ -20094,9 +20094,9 @@ HWTEST_F(InputWindowsManagerTest, HardCursor_CursorPosMap_GroupIsolation_001, Te
 
     // Set up bound group
     OLD::DisplayGroupInfo boundGroupInfo;
-    boundGroupInfo.groupId = BOUND_GROUP;
+    boundGroupInfo.groupId = boundGroup;
     OLD::DisplayInfo boundDisplay;
-    boundDisplay.id = BOUND_DISPLAY_ID;
+    boundDisplay.id = boundDisplayId;
     boundDisplay.width = 3840;
     boundDisplay.height = 2160;
     boundDisplay.validWidth = 3840;
@@ -20104,34 +20104,34 @@ HWTEST_F(InputWindowsManagerTest, HardCursor_CursorPosMap_GroupIsolation_001, Te
     boundDisplay.direction = DIRECTION90;
     boundDisplay.displayDirection = DIRECTION90;
     boundGroupInfo.displaysInfo.push_back(boundDisplay);
-    mgr.displayGroupInfoMap_[BOUND_GROUP] = boundGroupInfo;
+    mgr.displayGroupInfoMap_[boundGroup] = boundGroupInfo;
 
     // Bind device
-    mgr.bindInfo_.AddRuntimeBinding(MOUSE_DEVICE, BOUND_DISPLAY_ID, BOUND_GROUP);
-    mgr.EnsureGroupState(BOUND_GROUP);
+    mgr.bindInfo_.AddRuntimeBinding(mouseDevice, boundDisplayId, boundGroup);
+    mgr.EnsureGroupState(boundGroup);
 
     // Set initial cursor state for default group
     mgr.cursorPosMap_[DEFAULT_GROUP_ID].direction = DIRECTION0;
     mgr.cursorPosMap_[DEFAULT_GROUP_ID].displayDirection = DIRECTION0;
 
     // The bound group cursor state should be separate
-    mgr.cursorPosMap_[BOUND_GROUP].direction = DIRECTION0;
-    mgr.cursorPosMap_[BOUND_GROUP].displayDirection = DIRECTION0;
+    mgr.cursorPosMap_[boundGroup].direction = DIRECTION0;
+    mgr.cursorPosMap_[boundGroup].displayDirection = DIRECTION0;
 
     // Verify the bound group resolves correctly
-    int32_t resolvedGroup = mgr.ResolveGroupIdForDevice(MOUSE_DEVICE);
-    EXPECT_EQ(resolvedGroup, BOUND_GROUP) <<
+    int32_t resolvedGroup = mgr.ResolveGroupIdForDevice(mouseDevice);
+    EXPECT_EQ(resolvedGroup, boundGroup) <<
         "Device must resolve to bound group";
 
     // GetPhysicalDisplay for the bound display returns direction DIRECTION90
-    const OLD::DisplayInfo *boundInfo = mgr.GetPhysicalDisplay(BOUND_DISPLAY_ID);
+    const OLD::DisplayInfo *boundInfo = mgr.GetPhysicalDisplay(boundDisplayId);
     ASSERT_NE(boundInfo, nullptr);
     EXPECT_EQ(boundInfo->direction, DIRECTION90);
 
     // Directly verify cursor pos map isolation: setting bound group direction
     // does not affect default group
-    mgr.cursorPosMap_[BOUND_GROUP].direction = DIRECTION90;
-    mgr.cursorPosMap_[BOUND_GROUP].displayDirection = DIRECTION90;
+    mgr.cursorPosMap_[boundGroup].direction = DIRECTION90;
+    mgr.cursorPosMap_[boundGroup].displayDirection = DIRECTION90;
     EXPECT_EQ(mgr.cursorPosMap_[DEFAULT_GROUP_ID].direction, DIRECTION0)
         << "Bound group cursor direction must not affect default group";
     EXPECT_EQ(mgr.cursorPosMap_[DEFAULT_GROUP_ID].displayDirection, DIRECTION0)
@@ -20151,17 +20151,17 @@ HWTEST_F(InputWindowsManagerTest, HardCursor_TwoGroups_NoStateOverwrite_001, Tes
     CALL_TEST_DEBUG;
     InputWindowsManager mgr;
 
-    constexpr int32_t DEVICE_A = 60;
-    constexpr int32_t DEVICE_B = 70;
-    constexpr int32_t GROUP_A = 10;
-    constexpr int32_t GROUP_B = 11;
-    constexpr int32_t DISPLAY_A = 100;
-    constexpr int32_t DISPLAY_B = 200;
-    constexpr int32_t MAIN_DISPLAY_ID = 1;
+    constexpr int32_t deviceA = 60;
+    constexpr int32_t deviceB = 70;
+    constexpr int32_t groupA = 10;
+    constexpr int32_t groupB = 11;
+    constexpr int32_t displayAConst = 100;
+    constexpr int32_t displayBConst = 200;
+    constexpr int32_t mainDisplayId = 1;
 
     // Set up main group
     OLD::DisplayInfo mainDisplay;
-    mainDisplay.id = MAIN_DISPLAY_ID;
+    mainDisplay.id = mainDisplayId;
     mainDisplay.width = 1920;
     mainDisplay.height = 1080;
     mainDisplay.validWidth = 1920;
@@ -20173,47 +20173,47 @@ HWTEST_F(InputWindowsManagerTest, HardCursor_TwoGroups_NoStateOverwrite_001, Tes
 
     // Set up group A
     OLD::DisplayGroupInfo groupAInfo;
-    groupAInfo.groupId = GROUP_A;
+    groupAInfo.groupId = groupA;
     OLD::DisplayInfo displayA;
-    displayA.id = DISPLAY_A;
+    displayA.id = displayAConst;
     displayA.width = 1920;
     displayA.height = 1080;
     displayA.validWidth = 1920;
     displayA.validHeight = 1080;
     displayA.rsId = 0xA000;
     groupAInfo.displaysInfo.push_back(displayA);
-    mgr.displayGroupInfoMap_[GROUP_A] = groupAInfo;
+    mgr.displayGroupInfoMap_[groupA] = groupAInfo;
 
     // Set up group B
     OLD::DisplayGroupInfo groupBInfo;
-    groupBInfo.groupId = GROUP_B;
+    groupBInfo.groupId = groupB;
     OLD::DisplayInfo displayB;
-    displayB.id = DISPLAY_B;
+    displayB.id = displayBConst;
     displayB.width = 2560;
     displayB.height = 1440;
     displayB.validWidth = 2560;
     displayB.validHeight = 1440;
     displayB.rsId = 0xB000;
     groupBInfo.displaysInfo.push_back(displayB);
-    mgr.displayGroupInfoMap_[GROUP_B] = groupBInfo;
+    mgr.displayGroupInfoMap_[groupB] = groupBInfo;
 
     // Bind devices
-    mgr.bindInfo_.AddRuntimeBinding(DEVICE_A, DISPLAY_A, GROUP_A);
-    mgr.bindInfo_.AddRuntimeBinding(DEVICE_B, DISPLAY_B, GROUP_B);
-    mgr.EnsureGroupState(GROUP_A);
-    mgr.EnsureGroupState(GROUP_B);
+    mgr.bindInfo_.AddRuntimeBinding(deviceA, displayAConst, groupA);
+    mgr.bindInfo_.AddRuntimeBinding(deviceB, displayBConst, groupB);
+    mgr.EnsureGroupState(groupA);
+    mgr.EnsureGroupState(groupB);
 
     // Set initial cursor state for group B
-    mgr.cursorPosMap_[GROUP_B].displayId = DISPLAY_B;
-    mgr.cursorPosMap_[GROUP_B].cursorPos.x = 999;
-    mgr.cursorPosMap_[GROUP_B].cursorPos.y = 888;
-    mgr.cursorPosMap_[GROUP_B].direction = DIRECTION90;
+    mgr.cursorPosMap_[groupB].displayId = displayBConst;
+    mgr.cursorPosMap_[groupB].cursorPos.x = 999;
+    mgr.cursorPosMap_[groupB].cursorPos.y = 888;
+    mgr.cursorPosMap_[groupB].direction = DIRECTION90;
 
     // Create pointer event for device A
     auto eventA = PointerEvent::Create();
     ASSERT_NE(eventA, nullptr);
     eventA->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
-    eventA->SetDeviceId(DEVICE_A);
+    eventA->SetDeviceId(deviceA);
     eventA->SetTargetDisplayId(-1);
     eventA->SetPointerId(0);
     eventA->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
@@ -20227,24 +20227,24 @@ HWTEST_F(InputWindowsManagerTest, HardCursor_TwoGroups_NoStateOverwrite_001, Tes
     mgr.UpdateMouseTarget(eventA);
 
     // Device A's event should target display A, not display B
-    EXPECT_EQ(eventA->GetTargetDisplayId(), DISPLAY_A)
+    EXPECT_EQ(eventA->GetTargetDisplayId(), displayAConst)
         << "Device A must target display A, not display B";
 
     // Group B's cursor state must remain unchanged
-    EXPECT_EQ(mgr.cursorPosMap_[GROUP_B].displayId, DISPLAY_B)
+    EXPECT_EQ(mgr.cursorPosMap_[groupB].displayId, displayBConst)
         << "Device A movement must not overwrite group B's display";
-    EXPECT_EQ(mgr.cursorPosMap_[GROUP_B].cursorPos.x, 999)
+    EXPECT_EQ(mgr.cursorPosMap_[groupB].cursorPos.x, 999)
         << "Device A movement must not overwrite group B's cursor X";
-    EXPECT_EQ(mgr.cursorPosMap_[GROUP_B].cursorPos.y, 888)
+    EXPECT_EQ(mgr.cursorPosMap_[groupB].cursorPos.y, 888)
         << "Device A movement must not overwrite group B's cursor Y";
-    EXPECT_EQ(mgr.cursorPosMap_[GROUP_B].direction, DIRECTION90)
+    EXPECT_EQ(mgr.cursorPosMap_[groupB].direction, DIRECTION90)
         << "Device A movement must not overwrite group B's direction";
 
     // Now do device B
     auto eventB = PointerEvent::Create();
     ASSERT_NE(eventB, nullptr);
     eventB->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
-    eventB->SetDeviceId(DEVICE_B);
+    eventB->SetDeviceId(deviceB);
     eventB->SetTargetDisplayId(-1);
     eventB->SetPointerId(0);
     eventB->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
@@ -20257,13 +20257,13 @@ HWTEST_F(InputWindowsManagerTest, HardCursor_TwoGroups_NoStateOverwrite_001, Tes
     mgr.UpdateMouseTarget(eventB);
 
     // Device B's event should target display B
-    EXPECT_EQ(eventB->GetTargetDisplayId(), DISPLAY_B)
+    EXPECT_EQ(eventB->GetTargetDisplayId(), displayBConst)
         << "Device B must target display B";
 
     // Group A's cursor state must not be overwritten by device B
     // (direction was written by device A's UpdateMouseTarget, but B must not touch it)
-    auto groupAIter = mgr.cursorPosMap_.find(GROUP_A);
-    auto groupBIter = mgr.cursorPosMap_.find(GROUP_B);
+    auto groupAIter = mgr.cursorPosMap_.find(groupA);
+    auto groupBIter = mgr.cursorPosMap_.find(groupB);
     ASSERT_NE(groupAIter, mgr.cursorPosMap_.end());
     ASSERT_NE(groupBIter, mgr.cursorPosMap_.end());
     // Each group's displayId must match its own display
@@ -20289,13 +20289,13 @@ HWTEST_F(InputWindowsManagerTest, DualMouse_UnboundBaseline_SharedState_001, Tes
     CALL_TEST_DEBUG;
     InputWindowsManager mgr;
 
-    constexpr int32_t MOUSE_A = 101;
-    constexpr int32_t MOUSE_B = 102;
+    constexpr int32_t mouseA = 101;
+    constexpr int32_t mouseB = 102;
 
     // Both unbound -> both resolve to default (MAIN) group
-    EXPECT_EQ(mgr.ResolveGroupIdForDevice(MOUSE_A), DEFAULT_GROUP_ID)
+    EXPECT_EQ(mgr.ResolveGroupIdForDevice(mouseA), DEFAULT_GROUP_ID)
         << "Unbound mouse A must resolve to default group";
-    EXPECT_EQ(mgr.ResolveGroupIdForDevice(MOUSE_B), DEFAULT_GROUP_ID)
+    EXPECT_EQ(mgr.ResolveGroupIdForDevice(mouseB), DEFAULT_GROUP_ID)
         << "Unbound mouse B must resolve to default group";
 
     // Both read from the same mouse location map entry
@@ -20338,22 +20338,22 @@ HWTEST_F(InputWindowsManagerTest, DualMouse_BoundIsolation_PositionAndStyle_001,
     auto mgr = std::make_shared<InputWindowsManager>();
     ASSERT_NE(mgr, nullptr);
 
-    constexpr int32_t MOUSE_A = 111;
-    constexpr int32_t MOUSE_B = 222;
-    constexpr int32_t GROUP_A = 0;
-    constexpr int32_t GROUP_B = 5;
-    constexpr int32_t DISPLAY_A = 1;
-    constexpr int32_t DISPLAY_B = 10;
-    constexpr int32_t WINDOW_A = 50;
-    constexpr int32_t WINDOW_B = 60;
+    constexpr int32_t mouseAConst = 111;
+    constexpr int32_t mouseBConst = 222;
+    constexpr int32_t groupA = 0;
+    constexpr int32_t groupB = 5;
+    constexpr int32_t displayA = 1;
+    constexpr int32_t displayB = 10;
+    constexpr int32_t windowA = 50;
+    constexpr int32_t windowB = 60;
 
     // Set up main group (group A = 0)
     OLD::DisplayGroupInfo mainGroup;
-    mainGroup.groupId = GROUP_A;
+    mainGroup.groupId = groupA;
     mainGroup.type = GroupType::GROUP_DEFAULT;
-    mainGroup.focusWindowId = WINDOW_A;
+    mainGroup.focusWindowId = windowA;
     OLD::DisplayInfo mainDisplay;
-    mainDisplay.id = DISPLAY_A;
+    mainDisplay.id = displayA;
     mainDisplay.width = 1920;
     mainDisplay.height = 1080;
     mainDisplay.validWidth = 1920;
@@ -20364,9 +20364,9 @@ HWTEST_F(InputWindowsManagerTest, DualMouse_BoundIsolation_PositionAndStyle_001,
     mainDisplay.direction = DIRECTION0;
     mainGroup.displaysInfo.push_back(mainDisplay);
     WindowInfo winA;
-    winA.id = WINDOW_A;
+    winA.id = windowA;
     winA.pid = 100;
-    winA.agentWindowId = WINDOW_A;
+    winA.agentWindowId = windowA;
     winA.area = {0, 0, 1920, 1080};
     winA.defaultHotAreas = {winA.area};
     winA.pointerHotAreas = {winA.area};
@@ -20376,11 +20376,11 @@ HWTEST_F(InputWindowsManagerTest, DualMouse_BoundIsolation_PositionAndStyle_001,
 
     // Set up secondary group (group B = 5)
     OLD::DisplayGroupInfo secGroup;
-    secGroup.groupId = GROUP_B;
+    secGroup.groupId = groupB;
     secGroup.type = GroupType::GROUP_SPECIAL;
-    secGroup.focusWindowId = WINDOW_B;
+    secGroup.focusWindowId = windowB;
     OLD::DisplayInfo secDisplay;
-    secDisplay.id = DISPLAY_B;
+    secDisplay.id = displayB;
     secDisplay.width = 1280;
     secDisplay.height = 720;
     secDisplay.validWidth = 1280;
@@ -20391,9 +20391,9 @@ HWTEST_F(InputWindowsManagerTest, DualMouse_BoundIsolation_PositionAndStyle_001,
     secDisplay.direction = DIRECTION0;
     secGroup.displaysInfo.push_back(secDisplay);
     WindowInfo winB;
-    winB.id = WINDOW_B;
+    winB.id = windowB;
     winB.pid = 200;
-    winB.agentWindowId = WINDOW_B;
+    winB.agentWindowId = windowB;
     winB.area = {0, 0, 1280, 720};
     winB.defaultHotAreas = {winB.area};
     winB.pointerHotAreas = {winB.area};
@@ -20402,59 +20402,59 @@ HWTEST_F(InputWindowsManagerTest, DualMouse_BoundIsolation_PositionAndStyle_001,
     mgr->UpdateDisplayInfo(secGroup);
 
     // Bind mouse A to group A (display 1)
-    mgr->bindInfo_.AddInputDevice(MOUSE_A, "mouseA", "mouseA");
-    mgr->bindInfo_.AddDisplay(DISPLAY_A, "main0");
+    mgr->bindInfo_.AddInputDevice(mouseAConst, "mouseA", "mouseA");
+    mgr->bindInfo_.AddDisplay(displayA, "main0");
     std::string msg;
-    mgr->BindDeviceToDisplayGroupByDisplay(MOUSE_A, DISPLAY_A, msg);
+    mgr->BindDeviceToDisplayGroupByDisplay(mouseAConst, displayA, msg);
 
     // Bind mouse B to group B (display 10)
-    mgr->bindInfo_.AddInputDevice(MOUSE_B, "mouseB", "mouseB");
-    mgr->bindInfo_.AddDisplay(DISPLAY_B, "ext0");
-    mgr->BindDeviceToDisplayGroupByDisplay(MOUSE_B, DISPLAY_B, msg);
+    mgr->bindInfo_.AddInputDevice(mouseBConst, "mouseB", "mouseB");
+    mgr->bindInfo_.AddDisplay(displayB, "ext0");
+    mgr->BindDeviceToDisplayGroupByDisplay(mouseBConst, displayB, msg);
 
     // Verify resolution
-    EXPECT_EQ(mgr->ResolveGroupIdForDevice(MOUSE_A), GROUP_A);
-    EXPECT_EQ(mgr->ResolveGroupIdForDevice(MOUSE_B), GROUP_B);
+    EXPECT_EQ(mgr->ResolveGroupIdForDevice(mouseAConst), groupA);
+    EXPECT_EQ(mgr->ResolveGroupIdForDevice(mouseBConst), groupB);
 
     // Verify group B state was lazily created
-    EXPECT_TRUE(mgr->HasGroupState(GROUP_B))
+    EXPECT_TRUE(mgr->HasGroupState(groupB))
         << "Group B state must exist after binding mouse B";
 
     // Set initial state for group B
-    mgr->mouseLocationMap_[GROUP_B].displayId = DISPLAY_B;
-    mgr->mouseLocationMap_[GROUP_B].physicalX = 500;
-    mgr->mouseLocationMap_[GROUP_B].physicalY = 400;
-    mgr->cursorPosMap_[GROUP_B].displayId = DISPLAY_B;
-    mgr->cursorPosMap_[GROUP_B].cursorPos.x = 500;
-    mgr->cursorPosMap_[GROUP_B].cursorPos.y = 400;
+    mgr->mouseLocationMap_[groupB].displayId = displayB;
+    mgr->mouseLocationMap_[groupB].physicalX = 500;
+    mgr->mouseLocationMap_[groupB].physicalY = 400;
+    mgr->cursorPosMap_[groupB].displayId = displayB;
+    mgr->cursorPosMap_[groupB].cursorPos.x = 500;
+    mgr->cursorPosMap_[groupB].cursorPos.y = 400;
 
     // Simulate mouse A moving in group A
-    mgr->mouseLocationMap_[GROUP_A].displayId = DISPLAY_A;
-    mgr->mouseLocationMap_[GROUP_A].physicalX = 100;
-    mgr->mouseLocationMap_[GROUP_A].physicalY = 200;
-    mgr->cursorPosMap_[GROUP_A].displayId = DISPLAY_A;
-    mgr->cursorPosMap_[GROUP_A].cursorPos.x = 100;
-    mgr->cursorPosMap_[GROUP_A].cursorPos.y = 200;
+    mgr->mouseLocationMap_[groupA].displayId = displayA;
+    mgr->mouseLocationMap_[groupA].physicalX = 100;
+    mgr->mouseLocationMap_[groupA].physicalY = 200;
+    mgr->cursorPosMap_[groupA].displayId = displayA;
+    mgr->cursorPosMap_[groupA].cursorPos.x = 100;
+    mgr->cursorPosMap_[groupA].cursorPos.y = 200;
 
     // Mouse A's state must NOT overwrite mouse B's
-    EXPECT_EQ(mgr->mouseLocationMap_[GROUP_B].physicalX, 500)
+    EXPECT_EQ(mgr->mouseLocationMap_[groupB].physicalX, 500)
         << "Mouse A move must not overwrite mouse B's X position";
-    EXPECT_EQ(mgr->mouseLocationMap_[GROUP_B].physicalY, 400)
+    EXPECT_EQ(mgr->mouseLocationMap_[groupB].physicalY, 400)
         << "Mouse A move must not overwrite mouse B's Y position";
-    EXPECT_EQ(mgr->mouseLocationMap_[GROUP_B].displayId, DISPLAY_B)
+    EXPECT_EQ(mgr->mouseLocationMap_[groupB].displayId, displayB)
         << "Mouse A move must not overwrite mouse B's display";
 
-    EXPECT_EQ(mgr->cursorPosMap_[GROUP_B].cursorPos.x, 500)
+    EXPECT_EQ(mgr->cursorPosMap_[groupB].cursorPos.x, 500)
         << "Mouse A cursor must not overwrite mouse B's cursor X";
-    EXPECT_EQ(mgr->cursorPosMap_[GROUP_B].cursorPos.y, 400)
+    EXPECT_EQ(mgr->cursorPosMap_[groupB].cursorPos.y, 400)
         << "Mouse A cursor must not overwrite mouse B's cursor Y";
-    EXPECT_EQ(mgr->cursorPosMap_[GROUP_B].displayId, DISPLAY_B)
+    EXPECT_EQ(mgr->cursorPosMap_[groupB].displayId, displayB)
         << "Mouse A cursor must not overwrite mouse B's display";
 
     // Mouse B's state must NOT affect mouse A's
-    EXPECT_EQ(mgr->mouseLocationMap_[GROUP_A].physicalX, 100)
+    EXPECT_EQ(mgr->mouseLocationMap_[groupA].physicalX, 100)
         << "Mouse B state must not overwrite mouse A's X position";
-    EXPECT_EQ(mgr->mouseLocationMap_[GROUP_A].physicalY, 200)
+    EXPECT_EQ(mgr->mouseLocationMap_[groupA].physicalY, 200)
         << "Mouse B state must not overwrite mouse A's Y position";
 }
 
@@ -20471,12 +20471,12 @@ HWTEST_F(InputWindowsManagerTest, DualMouse_BoundIsolation_CaptureModePerGroup_0
     auto mgr = std::make_shared<InputWindowsManager>();
     ASSERT_NE(mgr, nullptr);
 
-    constexpr int32_t GROUP_A = 0;
-    constexpr int32_t GROUP_B = 3;
+    constexpr int32_t groupA = 0;
+    constexpr int32_t groupB = 3;
 
     // Register both groups
     OLD::DisplayGroupInfo mainGroup;
-    mainGroup.groupId = GROUP_A;
+    mainGroup.groupId = groupA;
     mainGroup.type = GroupType::GROUP_DEFAULT;
     OLD::DisplayInfo mainDisplay = { .id = 1 };
     mainDisplay.width = 1920;
@@ -20489,7 +20489,7 @@ HWTEST_F(InputWindowsManagerTest, DualMouse_BoundIsolation_CaptureModePerGroup_0
     mgr->UpdateDisplayInfo(mainGroup);
 
     OLD::DisplayGroupInfo secGroup;
-    secGroup.groupId = GROUP_B;
+    secGroup.groupId = groupB;
     secGroup.type = GroupType::GROUP_SPECIAL;
     OLD::DisplayInfo secDisplay = { .id = 5 };
     secDisplay.width = 1280;
@@ -20502,22 +20502,22 @@ HWTEST_F(InputWindowsManagerTest, DualMouse_BoundIsolation_CaptureModePerGroup_0
     mgr->UpdateDisplayInfo(secGroup);
 
     // Set capture on group A only
-    mgr->SetMouseCaptureMode(10, true, GROUP_A);
-    EXPECT_TRUE(mgr->GetMouseIsCaptureMode(GROUP_A))
+    mgr->SetMouseCaptureMode(10, true, groupA);
+    EXPECT_TRUE(mgr->GetMouseIsCaptureMode(groupA))
         << "Capture must be active for group A";
-    EXPECT_FALSE(mgr->GetMouseIsCaptureMode(GROUP_B))
+    EXPECT_FALSE(mgr->GetMouseIsCaptureMode(groupB))
         << "Capture must NOT be active for group B";
 
     // Set capture on group B
-    mgr->SetMouseCaptureMode(20, true, GROUP_B);
-    EXPECT_TRUE(mgr->GetMouseIsCaptureMode(GROUP_B))
+    mgr->SetMouseCaptureMode(20, true, groupB);
+    EXPECT_TRUE(mgr->GetMouseIsCaptureMode(groupB))
         << "Capture must be active for group B after setting";
 
     // Clear A - B should be unaffected
-    mgr->SetMouseCaptureMode(10, false, GROUP_A);
-    EXPECT_FALSE(mgr->GetMouseIsCaptureMode(GROUP_A))
+    mgr->SetMouseCaptureMode(10, false, groupA);
+    EXPECT_FALSE(mgr->GetMouseIsCaptureMode(groupA))
         << "Capture must be cleared for group A";
-    EXPECT_TRUE(mgr->GetMouseIsCaptureMode(GROUP_B))
+    EXPECT_TRUE(mgr->GetMouseIsCaptureMode(groupB))
         << "Clearing group A capture must not affect group B";
 }
 
@@ -20535,10 +20535,10 @@ HWTEST_F(InputWindowsManagerTest, DualMouse_NoOverIsolation_BindOneDeviceUnbound
     auto mgr = std::make_shared<InputWindowsManager>();
     ASSERT_NE(mgr, nullptr);
 
-    constexpr int32_t BOUND_MOUSE = 111;
-    constexpr int32_t UNBOUND_MOUSE = 222;
-    constexpr int32_t BOUND_GROUP = 3;
-    constexpr int32_t BOUND_DISPLAY = 5;
+    constexpr int32_t boundMouseConst = 111;
+    constexpr int32_t unboundMouse = 222;
+    constexpr int32_t boundGroup = 3;
+    constexpr int32_t boundDisplay = 5;
 
     // Register main group
     OLD::DisplayGroupInfo mainGroup;
@@ -20559,9 +20559,9 @@ HWTEST_F(InputWindowsManagerTest, DualMouse_NoOverIsolation_BindOneDeviceUnbound
 
     // Register secondary group
     OLD::DisplayGroupInfo secGroup;
-    secGroup.groupId = BOUND_GROUP;
+    secGroup.groupId = boundGroup;
     secGroup.type = GroupType::GROUP_SPECIAL;
-    OLD::DisplayInfo secDisplay = { .id = BOUND_DISPLAY };
+    OLD::DisplayInfo secDisplay = { .id = boundDisplay };
     secDisplay.width = 1280;
     secDisplay.height = 720;
     secDisplay.validWidth = 1280;
@@ -20574,20 +20574,20 @@ HWTEST_F(InputWindowsManagerTest, DualMouse_NoOverIsolation_BindOneDeviceUnbound
     mgr->UpdateDisplayInfo(secGroup);
 
     // Unbound mouse resolves to main group before binding
-    EXPECT_EQ(mgr->ResolveGroupIdForDevice(UNBOUND_MOUSE), DEFAULT_GROUP_ID)
+    EXPECT_EQ(mgr->ResolveGroupIdForDevice(unboundMouse), DEFAULT_GROUP_ID)
         << "Unbound mouse should be in default group before binding";
 
     // Bind bound_mouse to group 3
-    mgr->bindInfo_.AddInputDevice(BOUND_MOUSE, "boundMouse", "boundMouse");
-    mgr->bindInfo_.AddDisplay(BOUND_DISPLAY, "ext0");
+    mgr->bindInfo_.AddInputDevice(boundMouseConst, "boundMouse", "boundMouse");
+    mgr->bindInfo_.AddDisplay(boundDisplay, "ext0");
     std::string msg;
-    mgr->BindDeviceToDisplayGroupByDisplay(BOUND_MOUSE, BOUND_DISPLAY, msg);
+    mgr->BindDeviceToDisplayGroupByDisplay(boundMouseConst, boundDisplay, msg);
 
     // The bound mouse should resolve to group 3
-    EXPECT_EQ(mgr->ResolveGroupIdForDevice(BOUND_MOUSE), BOUND_GROUP);
+    EXPECT_EQ(mgr->ResolveGroupIdForDevice(boundMouseConst), boundGroup);
 
     // The unbound mouse must STILL resolve to default group (no over-isolation)
-    EXPECT_EQ(mgr->ResolveGroupIdForDevice(UNBOUND_MOUSE), DEFAULT_GROUP_ID)
+    EXPECT_EQ(mgr->ResolveGroupIdForDevice(unboundMouse), DEFAULT_GROUP_ID)
         << "Binding one mouse must NOT change unbound mouse's group resolution";
 
     // Unbound mouse still shares default group state
@@ -20609,45 +20609,45 @@ HWTEST_F(InputWindowsManagerTest, DualKeyboard_UnboundBaseline_SharedFocus_001, 
     CALL_TEST_DEBUG;
     InputWindowsManager mgr;
 
-    constexpr int32_t KBD_A = 301;
-    constexpr int32_t KBD_B = 302;
-    constexpr int32_t DEFAULT_FOCUS_WIN = 100;
+    constexpr int32_t kbdA = 301;
+    constexpr int32_t kbdB = 302;
+    constexpr int32_t defaultFocusWin = 100;
 
     // Set up default group with focus window
     auto it = mgr.displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
     ASSERT_NE(it, mgr.displayGroupInfoMap_.end());
-    it->second.focusWindowId = DEFAULT_FOCUS_WIN;
+    it->second.focusWindowId = defaultFocusWin;
     WindowInfo defWin;
-    defWin.id = DEFAULT_FOCUS_WIN;
+    defWin.id = defaultFocusWin;
     defWin.pid = 10;
-    defWin.agentWindowId = DEFAULT_FOCUS_WIN;
+    defWin.agentWindowId = defaultFocusWin;
     it->second.windowsInfo.push_back(defWin);
 
     // Both unbound keyboards resolve to the same group
-    EXPECT_EQ(mgr.ResolveGroupIdForDevice(KBD_A), DEFAULT_GROUP_ID)
+    EXPECT_EQ(mgr.ResolveGroupIdForDevice(kbdA), DEFAULT_GROUP_ID)
         << "Unbound keyboard A should resolve to default group";
-    EXPECT_EQ(mgr.ResolveGroupIdForDevice(KBD_B), DEFAULT_GROUP_ID)
+    EXPECT_EQ(mgr.ResolveGroupIdForDevice(kbdB), DEFAULT_GROUP_ID)
         << "Unbound keyboard B should resolve to default group";
 
     // Both share the same focus window
-    EXPECT_EQ(mgr.GetFocusWindowId(DEFAULT_GROUP_ID), DEFAULT_FOCUS_WIN)
+    EXPECT_EQ(mgr.GetFocusWindowId(DEFAULT_GROUP_ID), defaultFocusWin)
         << "Both unbound keyboards should use the same focus window";
 
     // Create key events from both keyboards - both should target the same window
     auto keyA = KeyEvent::Create();
     ASSERT_NE(keyA, nullptr);
-    keyA->SetDeviceId(KBD_A);
+    keyA->SetDeviceId(kbdA);
     keyA->SetTargetDisplayId(-1);
     mgr.HandleKeyEventWindowId(keyA);
-    EXPECT_EQ(keyA->GetTargetWindowId(), DEFAULT_FOCUS_WIN)
+    EXPECT_EQ(keyA->GetTargetWindowId(), defaultFocusWin)
         << "Keyboard A event should target default focus window";
 
     auto keyB = KeyEvent::Create();
     ASSERT_NE(keyB, nullptr);
-    keyB->SetDeviceId(KBD_B);
+    keyB->SetDeviceId(kbdB);
     keyB->SetTargetDisplayId(-1);
     mgr.HandleKeyEventWindowId(keyB);
-    EXPECT_EQ(keyB->GetTargetWindowId(), DEFAULT_FOCUS_WIN)
+    EXPECT_EQ(keyB->GetTargetWindowId(), defaultFocusWin)
         << "Keyboard B event should target same default focus window";
 }
 
@@ -20664,22 +20664,22 @@ HWTEST_F(InputWindowsManagerTest, DualKeyboard_BoundIsolation_IndependentFocus_0
     auto mgr = std::make_shared<InputWindowsManager>();
     ASSERT_NE(mgr, nullptr);
 
-    constexpr int32_t KBD_A = 401;
-    constexpr int32_t KBD_B = 402;
-    constexpr int32_t GROUP_A = 0;
-    constexpr int32_t GROUP_B = 7;
-    constexpr int32_t DISPLAY_A = 1;
-    constexpr int32_t DISPLAY_B = 15;
-    constexpr int32_t FOCUS_WIN_A = 100;
-    constexpr int32_t FOCUS_WIN_B = 200;
+    constexpr int32_t kbdA = 401;
+    constexpr int32_t kbdB = 402;
+    constexpr int32_t groupA = 0;
+    constexpr int32_t groupB = 7;
+    constexpr int32_t displayA = 1;
+    constexpr int32_t displayB = 15;
+    constexpr int32_t focusWinA = 100;
+    constexpr int32_t focusWinB = 200;
 
     // Set up group A (main)
     OLD::DisplayGroupInfo mainGroup;
-    mainGroup.groupId = GROUP_A;
+    mainGroup.groupId = groupA;
     mainGroup.type = GroupType::GROUP_DEFAULT;
-    mainGroup.focusWindowId = FOCUS_WIN_A;
+    mainGroup.focusWindowId = focusWinA;
     OLD::DisplayInfo mainDisplay;
-    mainDisplay.id = DISPLAY_A;
+    mainDisplay.id = displayA;
     mainDisplay.width = 1920;
     mainDisplay.height = 1080;
     mainDisplay.validWidth = 1920;
@@ -20690,20 +20690,20 @@ HWTEST_F(InputWindowsManagerTest, DualKeyboard_BoundIsolation_IndependentFocus_0
     mainDisplay.direction = DIRECTION0;
     mainGroup.displaysInfo.push_back(mainDisplay);
     WindowInfo winA;
-    winA.id = FOCUS_WIN_A;
+    winA.id = focusWinA;
     winA.pid = 10;
-    winA.agentWindowId = FOCUS_WIN_A;
+    winA.agentWindowId = focusWinA;
     winA.agentPid = 10;
     mainGroup.windowsInfo.push_back(winA);
     mgr->UpdateDisplayInfo(mainGroup);
 
     // Set up group B
     OLD::DisplayGroupInfo secGroup;
-    secGroup.groupId = GROUP_B;
+    secGroup.groupId = groupB;
     secGroup.type = GroupType::GROUP_SPECIAL;
-    secGroup.focusWindowId = FOCUS_WIN_B;
+    secGroup.focusWindowId = focusWinB;
     OLD::DisplayInfo secDisplay;
-    secDisplay.id = DISPLAY_B;
+    secDisplay.id = displayB;
     secDisplay.width = 1280;
     secDisplay.height = 720;
     secDisplay.validWidth = 1280;
@@ -20714,51 +20714,51 @@ HWTEST_F(InputWindowsManagerTest, DualKeyboard_BoundIsolation_IndependentFocus_0
     secDisplay.direction = DIRECTION0;
     secGroup.displaysInfo.push_back(secDisplay);
     WindowInfo winB;
-    winB.id = FOCUS_WIN_B;
+    winB.id = focusWinB;
     winB.pid = 20;
-    winB.agentWindowId = FOCUS_WIN_B;
+    winB.agentWindowId = focusWinB;
     winB.agentPid = 20;
     secGroup.windowsInfo.push_back(winB);
     mgr->UpdateDisplayInfo(secGroup);
 
     // Set up windowsPerDisplayMap_ for group B's display
     WindowGroupInfo wgInfo;
-    wgInfo.displayId = DISPLAY_B;
-    wgInfo.focusWindowId = FOCUS_WIN_B;
+    wgInfo.displayId = displayB;
+    wgInfo.focusWindowId = focusWinB;
     wgInfo.windowsInfo.push_back(winB);
     std::map<int32_t, WindowGroupInfo> bMap;
-    bMap[DISPLAY_B] = wgInfo;
-    mgr->windowsPerDisplayMap_[GROUP_B] = bMap;
+    bMap[displayB] = wgInfo;
+    mgr->windowsPerDisplayMap_[groupB] = bMap;
 
     // Bind keyboards
-    mgr->bindInfo_.AddRuntimeBinding(KBD_A, DISPLAY_A, GROUP_A);
-    mgr->bindInfo_.AddRuntimeBinding(KBD_B, DISPLAY_B, GROUP_B);
+    mgr->bindInfo_.AddRuntimeBinding(kbdA, displayA, groupA);
+    mgr->bindInfo_.AddRuntimeBinding(kbdB, displayB, groupB);
 
-    EXPECT_EQ(mgr->ResolveGroupIdForDevice(KBD_A), GROUP_A);
-    EXPECT_EQ(mgr->ResolveGroupIdForDevice(KBD_B), GROUP_B);
+    EXPECT_EQ(mgr->ResolveGroupIdForDevice(kbdA), groupA);
+    EXPECT_EQ(mgr->ResolveGroupIdForDevice(kbdB), groupB);
 
     // Focus windows are independent
-    EXPECT_EQ(mgr->GetFocusWindowId(GROUP_A), FOCUS_WIN_A)
+    EXPECT_EQ(mgr->GetFocusWindowId(groupA), focusWinA)
         << "Group A focus window should be independent";
-    EXPECT_EQ(mgr->GetFocusWindowId(GROUP_B), FOCUS_WIN_B)
+    EXPECT_EQ(mgr->GetFocusWindowId(groupB), focusWinB)
         << "Group B focus window should be independent";
 
     // Keyboard A event should target group A's focus window
     auto keyA = KeyEvent::Create();
     ASSERT_NE(keyA, nullptr);
-    keyA->SetDeviceId(KBD_A);
-    keyA->SetTargetDisplayId(DISPLAY_A);
+    keyA->SetDeviceId(kbdA);
+    keyA->SetTargetDisplayId(displayA);
     mgr->HandleKeyEventWindowId(keyA);
-    EXPECT_EQ(keyA->GetTargetWindowId(), FOCUS_WIN_A)
+    EXPECT_EQ(keyA->GetTargetWindowId(), focusWinA)
         << "Keyboard A event must target group A's focus window";
 
     // Keyboard B event should target group B's focus window
     auto keyB = KeyEvent::Create();
     ASSERT_NE(keyB, nullptr);
-    keyB->SetDeviceId(KBD_B);
-    keyB->SetTargetDisplayId(DISPLAY_B);
+    keyB->SetDeviceId(kbdB);
+    keyB->SetTargetDisplayId(displayB);
     mgr->HandleKeyEventWindowId(keyB);
-    EXPECT_EQ(keyB->GetTargetWindowId(), FOCUS_WIN_B)
+    EXPECT_EQ(keyB->GetTargetWindowId(), focusWinB)
         << "Keyboard B event must target group B's focus window, not A's";
 }
 
@@ -20774,24 +20774,24 @@ HWTEST_F(InputWindowsManagerTest, DualKeyboard_BoundIsolation_FocusMapIndependen
     CALL_TEST_DEBUG;
     InputWindowsManager mgr;
 
-    constexpr int32_t GROUP_A = 0;
-    constexpr int32_t GROUP_B = 4;
+    constexpr int32_t groupA = 0;
+    constexpr int32_t groupB = 4;
 
     // Initialize both groups' focus maps
-    mgr.focusWindowIdMap_[GROUP_A] = 100;
-    mgr.focusWindowIdMap_[GROUP_B] = 200;
+    mgr.focusWindowIdMap_[groupA] = 100;
+    mgr.focusWindowIdMap_[groupB] = 200;
 
     // Mutating one group's focus must not affect the other
-    mgr.focusWindowIdMap_[GROUP_A] = 150;
-    EXPECT_EQ(mgr.focusWindowIdMap_[GROUP_A], 150)
+    mgr.focusWindowIdMap_[groupA] = 150;
+    EXPECT_EQ(mgr.focusWindowIdMap_[groupA], 150)
         << "Group A focus should be updated";
-    EXPECT_EQ(mgr.focusWindowIdMap_[GROUP_B], 200)
+    EXPECT_EQ(mgr.focusWindowIdMap_[groupB], 200)
         << "Group B focus must not be affected by group A change";
 
-    mgr.focusWindowIdMap_[GROUP_B] = 250;
-    EXPECT_EQ(mgr.focusWindowIdMap_[GROUP_A], 150)
+    mgr.focusWindowIdMap_[groupB] = 250;
+    EXPECT_EQ(mgr.focusWindowIdMap_[groupA], 150)
         << "Group A focus must not be affected by group B change";
-    EXPECT_EQ(mgr.focusWindowIdMap_[GROUP_B], 250)
+    EXPECT_EQ(mgr.focusWindowIdMap_[groupB], 250)
         << "Group B focus should be updated";
 }
 
@@ -20807,28 +20807,28 @@ HWTEST_F(InputWindowsManagerTest, DualKeyboard_NoOverIsolation_BindOneUnboundUnc
     CALL_TEST_DEBUG;
     InputWindowsManager mgr;
 
-    constexpr int32_t KBD_BOUND = 501;
-    constexpr int32_t KBD_UNBOUND = 502;
-    constexpr int32_t BOUND_GROUP = 8;
-    constexpr int32_t BOUND_DISPLAY = 20;
-    constexpr int32_t DEFAULT_FOCUS_WIN = 100;
+    constexpr int32_t kbdBound = 501;
+    constexpr int32_t kbdUnbound = 502;
+    constexpr int32_t boundGroup = 8;
+    constexpr int32_t boundDisplay = 20;
+    constexpr int32_t defaultFocusWin = 100;
 
     // Set up default group
     auto it = mgr.displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
     ASSERT_NE(it, mgr.displayGroupInfoMap_.end());
-    it->second.focusWindowId = DEFAULT_FOCUS_WIN;
+    it->second.focusWindowId = defaultFocusWin;
 
     // Verify unbound keyboard uses default group BEFORE binding the other
-    EXPECT_EQ(mgr.ResolveGroupIdForDevice(KBD_UNBOUND), DEFAULT_GROUP_ID);
-    EXPECT_EQ(mgr.GetFocusWindowId(DEFAULT_GROUP_ID), DEFAULT_FOCUS_WIN);
+    EXPECT_EQ(mgr.ResolveGroupIdForDevice(kbdUnbound), DEFAULT_GROUP_ID);
+    EXPECT_EQ(mgr.GetFocusWindowId(DEFAULT_GROUP_ID), defaultFocusWin);
 
     // Bind one keyboard to a different group
-    mgr.bindInfo_.AddRuntimeBinding(KBD_BOUND, BOUND_DISPLAY, BOUND_GROUP);
+    mgr.bindInfo_.AddRuntimeBinding(kbdBound, boundDisplay, boundGroup);
 
     // Unbound keyboard must STILL resolve to default group
-    EXPECT_EQ(mgr.ResolveGroupIdForDevice(KBD_UNBOUND), DEFAULT_GROUP_ID)
+    EXPECT_EQ(mgr.ResolveGroupIdForDevice(kbdUnbound), DEFAULT_GROUP_ID)
         << "Binding one keyboard must not change unbound keyboard's resolution";
-    EXPECT_EQ(mgr.GetFocusWindowId(DEFAULT_GROUP_ID), DEFAULT_FOCUS_WIN)
+    EXPECT_EQ(mgr.GetFocusWindowId(DEFAULT_GROUP_ID), defaultFocusWin)
         << "Default group focus must not change when binding another device";
 }
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
@@ -20845,32 +20845,32 @@ HWTEST_F(InputWindowsManagerTest, SequenceClosure_KeyDownUp_BindMidSequence_001,
     CALL_TEST_DEBUG;
     InputWindowsManager mgr;
 
-    constexpr int32_t DEVICE_ID = 601;
-    constexpr int32_t KEY_CODE = 29;  // KEY_A
-    constexpr int32_t WINDOW_A = 100;
-    constexpr int32_t GROUP_B = 9;
-    constexpr int32_t DISPLAY_B = 30;
+    constexpr int32_t deviceId = 601;
+    constexpr int32_t keyCode = 29;  // KEY_A
+    constexpr int32_t windowA = 100;
+    constexpr int32_t groupB = 9;
+    constexpr int32_t displayB = 30;
 
     // Set up default group with focus window
     auto it = mgr.displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
     ASSERT_NE(it, mgr.displayGroupInfoMap_.end());
-    it->second.focusWindowId = WINDOW_A;
+    it->second.focusWindowId = windowA;
     WindowInfo defWin;
-    defWin.id = WINDOW_A;
+    defWin.id = windowA;
     defWin.pid = 10;
-    defWin.agentWindowId = WINDOW_A;
+    defWin.agentWindowId = windowA;
     it->second.windowsInfo.push_back(defWin);
 
     // Step 1: Key down while unbound (targets group A, window A)
     // HandleKeyEventWindowId records the sequence snapshot
     auto keyDown = KeyEvent::Create();
     ASSERT_NE(keyDown, nullptr);
-    keyDown->SetDeviceId(DEVICE_ID);
-    keyDown->SetKeyCode(KEY_CODE);
+    keyDown->SetDeviceId(deviceId);
+    keyDown->SetKeyCode(keyCode);
     keyDown->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
     keyDown->SetTargetDisplayId(-1);
     mgr.HandleKeyEventWindowId(keyDown);
-    EXPECT_EQ(keyDown->GetTargetWindowId(), WINDOW_A)
+    EXPECT_EQ(keyDown->GetTargetWindowId(), windowA)
         << "Key down should target window A in default group";
 
     // Verify sequence snapshot was recorded
@@ -20878,21 +20878,21 @@ HWTEST_F(InputWindowsManagerTest, SequenceClosure_KeyDownUp_BindMidSequence_001,
         << "One sequence snapshot should exist after key down";
 
     // Step 2: Bind device mid-sequence to group B
-    mgr.bindInfo_.AddRuntimeBinding(DEVICE_ID, DISPLAY_B, GROUP_B);
-    EXPECT_EQ(mgr.ResolveGroupIdForDevice(DEVICE_ID), GROUP_B)
+    mgr.bindInfo_.AddRuntimeBinding(deviceId, displayB, groupB);
+    EXPECT_EQ(mgr.ResolveGroupIdForDevice(deviceId), groupB)
         << "Device should now resolve to group B after binding";
 
     // Step 3: Key up - should use the snapshot to route to original group A, window A
     auto keyUp = KeyEvent::Create();
     ASSERT_NE(keyUp, nullptr);
-    keyUp->SetDeviceId(DEVICE_ID);
-    keyUp->SetKeyCode(KEY_CODE);
+    keyUp->SetDeviceId(deviceId);
+    keyUp->SetKeyCode(keyCode);
     keyUp->SetKeyAction(KeyEvent::KEY_ACTION_UP);
     keyUp->SetTargetDisplayId(-1);
     mgr.HandleKeyEventWindowId(keyUp);
 
     // The key up should route to the ORIGINAL window (group A), not the new group B
-    EXPECT_EQ(keyUp->GetTargetWindowId(), WINDOW_A)
+    EXPECT_EQ(keyUp->GetTargetWindowId(), windowA)
         << "Key up must route to original window A despite device now being bound to group B";
 
     // Snapshot should be consumed
@@ -20911,45 +20911,45 @@ HWTEST_F(InputWindowsManagerTest, SequenceClosure_KeyCancel_BindMidSequence_001,
     CALL_TEST_DEBUG;
     InputWindowsManager mgr;
 
-    constexpr int32_t DEVICE_ID = 602;
-    constexpr int32_t KEY_CODE = 30;
-    constexpr int32_t WINDOW_A = 110;
-    constexpr int32_t GROUP_B = 11;
-    constexpr int32_t DISPLAY_B = 40;
+    constexpr int32_t deviceId = 602;
+    constexpr int32_t keyCode = 30;
+    constexpr int32_t windowA = 110;
+    constexpr int32_t groupB = 11;
+    constexpr int32_t displayB = 40;
 
     // Set up default group
     auto it = mgr.displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
     ASSERT_NE(it, mgr.displayGroupInfoMap_.end());
-    it->second.focusWindowId = WINDOW_A;
+    it->second.focusWindowId = windowA;
     WindowInfo defWin;
-    defWin.id = WINDOW_A;
+    defWin.id = windowA;
     defWin.pid = 10;
-    defWin.agentWindowId = WINDOW_A;
+    defWin.agentWindowId = windowA;
     it->second.windowsInfo.push_back(defWin);
 
     // Key down (records snapshot)
     auto keyDown = KeyEvent::Create();
     ASSERT_NE(keyDown, nullptr);
-    keyDown->SetDeviceId(DEVICE_ID);
-    keyDown->SetKeyCode(KEY_CODE);
+    keyDown->SetDeviceId(deviceId);
+    keyDown->SetKeyCode(keyCode);
     keyDown->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
     keyDown->SetTargetDisplayId(-1);
     mgr.HandleKeyEventWindowId(keyDown);
     EXPECT_EQ(mgr.GetSequenceSnapshotCount(), 1u);
 
     // Bind device mid-sequence
-    mgr.bindInfo_.AddRuntimeBinding(DEVICE_ID, DISPLAY_B, GROUP_B);
+    mgr.bindInfo_.AddRuntimeBinding(deviceId, displayB, groupB);
 
     // Key cancel - should also consume the snapshot
     auto keyCancel = KeyEvent::Create();
     ASSERT_NE(keyCancel, nullptr);
-    keyCancel->SetDeviceId(DEVICE_ID);
-    keyCancel->SetKeyCode(KEY_CODE);
+    keyCancel->SetDeviceId(deviceId);
+    keyCancel->SetKeyCode(keyCode);
     keyCancel->SetKeyAction(KeyEvent::KEY_ACTION_CANCEL);
     keyCancel->SetTargetDisplayId(-1);
     mgr.HandleKeyEventWindowId(keyCancel);
 
-    EXPECT_EQ(keyCancel->GetTargetWindowId(), WINDOW_A)
+    EXPECT_EQ(keyCancel->GetTargetWindowId(), windowA)
         << "Key cancel must route to original window A";
     EXPECT_EQ(mgr.GetSequenceSnapshotCount(), 0u)
         << "Snapshot must be consumed after cancel";
@@ -20967,33 +20967,33 @@ HWTEST_F(InputWindowsManagerTest, SequenceClosure_ButtonDownUp_BindMidSequence_0
     CALL_TEST_DEBUG;
     InputWindowsManager mgr;
 
-    constexpr int32_t DEVICE_ID = 701;
-    constexpr int32_t POINTER_ID = 0;
-    constexpr int32_t GROUP_A = 0;
-    constexpr int32_t WINDOW_A = 120;
-    constexpr int32_t GROUP_B = 12;
+    constexpr int32_t deviceId = 701;
+    constexpr int32_t pointerId = 0;
+    constexpr int32_t groupA = 0;
+    constexpr int32_t windowA = 120;
+    constexpr int32_t groupB = 12;
 
     // Step 1: Simulate button down by recording a snapshot directly
     // (UpdateMouseTarget is too complex to call in unit test without full display setup)
     InputSequenceKey seqKey;
-    seqKey.deviceId = DEVICE_ID;
-    seqKey.itemId = POINTER_ID;
+    seqKey.deviceId = deviceId;
+    seqKey.itemId = pointerId;
     seqKey.type = InputSequenceType::BUTTON;
-    mgr.RecordSequenceBegin(seqKey, GROUP_A, WINDOW_A);
+    mgr.RecordSequenceBegin(seqKey, groupA, windowA);
     EXPECT_EQ(mgr.GetSequenceSnapshotCount(), 1u)
         << "Button down should record a sequence snapshot";
 
     // Step 2: Bind device mid-sequence
-    mgr.bindInfo_.AddRuntimeBinding(DEVICE_ID, 50, GROUP_B);
-    EXPECT_EQ(mgr.ResolveGroupIdForDevice(DEVICE_ID), GROUP_B);
+    mgr.bindInfo_.AddRuntimeBinding(deviceId, 50, groupB);
+    EXPECT_EQ(mgr.ResolveGroupIdForDevice(deviceId), groupB);
 
     // Step 3: Button up - consume the snapshot
     auto snap = mgr.ConsumeSequenceSnapshot(seqKey);
     ASSERT_TRUE(snap.has_value())
         << "Button up should find the snapshot from button down";
-    EXPECT_EQ(snap->groupId, GROUP_A)
+    EXPECT_EQ(snap->groupId, groupA)
         << "Button up must route to original group A";
-    EXPECT_EQ(snap->windowId, WINDOW_A)
+    EXPECT_EQ(snap->windowId, windowA)
         << "Button up must route to original window A";
 
     EXPECT_EQ(mgr.GetSequenceSnapshotCount(), 0u)
@@ -21012,30 +21012,30 @@ HWTEST_F(InputWindowsManagerTest, SequenceClosure_PointerDownUp_BindMidSequence_
     CALL_TEST_DEBUG;
     InputWindowsManager mgr;
 
-    constexpr int32_t DEVICE_ID = 801;
-    constexpr int32_t POINTER_ID = 0;
-    constexpr int32_t GROUP_A = 0;
-    constexpr int32_t WINDOW_A = 130;
-    constexpr int32_t GROUP_B = 14;
+    constexpr int32_t deviceId = 801;
+    constexpr int32_t pointerId = 0;
+    constexpr int32_t groupA = 0;
+    constexpr int32_t windowA = 130;
+    constexpr int32_t groupB = 14;
 
     // Record pointer down snapshot
     InputSequenceKey seqKey;
-    seqKey.deviceId = DEVICE_ID;
-    seqKey.itemId = POINTER_ID;
+    seqKey.deviceId = deviceId;
+    seqKey.itemId = pointerId;
     seqKey.type = InputSequenceType::POINTER;
-    mgr.RecordSequenceBegin(seqKey, GROUP_A, WINDOW_A);
+    mgr.RecordSequenceBegin(seqKey, groupA, windowA);
     EXPECT_EQ(mgr.GetSequenceSnapshotCount(), 1u);
 
     // Bind device mid-sequence
-    mgr.bindInfo_.AddRuntimeBinding(DEVICE_ID, 60, GROUP_B);
+    mgr.bindInfo_.AddRuntimeBinding(deviceId, 60, groupB);
 
     // Pointer up - consume the snapshot
     auto snap = mgr.ConsumeSequenceSnapshot(seqKey);
     ASSERT_TRUE(snap.has_value())
         << "Pointer up should find the snapshot from pointer down";
-    EXPECT_EQ(snap->groupId, GROUP_A)
+    EXPECT_EQ(snap->groupId, groupA)
         << "Pointer up must route to original group A";
-    EXPECT_EQ(snap->windowId, WINDOW_A)
+    EXPECT_EQ(snap->windowId, windowA)
         << "Pointer up must route to original window A";
     EXPECT_EQ(mgr.GetSequenceSnapshotCount(), 0u);
 }
@@ -21052,28 +21052,28 @@ HWTEST_F(InputWindowsManagerTest, SequenceClosure_PointerCancel_BindMidSequence_
     CALL_TEST_DEBUG;
     InputWindowsManager mgr;
 
-    constexpr int32_t DEVICE_ID = 802;
-    constexpr int32_t POINTER_ID = 1;
-    constexpr int32_t GROUP_A = 0;
-    constexpr int32_t WINDOW_A = 140;
-    constexpr int32_t GROUP_B = 15;
+    constexpr int32_t deviceId = 802;
+    constexpr int32_t pointerId = 1;
+    constexpr int32_t groupA = 0;
+    constexpr int32_t windowA = 140;
+    constexpr int32_t groupB = 15;
 
     // Record pointer down
     InputSequenceKey seqKey;
-    seqKey.deviceId = DEVICE_ID;
-    seqKey.itemId = POINTER_ID;
+    seqKey.deviceId = deviceId;
+    seqKey.itemId = pointerId;
     seqKey.type = InputSequenceType::POINTER;
-    mgr.RecordSequenceBegin(seqKey, GROUP_A, WINDOW_A);
+    mgr.RecordSequenceBegin(seqKey, groupA, windowA);
     EXPECT_EQ(mgr.GetSequenceSnapshotCount(), 1u);
 
     // Bind mid-sequence
-    mgr.bindInfo_.AddRuntimeBinding(DEVICE_ID, 70, GROUP_B);
+    mgr.bindInfo_.AddRuntimeBinding(deviceId, 70, groupB);
 
     // Pointer cancel - same as up: consume snapshot
     auto snap = mgr.ConsumeSequenceSnapshot(seqKey);
     ASSERT_TRUE(snap.has_value());
-    EXPECT_EQ(snap->groupId, GROUP_A);
-    EXPECT_EQ(snap->windowId, WINDOW_A);
+    EXPECT_EQ(snap->groupId, groupA);
+    EXPECT_EQ(snap->windowId, windowA);
     EXPECT_EQ(mgr.GetSequenceSnapshotCount(), 0u);
 }
 
@@ -21089,29 +21089,29 @@ HWTEST_F(InputWindowsManagerTest, SequenceClosure_GestureBeginEnd_BindMidSequenc
     CALL_TEST_DEBUG;
     InputWindowsManager mgr;
 
-    constexpr int32_t DEVICE_ID = 901;
-    constexpr int32_t POINTER_ID = 0;
-    constexpr int32_t GROUP_A = 0;
-    constexpr int32_t WINDOW_A = 150;
-    constexpr int32_t GROUP_B = 16;
+    constexpr int32_t deviceId = 901;
+    constexpr int32_t pointerId = 0;
+    constexpr int32_t groupA = 0;
+    constexpr int32_t windowA = 150;
+    constexpr int32_t groupB = 16;
 
     // Simulate gesture begin by recording snapshot (POINTER type)
     InputSequenceKey seqKey;
-    seqKey.deviceId = DEVICE_ID;
-    seqKey.itemId = POINTER_ID;
+    seqKey.deviceId = deviceId;
+    seqKey.itemId = pointerId;
     seqKey.type = InputSequenceType::POINTER;
-    mgr.RecordSequenceBegin(seqKey, GROUP_A, WINDOW_A);
+    mgr.RecordSequenceBegin(seqKey, groupA, windowA);
     EXPECT_EQ(mgr.GetSequenceSnapshotCount(), 1u);
 
     // Bind device mid-gesture
-    mgr.bindInfo_.AddRuntimeBinding(DEVICE_ID, 80, GROUP_B);
+    mgr.bindInfo_.AddRuntimeBinding(deviceId, 80, groupB);
 
     // Gesture end - consume snapshot
     auto snap = mgr.ConsumeSequenceSnapshot(seqKey);
     ASSERT_TRUE(snap.has_value());
-    EXPECT_EQ(snap->groupId, GROUP_A)
+    EXPECT_EQ(snap->groupId, groupA)
         << "Gesture end must route to original group A";
-    EXPECT_EQ(snap->windowId, WINDOW_A)
+    EXPECT_EQ(snap->windowId, windowA)
         << "Gesture end must route to original window A";
     EXPECT_EQ(mgr.GetSequenceSnapshotCount(), 0u);
 }
@@ -21128,25 +21128,25 @@ HWTEST_F(InputWindowsManagerTest, SequenceClosure_MultipleSimultaneous_Different
     CALL_TEST_DEBUG;
     InputWindowsManager mgr;
 
-    constexpr int32_t DEV_KBD = 1001;
-    constexpr int32_t DEV_MOUSE = 1002;
-    constexpr int32_t DEV_TOUCH = 1003;
+    constexpr int32_t devKbd = 1001;
+    constexpr int32_t devMouse = 1002;
+    constexpr int32_t devTouch = 1003;
 
     // Three concurrent sequences: keyboard, mouse button, touch pointer
     InputSequenceKey kbdKey;
-    kbdKey.deviceId = DEV_KBD;
+    kbdKey.deviceId = devKbd;
     kbdKey.itemId = 29;  // KEY_A
     kbdKey.type = InputSequenceType::KEY;
     mgr.RecordSequenceBegin(kbdKey, 0, 100);
 
     InputSequenceKey mouseKey;
-    mouseKey.deviceId = DEV_MOUSE;
+    mouseKey.deviceId = devMouse;
     mouseKey.itemId = 0;
     mouseKey.type = InputSequenceType::BUTTON;
     mgr.RecordSequenceBegin(mouseKey, 1, 200);
 
     InputSequenceKey touchKey;
-    touchKey.deviceId = DEV_TOUCH;
+    touchKey.deviceId = devTouch;
     touchKey.itemId = 0;
     touchKey.type = InputSequenceType::POINTER;
     mgr.RecordSequenceBegin(touchKey, 2, 300);
@@ -21155,9 +21155,9 @@ HWTEST_F(InputWindowsManagerTest, SequenceClosure_MultipleSimultaneous_Different
         << "Three independent sequences should be tracked";
 
     // Bind all three devices to different groups (simulating rebind mid-sequence)
-    mgr.bindInfo_.AddRuntimeBinding(DEV_KBD, 10, 5);
-    mgr.bindInfo_.AddRuntimeBinding(DEV_MOUSE, 20, 6);
-    mgr.bindInfo_.AddRuntimeBinding(DEV_TOUCH, 30, 7);
+    mgr.bindInfo_.AddRuntimeBinding(devKbd, 10, 5);
+    mgr.bindInfo_.AddRuntimeBinding(devMouse, 20, 6);
+    mgr.bindInfo_.AddRuntimeBinding(devTouch, 30, 7);
 
     // Consume in different order than created - each should still find its snapshot
     auto touchSnap = mgr.ConsumeSequenceSnapshot(touchKey);
@@ -21191,13 +21191,13 @@ HWTEST_F(InputWindowsManagerTest, SequenceClosure_NoSnapshotForUpWithoutDown_001
     CALL_TEST_DEBUG;
     InputWindowsManager mgr;
 
-    constexpr int32_t DEVICE_ID = 1100;
-    constexpr int32_t KEY_CODE = 31;
+    constexpr int32_t deviceId = 1100;
+    constexpr int32_t keyCode = 31;
 
     // No prior key-down was recorded - consuming should return nullopt
     InputSequenceKey seqKey;
-    seqKey.deviceId = DEVICE_ID;
-    seqKey.itemId = KEY_CODE;
+    seqKey.deviceId = deviceId;
+    seqKey.itemId = keyCode;
     seqKey.type = InputSequenceType::KEY;
     auto snap = mgr.ConsumeSequenceSnapshot(seqKey);
     EXPECT_FALSE(snap.has_value())
@@ -21217,31 +21217,31 @@ HWTEST_F(InputWindowsManagerTest, SequenceClosure_UnbindMidSequence_001, TestSiz
     CALL_TEST_DEBUG;
     InputWindowsManager mgr;
 
-    constexpr int32_t DEVICE_ID = 1200;
-    constexpr int32_t KEY_CODE = 32;
-    constexpr int32_t GROUP_B = 20;
-    constexpr int32_t WINDOW_B = 250;
+    constexpr int32_t deviceId = 1200;
+    constexpr int32_t keyCode = 32;
+    constexpr int32_t groupB = 20;
+    constexpr int32_t windowB = 250;
 
     // Record snapshot for a device that was bound to group B
     InputSequenceKey seqKey;
-    seqKey.deviceId = DEVICE_ID;
-    seqKey.itemId = KEY_CODE;
+    seqKey.deviceId = deviceId;
+    seqKey.itemId = keyCode;
     seqKey.type = InputSequenceType::KEY;
-    mgr.RecordSequenceBegin(seqKey, GROUP_B, WINDOW_B);
+    mgr.RecordSequenceBegin(seqKey, groupB, windowB);
     EXPECT_EQ(mgr.GetSequenceSnapshotCount(), 1u);
 
     // Unbind the device (it now resolves to default group)
-    mgr.bindInfo_.RemoveRuntimeBinding(DEVICE_ID);
-    EXPECT_EQ(mgr.ResolveGroupIdForDevice(DEVICE_ID), DEFAULT_GROUP_ID)
+    mgr.bindInfo_.RemoveRuntimeBinding(deviceId);
+    EXPECT_EQ(mgr.ResolveGroupIdForDevice(deviceId), DEFAULT_GROUP_ID)
         << "After unbind, device should resolve to default group";
 
     // Key up - snapshot should still have original group B
     auto snap = mgr.ConsumeSequenceSnapshot(seqKey);
     ASSERT_TRUE(snap.has_value())
         << "Snapshot should survive unbinding";
-    EXPECT_EQ(snap->groupId, GROUP_B)
+    EXPECT_EQ(snap->groupId, groupB)
         << "Key up must route to original group B after unbind";
-    EXPECT_EQ(snap->windowId, WINDOW_B)
+    EXPECT_EQ(snap->windowId, windowB)
         << "Key up must route to original window B after unbind";
     EXPECT_EQ(mgr.GetSequenceSnapshotCount(), 0u);
 }
@@ -21258,30 +21258,30 @@ HWTEST_F(InputWindowsManagerTest, SequenceClosure_RebindMidSequence_001, TestSiz
     CALL_TEST_DEBUG;
     InputWindowsManager mgr;
 
-    constexpr int32_t DEVICE_ID = 1300;
-    constexpr int32_t KEY_CODE = 33;
-    constexpr int32_t GROUP_A = 10;
-    constexpr int32_t WINDOW_A = 300;
-    constexpr int32_t GROUP_C = 30;
+    constexpr int32_t deviceId = 1300;
+    constexpr int32_t keyCode = 33;
+    constexpr int32_t groupA = 10;
+    constexpr int32_t windowA = 300;
+    constexpr int32_t groupC = 30;
 
     // Record snapshot while bound to group A
     InputSequenceKey seqKey;
-    seqKey.deviceId = DEVICE_ID;
-    seqKey.itemId = KEY_CODE;
+    seqKey.deviceId = deviceId;
+    seqKey.itemId = keyCode;
     seqKey.type = InputSequenceType::KEY;
-    mgr.RecordSequenceBegin(seqKey, GROUP_A, WINDOW_A);
+    mgr.RecordSequenceBegin(seqKey, groupA, windowA);
     EXPECT_EQ(mgr.GetSequenceSnapshotCount(), 1u);
 
     // Rebind to a completely different group C
-    mgr.bindInfo_.AddRuntimeBinding(DEVICE_ID, 90, GROUP_C);
-    EXPECT_EQ(mgr.ResolveGroupIdForDevice(DEVICE_ID), GROUP_C);
+    mgr.bindInfo_.AddRuntimeBinding(deviceId, 90, groupC);
+    EXPECT_EQ(mgr.ResolveGroupIdForDevice(deviceId), groupC);
 
     // Key up - snapshot should still point to original group A
     auto snap = mgr.ConsumeSequenceSnapshot(seqKey);
     ASSERT_TRUE(snap.has_value());
-    EXPECT_EQ(snap->groupId, GROUP_A)
+    EXPECT_EQ(snap->groupId, groupA)
         << "Key up must route to original group A, not new group C";
-    EXPECT_EQ(snap->windowId, WINDOW_A)
+    EXPECT_EQ(snap->windowId, windowA)
         << "Key up must route to original window A";
 }
 
@@ -21298,51 +21298,51 @@ HWTEST_F(InputWindowsManagerTest, SequenceClosure_HandleKeyEventWindowId_EndToEn
     CALL_TEST_DEBUG;
     InputWindowsManager mgr;
 
-    constexpr int32_t DEVICE_ID = 1400;
-    constexpr int32_t KEY_CODE = 34;
-    constexpr int32_t FOCUS_WIN = 400;
-    constexpr int32_t GROUP_NEW = 25;
-    constexpr int32_t DISPLAY_NEW = 55;
+    constexpr int32_t deviceId = 1400;
+    constexpr int32_t keyCode = 34;
+    constexpr int32_t focusWin = 400;
+    constexpr int32_t groupNew = 25;
+    constexpr int32_t displayNew = 55;
 
     // Set up default group with a focus window
     auto it = mgr.displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
     ASSERT_NE(it, mgr.displayGroupInfoMap_.end());
-    it->second.focusWindowId = FOCUS_WIN;
+    it->second.focusWindowId = focusWin;
     WindowInfo win;
-    win.id = FOCUS_WIN;
+    win.id = focusWin;
     win.pid = 10;
-    win.agentWindowId = FOCUS_WIN;
+    win.agentWindowId = focusWin;
     it->second.windowsInfo.push_back(win);
 
     // Step 1: Key down from unbound device
     auto keyDown = KeyEvent::Create();
     ASSERT_NE(keyDown, nullptr);
-    keyDown->SetDeviceId(DEVICE_ID);
-    keyDown->SetKeyCode(KEY_CODE);
+    keyDown->SetDeviceId(deviceId);
+    keyDown->SetKeyCode(keyCode);
     keyDown->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
     keyDown->SetTargetDisplayId(-1);
     mgr.HandleKeyEventWindowId(keyDown);
 
     // Verify: key down targeted the focus window
-    EXPECT_EQ(keyDown->GetTargetWindowId(), FOCUS_WIN);
+    EXPECT_EQ(keyDown->GetTargetWindowId(), focusWin);
     // Verify: a sequence snapshot was recorded
     EXPECT_EQ(mgr.GetSequenceSnapshotCount(), 1u)
         << "HandleKeyEventWindowId should record snapshot on KEY_ACTION_DOWN";
 
     // Step 2: Bind the device to a new group mid-sequence
-    mgr.bindInfo_.AddRuntimeBinding(DEVICE_ID, DISPLAY_NEW, GROUP_NEW);
+    mgr.bindInfo_.AddRuntimeBinding(deviceId, displayNew, groupNew);
 
     // Step 3: Key up
     auto keyUp = KeyEvent::Create();
     ASSERT_NE(keyUp, nullptr);
-    keyUp->SetDeviceId(DEVICE_ID);
-    keyUp->SetKeyCode(KEY_CODE);
+    keyUp->SetDeviceId(deviceId);
+    keyUp->SetKeyCode(keyCode);
     keyUp->SetKeyAction(KeyEvent::KEY_ACTION_UP);
     keyUp->SetTargetDisplayId(-1);
     mgr.HandleKeyEventWindowId(keyUp);
 
     // Verify: key up targeted the ORIGINAL focus window, not the new group's
-    EXPECT_EQ(keyUp->GetTargetWindowId(), FOCUS_WIN)
+    EXPECT_EQ(keyUp->GetTargetWindowId(), focusWin)
         << "KEY_ACTION_UP must use snapshot to route to original window";
     // Verify: snapshot is consumed
     EXPECT_EQ(mgr.GetSequenceSnapshotCount(), 0u)
@@ -21361,31 +21361,31 @@ HWTEST_F(InputWindowsManagerTest, SequenceClosure_KeyNoSnapshot_NormalRouting_00
     CALL_TEST_DEBUG;
     InputWindowsManager mgr;
 
-    constexpr int32_t DEVICE_ID = 1500;
-    constexpr int32_t KEY_CODE = 35;
-    constexpr int32_t FOCUS_WIN = 500;
+    constexpr int32_t deviceId = 1500;
+    constexpr int32_t keyCode = 35;
+    constexpr int32_t focusWin = 500;
 
     // Set up default group
     auto it = mgr.displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
     ASSERT_NE(it, mgr.displayGroupInfoMap_.end());
-    it->second.focusWindowId = FOCUS_WIN;
+    it->second.focusWindowId = focusWin;
     WindowInfo win;
-    win.id = FOCUS_WIN;
+    win.id = focusWin;
     win.pid = 10;
-    win.agentWindowId = FOCUS_WIN;
+    win.agentWindowId = focusWin;
     it->second.windowsInfo.push_back(win);
 
     // Send key-up without prior key-down (orphan release)
     auto keyUp = KeyEvent::Create();
     ASSERT_NE(keyUp, nullptr);
-    keyUp->SetDeviceId(DEVICE_ID);
-    keyUp->SetKeyCode(KEY_CODE);
+    keyUp->SetDeviceId(deviceId);
+    keyUp->SetKeyCode(keyCode);
     keyUp->SetKeyAction(KeyEvent::KEY_ACTION_UP);
     keyUp->SetTargetDisplayId(-1);
     mgr.HandleKeyEventWindowId(keyUp);
 
     // Should fall through to normal routing since no snapshot exists
-    EXPECT_EQ(keyUp->GetTargetWindowId(), FOCUS_WIN)
+    EXPECT_EQ(keyUp->GetTargetWindowId(), focusWin)
         << "Without a snapshot, key-up should use normal focus routing";
     EXPECT_EQ(mgr.GetSequenceSnapshotCount(), 0u);
 }
@@ -21403,24 +21403,24 @@ HWTEST_F(InputWindowsManagerTest, SequenceClosure_DeviceOffline_ClearsSnapshots_
     CALL_TEST_DEBUG;
     InputWindowsManager mgr;
 
-    constexpr int32_t DEVICE_A = 1601;
-    constexpr int32_t DEVICE_B = 1602;
+    constexpr int32_t deviceA = 1601;
+    constexpr int32_t deviceB = 1602;
 
     // Create snapshots for two devices
     InputSequenceKey keyA;
-    keyA.deviceId = DEVICE_A;
+    keyA.deviceId = deviceA;
     keyA.itemId = 29;
     keyA.type = InputSequenceType::KEY;
     mgr.RecordSequenceBegin(keyA, 0, 100);
 
     InputSequenceKey btnA;
-    btnA.deviceId = DEVICE_A;
+    btnA.deviceId = deviceA;
     btnA.itemId = 0;
     btnA.type = InputSequenceType::BUTTON;
     mgr.RecordSequenceBegin(btnA, 0, 100);
 
     InputSequenceKey keyB;
-    keyB.deviceId = DEVICE_B;
+    keyB.deviceId = deviceB;
     keyB.itemId = 30;
     keyB.type = InputSequenceType::KEY;
     mgr.RecordSequenceBegin(keyB, 1, 200);
@@ -21428,7 +21428,7 @@ HWTEST_F(InputWindowsManagerTest, SequenceClosure_DeviceOffline_ClearsSnapshots_
     EXPECT_EQ(mgr.GetSequenceSnapshotCount(), 3u);
 
     // Device A goes offline - clear its snapshots
-    mgr.ClearSequenceSnapshotsByDevice(DEVICE_A);
+    mgr.ClearSequenceSnapshotsByDevice(deviceA);
 
     EXPECT_EQ(mgr.GetSequenceSnapshotCount(), 1u)
         << "Only device B's snapshot should remain";
@@ -21462,10 +21462,10 @@ HWTEST_F(InputWindowsManagerTest, Compat_WindowScopedPointerStyle_ByGroup_001, T
     CALL_TEST_DEBUG;
     InputWindowsManager mgr;
 
-    constexpr int32_t PID_A = 10;
-    constexpr int32_t PID_B = 20;
-    constexpr int32_t WIN_A = 100;
-    constexpr int32_t WIN_B = 200;
+    constexpr int32_t pidA = 10;
+    constexpr int32_t pidB = 20;
+    constexpr int32_t winA = 100;
+    constexpr int32_t winB = 200;
 
     // Set up default group with basic display info for pointer style init
     OLD::DisplayGroupInfo defaultGroup;
@@ -21481,27 +21481,27 @@ HWTEST_F(InputWindowsManagerTest, Compat_WindowScopedPointerStyle_ByGroup_001, T
     defaultGroup.displaysInfo.push_back(disp);
     mgr.UpdateDisplayInfo(defaultGroup);
 
-    // Set window-scoped pointer style for PID_A / WIN_A
+    // Set window-scoped pointer style for pidA / winA
     PointerStyle styleA;
     styleA.id = POINTER_STYLE_ID_1;
-    int32_t ret = mgr.SetPointerStyle(PID_A, WIN_A, styleA);
+    int32_t ret = mgr.SetPointerStyle(pidA, winA, styleA);
     EXPECT_EQ(ret, RET_OK) << "Window-scoped SetPointerStyle must succeed for valid window";
 
-    // Set a different style for PID_B / WIN_B
+    // Set a different style for pidB / winB
     PointerStyle styleB;
     styleB.id = POINTER_STYLE_ID_2;
-    ret = mgr.SetPointerStyle(PID_B, WIN_B, styleB);
+    ret = mgr.SetPointerStyle(pidB, winB, styleB);
     EXPECT_EQ(ret, RET_OK) << "Window-scoped SetPointerStyle for another window must succeed";
 
     // Retrieve and verify isolation
     PointerStyle readA;
-    ret = mgr.GetPointerStyle(PID_A, WIN_A, readA);
+    ret = mgr.GetPointerStyle(pidA, winA, readA);
     EXPECT_EQ(ret, RET_OK);
     EXPECT_EQ(readA.id, POINTER_STYLE_ID_1)
         << "Per-window pointer style must be retrievable for the correct pid/window pair";
 
     PointerStyle readB;
-    ret = mgr.GetPointerStyle(PID_B, WIN_B, readB);
+    ret = mgr.GetPointerStyle(pidB, winB, readB);
     EXPECT_EQ(ret, RET_OK);
     EXPECT_EQ(readB.id, POINTER_STYLE_ID_2)
         << "Per-window pointer style must be independent per pid/window";
@@ -21509,9 +21509,9 @@ HWTEST_F(InputWindowsManagerTest, Compat_WindowScopedPointerStyle_ByGroup_001, T
     // Verify that changing one does NOT affect the other
     PointerStyle newStyle;
     newStyle.id = TEST_DEFAULT_POINTER_STYLE;
-    mgr.SetPointerStyle(PID_A, WIN_A, newStyle);
+    mgr.SetPointerStyle(pidA, winA, newStyle);
     PointerStyle rereadB;
-    mgr.GetPointerStyle(PID_B, WIN_B, rereadB);
+    mgr.GetPointerStyle(pidB, winB, rereadB);
     EXPECT_EQ(rereadB.id, POINTER_STYLE_ID_2)
         << "Changing window A style must not affect window B style";
 }
@@ -21530,12 +21530,12 @@ HWTEST_F(InputWindowsManagerTest, Compat_WindowScopedCapture_ByGroup_001, TestSi
     auto mgr = std::make_shared<InputWindowsManager>();
     ASSERT_NE(mgr, nullptr);
 
-    constexpr int32_t GROUP_DEFAULT = 0;
-    constexpr int32_t GROUP_EXT = 5;
+    constexpr int32_t groupDefault = 0;
+    constexpr int32_t groupExt = 5;
 
     // Set up default group
     OLD::DisplayGroupInfo defaultGroup;
-    defaultGroup.groupId = GROUP_DEFAULT;
+    defaultGroup.groupId = groupDefault;
     defaultGroup.type = GroupType::GROUP_DEFAULT;
     OLD::DisplayInfo mainDisp = { .id = 1 };
     mainDisp.width = 1920;
@@ -21549,7 +21549,7 @@ HWTEST_F(InputWindowsManagerTest, Compat_WindowScopedCapture_ByGroup_001, TestSi
 
     // Set up external group
     OLD::DisplayGroupInfo extGroup;
-    extGroup.groupId = GROUP_EXT;
+    extGroup.groupId = groupExt;
     extGroup.type = GroupType::GROUP_SPECIAL;
     OLD::DisplayInfo extDisp = { .id = 10 };
     extDisp.width = 1280;
@@ -21562,31 +21562,31 @@ HWTEST_F(InputWindowsManagerTest, Compat_WindowScopedCapture_ByGroup_001, TestSi
     mgr->UpdateDisplayInfo(extGroup);
 
     // Before any capture, both groups should be non-capture
-    EXPECT_FALSE(mgr->GetMouseIsCaptureMode(GROUP_DEFAULT))
+    EXPECT_FALSE(mgr->GetMouseIsCaptureMode(groupDefault))
         << "Default group must start with no capture mode";
-    EXPECT_FALSE(mgr->GetMouseIsCaptureMode(GROUP_EXT))
+    EXPECT_FALSE(mgr->GetMouseIsCaptureMode(groupExt))
         << "External group must start with no capture mode";
 
     // Enable capture for default group window
-    int32_t ret = mgr->SetMouseCaptureMode(1, true, GROUP_DEFAULT);
+    int32_t ret = mgr->SetMouseCaptureMode(1, true, groupDefault);
     EXPECT_EQ(ret, RET_OK);
-    EXPECT_TRUE(mgr->GetMouseIsCaptureMode(GROUP_DEFAULT))
+    EXPECT_TRUE(mgr->GetMouseIsCaptureMode(groupDefault))
         << "Default group capture must be active after setting";
-    EXPECT_FALSE(mgr->GetMouseIsCaptureMode(GROUP_EXT))
+    EXPECT_FALSE(mgr->GetMouseIsCaptureMode(groupExt))
         << "External group capture must remain inactive when only default is set";
 
     // Enable capture for external group
-    ret = mgr->SetMouseCaptureMode(10, true, GROUP_EXT);
+    ret = mgr->SetMouseCaptureMode(10, true, groupExt);
     EXPECT_EQ(ret, RET_OK);
-    EXPECT_TRUE(mgr->GetMouseIsCaptureMode(GROUP_EXT))
+    EXPECT_TRUE(mgr->GetMouseIsCaptureMode(groupExt))
         << "External group capture must be active after setting";
 
     // Disable default - external stays
-    ret = mgr->SetMouseCaptureMode(1, false, GROUP_DEFAULT);
+    ret = mgr->SetMouseCaptureMode(1, false, groupDefault);
     EXPECT_EQ(ret, RET_OK);
-    EXPECT_FALSE(mgr->GetMouseIsCaptureMode(GROUP_DEFAULT))
+    EXPECT_FALSE(mgr->GetMouseIsCaptureMode(groupDefault))
         << "Default group capture must be cleared";
-    EXPECT_TRUE(mgr->GetMouseIsCaptureMode(GROUP_EXT))
+    EXPECT_TRUE(mgr->GetMouseIsCaptureMode(groupExt))
         << "External group capture must remain active when only default is cleared";
 }
 
@@ -21603,8 +21603,8 @@ HWTEST_F(InputWindowsManagerTest, Compat_WindowScopedPointerStyle_GlobalOverride
     CALL_TEST_DEBUG;
     InputWindowsManager mgr;
 
-    constexpr int32_t PID_A = 10;
-    constexpr int32_t WIN_A = 100;
+    constexpr int32_t pidA = 10;
+    constexpr int32_t winA = 100;
 
     OLD::DisplayGroupInfo defaultGroup;
     defaultGroup.groupId = 0;
@@ -21622,22 +21622,22 @@ HWTEST_F(InputWindowsManagerTest, Compat_WindowScopedPointerStyle_GlobalOverride
     // Set a per-window style
     PointerStyle windowStyle;
     windowStyle.id = POINTER_STYLE_ID_1;
-    mgr.SetPointerStyle(PID_A, WIN_A, windowStyle);
+    mgr.SetPointerStyle(pidA, winA, windowStyle);
 
     // Set a global style (via GLOBAL_WINDOW_ID)
     PointerStyle globalStyle;
     globalStyle.id = POINTER_STYLE_ID_2;
-    mgr.SetPointerStyle(PID_A, GLOBAL_WINDOW_ID, globalStyle);
+    mgr.SetPointerStyle(pidA, GLOBAL_WINDOW_ID, globalStyle);
 
     // Per-window style should still return the window-specific value
     PointerStyle readWin;
-    mgr.GetPointerStyle(PID_A, WIN_A, readWin);
+    mgr.GetPointerStyle(pidA, winA, readWin);
     EXPECT_EQ(readWin.id, POINTER_STYLE_ID_1)
         << "Per-window style must remain even after setting global style";
 
     // Global style should return the global value
     PointerStyle readGlobal;
-    mgr.GetPointerStyle(PID_A, GLOBAL_WINDOW_ID, readGlobal);
+    mgr.GetPointerStyle(pidA, GLOBAL_WINDOW_ID, readGlobal);
     EXPECT_EQ(readGlobal.id, POINTER_STYLE_ID_2)
         << "Global pointer style must be readable via GLOBAL_WINDOW_ID";
 }
@@ -21655,15 +21655,15 @@ HWTEST_F(InputWindowsManagerTest, Compat_GlobalAPI_MouseInfo_DefaultGroupOnly_00
     CALL_TEST_DEBUG;
     InputWindowsManager mgr;
 
-    constexpr int32_t NON_DEFAULT_GROUP = 7;
-    constexpr int32_t DISPLAY_MAIN = 1;
-    constexpr int32_t DISPLAY_EXT = 20;
+    constexpr int32_t nonDefaultGroup = 7;
+    constexpr int32_t displayMain = 1;
+    constexpr int32_t displayExt = 20;
 
     // Set up default group
     OLD::DisplayGroupInfo defaultGroup;
     defaultGroup.groupId = 0;
     defaultGroup.type = GroupType::GROUP_DEFAULT;
-    OLD::DisplayInfo mainDisp = { .id = DISPLAY_MAIN };
+    OLD::DisplayInfo mainDisp = { .id = displayMain };
     mainDisp.width = 1920;
     mainDisp.height = 1080;
     mainDisp.validWidth = 1920;
@@ -21677,9 +21677,9 @@ HWTEST_F(InputWindowsManagerTest, Compat_GlobalAPI_MouseInfo_DefaultGroupOnly_00
 
     // Set up non-default group
     OLD::DisplayGroupInfo extGroup;
-    extGroup.groupId = NON_DEFAULT_GROUP;
+    extGroup.groupId = nonDefaultGroup;
     extGroup.type = GroupType::GROUP_SPECIAL;
-    OLD::DisplayInfo extDisp = { .id = DISPLAY_EXT };
+    OLD::DisplayInfo extDisp = { .id = displayExt };
     extDisp.width = 2560;
     extDisp.height = 1440;
     extDisp.validWidth = 2560;
@@ -21690,21 +21690,21 @@ HWTEST_F(InputWindowsManagerTest, Compat_GlobalAPI_MouseInfo_DefaultGroupOnly_00
     extDisp.direction = DIRECTION0;
     extGroup.displaysInfo.push_back(extDisp);
     mgr.UpdateDisplayInfo(extGroup);
-    mgr.EnsureGroupState(NON_DEFAULT_GROUP);
+    mgr.EnsureGroupState(nonDefaultGroup);
 
     // Manually set mouse location for default group
-    mgr.mouseLocationMap_[DEFAULT_GROUP_ID].displayId = DISPLAY_MAIN;
+    mgr.mouseLocationMap_[DEFAULT_GROUP_ID].displayId = displayMain;
     mgr.mouseLocationMap_[DEFAULT_GROUP_ID].physicalX = 500;
     mgr.mouseLocationMap_[DEFAULT_GROUP_ID].physicalY = 600;
 
     // Set different mouse location for non-default group
-    mgr.mouseLocationMap_[NON_DEFAULT_GROUP].displayId = DISPLAY_EXT;
-    mgr.mouseLocationMap_[NON_DEFAULT_GROUP].physicalX = 1000;
-    mgr.mouseLocationMap_[NON_DEFAULT_GROUP].physicalY = 1200;
+    mgr.mouseLocationMap_[nonDefaultGroup].displayId = displayExt;
+    mgr.mouseLocationMap_[nonDefaultGroup].physicalX = 1000;
+    mgr.mouseLocationMap_[nonDefaultGroup].physicalY = 1200;
 
     // Default GetMouseInfo() should return default group location
     MouseLocation defaultLoc = mgr.GetMouseInfo();
-    EXPECT_EQ(defaultLoc.displayId, DISPLAY_MAIN)
+    EXPECT_EQ(defaultLoc.displayId, displayMain)
         << "Default GetMouseInfo must return default group display";
     EXPECT_EQ(defaultLoc.physicalX, 500)
         << "Default GetMouseInfo X must match default group";
@@ -21712,8 +21712,8 @@ HWTEST_F(InputWindowsManagerTest, Compat_GlobalAPI_MouseInfo_DefaultGroupOnly_00
         << "Default GetMouseInfo Y must match default group";
 
     // Explicit non-default group should return its own location
-    MouseLocation extLoc = mgr.GetMouseInfo(NON_DEFAULT_GROUP);
-    EXPECT_EQ(extLoc.displayId, DISPLAY_EXT)
+    MouseLocation extLoc = mgr.GetMouseInfo(nonDefaultGroup);
+    EXPECT_EQ(extLoc.displayId, displayExt)
         << "Non-default GetMouseInfo must return non-default group display";
     EXPECT_EQ(extLoc.physicalX, 1000)
         << "Non-default GetMouseInfo X must match non-default group";
@@ -21734,15 +21734,15 @@ HWTEST_F(InputWindowsManagerTest, Compat_GlobalAPI_CursorPos_DefaultGroupOnly_00
     CALL_TEST_DEBUG;
     InputWindowsManager mgr;
 
-    constexpr int32_t NON_DEFAULT_GROUP = 4;
-    constexpr int32_t DISPLAY_MAIN = 1;
-    constexpr int32_t DISPLAY_EXT = 15;
+    constexpr int32_t nonDefaultGroup = 4;
+    constexpr int32_t displayMain = 1;
+    constexpr int32_t displayExt = 15;
 
     // Set up default group
     OLD::DisplayGroupInfo defaultGroup;
     defaultGroup.groupId = 0;
     defaultGroup.type = GroupType::GROUP_DEFAULT;
-    OLD::DisplayInfo mainDisp = { .id = DISPLAY_MAIN };
+    OLD::DisplayInfo mainDisp = { .id = displayMain };
     mainDisp.width = 1920;
     mainDisp.height = 1080;
     mainDisp.validWidth = 1920;
@@ -21756,9 +21756,9 @@ HWTEST_F(InputWindowsManagerTest, Compat_GlobalAPI_CursorPos_DefaultGroupOnly_00
 
     // Set up non-default group
     OLD::DisplayGroupInfo extGroup;
-    extGroup.groupId = NON_DEFAULT_GROUP;
+    extGroup.groupId = nonDefaultGroup;
     extGroup.type = GroupType::GROUP_SPECIAL;
-    OLD::DisplayInfo extDisp = { .id = DISPLAY_EXT };
+    OLD::DisplayInfo extDisp = { .id = displayExt };
     extDisp.width = 3840;
     extDisp.height = 2160;
     extDisp.validWidth = 3840;
@@ -21769,26 +21769,26 @@ HWTEST_F(InputWindowsManagerTest, Compat_GlobalAPI_CursorPos_DefaultGroupOnly_00
     extDisp.direction = DIRECTION0;
     extGroup.displaysInfo.push_back(extDisp);
     mgr.UpdateDisplayInfo(extGroup);
-    mgr.EnsureGroupState(NON_DEFAULT_GROUP);
+    mgr.EnsureGroupState(nonDefaultGroup);
 
     // Manually set cursor position for default group
-    mgr.cursorPosMap_[DEFAULT_GROUP_ID].displayId = DISPLAY_MAIN;
+    mgr.cursorPosMap_[DEFAULT_GROUP_ID].displayId = displayMain;
     mgr.cursorPosMap_[DEFAULT_GROUP_ID].cursorPos.x = 200;
     mgr.cursorPosMap_[DEFAULT_GROUP_ID].cursorPos.y = 300;
 
     // Manually set cursor position for non-default group
-    mgr.cursorPosMap_[NON_DEFAULT_GROUP].displayId = DISPLAY_EXT;
-    mgr.cursorPosMap_[NON_DEFAULT_GROUP].cursorPos.x = 1500;
-    mgr.cursorPosMap_[NON_DEFAULT_GROUP].cursorPos.y = 1800;
+    mgr.cursorPosMap_[nonDefaultGroup].displayId = displayExt;
+    mgr.cursorPosMap_[nonDefaultGroup].cursorPos.x = 1500;
+    mgr.cursorPosMap_[nonDefaultGroup].cursorPos.y = 1800;
 
     // Default GetCursorPos should return default group
     CursorPosition defaultPos = mgr.GetCursorPos();
-    EXPECT_EQ(defaultPos.displayId, DISPLAY_MAIN)
+    EXPECT_EQ(defaultPos.displayId, displayMain)
         << "Default GetCursorPos must use default group display";
 
     // Non-default GetCursorPos should return non-default group
-    CursorPosition extPos = mgr.GetCursorPos(NON_DEFAULT_GROUP);
-    EXPECT_EQ(extPos.displayId, DISPLAY_EXT)
+    CursorPosition extPos = mgr.GetCursorPos(nonDefaultGroup);
+    EXPECT_EQ(extPos.displayId, displayExt)
         << "Non-default GetCursorPos must use non-default group display";
 
     // They must be independent
@@ -21809,12 +21809,12 @@ HWTEST_F(InputWindowsManagerTest, Compat_GlobalAPI_CaptureMode_DefaultGroupOnly_
     auto mgr = std::make_shared<InputWindowsManager>();
     ASSERT_NE(mgr, nullptr);
 
-    constexpr int32_t GROUP_A = 0;
-    constexpr int32_t GROUP_B = 8;
+    constexpr int32_t groupA = 0;
+    constexpr int32_t groupB = 8;
 
     // Set up default group
     OLD::DisplayGroupInfo defaultGroup;
-    defaultGroup.groupId = GROUP_A;
+    defaultGroup.groupId = groupA;
     defaultGroup.type = GroupType::GROUP_DEFAULT;
     OLD::DisplayInfo mainDisp = { .id = 1 };
     mainDisp.width = 1920;
@@ -21828,7 +21828,7 @@ HWTEST_F(InputWindowsManagerTest, Compat_GlobalAPI_CaptureMode_DefaultGroupOnly_
 
     // Set up non-default group
     OLD::DisplayGroupInfo extGroup;
-    extGroup.groupId = GROUP_B;
+    extGroup.groupId = groupB;
     extGroup.type = GroupType::GROUP_SPECIAL;
     OLD::DisplayInfo extDisp = { .id = 10 };
     extDisp.width = 1280;
@@ -21847,11 +21847,11 @@ HWTEST_F(InputWindowsManagerTest, Compat_GlobalAPI_CaptureMode_DefaultGroupOnly_
     // Default group should be captured
     EXPECT_TRUE(mgr->GetMouseIsCaptureMode())
         << "Default group capture must be active via no-arg API";
-    EXPECT_TRUE(mgr->GetMouseIsCaptureMode(GROUP_A))
+    EXPECT_TRUE(mgr->GetMouseIsCaptureMode(groupA))
         << "Default group capture must be active via explicit default group arg";
 
     // Non-default group must NOT be affected
-    EXPECT_FALSE(mgr->GetMouseIsCaptureMode(GROUP_B))
+    EXPECT_FALSE(mgr->GetMouseIsCaptureMode(groupB))
         << "Non-default group must NOT be captured by default global API";
 }
 
@@ -21868,15 +21868,15 @@ HWTEST_F(InputWindowsManagerTest, Compat_GlobalAPI_DisplayGroupInfo_DefaultGroup
     CALL_TEST_DEBUG;
     InputWindowsManager mgr;
 
-    constexpr int32_t NON_DEFAULT = 6;
-    constexpr int32_t MAIN_DISPLAY = 1;
-    constexpr int32_t EXT_DISPLAY = 30;
+    constexpr int32_t nonDefault = 6;
+    constexpr int32_t mainDisplay = 1;
+    constexpr int32_t extDisplay = 30;
 
     // Set up default group with display
     OLD::DisplayGroupInfo defaultGroup;
     defaultGroup.groupId = 0;
     defaultGroup.type = GroupType::GROUP_DEFAULT;
-    OLD::DisplayInfo mainDisp = { .id = MAIN_DISPLAY };
+    OLD::DisplayInfo mainDisp = { .id = mainDisplay };
     mainDisp.width = 1920;
     mainDisp.height = 1080;
     mainDisp.dpi = 240;
@@ -21896,9 +21896,9 @@ HWTEST_F(InputWindowsManagerTest, Compat_GlobalAPI_DisplayGroupInfo_DefaultGroup
 
     // Set up non-default group with different display
     OLD::DisplayGroupInfo extGroup;
-    extGroup.groupId = NON_DEFAULT;
+    extGroup.groupId = nonDefault;
     extGroup.type = GroupType::GROUP_SPECIAL;
-    OLD::DisplayInfo extDisp = { .id = EXT_DISPLAY };
+    OLD::DisplayInfo extDisp = { .id = extDisplay };
     extDisp.width = 2560;
     extDisp.height = 1440;
     extDisp.dpi = 160;
@@ -21919,13 +21919,13 @@ HWTEST_F(InputWindowsManagerTest, Compat_GlobalAPI_DisplayGroupInfo_DefaultGroup
     // No-arg GetDisplayInfoVector should return default group displays
     const auto &defaultDisplays = mgr.GetDisplayInfoVector();
     ASSERT_FALSE(defaultDisplays.empty());
-    EXPECT_EQ(defaultDisplays[0].id, MAIN_DISPLAY)
+    EXPECT_EQ(defaultDisplays[0].id, mainDisplay)
         << "No-arg GetDisplayInfoVector must return default group display";
 
     // Explicit non-default should return its own displays
-    const auto &extDisplays = mgr.GetDisplayInfoVector(NON_DEFAULT);
+    const auto &extDisplays = mgr.GetDisplayInfoVector(nonDefault);
     ASSERT_FALSE(extDisplays.empty());
-    EXPECT_EQ(extDisplays[0].id, EXT_DISPLAY)
+    EXPECT_EQ(extDisplays[0].id, extDisplay)
         << "Explicit non-default GetDisplayInfoVector must return non-default display";
 
     // No-arg GetWindowInfoVector should return default group windows
@@ -22018,7 +22018,7 @@ HWTEST_F(InputWindowsManagerTest, Compat_UnboundEvent_NoNonDefaultState_001, Tes
     CALL_TEST_DEBUG;
     InputWindowsManager mgr;
 
-    constexpr int32_t UNBOUND_DEVICE = 42;
+    constexpr int32_t unboundDevice = 42;
 
     // Set up default group
     OLD::DisplayGroupInfo defaultGroup;
@@ -22035,7 +22035,7 @@ HWTEST_F(InputWindowsManagerTest, Compat_UnboundEvent_NoNonDefaultState_001, Tes
     mgr.UpdateDisplayInfo(defaultGroup);
 
     // Resolve group for unbound device - should return default
-    int32_t resolved = mgr.ResolveGroupIdForDevice(UNBOUND_DEVICE);
+    int32_t resolved = mgr.ResolveGroupIdForDevice(unboundDevice);
     EXPECT_EQ(resolved, DEFAULT_GROUP_ID)
         << "Unbound device must resolve to default group";
 
@@ -22065,15 +22065,15 @@ HWTEST_F(InputWindowsManagerTest, Compat_DefaultGroupAudit_TopologyFallback_001,
     CALL_TEST_DEBUG;
     InputWindowsManager mgr;
 
-    constexpr int32_t NONEXISTENT_GROUP = 999;
-    constexpr int32_t MAIN_DISPLAY = 1;
+    constexpr int32_t nonexistentGroup = 999;
+    constexpr int32_t mainDisplay = 1;
 
     // Set up default group only
     OLD::DisplayGroupInfo defaultGroup;
     defaultGroup.groupId = 0;
     defaultGroup.type = GroupType::GROUP_DEFAULT;
     defaultGroup.focusWindowId = 42;
-    OLD::DisplayInfo mainDisp = { .id = MAIN_DISPLAY };
+    OLD::DisplayInfo mainDisp = { .id = mainDisplay };
     mainDisp.width = 1920;
     mainDisp.height = 1080;
     mainDisp.dpi = 240;
@@ -22084,14 +22084,14 @@ HWTEST_F(InputWindowsManagerTest, Compat_DefaultGroupAudit_TopologyFallback_001,
     mgr.UpdateDisplayInfo(defaultGroup);
 
     // GetDisplayInfoVector for nonexistent group should fall back to default
-    const auto &displays = mgr.GetDisplayInfoVector(NONEXISTENT_GROUP);
+    const auto &displays = mgr.GetDisplayInfoVector(nonexistentGroup);
     ASSERT_FALSE(displays.empty())
         << "GetDisplayInfoVector must fall back to default group for unknown groupId";
-    EXPECT_EQ(displays[0].id, MAIN_DISPLAY)
+    EXPECT_EQ(displays[0].id, mainDisplay)
         << "Fallback display info must be from the default group";
 
     // GetFocusWindowId for nonexistent group should fall back to default
-    int32_t focusId = mgr.GetFocusWindowId(NONEXISTENT_GROUP);
+    int32_t focusId = mgr.GetFocusWindowId(nonexistentGroup);
     EXPECT_EQ(focusId, 42) <<
         "GetFocusWindowId must fall back to default group focusWindowId for unknown groupId";
 }
@@ -22110,10 +22110,10 @@ HWTEST_F(InputWindowsManagerTest, Compat_DefaultGroupAudit_ResolvedGroupRequired
     CALL_TEST_DEBUG;
     InputWindowsManager mgr;
 
-    constexpr int32_t BOUND_DEVICE = 50;
-    constexpr int32_t BOUND_GROUP = 3;
-    constexpr int32_t BOUND_DISPLAY = 10;
-    constexpr int32_t FOCUS_WINDOW_EXT = 777;
+    constexpr int32_t boundDevice = 50;
+    constexpr int32_t boundGroup = 3;
+    constexpr int32_t boundDisplay = 10;
+    constexpr int32_t focusWindowExt = 777;
 
     // Set up default group
     OLD::DisplayGroupInfo defaultGroup;
@@ -22132,10 +22132,10 @@ HWTEST_F(InputWindowsManagerTest, Compat_DefaultGroupAudit_ResolvedGroupRequired
 
     // Set up bound group with different focus window
     OLD::DisplayGroupInfo extGroup;
-    extGroup.groupId = BOUND_GROUP;
+    extGroup.groupId = boundGroup;
     extGroup.type = GroupType::GROUP_SPECIAL;
-    extGroup.focusWindowId = FOCUS_WINDOW_EXT;
-    OLD::DisplayInfo extDisp = { .id = BOUND_DISPLAY };
+    extGroup.focusWindowId = focusWindowExt;
+    OLD::DisplayInfo extDisp = { .id = boundDisplay };
     extDisp.width = 2560;
     extDisp.height = 1440;
     extDisp.dpi = 160;
@@ -22146,17 +22146,17 @@ HWTEST_F(InputWindowsManagerTest, Compat_DefaultGroupAudit_ResolvedGroupRequired
     mgr.UpdateDisplayInfo(extGroup);
 
     // Create runtime binding
-    mgr.bindInfo_.AddRuntimeBinding(BOUND_DEVICE, BOUND_DISPLAY, BOUND_GROUP);
-    mgr.EnsureGroupState(BOUND_GROUP);
+    mgr.bindInfo_.AddRuntimeBinding(boundDevice, boundDisplay, boundGroup);
+    mgr.EnsureGroupState(boundGroup);
 
     // Resolve group for bound device
-    int32_t resolved = mgr.ResolveGroupIdForDevice(BOUND_DEVICE);
-    EXPECT_EQ(resolved, BOUND_GROUP) <<
+    int32_t resolved = mgr.ResolveGroupIdForDevice(boundDevice);
+    EXPECT_EQ(resolved, boundGroup) <<
         "Bound device must resolve to its bound group";
 
     // Focus window for resolved group must be the bound group's focus
     int32_t focusWin = mgr.GetFocusWindowId(resolved);
-    EXPECT_EQ(focusWin, FOCUS_WINDOW_EXT) <<
+    EXPECT_EQ(focusWin, focusWindowExt) <<
         "Bound device keyboard events must use bound group focus window, not default";
 
     // Default group focus must remain unchanged
@@ -22179,15 +22179,15 @@ HWTEST_F(InputWindowsManagerTest, Compat_DefaultGroupAudit_ResolvedGroupRequired
     CALL_TEST_DEBUG;
     InputWindowsManager mgr;
 
-    constexpr int32_t BOUND_GROUP = 5;
-    constexpr int32_t DISPLAY_MAIN = 1;
-    constexpr int32_t DISPLAY_EXT = 20;
+    constexpr int32_t boundGroup = 5;
+    constexpr int32_t displayMain = 1;
+    constexpr int32_t displayExt = 20;
 
     // Set up default group
     OLD::DisplayGroupInfo defaultGroup;
     defaultGroup.groupId = 0;
     defaultGroup.type = GroupType::GROUP_DEFAULT;
-    OLD::DisplayInfo mainDisp = { .id = DISPLAY_MAIN };
+    OLD::DisplayInfo mainDisp = { .id = displayMain };
     mainDisp.width = 1920;
     mainDisp.height = 1080;
     mainDisp.validWidth = 1920;
@@ -22201,9 +22201,9 @@ HWTEST_F(InputWindowsManagerTest, Compat_DefaultGroupAudit_ResolvedGroupRequired
 
     // Set up non-default group
     OLD::DisplayGroupInfo extGroup;
-    extGroup.groupId = BOUND_GROUP;
+    extGroup.groupId = boundGroup;
     extGroup.type = GroupType::GROUP_SPECIAL;
-    OLD::DisplayInfo extDisp = { .id = DISPLAY_EXT };
+    OLD::DisplayInfo extDisp = { .id = displayExt };
     extDisp.width = 3840;
     extDisp.height = 2160;
     extDisp.validWidth = 3840;
@@ -22214,20 +22214,20 @@ HWTEST_F(InputWindowsManagerTest, Compat_DefaultGroupAudit_ResolvedGroupRequired
     extDisp.direction = DIRECTION0;
     extGroup.displaysInfo.push_back(extDisp);
     mgr.UpdateDisplayInfo(extGroup);
-    mgr.EnsureGroupState(BOUND_GROUP);
+    mgr.EnsureGroupState(boundGroup);
 
     // Simulate bound device cursor at ext position
-    mgr.mouseLocationMap_[BOUND_GROUP].displayId = DISPLAY_EXT;
-    mgr.mouseLocationMap_[BOUND_GROUP].physicalX = 2000;
-    mgr.mouseLocationMap_[BOUND_GROUP].physicalY = 1500;
+    mgr.mouseLocationMap_[boundGroup].displayId = displayExt;
+    mgr.mouseLocationMap_[boundGroup].physicalX = 2000;
+    mgr.mouseLocationMap_[boundGroup].physicalY = 1500;
 
     // Default mouse location should be independent
     MouseLocation defLoc = mgr.GetMouseInfo(DEFAULT_GROUP_ID);
-    MouseLocation extLoc = mgr.GetMouseInfo(BOUND_GROUP);
+    MouseLocation extLoc = mgr.GetMouseInfo(boundGroup);
 
     EXPECT_NE(defLoc.physicalX, extLoc.physicalX)
         << "Default and bound group mouse X must be independent";
-    EXPECT_EQ(extLoc.displayId, DISPLAY_EXT)
+    EXPECT_EQ(extLoc.displayId, displayExt)
         << "Bound group mouse location must reference bound display";
     EXPECT_EQ(extLoc.physicalX, 2000)
         << "Bound group mouse X must reflect bound group state";
@@ -22248,12 +22248,12 @@ HWTEST_F(InputWindowsManagerTest, Compat_DefaultGroupAudit_ResolvedGroupRequired
     auto mgr = std::make_shared<InputWindowsManager>();
     ASSERT_NE(mgr, nullptr);
 
-    constexpr int32_t GROUP_DEFAULT = 0;
-    constexpr int32_t GROUP_BOUND = 9;
+    constexpr int32_t groupDefault = 0;
+    constexpr int32_t groupBound = 9;
 
     // Set up both groups
     OLD::DisplayGroupInfo defaultGroup;
-    defaultGroup.groupId = GROUP_DEFAULT;
+    defaultGroup.groupId = groupDefault;
     defaultGroup.type = GroupType::GROUP_DEFAULT;
     OLD::DisplayInfo mainDisp = { .id = 1 };
     mainDisp.width = 1920;
@@ -22266,7 +22266,7 @@ HWTEST_F(InputWindowsManagerTest, Compat_DefaultGroupAudit_ResolvedGroupRequired
     mgr->UpdateDisplayInfo(defaultGroup);
 
     OLD::DisplayGroupInfo boundGroup;
-    boundGroup.groupId = GROUP_BOUND;
+    boundGroup.groupId = groupBound;
     boundGroup.type = GroupType::GROUP_SPECIAL;
     OLD::DisplayInfo extDisp = { .id = 20 };
     extDisp.width = 1280;
@@ -22279,24 +22279,24 @@ HWTEST_F(InputWindowsManagerTest, Compat_DefaultGroupAudit_ResolvedGroupRequired
     mgr->UpdateDisplayInfo(boundGroup);
 
     // Set capture mode explicitly on bound group
-    int32_t ret = mgr->SetMouseCaptureMode(50, true, GROUP_BOUND);
+    int32_t ret = mgr->SetMouseCaptureMode(50, true, groupBound);
     EXPECT_EQ(ret, RET_OK);
 
     // Bound group is captured, default is not
-    EXPECT_TRUE(mgr->GetMouseIsCaptureMode(GROUP_BOUND))
+    EXPECT_TRUE(mgr->GetMouseIsCaptureMode(groupBound))
         << "Bound group capture must be active after explicit group set";
-    EXPECT_FALSE(mgr->GetMouseIsCaptureMode(GROUP_DEFAULT))
+    EXPECT_FALSE(mgr->GetMouseIsCaptureMode(groupDefault))
         << "Default group must not be captured when bound group is";
 
     // Set capture on default group
-    ret = mgr->SetMouseCaptureMode(1, true, GROUP_DEFAULT);
+    ret = mgr->SetMouseCaptureMode(1, true, groupDefault);
     EXPECT_EQ(ret, RET_OK);
-    EXPECT_TRUE(mgr->GetMouseIsCaptureMode(GROUP_DEFAULT))
+    EXPECT_TRUE(mgr->GetMouseIsCaptureMode(groupDefault))
         << "Default group capture must be active after setting";
 
     // Both are now captured independently
-    EXPECT_TRUE(mgr->GetMouseIsCaptureMode(GROUP_BOUND));
-    EXPECT_TRUE(mgr->GetMouseIsCaptureMode(GROUP_DEFAULT));
+    EXPECT_TRUE(mgr->GetMouseIsCaptureMode(groupBound));
+    EXPECT_TRUE(mgr->GetMouseIsCaptureMode(groupDefault));
 }
 
 /**
@@ -22313,15 +22313,15 @@ HWTEST_F(InputWindowsManagerTest, Compat_DefaultGroupAudit_ResolvedGroupRequired
     CALL_TEST_DEBUG;
     InputWindowsManager mgr;
 
-    constexpr int32_t BOUND_GROUP = 6;
-    constexpr int32_t DISPLAY_MAIN = 1;
-    constexpr int32_t DISPLAY_EXT = 25;
+    constexpr int32_t boundGroup = 6;
+    constexpr int32_t displayMain = 1;
+    constexpr int32_t displayExt = 25;
 
     // Set up default group
     OLD::DisplayGroupInfo defaultGroup;
     defaultGroup.groupId = 0;
     defaultGroup.type = GroupType::GROUP_DEFAULT;
-    OLD::DisplayInfo mainDisp = { .id = DISPLAY_MAIN };
+    OLD::DisplayInfo mainDisp = { .id = displayMain };
     mainDisp.width = 1920;
     mainDisp.height = 1080;
     mainDisp.validWidth = 1920;
@@ -22335,9 +22335,9 @@ HWTEST_F(InputWindowsManagerTest, Compat_DefaultGroupAudit_ResolvedGroupRequired
 
     // Set up bound group
     OLD::DisplayGroupInfo extGroup;
-    extGroup.groupId = BOUND_GROUP;
+    extGroup.groupId = boundGroup;
     extGroup.type = GroupType::GROUP_SPECIAL;
-    OLD::DisplayInfo extDisp = { .id = DISPLAY_EXT };
+    OLD::DisplayInfo extDisp = { .id = displayExt };
     extDisp.width = 3840;
     extDisp.height = 2160;
     extDisp.validWidth = 3840;
@@ -22348,25 +22348,25 @@ HWTEST_F(InputWindowsManagerTest, Compat_DefaultGroupAudit_ResolvedGroupRequired
     extDisp.direction = DIRECTION0;
     extGroup.displaysInfo.push_back(extDisp);
     mgr.UpdateDisplayInfo(extGroup);
-    mgr.EnsureGroupState(BOUND_GROUP);
+    mgr.EnsureGroupState(boundGroup);
 
     // Set cursor for default group
-    mgr.cursorPosMap_[DEFAULT_GROUP_ID].displayId = DISPLAY_MAIN;
+    mgr.cursorPosMap_[DEFAULT_GROUP_ID].displayId = displayMain;
     mgr.cursorPosMap_[DEFAULT_GROUP_ID].cursorPos.x = 100;
     mgr.cursorPosMap_[DEFAULT_GROUP_ID].cursorPos.y = 200;
 
     // Set cursor for bound group
-    mgr.cursorPosMap_[BOUND_GROUP].displayId = DISPLAY_EXT;
-    mgr.cursorPosMap_[BOUND_GROUP].cursorPos.x = 1900;
-    mgr.cursorPosMap_[BOUND_GROUP].cursorPos.y = 1080;
+    mgr.cursorPosMap_[boundGroup].displayId = displayExt;
+    mgr.cursorPosMap_[boundGroup].cursorPos.x = 1900;
+    mgr.cursorPosMap_[boundGroup].cursorPos.y = 1080;
 
     // Reset cursor for default group only
     CursorPosition resetPos = mgr.ResetCursorPos(DEFAULT_GROUP_ID);
     static_cast<void>(resetPos);
 
     // Bound group cursor should be unchanged after default reset
-    CursorPosition boundPos = mgr.GetCursorPos(BOUND_GROUP);
-    EXPECT_EQ(boundPos.displayId, DISPLAY_EXT)
+    CursorPosition boundPos = mgr.GetCursorPos(boundGroup);
+    EXPECT_EQ(boundPos.displayId, displayExt)
         << "ResetCursorPos on default group must not affect bound group cursor display";
     EXPECT_EQ(boundPos.cursorPos.x, 1900)
         << "ResetCursorPos on default group must not affect bound group cursor X";
@@ -22427,25 +22427,25 @@ HWTEST_F(InputWindowsManagerTest, Compat_DefaultGroupAudit_EnsureGroupState_Lazy
     CALL_TEST_DEBUG;
     InputWindowsManager mgr;
 
-    constexpr int32_t NEW_GROUP = 11;
+    constexpr int32_t newGroup = 11;
 
     // Before EnsureGroupState, the group should not exist
-    EXPECT_FALSE(mgr.HasGroupState(NEW_GROUP))
+    EXPECT_FALSE(mgr.HasGroupState(newGroup))
         << "Group must not have state before EnsureGroupState";
 
     // Call EnsureGroupState
-    mgr.EnsureGroupState(NEW_GROUP);
+    mgr.EnsureGroupState(newGroup);
 
     // After EnsureGroupState, state must exist
-    EXPECT_TRUE(mgr.HasGroupState(NEW_GROUP))
+    EXPECT_TRUE(mgr.HasGroupState(newGroup))
         << "Group must have state after EnsureGroupState";
 
     // Verify specific maps were populated
-    EXPECT_NE(mgr.mouseLocationMap_.find(NEW_GROUP), mgr.mouseLocationMap_.end())
+    EXPECT_NE(mgr.mouseLocationMap_.find(newGroup), mgr.mouseLocationMap_.end())
         << "mouseLocationMap must contain new group after EnsureGroupState";
-    EXPECT_NE(mgr.cursorPosMap_.find(NEW_GROUP), mgr.cursorPosMap_.end())
+    EXPECT_NE(mgr.cursorPosMap_.find(newGroup), mgr.cursorPosMap_.end())
         << "cursorPosMap must contain new group after EnsureGroupState";
-    EXPECT_NE(mgr.captureModeInfoMap_.find(NEW_GROUP), mgr.captureModeInfoMap_.end())
+    EXPECT_NE(mgr.captureModeInfoMap_.find(newGroup), mgr.captureModeInfoMap_.end())
         << "captureModeInfoMap must contain new group after EnsureGroupState";
 
     // Calling EnsureGroupState for MAIN_GROUPID (0) should be a no-op
