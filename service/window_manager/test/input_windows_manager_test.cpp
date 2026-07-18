@@ -68,6 +68,91 @@ constexpr int32_t TEST_WINDOW_ID = 1;
 constexpr int32_t POINTER_STYLE_ID_1 = 1;
 constexpr int32_t POINTER_STYLE_ID_2 = 2;
 constexpr int32_t TEST_DEFAULT_POINTER_STYLE = 0;
+
+// Test helpers to build display/window structures compactly (keeps HWTEST bodies small).
+struct DisplaySpec {
+    int32_t id = 0;
+    int32_t x = 0;
+    int32_t y = 0;
+    int32_t width = 0;
+    int32_t height = 0;
+    int32_t validWidth = 0;
+    int32_t validHeight = 0;
+    int32_t dpi = 0;
+    std::string name;
+    std::string uniq;
+    Direction direction = DIRECTION0;
+    Direction displayDirection = DIRECTION0;
+    uint64_t rsId = 0;
+};
+
+struct WindowSpec {
+    int32_t id = 0;
+    int32_t pid = 0;
+    int32_t uid = 0;
+    int32_t agentWindowId = 0;
+    int32_t agentPid = -1;          // matches WindowInfo default
+    int32_t displayId = DEFAULT_DISPLAY_ID;  // matches WindowInfo default
+    Rect area = {0, 0, 0, 0};
+    uint32_t flags = 0;
+};
+
+inline OLD::DisplayInfo MakeDisplay(const DisplaySpec &s)
+{
+    OLD::DisplayInfo info {};
+    info.id = s.id;
+    info.x = s.x;
+    info.y = s.y;
+    info.width = s.width;
+    info.height = s.height;
+    info.validWidth = s.validWidth;
+    info.validHeight = s.validHeight;
+    info.dpi = s.dpi;
+    info.name = s.name;
+    info.uniq = s.uniq;
+    info.direction = s.direction;
+    info.displayDirection = s.displayDirection;
+    info.rsId = s.rsId;
+    return info;
+}
+
+inline WindowInfo MakeWindow(const WindowSpec &s)
+{
+    WindowInfo info {};
+    info.id = s.id;
+    info.pid = s.pid;
+    info.uid = s.uid;
+    info.agentWindowId = s.agentWindowId;
+    info.agentPid = s.agentPid;
+    info.displayId = s.displayId;
+    info.area = s.area;
+    info.defaultHotAreas = {s.area};
+    info.pointerHotAreas = {s.area};
+    info.flags = s.flags;
+    info.transform = {1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f};
+    return info;
+}
+
+// Build a mouse-move PointerEvent with a single pointer item at (displayX, displayY).
+inline std::shared_ptr<PointerEvent> MakeMouseMoveEvent(int32_t deviceId, int32_t displayX, int32_t displayY,
+    int32_t targetDisplayId = -1)
+{
+    auto event = PointerEvent::Create();
+    if (event == nullptr) {
+        return nullptr;
+    }
+    event->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
+    event->SetDeviceId(deviceId);
+    event->SetTargetDisplayId(targetDisplayId);
+    event->SetPointerId(0);
+    event->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
+    PointerEvent::PointerItem item;
+    item.SetPointerId(0);
+    item.SetDisplayX(displayX);
+    item.SetDisplayY(displayY);
+    event->AddPointerItem(item);
+    return event;
+}
 } // namespace
 
 #ifdef WIN_MGR
@@ -16700,27 +16785,13 @@ HWTEST_F(InputWindowsManagerTest, MultiGroupAudit_KeyFocusFallback_001, TestSize
     mainGroup.groupId = 0;
     mainGroup.type = GroupType::GROUP_DEFAULT;
     mainGroup.focusWindowId = 10;
-    OLD::DisplayInfo mainDisplay = { .id = 1 };
-    mainDisplay.x = 0;
-    mainDisplay.y = 0;
-    mainDisplay.width = 1920;
-    mainDisplay.height = 1080;
-    mainDisplay.dpi = 240;
-    mainDisplay.name = "main";
-    mainDisplay.uniq = "default0";
-    mainDisplay.direction = DIRECTION0;
-    mainGroup.displaysInfo.push_back(mainDisplay);
-    WindowInfo mainWin;
-    mainWin.id = 10;
-    mainWin.pid = 100;
-    mainWin.uid = 1;
-    mainWin.area = {0, 0, 1920, 1080};
-    mainWin.defaultHotAreas = {mainWin.area};
-    mainWin.pointerHotAreas = {mainWin.area};
-    mainWin.agentWindowId = 10;
-    mainWin.flags = 0;
-    mainWin.transform = {1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f};
-    mainGroup.windowsInfo.push_back(mainWin);
+    mainGroup.displaysInfo.push_back(MakeDisplay({
+        .id = 1, .x = 0, .y = 0, .width = 1920, .height = 1080, .dpi = 240, .name = "main", .uniq = "default0",
+        .direction = DIRECTION0,
+    }));
+    mainGroup.windowsInfo.push_back(MakeWindow({
+        .id = 10, .pid = 100, .uid = 1, .agentWindowId = 10, .area = {0, 0, 1920, 1080}, .flags = 0,
+    }));
     mgr->UpdateDisplayInfo(mainGroup);
 
     // Register secondary group (groupId=1) with focusWindowId=20
@@ -16728,27 +16799,13 @@ HWTEST_F(InputWindowsManagerTest, MultiGroupAudit_KeyFocusFallback_001, TestSize
     secGroup.groupId = 1;
     secGroup.type = GroupType::GROUP_SPECIAL;
     secGroup.focusWindowId = 20;
-    OLD::DisplayInfo secDisplay = { .id = 2 };
-    secDisplay.x = 0;
-    secDisplay.y = 0;
-    secDisplay.width = 1280;
-    secDisplay.height = 720;
-    secDisplay.dpi = 160;
-    secDisplay.name = "secondary";
-    secDisplay.uniq = "secondary0";
-    secDisplay.direction = DIRECTION0;
-    secGroup.displaysInfo.push_back(secDisplay);
-    WindowInfo secWin;
-    secWin.id = 20;
-    secWin.pid = 200;
-    secWin.uid = 2;
-    secWin.area = {0, 0, 1280, 720};
-    secWin.defaultHotAreas = {secWin.area};
-    secWin.pointerHotAreas = {secWin.area};
-    secWin.agentWindowId = 20;
-    secWin.flags = 0;
-    secWin.transform = {1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f};
-    secGroup.windowsInfo.push_back(secWin);
+    secGroup.displaysInfo.push_back(MakeDisplay({
+        .id = 2, .x = 0, .y = 0, .width = 1280, .height = 720, .dpi = 160, .name = "secondary",
+        .uniq = "secondary0", .direction = DIRECTION0,
+    }));
+    secGroup.windowsInfo.push_back(MakeWindow({
+        .id = 20, .pid = 200, .uid = 2, .agentWindowId = 20, .area = {0, 0, 1280, 720}, .flags = 0,
+    }));
     mgr->UpdateDisplayInfo(secGroup);
 
     // AUDIT ASSERTION: GetFocusWindowId for group 1 must return 20 (the secondary
@@ -16952,27 +17009,13 @@ HWTEST_F(InputWindowsManagerTest, MultiGroupAudit_GetDisplayIdNegativeFallback_0
     mainGroup.groupId = 0;
     mainGroup.type = GroupType::GROUP_DEFAULT;
     mainGroup.focusWindowId = 10;
-    OLD::DisplayInfo mainDisplay = { .id = 1 };
-    mainDisplay.x = 0;
-    mainDisplay.y = 0;
-    mainDisplay.width = 1920;
-    mainDisplay.height = 1080;
-    mainDisplay.dpi = 240;
-    mainDisplay.name = "main";
-    mainDisplay.uniq = "default0";
-    mainDisplay.direction = DIRECTION0;
-    mainGroup.displaysInfo.push_back(mainDisplay);
-    WindowInfo mainWin;
-    mainWin.id = 10;
-    mainWin.pid = 100;
-    mainWin.uid = 1;
-    mainWin.area = {0, 0, 1920, 1080};
-    mainWin.defaultHotAreas = {mainWin.area};
-    mainWin.pointerHotAreas = {mainWin.area};
-    mainWin.agentWindowId = 10;
-    mainWin.flags = 0;
-    mainWin.transform = {1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f};
-    mainGroup.windowsInfo.push_back(mainWin);
+    mainGroup.displaysInfo.push_back(MakeDisplay({
+        .id = 1, .x = 0, .y = 0, .width = 1920, .height = 1080, .dpi = 240, .name = "main", .uniq = "default0",
+        .direction = DIRECTION0,
+    }));
+    mainGroup.windowsInfo.push_back(MakeWindow({
+        .id = 10, .pid = 100, .uid = 1, .agentWindowId = 10, .area = {0, 0, 1920, 1080}, .flags = 0,
+    }));
     mgr->UpdateDisplayInfo(mainGroup);
 
     // Register secondary group with display id=2
@@ -16980,27 +17023,13 @@ HWTEST_F(InputWindowsManagerTest, MultiGroupAudit_GetDisplayIdNegativeFallback_0
     secGroup.groupId = 1;
     secGroup.type = GroupType::GROUP_SPECIAL;
     secGroup.focusWindowId = 20;
-    OLD::DisplayInfo secDisplay = { .id = 2 };
-    secDisplay.x = 0;
-    secDisplay.y = 0;
-    secDisplay.width = 1280;
-    secDisplay.height = 720;
-    secDisplay.dpi = 160;
-    secDisplay.name = "secondary";
-    secDisplay.uniq = "secondary0";
-    secDisplay.direction = DIRECTION0;
-    secGroup.displaysInfo.push_back(secDisplay);
-    WindowInfo secWin;
-    secWin.id = 20;
-    secWin.pid = 200;
-    secWin.uid = 2;
-    secWin.area = {0, 0, 1280, 720};
-    secWin.defaultHotAreas = {secWin.area};
-    secWin.pointerHotAreas = {secWin.area};
-    secWin.agentWindowId = 20;
-    secWin.flags = 0;
-    secWin.transform = {1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f};
-    secGroup.windowsInfo.push_back(secWin);
+    secGroup.displaysInfo.push_back(MakeDisplay({
+        .id = 2, .x = 0, .y = 0, .width = 1280, .height = 720, .dpi = 160, .name = "secondary",
+        .uniq = "secondary0", .direction = DIRECTION0,
+    }));
+    secGroup.windowsInfo.push_back(MakeWindow({
+        .id = 20, .pid = 200, .uid = 2, .agentWindowId = 20, .area = {0, 0, 1280, 720}, .flags = 0,
+    }));
     mgr->UpdateDisplayInfo(secGroup);
 
     // Create an input event with targetDisplayId=-1 (unresolved)
@@ -17618,29 +17647,13 @@ HWTEST_F(InputWindowsManagerTest, MouseGroupRouting_BoundMoveTargetsNonDefaultGr
     mainGroup.groupId = 0;
     mainGroup.type = GroupType::GROUP_DEFAULT;
     mainGroup.focusWindowId = 10;
-    OLD::DisplayInfo mainDisplay = { .id = 1 };
-    mainDisplay.x = 0;
-    mainDisplay.y = 0;
-    mainDisplay.width = 1920;
-    mainDisplay.height = 1080;
-    mainDisplay.validWidth = 1920;
-    mainDisplay.validHeight = 1080;
-    mainDisplay.dpi = 240;
-    mainDisplay.name = "main";
-    mainDisplay.uniq = "default0";
-    mainDisplay.direction = DIRECTION0;
-    mainGroup.displaysInfo.push_back(mainDisplay);
-    WindowInfo mainWin;
-    mainWin.id = 10;
-    mainWin.pid = 100;
-    mainWin.uid = 1;
-    mainWin.area = {0, 0, 1920, 1080};
-    mainWin.defaultHotAreas = {mainWin.area};
-    mainWin.pointerHotAreas = {mainWin.area};
-    mainWin.agentWindowId = 10;
-    mainWin.flags = 0;
-    mainWin.transform = {1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f};
-    mainGroup.windowsInfo.push_back(mainWin);
+    mainGroup.displaysInfo.push_back(MakeDisplay({
+        .id = 1, .x = 0, .y = 0, .width = 1920, .height = 1080, .validWidth = 1920, .validHeight = 1080, .dpi = 240,
+        .name = "main", .uniq = "default0", .direction = DIRECTION0,
+    }));
+    mainGroup.windowsInfo.push_back(MakeWindow({
+        .id = 10, .pid = 100, .uid = 1, .agentWindowId = 10, .area = {0, 0, 1920, 1080}, .flags = 0,
+    }));
     mgr->UpdateDisplayInfo(mainGroup);
 
     // Register secondary group (groupId=1)
@@ -17648,29 +17661,13 @@ HWTEST_F(InputWindowsManagerTest, MouseGroupRouting_BoundMoveTargetsNonDefaultGr
     secGroup.groupId = 1;
     secGroup.type = GroupType::GROUP_SPECIAL;
     secGroup.focusWindowId = 20;
-    OLD::DisplayInfo secDisplay = { .id = 2 };
-    secDisplay.x = 0;
-    secDisplay.y = 0;
-    secDisplay.width = 1280;
-    secDisplay.height = 720;
-    secDisplay.validWidth = 1280;
-    secDisplay.validHeight = 720;
-    secDisplay.dpi = 160;
-    secDisplay.name = "secondary";
-    secDisplay.uniq = "secondary0";
-    secDisplay.direction = DIRECTION0;
-    secGroup.displaysInfo.push_back(secDisplay);
-    WindowInfo secWin;
-    secWin.id = 20;
-    secWin.pid = 200;
-    secWin.uid = 2;
-    secWin.area = {0, 0, 1280, 720};
-    secWin.defaultHotAreas = {secWin.area};
-    secWin.pointerHotAreas = {secWin.area};
-    secWin.agentWindowId = 20;
-    secWin.flags = 0;
-    secWin.transform = {1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f};
-    secGroup.windowsInfo.push_back(secWin);
+    secGroup.displaysInfo.push_back(MakeDisplay({
+        .id = 2, .x = 0, .y = 0, .width = 1280, .height = 720, .validWidth = 1280, .validHeight = 720, .dpi = 160,
+        .name = "secondary", .uniq = "secondary0", .direction = DIRECTION0,
+    }));
+    secGroup.windowsInfo.push_back(MakeWindow({
+        .id = 20, .pid = 200, .uid = 2, .agentWindowId = 20, .area = {0, 0, 1280, 720}, .flags = 0,
+    }));
     mgr->UpdateDisplayInfo(secGroup);
 
     // Bind device 42 to display 2 (secondary group)
@@ -17890,36 +17887,20 @@ HWTEST_F(InputWindowsManagerTest, MouseGroupRouting_AxisBoundGroup_001, TestSize
     mainGroup.groupId = 0;
     mainGroup.type = GroupType::GROUP_DEFAULT;
     mainGroup.focusWindowId = 10;
-    OLD::DisplayInfo mainDisplay = { .id = 1 };
-    mainDisplay.x = 0;
-    mainDisplay.y = 0;
-    mainDisplay.width = 1920;
-    mainDisplay.height = 1080;
-    mainDisplay.validWidth = 1920;
-    mainDisplay.validHeight = 1080;
-    mainDisplay.dpi = 240;
-    mainDisplay.name = "main";
-    mainDisplay.uniq = "default0";
-    mainDisplay.direction = DIRECTION0;
-    mainGroup.displaysInfo.push_back(mainDisplay);
+    mainGroup.displaysInfo.push_back(MakeDisplay({
+        .id = 1, .x = 0, .y = 0, .width = 1920, .height = 1080, .validWidth = 1920, .validHeight = 1080, .dpi = 240,
+        .name = "main", .uniq = "default0", .direction = DIRECTION0,
+    }));
     mgr->UpdateDisplayInfo(mainGroup);
 
     OLD::DisplayGroupInfo secGroup;
     secGroup.groupId = 1;
     secGroup.type = GroupType::GROUP_SPECIAL;
     secGroup.focusWindowId = 20;
-    OLD::DisplayInfo secDisplay = { .id = 2 };
-    secDisplay.x = 0;
-    secDisplay.y = 0;
-    secDisplay.width = 1280;
-    secDisplay.height = 720;
-    secDisplay.validWidth = 1280;
-    secDisplay.validHeight = 720;
-    secDisplay.dpi = 160;
-    secDisplay.name = "secondary";
-    secDisplay.uniq = "secondary0";
-    secDisplay.direction = DIRECTION0;
-    secGroup.displaysInfo.push_back(secDisplay);
+    secGroup.displaysInfo.push_back(MakeDisplay({
+        .id = 2, .x = 0, .y = 0, .width = 1280, .height = 720, .validWidth = 1280, .validHeight = 720, .dpi = 160,
+        .name = "secondary", .uniq = "secondary0", .direction = DIRECTION0,
+    }));
     mgr->UpdateDisplayInfo(secGroup);
 
     // Bind device 55 to display 2 (secondary group)
@@ -18033,9 +18014,7 @@ HWTEST_F(InputWindowsManagerTest, TouchpadGroupRouting_BoundSwipeUsesBoundGroup_
     boundGroupInfo.groupId = boundGroupId;
     boundGroupInfo.focusWindowId = boundFocusWin;
     boundGroupInfo.type = GroupType::GROUP_SPECIAL;
-    OLD::DisplayInfo boundDisplay;
-    boundDisplay.id = boundDisplayId;
-    boundGroupInfo.displaysInfo.push_back(boundDisplay);
+    boundGroupInfo.displaysInfo.push_back(MakeDisplay({.id = boundDisplayId}));
     WindowInfo boundWin;
     boundWin.id = boundFocusWin;
     boundWin.pid = 10;
@@ -18170,18 +18149,10 @@ HWTEST_F(InputWindowsManagerTest, TouchpadGroupRouting_BoundPointerDerivedEventU
     mainGroup.groupId = 0;
     mainGroup.type = GroupType::GROUP_DEFAULT;
     mainGroup.focusWindowId = 10;
-    OLD::DisplayInfo mainDisplay = { .id = 1 };
-    mainDisplay.x = 0;
-    mainDisplay.y = 0;
-    mainDisplay.width = 1920;
-    mainDisplay.height = 1080;
-    mainDisplay.validWidth = 1920;
-    mainDisplay.validHeight = 1080;
-    mainDisplay.dpi = 240;
-    mainDisplay.name = "main";
-    mainDisplay.uniq = "default0";
-    mainDisplay.direction = DIRECTION0;
-    mainGroup.displaysInfo.push_back(mainDisplay);
+    mainGroup.displaysInfo.push_back(MakeDisplay({
+        .id = 1, .x = 0, .y = 0, .width = 1920, .height = 1080, .validWidth = 1920, .validHeight = 1080, .dpi = 240,
+        .name = "main", .uniq = "default0", .direction = DIRECTION0,
+    }));
     mgr->UpdateDisplayInfo(mainGroup);
 
     // Register secondary group
@@ -18189,18 +18160,10 @@ HWTEST_F(InputWindowsManagerTest, TouchpadGroupRouting_BoundPointerDerivedEventU
     secGroup.groupId = 1;
     secGroup.type = GroupType::GROUP_SPECIAL;
     secGroup.focusWindowId = 20;
-    OLD::DisplayInfo secDisplay = { .id = 2 };
-    secDisplay.x = 0;
-    secDisplay.y = 0;
-    secDisplay.width = 1280;
-    secDisplay.height = 720;
-    secDisplay.validWidth = 1280;
-    secDisplay.validHeight = 720;
-    secDisplay.dpi = 160;
-    secDisplay.name = "secondary";
-    secDisplay.uniq = "secondary0";
-    secDisplay.direction = DIRECTION0;
-    secGroup.displaysInfo.push_back(secDisplay);
+    secGroup.displaysInfo.push_back(MakeDisplay({
+        .id = 2, .x = 0, .y = 0, .width = 1280, .height = 720, .validWidth = 1280, .validHeight = 720, .dpi = 160,
+        .name = "secondary", .uniq = "secondary0", .direction = DIRECTION0,
+    }));
     mgr->UpdateDisplayInfo(secGroup);
 
     // Bind touchpad device to secondary group
@@ -18312,9 +18275,7 @@ HWTEST_F(InputWindowsManagerTest, TouchpadGroupRouting_SwipeEndBoundGroup_001, T
     boundGroupInfo.groupId = boundGroupId;
     boundGroupInfo.focusWindowId = boundFocusWin;
     boundGroupInfo.type = GroupType::GROUP_SPECIAL;
-    OLD::DisplayInfo boundDisplay;
-    boundDisplay.id = boundDisplayId;
-    boundGroupInfo.displaysInfo.push_back(boundDisplay);
+    boundGroupInfo.displaysInfo.push_back(MakeDisplay({.id = boundDisplayId}));
     WindowInfo boundWin;
     boundWin.id = boundFocusWin;
     boundWin.pid = 20;
@@ -18491,27 +18452,13 @@ HWTEST_F(InputWindowsManagerTest, GroupStateIsolation_MouseLocationIsolation_001
     mainGroup.groupId = 0;
     mainGroup.type = GroupType::GROUP_DEFAULT;
     mainGroup.focusWindowId = 10;
-    OLD::DisplayInfo mainDisplay;
-    mainDisplay.id = 0;
-    mainDisplay.width = 1920;
-    mainDisplay.height = 1080;
-    mainDisplay.validWidth = 1920;
-    mainDisplay.validHeight = 1080;
-    mainDisplay.dpi = 160;
-    mainDisplay.name = "main";
-    mainDisplay.uniq = "main0";
-    mainDisplay.direction = DIRECTION0;
-    mainGroup.displaysInfo.push_back(mainDisplay);
-    WindowInfo mainWin;
-    mainWin.id = 10;
-    mainWin.pid = 100;
-    mainWin.agentWindowId = 10;
-    mainWin.displayId = 0;
-    mainWin.area = {0, 0, 1920, 1080};
-    mainWin.defaultHotAreas = {mainWin.area};
-    mainWin.pointerHotAreas = {mainWin.area};
-    mainWin.transform = {1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f};
-    mainGroup.windowsInfo.push_back(mainWin);
+    mainGroup.displaysInfo.push_back(MakeDisplay({
+        .id = 0, .width = 1920, .height = 1080, .validWidth = 1920, .validHeight = 1080, .dpi = 160, .name = "main",
+        .uniq = "main0", .direction = DIRECTION0,
+    }));
+    mainGroup.windowsInfo.push_back(MakeWindow({
+        .id = 10, .pid = 100, .agentWindowId = 10, .displayId = 0, .area = {0, 0, 1920, 1080},
+    }));
     mgr.UpdateDisplayInfo(mainGroup);
 
     // Set up secondary group (group 2) with display 5
@@ -18519,27 +18466,13 @@ HWTEST_F(InputWindowsManagerTest, GroupStateIsolation_MouseLocationIsolation_001
     secGroup.groupId = 2;
     secGroup.type = GroupType::GROUP_SPECIAL;
     secGroup.focusWindowId = 20;
-    OLD::DisplayInfo secDisplay;
-    secDisplay.id = 5;
-    secDisplay.width = 1280;
-    secDisplay.height = 720;
-    secDisplay.validWidth = 1280;
-    secDisplay.validHeight = 720;
-    secDisplay.dpi = 160;
-    secDisplay.name = "secondary";
-    secDisplay.uniq = "sec0";
-    secDisplay.direction = DIRECTION0;
-    secGroup.displaysInfo.push_back(secDisplay);
-    WindowInfo secWin;
-    secWin.id = 20;
-    secWin.pid = 200;
-    secWin.agentWindowId = 20;
-    secWin.displayId = 5;
-    secWin.area = {0, 0, 1280, 720};
-    secWin.defaultHotAreas = {secWin.area};
-    secWin.pointerHotAreas = {secWin.area};
-    secWin.transform = {1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f};
-    secGroup.windowsInfo.push_back(secWin);
+    secGroup.displaysInfo.push_back(MakeDisplay({
+        .id = 5, .width = 1280, .height = 720, .validWidth = 1280, .validHeight = 720, .dpi = 160,
+        .name = "secondary", .uniq = "sec0", .direction = DIRECTION0,
+    }));
+    secGroup.windowsInfo.push_back(MakeWindow({
+        .id = 20, .pid = 200, .agentWindowId = 20, .displayId = 5, .area = {0, 0, 1280, 720},
+    }));
     mgr.UpdateDisplayInfo(secGroup);
 
     // Bind device 50 to group 2 (display 5)
@@ -18584,54 +18517,26 @@ HWTEST_F(InputWindowsManagerTest, GroupStateIsolation_CaptureModeIsolation_001, 
     mainGroup.groupId = 0;
     mainGroup.type = GroupType::GROUP_DEFAULT;
     mainGroup.focusWindowId = 10;
-    OLD::DisplayInfo mainDisplay;
-    mainDisplay.id = 0;
-    mainDisplay.width = 1920;
-    mainDisplay.height = 1080;
-    mainDisplay.validWidth = 1920;
-    mainDisplay.validHeight = 1080;
-    mainDisplay.dpi = 160;
-    mainDisplay.name = "main";
-    mainDisplay.uniq = "main0";
-    mainDisplay.direction = DIRECTION0;
-    mainGroup.displaysInfo.push_back(mainDisplay);
-    WindowInfo mainWin;
-    mainWin.id = 10;
-    mainWin.pid = 100;
-    mainWin.agentWindowId = 10;
-    mainWin.displayId = 0;
-    mainWin.area = {0, 0, 1920, 1080};
-    mainWin.defaultHotAreas = {mainWin.area};
-    mainWin.pointerHotAreas = {mainWin.area};
-    mainWin.transform = {1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f};
-    mainGroup.windowsInfo.push_back(mainWin);
+    mainGroup.displaysInfo.push_back(MakeDisplay({
+        .id = 0, .width = 1920, .height = 1080, .validWidth = 1920, .validHeight = 1080, .dpi = 160, .name = "main",
+        .uniq = "main0", .direction = DIRECTION0,
+    }));
+    mainGroup.windowsInfo.push_back(MakeWindow({
+        .id = 10, .pid = 100, .agentWindowId = 10, .displayId = 0, .area = {0, 0, 1920, 1080},
+    }));
     mgr.UpdateDisplayInfo(mainGroup);
 
     OLD::DisplayGroupInfo secGroup;
     secGroup.groupId = 1;
     secGroup.type = GroupType::GROUP_SPECIAL;
     secGroup.focusWindowId = 20;
-    OLD::DisplayInfo secDisplay;
-    secDisplay.id = 3;
-    secDisplay.width = 1280;
-    secDisplay.height = 720;
-    secDisplay.validWidth = 1280;
-    secDisplay.validHeight = 720;
-    secDisplay.dpi = 160;
-    secDisplay.name = "secondary";
-    secDisplay.uniq = "sec0";
-    secDisplay.direction = DIRECTION0;
-    secGroup.displaysInfo.push_back(secDisplay);
-    WindowInfo secWin;
-    secWin.id = 20;
-    secWin.pid = 200;
-    secWin.agentWindowId = 20;
-    secWin.displayId = 3;
-    secWin.area = {0, 0, 1280, 720};
-    secWin.defaultHotAreas = {secWin.area};
-    secWin.pointerHotAreas = {secWin.area};
-    secWin.transform = {1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f};
-    secGroup.windowsInfo.push_back(secWin);
+    secGroup.displaysInfo.push_back(MakeDisplay({
+        .id = 3, .width = 1280, .height = 720, .validWidth = 1280, .validHeight = 720, .dpi = 160,
+        .name = "secondary", .uniq = "sec0", .direction = DIRECTION0,
+    }));
+    secGroup.windowsInfo.push_back(MakeWindow({
+        .id = 20, .pid = 200, .agentWindowId = 20, .displayId = 3, .area = {0, 0, 1280, 720},
+    }));
     mgr.UpdateDisplayInfo(secGroup);
 
     // Bind device to secondary group
@@ -18674,54 +18579,26 @@ HWTEST_F(InputWindowsManagerTest, GroupStateIsolation_KeyboardFocusIsolation_001
     mainGroup.groupId = 0;
     mainGroup.type = GroupType::GROUP_DEFAULT;
     mainGroup.focusWindowId = 10;
-    OLD::DisplayInfo mainDisplay;
-    mainDisplay.id = 0;
-    mainDisplay.width = 1920;
-    mainDisplay.height = 1080;
-    mainDisplay.validWidth = 1920;
-    mainDisplay.validHeight = 1080;
-    mainDisplay.dpi = 160;
-    mainDisplay.name = "main";
-    mainDisplay.uniq = "main0";
-    mainDisplay.direction = DIRECTION0;
-    mainGroup.displaysInfo.push_back(mainDisplay);
-    WindowInfo mainWin;
-    mainWin.id = 10;
-    mainWin.pid = 100;
-    mainWin.agentWindowId = 10;
-    mainWin.displayId = 0;
-    mainWin.area = {0, 0, 1920, 1080};
-    mainWin.defaultHotAreas = {mainWin.area};
-    mainWin.pointerHotAreas = {mainWin.area};
-    mainWin.transform = {1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f};
-    mainGroup.windowsInfo.push_back(mainWin);
+    mainGroup.displaysInfo.push_back(MakeDisplay({
+        .id = 0, .width = 1920, .height = 1080, .validWidth = 1920, .validHeight = 1080, .dpi = 160, .name = "main",
+        .uniq = "main0", .direction = DIRECTION0,
+    }));
+    mainGroup.windowsInfo.push_back(MakeWindow({
+        .id = 10, .pid = 100, .agentWindowId = 10, .displayId = 0, .area = {0, 0, 1920, 1080},
+    }));
     mgr.UpdateDisplayInfo(mainGroup);
 
     OLD::DisplayGroupInfo secGroup;
     secGroup.groupId = 3;
     secGroup.type = GroupType::GROUP_SPECIAL;
     secGroup.focusWindowId = 50;
-    OLD::DisplayInfo secDisplay;
-    secDisplay.id = 7;
-    secDisplay.width = 1280;
-    secDisplay.height = 720;
-    secDisplay.validWidth = 1280;
-    secDisplay.validHeight = 720;
-    secDisplay.dpi = 160;
-    secDisplay.name = "ext";
-    secDisplay.uniq = "ext0";
-    secDisplay.direction = DIRECTION0;
-    secGroup.displaysInfo.push_back(secDisplay);
-    WindowInfo secWin;
-    secWin.id = 50;
-    secWin.pid = 500;
-    secWin.agentWindowId = 50;
-    secWin.displayId = 7;
-    secWin.area = {0, 0, 1280, 720};
-    secWin.defaultHotAreas = {secWin.area};
-    secWin.pointerHotAreas = {secWin.area};
-    secWin.transform = {1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f};
-    secGroup.windowsInfo.push_back(secWin);
+    secGroup.displaysInfo.push_back(MakeDisplay({
+        .id = 7, .width = 1280, .height = 720, .validWidth = 1280, .validHeight = 720, .dpi = 160, .name = "ext",
+        .uniq = "ext0", .direction = DIRECTION0,
+    }));
+    secGroup.windowsInfo.push_back(MakeWindow({
+        .id = 50, .pid = 500, .agentWindowId = 50, .displayId = 7, .area = {0, 0, 1280, 720},
+    }));
     mgr.UpdateDisplayInfo(secGroup);
 
     // Bind keyboard device 80 to group 3
@@ -18911,27 +18788,13 @@ HWTEST_F(InputWindowsManagerTest, GroupStateIsolation_DualBoundMice_IndependentS
     mainGroup.groupId = 0;
     mainGroup.type = GroupType::GROUP_DEFAULT;
     mainGroup.focusWindowId = 10;
-    OLD::DisplayInfo mainDisplay;
-    mainDisplay.id = 0;
-    mainDisplay.width = 1920;
-    mainDisplay.height = 1080;
-    mainDisplay.validWidth = 1920;
-    mainDisplay.validHeight = 1080;
-    mainDisplay.dpi = 160;
-    mainDisplay.name = "main";
-    mainDisplay.uniq = "main0";
-    mainDisplay.direction = DIRECTION0;
-    mainGroup.displaysInfo.push_back(mainDisplay);
-    WindowInfo mainWin;
-    mainWin.id = 10;
-    mainWin.pid = 100;
-    mainWin.agentWindowId = 10;
-    mainWin.displayId = 0;
-    mainWin.area = {0, 0, 1920, 1080};
-    mainWin.defaultHotAreas = {mainWin.area};
-    mainWin.pointerHotAreas = {mainWin.area};
-    mainWin.transform = {1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f};
-    mainGroup.windowsInfo.push_back(mainWin);
+    mainGroup.displaysInfo.push_back(MakeDisplay({
+        .id = 0, .width = 1920, .height = 1080, .validWidth = 1920, .validHeight = 1080, .dpi = 160, .name = "main",
+        .uniq = "main0", .direction = DIRECTION0,
+    }));
+    mainGroup.windowsInfo.push_back(MakeWindow({
+        .id = 10, .pid = 100, .agentWindowId = 10, .displayId = 0, .area = {0, 0, 1920, 1080},
+    }));
     mgr->UpdateDisplayInfo(mainGroup);
 
     // Set up secondary group (group 4)
@@ -18939,27 +18802,13 @@ HWTEST_F(InputWindowsManagerTest, GroupStateIsolation_DualBoundMice_IndependentS
     secGroup.groupId = 4;
     secGroup.type = GroupType::GROUP_SPECIAL;
     secGroup.focusWindowId = 40;
-    OLD::DisplayInfo secDisplay;
-    secDisplay.id = 8;
-    secDisplay.width = 1280;
-    secDisplay.height = 720;
-    secDisplay.validWidth = 1280;
-    secDisplay.validHeight = 720;
-    secDisplay.dpi = 160;
-    secDisplay.name = "ext";
-    secDisplay.uniq = "ext0";
-    secDisplay.direction = DIRECTION0;
-    secGroup.displaysInfo.push_back(secDisplay);
-    WindowInfo secWin;
-    secWin.id = 40;
-    secWin.pid = 400;
-    secWin.agentWindowId = 40;
-    secWin.displayId = 8;
-    secWin.area = {0, 0, 1280, 720};
-    secWin.defaultHotAreas = {secWin.area};
-    secWin.pointerHotAreas = {secWin.area};
-    secWin.transform = {1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f};
-    secGroup.windowsInfo.push_back(secWin);
+    secGroup.displaysInfo.push_back(MakeDisplay({
+        .id = 8, .width = 1280, .height = 720, .validWidth = 1280, .validHeight = 720, .dpi = 160, .name = "ext",
+        .uniq = "ext0", .direction = DIRECTION0,
+    }));
+    secGroup.windowsInfo.push_back(MakeWindow({
+        .id = 40, .pid = 400, .agentWindowId = 40, .displayId = 8, .area = {0, 0, 1280, 720},
+    }));
     mgr->UpdateDisplayInfo(secGroup);
 
     // Bind mouse A to main group (display 0)
@@ -19042,27 +18891,13 @@ HWTEST_F(InputWindowsManagerTest, GroupStateIsolation_DualBoundKeyboards_Indepen
     mainGroup.groupId = 0;
     mainGroup.type = GroupType::GROUP_DEFAULT;
     mainGroup.focusWindowId = 10;
-    OLD::DisplayInfo mainDisplay;
-    mainDisplay.id = 0;
-    mainDisplay.width = 1920;
-    mainDisplay.height = 1080;
-    mainDisplay.validWidth = 1920;
-    mainDisplay.validHeight = 1080;
-    mainDisplay.dpi = 160;
-    mainDisplay.name = "main";
-    mainDisplay.uniq = "main0";
-    mainDisplay.direction = DIRECTION0;
-    mainGroup.displaysInfo.push_back(mainDisplay);
-    WindowInfo mainWin;
-    mainWin.id = 10;
-    mainWin.pid = 100;
-    mainWin.agentWindowId = 10;
-    mainWin.displayId = 0;
-    mainWin.area = {0, 0, 1920, 1080};
-    mainWin.defaultHotAreas = {mainWin.area};
-    mainWin.pointerHotAreas = {mainWin.area};
-    mainWin.transform = {1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f};
-    mainGroup.windowsInfo.push_back(mainWin);
+    mainGroup.displaysInfo.push_back(MakeDisplay({
+        .id = 0, .width = 1920, .height = 1080, .validWidth = 1920, .validHeight = 1080, .dpi = 160, .name = "main",
+        .uniq = "main0", .direction = DIRECTION0,
+    }));
+    mainGroup.windowsInfo.push_back(MakeWindow({
+        .id = 10, .pid = 100, .agentWindowId = 10, .displayId = 0, .area = {0, 0, 1920, 1080},
+    }));
     mgr->UpdateDisplayInfo(mainGroup);
 
     // Set up secondary group
@@ -19070,27 +18905,13 @@ HWTEST_F(InputWindowsManagerTest, GroupStateIsolation_DualBoundKeyboards_Indepen
     secGroup.groupId = 6;
     secGroup.type = GroupType::GROUP_SPECIAL;
     secGroup.focusWindowId = 60;
-    OLD::DisplayInfo secDisplay;
-    secDisplay.id = 12;
-    secDisplay.width = 1280;
-    secDisplay.height = 720;
-    secDisplay.validWidth = 1280;
-    secDisplay.validHeight = 720;
-    secDisplay.dpi = 160;
-    secDisplay.name = "ext";
-    secDisplay.uniq = "ext0";
-    secDisplay.direction = DIRECTION0;
-    secGroup.displaysInfo.push_back(secDisplay);
-    WindowInfo secWin;
-    secWin.id = 60;
-    secWin.pid = 600;
-    secWin.agentWindowId = 60;
-    secWin.displayId = 12;
-    secWin.area = {0, 0, 1280, 720};
-    secWin.defaultHotAreas = {secWin.area};
-    secWin.pointerHotAreas = {secWin.area};
-    secWin.transform = {1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f};
-    secGroup.windowsInfo.push_back(secWin);
+    secGroup.displaysInfo.push_back(MakeDisplay({
+        .id = 12, .width = 1280, .height = 720, .validWidth = 1280, .validHeight = 720, .dpi = 160, .name = "ext",
+        .uniq = "ext0", .direction = DIRECTION0,
+    }));
+    secGroup.windowsInfo.push_back(MakeWindow({
+        .id = 60, .pid = 600, .agentWindowId = 60, .displayId = 12, .area = {0, 0, 1280, 720},
+    }));
     mgr->UpdateDisplayInfo(secGroup);
 
     // Bind keyboard A to main group
@@ -19747,15 +19568,10 @@ HWTEST_F(InputWindowsManagerTest, SoftCursorRS_TwoGroupsIndependentCursorState_0
     // Set up group B display
     OLD::DisplayGroupInfo groupBInfo;
     groupBInfo.groupId = groupB;
-    OLD::DisplayInfo displayB;
-    displayB.id = displayBConst;
-    displayB.width = 2560;
-    displayB.height = 1440;
-    displayB.validWidth = 2560;
-    displayB.validHeight = 1440;
-    displayB.direction = Direction::DIRECTION90;
-    displayB.displayDirection = Direction::DIRECTION90;
-    groupBInfo.displaysInfo.push_back(displayB);
+    groupBInfo.displaysInfo.push_back(MakeDisplay({
+        .id = displayBConst, .width = 2560, .height = 1440, .validWidth = 2560, .validHeight = 1440,
+        .direction = Direction::DIRECTION90, .displayDirection = Direction::DIRECTION90,
+    }));
     mgr.displayGroupInfoMap_[groupB] = groupBInfo;
 
     // Ensure group state
@@ -20174,27 +19990,17 @@ HWTEST_F(InputWindowsManagerTest, HardCursor_TwoGroups_NoStateOverwrite_001, Tes
     // Set up group A
     OLD::DisplayGroupInfo groupAInfo;
     groupAInfo.groupId = groupA;
-    OLD::DisplayInfo displayA;
-    displayA.id = displayAConst;
-    displayA.width = 1920;
-    displayA.height = 1080;
-    displayA.validWidth = 1920;
-    displayA.validHeight = 1080;
-    displayA.rsId = 0xA000;
-    groupAInfo.displaysInfo.push_back(displayA);
+    groupAInfo.displaysInfo.push_back(MakeDisplay({
+        .id = displayAConst, .width = 1920, .height = 1080, .validWidth = 1920, .validHeight = 1080, .rsId = 0xA000,
+    }));
     mgr.displayGroupInfoMap_[groupA] = groupAInfo;
 
     // Set up group B
     OLD::DisplayGroupInfo groupBInfo;
     groupBInfo.groupId = groupB;
-    OLD::DisplayInfo displayB;
-    displayB.id = displayBConst;
-    displayB.width = 2560;
-    displayB.height = 1440;
-    displayB.validWidth = 2560;
-    displayB.validHeight = 1440;
-    displayB.rsId = 0xB000;
-    groupBInfo.displaysInfo.push_back(displayB);
+    groupBInfo.displaysInfo.push_back(MakeDisplay({
+        .id = displayBConst, .width = 2560, .height = 1440, .validWidth = 2560, .validHeight = 1440, .rsId = 0xB000,
+    }));
     mgr.displayGroupInfoMap_[groupB] = groupBInfo;
 
     // Bind devices
@@ -20210,18 +20016,8 @@ HWTEST_F(InputWindowsManagerTest, HardCursor_TwoGroups_NoStateOverwrite_001, Tes
     mgr.cursorPosMap_[groupB].direction = DIRECTION90;
 
     // Create pointer event for device A
-    auto eventA = PointerEvent::Create();
+    auto eventA = MakeMouseMoveEvent(deviceA, 200, 150);
     ASSERT_NE(eventA, nullptr);
-    eventA->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
-    eventA->SetDeviceId(deviceA);
-    eventA->SetTargetDisplayId(-1);
-    eventA->SetPointerId(0);
-    eventA->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
-    PointerEvent::PointerItem itemA;
-    itemA.SetPointerId(0);
-    itemA.SetDisplayX(200);
-    itemA.SetDisplayY(150);
-    eventA->AddPointerItem(itemA);
 
     // Call UpdateMouseTarget for device A
     mgr.UpdateMouseTarget(eventA);
@@ -20241,18 +20037,8 @@ HWTEST_F(InputWindowsManagerTest, HardCursor_TwoGroups_NoStateOverwrite_001, Tes
         << "Device A movement must not overwrite group B's direction";
 
     // Now do device B
-    auto eventB = PointerEvent::Create();
+    auto eventB = MakeMouseMoveEvent(deviceB, 300, 250);
     ASSERT_NE(eventB, nullptr);
-    eventB->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
-    eventB->SetDeviceId(deviceB);
-    eventB->SetTargetDisplayId(-1);
-    eventB->SetPointerId(0);
-    eventB->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
-    PointerEvent::PointerItem itemB;
-    itemB.SetPointerId(0);
-    itemB.SetDisplayX(300);
-    itemB.SetDisplayY(250);
-    eventB->AddPointerItem(itemB);
 
     mgr.UpdateMouseTarget(eventB);
 
@@ -20352,26 +20138,13 @@ HWTEST_F(InputWindowsManagerTest, DualMouse_BoundIsolation_PositionAndStyle_001,
     mainGroup.groupId = groupA;
     mainGroup.type = GroupType::GROUP_DEFAULT;
     mainGroup.focusWindowId = windowA;
-    OLD::DisplayInfo mainDisplay;
-    mainDisplay.id = displayA;
-    mainDisplay.width = 1920;
-    mainDisplay.height = 1080;
-    mainDisplay.validWidth = 1920;
-    mainDisplay.validHeight = 1080;
-    mainDisplay.dpi = 240;
-    mainDisplay.name = "main";
-    mainDisplay.uniq = "main0";
-    mainDisplay.direction = DIRECTION0;
-    mainGroup.displaysInfo.push_back(mainDisplay);
-    WindowInfo winA;
-    winA.id = windowA;
-    winA.pid = 100;
-    winA.agentWindowId = windowA;
-    winA.area = {0, 0, 1920, 1080};
-    winA.defaultHotAreas = {winA.area};
-    winA.pointerHotAreas = {winA.area};
-    winA.transform = {1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f};
-    mainGroup.windowsInfo.push_back(winA);
+    mainGroup.displaysInfo.push_back(MakeDisplay({
+        .id = displayA, .width = 1920, .height = 1080, .validWidth = 1920, .validHeight = 1080, .dpi = 240,
+        .name = "main", .uniq = "main0", .direction = DIRECTION0,
+    }));
+    mainGroup.windowsInfo.push_back(MakeWindow({
+        .id = windowA, .pid = 100, .agentWindowId = windowA, .area = {0, 0, 1920, 1080},
+    }));
     mgr->UpdateDisplayInfo(mainGroup);
 
     // Set up secondary group (group B = 5)
@@ -20379,26 +20152,13 @@ HWTEST_F(InputWindowsManagerTest, DualMouse_BoundIsolation_PositionAndStyle_001,
     secGroup.groupId = groupB;
     secGroup.type = GroupType::GROUP_SPECIAL;
     secGroup.focusWindowId = windowB;
-    OLD::DisplayInfo secDisplay;
-    secDisplay.id = displayB;
-    secDisplay.width = 1280;
-    secDisplay.height = 720;
-    secDisplay.validWidth = 1280;
-    secDisplay.validHeight = 720;
-    secDisplay.dpi = 160;
-    secDisplay.name = "ext";
-    secDisplay.uniq = "ext0";
-    secDisplay.direction = DIRECTION0;
-    secGroup.displaysInfo.push_back(secDisplay);
-    WindowInfo winB;
-    winB.id = windowB;
-    winB.pid = 200;
-    winB.agentWindowId = windowB;
-    winB.area = {0, 0, 1280, 720};
-    winB.defaultHotAreas = {winB.area};
-    winB.pointerHotAreas = {winB.area};
-    winB.transform = {1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f};
-    secGroup.windowsInfo.push_back(winB);
+    secGroup.displaysInfo.push_back(MakeDisplay({
+        .id = displayB, .width = 1280, .height = 720, .validWidth = 1280, .validHeight = 720, .dpi = 160,
+        .name = "ext", .uniq = "ext0", .direction = DIRECTION0,
+    }));
+    secGroup.windowsInfo.push_back(MakeWindow({
+        .id = windowB, .pid = 200, .agentWindowId = windowB, .area = {0, 0, 1280, 720},
+    }));
     mgr->UpdateDisplayInfo(secGroup);
 
     // Bind mouse A to group A (display 1)
@@ -20678,23 +20438,13 @@ HWTEST_F(InputWindowsManagerTest, DualKeyboard_BoundIsolation_IndependentFocus_0
     mainGroup.groupId = groupA;
     mainGroup.type = GroupType::GROUP_DEFAULT;
     mainGroup.focusWindowId = focusWinA;
-    OLD::DisplayInfo mainDisplay;
-    mainDisplay.id = displayA;
-    mainDisplay.width = 1920;
-    mainDisplay.height = 1080;
-    mainDisplay.validWidth = 1920;
-    mainDisplay.validHeight = 1080;
-    mainDisplay.dpi = 240;
-    mainDisplay.name = "main";
-    mainDisplay.uniq = "main0";
-    mainDisplay.direction = DIRECTION0;
-    mainGroup.displaysInfo.push_back(mainDisplay);
-    WindowInfo winA;
-    winA.id = focusWinA;
-    winA.pid = 10;
-    winA.agentWindowId = focusWinA;
-    winA.agentPid = 10;
-    mainGroup.windowsInfo.push_back(winA);
+    mainGroup.displaysInfo.push_back(MakeDisplay({
+        .id = displayA, .width = 1920, .height = 1080, .validWidth = 1920, .validHeight = 1080, .dpi = 240,
+        .name = "main", .uniq = "main0", .direction = DIRECTION0,
+    }));
+    mainGroup.windowsInfo.push_back(MakeWindow({
+        .id = focusWinA, .pid = 10, .agentWindowId = focusWinA, .agentPid = 10,
+    }));
     mgr->UpdateDisplayInfo(mainGroup);
 
     // Set up group B
@@ -20702,17 +20452,10 @@ HWTEST_F(InputWindowsManagerTest, DualKeyboard_BoundIsolation_IndependentFocus_0
     secGroup.groupId = groupB;
     secGroup.type = GroupType::GROUP_SPECIAL;
     secGroup.focusWindowId = focusWinB;
-    OLD::DisplayInfo secDisplay;
-    secDisplay.id = displayB;
-    secDisplay.width = 1280;
-    secDisplay.height = 720;
-    secDisplay.validWidth = 1280;
-    secDisplay.validHeight = 720;
-    secDisplay.dpi = 160;
-    secDisplay.name = "ext";
-    secDisplay.uniq = "ext0";
-    secDisplay.direction = DIRECTION0;
-    secGroup.displaysInfo.push_back(secDisplay);
+    secGroup.displaysInfo.push_back(MakeDisplay({
+        .id = displayB, .width = 1280, .height = 720, .validWidth = 1280, .validHeight = 720, .dpi = 160,
+        .name = "ext", .uniq = "ext0", .direction = DIRECTION0,
+    }));
     WindowInfo winB;
     winB.id = focusWinB;
     winB.pid = 20;
@@ -21537,28 +21280,19 @@ HWTEST_F(InputWindowsManagerTest, Compat_WindowScopedCapture_ByGroup_001, TestSi
     OLD::DisplayGroupInfo defaultGroup;
     defaultGroup.groupId = groupDefault;
     defaultGroup.type = GroupType::GROUP_DEFAULT;
-    OLD::DisplayInfo mainDisp = { .id = 1 };
-    mainDisp.width = 1920;
-    mainDisp.height = 1080;
-    mainDisp.dpi = 240;
-    mainDisp.name = "main";
-    mainDisp.uniq = "main0";
-    mainDisp.direction = DIRECTION0;
-    defaultGroup.displaysInfo.push_back(mainDisp);
+    defaultGroup.displaysInfo.push_back(MakeDisplay({
+        .id = 1, .width = 1920, .height = 1080, .dpi = 240, .name = "main", .uniq = "main0",
+        .direction = DIRECTION0,
+    }));
     mgr->UpdateDisplayInfo(defaultGroup);
 
     // Set up external group
     OLD::DisplayGroupInfo extGroup;
     extGroup.groupId = groupExt;
     extGroup.type = GroupType::GROUP_SPECIAL;
-    OLD::DisplayInfo extDisp = { .id = 10 };
-    extDisp.width = 1280;
-    extDisp.height = 720;
-    extDisp.dpi = 160;
-    extDisp.name = "ext";
-    extDisp.uniq = "ext0";
-    extDisp.direction = DIRECTION0;
-    extGroup.displaysInfo.push_back(extDisp);
+    extGroup.displaysInfo.push_back(MakeDisplay({
+        .id = 10, .width = 1280, .height = 720, .dpi = 160, .name = "ext", .uniq = "ext0", .direction = DIRECTION0,
+    }));
     mgr->UpdateDisplayInfo(extGroup);
 
     // Before any capture, both groups should be non-capture
@@ -21663,32 +21397,20 @@ HWTEST_F(InputWindowsManagerTest, Compat_GlobalAPI_MouseInfo_DefaultGroupOnly_00
     OLD::DisplayGroupInfo defaultGroup;
     defaultGroup.groupId = 0;
     defaultGroup.type = GroupType::GROUP_DEFAULT;
-    OLD::DisplayInfo mainDisp = { .id = displayMain };
-    mainDisp.width = 1920;
-    mainDisp.height = 1080;
-    mainDisp.validWidth = 1920;
-    mainDisp.validHeight = 1080;
-    mainDisp.dpi = 240;
-    mainDisp.name = "main";
-    mainDisp.uniq = "main0";
-    mainDisp.direction = DIRECTION0;
-    defaultGroup.displaysInfo.push_back(mainDisp);
+    defaultGroup.displaysInfo.push_back(MakeDisplay({
+        .id = displayMain, .width = 1920, .height = 1080, .validWidth = 1920, .validHeight = 1080, .dpi = 240,
+        .name = "main", .uniq = "main0", .direction = DIRECTION0,
+    }));
     mgr.UpdateDisplayInfo(defaultGroup);
 
     // Set up non-default group
     OLD::DisplayGroupInfo extGroup;
     extGroup.groupId = nonDefaultGroup;
     extGroup.type = GroupType::GROUP_SPECIAL;
-    OLD::DisplayInfo extDisp = { .id = displayExt };
-    extDisp.width = 2560;
-    extDisp.height = 1440;
-    extDisp.validWidth = 2560;
-    extDisp.validHeight = 1440;
-    extDisp.dpi = 160;
-    extDisp.name = "ext";
-    extDisp.uniq = "ext0";
-    extDisp.direction = DIRECTION0;
-    extGroup.displaysInfo.push_back(extDisp);
+    extGroup.displaysInfo.push_back(MakeDisplay({
+        .id = displayExt, .width = 2560, .height = 1440, .validWidth = 2560, .validHeight = 1440, .dpi = 160,
+        .name = "ext", .uniq = "ext0", .direction = DIRECTION0,
+    }));
     mgr.UpdateDisplayInfo(extGroup);
     mgr.EnsureGroupState(nonDefaultGroup);
 
@@ -21876,44 +21598,22 @@ HWTEST_F(InputWindowsManagerTest, Compat_GlobalAPI_DisplayGroupInfo_DefaultGroup
     OLD::DisplayGroupInfo defaultGroup;
     defaultGroup.groupId = 0;
     defaultGroup.type = GroupType::GROUP_DEFAULT;
-    OLD::DisplayInfo mainDisp = { .id = mainDisplay };
-    mainDisp.width = 1920;
-    mainDisp.height = 1080;
-    mainDisp.dpi = 240;
-    mainDisp.name = "main";
-    mainDisp.uniq = "main0";
-    mainDisp.direction = DIRECTION0;
-    defaultGroup.displaysInfo.push_back(mainDisp);
-    WindowInfo win;
-    win.id = 100;
-    win.pid = 10;
-    win.uid = 10;
-    win.area = {0, 0, 1920, 1080};
-    win.defaultHotAreas = {win.area};
-    win.pointerHotAreas = {win.area};
-    defaultGroup.windowsInfo.push_back(win);
+    defaultGroup.displaysInfo.push_back(MakeDisplay({
+        .id = mainDisplay, .width = 1920, .height = 1080, .dpi = 240, .name = "main", .uniq = "main0",
+        .direction = DIRECTION0,
+    }));
+    defaultGroup.windowsInfo.push_back(MakeWindow({.id = 100, .pid = 10, .uid = 10, .area = {0, 0, 1920, 1080}}));
     mgr.UpdateDisplayInfo(defaultGroup);
 
     // Set up non-default group with different display
     OLD::DisplayGroupInfo extGroup;
     extGroup.groupId = nonDefault;
     extGroup.type = GroupType::GROUP_SPECIAL;
-    OLD::DisplayInfo extDisp = { .id = extDisplay };
-    extDisp.width = 2560;
-    extDisp.height = 1440;
-    extDisp.dpi = 160;
-    extDisp.name = "ext";
-    extDisp.uniq = "ext0";
-    extDisp.direction = DIRECTION0;
-    extGroup.displaysInfo.push_back(extDisp);
-    WindowInfo extWin;
-    extWin.id = 200;
-    extWin.pid = 20;
-    extWin.uid = 20;
-    extWin.area = {0, 0, 2560, 1440};
-    extWin.defaultHotAreas = {extWin.area};
-    extWin.pointerHotAreas = {extWin.area};
-    extGroup.windowsInfo.push_back(extWin);
+    extGroup.displaysInfo.push_back(MakeDisplay({
+        .id = extDisplay, .width = 2560, .height = 1440, .dpi = 160, .name = "ext", .uniq = "ext0",
+        .direction = DIRECTION0,
+    }));
+    extGroup.windowsInfo.push_back(MakeWindow({.id = 200, .pid = 20, .uid = 20, .area = {0, 0, 2560, 1440}}));
     mgr.UpdateDisplayInfo(extGroup);
 
     // No-arg GetDisplayInfoVector should return default group displays
@@ -22321,32 +22021,20 @@ HWTEST_F(InputWindowsManagerTest, Compat_DefaultGroupAudit_ResolvedGroupRequired
     OLD::DisplayGroupInfo defaultGroup;
     defaultGroup.groupId = 0;
     defaultGroup.type = GroupType::GROUP_DEFAULT;
-    OLD::DisplayInfo mainDisp = { .id = displayMain };
-    mainDisp.width = 1920;
-    mainDisp.height = 1080;
-    mainDisp.validWidth = 1920;
-    mainDisp.validHeight = 1080;
-    mainDisp.dpi = 240;
-    mainDisp.name = "main";
-    mainDisp.uniq = "main0";
-    mainDisp.direction = DIRECTION0;
-    defaultGroup.displaysInfo.push_back(mainDisp);
+    defaultGroup.displaysInfo.push_back(MakeDisplay({
+        .id = displayMain, .width = 1920, .height = 1080, .validWidth = 1920, .validHeight = 1080, .dpi = 240,
+        .name = "main", .uniq = "main0", .direction = DIRECTION0,
+    }));
     mgr.UpdateDisplayInfo(defaultGroup);
 
     // Set up bound group
     OLD::DisplayGroupInfo extGroup;
     extGroup.groupId = boundGroup;
     extGroup.type = GroupType::GROUP_SPECIAL;
-    OLD::DisplayInfo extDisp = { .id = displayExt };
-    extDisp.width = 3840;
-    extDisp.height = 2160;
-    extDisp.validWidth = 3840;
-    extDisp.validHeight = 2160;
-    extDisp.dpi = 160;
-    extDisp.name = "ext";
-    extDisp.uniq = "ext0";
-    extDisp.direction = DIRECTION0;
-    extGroup.displaysInfo.push_back(extDisp);
+    extGroup.displaysInfo.push_back(MakeDisplay({
+        .id = displayExt, .width = 3840, .height = 2160, .validWidth = 3840, .validHeight = 2160, .dpi = 160,
+        .name = "ext", .uniq = "ext0", .direction = DIRECTION0,
+    }));
     mgr.UpdateDisplayInfo(extGroup);
     mgr.EnsureGroupState(boundGroup);
 
