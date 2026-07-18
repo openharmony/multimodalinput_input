@@ -134,7 +134,8 @@ public:
     ExtraData GetExtraData() const override;
     const std::vector<WindowInfo> GetWindowGroupInfoByDisplayIdCopy(int32_t displayId) const override;
     std::pair<double, double> TransformWindowXY(const WindowInfo &window, double logicX, double logicY) const override;
-    std::pair<double, double> TransformDisplayXY(const OLD::DisplayInfo &info, double logicX, double logicY) const override;
+    std::pair<double, double> TransformDisplayXY(const OLD::DisplayInfo &info, double logicX,
+        double logicY) const override;
     bool GetCancelEventFlag(std::shared_ptr<PointerEvent> pointerEvent) override;
     void SetFoldState () override;
     bool CheckAppFocused(int32_t pid) override;
@@ -204,7 +205,8 @@ public:
 #ifdef OHOS_BUILD_ENABLE_TOUCH
     void AdjustDisplayCoordinate(const OLD::DisplayInfo& displayInfo, double& physicalX, double& physicalY) const;
     bool TouchPointToDisplayPoint(int32_t deviceId, struct libinput_event_touch* touch,
-        EventTouch& touchInfo, int32_t& targetDisplayId, bool isNeedClear = false, bool hasValidAreaDowned = false) override;
+        EventTouch& touchInfo, int32_t& targetDisplayId, bool isNeedClear = false,
+        bool hasValidAreaDowned = false) override;
 #endif // OHOS_BUILD_ENABLE_TOUCH
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     void ReverseRotateScreen(const OLD::DisplayInfo& info, const double x, const double y,
@@ -308,7 +310,10 @@ public:
     void CancelAllTouches(std::shared_ptr<PointerEvent> event, bool isDisplayChanged = false) override;
 #endif // defined(OHOS_BUILD_ENABLE_TOUCH) && defined(OHOS_BUILD_ENABLE_MONITOR)
 #ifdef OHOS_BUILD_ENABLE_TOUCH
-    std::shared_ptr<PointerEvent> GetLastPointerEventForGesture() override { return TouchLastPointerEventForGesture(); };
+    std::shared_ptr<PointerEvent> GetLastPointerEventForGesture() override
+    {
+        return TouchLastPointerEventForGesture();
+    };
     std::pair<int32_t, int32_t> CalcDrawCoordinate(const OLD::DisplayInfo& displayInfo,
         PointerEvent::PointerItem pointerItem) override;
 #endif // OHOS_BUILD_ENABLE_TOUCH
