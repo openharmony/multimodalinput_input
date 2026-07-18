@@ -16755,9 +16755,9 @@ HWTEST_F(InputWindowsManagerTest, MultiGroupAudit_KeyFocusFallback_001, TestSize
     // group's own focus), not 10 (the main group's focus).
     // This test is expected to FAIL until TASK-4 (keyboard group routing) is implemented.
     int32_t focusInSecGroup = mgr->GetFocusWindowId(1);
-    EXPECT_EQ(focusInSecGroup, 20)
-        << "AUDIT: GetFocusWindowId(1) returned " << focusInSecGroup
-        << " instead of 20; multi-group keyboard focus routing not yet implemented";
+    EXPECT_EQ(focusInSecGroup, 20) <<
+        "AUDIT: GetFocusWindowId(1) returned " << focusInSecGroup <<
+        " instead of 20; multi-group keyboard focus routing not yet implemented";
 }
 
 /**
@@ -17017,9 +17017,9 @@ HWTEST_F(InputWindowsManagerTest, MultiGroupAudit_GetDisplayIdNegativeFallback_0
     // displayId=-1, GetDisplayId should resolve to group 1's display (id=2), not
     // the main group's. Currently it always falls back to main group display (1).
     // This will fail until TASK-4/TASK-5 add device-binding-aware display resolution.
-    EXPECT_EQ(resolvedId, 2)
-        << "AUDIT: GetDisplayId(-1) resolved to " << resolvedId
-        << " (main group display); should resolve to bound group display (2)";
+    EXPECT_EQ(resolvedId, 2) <<
+        "AUDIT: GetDisplayId(-1) resolved to " << resolvedId <<
+        " (main group display); should resolve to bound group display (2)";
 }
 
 /**
@@ -17681,8 +17681,8 @@ HWTEST_F(InputWindowsManagerTest, MouseGroupRouting_BoundMoveTargetsNonDefaultGr
 
     // Verify the ResolveGroupIdForDevice returns the bound group
     int32_t resolvedGroupId = mgr->ResolveGroupIdForDevice(42);
-    EXPECT_EQ(resolvedGroupId, 1)
-        << "Device 42 should resolve to group 1 after binding";
+    EXPECT_EQ(resolvedGroupId, 1) <<
+        "Device 42 should resolve to group 1 after binding";
 
     // Verify GetMouseInfo for the bound group uses the secondary group's data
     MouseLocation mouseInfoSec = mgr->GetMouseInfo(1);
@@ -17856,8 +17856,8 @@ HWTEST_F(InputWindowsManagerTest, MouseGroupRouting_UnboundMouseUnchanged_001, T
 
     // Unbound device should resolve to MAIN_GROUPID (0)
     int32_t resolvedGroupId = mgr->ResolveGroupIdForDevice(999);
-    EXPECT_EQ(resolvedGroupId, 0)
-        << "Unbound device 999 should resolve to MAIN_GROUPID (0)";
+    EXPECT_EQ(resolvedGroupId, 0) <<
+        "Unbound device 999 should resolve to MAIN_GROUPID (0)";
 
     // GetMouseInfo with default group should still work
     MouseLocation mouseInfo = mgr->GetMouseInfo();
@@ -18125,8 +18125,8 @@ HWTEST_F(InputWindowsManagerTest, TouchpadGroupRouting_UnboundTouchpadUsesDefaul
 
     // Verify ResolveGroupIdForDevice returns MAIN_GROUPID for unbound touchpad
     int32_t groupId = mgr.ResolveGroupIdForDevice(UNBOUND_DEVICE);
-    EXPECT_EQ(groupId, 0)
-        << "Unbound touchpad should resolve to MAIN_GROUPID";
+    EXPECT_EQ(groupId, 0) <<
+        "Unbound touchpad should resolve to MAIN_GROUPID";
 
     // Create a touchpad gesture event from unbound device
     auto pointerEvent = PointerEvent::Create();
@@ -18211,8 +18211,8 @@ HWTEST_F(InputWindowsManagerTest, TouchpadGroupRouting_BoundPointerDerivedEventU
 
     // Verify the touchpad device resolves to secondary group
     int32_t resolvedGroupId = mgr->ResolveGroupIdForDevice(TOUCHPAD_DEVICE_ID);
-    EXPECT_EQ(resolvedGroupId, 1)
-        << "Bound touchpad device should resolve to group 1";
+    EXPECT_EQ(resolvedGroupId, 1) <<
+        "Bound touchpad device should resolve to group 1";
 
     // Verify GetMouseInfo for each group is independent (touchpad shares mouse location maps)
     mgr->mouseLocationMap_[1].displayId = 2;
@@ -18402,8 +18402,8 @@ HWTEST_F(InputWindowsManagerTest, GroupStateIsolation_LazyAllocation_UnboundNoEx
 
     // Simulate an unbound device resolving to default group
     int32_t unboundGroupId = mgr.ResolveGroupIdForDevice(999);
-    EXPECT_EQ(unboundGroupId, 0)
-        << "Unbound device should resolve to MAIN_GROUPID";
+    EXPECT_EQ(unboundGroupId, 0) <<
+        "Unbound device should resolve to MAIN_GROUPID";
 
     // After resolving, still no extra state should be created
     EXPECT_FALSE(mgr.HasGroupState(1))
@@ -19018,8 +19018,8 @@ HWTEST_F(InputWindowsManagerTest, GroupStateIsolation_DualUnboundKeyboards_Share
     // Both use the same focus window from group 0
     int32_t focusA = mgr.GetFocusWindowId(0);
     int32_t focusB = mgr.GetFocusWindowId(0);
-    EXPECT_EQ(focusA, focusB)
-        << "Unbound keyboards should share focus window";
+    EXPECT_EQ(focusA, focusB) <<
+        "Unbound keyboards should share focus window";
 
     // No non-default group state created
     EXPECT_FALSE(mgr.HasGroupState(1));
@@ -19853,8 +19853,8 @@ HWTEST_F(InputWindowsManagerTest, SoftCursorRS_BoundMouseUsesGroupDisplay_001, T
 
     // Resolve group for the bound mouse
     int32_t resolvedGroup = mgr.ResolveGroupIdForDevice(MOUSE_DEVICE);
-    ASSERT_EQ(resolvedGroup, BOUND_GROUP)
-        << "Bound mouse should resolve to bound group";
+    ASSERT_EQ(resolvedGroup, BOUND_GROUP) <<
+        "Bound mouse should resolve to bound group";
 
     // Set cursor state for each group independently
     mgr.cursorPosMap_[DEFAULT_GROUP_ID].displayId = MAIN_DISPLAY_ID;
@@ -19947,7 +19947,7 @@ HWTEST_F(InputWindowsManagerTest, SoftCursorRS_ResetCursorPosIndependent_001, Te
  * @tc.desc: When a mouse device is bound to a non-default group display, UpdateMouseTarget
  *           overrides the pointer event's targetDisplayId to the bound display. This ensures
  *           that GetPhysicalDisplay returns the bound display info, so DrawPointer / DrawMovePointer /
- *           HandleHardwareCursor all target the correct display (CPU draw, HWC buffer, RS buffer).
+ *           HandleHardwareCursor all target the correct display (CPU draw, hardware-composer buffer, RS buffer).
  *           Verifies AC-4.2.
  * @tc.type: FUNC
  * @tc.require: AC-4.2
@@ -20120,8 +20120,8 @@ HWTEST_F(InputWindowsManagerTest, HardCursor_CursorPosMap_GroupIsolation_001, Te
 
     // Verify the bound group resolves correctly
     int32_t resolvedGroup = mgr.ResolveGroupIdForDevice(MOUSE_DEVICE);
-    EXPECT_EQ(resolvedGroup, BOUND_GROUP)
-        << "Device must resolve to bound group";
+    EXPECT_EQ(resolvedGroup, BOUND_GROUP) <<
+        "Device must resolve to bound group";
 
     // GetPhysicalDisplay for the bound display returns direction DIRECTION90
     const OLD::DisplayInfo *boundInfo = mgr.GetPhysicalDisplay(BOUND_DISPLAY_ID);
@@ -22092,8 +22092,8 @@ HWTEST_F(InputWindowsManagerTest, Compat_DefaultGroupAudit_TopologyFallback_001,
 
     // GetFocusWindowId for nonexistent group should fall back to default
     int32_t focusId = mgr.GetFocusWindowId(NONEXISTENT_GROUP);
-    EXPECT_EQ(focusId, 42)
-        << "GetFocusWindowId must fall back to default group focusWindowId for unknown groupId";
+    EXPECT_EQ(focusId, 42) <<
+        "GetFocusWindowId must fall back to default group focusWindowId for unknown groupId";
 }
 
 /**
@@ -22151,18 +22151,18 @@ HWTEST_F(InputWindowsManagerTest, Compat_DefaultGroupAudit_ResolvedGroupRequired
 
     // Resolve group for bound device
     int32_t resolved = mgr.ResolveGroupIdForDevice(BOUND_DEVICE);
-    EXPECT_EQ(resolved, BOUND_GROUP)
-        << "Bound device must resolve to its bound group";
+    EXPECT_EQ(resolved, BOUND_GROUP) <<
+        "Bound device must resolve to its bound group";
 
     // Focus window for resolved group must be the bound group's focus
     int32_t focusWin = mgr.GetFocusWindowId(resolved);
-    EXPECT_EQ(focusWin, FOCUS_WINDOW_EXT)
-        << "Bound device keyboard events must use bound group focus window, not default";
+    EXPECT_EQ(focusWin, FOCUS_WINDOW_EXT) <<
+        "Bound device keyboard events must use bound group focus window, not default";
 
     // Default group focus must remain unchanged
     int32_t defaultFocus = mgr.GetFocusWindowId(DEFAULT_GROUP_ID);
-    EXPECT_EQ(defaultFocus, 100)
-        << "Default group focus must not be affected by bound device routing";
+    EXPECT_EQ(defaultFocus, 100) <<
+        "Default group focus must not be affected by bound device routing";
 }
 
 /**
@@ -22405,13 +22405,13 @@ HWTEST_F(InputWindowsManagerTest, Compat_DefaultGroupAudit_LegacyDefaultOnly_Cam
 
     // Camera check uses MAIN_GROUPID explicitly - verify focus window comes from main
     int32_t mainFocus = mgr.GetFocusWindowId(0);
-    EXPECT_EQ(mainFocus, 10)
-        << "Legacy camera check uses MAIN_GROUPID=0 focus, which must remain correct";
+    EXPECT_EQ(mainFocus, 10) <<
+        "Legacy camera check uses MAIN_GROUPID=0 focus, which must remain correct";
 
     // Main display ID from MAIN_GROUPID must return the main display
     int32_t mainDisplayId = mgr.GetMainDisplayId(0);
-    EXPECT_EQ(mainDisplayId, 1)
-        << "Legacy camera check uses MAIN_GROUPID=0 main display, which must remain correct";
+    EXPECT_EQ(mainDisplayId, 1) <<
+        "Legacy camera check uses MAIN_GROUPID=0 main display, which must remain correct";
 }
 
 /**
@@ -22453,8 +22453,8 @@ HWTEST_F(InputWindowsManagerTest, Compat_DefaultGroupAudit_EnsureGroupState_Lazy
     size_t before = mgr.mouseLocationMap_.size();
     mgr.EnsureGroupState(0);
     size_t after = mgr.mouseLocationMap_.size();
-    EXPECT_EQ(before, after)
-        << "EnsureGroupState(0) must be a no-op for main group";
+    EXPECT_EQ(before, after) <<
+        "EnsureGroupState(0) must be a no-op for main group";
 }
 
 /**

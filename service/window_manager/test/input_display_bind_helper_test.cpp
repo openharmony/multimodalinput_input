@@ -2404,8 +2404,8 @@ HWTEST_F(InputDisplayBindHelperTest, RuntimeBinding_NoConfigFileTouch_001, TestS
 
     struct stat statAfter;
     stat(testCfg.c_str(), &statAfter);
-    EXPECT_EQ(statBefore.st_mtime, statAfter.st_mtime)
-        << "Config file must not be modified by runtime binding operations";
+    EXPECT_EQ(statBefore.st_mtime, statAfter.st_mtime) <<
+        "Config file must not be modified by runtime binding operations";
     std::remove(testCfg.c_str());
 }
 

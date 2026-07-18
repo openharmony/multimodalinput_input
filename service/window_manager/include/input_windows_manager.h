@@ -646,6 +646,15 @@ private:
     // --- Lifecycle cleanup ---
     void CleanupGroupState(int32_t groupId);
 
+    // --- DumpMultiGroupState section helpers ---
+    void DumpRuntimeBindings(int32_t fd);
+    void DumpDisplayGroups(int32_t fd);
+    void DumpPointerStateByGroup(int32_t fd);
+    void DumpKeyboardStateByGroup(int32_t fd);
+    void DumpSequenceSnapshots(int32_t fd);
+    void DumpMouseDownState(int32_t fd);
+    void DumpMouseTransformCoords(int32_t fd);
+
 private:
     UDSServer* udsServer_ { nullptr };
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)

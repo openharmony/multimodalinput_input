@@ -5093,7 +5093,7 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
     auto& axisBeginWindowInfo = axisBeginWindowInfoMap_[deviceId];
     auto displayId = pointerEvent->GetTargetDisplayId();
     // For bound devices, override displayId so that hardware cursor rendering
-    // (CPU draw, HWC buffer, RS buffer) targets the correct bound display
+    // (CPU draw, hardware-composer buffer, RS buffer) targets the correct bound display
     // instead of the default display. This ensures per-group cursor isolation.
     auto binding = bindInfo_.GetRuntimeBinding(pointerEvent->GetDeviceId());
     if (binding.has_value()) {
@@ -8339,38 +8339,57 @@ const char* InputSequenceTypeToString(InputSequenceType type)
 
 void InputWindowsManager::DumpMultiGroupState(int32_t fd)
 {
-    // --- RuntimeBindings ---
+    DumpRuntimeBindings(fd);
+    DumpDisplayGroups(fd);
+    DumpPointerStateByGroup(fd);
+    DumpKeyboardStateByGroup(fd);
+    DumpSequenceSnapshots(fd);
+    DumpMouseDownState(fd);
+    DumpMouseTransformCoords(fd);
+    // --- SoftCursorRS / HardwareCursor ---
+    mprintf(fd, "--- SoftCursorRS ---");
+    mprintf(fd, "  (see hidumper -s 3101 -a -c for PointerDrawingManager singleton + per-group context)");
+    mprintf(fd, "--- HardwareCursor ---");
+    mprintf(fd, "  (see hidumper -s 3101 -a -c for detailed cursor state)");
+}
+
+void InputWindowsManager::DumpRuntimeBindings(int32_t fd)
+{
     mprintf(fd, "--- RuntimeBindings ---");
     const auto& bindings = bindInfo_.GetAllRuntimeBindings();
     if (bindings.empty()) {
         mprintf(fd, "  (empty)");
-    } else {
-        for (const auto& [devId, binding] : bindings) {
-            mprintf(fd, "  deviceId=%d displayId=%d groupId=%d",
-                binding.deviceId, binding.displayId, binding.groupId);
-        }
+        return;
     }
+    for (const auto& [devId, binding] : bindings) {
+        mprintf(fd, "  deviceId=%d displayId=%d groupId=%d",
+            binding.deviceId, binding.displayId, binding.groupId);
+    }
+}
 
-    // --- DisplayGroups ---
+void InputWindowsManager::DumpDisplayGroups(int32_t fd)
+{
     mprintf(fd, "--- DisplayGroups ---");
     if (displayGroupInfoMap_.empty()) {
         mprintf(fd, "  (empty)");
-    } else {
-        for (const auto& [gid, groupInfo] : displayGroupInfoMap_) {
-            std::string displayIds;
-            for (size_t i = 0; i < groupInfo.displaysInfo.size(); ++i) {
-                if (i > 0) {
-                    displayIds += ",";
-                }
-                displayIds += std::to_string(groupInfo.displaysInfo[i].id);
-            }
-            mprintf(fd, "  groupId=%d displays=[%s] mainDisplayId=%d focusWindowId=%d windowCount=%zu",
-                gid, displayIds.c_str(), groupInfo.mainDisplayId,
-                groupInfo.focusWindowId, groupInfo.windowsInfo.size());
-        }
+        return;
     }
+    for (const auto& [gid, groupInfo] : displayGroupInfoMap_) {
+        std::string displayIds;
+        for (size_t i = 0; i < groupInfo.displaysInfo.size(); ++i) {
+            if (i > 0) {
+                displayIds += ",";
+            }
+            displayIds += std::to_string(groupInfo.displaysInfo[i].id);
+        }
+        mprintf(fd, "  groupId=%d displays=[%s] mainDisplayId=%d focusWindowId=%d windowCount=%zu",
+            gid, displayIds.c_str(), groupInfo.mainDisplayId,
+            groupInfo.focusWindowId, groupInfo.windowsInfo.size());
+    }
+}
 
-    // --- PointerStateByGroup ---
+void InputWindowsManager::DumpPointerStateByGroup(int32_t fd)
+{
     mprintf(fd, "--- PointerStateByGroup ---");
     // Collect all known group ids from displayGroupInfoMap_ and state maps
     std::set<int32_t> allGroupIds;
@@ -8378,100 +8397,89 @@ void InputWindowsManager::DumpMultiGroupState(int32_t fd)
         allGroupIds.insert(gid);
     }
     for (const auto& [gid, _] : mouseLocationMap_) {
-            allGroupIds.insert(gid);
+        allGroupIds.insert(gid);
+    }
+    for (const auto& [gid, _] : cursorPosMap_) {
+        allGroupIds.insert(gid);
+    }
+    if (allGroupIds.empty()) {
+        mprintf(fd, "  (empty)");
+    }
+    for (int32_t gid : allGroupIds) {
+        auto mouseIt = mouseLocationMap_.find(gid);
+        auto cursorIt = cursorPosMap_.find(gid);
+        if (mouseIt == mouseLocationMap_.end() && cursorIt == cursorPosMap_.end()) {
+            mprintf(fd, "  groupId=%d: (absent)", gid);
+            continue;
         }
-        for (const auto& [gid, _] : cursorPosMap_) {
-            allGroupIds.insert(gid);
-        }
+        double cursorX = (cursorIt != cursorPosMap_.end()) ? cursorIt->second.cursorPos.x : 0;
+        double cursorY = (cursorIt != cursorPosMap_.end()) ? cursorIt->second.cursorPos.y : 0;
+        int32_t mouseDisplayId = (mouseIt != mouseLocationMap_.end()) ? mouseIt->second.displayId : -1;
+        int32_t mouseX = (mouseIt != mouseLocationMap_.end()) ? mouseIt->second.physicalX : 0;
+        int32_t mouseY = (mouseIt != mouseLocationMap_.end()) ? mouseIt->second.physicalY : 0;
+        auto captureIt = captureModeInfoMap_.find(gid);
+        bool captureMode = (captureIt != captureModeInfoMap_.end()) ? captureIt->second.isCaptureMode : false;
+        mprintf(fd, "  groupId=%d: cursorPos=(%.0f,%.0f) mouseLocation=(%d,%d,%d) captureMode=%s",
+            gid, cursorX, cursorY, mouseX, mouseY, mouseDisplayId,
+            captureMode ? "true" : "false");
+    }
+}
 
-        if (allGroupIds.empty()) {
-            mprintf(fd, "  (empty)");
-        }
-        for (int32_t gid : allGroupIds) {
-            auto mouseIt = mouseLocationMap_.find(gid);
-            auto cursorIt = cursorPosMap_.find(gid);
-            auto captureIt = captureModeInfoMap_.find(gid);
-            if (mouseIt == mouseLocationMap_.end() && cursorIt == cursorPosMap_.end()) {
-                mprintf(fd, "  groupId=%d: (absent)", gid);
-                continue;
-            }
-            double cursorX = 0;
-            double cursorY = 0;
-            if (cursorIt != cursorPosMap_.end()) {
-                cursorX = cursorIt->second.cursorPos.x;
-                cursorY = cursorIt->second.cursorPos.y;
-            }
-            int32_t mouseDisplayId = -1;
-            int32_t mouseX = 0;
-            int32_t mouseY = 0;
-            if (mouseIt != mouseLocationMap_.end()) {
-                mouseDisplayId = mouseIt->second.displayId;
-                mouseX = mouseIt->second.physicalX;
-                mouseY = mouseIt->second.physicalY;
-            }
-            bool captureMode = false;
-            if (captureIt != captureModeInfoMap_.end()) {
-                captureMode = captureIt->second.isCaptureMode;
-            }
-            mprintf(fd, "  groupId=%d: cursorPos=(%.0f,%.0f) mouseLocation=(%d,%d,%d) captureMode=%s",
-                gid, cursorX, cursorY, mouseX, mouseY, mouseDisplayId,
-                captureMode ? "true" : "false");
-        }
-
-    // --- KeyboardStateByGroup ---
+void InputWindowsManager::DumpKeyboardStateByGroup(int32_t fd)
+{
     mprintf(fd, "--- KeyboardStateByGroup ---");
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     if (displayGroupInfoMap_.empty()) {
         mprintf(fd, "  (empty)");
-    } else {
-        for (const auto& [gid, groupInfo] : displayGroupInfoMap_) {
-            mprintf(fd, "  groupId=%d: focusWindowId=%d", gid, groupInfo.focusWindowId);
-        }
+        return;
+    }
+    for (const auto& [gid, groupInfo] : displayGroupInfoMap_) {
+        mprintf(fd, "  groupId=%d: focusWindowId=%d", gid, groupInfo.focusWindowId);
     }
 #else
     mprintf(fd, "  (keyboard not enabled)");
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
+}
 
-    // --- SequenceSnapshots ---
+void InputWindowsManager::DumpSequenceSnapshots(int32_t fd)
+{
     mprintf(fd, "--- SequenceSnapshots ---");
     if (sequenceSnapshots_.empty()) {
         mprintf(fd, "  (empty)");
-    } else {
-        for (const auto& [key, snap] : sequenceSnapshots_) {
-            mprintf(fd, "  deviceId=%d itemId=%d type=%s beginGroup=%d beginWindow=%d",
-                key.deviceId, key.itemId, InputSequenceTypeToString(key.type),
-                snap.groupId, snap.windowId);
-        }
+        return;
     }
+    for (const auto& [key, snap] : sequenceSnapshots_) {
+        mprintf(fd, "  deviceId=%d itemId=%d type=%s beginGroup=%d beginWindow=%d",
+            key.deviceId, key.itemId, InputSequenceTypeToString(key.type),
+            snap.groupId, snap.windowId);
+    }
+}
 
-    // --- MouseDownState ---
+void InputWindowsManager::DumpMouseDownState(int32_t fd)
+{
     mprintf(fd, "--- MouseDownState ---");
     if (mouseDownInfoMap_.empty()) {
         mprintf(fd, "  (empty)");
-    } else {
-        for (const auto& [devId, winInfo] : mouseDownInfoMap_) {
-            mprintf(fd, "  deviceId=%d windowId=%d displayId=%d",
-                devId, winInfo.id, winInfo.displayId);
-        }
+        return;
     }
+    for (const auto& [devId, winInfo] : mouseDownInfoMap_) {
+        mprintf(fd, "  deviceId=%d windowId=%d displayId=%d",
+            devId, winInfo.id, winInfo.displayId);
+    }
+}
 
-    // --- MouseTransformCoords ---
+void InputWindowsManager::DumpMouseTransformCoords(int32_t fd)
+{
     mprintf(fd, "--- MouseTransformCoords ---");
     if (displayGroupInfoMap_.empty()) {
         mprintf(fd, "  (no groups)");
-    } else {
-        for (const auto& [gid, groupInfo] : displayGroupInfoMap_) {
-            int32_t mx = MouseEventHdr->GetMouseCoordsX(gid);
-            int32_t my = MouseEventHdr->GetMouseCoordsY(gid);
-            mprintf(fd, "  groupId=%d: physicalXY=(%d,%d)", gid, mx, my);
-        }
+        return;
     }
-
-    // --- SoftCursorRS / HardwareCursor ---
-    mprintf(fd, "--- SoftCursorRS ---");
-    mprintf(fd, "  (see hidumper -s 3101 -a -c for PointerDrawingManager singleton + per-group context)");
-    mprintf(fd, "--- HardwareCursor ---");
-    mprintf(fd, "  (see hidumper -s 3101 -a -c for detailed cursor state)");
+    for (const auto& [gid, groupInfo] : displayGroupInfoMap_) {
+        int32_t mx = MouseEventHdr->GetMouseCoordsX(gid);
+        int32_t my = MouseEventHdr->GetMouseCoordsY(gid);
+        mprintf(fd, "  groupId=%d: physicalXY=(%d,%d)", gid, mx, my);
+    }
 }
 
 std::pair<double, double> InputWindowsManager::TransformWindowXY(const WindowInfo &window,

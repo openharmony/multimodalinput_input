@@ -26,6 +26,14 @@
 namespace OHOS {
 namespace MMI {
 namespace {
+constexpr int32_t MAIN_FOCUS_WINDOW_ID = 10;
+constexpr int32_t SEC_FOCUS_WINDOW_ID = 20;
+constexpr int32_t MAIN_DISPLAY_WIDTH = 1920;
+constexpr int32_t MAIN_DISPLAY_HEIGHT = 1080;
+constexpr int32_t MAIN_DISPLAY_DPI = 240;
+constexpr int32_t SEC_DISPLAY_WIDTH = 1280;
+constexpr int32_t SEC_DISPLAY_HEIGHT = 720;
+constexpr int32_t SEC_DISPLAY_DPI = 160;
 
 class MultiGroupBindingTest : public testing::Test {
 public:
@@ -40,11 +48,11 @@ public:
         OLD::DisplayGroupInfo mainGroup;
         mainGroup.groupId = 0;
         mainGroup.type = GroupType::GROUP_DEFAULT;
-        mainGroup.focusWindowId = 10;
+        mainGroup.focusWindowId = MAIN_FOCUS_WINDOW_ID;
         OLD::DisplayInfo mainDisplay = { .id = 1 };
-        mainDisplay.width = 1920;
-        mainDisplay.height = 1080;
-        mainDisplay.dpi = 240;
+        mainDisplay.width = MAIN_DISPLAY_WIDTH;
+        mainDisplay.height = MAIN_DISPLAY_HEIGHT;
+        mainDisplay.dpi = MAIN_DISPLAY_DPI;
         mainDisplay.name = "main";
         mainDisplay.uniq = "default0";
         mainDisplay.direction = DIRECTION0;
@@ -54,11 +62,11 @@ public:
         OLD::DisplayGroupInfo secGroup;
         secGroup.groupId = 1;
         secGroup.type = GroupType::GROUP_SPECIAL;
-        secGroup.focusWindowId = 20;
+        secGroup.focusWindowId = SEC_FOCUS_WINDOW_ID;
         OLD::DisplayInfo secDisplay = { .id = 2 };
-        secDisplay.width = 1280;
-        secDisplay.height = 720;
-        secDisplay.dpi = 160;
+        secDisplay.width = SEC_DISPLAY_WIDTH;
+        secDisplay.height = SEC_DISPLAY_HEIGHT;
+        secDisplay.dpi = SEC_DISPLAY_DPI;
         secDisplay.name = "secondary";
         secDisplay.uniq = "secondary0";
         secDisplay.direction = DIRECTION0;
