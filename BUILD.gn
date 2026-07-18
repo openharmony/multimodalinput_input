@@ -64,6 +64,7 @@ ohos_executable("uinput_inject") {
   ]
 
   external_deps = [
+    "bounds_checking_function:libsec_shared",
     "c_utils:utils",
     "drivers_interface_input:libinput_proxy_1.0",
     "hilog:libhilog",
@@ -217,6 +218,7 @@ group("mmi_tests") {
     "frameworks/proxy:PointerStyleTest",
     "frameworks/proxy:ut-mmi-proxy-out",
     "frameworks/proxy/event_handler/test:InputActiveSubscribeManagerTest",
+    "frameworks/proxy/event_handler/test:InputEventHookHandlerTest",
     "frameworks/proxy/event_handler/test:InputEventStagerTest",
     "frameworks/proxy/events/test:FrameworkEventTests",
     "libudev:test",
@@ -245,19 +247,16 @@ group("mmi_tests") {
     "service:InfraredEmitterTest",
     "service:InputDisplayBindHelperTest",
     "service:InputEventHandlerTest",
-    "service:InputEventHookTest",
-    "service:InputEventHookManagerTest",
     "service:InputWindowsManagerOneTest",
     "service:InputWindowsManagerTest",
+    "service:InputWindowsManagerDisplayChangeTest",
     "service:InputWindowsManagerCoverageTest",
     "service:InterceptorTest",
     "service:KeyAutoRepeatExTest",
     "service/key_command/test:KeyCommandTest",
-    "service:KeyEventHookTest",
     "service:KeyEventHookManagerTest",
     "service:KeyEventNormalizeTest",
     "service:KeyEventValueTransformationTest",
-    "service:KeyLoopClosureCheckerTest",
     "service:KeyShortcutManagerTest",
     "service:KeyUnicodeTransformationTest",
     "service:KeymapMgrTest",
@@ -266,8 +265,6 @@ group("mmi_tests") {
     "service:ModuleLoaderTest",
     "service:MonitorTest",
     "service:NapProcessTest",
-    "service:PointerLoopClosureCheckerTest",
-    "service:PointerEventHookTest",
     "service:ProductTypeParserTest",
     "service:PropertyNameMapperTest",
     "service:ServerMsgHandlerTest",
@@ -281,6 +278,7 @@ group("mmi_tests") {
     "service:event_resample_test",
     "service:mmi-service-tests",
     "service/crown_transform_processor/test:CrownTransformProcessorTest",
+    "service/joystick/test:JoystickLayoutMapTest",
     "service/subscriber/test:InputActiveSubscriberHandlerNewTest",
     "service/module_loader/test:ModuleLoaderTests",
     "service/mouse_event_normalize/test:MouseEventNormalizeEXTest",
@@ -293,9 +291,21 @@ group("mmi_tests") {
     "tools/inject_event:InjectEventTest",
     "util:UdsClientTest",
     "util/common:InputEventDataTransformationTest",
+    "util/common:ResourceDecompressTest",
     "util/common:UtilCommonTest",
     "util/json_parser:JsonParserTest",
   ]
+
+  if (input_feature_input_event_hook) {
+    deps += [
+      "service:InputEventHookTest",
+      "service:InputEventHookManagerTest",
+      "service:KeyEventHookTest",
+      "service:KeyLoopClosureCheckerTest",
+      "service:PointerLoopClosureCheckerTest",
+      "service:PointerEventHookTest",
+    ]
+  }
 
   if (input_feature_pointer_drawing) {
     deps += [
@@ -324,6 +334,10 @@ group("mmi_tests") {
 
   if (input_feature_triple_finger_snapshot) {
     deps += [ "service:TripleFingerSnapshotManagerTest" ]
+  }
+
+  if (input_feature_product == "pc") {
+    deps += [ "service:SuspendStateManagerTest" ]
   }
 }
 

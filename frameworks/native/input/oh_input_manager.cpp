@@ -2668,8 +2668,9 @@ static int32_t AddHotkeySubscribe(Input_HotkeyInfo* hotkeyInfo)
                 return INPUT_PARAMETER_ERROR;
             }
         }
+
+        it->second.push_back(hotkeyInfo);
     }
-    it->second.push_back(hotkeyInfo);
     return INPUT_SUCCESS;
 }
 
@@ -3022,12 +3023,7 @@ Input_Result OH_Input_GetDeviceIds(int32_t *deviceIds, int32_t inSize, int32_t *
     CHKPR(outSize, INPUT_PARAMETER_ERROR);
     auto nativeCallback = [&](std::vector<int32_t> &ids) {
         auto deviceIdslength = static_cast<int32_t>(ids.size());
-        if (inSize > deviceIdslength) {
-            *outSize = deviceIdslength;
-        }
-        if (inSize < deviceIdslength) {
-            *outSize = inSize;
-        }
+        *outSize = std::min(inSize, deviceIdslength);
         for (int32_t i = 0; i < *outSize; ++i) {
             *(deviceIds + i) = ids[i];
         }
@@ -3334,7 +3330,7 @@ Input_Result OH_Input_GetPointerLocation(int32_t *displayId, double *displayX, d
 static void TransformTouchActionDown(std::shared_ptr<OHOS::MMI::PointerEvent> pointerEvent,
     OHOS::MMI::PointerEvent::PointerItem &item, int64_t time)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     CHKPV(pointerEvent);
     auto pointIds = pointerEvent->GetPointerIds();
     if (pointIds.empty()) {
@@ -3350,7 +3346,7 @@ static void TransformTouchActionDown(std::shared_ptr<OHOS::MMI::PointerEvent> po
 static int32_t TransformTouchAction(const struct Input_TouchEvent *touchEvent,
     std::shared_ptr<OHOS::MMI::PointerEvent> pointerEvent, OHOS::MMI::PointerEvent::PointerItem &item)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     CHKPR(touchEvent, INPUT_PARAMETER_ERROR);
     CHKPR(pointerEvent, INPUT_PARAMETER_ERROR);
     int64_t time = touchEvent->actionTime;
@@ -3392,7 +3388,7 @@ static int32_t TransformTouchProperty(const struct Input_TouchEvent *touchEvent,
     std::shared_ptr<OHOS::MMI::PointerEvent> pointerEvent,
     OHOS::MMI::PointerEvent::PointerItem &item, int32_t windowX, int32_t windowY)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     CHKPR(touchEvent, INPUT_PARAMETER_ERROR);
     CHKPR(pointerEvent, INPUT_PARAMETER_ERROR);
     int32_t screenX = touchEvent->displayX;
@@ -3446,7 +3442,7 @@ static int32_t TransformTouchProperty(const struct Input_TouchEvent *touchEvent,
 std::shared_ptr<OHOS::MMI::PointerEvent> OH_Input_TouchEventToPointerEvent(Input_TouchEvent *touchEvent,
     int32_t windowX, int32_t windowY)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     if (touchEvent == nullptr) {
         MMI_HILOGE("touchEvent is null");
         return nullptr;
@@ -3474,6 +3470,39 @@ std::shared_ptr<OHOS::MMI::PointerEvent> OH_Input_TouchEventToPointerEvent(Input
     return pointerEvent;
 }
 
+Input_TouchEvent  *OH_Input_PointerEventToTouchEvent(const OHOS::MMI::PointerEvent &event)
+{
+    Input_TouchEvent* touchEvent = OH_Input_CreateTouchEvent();
+    if (touchEvent == nullptr) {
+        MMI_HILOGE("touchevent is null");
+        return nullptr;
+    }
+    OHOS::MMI::PointerEvent::PointerItem item;
+    if (!(event.GetPointerItem(event.GetPointerId(), item))) {
+        MMI_HILOGE("Can not get pointerItem for the pointer event");
+        OH_Input_DestroyTouchEvent(&touchEvent);
+        return nullptr;
+    }
+    if (!SetTouchEventAction(touchEvent, event.GetPointerAction())) {
+        OH_Input_DestroyTouchEvent(&touchEvent);
+        return nullptr;
+    }
+    touchEvent->id = event.GetPointerId();
+    touchEvent->displayX = item.GetDisplayX();
+    touchEvent->displayY = item.GetDisplayY();
+    touchEvent->actionTime = event.GetActionTime();
+    touchEvent->windowId = event.GetTargetWindowId();
+    touchEvent->displayId = event.GetTargetDisplayId();
+    touchEvent->globalX = item.GetGlobalX();
+    touchEvent->globalY = item.GetGlobalY();
+    touchEvent->pressure = item.GetPressure();
+    touchEvent->windowX = item.GetWindowX();
+    touchEvent->windowY = item.GetWindowY();
+    touchEvent->downTime = item.GetDownTime();
+    touchEvent->toolType = static_cast<Input_TouchEventToolType>(item.GetToolType());
+    return touchEvent;
+}
+
 Input_Result OH_Input_GetKeyEventId(const struct Input_KeyEvent* keyEvent, int32_t* eventId)
 {
     MMI_HISTOGRAM_BOOLEAN("InputKit.OH_Input_GetKeyEventId.Call", true);
@@ -3485,7 +3514,7 @@ Input_Result OH_Input_GetKeyEventId(const struct Input_KeyEvent* keyEvent, int32
 
 Input_Result OH_Input_AddKeyEventHook(Input_KeyEventCallback callback)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     MMI_HISTOGRAM_BOOLEAN("InputKit.OH_Input_AddKeyEventHook.Call", true);
     CHKPR(callback, INPUT_PARAMETER_ERROR);
     if (auto hookCallback = GetHookCallback(); callback == hookCallback) {
@@ -3528,7 +3557,7 @@ Input_Result OH_Input_AddKeyEventHook(Input_KeyEventCallback callback)
 
 Input_Result OH_Input_RemoveKeyEventHook(Input_KeyEventCallback callback)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     MMI_HISTOGRAM_BOOLEAN("InputKit.OH_Input_RemoveKeyEventHook.Call", true);
     CHKPR(callback, INPUT_PARAMETER_ERROR);
     if (auto hookCallback = GetHookCallback(); hookCallback != callback) {

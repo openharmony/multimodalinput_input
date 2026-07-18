@@ -87,6 +87,11 @@ ohos_shared_library("libmmi-util") {
   version_script = "libmmi-util-map"
   configs = [ ":libmmi_util_config" ]
   branch_protector_ret = "pac_ret"
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
   deps = [
     ":mmi_rust_key_config",
     "${mmi_path}/frameworks/proxy:libmmi-common",
@@ -102,6 +107,7 @@ ohos_shared_library("libmmi-util") {
     "ability_base:configuration",
     "ability_runtime:app_manager",
     "cJSON:cjson",
+    "zlib:libz",
   ]
 
   if (security_component_enable) {

@@ -16,35 +16,6 @@ import("../../../../device_status.gni")
 
 module_output_path = "input/input"
 
-ohos_unittest("InputAdapterTest") {
-  sanitize = {
-    cfi = true
-    cfi_cross_dso = true
-    debug = false
-    blocklist = "./ipc_blocklist.txt"
-  }
-
-  branch_protector_ret = "pac_ret"
-  module_out_path = module_output_path
-  include_dirs = [
-    "${device_status_utils_path}",
-    "${device_status_utils_path}/include",
-    "${device_status_root_path}/intention/prototype/include",
-  ]
-
-  sources = [ "src/input_adapter_test.cpp" ]
-
-  deps = [ "${device_status_root_path}/intention/adapters/input_adapter:intention_input_adapter" ]
-  external_deps = [
-    "access_token:libaccesstoken_sdk",
-    "access_token:libnativetoken_shared",
-    "access_token:libtokensetproc_shared",
-    "c_utils:utils",
-    "hilog:libhilog",
-    "input:libmmi-client",
-  ]
-}
-
 ohos_unittest("DsoftbusAdapterTest") {
   sanitize = {
     cfi = true
@@ -78,6 +49,35 @@ ohos_unittest("DsoftbusAdapterTest") {
     "c_utils:utils",
     "device_manager:devicemanagersdk",
     "dsoftbus:softbus_client",
+    "hilog:libhilog",
+    "input:libmmi-client",
+  ]
+}
+
+ohos_unittest("InputAdapterTest") {
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+    blocklist = "./ipc_blocklist.txt"
+  }
+
+  branch_protector_ret = "pac_ret"
+  module_out_path = module_output_path
+  include_dirs = [
+    "${device_status_utils_path}",
+    "${device_status_utils_path}/include",
+    "${device_status_root_path}/intention/prototype/include",
+  ]
+
+  sources = [ "src/input_adapter_test.cpp" ]
+
+  deps = [ "${device_status_root_path}/intention/adapters/input_adapter:intention_input_adapter" ]
+  external_deps = [
+    "access_token:libaccesstoken_sdk",
+    "access_token:libnativetoken_shared",
+    "access_token:libtokensetproc_shared",
+    "c_utils:utils",
     "hilog:libhilog",
     "input:libmmi-client",
   ]

@@ -228,24 +228,31 @@ void KeyEventNormalize::HandleKeyAction(struct libinput_device* device, KeyEvent
     }
 }
 
-void KeyEventNormalize::SyncLedStateFromKeyEvent(struct libinput_device* device)
+bool KeyEventNormalize::SyncLedStateFromKeyEvent(struct libinput_device* device)
 {
-    CHKPV(device);
-    if (INPUT_DEV_MGR->IsKeyboardDevice(device) && libinput_has_event_led_type(device)) {
+    CHKPR(device, false);
+    bool isKeyboardWithLed = INPUT_DEV_MGR->IsKeyboardDevice(device) &&
+        libinput_has_event_led_type(device);
+    if (isKeyboardWithLed) {
         if (keyEvent_ == nullptr) {
             keyEvent_ = KeyEvent::Create();
         }
-        CHKPV(keyEvent_);
+        CHKPR(keyEvent_, false);
         const std::vector<int32_t> funcKeys = {
             KeyEvent::NUM_LOCK_FUNCTION_KEY,
             KeyEvent::CAPS_LOCK_FUNCTION_KEY,
             KeyEvent::SCROLL_LOCK_FUNCTION_KEY
         };
         for (const auto &funcKey : funcKeys) {
-            LibinputAdapter::DeviceLedUpdate(device, funcKey, keyEvent_->GetFunctionKey(funcKey));
+            if (LibinputAdapter::DeviceLedUpdate(device, funcKey,
+                keyEvent_->GetFunctionKey(funcKey)) != RET_OK) {
+                MMI_HILOGE("Failed to set led state for funcKey:%{public}d", funcKey);
+                return false;
+            }
         }
         MMI_HILOGI("Sync led state of added device from keyEvent");
     }
+    return isKeyboardWithLed;
 }
 
 void KeyEventNormalize::ResetKeyEvent(struct libinput_device* device)
@@ -337,7 +344,7 @@ void KeyEventNormalize::ReadProductConfig(InputProductConfig &config) const
         MMI_HILOGE("No '%{private}s' was found", cfgName);
         return;
     }
-    MMI_HILOGI("Input product config:%{private}s", cfgPath);
+    MMI_HILOGD("Input product config:%{private}s", cfgPath);
     ReadProductConfig(std::string(cfgPath), config);
 }
 
@@ -641,12 +648,6 @@ bool KeyEventNormalize::CheckSimulatedModifierKeyEventFromShell(const std::share
 
     if (!keyStatusRecordSwitch_) {
         MMI_HILOGW("The simulated modifier key status record switch is not enabled");
-        return false;
-    }
-
-    const int32_t funcKey = keyEvent->TransitionFunctionKey(keyEvent->GetKeyCode());
-    if (funcKey == KeyEvent::UNKNOWN_FUNCTION_KEY) {
-        MMI_HILOGW("The shell simulate not function key");
         return false;
     }
 

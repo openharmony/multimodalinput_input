@@ -234,7 +234,7 @@ HWTEST_F(KeyEventNormalizeWithMockTest, KeyEventNormalizeWithMockTest_SyncLedSta
     // led off
     EXPECT_CALL(libinputMock, HasEventLedType).Times(testing::AtMost(1)).WillOnce(testing::Return(0));
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
-    EXPECT_NO_FATAL_FAILURE(KeyEventHdr->SyncLedStateFromKeyEvent(&libDev));
+    EXPECT_EQ(KeyEventHdr->SyncLedStateFromKeyEvent(&libDev), false);
     if (vKeyboardDeviceId > 0) {
         INPUT_DEV_MGR->RemoveVirtualInputDevice(vKeyboardDeviceId);
     }
@@ -273,7 +273,7 @@ HWTEST_F(KeyEventNormalizeWithMockTest, KeyEventNormalizeWithMockTest_SyncLedSta
     // led off
     EXPECT_CALL(libinputMock, HasEventLedType).Times(testing::AtMost(1)).WillOnce(testing::Return(0));
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
-    EXPECT_NO_FATAL_FAILURE(KeyEventHdr->SyncLedStateFromKeyEvent(&libDev));
+    EXPECT_EQ(KeyEventHdr->SyncLedStateFromKeyEvent(&libDev), false);
     if (vKeyboardDeviceId > 0) {
         INPUT_DEV_MGR->RemoveVirtualInputDevice(vKeyboardDeviceId);
     }
@@ -312,10 +312,69 @@ HWTEST_F(KeyEventNormalizeWithMockTest, KeyEventNormalizeWithMockTest_SyncLedSta
     // led on
     EXPECT_CALL(libinputMock, HasEventLedType).Times(testing::AtMost(1)).WillOnce(testing::Return(1));
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
-    EXPECT_NO_FATAL_FAILURE(KeyEventHdr->SyncLedStateFromKeyEvent(&libDev));
+    EXPECT_EQ(KeyEventHdr->SyncLedStateFromKeyEvent(&libDev), false);
     if (vKeyboardDeviceId > 0) {
         INPUT_DEV_MGR->RemoveVirtualInputDevice(vKeyboardDeviceId);
     }
+}
+
+/**
+ * @tc.name: KeyEventNormalizeWithMockTest_SimulatedModifierKeyEventNormalize_NonSimulated_002
+ * @tc.desc: Test SimulatedModifierKeyEventNormalize with non-simulated keyEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyEventNormalizeWithMockTest,
+    KeyEventNormalizeWithMockTest_SimulatedModifierKeyEventNormalize_NonSimulated_002,
+    TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_CTRL_LEFT);
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+    KeyEventHdr->SimulatedModifierKeyEventNormalize(keyEvent);
+}
+
+/**
+ * @tc.name: KeyEventNormalizeWithMockTest_SimulatedModifierKeyEventNormalize_NonFunction_003
+ * @tc.desc: Test SimulatedModifierKeyEventNormalize with non-function key
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyEventNormalizeWithMockTest,
+    KeyEventNormalizeWithMockTest_SimulatedModifierKeyEventNormalize_NonFunc_003,
+    TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    keyEvent->AddFlag(InputEvent::EVENT_FLAG_SIMULATE);
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_A);
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+    KeyEventHdr->SimulatedModifierKeyEventNormalize(keyEvent);
+}
+
+/**
+ * @tc.name: KeyEventNormalizeWithMockTest_SimulatedModifierKeyEventNormalize_ModifierWithShell_004
+ * @tc.desc: Test SimulatedModifierKeyEventNormalize with modifier key from shell
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyEventNormalizeWithMockTest,
+    KeyEventNormalizeWithMockTest_SimulatedModifierKeyEventNormalize_Shell_004,
+    TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    keyEvent->AddFlag(InputEvent::EVENT_FLAG_SIMULATE);
+    keyEvent->AddFlag(InputEvent::EVENT_FLAG_SHELL);
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_CTRL_LEFT);
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+    KeyEventHdr->SetKeyStatusRecord(true, 5000);
+    KeyEventHdr->SimulatedModifierKeyEventNormalize(keyEvent);
+    KeyEventHdr->SetKeyStatusRecord(false, 10000);
 }
 }
 }

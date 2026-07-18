@@ -52,7 +52,7 @@ int32_t SpecialInputDeviceParser::Init()
 
 int32_t SpecialInputDeviceParser::InitializeImpl()
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     std::string jsonStr = ReadJsonFile(std::string(specialInputDeviceDir));
     if (jsonStr.empty()) {
         MMI_HILOGE("Read specialInputDevice failed");

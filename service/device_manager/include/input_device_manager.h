@@ -25,6 +25,12 @@
 
 namespace OHOS {
 namespace MMI {
+enum class InputDeviceClass : uint32_t {
+    ALPHAKEY,
+    GAMEPAD,
+    DPAD
+};
+
 class InputDeviceManager final : public IInputDeviceManager {
 private:
     struct InputDeviceInfo {
@@ -146,7 +152,6 @@ public:
         bool isVirtualPointerDev = false);
     void NotifyRemovePointerDevice(bool removePointerDevice);
     bool HasTouchDevice();
-    bool HasLocalMouseDevice();
     const std::string& GetScreenId(int32_t deviceId) const;
     using inputDeviceCallback =
         std::function<void(int32_t deviceId, std::string nodeName, std::string devName, std::string devStatus)>;
@@ -170,11 +175,18 @@ public:
     void AddFlag(int32_t deviceId, uint32_t flag);
     void RemoveFlag(int32_t deviceId);
     uint32_t GetFlag(int32_t deviceId);
+    std::vector<std::shared_ptr<InputDevice>> GetInputDeviceInfosForPlugin() const;
+    int32_t EnableInputDeviceForPlugin(int32_t deviceId);
+    int32_t DisableInputDeviceForPlugin(int32_t deviceId);
+    std::vector<int32_t> GetInputDeviceClassKeyCodes(InputDeviceClass deviceClass);
+    bool HasInputDeviceClass(int32_t deviceId, InputDeviceClass deviceClass);
 
 private:
     int32_t ParseDeviceId(struct libinput_device *inputDevice);
     void MakeDeviceInfo(struct libinput_device *inputDevice, struct InputDeviceInfo& info);
     bool IsMatchKeys(struct libinput_device* device, const std::vector<int32_t> &keyCodes) const;
+    bool IsMatchDeviceKeys(
+        int32_t deviceId, struct libinput_device *device, const std::vector<int32_t> &keyCodes) const;
     void ScanPointerDevice();
     void FillInputDevice(std::shared_ptr<InputDevice> inputDevice, libinput_device *deviceOrigin) const;
     void FillInputDeviceWithVirtualCapability(

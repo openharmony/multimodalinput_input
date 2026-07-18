@@ -37,7 +37,7 @@ InputEventHookHandler &InputEventHookHandler::GetInstance()
 int32_t InputEventHookHandler::AddInputEventHookLocal(std::shared_ptr<IInputEventConsumer> consumer,
     HookEventType hookEventType)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     CHKPR(consumer, ERROR_INVALID_PARAMETER);
     if (hookEventType & HOOK_EVENT_TYPE_KEY) {
         AddKeyHook([consumer](std::shared_ptr<KeyEvent> event) {
@@ -61,7 +61,7 @@ int32_t InputEventHookHandler::AddInputEventHookLocal(std::shared_ptr<IInputEven
 int32_t InputEventHookHandler::AddInputEventHook(std::shared_ptr<IInputEventConsumer> consumer,
     HookEventType hookEventType)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     CHKPR(consumer, RET_ERR);
     if (!MMIEventHdl.InitClient()) {
         MMI_HILOGE("Client init failed");
@@ -87,7 +87,7 @@ int32_t InputEventHookHandler::AddInputEventHook(std::shared_ptr<IInputEventCons
 
 int32_t InputEventHookHandler::RemoveInputEventHookLocal(HookEventType hookEventType)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     std::unique_lock<std::shared_mutex> lock(rwMutex_);
     if ((hookEventType & HOOK_EVENT_TYPE_KEY) & CheckHookStatsBit(HOOK_EVENT_TYPE_KEY)) {
         hookConsumer_.keyHookCallback_ = nullptr;
@@ -218,7 +218,7 @@ void InputEventHookHandler::AddTouchHook(std::function<void(std::shared_ptr<Poin
 
 int32_t InputEventHookHandler::AddInputEventHookToServer(HookEventType hookEventType)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     if (int32_t ret = MULTIMODAL_INPUT_CONNECT_MGR->AddInputEventHook(hookEventType); ret != RET_OK) {
         MMI_HILOGE("AddInputEventHook to server, ret:%{public}d", ret);
         return ret;
@@ -228,7 +228,7 @@ int32_t InputEventHookHandler::AddInputEventHookToServer(HookEventType hookEvent
 
 int32_t InputEventHookHandler::RemoveInputEventHookOfServer(HookEventType hookEventType)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     if (int32_t ret = MULTIMODAL_INPUT_CONNECT_MGR->RemoveInputEventHook(hookEventType); ret != RET_OK) {
         MMI_HILOGE("RemoveInputEventHook of server, ret:%{public}d", ret);
         return ret;
@@ -271,7 +271,7 @@ bool InputEventHookHandler::IsHookExisted(HookEventType hookEventType)
 
 int32_t InputEventHookHandler::DispatchToNextHandler(std::shared_ptr<KeyEvent> keyEvent)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     if (int32_t ret = MULTIMODAL_INPUT_CONNECT_MGR->DispatchToNextHandler(keyEvent); ret != RET_OK) {
         MMI_HILOGE("DispatchToNextHandler keyEvent of server, ret:%{public}d", ret);
         return ret;
@@ -281,7 +281,7 @@ int32_t InputEventHookHandler::DispatchToNextHandler(std::shared_ptr<KeyEvent> k
 
 int32_t InputEventHookHandler::DispatchToNextHandler(std::shared_ptr<PointerEvent> pointerEvent)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     if (int32_t ret = MULTIMODAL_INPUT_CONNECT_MGR->DispatchToNextHandler(pointerEvent); ret != RET_OK) {
         MMI_HILOGE("DispatchToNextHandler pointerEvent of server, ret:%{public}d", ret);
         return ret;

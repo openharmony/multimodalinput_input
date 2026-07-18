@@ -119,7 +119,7 @@ Data IntentionManager::GetDeviceStatusData(const Type type)
 int32_t IntentionManager::RegisterCoordinationListener(
     std::shared_ptr<ICoordinationListener> listener, bool isCompatible)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
     InitClient();
     return cooperate_.RegisterListener(*tunnel_, listener, isCompatible);
@@ -134,7 +134,7 @@ int32_t IntentionManager::RegisterCoordinationListener(
 int32_t IntentionManager::UnregisterCoordinationListener(
     std::shared_ptr<ICoordinationListener> listener, bool isCompatible)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
     return cooperate_.UnregisterListener(*tunnel_, listener, isCompatible);
 #else
@@ -147,7 +147,7 @@ int32_t IntentionManager::UnregisterCoordinationListener(
 
 int32_t IntentionManager::PrepareCoordination(CooperateMsgInfoCallback callback, bool isCompatible)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
     InitClient();
     return cooperate_.Enable(*tunnel_, callback, isCompatible);
@@ -161,7 +161,7 @@ int32_t IntentionManager::PrepareCoordination(CooperateMsgInfoCallback callback,
 
 int32_t IntentionManager::UnprepareCoordination(CooperateMsgInfoCallback callback, bool isCompatible)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
     InitClient();
     return cooperate_.Disable(*tunnel_, callback, isCompatible);
@@ -176,7 +176,7 @@ int32_t IntentionManager::UnprepareCoordination(CooperateMsgInfoCallback callbac
 int32_t IntentionManager::ActivateCoordination(const std::string &remoteNetworkId, int32_t startDeviceId,
     CooperateMsgInfoCallback callback, bool isCompatible)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
     InitClient();
     return cooperate_.Start(*tunnel_, remoteNetworkId, startDeviceId, callback, isCompatible);
@@ -193,7 +193,7 @@ int32_t IntentionManager::ActivateCoordination(const std::string &remoteNetworkI
 int32_t IntentionManager::DeactivateCoordination(bool isUnchained,
     CooperateMsgInfoCallback callback, bool isCompatible)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
     InitClient();
     return cooperate_.Stop(*tunnel_, isUnchained, callback, isCompatible);
@@ -208,7 +208,7 @@ int32_t IntentionManager::DeactivateCoordination(bool isUnchained,
 int32_t IntentionManager::GetCoordinationState(
     const std::string &networkId, std::function<void(bool)> callback, bool isCompatible)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
     InitClient();
     return cooperate_.GetCooperateState(*tunnel_, networkId, callback, isCompatible);
@@ -223,7 +223,7 @@ int32_t IntentionManager::GetCoordinationState(
 
 int32_t IntentionManager::GetCoordinationState(const std::string &udId, bool &state)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
     InitClient();
     return cooperate_.GetCooperateState(*tunnel_, udId, state);
@@ -237,7 +237,7 @@ int32_t IntentionManager::GetCoordinationState(const std::string &udId, bool &st
 
 int32_t IntentionManager::RegisterEventListener(const std::string &networkId, std::shared_ptr<IEventListener> listener)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
     InitClient();
     return cooperate_.RegisterEventListener(*tunnel_, networkId, listener);
@@ -252,7 +252,7 @@ int32_t IntentionManager::RegisterEventListener(const std::string &networkId, st
 int32_t IntentionManager::UnregisterEventListener(const std::string &networkId,
     std::shared_ptr<IEventListener> listener)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
     InitClient();
     return cooperate_.UnregisterEventListener(*tunnel_, networkId, listener);

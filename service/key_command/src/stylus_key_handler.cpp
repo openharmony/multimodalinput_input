@@ -137,7 +137,7 @@ void StylusKeyHandler::LaunchAbility(const Ability &ability)
     if (err != ERR_OK) {
         MMI_HILOGE("LaunchAbility failed, bundleName:%{public}s, err:%{public}d", ability.bundleName.c_str(), err);
     }
-    MMI_HILOGD("End launch ability, bundleName:%{public}s", ability.bundleName.c_str());
+    MMI_HILOGI("End launch ability, bundleName:%{public}s", ability.bundleName.c_str());
 }
 
 void StylusKeyHandler::SetLastEventState(bool state)

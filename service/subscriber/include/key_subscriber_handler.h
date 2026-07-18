@@ -45,7 +45,6 @@ public:
     void RemoveSubscriberKeyUpTimer(int32_t keyCode);
     int32_t EnableCombineKey(bool enable);
     void ResetSkipPowerKeyUpFlag();
-    void ResetCallEndKeyUpFlag();
     void Dump(int32_t fd, const std::vector<std::string> &args);
 
 private:

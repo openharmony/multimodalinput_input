@@ -46,13 +46,13 @@ void CooperateOut::OnEvent(Context &context, const CooperateEvent &event)
 
 void CooperateOut::OnEnterState(Context &context)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     env_->GetInput().SetPointerVisibility(false);
 }
 
 void CooperateOut::OnLeaveState(Context &context)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     SetPointerVisible(context);
 }
 
@@ -156,7 +156,7 @@ void CooperateOut::Initial::OnStop(Context &context, const CooperateEvent &event
 
 void CooperateOut::Initial::OnComeBack(Context &context, const CooperateEvent &event)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     DSoftbusComeBack notice = std::get<DSoftbusComeBack>(event.event);
 
     if (!context.IsPeer(notice.networkId)) {

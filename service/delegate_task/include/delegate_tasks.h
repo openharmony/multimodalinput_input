@@ -61,9 +61,14 @@ public:
         {
             hasWaited_ = true;
         }
+        bool TaskIsRunning()
+        {
+            return taskIsRunning;
+        }
 
     private:
         std::atomic_bool hasWaited_ { false };
+        std::atomic_bool taskIsRunning { false };
         uint64_t id_ { 0 };
         DTaskCallback fun_;
         std::shared_ptr<Promise> promise_ { nullptr };

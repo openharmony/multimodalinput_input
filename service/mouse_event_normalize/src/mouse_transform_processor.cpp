@@ -99,7 +99,7 @@ MouseTransformProcessor::MouseTransformProcessor(IInputServiceContext *env, int3
 
 MouseTransformProcessor::~MouseTransformProcessor()
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     auto timerMgr = GetTimerManager();
     if (timerMgr == nullptr) {
         MMI_HILOGE("timerMgr is nullptr");
@@ -1226,7 +1226,7 @@ bool MouseTransformProcessor::HandlePostInner(struct libinput_event_pointer* dat
 
 bool MouseTransformProcessor::CheckAndPackageAxisEvent()
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     if (!isAxisBegin_) {
         return false;
     }
@@ -1307,6 +1307,7 @@ int32_t MouseTransformProcessor::Normalize(struct libinput_event *event)
         return RET_ERR;
     }
     winMgr->UpdateTargetPointer(pointerEvent_);
+    RefreshLastPointerEvent();
     DumpInner();
     return result;
 }
@@ -1928,7 +1929,10 @@ void MouseTransformProcessor::SendButtonUpEvents()
 
     auto pressedButtons = pointerEvent_->GetPressedButtons();
     if (pressedButtons.empty()) {
-        return;
+        if (!RestoreLastPointerEvent()) {
+            return;
+        }
+        pressedButtons = pointerEvent_->GetPressedButtons();
     }
     MMI_HILOGI("Mouse[%{public}d] has pressed buttons, sending BUTTON_UP", deviceId_);
 
@@ -1949,8 +1953,9 @@ void MouseTransformProcessor::SendButtonUpEvents()
             continue;
         }
 
+        const int32_t mappedButtonId = iter->second.buttonId_;
         HandleButtonReleased(iter->second.buttonCode_, iter->first, iter->second.eventType_);
-        pointerEvent_->SetButtonId(iter->second.buttonId_);
+        pointerEvent_->SetButtonId(mappedButtonId);
         pointerEvent_->UpdateId();
 
         LogTracer lt(pointerEvent_->GetId(), pointerEvent_->GetEventType(), pointerEvent_->GetPointerAction());
@@ -1958,6 +1963,72 @@ void MouseTransformProcessor::SendButtonUpEvents()
         MMI_HILOGD("Sent BUTTON_UP for button[%{public}d], pressedButtons size=%{public}zu",
             buttonId, pointerEvent_->GetPressedButtons().size());
     }
+}
+
+void MouseTransformProcessor::RefreshLastPointerEvent()
+{
+    if (pointerEvent_ == nullptr) {
+        return;
+    }
+    if (pointerEvent_->GetPressedButtons().empty() && buttonMapping_.empty()) {
+        lastPointerEvent_.reset();
+        return;
+    }
+    lastPointerEvent_.reset(new (std::nothrow) PointerEvent(*pointerEvent_));
+    if (lastPointerEvent_ == nullptr) {
+        MMI_HILOGE("Save last pointer event failed");
+    }
+}
+
+bool MouseTransformProcessor::RestoreLastPointerEvent()
+{
+    if (pointerEvent_ == nullptr || lastPointerEvent_ == nullptr) {
+        return false;
+    }
+    if (lastPointerEvent_->GetPressedButtons().empty()) {
+        return false;
+    }
+
+    pointerEvent_->SetId(lastPointerEvent_->GetId());
+    pointerEvent_->SetActionTime(lastPointerEvent_->GetActionTime());
+    pointerEvent_->SetSensorInputTime(lastPointerEvent_->GetSensorInputTime());
+    pointerEvent_->SetAction(lastPointerEvent_->GetAction());
+    pointerEvent_->SetActionStartTime(lastPointerEvent_->GetActionStartTime());
+    pointerEvent_->SetDeviceId(lastPointerEvent_->GetDeviceId());
+    pointerEvent_->SetSourceType(lastPointerEvent_->GetSourceType());
+    pointerEvent_->SetTargetDisplayId(lastPointerEvent_->GetTargetDisplayId());
+    pointerEvent_->SetTargetWindowId(lastPointerEvent_->GetTargetWindowId());
+    pointerEvent_->SetAgentWindowId(lastPointerEvent_->GetAgentWindowId());
+    pointerEvent_->ClearFlag();
+    if (lastPointerEvent_->GetFlag() != InputEvent::EVENT_FLAG_NONE) {
+        pointerEvent_->AddFlag(lastPointerEvent_->GetFlag());
+    }
+    pointerEvent_->SetPointerAction(lastPointerEvent_->GetPointerAction());
+    pointerEvent_->SetOriginPointerAction(lastPointerEvent_->GetOriginPointerAction());
+    pointerEvent_->SetPointerId(lastPointerEvent_->GetPointerId());
+    pointerEvent_->SetButtonId(lastPointerEvent_->GetButtonId());
+    pointerEvent_->SetFingerCount(lastPointerEvent_->GetFingerCount());
+    pointerEvent_->SetZOrder(lastPointerEvent_->GetZOrder());
+    pointerEvent_->SetDispatchTimes(lastPointerEvent_->GetDispatchTimes());
+    pointerEvent_->SetAxisEventType(lastPointerEvent_->GetAxisEventType());
+    pointerEvent_->SetRightButtonSource(lastPointerEvent_->GetRightButtonSource());
+    pointerEvent_->RemoveAllPointerItems();
+    for (auto pointerItem : lastPointerEvent_->GetAllPointerItems()) {
+        pointerEvent_->AddPointerItem(pointerItem);
+    }
+    pointerEvent_->ClearButtonPressed();
+    for (int32_t buttonId : lastPointerEvent_->GetPressedButtons()) {
+        pointerEvent_->SetButtonPressed(buttonId);
+    }
+    pointerEvent_->ClearAxisValue();
+    const uint32_t axes = lastPointerEvent_->GetAxes();
+    for (int32_t i = PointerEvent::AXIS_TYPE_UNKNOWN; i < PointerEvent::AXIS_TYPE_MAX; ++i) {
+        const auto axis = static_cast<PointerEvent::AxisType>(i);
+        if (PointerEvent::HasAxis(axes, axis)) {
+            pointerEvent_->SetAxisValue(axis, lastPointerEvent_->GetAxisValue(axis));
+        }
+    }
+    return true;
 }
 
 void MouseTransformProcessor::SendAxisEndEvent()

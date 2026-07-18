@@ -47,7 +47,10 @@ constexpr uint32_t POINTER_SIZE_FOLD_PC { 2 };
 constexpr int32_t ANGLE_90 { 90 };
 constexpr int32_t ANGLE_360 { 360 };
 
-
+/*
+ * 获取当前屏幕宽，该宽不跟随屏幕旋转
+ * 使用"hidumper -s 10 -a screen"查看GetModes值
+ */
 uint32_t GetScreenInfoWidth(screen_info_ptr_t si)
 {
     uint32_t width = 0;
@@ -58,6 +61,11 @@ uint32_t GetScreenInfoWidth(screen_info_ptr_t si)
     }
     return modes[modeId]->width_;
 }
+
+/*
+ * 获取当前屏幕高，该高不跟随屏幕旋转
+ * 使用"hidumper -s 10 -a screen"查看GetModes值
+ */
 uint32_t GetScreenInfoHeight(screen_info_ptr_t si)
 {
     uint32_t height = 0;
@@ -82,7 +90,7 @@ ScreenPointer::ScreenPointer(hwcmgr_ptr_t hwcMgr, handler_ptr_t handler, const O
     }
     dpi_ = float(di.dpi) / BASELINE_DENSITY;
     MMI_HILOGI("Construct with DisplayInfo, id=%{public}" PRIu64 ", shape=(%{public}u, %{public}u), mode=%{public}u, "
-        "rotation=%{public}u, dpi=%{public}f", screenId_, width_, height_, mode_, rotation_, dpi_);
+        "rotation=%{public}u, dpi=%{public}f", screenId_, width_, height_, mode_, rotation_.load(), dpi_);
 }
 
 ScreenPointer::ScreenPointer(hwcmgr_ptr_t hwcMgr, handler_ptr_t handler, screen_info_ptr_t si)
@@ -99,17 +107,13 @@ ScreenPointer::ScreenPointer(hwcmgr_ptr_t hwcMgr, handler_ptr_t handler, screen_
     mirrorHeight_ = si->GetMirrorHeight();
 #endif // OHOS_BUILD_EXTERNAL_SCREEN
     MMI_HILOGI("Construct with ScreenInfo, id=%{public}" PRIu64 ", shape=(%{public}u, %{public}u), mode=%{public}u, "
-        "rotation=%{public}u, dpi=%{public}f", screenId_, width_, height_, mode_, rotation_, dpi_);
+        "rotation=%{public}u, dpi=%{public}f", screenId_, width_, height_, mode_, rotation_.load(), dpi_);
 }
 
 ScreenPointer::~ScreenPointer()
 {
-    if (surfaceNode_ != nullptr) {
-        surfaceNode_->DetachToDisplay(screenId_);
-        surfaceNode_ = nullptr;
-        MMI_HILOGI("Detach screenId:%{public}" PRIu64, screenId_);
-        RsFlushImplicitTransaction();
-    }
+    DestroyPointerWindow();
+    MMI_HILOGI("Destruct ScreenPointer, id:%{public}" PRIu64, screenId_);
 }
 
 bool ScreenPointer::Init(PointerRenderer &render, bool needDrawPointer)
@@ -122,7 +126,7 @@ bool ScreenPointer::Init(PointerRenderer &render, bool needDrawPointer)
     RenderConfig defaultCursorCfg {
         .style_ = MOUSE_ICON::DEFAULT,
         .align_ = ICON_TYPE::ANGLE_NW,
-        .path_ = "/system/etc/multimodalinput/mouse_icon/Default.svg",
+        .path_ = "/data/service/el1/public/multimodalinput/mouse_icon/Default.svg",
         .color = 0,
         .size = POINTER_SIZE_DEFAULT,
         .direction = Direction::DIRECTION0,
@@ -329,14 +333,14 @@ bool ScreenPointer::InitSurface(bool needDrawPointer)
 
     canvasNode_->SetCornerRadius(1);
     canvasNode_->SetPositionZ(Rosen::RSSurfaceNode::POINTER_WINDOW_POSITION_Z);
-    canvasNode_->SetRotation(float(rotation_));
+    canvasNode_->SetRotation(float(rotation_.load()));
     surfaceNode_->AddChild(canvasNode_, RS_NODE_CANVAS_INDEX);
 
     MMI_HILOGI("InitSurface completed");
     return true;
 }
 
-void ScreenPointer::UpdateScreenInfo(const sptr<OHOS::Rosen::ScreenInfo> si, bool needDrawPointer)
+void ScreenPointer::UpdateScreenInfo(sptr<OHOS::Rosen::ScreenInfo> si, bool needDrawPointer)
 {
     CHKPV(si);
     CHKPV(surfaceNode_);
@@ -356,8 +360,9 @@ void ScreenPointer::UpdateScreenInfo(const sptr<OHOS::Rosen::ScreenInfo> si, boo
     }
     RsFlushImplicitTransaction();
     MMI_HILOGI("Update with ScreenInfo, id=%{public}" PRIu64 ", shape=(%{public}u, %{public}u), mode=%{public}u, "
-        "rotation=%{public}u, dpi=%{public}f, needDrawPointer=%{public}d", screenId_, width_, height_, mode_,
-        rotation_, dpi_, needDrawPointer);
+        "rotation=%{public}u, dpi=%{public}f, (mirrorWidth,mirrotHeight)=(%{public}u, %{public}u), "
+        "needDrawPointer=%{public}d",
+        screenId_, width_, height_, mode_, rotation_.load(), dpi_, mirrorWidth_, mirrorHeight_, needDrawPointer);
 }
 
 void ScreenPointer::OnDisplayInfo(const OLD::DisplayInfo &di)
@@ -373,23 +378,46 @@ void ScreenPointer::OnDisplayInfo(const OLD::DisplayInfo &di)
     }
     displayDirection_ = di.displayDirection;
     MMI_HILOGD("Update with DisplayInfo, id=%{public}" PRIu64 ", shape=(%{public}u, %{public}u), mode=%{public}u, "
-        "rotation=%{public}u, dpi=%{public}f", screenId_, width_, height_, mode_, rotation_, dpi_);
+        "rotation=%{public}u, dpi=%{public}f", screenId_, width_, height_, mode_, rotation_.load(), dpi_);
     if (isCurrentOffScreenRendering_) {
-        if (di.width == 0) {
-            MMI_HILOGE("The divisor cannot be 0");
+        if (di.width == 0 || di.screenRealWidth == 0 || di.screenRealHeight == 0) {
+            MMI_HILOGE("invalid data, width=%{public}u, screenRealWidth=%{public}u, screenRealHeight=%{public}u",
+                di.width, di.screenRealWidth, di.screenRealHeight);
             return;
         }
-        offRenderScale_ = float(di.screenRealWidth) / di.width;
+
+        int32_t realWidth = di.screenRealWidth;
+        int32_t realHeight = di.screenRealHeight;
+        if ((rotation_ == rotation_t::ROTATION_90 || rotation_ == rotation_t::ROTATION_270)) {
+            std::swap(realWidth, realHeight);
+        }
+
+        offRenderScale_ = float(realWidth) / di.width;
         MMI_HILOGD("Update with DisplayInfo, screenRealDPI=%{public}d, offRenderScale_=(%{public}f ",
             di.screenRealDPI, offRenderScale_);
     }
 }
 
-bool ScreenPointer::UpdatePadding(uint32_t mainWidth, uint32_t mainHeight)
+/*
+ * 镜像模式下，计算主屏或镜像屏的屏幕黑边，此接口仅主屏或镜像屏调用
+ * 注意：width_、height_不跟随屏幕旋转，sourceScreenWidth、sourceScreenHeight不跟随屏幕旋转
+ *
+ * 单显示器模式: sourceScreenWidth、sourceScreenHeight为主屏宽高
+ * 扩展模式：sourceScreenWidth、sourceScreenHeight为主屏宽高
+ * 仅第二屏模式：sourceScreenWidth、sourceScreenHeight为主屏宽高
+ * 镜像模式：镜像模式下，主屏可以旋转，镜像屏不旋转
+ * （1）满屏显示：主屏
+ *      主屏ScreenPointer：sourceScreenWidth、sourceScreenHeight为主屏宽高
+ *      镜像屏ScreenPointer: sourceScreenWidth、sourceScreenHeight为主屏宽高
+ * （2）满屏显示：镜像屏
+ *      主屏ScreenPointer：sourceScreenWidth、sourceScreenHeight为镜像屏宽高
+ *      镜像屏ScreenPointer: sourceScreenWidth、sourceScreenHeight为镜像屏宽高
+ */
+bool ScreenPointer::UpdatePadding(uint32_t sourceScreenWidth, uint32_t sourceScreenHeight)
 {
 #ifndef OHOS_BUILD_EXTERNAL_SCREEN
     if (!IsMirror()) {
-        MMI_HILOGI("UpdatePadidng, reset padding, screenId=%{public}" PRIu64 ", scale=%{public}f, "
+        MMI_HILOGI("UpdatePadding, reset padding, screenId=%{public}" PRIu64 ", scale=%{public}f, "
             "paddingTop_=%{public}u, paddingLeft_=%{public}u", screenId_, scale_, paddingTop_, paddingLeft_);
         scale_ = 1.0;
         paddingTop_ = 0;
@@ -397,26 +425,30 @@ bool ScreenPointer::UpdatePadding(uint32_t mainWidth, uint32_t mainHeight)
         return false;
     }
 #endif // OHOS_BUILD_EXTERNAL_SCREEN
-    if (mainWidth == 0 || mainHeight == 0) {
-        MMI_HILOGE("Invalid parameters, mainWidth=%{public}u, mainHeight=%{public}u", mainWidth, mainHeight);
+    if (sourceScreenWidth == 0 || sourceScreenHeight == 0) {
+        MMI_HILOGE("Invalid parameters, sourceScreenWidth=%{public}u, sourceScreenHeight=%{public}u",
+            sourceScreenWidth, sourceScreenHeight);
         return false;
     }
-    if ((sourceScreenRotation_  == rotation_t::ROTATION_90 || sourceScreenRotation_  == rotation_t::ROTATION_270)
-        && IsMirror()) {
-        std::swap(mainWidth, mainHeight);
+    // 镜像屏不会旋转，若主屏旋转90度或270度，则(sourceScreenHeight, sourceScreenWidth)为主屏实际分辨率
+    if (IsMirror() && (sourceScreenRotation_ == rotation_t::ROTATION_90 ||
+        sourceScreenRotation_ == rotation_t::ROTATION_270)) {
+        std::swap(sourceScreenWidth, sourceScreenHeight);
     }
-
-    // caculate padding for mirror screens
-    scale_ = fmin(float(width_) / mainWidth, float(height_) / mainHeight);
-    paddingTop_ = (height_ - mainHeight * scale_) / NUM_TWO;
-    paddingLeft_ = (width_ - mainWidth * scale_) / NUM_TWO;
+    // caculate padding for main screen or mirror screen
+    scale_ = fmin(float(width_) / sourceScreenWidth, float(height_) / sourceScreenHeight);
+    paddingTop_ = (height_ - sourceScreenHeight * scale_) / NUM_TWO;
+    paddingLeft_ = (width_ - sourceScreenWidth * scale_) / NUM_TWO;
 #ifdef OHOS_BUILD_EXTERNAL_SCREEN
     if (IsMain()) {
         scale_ = 1.0;
     }
 #endif // OHOS_BUILD_EXTERNAL_SCREEN
     MMI_HILOGI("UpdatePadding, screenId=%{public}" PRIu64 ", scale=%{public}f, paddingTop_=%{public}u,"
-               " paddingLeft_=%{public}u", screenId_, scale_, paddingTop_, paddingLeft_);
+               " paddingLeft_=%{public}u, curScreen=(%{public}u, %{public}u), sourceScreen=(%{public}u, %{public}u)"
+               "sourceScreenRotation=%{public}d",
+               screenId_, scale_, paddingTop_, paddingLeft_, width_, height_, sourceScreenWidth,
+               sourceScreenHeight, sourceScreenRotation_);
     return true;
 }
 
@@ -677,5 +709,19 @@ void ScreenPointer::DestroyPointerWindow()
     rsUIDirector_ = nullptr;
     rsUIContext_ = nullptr;
     MMI_HILOGI("Destroy pointer window, screenId=%{public}" PRIu64, screenId_);
+}
+
+Direction ScreenPointer::GetRenderDirection(bool isHard)
+{
+    if (IsMirror()) {
+        return Direction::DIRECTION0;
+    }
+
+    if (isHard) {
+        return static_cast<Direction>(rotation_.load());
+    } else {
+        return static_cast<Direction>((((static_cast<Direction>(rotation_.load()) - displayDirection_) *
+            ANGLE_90 + ANGLE_360) % ANGLE_360) / ANGLE_90);
+    }
 }
 } // namespace OHOS::MMI

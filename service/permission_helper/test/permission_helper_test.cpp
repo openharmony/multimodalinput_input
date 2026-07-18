@@ -616,6 +616,23 @@ HWTEST_F(PermissionHelperTest, PermissionHelperTest_CheckInjectPermission_01, Te
 }
 
 /**
+ * @tc.name: PermissionHelperTest_CheckInjectPermission_02
+ * @tc.desc: Test CheckInjectPermission with a specified non-zero tokenId, which skips the
+ *           GetCallingTokenID() fallback and exercises the new token-id branch.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PermissionHelperTest, PermissionHelperTest_CheckInjectPermission_02, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    const uint32_t tokenId = 1;
+    bool ret = PER_HELPER->CheckInjectPermission(tokenId);
+    // The unittest runs under a non-granted token id (not a shell token), so the inject
+    // permission is denied and CheckInjectPermission returns false.
+    EXPECT_FALSE(ret);
+}
+
+/**
  * @tc.name: PermissionHelperTest_CheckHapPermission_09
  * @tc.desc: Test CheckHapPermission with TOKEN_INVALID type
  * @tc.type: FUNC

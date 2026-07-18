@@ -25,6 +25,12 @@
             "triggerType": "down"
         },
         {
+            "preKeys": [2076],
+            "finalKey": 2038,
+            "longPressTime": 0,
+            "triggerType": "down"
+        },
+        {
             "preKeys": [ 2077 ],
             "finalKey": 2032,
             "longPressTime": 0,
@@ -166,6 +172,12 @@
             "preKeys": [],
             "finalKey": 18,
             "longPressTime": 500,
+            "triggerType": "down"
+        },
+        {
+            "preKeys": [],
+            "finalKey": 18,
+            "longPressTime": 3500,
             "triggerType": "down"
         },
         {
@@ -440,6 +452,12 @@
         },
         {
             "preKeys": [],
+            "finalKey": 2049,
+            "longPressTime": 0,
+            "triggerType": "down"
+        },
+        {
+            "preKeys": [],
             "finalKey": 2045,
             "longPressTime": 0,
             "triggerType": "up"
@@ -470,9 +488,21 @@
         },
         {
             "preKeys": [],
+            "finalKey": 2012,
+            "longPressTime": 0,
+            "triggerType": "down"
+        },
+        {
+            "preKeys": [],
             "finalKey": 2013,
             "longPressTime": 0,
             "triggerType": "up"
+        },
+        {
+            "preKeys": [],
+            "finalKey": 2013,
+            "longPressTime": 0,
+            "triggerType": "down"
         },
         {
             "preKeys": [],
@@ -503,6 +533,12 @@
             "finalKey": 2054,
             "longPressTime": 0,
             "triggerType": "up"
+        },
+        {
+            "preKeys": [],
+            "finalKey": 2054,
+            "longPressTime": 0,
+            "triggerType": "down"
         },
         {
             "preKeys": [],

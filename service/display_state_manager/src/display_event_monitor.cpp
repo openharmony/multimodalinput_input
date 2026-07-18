@@ -91,7 +91,7 @@ public:
             STYLUS_HANDLER->IsLaunchAbility();
 #endif // OHOS_BUILD_ENABLE_COMBINATION_KEY
 #ifdef OHOS_BUILD_KNUCKLE
-            MMI_HILOGI("Start enable fingersense");
+            MMI_HILOGD("Start enable fingersense");
             KnuckleHandlerComponent::GetInstance().EnableFingersense();
 #endif // OHOS_BUILD_KNUCKLE
             DISPLAY_MONITOR->UpdateShieldStatusOnScreenOn();
@@ -99,7 +99,7 @@ public:
             MMI_HILOGD("Display screen off");
             DISPLAY_MONITOR->SetScreenStatus(action);
 #ifdef OHOS_BUILD_KNUCKLE
-            MMI_HILOGI("Disable fingersense");
+            MMI_HILOGD("Disable fingersense");
             KnuckleHandlerComponent::GetInstance().DisableFingersense();
 #endif // OHOS_BUILD_KNUCKLE
             DISPLAY_MONITOR->UpdateShieldStatusOnScreenOff();
@@ -145,7 +145,7 @@ public:
 void DisplayEventMonitor::UpdateShieldStatusOnScreenOn()
 {
     CALL_DEBUG_ENTER;
-    MMI_HILOGI("Shield mode before screen on:%{public}d", shieldModeBeforeSreenOff_);
+    MMI_HILOGD("Shield mode before screen on:%{public}d", shieldModeBeforeSreenOff_);
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     if (shieldModeBeforeSreenOff_ != SHIELD_MODE::UNSET_MODE) {
         KeyEventHdr->SetCurrentShieldMode(shieldModeBeforeSreenOff_);
@@ -160,7 +160,7 @@ void DisplayEventMonitor::UpdateShieldStatusOnScreenOn()
 void DisplayEventMonitor::UpdateShieldStatusOnScreenOff()
 {
     CALL_DEBUG_ENTER;
-    MMI_HILOGI("Shield mode before screen off:%{public}d", shieldModeBeforeSreenOff_);
+    MMI_HILOGD("Shield mode before screen off:%{public}d", shieldModeBeforeSreenOff_);
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     shieldModeBeforeSreenOff_ = KeyEventHdr->GetCurrentShieldMode();
     if (shieldModeBeforeSreenOff_ != SHIELD_MODE::UNSET_MODE) {
@@ -188,8 +188,8 @@ void DisplayEventMonitor::InitCommonEventSubscriber()
     matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_UNLOCKED);
     matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_DATA_SHARE_READY);
     EventFwk::CommonEventSubscribeInfo commonEventSubscribeInfo(matchingSkills);
-    hasInit_ = OHOS::EventFwk::CommonEventManager::SubscribeCommonEvent(
-        std::make_shared<DisplayChangedReceiver>(commonEventSubscribeInfo));
+    CommonEventSubscriber_ = std::make_shared<DisplayChangedReceiver>(commonEventSubscribeInfo);
+    hasInit_ = OHOS::EventFwk::CommonEventManager::SubscribeCommonEvent(CommonEventSubscriber_);
 }
 
 void DisplayEventMonitor::SendCancelEventWhenLock()

@@ -31,6 +31,7 @@
 #define MMI_LOG_TAG "OHInputManagerTest"
 
 void SetCursorInfo(OHOS::MMI::PointerEvent::PointerItem& item, Input_MouseEvent* mouseEvent);
+Input_TouchEvent  *OH_Input_PointerEventToTouchEvent(const OHOS::MMI::PointerEvent &event);
 
 struct Input_KeyState {
     int32_t keyCode;
@@ -6126,5 +6127,407 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_BindInputDeviceToDispla
     int32_t displayId = 1;
     EXPECT_EQ(OH_Input_BindInputDeviceToDisplay(inputDeviceId, displayId), INPUT_PARAMETER_ERROR);
 }
+
+/**
+ * @tc.name: OHInputManagerTest_OH_Input_SetPointerVisible_001
+ * @tc.desc: Test OH_Input_SetPointerVisible with true and false
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_SetPointerVisible_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    Input_Result ret = OH_Input_SetPointerVisible(true);
+    EXPECT_TRUE(ret == INPUT_SUCCESS || ret == INPUT_SERVICE_EXCEPTION ||
+        ret == INPUT_DEVICE_NOT_SUPPORTED);
+    ret = OH_Input_SetPointerVisible(false);
+    EXPECT_TRUE(ret == INPUT_SUCCESS || ret == INPUT_SERVICE_EXCEPTION ||
+        ret == INPUT_DEVICE_NOT_SUPPORTED);
+}
+
+/**
+ * @tc.name: OHInputManagerTest_OH_Input_GetMouseEventGlobalX_001
+ * @tc.desc: Test OH_Input_GetMouseEventGlobalX with nullptr returns INT32_MAX
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_GetMouseEventGlobalX_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t ret = OH_Input_GetMouseEventGlobalX(nullptr);
+    EXPECT_EQ(ret, INT32_MAX);
+}
+
+/**
+ * @tc.name: OHInputManagerTest_OH_Input_GetMouseEventGlobalY_001
+ * @tc.desc: Test OH_Input_GetMouseEventGlobalY with nullptr returns INT32_MAX
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_GetMouseEventGlobalY_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t ret = OH_Input_GetMouseEventGlobalY(nullptr);
+    EXPECT_EQ(ret, INT32_MAX);
+}
+
+/**
+ * @tc.name: OHInputManagerTest_OH_Input_SetGetMouseEventGlobalX_001
+ * @tc.desc: Test set/get round trip for MouseEventGlobalX
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_SetGetMouseEventGlobalX_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    Input_MouseEvent mouseEvent;
+    int32_t globalX = 100;
+    OH_Input_SetMouseEventGlobalX(&mouseEvent, globalX);
+    EXPECT_EQ(OH_Input_GetMouseEventGlobalX(&mouseEvent), globalX);
+}
+
+/**
+ * @tc.name: OHInputManagerTest_OH_Input_SetGetMouseEventGlobalY_001
+ * @tc.desc: Test set/get round trip for MouseEventGlobalY
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_SetGetMouseEventGlobalY_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    Input_MouseEvent mouseEvent;
+    int32_t globalY = 200;
+    OH_Input_SetMouseEventGlobalY(&mouseEvent, globalY);
+    EXPECT_EQ(OH_Input_GetMouseEventGlobalY(&mouseEvent), globalY);
+}
+
+/**
+ * @tc.name: OHInputManagerTest_OH_Input_GetTouchEventGlobalX_001
+ * @tc.desc: Test OH_Input_GetTouchEventGlobalX with nullptr returns INT32_MAX
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_GetTouchEventGlobalX_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t ret = OH_Input_GetTouchEventGlobalX(nullptr);
+    EXPECT_EQ(ret, INT32_MAX);
+}
+
+/**
+ * @tc.name: OHInputManagerTest_OH_Input_GetTouchEventGlobalY_001
+ * @tc.desc: Test OH_Input_GetTouchEventGlobalY with nullptr returns INT32_MAX
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_GetTouchEventGlobalY_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t ret = OH_Input_GetTouchEventGlobalY(nullptr);
+    EXPECT_EQ(ret, INT32_MAX);
+}
+
+/**
+ * @tc.name: OHInputManagerTest_OH_Input_SetGetTouchEventGlobalX_001
+ * @tc.desc: Test set/get round trip for TouchEventGlobalX
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_SetGetTouchEventGlobalX_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    Input_TouchEvent touchEvent;
+    int32_t globalX = 300;
+    OH_Input_SetTouchEventGlobalX(&touchEvent, globalX);
+    EXPECT_EQ(OH_Input_GetTouchEventGlobalX(&touchEvent), globalX);
+}
+
+/**
+ * @tc.name: OHInputManagerTest_OH_Input_SetGetTouchEventGlobalY_001
+ * @tc.desc: Test set/get round trip for TouchEventGlobalY
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_SetGetTouchEventGlobalY_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    Input_TouchEvent touchEvent;
+    int32_t globalY = 400;
+    OH_Input_SetTouchEventGlobalY(&touchEvent, globalY);
+    EXPECT_EQ(OH_Input_GetTouchEventGlobalY(&touchEvent), globalY);
+}
+
+/**
+ * @tc.name: OHInputManagerTest_OH_Input_GetTouchEventWindowX_001
+ * @tc.desc: Test OH_Input_GetTouchEventWindowX with nullptr returns 0
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_GetTouchEventWindowX_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t ret = OH_Input_GetTouchEventWindowX(nullptr);
+    EXPECT_EQ(ret, 0);
+}
+
+/**
+ * @tc.name: OHInputManagerTest_OH_Input_GetTouchEventWindowY_001
+ * @tc.desc: Test OH_Input_GetTouchEventWindowY with nullptr returns 0
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_GetTouchEventWindowY_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t ret = OH_Input_GetTouchEventWindowY(nullptr);
+    EXPECT_EQ(ret, 0);
+}
+
+/**
+ * @tc.name: OHInputManagerTest_OH_Input_GetTouchEventDownTime_001
+ * @tc.desc: Test OH_Input_GetTouchEventDownTime with nullptr returns 0
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_GetTouchEventDownTime_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int64_t ret = OH_Input_GetTouchEventDownTime(nullptr);
+    EXPECT_EQ(ret, 0);
+}
+
+/**
+ * @tc.name: OHInputManagerTest_OH_Input_GetTouchEventPressure_001
+ * @tc.desc: Test OH_Input_GetTouchEventPressure with nullptr returns 0.0
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_GetTouchEventPressure_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    double ret = OH_Input_GetTouchEventPressure(nullptr);
+    EXPECT_DOUBLE_EQ(ret, 0.0);
+}
+
+/**
+ * @tc.name: OHInputManagerTest_OH_Input_SetTouchEventPressure_001
+ * @tc.desc: Test OH_Input_SetTouchEventPressure with nullptr returns error
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_SetTouchEventPressure_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    Input_Result ret = OH_Input_SetTouchEventPressure(nullptr, 0.5);
+    EXPECT_EQ(ret, INPUT_PARAMETER_ERROR);
+}
+
+/**
+ * @tc.name: OHInputManagerTest_OH_Input_GetTouchEventToolType_001
+ * @tc.desc: Test OH_Input_GetTouchEventToolType with nullptr returns TOOL_TYPE_FINGER
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_GetTouchEventToolType_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    Input_TouchEventToolType ret = OH_Input_GetTouchEventToolType(nullptr);
+    EXPECT_EQ(ret, Input_TouchEventToolType::TOOL_TYPE_FINGER);
+}
+
+/**
+ * @tc.name: OHInputManagerTest_OH_Input_SetTouchEventToolType_001
+ * @tc.desc: Test OH_Input_SetTouchEventToolType with nullptr returns error
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_SetTouchEventToolType_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    Input_Result ret = OH_Input_SetTouchEventToolType(nullptr, Input_TouchEventToolType::TOOL_TYPE_FINGER);
+    EXPECT_EQ(ret, INPUT_PARAMETER_ERROR);
+}
+
+/**
+ * @tc.name: OHInputManagerTest_OH_Input_GetFunctionKeyState_004
+ * @tc.desc: Test OH_Input_GetFunctionKeyState with invalid keyCode
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_GetFunctionKeyState_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t state = -1;
+    Input_Result ret = OH_Input_GetFunctionKeyState(-1, &state);
+    EXPECT_EQ(ret, INPUT_PARAMETER_ERROR);
+    ret = OH_Input_GetFunctionKeyState(99999, &state);
+    EXPECT_EQ(ret, INPUT_PARAMETER_ERROR);
+}
+
+/**
+ * @tc.name: OHInputManagerTest_OH_Input_QueryMaxTouchPoints_003
+ * @tc.desc: Test OH_Input_QueryMaxTouchPoints with nullptr count
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_QueryMaxTouchPoints_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    Input_Result ret = OH_Input_QueryMaxTouchPoints(nullptr);
+    EXPECT_EQ(ret, INPUT_PARAMETER_ERROR);
+}
+
+/**
+ * @tc.name: OHInputManagerTest_OH_Input_SetGetTouchEventWindowX_001
+ * @tc.desc: Test set/get round trip for TouchEventWindowX
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_SetGetTouchEventWindowX_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    Input_TouchEvent touchEvent;
+    int32_t windowX = 50;
+    OH_Input_SetTouchEventWindowX(&touchEvent, windowX);
+    EXPECT_EQ(OH_Input_GetTouchEventWindowX(&touchEvent), windowX);
+}
+
+/**
+ * @tc.name: OHInputManagerTest_OH_Input_SetGetTouchEventWindowY_001
+ * @tc.desc: Test set/get round trip for TouchEventWindowY
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_SetGetTouchEventWindowY_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    Input_TouchEvent touchEvent;
+    int32_t windowY = 60;
+    OH_Input_SetTouchEventWindowY(&touchEvent, windowY);
+    EXPECT_EQ(OH_Input_GetTouchEventWindowY(&touchEvent), windowY);
+}
+
+/**
+ * @tc.name: OHInputManagerTest_OH_Input_SetGetTouchEventDownTime_001
+ * @tc.desc: Test set/get round trip for TouchEventDownTime
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_SetGetTouchEventDownTime_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    Input_TouchEvent touchEvent;
+    int64_t downTime = 123456789;
+    OH_Input_SetTouchEventDownTime(&touchEvent, downTime);
+    EXPECT_EQ(OH_Input_GetTouchEventDownTime(&touchEvent), downTime);
+}
+
+/**
+ * @tc.name: OHInputManagerTest_OH_Input_PointerEventToTouchEvent_001
+ * @tc.desc: Test OH_Input_PointerEventToTouchEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_PointerEventToTouchEvent_001, TestSize.Level1)
+{
+    // no pointer item fail
+    auto pointerEvent = OHOS::MMI::PointerEvent::Create();
+    auto ret = OH_Input_PointerEventToTouchEvent(*pointerEvent);
+    EXPECT_EQ(ret, nullptr);
+}
+ 
+/**
+ * @tc.name: OHInputManagerTest_OH_Input_PointerEventToTouchEvent_002
+ * @tc.desc: Test OH_Input_PointerEventToTouchEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_PointerEventToTouchEvent_002, TestSize.Level1)
+{
+    std::shared_ptr<OHOS::MMI::PointerEvent> event = OHOS::MMI::PointerEvent::Create();
+    ASSERT_NE(event, nullptr);
+ 
+    OHOS::MMI::PointerEvent::PointerItem item;
+    auto pointerId = 1;
+    auto pointerAction = -1;
+ 
+    item.SetPointerId(pointerId);
+    event->AddPointerItem(item);
+    event->SetPointerAction(pointerAction);
+ 
+    // action type is invalid
+    auto touchEvent = OH_Input_PointerEventToTouchEvent(*event);
+    EXPECT_EQ(touchEvent, nullptr);
+ 
+    // action type is invalid
+    pointerAction = 5;
+    touchEvent = OH_Input_PointerEventToTouchEvent(*event);
+    EXPECT_EQ(touchEvent, nullptr);
+ 
+ 
+    // pointer id is invalid
+    pointerAction = OHOS::MMI::PointerEvent::POINTER_ACTION_DOWN;
+    event->SetPointerAction(pointerAction);
+    event->SetPointerId(-1);
+    touchEvent = OH_Input_PointerEventToTouchEvent(*event);
+    EXPECT_EQ(touchEvent, nullptr);
+ 
+    // pointer action & pointer id is OK
+    event->SetPointerId(pointerId);
+    touchEvent = OH_Input_PointerEventToTouchEvent(*event);
+    EXPECT_EQ(TOUCH_ACTION_DOWN, OH_Input_GetTouchEventAction(touchEvent));
+}
+ 
+/**
+ * @tc.name: OHInputManagerTest_OH_Input_PointerEventToTouchEvent_003
+ * @tc.desc: Test OH_Input_PointerEventToTouchEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_PointerEventToTouchEvent_003, TestSize.Level1)
+{
+    std::shared_ptr<OHOS::MMI::PointerEvent> event = OHOS::MMI::PointerEvent::Create();
+    ASSERT_NE(event, nullptr);
+ 
+    OHOS::MMI::PointerEvent::PointerItem item;
+    auto pointerId = 1;
+    auto displayX = 100;
+    auto displayY = 200;
+    auto downTime = 20;
+    auto actionTime = 20;
+    auto toolType = 0;
+    auto windowX = 100;
+    auto windowY = 200;
+    double pressure = 0.5;
+ 
+    item.SetPointerId(pointerId);
+    item.SetDisplayX(displayX);
+    item.SetDisplayY(displayY);
+    item.SetDownTime(downTime);
+    item.SetToolType(toolType);
+    item.SetWindowX(windowX);
+    item.SetWindowY(windowY);
+    item.SetPressure(pressure);
+ 
+    event->AddPointerItem(item);
+    event->SetActionTime(actionTime);
+    event->SetPointerId(pointerId);
+    event->SetPointerAction(OHOS::MMI::PointerEvent::POINTER_ACTION_DOWN);
+    event->SetSourceType(OHOS::MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+ 
+    auto touchEvent = OH_Input_PointerEventToTouchEvent(*event);
+    ASSERT_NE(touchEvent, nullptr);
+ 
+    EXPECT_EQ(pointerId, OH_Input_GetTouchEventFingerId(touchEvent));
+    EXPECT_EQ(windowX, OH_Input_GetTouchEventWindowX(touchEvent));
+    EXPECT_EQ(windowY, OH_Input_GetTouchEventWindowY(touchEvent));
+    EXPECT_EQ(displayX, OH_Input_GetTouchEventDisplayX(touchEvent));
+    EXPECT_EQ(displayY, OH_Input_GetTouchEventDisplayY(touchEvent));
+    EXPECT_EQ(downTime, OH_Input_GetTouchEventDownTime(touchEvent));
+    EXPECT_EQ(actionTime, OH_Input_GetTouchEventActionTime(touchEvent));
+    EXPECT_EQ(toolType, OH_Input_GetTouchEventToolType(touchEvent));
+    EXPECT_EQ(pressure, OH_Input_GetTouchEventPressure(touchEvent));
+}
+
 } // namespace MMI
 } // namespace OHOS

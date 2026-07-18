@@ -177,6 +177,8 @@ ohos_unittest("TouchEventNormalizeTest") {
     "ability_runtime:ability_manager",
     "image_framework:image_native",
     "image_framework:pixelmap",
+    "napi:ace_napi",
+    "icu:shared_icuuc",
   ]
 }
 
@@ -1083,6 +1085,8 @@ ohos_unittest("TouchGestureAdapterTest") {
     "samgr:samgr_proxy",
     "image_framework:image_native",
     "image_framework:pixelmap",
+    "napi:ace_napi",
+    "icu:shared_icuuc",
   ]
 
   if (enable_player_framework) {
@@ -1151,6 +1155,8 @@ ohos_unittest("TouchGestureManagerTest") {
     "samgr:samgr_proxy",
     "image_framework:image_native",
     "image_framework:pixelmap",
+    "napi:ace_napi",
+    "icu:shared_icuuc",
   ]
 
   if (enable_player_framework) {

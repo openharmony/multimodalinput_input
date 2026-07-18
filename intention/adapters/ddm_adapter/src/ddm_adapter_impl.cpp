@@ -113,7 +113,7 @@ void DDMAdapterImpl::RemoveBoardObserver(std::shared_ptr<IBoardObserver> observe
 
 int32_t DDMAdapterImpl::GetTrustedDeviceList(std::vector<DistributedHardware::DmDeviceInfo> &deviceList)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     deviceList.clear();
     if (int32_t ret = D_DEV_MGR.GetTrustedDeviceList(FI_PKG_NAME, "", deviceList); ret != RET_OK) {
         FI_HILOGE("GetTrustedDeviceList failed, ret %{public}d.", ret);
@@ -124,7 +124,7 @@ int32_t DDMAdapterImpl::GetTrustedDeviceList(std::vector<DistributedHardware::Dm
 
 bool DDMAdapterImpl::CheckSameAccountToLocal(const std::string &networkId)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     std::vector<DistributedHardware::DmDeviceInfo> deviceList;
     if (GetTrustedDeviceList(deviceList) != RET_OK) {
         FI_HILOGE("GetTrustedDeviceList failed");

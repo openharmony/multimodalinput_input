@@ -20,6 +20,7 @@
 
 #include "common_event_data.h"
 #include "common_event_subscribe_info.h"
+#include "config_multimodal.h"
 #include "image_source.h"
 #include "input_windows_manager_mock.h"
 #include "i_preference_manager.h"
@@ -27,6 +28,7 @@
 #include "mmi_log.h"
 #include "parameters.h"
 #include "pixel_map.h"
+#include "resource_decompress.h"
 #define private public
 #include "pointer_drawing_manager.h"
 #undef private
@@ -41,6 +43,7 @@
 namespace OHOS {
 namespace MMI {
 namespace {
+using namespace testing;
 using namespace testing::ext;
 constexpr int32_t MOUSE_ICON_SIZE = 64;
 constexpr uint32_t DEFAULT_ICON_COLOR { 0xFF };
@@ -54,7 +57,7 @@ constexpr int32_t FOLDABLE_DEVICE { 2 };
 constexpr int32_t MIN_POINTER_COLOR { 0x000000 };
 const std::string MOUSE_FILE_NAME { "mouse_settings.xml" };
 const int32_t ROTATE_POLICY = system::GetIntParameter("const.window.device.rotate_policy", 0);
-const std::string IMAGE_POINTER_DEFAULT_PATH = "/system/etc/multimodalinput/mouse_icon/";
+const std::string IMAGE_POINTER_DEFAULT_PATH = "/data/service/el1/public/multimodalinput/mouse_icon/";
 const std::string CURSOR_ICON_PATH = IMAGE_POINTER_DEFAULT_PATH + "Cursor_Circle.png";
 const std::string CUSTOM_CURSOR_ICON_PATH = IMAGE_POINTER_DEFAULT_PATH + "Custom_Cursor_Circle.svg";
 const std::string DEFAULT_ICON_PATH = IMAGE_POINTER_DEFAULT_PATH + "Default.svg";
@@ -62,7 +65,6 @@ constexpr int32_t AECH_DEVELOPER_DEFINED_STYLE { 47 };
 constexpr int32_t AECH_DEVELOPER_DEFINED { 4 };
 constexpr int32_t DEFAULT_VALUE { -1 };
 constexpr uint64_t TEST_INVALID_DISPLAY_ID { 999 };
-constexpr uint64_t WAIT_TIME { 100 * 1000 };
 } // namespace
 
 class PointerDrawingManagerTest : public testing::Test {
@@ -85,6 +87,7 @@ public:
     }
     static void SetUpTestCase(void)
     {
+        DecompressToDisk(DEF_MOUSE_ICONS_DAT_PATH, "/data/service/el1/public/multimodalinput/mouse_icon/");
         GetRSUIContext(0, rsUIDirector_, rsUIContext_);
     }
     static void TearDownTestCase(void)
@@ -1512,7 +1515,7 @@ HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_DecodeImageToPixelMa
 {
     CALL_TEST_DEBUG;
     PointerDrawingManager pointerDrawingManager;
-    std::string iconPath = ("/system/etc/multimodalinput/mouse_icon/Loading_Left.svg");
+    std::string iconPath = ("/data/service/el1/public/multimodalinput/mouse_icon/Loading_Left.svg");
     pointerDrawingManager.tempPointerColor_ = 1;
     ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.DecodeImageToPixelMap(MOUSE_ICON::RUNNING));
 }
@@ -1728,7 +1731,7 @@ HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_SetCustomCursor_001,
 {
     CALL_TEST_DEBUG;
     PointerDrawingManager pointerDrawingManager;
-    const std::string iconPath = "/system/etc/multimodalinput/mouse_icon/North_South.svg";
+    const std::string iconPath = "/data/service/el1/public/multimodalinput/mouse_icon/North_South.svg";
     std::unique_ptr<OHOS::Media::PixelMap> pixelMap = SetMouseIconTest(iconPath);
     ASSERT_NE(pixelMap, nullptr);
     int32_t pid = -1;
@@ -1750,7 +1753,7 @@ HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_SetCustomCursor_001,
 HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_SetMouseIcon_002, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    const std::string iconPath = "/system/etc/multimodalinput/mouse_icon/North_South.svg";
+    const std::string iconPath = "/data/service/el1/public/multimodalinput/mouse_icon/North_South.svg";
     std::unique_ptr<OHOS::Media::PixelMap> pixelMap = SetMouseIconTest(iconPath);
     ASSERT_NE(pixelMap, nullptr);
     int32_t pid = -1;
@@ -1770,7 +1773,7 @@ HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_SetMouseIcon_002, Te
 HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_SetMouseIcon_004, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    const std::string iconPath = "/system/etc/multimodalinput/mouse_icon/North_South.svg";
+    const std::string iconPath = "/data/service/el1/public/multimodalinput/mouse_icon/North_South.svg";
     std::unique_ptr<OHOS::Media::PixelMap> pixelMap = SetMouseIconTest(iconPath);
     ASSERT_NE(pixelMap, nullptr);
     int32_t pid = 1;
@@ -1790,7 +1793,7 @@ HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_SetMouseIcon_004, Te
 HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_SetMouseIcon_005, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    const std::string iconPath = "/system/etc/multimodalinput/mouse_icon/North_South.svg";
+    const std::string iconPath = "/data/service/el1/public/multimodalinput/mouse_icon/North_South.svg";
     std::unique_ptr<OHOS::Media::PixelMap> pixelMap = SetMouseIconTest(iconPath);
     ASSERT_NE(pixelMap, nullptr);
     int32_t pid = 2;
@@ -2700,7 +2703,7 @@ HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_branchCoverage, Test
 {
     PointerDrawingManager pointerDrawingManager;
     MOUSE_ICON mouseStyle = EAST;
-    const std::string iconPath = "/system/etc/multimodalinput/mouse_icon/North_South.svg";
+    const std::string iconPath = "/data/service/el1/public/multimodalinput/mouse_icon/North_South.svg";
     std::unique_ptr<OHOS::Media::PixelMap> pixelMap = SetMouseIconTest(iconPath);
     ASSERT_NE(pixelMap, nullptr);
     CursorDrawingInformation::GetInstance().UpdateIconPath(mouseStyle, iconPath);
@@ -2960,26 +2963,6 @@ HWTEST_F(PointerDrawingManagerTest, RegisterDisplayStatusReceiver_002, TestSize.
 }
 
 /**
- * @tc.name: PointerDrawingManagerTest_CalculateRenderDirection_001
- * @tc.desc: Test CalculateRenderDirection
- * @tc.type: Function
- * @tc.require:
- */
-HWTEST_F(PointerDrawingManagerTest, CalculateRenderDirection_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    auto *pointerDrawingManager = static_cast<PointerDrawingManager *>(IPointerDrawingManager::GetInstance());
-    pointerDrawingManager->displayInfo_.displayDirection = DIRECTION270;
-    pointerDrawingManager->displayInfo_.direction = DIRECTION90;
-    bool isHard = true;
-    Direction ret = pointerDrawingManager->CalculateRenderDirection(isHard);
-    ASSERT_EQ(ret, DIRECTION90);
-    isHard = false;
-    ret = pointerDrawingManager->CalculateRenderDirection(isHard);
-    ASSERT_EQ(ret, DIRECTION180);
-}
-
-/**
  * @tc.name: PointerDrawingManagerTest_UpdateMirrorScreens_001
  * @tc.desc: Test UpdateMirrorScreens
  * @tc.type: Function
@@ -3095,8 +3078,6 @@ HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_UpdateMouseLayer, Te
     pointerDrawingManager.hardwareCursorPointerManager_->isEnableState_ = true;
     pointerDrawingManager.lastMouseStyle_.id = 2;
     ASSERT_EQ(pointerDrawingManager.UpdateMouseLayer(physicalX, physicalY), RET_ERR);
-    // wait for render thread create done and running
-    usleep(WAIT_TIME);
 }
 
 /**
@@ -3670,7 +3651,215 @@ HWTEST_F(PointerDrawingManagerTest, ShouldSkipScreen, TestSize.Level1)
 
     screen->SetType(OHOS::Rosen::ScreenType::VIRTUAL);
     screen->SetSourceMode(OHOS::Rosen::ScreenSourceMode::SCREEN_EXTEND);
+    screen->SetIsInUse(true);
     EXPECT_FALSE(pointerDrawingManager.ShouldSkipScreen(screen));
+}
+
+/**
+ * @tc.name: ShouldSkipScreen_ScreenAlone
+ * @tc.desc: Test ShouldSkipScreen function.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerTest, ShouldSkipScreen_ScreenAlone, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerDrawingManager pointerDrawingManager;
+
+    sptr<OHOS::Rosen::ScreenInfo> screen = new OHOS::Rosen::ScreenInfo();
+    ASSERT_NE(screen, nullptr);
+    screen->SetRsId(1);
+    screen->SetType(OHOS::Rosen::ScreenType::REAL);
+    screen->SetSourceMode(OHOS::Rosen::ScreenSourceMode::SCREEN_ALONE);
+    screen->SetIsInUse(true);
+
+    EXPECT_TRUE(pointerDrawingManager.ShouldSkipScreen(screen));
+}
+
+/**
+ * @tc.name: ShouldSkipScreen_ScreenAlone
+ * @tc.desc: Test ShouldSkipScreen function.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerTest, ShouldSkipScreen_ScreenUnique, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerDrawingManager pointerDrawingManager;
+
+    sptr<OHOS::Rosen::ScreenInfo> screen = new OHOS::Rosen::ScreenInfo();
+    ASSERT_NE(screen, nullptr);
+    screen->SetRsId(2);
+    screen->SetType(OHOS::Rosen::ScreenType::REAL);
+    screen->SetSourceMode(OHOS::Rosen::ScreenSourceMode::SCREEN_UNIQUE);
+    screen->SetIsInUse(true);
+
+    EXPECT_TRUE(pointerDrawingManager.ShouldSkipScreen(screen));
+}
+
+/**
+ * @tc.name: ShouldSkipScreen_NotInUse
+ * @tc.desc: Test ShouldSkipScreen function.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerTest, ShouldSkipScreen_NotInUse, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerDrawingManager pointerDrawingManager;
+
+    sptr<OHOS::Rosen::ScreenInfo> screen = new OHOS::Rosen::ScreenInfo();
+    ASSERT_NE(screen, nullptr);
+    screen->SetRsId(3);
+    screen->SetType(OHOS::Rosen::ScreenType::REAL);
+    screen->SetSourceMode(OHOS::Rosen::ScreenSourceMode::SCREEN_MAIN);
+    screen->SetIsInUse(false);
+
+    EXPECT_TRUE(pointerDrawingManager.ShouldSkipScreen(screen));
+}
+
+/**
+ * @tc.name: ShouldSkipScreen_NormalCase
+ * @tc.desc: Test ShouldSkipScreen function.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerTest, ShouldSkipScreen_NormalCase, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerDrawingManager pointerDrawingManager;
+
+    sptr<OHOS::Rosen::ScreenInfo> screen = new OHOS::Rosen::ScreenInfo();
+    ASSERT_NE(screen, nullptr);
+    screen->SetRsId(4);
+    screen->SetType(OHOS::Rosen::ScreenType::REAL);
+    screen->SetSourceMode(OHOS::Rosen::ScreenSourceMode::SCREEN_MAIN);
+    screen->SetIsInUse(true);
+
+    EXPECT_FALSE(pointerDrawingManager.ShouldSkipScreen(screen));
+}
+
+/**
+ * @tc.name: SetMainScreenTargetDevice_NullScreen
+ * @tc.desc: Test SetMainScreenTargetDevice function.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerTest, SetMainScreenTargetDevice_NullScreen, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerDrawingManager pointerDrawingManager;
+    ASSERT_NE(pointerDrawingManager.hardwareCursorPointerManager_, nullptr);
+
+    std::vector<sptr<OHOS::Rosen::ScreenInfo>> screens;
+    screens.push_back(nullptr);
+
+    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.SetMainScreenTargetDevice(screens));
+}
+
+/**
+ * @tc.name: SetMainScreenTargetDevice_NotMainScreen
+ * @tc.desc: Test SetMainScreenTargetDevice function.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerTest, SetMainScreenTargetDevice_NotMainScreen, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerDrawingManager pointerDrawingManager;
+    ASSERT_NE(pointerDrawingManager.hardwareCursorPointerManager_, nullptr);
+
+    std::vector<sptr<OHOS::Rosen::ScreenInfo>> screens;
+    sptr<OHOS::Rosen::ScreenInfo> screen = new OHOS::Rosen::ScreenInfo();
+    ASSERT_NE(screen, nullptr);
+    screen->SetRsId(1);
+    screen->SetType(OHOS::Rosen::ScreenType::REAL);
+    screen->SetSourceMode(OHOS::Rosen::ScreenSourceMode::SCREEN_MIRROR);
+    screen->SetIsInUse(true);
+    screens.push_back(screen);
+
+    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.SetMainScreenTargetDevice(screens));
+}
+
+/**
+ * @tc.name: SetMainScreenTargetDevice_NotInUse
+ * @tc.desc: Test SetMainScreenTargetDevice function.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerTest, SetMainScreenTargetDevice_NotInUse, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerDrawingManager pointerDrawingManager;
+    ASSERT_NE(pointerDrawingManager.hardwareCursorPointerManager_, nullptr);
+
+    std::vector<sptr<OHOS::Rosen::ScreenInfo>> screens;
+    sptr<OHOS::Rosen::ScreenInfo> screen = new OHOS::Rosen::ScreenInfo();
+    ASSERT_NE(screen, nullptr);
+    screen->SetRsId(1);
+    screen->SetType(OHOS::Rosen::ScreenType::REAL);
+    screen->SetSourceMode(OHOS::Rosen::ScreenSourceMode::SCREEN_MAIN);
+    screen->SetIsInUse(false);
+    screens.push_back(screen);
+
+    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.SetMainScreenTargetDevice(screens));
+}
+
+/**
+ * @tc.name: SetMainScreenTargetDevice_Success
+ * @tc.desc: Test SetMainScreenTargetDevice function.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerTest, SetMainScreenTargetDevice_Success, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerDrawingManager pointerDrawingManager;
+    ASSERT_NE(pointerDrawingManager.hardwareCursorPointerManager_, nullptr);
+
+    std::vector<sptr<OHOS::Rosen::ScreenInfo>> screens;
+    sptr<OHOS::Rosen::ScreenInfo> screen = new OHOS::Rosen::ScreenInfo();
+    ASSERT_NE(screen, nullptr);
+    screen->SetRsId(1);
+    screen->SetType(OHOS::Rosen::ScreenType::REAL);
+    screen->SetSourceMode(OHOS::Rosen::ScreenSourceMode::SCREEN_MAIN);
+    screen->SetIsInUse(true);
+    screens.push_back(screen);
+
+    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.SetMainScreenTargetDevice(screens));
+}
+
+/**
+ * @tc.name: SetMainScreenTargetDevice_MultipleScreens
+ * @tc.desc: Test SetMainScreenTargetDevice function.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerTest, SetMainScreenTargetDevice_MultipleScreens, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerDrawingManager pointerDrawingManager;
+    ASSERT_NE(pointerDrawingManager.hardwareCursorPointerManager_, nullptr);
+
+    std::vector<sptr<OHOS::Rosen::ScreenInfo>> screens;
+    
+    sptr<OHOS::Rosen::ScreenInfo> mirrorScreen = new OHOS::Rosen::ScreenInfo();
+    ASSERT_NE(mirrorScreen, nullptr);
+    mirrorScreen->SetRsId(2);
+    mirrorScreen->SetType(OHOS::Rosen::ScreenType::REAL);
+    mirrorScreen->SetSourceMode(OHOS::Rosen::ScreenSourceMode::SCREEN_MIRROR);
+    mirrorScreen->SetIsInUse(true);
+    screens.push_back(mirrorScreen);
+
+    sptr<OHOS::Rosen::ScreenInfo> mainScreen = new OHOS::Rosen::ScreenInfo();
+    ASSERT_NE(mainScreen, nullptr);
+    mainScreen->SetRsId(1);
+    mainScreen->SetType(OHOS::Rosen::ScreenType::REAL);
+    mainScreen->SetSourceMode(OHOS::Rosen::ScreenSourceMode::SCREEN_MAIN);
+    mainScreen->SetIsInUse(true);
+    screens.push_back(mainScreen);
+
+    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.SetMainScreenTargetDevice(screens));
 }
 
 /**
@@ -3728,6 +3917,7 @@ HWTEST_F(PointerDrawingManagerTest, UpdateScreenPointerAndFindMainScreenInfo_003
     screen->SetRsId(0);
     screen->SetType(OHOS::Rosen::ScreenType::REAL);
     screen->SetSourceMode(OHOS::Rosen::ScreenSourceMode::SCREEN_MAIN);
+    screen->SetIsInUse(true);
     screens.push_back(screen);
 
     auto mainScreen = pointerDrawingManager.UpdateScreenPointerAndFindMainScreenInfo(screens);
@@ -3752,6 +3942,7 @@ HWTEST_F(PointerDrawingManagerTest, UpdateScreenPointerAndFindMainScreenInfo_004
     screen->SetRsId(0);
     screen->SetType(OHOS::Rosen::ScreenType::REAL);
     screen->SetSourceMode(OHOS::Rosen::ScreenSourceMode::SCREEN_MAIN);
+    screen->SetIsInUse(true);
     screens.push_back(screen);
 
     auto sp = std::make_shared<ScreenPointer>(nullptr, nullptr, pointerDrawingManager.displayInfo_);
@@ -3780,6 +3971,7 @@ HWTEST_F(PointerDrawingManagerTest, UpdateScreenPointerAndFindMainScreenInfo_005
     screen1->SetRsId(0);
     screen1->SetType(OHOS::Rosen::ScreenType::REAL);
     screen1->SetSourceMode(OHOS::Rosen::ScreenSourceMode::SCREEN_MAIN);
+    screen1->SetIsInUse(true);
     screens.push_back(screen1);
 
     sptr<OHOS::Rosen::ScreenInfo> screen2 = new OHOS::Rosen::ScreenInfo();
@@ -3787,6 +3979,7 @@ HWTEST_F(PointerDrawingManagerTest, UpdateScreenPointerAndFindMainScreenInfo_005
     screen2->SetRsId(1);
     screen2->SetType(OHOS::Rosen::ScreenType::VIRTUAL);
     screen2->SetSourceMode(OHOS::Rosen::ScreenSourceMode::SCREEN_EXTEND);
+    screen2->SetIsInUse(true);
     screens.push_back(screen2);
 
     auto sp1 = std::make_shared<ScreenPointer>(nullptr, nullptr, pointerDrawingManager.displayInfo_);
@@ -3822,6 +4015,7 @@ HWTEST_F(PointerDrawingManagerTest, UpdateScreenPointerAndFindMainScreenInfo_006
     screen->SetRsId(0);
     screen->SetType(OHOS::Rosen::ScreenType::REAL);
     screen->SetSourceMode(OHOS::Rosen::ScreenSourceMode::SCREEN_MAIN);
+    screen->SetIsInUse(true);
     screens.push_back(screen);
 
     auto sp1 = std::make_shared<ScreenPointer>(nullptr, nullptr, pointerDrawingManager.displayInfo_);
@@ -4079,22 +4273,6 @@ HWTEST_F(PointerDrawingManagerTest, PointerDrawingManagerTest_ClearDisappearedSc
     ASSERT_EQ(pointerDrawingManager.screenPointers_.size(), 1);
     std::set<uint64_t> screenIds = {1};
     pointerDrawingManager.ClearDisappearedScreenPointer(screenIds);
-    ASSERT_EQ(pointerDrawingManager.screenPointers_.size(), 0);
-}
-
-/**
- * @tc.name: PointerDrawingManagerTest_ClearScreenPointer_001
- * @tc.desc: Test ClearScreenPointer
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(PointerDrawingManagerTest, PointerDrawingManagerTest_ClearScreenPointer_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    PointerDrawingManager pointerDrawingManager;
-    auto screenPointer = std::make_shared<ScreenPointer>(nullptr, nullptr, pointerDrawingManager.displayInfo_);
-    pointerDrawingManager.screenPointers_.insert(std::make_pair(0, screenPointer));
-    pointerDrawingManager.ClearScreenPointer();
     ASSERT_EQ(pointerDrawingManager.screenPointers_.size(), 0);
 }
 
@@ -4496,10 +4674,332 @@ HWTEST_F(PointerDrawingManagerTest, PointerDrawingManagerTest_InitLayer_001, Tes
     pointerDrawingManager.displayId_ = TEST_INVALID_DISPLAY_ID;
     int32_t styleId = 0;
     int32_t ret = pointerDrawingManager.InitLayer(MOUSE_ICON(styleId));
+    EXPECT_EQ(ret, RET_ERR);
+}
+
+/**
+ * @tc.name: PointerDrawingManagerTest_ScalePixelMap_01
+ * @tc.desc: Test ScalePixelMap
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerTest, PointerDrawingManagerTest_ScalePixelMap_01, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerDrawingManager pointerDrawingManager;
+    const std::string iconPath = "/data/service/el1/public/multimodalinput/mouse_icon/North_South.svg";
+    std::unique_ptr<OHOS::Media::PixelMap> pixelMap = SetMouseIconTest(iconPath);
+    ASSERT_NE(pixelMap, nullptr);
+    float scale = 1.0f;
+    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.ScalePixelMap(pixelMap.get(), scale, scale));
+}
+
+/**
+ * @tc.name: PointerDrawingManagerTest_ScalePixelMap_02
+ * @tc.desc: Test ScalePixelMap
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerTest, PointerDrawingManagerTest_ScalePixelMap_02, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerDrawingManager pointerDrawingManager;
+    const std::string iconPath = "/data/service/el1/public/multimodalinput/mouse_icon/North_South.svg";
+    std::unique_ptr<OHOS::Media::PixelMap> pixelMap = SetMouseIconTest(iconPath);
+    ASSERT_NE(pixelMap, nullptr);
+    float scale = 1.0f;
+    ASSERT_NO_FATAL_FAILURE(
+        pointerDrawingManager.ScalePixelMap(pixelMap.get(), scale * INT32_BYTE, scale * INT32_BYTE));
+}
+
+/**
+ * @tc.name: PointerDrawingManagerTest_ScalePixelMap_03
+ * @tc.desc: Test ScalePixelMap
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerTest, PointerDrawingManagerTest_ScalePixelMap_03, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerDrawingManager pointerDrawingManager;
+    const std::string iconPath = "/data/service/el1/public/multimodalinput/mouse_icon/North_South.svg";
+    std::unique_ptr<OHOS::Media::PixelMap> pixelMap = SetMouseIconTest(iconPath);
+    ASSERT_NE(pixelMap, nullptr);
+    float scale = 1.0f;
+    ASSERT_NO_FATAL_FAILURE(
+        pointerDrawingManager.ScalePixelMap(pixelMap.get(), scale / INT32_BYTE, scale / INT32_BYTE));
+}
+
+/**
+ * @tc.name: PointerDrawingManagerTest_ScalePixelMap_04
+ * @tc.desc: Test ScalePixelMap
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerTest, PointerDrawingManagerTest_ScalePixelMap_04, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerDrawingManager pointerDrawingManager;
+    const std::string iconPath = "/data/service/el1/public/multimodalinput/mouse_icon/North_South.svg";
+    std::unique_ptr<OHOS::Media::PixelMap> pixelMap = SetMouseIconTest(iconPath);
+    ASSERT_NE(pixelMap, nullptr);
+    float scale = 1.0f;
+    ASSERT_NO_FATAL_FAILURE(
+        pointerDrawingManager.ScalePixelMap(pixelMap.get(), scale * INT32_BYTE, scale / INT32_BYTE));
+}
+
+/**
+ * @tc.name: PointerDrawingManagerTest_InitLayer_002
+ * @tc.desc: Test InitLayer wheather cursor blur enable
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerTest, PointerDrawingManagerTest_InitLayer_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerDrawingManager pointerDrawingManager;
+    pointerDrawingManager.hardwareCursorPointerManager_ = std::make_shared<HardwareCursorPointerManager>();
+    pointerDrawingManager.hardwareCursorPointerManager_->SetHdiServiceState(true);
+    pointerDrawingManager.hardwareCursorPointerManager_->isEnableState_ = true;
+    pointerDrawingManager.displayId_ = TEST_INVALID_DISPLAY_ID;
+    int32_t styleId = 0;
+    pointerDrawingManager.currentCursorBlurEnabled_ = true;
+    int32_t ret = pointerDrawingManager.InitLayer(MOUSE_ICON(styleId));
+    EXPECT_EQ(ret, RET_ERR);
+    pointerDrawingManager.currentCursorBlurEnabled_ = false;
+    ret = pointerDrawingManager.InitLayer(MOUSE_ICON(styleId));
     EXPECT_EQ(ret, RET_OK);
-    // wait for render thread create done and running
-    usleep(WAIT_TIME);
-    EXPECT_EQ(pointerDrawingManager.initEventHandlerFlag_.load(), true);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_DrawMovePointer_004
+ * @tc.desc: Test the function DrawMovePointer wheather cursor blur is enabled
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_DrawMovePointer_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerDrawingManager pointerDrawingManager;
+    int32_t physicalX = 1;
+    int32_t physicalY = 2;
+    uint64_t displayId = 3;
+    pointerDrawingManager.currentCursorBlurEnabled_ = true;
+    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.DrawMovePointer(displayId, physicalX, physicalY));
+    Rosen::RSSurfaceNodeConfig surfaceNodeConfig;
+    surfaceNodeConfig.SurfaceNodeName = "pointer window";
+    Rosen::RSSurfaceNodeType surfaceNodeType = Rosen::RSSurfaceNodeType::SELF_DRAWING_WINDOW_NODE;
+    pointerDrawingManager.surfaceNode_ = Rosen::RSSurfaceNode::Create(surfaceNodeConfig, surfaceNodeType, true, false,
+        rsUIContext_);
+    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.DrawMovePointer(displayId, physicalX, physicalY));
+    pointerDrawingManager.currentCursorBlurEnabled_ = false;
+    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.DrawMovePointer(displayId, physicalX, physicalY));
+}
+
+/**
+ * @tc.name: PointerDrawingManagerTest_ShowCursorWhenHardwareCursorEnabled_001
+ * @tc.desc: Test ShowCursorWhenHardwareCursorEnabled when hard cursor enabled
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerTest, PointerDrawingManagerTest_ShowCursorWhenHardwareCursorEnabled_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerDrawingManager pointerDrawingManager;
+    pointerDrawingManager.hardwareCursorPointerManager_ = std::make_shared<HardwareCursorPointerManager>();
+    pointerDrawingManager.hardwareCursorPointerManager_->SetHdiServiceState(true);
+    pointerDrawingManager.hardwareCursorPointerManager_->isEnableState_ = true;
+    pointerDrawingManager.displayId_ = TEST_INVALID_DISPLAY_ID;
+    pointerDrawingManager.currentCursorBlurEnabled_ = true;
+    EXPECT_NO_FATAL_FAILURE(pointerDrawingManager.ShowCursorWhenHardwareCursorEnabled());
+    pointerDrawingManager.currentCursorBlurEnabled_ = false;
+    EXPECT_NO_FATAL_FAILURE(pointerDrawingManager.ShowCursorWhenHardwareCursorEnabled());
+}
+
+/**
+ * @tc.name: PointerDrawingManagerTest_DeleteScreenPointer_002
+ * @tc.desc: Test DeleteScreenPointer when surfaceNode matches
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerTest, PointerDrawingManagerTest_DeleteScreenPointer_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerDrawingManager pointerDrawingManager;
+    pointerDrawingManager.hardwareCursorPointerManager_ = std::make_shared<HardwareCursorPointerManager>();
+    ASSERT_NE(pointerDrawingManager.hardwareCursorPointerManager_, nullptr);
+    
+    sptr<Rosen::ScreenInfo> screenInfo = new Rosen::ScreenInfo();
+    ASSERT_NE(screenInfo, nullptr);
+    sptr<Rosen::SupportedScreenModes> mode = new Rosen::SupportedScreenModes();
+    ASSERT_NE(mode, nullptr);
+    mode->width_ = 100;
+    mode->height_ = 200;
+    screenInfo->SetRsId(0);
+    screenInfo->SetType(Rosen::ScreenType::REAL);
+    screenInfo->SetModeId(0);
+    screenInfo->modes_ = { { mode } };
+    screenInfo->SetSourceMode(Rosen::ScreenSourceMode::SCREEN_MAIN);
+    
+    auto screenPointer = std::make_shared<ScreenPointer>(
+        pointerDrawingManager.hardwareCursorPointerManager_,
+        pointerDrawingManager.handler_, screenInfo);
+    ASSERT_NE(screenPointer, nullptr);
+    screenPointer->Init(pointerDrawingManager.pointerRenderer_);
+    
+    pointerDrawingManager.screenPointers_.insert(std::make_pair(0, screenPointer));
+    ASSERT_EQ(pointerDrawingManager.screenPointers_.size(), 1);
+    
+    auto surfaceNode = screenPointer->GetSurfaceNode();
+    ASSERT_NE(surfaceNode, nullptr);
+    pointerDrawingManager.SetSurfaceNode(surfaceNode);
+    ASSERT_NE(pointerDrawingManager.GetSurfaceNode(), nullptr);
+    
+    pointerDrawingManager.DeleteScreenPointer(0);
+    ASSERT_EQ(pointerDrawingManager.screenPointers_.size(), 0);
+    ASSERT_EQ(pointerDrawingManager.GetSurfaceNode(), nullptr);
+}
+
+/**
+ * @tc.name: PointerDrawingManagerTest_ClearDisappearedScreenPointer_003
+ * @tc.desc: Test ClearDisappearedScreenPointer when surfaceNode matches
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerTest, PointerDrawingManagerTest_ClearDisappearedScreenPointer_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerDrawingManager pointerDrawingManager;
+    pointerDrawingManager.hardwareCursorPointerManager_ = std::make_shared<HardwareCursorPointerManager>();
+    ASSERT_NE(pointerDrawingManager.hardwareCursorPointerManager_, nullptr);
+    
+    sptr<Rosen::ScreenInfo> screenInfo = new Rosen::ScreenInfo();
+    ASSERT_NE(screenInfo, nullptr);
+    sptr<Rosen::SupportedScreenModes> mode = new Rosen::SupportedScreenModes();
+    ASSERT_NE(mode, nullptr);
+    mode->width_ = 100;
+    mode->height_ = 200;
+    screenInfo->SetRsId(0);
+    screenInfo->SetType(Rosen::ScreenType::REAL);
+    screenInfo->SetModeId(0);
+    screenInfo->modes_ = { { mode } };
+    screenInfo->SetSourceMode(Rosen::ScreenSourceMode::SCREEN_MAIN);
+    
+    auto screenPointer = std::make_shared<ScreenPointer>(
+        pointerDrawingManager.hardwareCursorPointerManager_,
+        pointerDrawingManager.handler_, screenInfo);
+    ASSERT_NE(screenPointer, nullptr);
+    screenPointer->Init(pointerDrawingManager.pointerRenderer_);
+    
+    pointerDrawingManager.screenPointers_.insert(std::make_pair(0, screenPointer));
+    ASSERT_EQ(pointerDrawingManager.screenPointers_.size(), 1);
+    
+    auto surfaceNode = screenPointer->GetSurfaceNode();
+    ASSERT_NE(surfaceNode, nullptr);
+    pointerDrawingManager.SetSurfaceNode(surfaceNode);
+    ASSERT_NE(pointerDrawingManager.GetSurfaceNode(), nullptr);
+    
+    std::set<uint64_t> screenIds = {1};
+    pointerDrawingManager.ClearDisappearedScreenPointer(screenIds);
+    ASSERT_EQ(pointerDrawingManager.screenPointers_.size(), 0);
+    ASSERT_EQ(pointerDrawingManager.GetSurfaceNode(), nullptr);
+}
+
+/**
+ * @tc.name: PointerDrawingManagerTest_DestroyPointerWindowOfHardCursor_004
+ * @tc.desc: Test DestroyPointerWindowOfHardCursor with surfaceNode match
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerTest, PointerDrawingManagerTest_DestroyPointerWindowOfHardCursor_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerDrawingManager pointerDrawingManager;
+    pointerDrawingManager.hardwareCursorPointerManager_ = std::make_shared<HardwareCursorPointerManager>();
+    ASSERT_NE(pointerDrawingManager.hardwareCursorPointerManager_, nullptr);
+
+    sptr<Rosen::ScreenInfo> screenInfo = new Rosen::ScreenInfo();
+    ASSERT_NE(screenInfo, nullptr);
+    sptr<Rosen::SupportedScreenModes> mode = new Rosen::SupportedScreenModes();
+    ASSERT_NE(mode, nullptr);
+    mode->width_ = 100;
+    mode->height_ = 200;
+    screenInfo->SetRsId(0);
+    screenInfo->SetType(Rosen::ScreenType::REAL);
+    screenInfo->SetModeId(0);
+    screenInfo->modes_ = { { mode } };
+    screenInfo->SetSourceMode(Rosen::ScreenSourceMode::SCREEN_MAIN);
+
+    auto screenPointer = std::make_shared<ScreenPointer>(
+        pointerDrawingManager.hardwareCursorPointerManager_,
+        pointerDrawingManager.handler_, screenInfo);
+    ASSERT_NE(screenPointer, nullptr);
+    screenPointer->Init(pointerDrawingManager.pointerRenderer_);
+
+    pointerDrawingManager.screenPointers_.insert(std::make_pair(0, screenPointer));
+    ASSERT_EQ(pointerDrawingManager.screenPointers_.size(), 1);
+
+    auto surfaceNode = screenPointer->GetSurfaceNode();
+    ASSERT_NE(surfaceNode, nullptr);
+    pointerDrawingManager.SetSurfaceNode(surfaceNode);
+    ASSERT_NE(pointerDrawingManager.GetSurfaceNode(), nullptr);
+
+    pointerDrawingManager.DestroyPointerWindowOfHardCursor();
+    ASSERT_EQ(pointerDrawingManager.screenPointers_.size(), 0);
+    ASSERT_EQ(pointerDrawingManager.GetSurfaceNode(), nullptr);
+}
+
+/**
+ * @tc.name: PointerDrawingManagerTest_DestroyPointerWindowOfSoftCursor_003
+ * @tc.desc: Test DestroyPointerWindowOfSoftCursor with rsUIDirector_ not null
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerTest, PointerDrawingManagerTest_DestroyPointerWindowOfSoftCursor_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerDrawingManager pointerDrawingManager;
+
+    Rosen::RSSurfaceNodeConfig surfaceNodeConfig;
+    surfaceNodeConfig.SurfaceNodeName = "pointer window";
+    Rosen::RSSurfaceNodeType surfaceNodeType = Rosen::RSSurfaceNodeType::SELF_DRAWING_WINDOW_NODE;
+    auto surfaceNode = Rosen::RSSurfaceNode::Create(surfaceNodeConfig, surfaceNodeType, true, false, rsUIContext_);
+    ASSERT_NE(surfaceNode, nullptr);
+    pointerDrawingManager.SetSurfaceNode(surfaceNode);
+    pointerDrawingManager.screenId_ = 0;
+    pointerDrawingManager.rsUIDirector_ = rsUIDirector_;
+    pointerDrawingManager.rsUIContext_ = rsUIContext_;
+
+    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.DestroyPointerWindowOfSoftCursor());
+    EXPECT_EQ(pointerDrawingManager.GetSurfaceNode(), nullptr);
+    EXPECT_EQ(pointerDrawingManager.rsUIDirector_, nullptr);
+    EXPECT_EQ(pointerDrawingManager.rsUIContext_, nullptr);
+}
+
+/**
+ * @tc.name: PointerDrawingManagerTest_DestroyPointerWindowOfSoftCursor_004
+ * @tc.desc: Test DestroyPointerWindowOfSoftCursor with null rsUIDirector_
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerTest, PointerDrawingManagerTest_DestroyPointerWindowOfSoftCursor_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerDrawingManager pointerDrawingManager;
+
+    Rosen::RSSurfaceNodeConfig surfaceNodeConfig;
+    surfaceNodeConfig.SurfaceNodeName = "pointer window";
+    Rosen::RSSurfaceNodeType surfaceNodeType = Rosen::RSSurfaceNodeType::SELF_DRAWING_WINDOW_NODE;
+    auto surfaceNode = Rosen::RSSurfaceNode::Create(surfaceNodeConfig, surfaceNodeType, true, false, rsUIContext_);
+    ASSERT_NE(surfaceNode, nullptr);
+    pointerDrawingManager.SetSurfaceNode(surfaceNode);
+    pointerDrawingManager.screenId_ = 0;
+    pointerDrawingManager.rsUIDirector_ = nullptr;
+    pointerDrawingManager.rsUIContext_ = rsUIContext_;
+
+    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.DestroyPointerWindowOfSoftCursor());
+    EXPECT_EQ(pointerDrawingManager.GetSurfaceNode(), nullptr);
+    EXPECT_EQ(pointerDrawingManager.rsUIDirector_, nullptr);
+    EXPECT_EQ(pointerDrawingManager.rsUIContext_, nullptr);
 }
 } // namespace MMI
 } // namespace OHOS

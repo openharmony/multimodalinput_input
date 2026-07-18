@@ -226,7 +226,7 @@ void ANRManager::OnSessionLost(SessionPtr session)
 
 int32_t ANRManager::SetANRNoticedPid(int32_t pid)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     anrNoticedPid_ = pid;
     return RET_OK;
 }

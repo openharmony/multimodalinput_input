@@ -13,9 +13,9 @@
  * limitations under the License.
  */
 
-#include <gtest/gtest.h>
-
 #include "virtual_device.h"
+
+#include <gtest/gtest.h>
 
 namespace OHOS {
 namespace MMI {

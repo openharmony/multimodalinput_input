@@ -20,6 +20,7 @@
 #include <optional>
 #include <set>
 #include <unordered_map>
+#include <vector>
 
 #include "window_info.h"
 
@@ -56,6 +57,8 @@ public:
     bool Add(const BindInfo &info);
     void UnbindInputDevice(int32_t deviceId);
     void UnbindDisplay(int32_t displayId);
+    void BindDisplayByCfgNodes(int32_t displayId, const std::string &displayName,
+        const std::set<std::string> &cfgNodeNames);
     BindInfo GetUnbindInputDevice(const std::string &displayName);
     BindInfo GetUnbindDisplay(const std::string &inputDeviceName);
     std::string GetDisplayNameByInputDevice(const std::string &name) const;
@@ -69,7 +72,6 @@ public:
 
 private:
     BindInfo GetUnbindInputDevice();
-    BindInfo GetUnbindDisplay();
     std::list<BindInfo> infos_;
 };
 struct RuntimeDeviceBinding {
@@ -97,6 +99,7 @@ public:
 
     std::string GetInputDeviceById(int32_t id);
     std::string GetInputNodeNameByCfg(int32_t id);
+    void GetInputNodeNamesByCfg(int32_t id, std::vector<std::string> &nodeNames);
     std::string GetContent(const std::string &fileName);
     std::string GetInputNode(const std::string &inputNodeName);
     bool GetRsIdByInputNodeNameCfg(const std::string &nodeName, int32_t &cfgRsId) const;
@@ -111,6 +114,7 @@ public:
     void ClearAllRuntimeBindings();
 
 private:
+    std::string GetInputDeviceNameCfgPath() const;
     const std::string fileName_;
     std::shared_ptr<BindInfos> infos_;
     std::shared_ptr<BindInfos> configFileInfos_;

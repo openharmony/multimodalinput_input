@@ -118,7 +118,9 @@
         "libinput",
 	      "libuv",
         "os_account",
-        "openssl"
+        "openssl",
+        "zlib",
+        "taihe_ffi_gen"
       ],
       "third_party": [
         "libuv",

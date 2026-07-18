@@ -3048,20 +3048,6 @@ HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_RemovePhysicalInputDevic
 }
 
 /**
- * @tc.name: InputDeviceManagerTest_HasLocalMouseDevice_001
- * @tc.desc: Test HasLocalMouseDevice
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_HasLocalMouseDevice_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    
-    auto result = INPUT_DEV_MGR->HasLocalMouseDevice();
-    EXPECT_FALSE(result);
-}
-
-/**
  * @tc.name: InputDeviceManagerTest_HasTouchDevice_001
  * @tc.desc: Test HasTouchDevice
  * @tc.type: FUNC

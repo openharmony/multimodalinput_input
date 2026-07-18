@@ -20,8 +20,12 @@
 #include <iostream>
 #include <sys/stat.h>
 
+#include <gmock/gmock.h>
+
+#include "config_policy_utils.h"
 #include "input_display_bind_helper.h"
 #include "mmi_log.h"
+#include "securec.h"
 
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "InputDisplayBindHelperTest"
@@ -35,6 +39,21 @@ const std::string INPUT_DEVICE_NAME_FILE = "/data/input0_test/name";
 const std::string INPUT_DEVICE_NAME_CONFIG = "/data/input_device_name.cfg";
 const std::string DISPLAY_MAPPING = "0<=>wrapper";
 const std::string INPUT_NODE_NAME = "wrapper";
+
+// Action: write test cfg path into GetOneCfgFile's buf (arg1) and return it so that
+// GetInputDeviceNameCfgPath() resolves the test-written input_device_name.cfg.
+ACTION_P(ReturnCfgPath, path)
+{
+    // args: (pathSuffix, buf, bufLength) = (arg0, arg1, arg2)
+    if (arg1 == nullptr || arg2 == 0) {
+        return static_cast<char *>(nullptr);
+    }
+    int32_t ret = snprintf_s(arg1, arg2, arg2 - 1, "%s", path.c_str());
+    if (ret < 0) {
+        return static_cast<char *>(nullptr);
+    }
+    return arg1;
+}
 } // namespace
 namespace fs = std::filesystem;
 class InputDisplayBindHelperTest : public testing::Test {
@@ -49,6 +68,9 @@ public:
     {
         return bindCfgFile_;
     }
+    // Default NiceMock returns nullptr for GetOneCfgFile, simulating cfg absent.
+    // Individual tests may override with EXPECT_CALL to supply a real cfg path.
+    testing::NiceMock<ConfigPolicyUtilsMock> cfgPolicyUtils_;
 };
 
 bool InputDisplayBindHelperTest::WriteConfigFile(const std::string &content)
@@ -113,7 +135,7 @@ bool InputDisplayBindHelperTest::InitConfigFile()
 
 /**
  * @tc.name: InputDisplayBindHelperTest_001
- * @tc.desc: No bind info in disk
+ * @tc.desc: No bind info in disk, cfg-driven binding
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -121,6 +143,11 @@ HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_001, TestSize.Le
 {
     CALL_TEST_DEBUG;
     InputDisplayBindHelperTest::WriteConfigFile("");
+    std::ofstream cfgFile(INPUT_DEVICE_NAME_CONFIG);
+    cfgFile << "0<=>mouse\n2<=>keyboard";
+    cfgFile.close();
+    EXPECT_CALL(cfgPolicyUtils_, GetOneCfgFile(testing::_, testing::_, testing::_))
+        .WillRepeatedly(ReturnCfgPath(INPUT_DEVICE_NAME_CONFIG));
     InputDisplayBindHelper bindInfo(InputDisplayBindHelperTest::GetCfgFileName());
     // 多模初始化
     bindInfo.Load();
@@ -128,9 +155,9 @@ HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_001, TestSize.Le
     bindInfo.AddInputDevice(1, "mouse", "mouse");
     bindInfo.AddInputDevice(2, "keyboard", "keyboard");
     // 窗口同步信息
-    bindInfo.AddDisplay(0, "hp 223");
-    bindInfo.AddDisplay(2, "think 123");
-    ASSERT_EQ(bindInfo.Dumps(), std::string("mouse<=>hp 223\nkeyboard<=>think 123\n"));
+    bindInfo.AddDisplay(0, "default0");
+    bindInfo.AddDisplay(2, "default2");
+    ASSERT_EQ(bindInfo.Dumps(), std::string("mouse<=>mouse<=>default0\nkeyboard<=>keyboard<=>default2\n"));
 }
 
 /**
@@ -152,7 +179,7 @@ HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_002, TestSize.Le
     // 窗口同步信息
     bindInfo.AddDisplay(0, "hp 223");
     bindInfo.AddDisplay(2, "think 123");
-    ASSERT_EQ(bindInfo.Dumps(), std::string("mouse<=>hp 223\nkeyboard<=>think 123\n"));
+    ASSERT_EQ(bindInfo.Dumps(), std::string("mouse<=>mouse<=>hp 223\nkeyboard<=>keyboard<=>think 123\n"));
 }
 
 /**
@@ -174,7 +201,7 @@ HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_003, TestSize.Le
     // 窗口同步信息
     bindInfo.AddDisplay(0, "think 123");
     bindInfo.AddDisplay(2, "hp 223");
-    ASSERT_EQ(bindInfo.Dumps(), std::string("mouse<=>think 123\nkeyboard<=>hp 223\n"));
+    ASSERT_EQ(bindInfo.Dumps(), std::string("mouse<=>mouse<=>think 123\nkeyboard<=>keyboard<=>hp 223\n"));
 }
 
 /**
@@ -242,7 +269,7 @@ HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_GetBindDisplayNa
     // 窗口同步信息
     bindInfo.AddDisplay(0, "think 123");
     bindInfo.AddDisplay(2, "hp 223");
-    ASSERT_EQ(bindInfo.Dumps(), std::string("mouse<=>think 123\nkeyboard<=>hp 223\n"));
+    ASSERT_EQ(bindInfo.Dumps(), std::string("mouse<=>mouse<=>think 123\nkeyboard<=>keyboard<=>hp 223\n"));
     // 获取
     ASSERT_EQ(bindInfo.GetBindDisplayNameByInputDevice(1), std::string("think 123"));
     ASSERT_EQ(bindInfo.GetBindDisplayNameByInputDevice(2), std::string("hp 223"));
@@ -283,7 +310,7 @@ HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_IsDisplayAdd_006
     ASSERT_TRUE(bindInfo.IsDisplayAdd(2, "hp 223"));
     ASSERT_FALSE(bindInfo.IsDisplayAdd(1, "think 123"));
 
-    ASSERT_EQ(bindInfo.Dumps(), std::string("mouse<=>think 123\nkeyboard<=>hp 223\n"));
+    ASSERT_EQ(bindInfo.Dumps(), std::string("mouse<=>mouse<=>think 123\nkeyboard<=>keyboard<=>hp 223\n"));
 }
 
 /**
@@ -317,7 +344,7 @@ HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_GetDisplayIdName
     bindInfo.AddDisplay(2, "hp 223");
     idNames.insert(std::make_pair(2, "hp 223"));
     ASSERT_EQ(bindInfo.GetDisplayIdNames(), idNames);
-    ASSERT_EQ(bindInfo.Dumps(), std::string("mouse<=>think 123\nkeyboard<=>hp 223\n"));
+    ASSERT_EQ(bindInfo.Dumps(), std::string("mouse<=>mouse<=>think 123\nkeyboard<=>keyboard<=>hp 223\n"));
 }
 
 /**
@@ -329,6 +356,9 @@ HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_GetDisplayIdName
 HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_GetInputDeviceById_008, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
+    if (fs::exists(INPUT_NODE_PATH)) {
+        fs::remove_all(INPUT_NODE_PATH);
+    }
     InputDisplayBindHelper idh("/data/service/el1/public/multimodalinput/0.txt");
     // 读取输入节点名称
     std::string content = idh.GetContent(INPUT_DEVICE_NAME_FILE);
@@ -406,8 +436,7 @@ HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_GetInputNodeName
     CALL_TEST_DEBUG;
     int32_t id = 3;
     InputDisplayBindHelper idh("/data/service/el1/public/multimodalinput/0.txt");
-    std::ifstream file(INPUT_DEVICE_NAME_CONFIG);
-    EXPECT_FALSE(file.is_open());
+    // fixture NiceMock returns nullptr for GetOneCfgFile -> GetInputNodeNameByCfg returns empty
     std::string ret1 = idh.GetInputNodeNameByCfg(id);
     EXPECT_EQ(ret1, "");
 
@@ -1835,7 +1864,7 @@ HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_BindInfos_GetUnb
 
 /**
  * @tc.name: InputDisplayBindHelperTest_BindInfos_GetUnbindDisplay_01
- * @tc.desc: Test BindInfos GetUnbindDisplay not found
+ * @tc.desc: Test BindInfos GetUnbindDisplay(inputDeviceName) not found returns BindInfo() (v2: unified fallback)
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1846,14 +1875,15 @@ HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_BindInfos_GetUnb
     BindInfo bindInfo;
     bindInfo.displayId_ = 0;
     bindInfos.infos_.push_back(bindInfo);
-    
-    BindInfo ret = bindInfos.GetUnbindDisplay();
+
+    // No unbind display with matching inputDeviceName -> returns BindInfo() (v2 unified fallback)
+    BindInfo ret = bindInfos.GetUnbindDisplay("unknown_device");
     EXPECT_EQ(ret.GetDisplayId(), -1);
 }
 
 /**
  * @tc.name: InputDisplayBindHelperTest_BindInfos_GetUnbindDisplay_02
- * @tc.desc: Test BindInfos GetUnbindDisplay with inputDeviceName not found
+ * @tc.desc: Test BindInfos GetUnbindDisplay(inputDeviceName) name mismatch returns BindInfo() (v2 unified fallback)
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1865,9 +1895,10 @@ HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_BindInfos_GetUnb
     bindInfo.displayId_ = -1;
     bindInfo.inputDeviceName_ = "mouse";
     bindInfos.infos_.push_back(bindInfo);
-    
+
+    // "keyboard" does not match "mouse"; v2 unified fallback returns BindInfo() (no auto-pair)
     BindInfo ret = bindInfos.GetUnbindDisplay("keyboard");
-    EXPECT_EQ(ret.GetInputDeviceName(), "mouse");
+    EXPECT_EQ(ret.GetInputDeviceName(), "");
 }
 
 /**
@@ -2376,6 +2407,186 @@ HWTEST_F(InputDisplayBindHelperTest, RuntimeBinding_NoConfigFileTouch_001, TestS
     EXPECT_EQ(statBefore.st_mtime, statAfter.st_mtime)
         << "Config file must not be modified by runtime binding operations";
     std::remove(testCfg.c_str());
+}
+
+/**
+ * @tc.name: InputDisplayBindHelperTest_CfgBinding_Hit_01
+ * @tc.desc: AC-1.1 - input_device_name.cfg hit drives displayId/displayName for all product forms
+ * @tc.type: FUNC
+ * @tc.require: ISSUE-7430
+ */
+HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_CfgBinding_Hit_01, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputDisplayBindHelperTest::WriteConfigFile("");
+    if (!InputDisplayBindHelperTest::InitConfigFile()) {
+        FAIL();
+    }
+    // Mock GetOneCfgFile to resolve the test-written cfg under /data/
+    EXPECT_CALL(cfgPolicyUtils_, GetOneCfgFile)
+        .WillRepeatedly(ReturnCfgPath(INPUT_DEVICE_NAME_CONFIG));
+    InputDisplayBindHelper bindInfo(InputDisplayBindHelperTest::GetCfgFileName());
+    bindInfo.Load();
+    // input_device_name.cfg contains "0<=>wrapper"; nodeName "wrapper" should map to displayId=0
+    bindInfo.AddInputDevice(1, INPUT_NODE_NAME, "sysUid_test");
+    bindInfo.AddDisplay(0, "default0");
+    ASSERT_EQ(bindInfo.GetBindDisplayNameByInputDevice(1), std::string("default0"));
+}
+
+/**
+ * @tc.name: InputDisplayBindHelperTest_CfgBinding_AddDisplayReverseLookup_01
+ * @tc.desc: AC-1.2 - AddDisplay reverse-lookup through cfg works for all product forms
+ * @tc.type: FUNC
+ * @tc.require: ISSUE-7430
+ */
+HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_CfgBinding_AddDisplayReverseLookup_01, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputDisplayBindHelperTest::WriteConfigFile("");
+    if (!InputDisplayBindHelperTest::InitInputNode() || !InputDisplayBindHelperTest::InitConfigFile()) {
+        FAIL();
+    }
+    // Mock GetOneCfgFile to resolve the test-written cfg under /data/
+    EXPECT_CALL(cfgPolicyUtils_, GetOneCfgFile)
+        .WillRepeatedly(ReturnCfgPath(INPUT_DEVICE_NAME_CONFIG));
+    InputDisplayBindHelper bindInfo(InputDisplayBindHelperTest::GetCfgFileName());
+    bindInfo.Load();
+    // cfg: "0<=>wrapper"; sysfs node /data/input0_test/name contains "wrapper"
+    // AddDisplay(0) should resolve inputDevice via GetInputDeviceById(0) and bind
+    bindInfo.AddDisplay(0, "default0");
+    ASSERT_NO_FATAL_FAILURE(bindInfo.GetBindDisplayNameByInputDevice(0));
+}
+
+/**
+ * @tc.name: InputDisplayBindHelperTest_CfgBinding_FileMissing_01
+ * @tc.desc: AC-1.3 - missing input_device_name.cfg falls back to default display path without crash
+ * @tc.type: FUNC
+ * @tc.require: ISSUE-7430
+ */
+HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_CfgBinding_FileMissing_01, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputDisplayBindHelperTest::WriteConfigFile("");
+    // ensure cfg file is removed
+    if (fs::exists(INPUT_DEVICE_NAME_CONFIG)) {
+        std::remove(INPUT_DEVICE_NAME_CONFIG.c_str());
+    }
+    ASSERT_FALSE(fs::exists(INPUT_DEVICE_NAME_CONFIG));
+    InputDisplayBindHelper bindInfo(InputDisplayBindHelperTest::GetCfgFileName());
+    bindInfo.Load();
+    // must not crash; falls back to default display path
+    ASSERT_NO_FATAL_FAILURE(bindInfo.AddInputDevice(1, "orphan_node", "orphan_sysUid"));
+    ASSERT_NO_FATAL_FAILURE(bindInfo.AddDisplay(0, "default0"));
+}
+
+/**
+ * @tc.name: InputDisplayBindHelperTest_CfgBinding_InvalidLines_01
+ * @tc.desc: AC-1.4 - invalid cfg lines are silently skipped, valid lines still parsed
+ * @tc.type: FUNC
+ * @tc.require: ISSUE-7430
+ */
+HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_CfgBinding_InvalidLines_01, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputDisplayBindHelperTest::WriteConfigFile("");
+    // remove existing cfg
+    if (fs::exists(INPUT_DEVICE_NAME_CONFIG)) {
+        std::remove(INPUT_DEVICE_NAME_CONFIG.c_str());
+    }
+    // mix invalid lines + one valid line "2<=>goodNode"
+    std::ofstream file(INPUT_DEVICE_NAME_CONFIG);
+    ASSERT_TRUE(file.is_open());
+    file << "abc<=>badNode\n";        // displayId non-digit
+    file << "<=>emptyId\n";           // empty displayId
+    file << "3<=>\n";                 // empty inputNodeName
+    file << "noSeparatorLine\n";      // missing <=>
+    file << "2<=>goodNode\n";         // valid line
+    file.close();
+    // Mock GetOneCfgFile to resolve the test-written cfg under /data/
+    EXPECT_CALL(cfgPolicyUtils_, GetOneCfgFile)
+        .WillRepeatedly(ReturnCfgPath(INPUT_DEVICE_NAME_CONFIG));
+    InputDisplayBindHelper idh(InputDisplayBindHelperTest::GetCfgFileName());
+    idh.Load();
+    // valid line should still be parsed: GetInputNodeNameByCfg(2) returns "goodNode"
+    EXPECT_EQ(idh.GetInputNodeNameByCfg(2), "goodNode");
+    // invalid lines should not produce results
+    EXPECT_EQ(idh.GetInputNodeNameByCfg(0), "");
+    EXPECT_EQ(idh.GetInputNodeNameByCfg(3), "");
+}
+
+/**
+ * @tc.name: InputDisplayBindHelperTest_BindInfos_GetUnbindDisplay_FallbackNoPc_01
+ * @tc.desc: AC-2.3 (v2) - GetUnbindDisplay(inputDeviceName) name mismatch returns BindInfo() (unified fallback,
+ *                       no auto-pair across all product forms)
+ * @tc.type: FUNC
+ * @tc.require: ISSUE-7430
+ */
+HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_BindInfos_GetUnbindDisplay_FallbackNoPc_01,
+    TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    BindInfos bindInfos;
+    // Set up an unbound display BindInfo with a known inputDeviceName (e.g. "mouse")
+    BindInfo unboundDisplay;
+    unboundDisplay.inputDeviceName_ = "mouse";
+    unboundDisplay.displayId_ = -1; // DisplayNotBind
+    unboundDisplay.inputDeviceId_ = -1;
+    bindInfos.infos_.push_back(unboundDisplay);
+    // Query for a different inputDeviceName; v2 unified fallback returns BindInfo() (no auto-pair)
+    BindInfo ret = bindInfos.GetUnbindDisplay("unknown_device");
+    EXPECT_EQ(ret.GetInputDeviceName(), "");
+}
+
+/**
+ * @tc.name: InputDisplayBindHelperTest_BindInfos_GetUnbindDisplay_TriFallback_01
+ * @tc.desc: AC-2.2/2.3 (v2) - With DEFAULT_TP_DEVICE removed and GetUnbindDisplay unified to return BindInfo(),
+ *                   GetInputDeviceById returns empty for all ids when cfg is absent (GetOneCfgFile returns null).
+ *                   This smoke test exercises GetInputDeviceById(0) and GetInputDeviceById(99) without crashing.
+ * @tc.type: FUNC
+ * @tc.require: ISSUE-7430
+ */
+HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_BindInfos_GetUnbindDisplay_TriFallback_01,
+    TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputDisplayBindHelperTest::WriteConfigFile("");
+    // fixture NiceMock returns nullptr for GetOneCfgFile -> cfg absent
+    InputDisplayBindHelper idh(InputDisplayBindHelperTest::GetCfgFileName());
+    idh.Load();
+    // id==0, no cfg -> empty string (DEFAULT_TP_DEVICE fallback removed in v2; etc cfg provides equivalent)
+    std::string ret0 = idh.GetInputDeviceById(0);
+    EXPECT_EQ(ret0, "");
+    // id!=0, no cfg -> empty string
+    std::string ret99 = idh.GetInputDeviceById(99);
+    EXPECT_EQ(ret99, "");
+}
+
+/**
+ * @tc.name: InputDisplayBindHelperTest_AddLocalDisplay_ParallelWithAddDisplay_01
+ * @tc.desc: AC-4.3 - AddLocalDisplay invokes GetInputDeviceById the same way as AddDisplay.
+ *                   Smoke test: calling AddLocalDisplay must not crash and must not corrupt state.
+ * @tc.type: FUNC
+ * @tc.require: ISSUE-7430
+ */
+HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_AddLocalDisplay_ParallelWithAddDisplay_01,
+    TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputDisplayBindHelperTest::WriteConfigFile("");
+    if (fs::exists(INPUT_DEVICE_NAME_CONFIG)) {
+        std::remove(INPUT_DEVICE_NAME_CONFIG.c_str());
+    }
+    InputDisplayBindHelper idh(InputDisplayBindHelperTest::GetCfgFileName());
+    idh.Load();
+    // Pre-populate an unbind input device entry
+    BindInfo unboundDevice;
+    unboundDevice.inputDeviceId_ = 1;
+    unboundDevice.inputDeviceName_ = "mouse";
+    unboundDevice.inputNodeName_ = "node1";
+    unboundDevice.displayId_ = -1;
+    idh.infos_->infos_.push_back(unboundDevice);
+    ASSERT_NO_FATAL_FAILURE(idh.AddLocalDisplay(0, "default0"));
+    ASSERT_NO_FATAL_FAILURE(idh.AddDisplay(1, "default1"));
 }
 } // namespace MMI
 } // namespace OHOS

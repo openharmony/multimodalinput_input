@@ -21,7 +21,9 @@
 #include "config_policy_utils.h"
 
 #include "event_log_helper.h"
+#ifdef OHOS_BUILD_ENABLE_INPUT_EVENT_HOOK
 #include "input_event_hook_handler.h"
+#endif // OHOS_BUILD_ENABLE_INPUT_EVENT_HOOK
 #include "input_manager_impl.h"
 #ifdef OHOS_BUILD_ENABLE_KEY_HOOK
 #include "key_event_hook_handler.h"
@@ -72,7 +74,9 @@ void OnConnected(const IfMMIClient& client)
 #ifdef OHOS_BUILD_ENABLE_KEY_HOOK
     KEY_EVENT_HOOK_HANDLER.OnConnected();
 #endif // OHOS_BUILD_ENABLE_KEY_HOOK
+#ifdef OHOS_BUILD_ENABLE_INPUT_EVENT_HOOK
     INPUT_EVENT_HOOK_HANDLER.OnConnected();
+#endif // OHOS_BUILD_ENABLE_INPUT_EVENT_HOOK
     LONG_PRESS_EVENT_SUBSCRIBE_MGR.OnConnected();
 }
 

@@ -38,8 +38,7 @@ constexpr size_t SECOND_INDEX { 1 };
 constexpr size_t THIRD_INDEX { 2 };
 constexpr size_t FOURTH_INDEX { 3 };
 const int64_t MILLISECONDS_IN_SECOND = 1000;
-constexpr int32_t TRIGGER_TYPE_NOT_SET { 0 };
-constexpr int32_t TRIGGER_TYPE_MIN { 0 };
+constexpr int32_t TRIGGER_TYPE_MIN { 1 };
 constexpr int32_t TRIGGER_TYPE_MAX { 3 };
 
 enum ETS_CALLBACK_EVENT {
@@ -332,7 +331,10 @@ void SubscribeKeyMonitor(KeyPressedConfig const& options,
         } else {
             MMI_HILOGE("SubscribeKeyMonitor fail, error:%{public}d", subscriberId);
         }
-        jsCbMap_.erase(std::to_string(keyMonitorId));
+        {
+            std::lock_guard<std::mutex> lock(jsCbMapMutex);
+            jsCbMap_.erase(std::to_string(keyMonitorId));
+        }
         return;
     }
     MMI_HILOGI("[ETS] Subscribe key monitor(ID:%{public}zu, subscriberId:%{public}d)", keyMonitorId, subscriberId);
@@ -908,10 +910,6 @@ int32_t ParseAPI26PreKeys(KeyOptions const& keyOptions, std::shared_ptr<KeyOptio
     std::string& subKeyNames)
 {
     CALL_DEBUG_ENTER;
-    if (keyOptions.preKeys.empty()) {
-        taihe::set_business_error(COMMON_PARAMETER_ERROR, "preKeys not found");
-        return RET_ERR;
-    }
     std::set<int32_t> preKeys;
     std::vector<int32_t> etsPreKeys(keyOptions.preKeys.begin(), keyOptions.preKeys.end());
     if (GetPreKeys(etsPreKeys, preKeys) != RET_OK) {
@@ -934,7 +932,7 @@ int32_t ParseAPI26PreKeys(KeyOptions const& keyOptions, std::shared_ptr<KeyOptio
     return RET_OK;
 }
 
-void ParseAPI26TriggerTypeAndLegacy(KeyOptions const& keyOptions, std::shared_ptr<KeyOption> keyOption,
+int32_t ParseAPI26TriggerTypeAndLegacy(KeyOptions const& keyOptions, std::shared_ptr<KeyOption> keyOption,
     std::string& subKeyNames)
 {
     CALL_DEBUG_ENTER;
@@ -944,22 +942,22 @@ void ParseAPI26TriggerTypeAndLegacy(KeyOptions const& keyOptions, std::shared_pt
             keyOption->SetTriggerType(triggerType);
             subKeyNames += std::to_string(triggerType) + ",";
         } else {
-            subKeyNames += "0,";
+            MMI_HILOGE("triggerType:%{public}d is invalid, must be [1, 3]", triggerType);
+            taihe::set_business_error(COMMON_PARAMETER_ERROR,
+                "triggerType must be one of KeyCommandTriggerType values "
+                "(PRESSED=1, REPEAT_PRESSED=2, ALL_RELEASED=3)");
+            return RET_ERR;
         }
     } else {
-        subKeyNames += "0,";
+        MMI_HILOGE("triggerType is required for onKey/offKey API");
+        taihe::set_business_error(COMMON_PARAMETER_ERROR,
+            "triggerType is required and must be one of KeyCommandTriggerType values");
+        return RET_ERR;
     }
-    if (keyOption->GetTriggerType() == TRIGGER_TYPE_NOT_SET) {
-        subKeyNames += std::to_string(keyOptions.isFinalKeyDown) + ",";
-        keyOption->SetFinalKeyDown(keyOptions.isFinalKeyDown);
-        bool isRepeat = keyOptions.isRepeat.has_value() ? keyOptions.isRepeat.value() : true;
-        subKeyNames += std::to_string(isRepeat);
-        keyOption->SetRepeat(isRepeat);
-    } else {
-        subKeyNames += "false,";
-        keyOption->SetFinalKeyDown(false);
-        keyOption->SetRepeat(false);
-    }
+    subKeyNames += "false,";
+    keyOption->SetFinalKeyDown(false);
+    keyOption->SetRepeat(false);
+    return RET_OK;
 }
 
 int32_t GetEventInfoAPI26(KeyOptions const& keyOptions, std::shared_ptr<KeyEventMonitorInfo> event,
@@ -980,7 +978,10 @@ int32_t GetEventInfoAPI26(KeyOptions const& keyOptions, std::shared_ptr<KeyEvent
     keyOption->SetFinalKey(keyOptions.finalKey);
     subKeyNames += std::to_string(keyOptions.finalKeyDownDuration) + ",";
     keyOption->SetFinalKeyDownDuration(keyOptions.finalKeyDownDuration);
-    ParseAPI26TriggerTypeAndLegacy(keyOptions, keyOption, subKeyNames);
+    if (ParseAPI26TriggerTypeAndLegacy(keyOptions, keyOption, subKeyNames) != RET_OK) {
+        MMI_HILOGE("ParseAPI26TriggerTypeAndLegacy failed");
+        return RET_ERR;
+    }
     event->eventType = subKeyNames;
     return RET_OK;
 }
@@ -1202,6 +1203,12 @@ void onKeyCommandImpl(KeyOptions const& keyOptions,
 
 void offKeyCommandImpl(KeyOptions const& keyOptions, optional_view<uintptr_t> opq)
 {
+    CALL_DEBUG_ENTER;
+    if (!opq.has_value() || opq.value() == 0) {
+        MMI_HILOGE("callback cannot be null or undefined");
+        taihe::set_business_error(COMMON_PARAMETER_ERROR, "callback cannot be null or undefined");
+        return;
+    }
     UnsubscribeKeyCommand(keyOptions, opq);
 }
 

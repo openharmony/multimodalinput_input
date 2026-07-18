@@ -15,12 +15,10 @@
 
 #include "injection_tools_help_func.h"
 
-#include <getopt.h>
-
 #include <algorithm>
+#include <getopt.h>
 #include <iostream>
 #include <string>
-
 #include <unistd.h>
 
 #undef MMI_LOG_TAG

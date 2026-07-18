@@ -287,5 +287,59 @@ HWTEST_F(CrownTransformProcessorTest, CrownTransformProcessorTest_Dump_001, Test
     std::vector<std::string> args;
     EXPECT_NO_FATAL_FAILURE(processor->Dump(fd, args));
 }
+
+/* *
+ * @tc.name: CrownTransformProcessorTest_IsCrownEvent_006
+ * @tc.desc: Test IsCrownEvent with non-null event but null device
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(CrownTransformProcessorTest, CrownTransformProcessorTest_IsCrownEvent_006, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<CrownTransformProcessor> processor = std::make_shared<CrownTransformProcessor>();
+    NiceMock<LibinputInterfaceMock> libinputMock;
+    libinput_device *nullDevice = nullptr;
+    EXPECT_CALL(libinputMock, GetDevice).WillOnce(Return(nullDevice));
+    libinput_event event;
+    bool ret = processor->IsCrownEvent(&event);
+    EXPECT_FALSE(ret);
+}
+
+/* *
+ * @tc.name: CrownTransformProcessorTest_HandleCrownRotatePostInner_002
+ * @tc.desc: Test HandleCrownRotatePostInner with valid pointerEvent
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(CrownTransformProcessorTest, CrownTransformProcessorTest_HandleCrownRotatePostInner_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<CrownTransformProcessor> processor = std::make_shared<CrownTransformProcessor>();
+    double velocity = 1.0;
+    double degree = 30.0;
+    int32_t action = PointerEvent::POINTER_ACTION_AXIS_BEGIN;
+    processor->HandleCrownRotatePostInner(velocity, degree, action);
+    auto pointerEvent = processor->GetPointerEvent();
+    ASSERT_NE(pointerEvent, nullptr);
+    EXPECT_EQ(pointerEvent->GetPointerAction(), PointerEvent::POINTER_ACTION_AXIS_BEGIN);
+}
+
+/* *
+ * @tc.name: CrownTransformProcessorTest_Dump_002
+ * @tc.desc: Test Dump with valid pointerEvent
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(CrownTransformProcessorTest, CrownTransformProcessorTest_Dump_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<CrownTransformProcessor> processor = std::make_shared<CrownTransformProcessor>();
+    int32_t fd = -1;
+    std::vector<std::string> args;
+    processor->Dump(fd, args);
+    auto pointerEvent = processor->GetPointerEvent();
+    ASSERT_NE(pointerEvent, nullptr);
+}
 } // namespace MMI
 } // namespace OHOS

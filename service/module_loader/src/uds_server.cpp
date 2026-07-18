@@ -97,7 +97,8 @@ void UDSServer::Multicast(const std::vector<int32_t>& fdList, NetPacket& pkt)
 int32_t UDSServer::AddSocketPairInfo(const std::string& programName,
     const int32_t moduleType, const int32_t uid, const int32_t pid,
     int32_t& serverFd, int32_t& toReturnClientFd, int32_t& tokenType,
-    uint32_t tokenId, bool isRealProcessName)
+    uint32_t tokenId, bool isRealProcessName,
+    std::shared_ptr<SocketPairFlag> socketPairClosedFlag)
 {
     CALL_DEBUG_ENTER;
     int32_t sockFds[2] = { -1 };
@@ -110,6 +111,8 @@ int32_t UDSServer::AddSocketPairInfo(const std::string& programName,
     fdsan_exchange_owner_tag(sockFds[1], 0, TAG);
     serverFd = sockFds[0];
     toReturnClientFd = sockFds[1];
+    socketPairClosedFlag->serverFd = sockFds[0];
+    socketPairClosedFlag->toReturnClientFd = sockFds[1];
     if (serverFd < 0 || toReturnClientFd < 0) {
         MMI_HILOGE("Call fcntl failed, errno:%{public}d", errno);
         return RET_ERR;
@@ -147,6 +150,7 @@ int32_t UDSServer::AddSocketPairInfo(const std::string& programName,
     serverFd = MultimodalInputConnectManager::INVALID_SOCKET_FD;
     fdsan_close_with_tag(sockFds[1], TAG);
     toReturnClientFd = MultimodalInputConnectManager::INVALID_SOCKET_FD;
+    socketPairClosedFlag->executeClosed = true;
     return RET_ERR;
 }
 
@@ -435,7 +439,7 @@ bool UDSServer::AddSession(SessionPtr ses)
         return false;
     }
     DumpSession("AddSession");
-    MMI_HILOGI("AddSession end");
+    MMI_HILOGD("AddSession end");
     return true;
 }
 

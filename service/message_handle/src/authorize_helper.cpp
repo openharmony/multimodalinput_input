@@ -85,11 +85,11 @@ void AuthorizeHelper::OnClientDeath(int32_t pid)
     {
         std::lock_guard<std::mutex> lock(mutex_);
         ClearRequestInjectionCallback(pid);
-    }
-    if (pid != pid_) {
-        MMI_HILOGD("Cancel process is inconsistent with authorize, cancel pid:%{public}d, authorize pid:%{public}d",
+        if (pid != pid_) {
+            MMI_HILOGD("Cancel process is inconsistent with authorize, cancel pid:%{public}d, authorize pid:%{public}d",
             pid, pid_);
-        return;
+            return;
+        }
     }
     AuthorizeProcessExit();
 }

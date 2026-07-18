@@ -51,7 +51,7 @@ int32_t BundleNameParser::Init()
 
 int32_t BundleNameParser::InitializeImpl()
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     std::string jsonStr = ReadJsonFile(std::string(bundleNameConfigDir));
     if (jsonStr.empty()) {
         MMI_HILOGE("Read bundleName failed");
@@ -130,7 +130,7 @@ int32_t BundleNameParser::ParseBundleNameItem(const cJSON *json, BundleNameItem 
 void BundleNameParser::PrintBundleNames()
 {
     // LCOV_EXCL_START
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     std::shared_lock<std::shared_mutex> lock(lock_);
     for (const auto &bundleName: bundleNames_) {
         MMI_HILOGI("key:%{public}s -> value:%{public}s", bundleName.first.c_str(), bundleName.second.c_str());

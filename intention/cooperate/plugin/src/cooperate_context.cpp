@@ -147,57 +147,6 @@ void Context::Disable()
     StopEventHandler();
 }
 
-int32_t Context::StartEventHandler()
-{
-    auto runner = AppExecFwk::EventRunner::Create(THREAD_NAME);
-    CHKPR(runner, RET_ERR);
-    eventHandler_ = std::make_shared<AppExecFwk::EventHandler>(runner);
-    return RET_OK;
-}
-
-void Context::StopEventHandler()
-{
-    eventHandler_.reset();
-}
-
-int32_t Context::EnableDDM()
-{
-    boardObserver_ = std::make_shared<BoardObserver>(sender_);
-    ddm_.AddBoardObserver(boardObserver_);
-    return ddm_.Enable();
-}
-
-void Context::DisableDDM()
-{
-    ddm_.Disable();
-    ddm_.RemoveBoardObserver(boardObserver_);
-    boardObserver_.reset();
-}
-
-int32_t Context::EnableDevMgr()
-{
-    hotplugObserver_ = std::make_shared<HotplugObserver>(sender_);
-    env_->GetDeviceManager().AddDeviceObserver(hotplugObserver_);
-    return RET_OK;
-}
-
-void Context::DisableDevMgr()
-{
-    env_->GetDeviceManager().RemoveDeviceObserver(hotplugObserver_);
-    hotplugObserver_.reset();
-}
-
-int32_t Context::EnableInputDevMgr()
-{
-    inputDevMgr_.Enable();
-    return RET_OK;
-}
-
-void Context::DisableInputDevMgr()
-{
-    inputDevMgr_.Disable();
-}
-
 NormalizedCoordinate Context::NormalizedCursorPosition() const
 {
     auto display = Rosen::DisplayManagerLite::GetInstance().GetDefaultDisplay();
@@ -229,15 +178,6 @@ void Context::StartCooperate(const StartCooperateEvent &event)
     startDeviceId_ = event.startDeviceId;
 }
 
-void Context::OnPointerEvent(const InputPointerEvent &event)
-{
-    if ((event.sourceType == MMI::PointerEvent::SOURCE_TYPE_MOUSE) &&
-        ((event.pointerAction == MMI::PointerEvent::POINTER_ACTION_MOVE) ||
-            (event.pointerAction == MMI::PointerEvent::POINTER_ACTION_PULL_MOVE))) {
-        cursorPos_ = event.position;
-    }
-}
-
 void Context::RemoteStartSuccess(const DSoftbusStartCooperateFinished &event)
 {
     remoteNetworkId_ = event.originNetworkId;
@@ -250,9 +190,33 @@ void Context::RelayCooperate(const DSoftbusRelayCooperate &event)
     remoteNetworkId_ = event.targetNetworkId;
 }
 
+void Context::OnPointerEvent(const InputPointerEvent &event)
+{
+    if ((event.sourceType == MMI::PointerEvent::SOURCE_TYPE_MOUSE) &&
+        ((event.pointerAction == MMI::PointerEvent::POINTER_ACTION_MOVE) ||
+            (event.pointerAction == MMI::PointerEvent::POINTER_ACTION_PULL_MOVE))) {
+        cursorPos_ = event.position;
+    }
+}
+
 void Context::UpdateCooperateFlag(const UpdateCooperateFlagEvent &event)
 {
     flag_ = ((flag_ & ~event.mask) | (event.flag & event.mask));
+}
+
+void Context::UpdateCursorPosition()
+{
+    env_->GetInput().SetPointerLocation(cursorPos_.x, cursorPos_.y);
+    FI_HILOGI("Update cursor position (%{private}d,%{private}d)", cursorPos_.x, cursorPos_.y);
+}
+
+void Context::ResetCursorPosition()
+{
+    constexpr Coordinate defaultCursorPos {
+        .x = 50,
+        .y = 50,
+    };
+    SetCursorPosition(defaultCursorPos);
 }
 
 bool Context::IsAllowCooperate()
@@ -329,6 +293,19 @@ void Context::OnRelayCooperation(const std::string &networkId, const NormalizedC
     }
 }
 
+void Context::OnResetCooperation()
+{
+    CHKPV(eventHandler_);
+    FI_HILOGI("Notify observers of reset cooperation");
+    for (const auto &observer : observers_) {
+        eventHandler_->PostTask([observer] {
+            FI_HILOGI("Notify one observer of reset cooperation");
+            CHKPV(observer);
+            observer->OnReset();
+        });
+    }
+}
+
 void Context::CloseDistributedFileConnection(const std::string &remoteNetworkId)
 {
     CHKPV(eventHandler_);
@@ -343,17 +320,55 @@ void Context::CloseDistributedFileConnection(const std::string &remoteNetworkId)
     }
 }
 
-void Context::OnResetCooperation()
+int32_t Context::StartEventHandler()
 {
-    CHKPV(eventHandler_);
-    FI_HILOGI("Notify observers of reset cooperation");
-    for (const auto &observer : observers_) {
-        eventHandler_->PostTask([observer] {
-            FI_HILOGI("Notify one observer of reset cooperation");
-            CHKPV(observer);
-            observer->OnReset();
-        });
-    }
+    auto runner = AppExecFwk::EventRunner::Create(THREAD_NAME);
+    CHKPR(runner, RET_ERR);
+    eventHandler_ = std::make_shared<AppExecFwk::EventHandler>(runner);
+    return RET_OK;
+}
+
+void Context::StopEventHandler()
+{
+    eventHandler_.reset();
+}
+
+int32_t Context::EnableDDM()
+{
+    boardObserver_ = std::make_shared<BoardObserver>(sender_);
+    ddm_.AddBoardObserver(boardObserver_);
+    return ddm_.Enable();
+}
+
+void Context::DisableDDM()
+{
+    ddm_.Disable();
+    ddm_.RemoveBoardObserver(boardObserver_);
+    boardObserver_.reset();
+}
+
+int32_t Context::EnableDevMgr()
+{
+    hotplugObserver_ = std::make_shared<HotplugObserver>(sender_);
+    env_->GetDeviceManager().AddDeviceObserver(hotplugObserver_);
+    return RET_OK;
+}
+
+void Context::DisableDevMgr()
+{
+    env_->GetDeviceManager().RemoveDeviceObserver(hotplugObserver_);
+    hotplugObserver_.reset();
+}
+
+int32_t Context::EnableInputDevMgr()
+{
+    inputDevMgr_.Enable();
+    return RET_OK;
+}
+
+void Context::DisableInputDevMgr()
+{
+    inputDevMgr_.Disable();
 }
 
 void Context::SetCursorPosition(const Coordinate &cursorPos)
@@ -368,21 +383,6 @@ void Context::SetCursorPosition(const Coordinate &cursorPos)
     env_->GetInput().SetPointerLocation(cursorPos_.x, cursorPos_.y);
     FI_HILOGI("Set cursor position (%{private}d,%{private}d)(%{private}d,%{private}d)(%{public}d,%{public}d)",
         cursorPos.x, cursorPos.y, cursorPos_.x, cursorPos_.y, display->GetWidth(), display->GetHeight());
-}
-
-void Context::UpdateCursorPosition()
-{
-    env_->GetInput().SetPointerLocation(cursorPos_.x, cursorPos_.y);
-    FI_HILOGI("Update cursor position (%{private}d,%{private}d)", cursorPos_.x, cursorPos_.y);
-}
-
-void Context::ResetCursorPosition()
-{
-    constexpr Coordinate defaultCursorPos {
-        .x = 50,
-        .y = 50,
-    };
-    SetCursorPosition(defaultCursorPos);
 }
 
 #ifdef ENABLE_PERFORMANCE_CHECK

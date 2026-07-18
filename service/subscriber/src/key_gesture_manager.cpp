@@ -460,7 +460,7 @@ KeyGestureManager::KeyGestureManager()
 
 bool KeyGestureManager::ShouldIntercept(std::shared_ptr<KeyOption> keyOption) const
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     CHKPF(keyOption);
     return std::any_of(keyGestures_.cbegin(), keyGestures_.cend(),
         [keyOption](const auto &keyGesture) {

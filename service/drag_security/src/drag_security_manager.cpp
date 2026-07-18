@@ -45,7 +45,7 @@ uint64_t DragSecurityManager::GetCurrentTimesTampMs() const
 
 int32_t DragSecurityManager::DeliverNonce(const std::string& nonce)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     if (nonce.empty()) {
         MMI_HILOGE("nonce is empty");
         return RET_ERR;
@@ -67,7 +67,7 @@ void DragSecurityManager::ResetNonce()
 #ifdef OHOS_BUILD_ENABLE_DRAG_SECURITY
 void DragSecurityManager::DragSecurityUpdatePointerEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     auto now = std::chrono::steady_clock::now();
     auto duration = now.time_since_epoch();
     uint64_t distributeEventTime = static_cast<uint64_t>(
@@ -95,7 +95,7 @@ void DragSecurityManager::DragSecurityUpdatePointerEvent(std::shared_ptr<Pointer
 std::vector<uint8_t> DragSecurityManager::GenerateSignature(const std::vector<uint8_t>& nonce,
     const DragSecurityData& dragSecurityData)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     if (nonce.empty()) {
         MMI_HILOGE("Empty nonce provided");
         return {};

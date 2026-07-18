@@ -14,8 +14,8 @@
  */
 
 #include <gtest/gtest.h>
-#include <unistd.h>
 
+#include <unistd.h>
 #include "define_multimodal.h"
 #include "input_enable_key_status_command.h"
 

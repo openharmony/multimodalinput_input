@@ -81,7 +81,7 @@ void InputActiveSubscriberHandler::HandleSwitchEvent(const std::shared_ptr<Switc
 
 int32_t InputActiveSubscriberHandler::SubscribeInputActive(SessionPtr sess, int32_t subscribeId, int64_t interval)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     if (subscribeId < 0) {
         MMI_HILOGE("Invalid subscribeId");
         return ERROR_INVALID_SUBSCRIBE_ID;
@@ -96,7 +96,7 @@ int32_t InputActiveSubscriberHandler::SubscribeInputActive(SessionPtr sess, int3
 
 int32_t InputActiveSubscriberHandler::UnsubscribeInputActive(SessionPtr sess, int32_t subscribeId)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     MMI_HILOGD("subscribeId: %{public}d", subscribeId);
     auto findResult = std::find_if(
         subscribers_.begin(), subscribers_.end(), [subscribeId, sess](std::shared_ptr<Subscriber> subscribe) {
@@ -246,7 +246,7 @@ void InputActiveSubscriberHandler::InsertSubscriber(std::shared_ptr<Subscriber> 
 {
     CALL_DEBUG_ENTER;
     CHKPV(subscriber);
-    MMI_HILOGI("InsertSubscriber id = %{public}d", subscriber->id_);
+    MMI_HILOGD("InsertSubscriber id = %{public}d", subscriber->id_);
     auto findResult = std::find_if(
         subscribers_.begin(), subscribers_.end(), [subscriber](std::shared_ptr<Subscriber> tmpSubscriber) {
             if (tmpSubscriber && tmpSubscriber->id_ == subscriber->id_ && tmpSubscriber->sess_ == subscriber->sess_) {
@@ -266,14 +266,13 @@ void InputActiveSubscriberHandler::OnSessionDelete(SessionPtr sess)
 {
     CALL_DEBUG_ENTER;
     CHKPV(sess);
-    auto newEnd = std::remove_if(
+    subscribers_.erase(std::remove_if(
         subscribers_.begin(), subscribers_.end(), [sess](std::shared_ptr<Subscriber> subscribe) {
             if (subscribe && subscribe->sess_ == sess) {
                 return true;
             }
             return false;
-        });
-    subscribers_.erase(newEnd, subscribers_.end());
+        }), subscribers_.end());
 }
 
 void InputActiveSubscriberHandler::NotifySubscriber(
@@ -323,7 +322,7 @@ void InputActiveSubscriberHandler::NotifySubscriber(
     }
     int32_t fd = subscriber->sess_->GetFd();
     pkt << subscriber->id_;
-    MMI_HILOGI("%{public}d|%{public}d|%{public}d",
+    MMI_HILOGD("%{public}d|%{public}d|%{public}d",
         subscriber->id_, pointerEvent->GetPointerId(), subscriber->sess_->GetPid());
     if (pkt.ChkRWError()) {
         MMI_HILOGE("Packet write dispatch subscriber failed");

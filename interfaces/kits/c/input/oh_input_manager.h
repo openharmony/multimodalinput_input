@@ -35,6 +35,7 @@
 #ifndef OH_INPUT_MANAGER_H
 #define OH_INPUT_MANAGER_H
 
+#include <stdbool.h>
 #include <stdint.h>
 
 #include "oh_axis_type.h"

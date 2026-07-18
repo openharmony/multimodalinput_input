@@ -72,6 +72,33 @@ std::vector<std::pair<enum libinput_device_capability, InputDeviceCapability>> d
 
 constexpr size_t EXPECTED_N_SUBMATCHES{ 2 };
 constexpr size_t EXPECTED_SUBMATCH{ 1 };
+
+static const std::vector<int32_t> DPAD_REQUIRED_KEYCODES = {
+    KeyEvent::KEYCODE_DPAD_UP,
+    KeyEvent::KEYCODE_DPAD_DOWN,
+    KeyEvent::KEYCODE_DPAD_LEFT,
+    KeyEvent::KEYCODE_DPAD_RIGHT,
+    KeyEvent::KEYCODE_DPAD_CENTER
+};
+
+static const std::vector<int32_t> GAMEPAD_KEYCODES = {
+    KeyEvent::KEYCODE_BUTTON_A,
+    KeyEvent::KEYCODE_BUTTON_B,
+    KeyEvent::KEYCODE_BUTTON_C,
+    KeyEvent::KEYCODE_BUTTON_X,
+    KeyEvent::KEYCODE_BUTTON_Y,
+    KeyEvent::KEYCODE_BUTTON_Z,
+    KeyEvent::KEYCODE_BUTTON_L1,
+    KeyEvent::KEYCODE_BUTTON_R1,
+    KeyEvent::KEYCODE_BUTTON_L2,
+    KeyEvent::KEYCODE_BUTTON_R2,
+    KeyEvent::KEYCODE_BUTTON_THUMBL,
+    KeyEvent::KEYCODE_BUTTON_THUMBR,
+    KeyEvent::KEYCODE_BUTTON_START,
+    KeyEvent::KEYCODE_BUTTON_SELECT,
+    KeyEvent::KEYCODE_BUTTON_MODE
+};
+
 } // namespace
 
 std::shared_ptr<InputDeviceManager> InputDeviceManager::instance_ = nullptr;
@@ -452,6 +479,23 @@ int32_t InputDeviceManager::SupportKeys(int32_t deviceId, std::vector<int32_t> &
     return RET_OK;
 }
 
+bool InputDeviceManager::IsMatchDeviceKeys(
+    int32_t deviceId, struct libinput_device *device, const std::vector<int32_t> &keyCodes) const
+{
+    if (device == nullptr) {
+        MMI_HILOGE("Input device is nullptr");
+        return false;
+    }
+    for (const auto &item : keyCodes) {
+        for (const auto &it : KeyMapMgr->InputTransferKeyValue(deviceId, item)) {
+            if (libinput_device_has_key(device, it) == SUPPORT_KEY) {
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
 bool InputDeviceManager::IsMatchKeys(struct libinput_device *device, const std::vector<int32_t> &keyCodes) const
 {
     // LCOV_EXCL_START
@@ -490,6 +534,40 @@ int32_t InputDeviceManager::GetKeyboardBusMode(int32_t deviceId)
     std::shared_ptr dev = GetInputDevice(deviceId);
     CHKPR(dev, ERROR_NULL_POINTER);
     return dev->GetBus();
+}
+
+std::vector<int32_t> InputDeviceManager::GetInputDeviceClassKeyCodes(InputDeviceClass deviceClass)
+{
+    switch (deviceClass) {
+        case InputDeviceClass::GAMEPAD:
+            return GAMEPAD_KEYCODES;
+        case InputDeviceClass::DPAD:
+            return DPAD_REQUIRED_KEYCODES;
+        case InputDeviceClass::ALPHAKEY:
+            return { KeyEvent::KEYCODE_Q };
+        default:
+            return std::vector<int32_t>();
+    }
+}
+
+bool InputDeviceManager::HasInputDeviceClass(int32_t deviceId, InputDeviceClass deviceClass)
+{
+    CALL_DEBUG_ENTER;
+    auto iter = inputDevice_.find(deviceId);
+    if (iter == inputDevice_.end()) {
+        MMI_HILOGD("Failed to search for the deviceID");
+        return false;
+    }
+    if (!iter->second.enable) {
+        MMI_HILOGE("The current device has been disabled");
+        return false;
+    }
+    std::vector<int32_t> keyCodes = GetInputDeviceClassKeyCodes(deviceClass);
+    if (keyCodes.empty()) {
+        MMI_HILOGE("Invalid device class");
+        return false;
+    }
+    return IsMatchDeviceKeys(deviceId, iter->second.inputDeviceOrigin, keyCodes);
 }
 
 int32_t InputDeviceManager::GetDeviceSupportKey(int32_t deviceId, int32_t &keyboardType)
@@ -653,27 +731,6 @@ bool InputDeviceManager::HasTouchDevice()
     // LCOV_EXCL_STOP
 }
 
-bool InputDeviceManager::HasLocalMouseDevice()
-{
-    // LCOV_EXCL_START
-    CALL_DEBUG_ENTER;
-    for (const auto &item : inputDevice_) {
-        auto inputDevice = item.second.inputDeviceOrigin;
-        if (inputDevice == nullptr) {
-            continue;
-        }
-        enum evdev_device_udev_tags udevTags = libinput_device_get_tags(inputDevice);
-        auto bus = libinput_device_get_id_bustype(inputDevice);
-        if (item.second.isPointerDevice && (udevTags & EVDEV_UDEV_TAG_MOUSE) != 0 &&
-            (bus == BUS_BLUETOOTH || bus == BUS_USB) && item.second.isDeviceReportEvent) {
-            MMI_HILOGI("device:%{public}d is a reportevent mouse", item.first);
-            return true;
-        }
-    }
-    return false;
-    // LCOV_EXCL_STOP
-}
-
 std::string InputDeviceManager::GetInputIdentification(struct libinput_device *inputDevice)
 {
     // LCOV_EXCL_START
@@ -814,7 +871,7 @@ void InputDeviceManager::NotifyDevCallback(int32_t deviceId, struct InputDeviceI
     NotifyDevCallbackExt(deviceId, inDevice.inputDeviceOrigin);
 #endif // OHOS_BUILD_ENABLE_KEYBOARD_EXT_FLAG
     if (!inDevice.isTouchableDevice || (deviceId < 0)) {
-        MMI_HILOGI("The device is not touchable device already existent");
+        MMI_HILOGD("The device is not touchable device already existent");
         return;
     }
     std::string name = "null";
@@ -1284,7 +1341,7 @@ int32_t InputDeviceManager::OnEnableInputDevice(bool enable)
 int32_t InputDeviceManager::AddVirtualInputDevice(std::shared_ptr<InputDevice> device, int32_t &deviceId)
 {
     // LCOV_EXCL_START
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     CHKPR(device, RET_ERR);
     if (CheckDuplicateInputDevice(device)) {
         return RET_ERR;
@@ -1543,7 +1600,7 @@ void InputDeviceManager::NotifyRemovePointerDevice(bool removePointerDevice)
 
 int32_t InputDeviceManager::RemoveVirtualInputDevice(int32_t deviceId)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     InputDeviceInfo deviceInfo;
     if (RemoveVirtualInputDeviceInner(deviceId, deviceInfo) == RET_ERR) {
         return RET_ERR;
@@ -1563,7 +1620,7 @@ int32_t InputDeviceManager::RemoveVirtualInputDevice(int32_t deviceId)
 int32_t InputDeviceManager::MakeVirtualDeviceInfo(std::shared_ptr<InputDevice> device, InputDeviceInfo &deviceInfo)
 {
     // LCOV_EXCL_START
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     CHKPR(device, ERROR_NULL_POINTER);
     deviceInfo.isRemote = false;
     deviceInfo.isPointerDevice = device->HasCapability(InputDeviceCapability::INPUT_DEV_CAP_POINTER);
@@ -1575,7 +1632,7 @@ int32_t InputDeviceManager::MakeVirtualDeviceInfo(std::shared_ptr<InputDevice> d
 
 int32_t InputDeviceManager::GenerateVirtualDeviceId(int32_t &deviceId)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     static int32_t virtualDeviceId { MIN_VIRTUAL_INPUT_DEVICE_ID };
     if (virtualInputDevices_.size() >= MAX_VIRTUAL_INPUT_DEVICE_NUM) {
         MMI_HILOGE("Virtual device num exceeds limit:%{public}d", MAX_VIRTUAL_INPUT_DEVICE_NUM);
@@ -1760,6 +1817,58 @@ int32_t InputDeviceManager::SetInputDeviceEnabled(
     }
 
     NotifyInputdeviceMessage(session, index, RET_OK);
+    return RET_OK;
+}
+
+std::vector<std::shared_ptr<InputDevice>> InputDeviceManager::GetInputDeviceInfosForPlugin() const
+{
+    std::vector<std::shared_ptr<InputDevice>> devices;
+    devices.reserve(inputDevice_.size());
+    for (const auto &[deviceId, deviceInfo] : inputDevice_) {
+        if (deviceInfo.inputDeviceOrigin == nullptr) {
+            MMI_HILOGW("Input device origin is null, deviceId:%{public}d", deviceId);
+            continue;
+        }
+        auto inputDevice = GetInputDevice(deviceId, false);
+        if (inputDevice != nullptr) {
+            devices.push_back(inputDevice);
+        }
+    }
+    return devices;
+}
+
+int32_t InputDeviceManager::EnableInputDeviceForPlugin(int32_t deviceId)
+{
+    MMI_HILOGI("Plugin enable input device: %{public}d", deviceId);
+    auto item = inputDevice_.find(deviceId);
+    if (item == inputDevice_.end()) {
+        MMI_HILOGE("Invalid device id: %{public}d", deviceId);
+        return RET_ERR;
+    }
+    item->second.inputEnable = true;
+    DEVICE_STATE_MGR->EnableDevice(deviceId,
+        [](int32_t id) {
+            INPUT_DEV_MGR->EnableInputDevice(id);
+            return RET_OK;
+        });
+    return RET_OK;
+}
+
+int32_t InputDeviceManager::DisableInputDeviceForPlugin(int32_t deviceId)
+{
+    MMI_HILOGI("Plugin disable input device: %{public}d", deviceId);
+    auto item = inputDevice_.find(deviceId);
+    if (item == inputDevice_.end()) {
+        MMI_HILOGE("Invalid device id: %{public}d", deviceId);
+        return RET_ERR;
+    }
+    if (!item->second.inputEnable) {
+        MMI_HILOGI("Device %{public}d already disabled", deviceId);
+        return RET_OK;
+    }
+    item->second.inputEnable = false;
+    item->second.enable = false;
+    NotifyDeviceDisabled(deviceId);
     return RET_OK;
 }
 

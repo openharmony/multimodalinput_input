@@ -281,6 +281,26 @@ HWTEST_F(MMIServerTest, AllocSocketFd_001, TestSize.Level1)
 }
 
 /**
+ * @tc.name: AllocSocketFdResult_001
+ * @tc.desc: Test the function AllocSocketFdResult
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIServerTest, AllocSocketFdResult_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MMIService mmiService;
+    int32_t ret = 0;
+    int32_t pid = 1;
+    int32_t uid = 1;
+    const int32_t moduleType = 1;
+    const std::string programName = "programName";
+    std::shared_ptr<SocketPairFlag> socketPairClosedFlag = std::make_shared<SocketPairFlag>();
+    ASSERT_NO_FATAL_FAILURE(mmiService.AllocSocketFdResult(ret, pid, uid, moduleType, programName,
+        socketPairClosedFlag));
+}
+
+/**
  * @tc.name: AddInputEventFilter_001
  * @tc.desc: Test the function AddInputEventFilter and RemoveInputEventFilter
  * @tc.type: FUNC

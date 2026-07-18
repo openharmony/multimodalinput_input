@@ -35,30 +35,27 @@ public:
 
     InputDevice& operator=(InputDevice&& other) noexcept;
 
-    bool IsOpen() const;
     void Close();
+    bool InitFromTextLine(const std::string& line);
+    bool IsOpen() const;
     bool OpenForReading();
     bool OpenForWriting();
-
-    int32_t GetFd() const;
-    const std::string& GetPath() const;
-    const std::string& GetName() const;
-    uint32_t GetId() const;
-    std::string GetHash() const;
-
-    void SetId(uint32_t id);
-    void SetPath(const std::string& path);
-    void SetName(const std::string& name);
-
     bool ReadEvent(input_event& event);
     bool WriteEvents(const std::vector<input_event>& events);
-    bool InitFromTextLine(const std::string& line);
+    const std::string& GetName() const;
+    const std::string& GetPath() const;
+    int32_t GetFd() const;
+    std::string GetHash() const;
+    uint32_t GetId() const;
+    void SetId(uint32_t id);
+    void SetName(const std::string& name);
+    void SetPath(const std::string& path);
 
 private:
-    bool VerifyDeviceMatch() const;
-    bool OpenDevice(int32_t flags);
-    void QueryDeviceInfo();
     void CalculateDeviceHash();
+    void QueryDeviceInfo();
+    bool OpenDevice(int32_t flags);
+    bool VerifyDeviceMatch() const;
 
     std::string path_;
     std::string name_;

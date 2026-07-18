@@ -102,7 +102,7 @@ int32_t TimerManager::OnResetTimer(int32_t timerId)
 
 int32_t TimerManager::ResetTimer(int32_t timerId)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     CHKPR(context_, RET_ERR);
     return context_->GetDelegateTasks().PostSyncTask([this, timerId] {
         return this->OnResetTimer(timerId);
