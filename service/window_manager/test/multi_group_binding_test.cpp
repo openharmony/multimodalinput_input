@@ -23,6 +23,8 @@
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "MultiGroupBindingTest"
 
+using namespace testing::ext;
+
 namespace OHOS {
 namespace MMI {
 namespace {

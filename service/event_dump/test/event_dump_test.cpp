@@ -661,12 +661,12 @@ HWTEST_F(EventDumpTest, EventDumpTest_ParseCommand_013, TestSize.Level1)
     EXPECT_NO_FATAL_FAILURE(MMIEventDump->ParseCommand(fd_, args));
 }
 /**
- * @tc.name: EventDumpTest_ParseCommand_014
+ * @tc.name: EventDumpTest_ParseCommand_023
  * @tc.desc: Verify ParseCommand with '-G' option (multigroup)
  * @tc.type: FUNC
  * @tc.require: AC-6.1
  */
-HWTEST_F(EventDumpTest, EventDumpTest_ParseCommand_014, TestSize.Level1)
+HWTEST_F(EventDumpTest, EventDumpTest_ParseCommand_023, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     std::vector<std::string> args = {"-G"};
@@ -674,12 +674,12 @@ HWTEST_F(EventDumpTest, EventDumpTest_ParseCommand_014, TestSize.Level1)
 }
 
 /**
- * @tc.name: EventDumpTest_ParseCommand_015
+ * @tc.name: EventDumpTest_ParseCommand_024
  * @tc.desc: Verify ParseCommand with '--multigroup' long option
  * @tc.type: FUNC
  * @tc.require: AC-6.1
  */
-HWTEST_F(EventDumpTest, EventDumpTest_ParseCommand_015, TestSize.Level1)
+HWTEST_F(EventDumpTest, EventDumpTest_ParseCommand_024, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     std::vector<std::string> args = {"--multigroup"};

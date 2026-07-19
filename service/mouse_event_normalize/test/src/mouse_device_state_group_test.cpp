@@ -18,6 +18,8 @@
 #include "mouse_device_state.h"
 #include "window_info.h"
 
+using namespace testing::ext;
+
 namespace OHOS {
 namespace MMI {
 namespace {

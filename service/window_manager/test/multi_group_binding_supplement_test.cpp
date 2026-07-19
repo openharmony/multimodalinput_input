@@ -22,6 +22,8 @@
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "MultiGroupBindingSupplementTest"
 
+using namespace testing::ext;
+
 namespace OHOS {
 namespace MMI {
 namespace {
@@ -79,6 +81,7 @@ HWTEST_F(MultiGroupBindingSupplementTest, CursorPosPerGroupIsolation_001, TestSi
     auto pos0 = mgr_->GetCursorPos(0);
     auto pos1 = mgr_->GetCursorPos(1);
     EXPECT_EQ(pos0.displayId, 1);
+    EXPECT_EQ(pos1.displayId, 2);
 }
 
 HWTEST_F(MultiGroupBindingSupplementTest, MouseLocationPerGroupIsolation_001, TestSize.Level1)
