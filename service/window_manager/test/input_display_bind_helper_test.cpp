@@ -18,6 +18,7 @@
 #include <filesystem>
 #include <fstream>
 #include <iostream>
+#include <sys/stat.h>
 
 #include <gmock/gmock.h>
 
@@ -2214,6 +2215,198 @@ HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_GetDisplayIdName
 
     auto ret = idh.GetDisplayIdNames();
     EXPECT_EQ(ret.size(), 0);
+}
+
+/**
+ * @tc.name: RuntimeBinding_AddAndQuery_001
+ * @tc.desc: Add a runtime binding and query it back
+ * @tc.type: FUNC
+ * @tc.require: AC-1.1
+ */
+HWTEST_F(InputDisplayBindHelperTest, RuntimeBinding_AddAndQuery_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputDisplayBindHelper idh(InputDisplayBindHelperTest::GetCfgFileName());
+    int32_t ret = idh.AddRuntimeBinding(10, 1, 0);
+    EXPECT_EQ(ret, RET_OK);
+
+    auto binding = idh.GetRuntimeBinding(10);
+    ASSERT_TRUE(binding.has_value());
+    EXPECT_EQ(binding->deviceId, 10);
+    EXPECT_EQ(binding->displayId, 1);
+    EXPECT_EQ(binding->groupId, 0);
+}
+
+/**
+ * @tc.name: RuntimeBinding_QueryMissing_001
+ * @tc.desc: Query a runtime binding that does not exist returns nullopt
+ * @tc.type: FUNC
+ * @tc.require: AC-1.1
+ */
+HWTEST_F(InputDisplayBindHelperTest, RuntimeBinding_QueryMissing_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputDisplayBindHelper idh(InputDisplayBindHelperTest::GetCfgFileName());
+    auto binding = idh.GetRuntimeBinding(999);
+    EXPECT_FALSE(binding.has_value());
+}
+
+/**
+ * @tc.name: RuntimeBinding_Unbind_001
+ * @tc.desc: Remove a runtime binding explicitly
+ * @tc.type: FUNC
+ * @tc.require: AC-1.4
+ */
+HWTEST_F(InputDisplayBindHelperTest, RuntimeBinding_Unbind_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputDisplayBindHelper idh(InputDisplayBindHelperTest::GetCfgFileName());
+    idh.AddRuntimeBinding(10, 1, 0);
+    int32_t ret = idh.RemoveRuntimeBinding(10);
+    EXPECT_EQ(ret, RET_OK);
+
+    auto binding = idh.GetRuntimeBinding(10);
+    EXPECT_FALSE(binding.has_value());
+}
+
+/**
+ * @tc.name: RuntimeBinding_UnbindMissing_001
+ * @tc.desc: Unbinding a non-existent binding is a no-op, returns RET_OK
+ * @tc.type: FUNC
+ * @tc.require: AC-1.4
+ */
+HWTEST_F(InputDisplayBindHelperTest, RuntimeBinding_UnbindMissing_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputDisplayBindHelper idh(InputDisplayBindHelperTest::GetCfgFileName());
+    int32_t ret = idh.RemoveRuntimeBinding(999);
+    EXPECT_EQ(ret, RET_OK);
+}
+
+/**
+ * @tc.name: RuntimeBinding_RebindOverwrite_001
+ * @tc.desc: Rebinding a device overwrites the old binding
+ * @tc.type: FUNC
+ * @tc.require: AC-1.3
+ */
+HWTEST_F(InputDisplayBindHelperTest, RuntimeBinding_RebindOverwrite_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputDisplayBindHelper idh(InputDisplayBindHelperTest::GetCfgFileName());
+    idh.AddRuntimeBinding(10, 1, 0);
+    idh.AddRuntimeBinding(10, 2, 1);
+
+    auto binding = idh.GetRuntimeBinding(10);
+    ASSERT_TRUE(binding.has_value());
+    EXPECT_EQ(binding->displayId, 2);
+    EXPECT_EQ(binding->groupId, 1);
+}
+
+/**
+ * @tc.name: RuntimeBinding_ClearByDevice_001
+ * @tc.desc: ClearRuntimeBindingsByDevice removes only the matching device
+ * @tc.type: FUNC
+ * @tc.require: AC-1.5
+ */
+HWTEST_F(InputDisplayBindHelperTest, RuntimeBinding_ClearByDevice_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputDisplayBindHelper idh(InputDisplayBindHelperTest::GetCfgFileName());
+    idh.AddRuntimeBinding(10, 1, 0);
+    idh.AddRuntimeBinding(20, 2, 1);
+    idh.ClearRuntimeBindingsByDevice(10);
+
+    EXPECT_FALSE(idh.GetRuntimeBinding(10).has_value());
+    EXPECT_TRUE(idh.GetRuntimeBinding(20).has_value());
+}
+
+/**
+ * @tc.name: RuntimeBinding_ClearByDisplay_001
+ * @tc.desc: ClearRuntimeBindingsByDisplay removes all bindings to a given display
+ * @tc.type: FUNC
+ * @tc.require: AC-1.5
+ */
+HWTEST_F(InputDisplayBindHelperTest, RuntimeBinding_ClearByDisplay_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputDisplayBindHelper idh(InputDisplayBindHelperTest::GetCfgFileName());
+    idh.AddRuntimeBinding(10, 1, 0);
+    idh.AddRuntimeBinding(20, 1, 0);
+    idh.AddRuntimeBinding(30, 2, 1);
+    idh.ClearRuntimeBindingsByDisplay(1);
+
+    EXPECT_FALSE(idh.GetRuntimeBinding(10).has_value());
+    EXPECT_FALSE(idh.GetRuntimeBinding(20).has_value());
+    EXPECT_TRUE(idh.GetRuntimeBinding(30).has_value());
+}
+
+/**
+ * @tc.name: RuntimeBinding_ClearByGroup_001
+ * @tc.desc: ClearRuntimeBindingsByGroup removes all bindings to a given group
+ * @tc.type: FUNC
+ * @tc.require: AC-1.5
+ */
+HWTEST_F(InputDisplayBindHelperTest, RuntimeBinding_ClearByGroup_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputDisplayBindHelper idh(InputDisplayBindHelperTest::GetCfgFileName());
+    idh.AddRuntimeBinding(10, 1, 0);
+    idh.AddRuntimeBinding(20, 2, 0);
+    idh.AddRuntimeBinding(30, 3, 1);
+    idh.ClearRuntimeBindingsByGroup(0);
+
+    EXPECT_FALSE(idh.GetRuntimeBinding(10).has_value());
+    EXPECT_FALSE(idh.GetRuntimeBinding(20).has_value());
+    EXPECT_TRUE(idh.GetRuntimeBinding(30).has_value());
+}
+
+/**
+ * @tc.name: RuntimeBinding_ClearAll_001
+ * @tc.desc: ClearAllRuntimeBindings removes everything
+ * @tc.type: FUNC
+ * @tc.require: AC-1.5
+ */
+HWTEST_F(InputDisplayBindHelperTest, RuntimeBinding_ClearAll_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputDisplayBindHelper idh(InputDisplayBindHelperTest::GetCfgFileName());
+    idh.AddRuntimeBinding(10, 1, 0);
+    idh.AddRuntimeBinding(20, 2, 1);
+    idh.AddRuntimeBinding(30, 3, 2);
+    idh.ClearAllRuntimeBindings();
+
+    EXPECT_FALSE(idh.GetRuntimeBinding(10).has_value());
+    EXPECT_FALSE(idh.GetRuntimeBinding(20).has_value());
+    EXPECT_FALSE(idh.GetRuntimeBinding(30).has_value());
+}
+
+/**
+ * @tc.name: RuntimeBinding_NoConfigFileTouch_001
+ * @tc.desc: Runtime binding operations do not touch any config file (runtime-only check)
+ * @tc.type: FUNC
+ * @tc.require: Anti-fake: Runtime only
+ */
+HWTEST_F(InputDisplayBindHelperTest, RuntimeBinding_NoConfigFileTouch_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    const std::string testCfg = "runtime_binding_test.cfg";
+    std::ofstream ofs(testCfg);
+    ofs << "";
+    ofs.close();
+
+    struct stat statBefore;
+    stat(testCfg.c_str(), &statBefore);
+
+    InputDisplayBindHelper idh(testCfg);
+    idh.AddRuntimeBinding(10, 1, 0);
+    idh.RemoveRuntimeBinding(10);
+    idh.ClearAllRuntimeBindings();
+
+    struct stat statAfter;
+    stat(testCfg.c_str(), &statAfter);
+    EXPECT_EQ(statBefore.st_mtime, statAfter.st_mtime) <<
+        "Config file must not be modified by runtime binding operations";
+    std::remove(testCfg.c_str());
 }
 
 /**

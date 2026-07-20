@@ -49,12 +49,18 @@ public:
     void UpdateWindowInfo(const WindowGroupInfo&) override {}
     MOCK_METHOD(int32_t, ClearWindowPointerStyle, (int32_t, int32_t));
     void Dump(int32_t, const std::vector<std::string>&) override {}
+    void DumpMultiGroupState(int32_t) override {}
+    size_t GetGroupStateMapSize() const override { return 0; }
     MOCK_METHOD(int32_t, GetWindowPid, (int32_t), (const));
     MOCK_METHOD(int32_t, GetWindowAgentPid, (int32_t), (const));
-    MOCK_METHOD(int32_t, SetMouseCaptureMode, (int32_t, bool));
-    MOCK_METHOD(bool, GetMouseIsCaptureMode, (), (const));
+    MOCK_METHOD(int32_t, SetMouseCaptureMode, (int32_t, bool, int32_t));
+    MOCK_METHOD(bool, GetMouseIsCaptureMode, (int32_t), (const));
+    MOCK_METHOD(int32_t, GetDeviceGroupId, (int32_t), (const));
     MOCK_METHOD(int32_t, GetDisplayBindInfo, (DisplayBindInfos&));
     MOCK_METHOD(int32_t, SetDisplayBind, (int32_t, int32_t, std::string&));
+    int32_t BindDeviceToDisplayGroupByDisplay(int32_t, int32_t, std::string&) override { return 0; }
+    int32_t UnbindDeviceFromDisplayGroup(int32_t, std::string&) override { return 0; }
+    void OnDeviceUnbind(int32_t) override {}
     MOCK_METHOD(int32_t, AppendExtraData, (const ExtraData&));
     MOCK_METHOD(bool, IsWindowVisible, (int32_t));
     MOCK_METHOD(ExtraData, GetExtraData, (), (const));
@@ -78,9 +84,9 @@ public:
     MOCK_METHOD(void, UpdateUIExtensionInfo, (const std::vector<UIExtensionInfo> &));
 
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
-    MOCK_METHOD(MouseLocation, GetMouseInfo, ());
-    MOCK_METHOD(CursorPosition, GetCursorPos, ());
-    MOCK_METHOD(CursorPosition, ResetCursorPos, ());
+    MOCK_METHOD(MouseLocation, GetMouseInfo, (int32_t));
+    MOCK_METHOD(CursorPosition, GetCursorPos, (int32_t));
+    MOCK_METHOD(CursorPosition, ResetCursorPos, (int32_t));
     void UpdateAndAdjustMouseLocation(int32_t&, double&, double&, bool) override {}
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 

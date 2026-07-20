@@ -61,7 +61,17 @@ public:
     void GetPressedButtons(std::vector<int32_t>& pressedButtons) override;
     void MouseBtnStateCounts(uint32_t btnCode, const BUTTON_STATE btnState) override;
     int32_t LibinputChangeToPointer(const uint32_t keyValue) override;
+
+    // Per-group overloads
+    int32_t GetMouseCoordsX(int32_t groupId) const override;
+    int32_t GetMouseCoordsY(int32_t groupId) const override;
+    void SetMouseCoords(int32_t groupId, int32_t x, int32_t y) override;
+    bool IsLeftBtnPressed(int32_t groupId) override;
+    void GetPressedButtons(int32_t groupId, std::vector<int32_t>& pressedButtons) override;
+    void MouseBtnStateCounts(int32_t groupId, uint32_t btnCode, const BUTTON_STATE btnState) override;
+
     int32_t SetScrollSwitchSetterPid(int32_t pid) override;
+    void OnGroupRemoved(int32_t groupId) override;
 
 private:
     std::shared_ptr<MouseTransformProcessor> GetProcessor(int32_t deviceId) const;

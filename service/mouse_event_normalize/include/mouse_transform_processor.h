@@ -208,6 +208,7 @@ public:
 
 private:
     IInputServiceContext *env_ { nullptr };
+    int32_t groupId_ { 0 };
     static std::atomic_int32_t globalPointerSpeed_;
     static std::atomic_int32_t globalScrollSwitchPid_;
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD

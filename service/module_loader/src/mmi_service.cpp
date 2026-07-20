@@ -3263,6 +3263,88 @@ ErrCode MMIService::SetDisplayBind(int32_t deviceId, int32_t displayId, std::str
     return RET_OK;
 }
 
+int32_t MMIService::CheckBindDevicePermission()
+{
+    CALL_DEBUG_ENTER;
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
+
+    if (!PER_HELPER->CheckInputDeviceCfg()) {
+        MMI_HILOGE("Failed to verify the INPUT_DEVICE_PERMISSION_CODE permission");
+        return ERROR_NO_PERMISSION;
+    }
+
+    return RET_OK;
+}
+
+bool MMIService::IsHidStandardDevice(int32_t deviceId) const
+{
+    CALL_DEBUG_ENTER;
+    auto device = INPUT_DEV_MGR->GetInputDevice(deviceId, false);
+    if (device == nullptr) {
+        MMI_HILOGE("Device not found, deviceId:%{public}d", deviceId);
+        return false;
+    }
+
+    if (device->HasCapability(INPUT_DEV_CAP_KEYBOARD) ||
+        device->HasCapability(INPUT_DEV_CAP_POINTER) ||
+        device->HasCapability(INPUT_DEV_CAP_JOYSTICK)) {
+        return true;
+    }
+    return false;
+}
+
+ErrCode MMIService::BindDeviceToDisplayGroupByDisplay(int32_t deviceId, int32_t displayId, std::string &msg)
+{
+    CALL_INFO_TRACE;
+    int32_t ret = CheckBindDevicePermission();
+    if (ret != RET_OK) {
+        msg = "Permission denied: caller is not a system app or lacks input device config permission";
+        MMI_HILOGE("BindDeviceToDisplayGroupByDisplay permission check failed, ret:%{public}d", ret);
+        return ERROR_NO_PERMISSION;
+    }
+    if (!IsRunning()) {
+        MMI_HILOGE("Service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
+
+    std::string connectType = INPUT_DEV_MGR->GetDeviceConnectionType(deviceId);
+    if (connectType != "USB" && connectType != "BLUETOOTH") {
+        msg = "Device connection type is not USB or BLUETOOTH, type: " + connectType;
+        MMI_HILOGE("Invalid connection type [%{public}s] for deviceId:%{public}d", connectType.c_str(), deviceId);
+        return RET_ERR;
+    }
+
+    if (!IsHidStandardDevice(deviceId)) {
+        msg = "Device is not a HID standard device (keyboard, pointer, or joystick)";
+        MMI_HILOGE("Device is not a HID standard device, deviceId:%{public}d", deviceId);
+        return RET_ERR;
+    }
+
+    MMI_HILOGI("BindDeviceToDisplayGroupByDisplay: deviceId:%{public}d, displayId:%{public}d", deviceId, displayId);
+    return WIN_MGR->BindDeviceToDisplayGroupByDisplay(deviceId, displayId, msg);
+}
+
+ErrCode MMIService::UnbindDeviceFromDisplayGroup(int32_t deviceId, std::string &msg)
+{
+    CALL_INFO_TRACE;
+    int32_t ret = CheckBindDevicePermission();
+    if (ret != RET_OK) {
+        msg = "Permission denied: caller is not a system app or lacks input device config permission";
+        MMI_HILOGE("UnbindDeviceFromDisplayGroup permission check failed, ret:%{public}d", ret);
+        return ERROR_NO_PERMISSION;
+    }
+    if (!IsRunning()) {
+        MMI_HILOGE("Service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
+
+    MMI_HILOGI("UnbindDeviceFromDisplayGroup: deviceId:%{public}d", deviceId);
+    return WIN_MGR->UnbindDeviceFromDisplayGroup(deviceId, msg);
+}
+
 ErrCode MMIService::GetFunctionKeyState(int32_t funcKey, bool &state)
 {
     CALL_DEBUG_ENTER;

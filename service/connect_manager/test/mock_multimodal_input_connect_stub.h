@@ -131,6 +131,9 @@ public:
     MOCK_METHOD(int32_t, GetAllMmiSubscribedEvents,
                 ((std::map<std::tuple<int32_t, int32_t, std::string>, int32_t> & datas)), (override));
     MOCK_METHOD(int32_t, SetDisplayBind, (int32_t deviceId, int32_t displayId, std::string &msg), (override));
+    MOCK_METHOD(int32_t, BindDeviceToDisplayGroupByDisplay,
+                (int32_t deviceId, int32_t displayId, std::string &msg), (override));
+    MOCK_METHOD(int32_t, UnbindDeviceFromDisplayGroup, (int32_t deviceId, std::string &msg), (override));
     MOCK_METHOD(int32_t, GetFunctionKeyState, (int32_t funckey, bool &state), (override));
     MOCK_METHOD(int32_t, SetFunctionKeyState, (int32_t funcKey, bool enable), (override));
     MOCK_METHOD(int32_t, SetPointerLocation, (int32_t x, int32_t y, int32_t displayId), (override));

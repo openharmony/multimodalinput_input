@@ -55,6 +55,8 @@ class KeyEventNormalize final {
 public:
     DISALLOW_COPY_AND_MOVE(KeyEventNormalize);
     std::shared_ptr<KeyEvent> GetKeyEvent();
+    std::shared_ptr<KeyEvent> GetKeyEventForGroup(int32_t groupId);
+    void RemoveGroupKeyEvent(int32_t groupId);
     void Init();
     int32_t Normalize(libinput_event *event, std::shared_ptr<KeyEvent> keyEvent);
     bool SyncLedStateFromKeyEvent(struct libinput_device* device);
@@ -95,6 +97,8 @@ private:
 
 private:
     std::shared_ptr<KeyEvent> keyEvent_ { nullptr };
+    std::map<int32_t, std::shared_ptr<KeyEvent>> groupKeyEvents_;
+    std::mutex groupKeyEventsMutex_;
     std::map<int32_t, bool> shieldStatus_ {
         {SHIELD_MODE::FACTORY_MODE, false},
         {SHIELD_MODE::OOBE_MODE, false},

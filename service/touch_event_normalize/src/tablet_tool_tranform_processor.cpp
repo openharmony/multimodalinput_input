@@ -643,7 +643,8 @@ bool TabletToolTransformProcessor::OnToolButton(struct libinput_event* event)
         MMI_HILOGE("WinMgr is null");
         return false;
     }
-    auto mouseInfo = winMgr->GetMouseInfo();
+    int32_t groupId = winMgr->GetDeviceGroupId(deviceId_);
+    auto mouseInfo = winMgr->GetMouseInfo(groupId);
     auto time = GetSysClockTime();
     auto toolType = GetToolType(tabletEvent);
 

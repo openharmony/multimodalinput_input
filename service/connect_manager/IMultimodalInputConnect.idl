@@ -123,6 +123,8 @@ interface OHOS.MMI.IMultimodalInputConnect {
     void GetHardwareCursorStats([out] unsigned int frameCount, [out] unsigned int vsyncCount);
     void GetAllMmiSubscribedEvents([out] MmiEventMap mmiEventMap);
     void SetDisplayBind([in] int deviceId, [in] int displayId, [out] String msg);
+    void BindDeviceToDisplayGroupByDisplay([in] int deviceId, [in] int displayId, [out] String msg);
+    void UnbindDeviceFromDisplayGroup([in] int deviceId, [out] String msg);
     void GetFunctionKeyState([in] int funckey, [out] boolean state);
     void SetFunctionKeyState([in] int funcKey, [in] boolean enable);
     void SetPointerLocation([in] int x, [in] int y, [in] int displayId);

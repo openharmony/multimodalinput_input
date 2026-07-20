@@ -189,7 +189,8 @@ void CrownTransformProcessor::HandleCrownRotatePostInner(double velocity, double
     CHKPV(pointerEvent_);
 
 #ifdef OHOS_BUILD_ENABLE_POINTER
-    auto mouseInfo = WIN_MGR->GetMouseInfo();
+    int32_t groupId = WIN_MGR->GetDeviceGroupId(deviceId_);
+    auto mouseInfo = WIN_MGR->GetMouseInfo(groupId);
 
     PointerEvent::PointerItem pointerItem;
     pointerItem.SetDisplayX(mouseInfo.physicalX);

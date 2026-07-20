@@ -521,9 +521,13 @@ int32_t EventNormalizeHandler::HandleKeyboardEvent(libinput_event* event)
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     g_lastKeyboardEventTime = GetSysClockTime();
     BytraceAdapter::StartPackageEvent("package keyEvent");
-    auto keyEvent = KeyEventHdr->GetKeyEvent();
-    CHKPR(keyEvent, ERROR_NULL_POINTER);
     CHKPR(event, ERROR_NULL_POINTER);
+    auto device = libinput_event_get_device(event);
+    CHKPR(device, ERROR_NULL_POINTER);
+    int32_t deviceId = INPUT_DEV_MGR->FindInputDeviceId(device);
+    int32_t groupId = WIN_MGR->GetDeviceGroupId(deviceId);
+    auto keyEvent = KeyEventHdr->GetKeyEventForGroup(groupId);
+    CHKPR(keyEvent, ERROR_NULL_POINTER);
     std::vector<int32_t> pressedKeys = keyEvent->GetPressedKeys();
     int32_t lastPressedKey = -1;
     if (!pressedKeys.empty()) {
@@ -562,9 +566,10 @@ int32_t EventNormalizeHandler::HandleKeyboardEvent(libinput_event* event)
     BytraceAdapter::StopPackageEvent();
     BytraceAdapter::StartBytrace(keyEvent);
     EventLogHelper::PrintEventData(keyEvent, MMI_LOG_HEADER);
-    auto device = INPUT_DEV_MGR->GetInputDevice(keyEvent->GetDeviceId());
-    CHKPR(device, RET_ERR);
-    MMI_HILOGI("InputTracking id:%{public}d event created by:%{public}s", keyEvent->GetId(), device->GetName().c_str());
+    auto inputDevice = INPUT_DEV_MGR->GetInputDevice(keyEvent->GetDeviceId());
+    CHKPR(inputDevice, RET_ERR);
+    MMI_HILOGI("InputTracking id:%{public}d event created by:%{public}s", keyEvent->GetId(),
+        inputDevice->GetName().c_str());
     UpdateKeyEventHandlerChain(keyEvent);
 #ifdef SHORTCUT_KEY_RULES_ENABLED
     KEY_SHORTCUT_MGR->UpdateShortcutConsumed(keyEvent);

@@ -80,7 +80,23 @@ public:
     virtual void GetPressedButtons(std::vector<int32_t>& pressedButtons) = 0;
     virtual void MouseBtnStateCounts(uint32_t btnCode, const BUTTON_STATE btnState) = 0;
     virtual int32_t LibinputChangeToPointer(const uint32_t keyValue) = 0;
+
+    // Per-group overloads with default delegation to no-group versions
+    virtual int32_t GetMouseCoordsX(int32_t groupId) const { return GetMouseCoordsX(); }
+    virtual int32_t GetMouseCoordsY(int32_t groupId) const { return GetMouseCoordsY(); }
+    virtual void SetMouseCoords(int32_t groupId, int32_t x, int32_t y) { SetMouseCoords(x, y); }
+    virtual bool IsLeftBtnPressed(int32_t groupId) { return IsLeftBtnPressed(); }
+    virtual void GetPressedButtons(int32_t groupId, std::vector<int32_t>& pressedButtons)
+    {
+        GetPressedButtons(pressedButtons);
+    }
+    virtual void MouseBtnStateCounts(int32_t groupId, uint32_t btnCode, const BUTTON_STATE btnState)
+    {
+        MouseBtnStateCounts(btnCode, btnState);
+    }
+
     virtual int32_t SetScrollSwitchSetterPid(int32_t pid) = 0;
+    virtual void OnGroupRemoved(int32_t groupId) {}
 };
 } // namespace MMI
 } // namespace OHOS

@@ -5401,5 +5401,142 @@ HWTEST_F(MMIServerTest, MMIService_UpdateUIExtensionInfo_NoPermission_002, TestS
     ErrCode ret = mmiService.UpdateUIExtensionInfo(uiExtensionInfos);
     EXPECT_EQ(ret, ERROR_NO_PERMISSION);
 }
+/**
+ * @tc.name: MMIService_CheckBindDevicePermission_001
+ * @tc.desc: Test CheckBindDevicePermission rejects non-system app
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIServerTest, MMIService_CheckBindDevicePermission_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MMIService mmiService;
+    int32_t ret = mmiService.CheckBindDevicePermission();
+    EXPECT_NE(ret, RET_OK);
+}
+
+/**
+ * @tc.name: MMIService_BindDeviceToDisplayGroupByDisplay_NoPermission_001
+ * @tc.desc: Test BindDeviceToDisplayGroupByDisplay returns ERROR_NO_PERMISSION for non-system app
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIServerTest, MMIService_BindDeviceToDisplayGroupByDisplay_NoPermission_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MMIService mmiService;
+    mmiService.state_ = ServiceRunningState::STATE_RUNNING;
+    int32_t deviceId = 1;
+    int32_t displayId = 2;
+    std::string msg;
+    ErrCode ret = mmiService.BindDeviceToDisplayGroupByDisplay(deviceId, displayId, msg);
+    EXPECT_EQ(ret, ERROR_NO_PERMISSION);
+    EXPECT_FALSE(msg.empty());
+}
+
+/**
+ * @tc.name: MMIService_UnbindDeviceFromDisplayGroup_NoPermission_001
+ * @tc.desc: Test UnbindDeviceFromDisplayGroup returns ERROR_NO_PERMISSION for non-system app
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIServerTest, MMIService_UnbindDeviceFromDisplayGroup_NoPermission_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MMIService mmiService;
+    mmiService.state_ = ServiceRunningState::STATE_RUNNING;
+    int32_t deviceId = 1;
+    std::string msg;
+    ErrCode ret = mmiService.UnbindDeviceFromDisplayGroup(deviceId, msg);
+    EXPECT_EQ(ret, ERROR_NO_PERMISSION);
+    EXPECT_FALSE(msg.empty());
+}
+
+/**
+ * @tc.name: MMIService_BindDeviceToDisplayGroupByDisplay_ServiceNotRunning_001
+ * @tc.desc: Test BindDeviceToDisplayGroupByDisplay when service is not running returns MMISERVICE_NOT_RUNNING
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIServerTest, MMIService_BindDeviceToDisplayGroupByDisplay_ServiceNotRunning_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MMIService mmiService;
+    mmiService.state_ = ServiceRunningState::STATE_EXIT;
+    int32_t deviceId = 1;
+    int32_t displayId = 2;
+    std::string msg;
+    ErrCode ret = mmiService.BindDeviceToDisplayGroupByDisplay(deviceId, displayId, msg);
+    EXPECT_NE(ret, RET_OK);
+}
+
+/**
+ * @tc.name: MMIService_UnbindDeviceFromDisplayGroup_ServiceNotRunning_001
+ * @tc.desc: Test UnbindDeviceFromDisplayGroup when service is not running returns MMISERVICE_NOT_RUNNING
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIServerTest, MMIService_UnbindDeviceFromDisplayGroup_ServiceNotRunning_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MMIService mmiService;
+    mmiService.state_ = ServiceRunningState::STATE_EXIT;
+    int32_t deviceId = 1;
+    std::string msg;
+    ErrCode ret = mmiService.UnbindDeviceFromDisplayGroup(deviceId, msg);
+    EXPECT_NE(ret, RET_OK);
+}
+
+/**
+ * @tc.name: MMIService_IsHidStandardDevice_NoDevice_001
+ * @tc.desc: Test IsHidStandardDevice returns false when device does not exist
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIServerTest, MMIService_IsHidStandardDevice_NoDevice_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MMIService mmiService;
+    int32_t invalidDeviceId = 99999;
+    bool result = mmiService.IsHidStandardDevice(invalidDeviceId);
+    EXPECT_FALSE(result);
+}
+
+/**
+ * @tc.name: MMIService_BindDeviceToDisplayGroupByDisplay_MsgOnPermFailure_001
+ * @tc.desc: Test that msg contains failure reason on permission failure for bind
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIServerTest, MMIService_BindDeviceToDisplayGroupByDisplay_MsgOnPermFailure_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MMIService mmiService;
+    mmiService.state_ = ServiceRunningState::STATE_RUNNING;
+    int32_t deviceId = 1;
+    int32_t displayId = 2;
+    std::string msg;
+    ErrCode ret = mmiService.BindDeviceToDisplayGroupByDisplay(deviceId, displayId, msg);
+    EXPECT_EQ(ret, ERROR_NO_PERMISSION);
+    EXPECT_NE(msg.find("Permission denied"), std::string::npos);
+}
+
+/**
+ * @tc.name: MMIService_UnbindDeviceFromDisplayGroup_MsgOnPermFailure_001
+ * @tc.desc: Test that msg contains failure reason on permission failure for unbind
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIServerTest, MMIService_UnbindDeviceFromDisplayGroup_MsgOnPermFailure_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MMIService mmiService;
+    mmiService.state_ = ServiceRunningState::STATE_RUNNING;
+    int32_t deviceId = 1;
+    std::string msg;
+    ErrCode ret = mmiService.UnbindDeviceFromDisplayGroup(deviceId, msg);
+    EXPECT_EQ(ret, ERROR_NO_PERMISSION);
+    EXPECT_NE(msg.find("Permission denied"), std::string::npos);
+}
 } // namespace MMI
 } // namespace OHOS

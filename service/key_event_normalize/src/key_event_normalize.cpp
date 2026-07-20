@@ -110,6 +110,32 @@ std::shared_ptr<KeyEvent> KeyEventNormalize::GetKeyEvent()
     return keyEvent_;
 }
 
+std::shared_ptr<KeyEvent> KeyEventNormalize::GetKeyEventForGroup(int32_t groupId)
+{
+    if (groupId == DEFAULT_GROUP_ID) {
+        return GetKeyEvent();
+    }
+    std::lock_guard<std::mutex> lock(groupKeyEventsMutex_);
+    auto iter = groupKeyEvents_.find(groupId);
+    if (iter != groupKeyEvents_.end()) {
+        return iter->second;
+    }
+    auto keyEvent = KeyEvent::Create();
+    if (keyEvent != nullptr) {
+        groupKeyEvents_[groupId] = keyEvent;
+    }
+    return keyEvent;
+}
+
+void KeyEventNormalize::RemoveGroupKeyEvent(int32_t groupId)
+{
+    if (groupId == DEFAULT_GROUP_ID) {
+        return;
+    }
+    std::lock_guard<std::mutex> lock(groupKeyEventsMutex_);
+    groupKeyEvents_.erase(groupId);
+}
+
 int32_t KeyEventNormalize::Normalize(struct libinput_event *event, std::shared_ptr<KeyEvent> keyEvent)
 {
     CALL_DEBUG_ENTER;

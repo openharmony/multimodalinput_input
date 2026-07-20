@@ -578,6 +578,88 @@ int32_t CursorDrawingComponent::DrawNewDpiPointer()
     return pointerInstance_->DrawNewDpiPointer();
 }
 
+void CursorDrawingComponent::RemoveContext(int32_t groupId)
+{
+    CHK_IS_LOADV(isLoaded_, pointerInstance_)
+    pointerInstance_->RemoveContext(groupId);
+}
+
+void CursorDrawingComponent::DrawPointer(int32_t groupId, uint64_t rsId, PhysicalCoord coord,
+    const PointerStyle pointerStyle, Direction direction)
+{
+    CHK_IS_LOADV(isLoaded_, pointerInstance_)
+    pointerInstance_->DrawPointer(groupId, rsId, coord, pointerStyle, direction);
+}
+
+void CursorDrawingComponent::DrawMovePointer(int32_t groupId, uint64_t rsId,
+    int32_t physicalX, int32_t physicalY)
+{
+    CHK_IS_LOADV(isLoaded_, pointerInstance_)
+    pointerInstance_->DrawMovePointer(groupId, rsId, physicalX, physicalY);
+}
+
+void CursorDrawingComponent::SetMouseDisplayState(int32_t groupId, bool state)
+{
+    CHK_IS_LOADV(isLoaded_, pointerInstance_)
+    pointerInstance_->SetMouseDisplayState(groupId, state);
+}
+
+bool CursorDrawingComponent::GetMouseDisplayState(int32_t groupId) const
+{
+    if (!isLoaded_ || (pointerInstance_ == nullptr)) {
+        MMI_HILOGE("libcursor_drawing_adapter.z.so is not loaded");
+        return false;
+    }
+    return pointerInstance_->GetMouseDisplayState(groupId);
+}
+
+void CursorDrawingComponent::SetPointerLocation(int32_t groupId, int32_t x, int32_t y, uint64_t rsId)
+{
+    CHK_IS_LOADV(isLoaded_, pointerInstance_)
+    pointerInstance_->SetPointerLocation(groupId, x, y, rsId);
+}
+
+int32_t CursorDrawingComponent::SetPointerStyleForGroup(int32_t groupId, int32_t pid,
+    int32_t windowId, PointerStyle pointerStyle)
+{
+    CHK_IS_LOADR(isLoaded_, pointerInstance_)
+    return pointerInstance_->SetPointerStyleForGroup(groupId, pid, windowId, pointerStyle);
+}
+
+int32_t CursorDrawingComponent::GetPointerStyleForGroup(int32_t groupId, int32_t pid,
+    int32_t windowId, PointerStyle &style) const
+{
+    if (!isLoaded_ || (pointerInstance_ == nullptr)) {
+        MMI_HILOGE("libcursor_drawing_adapter.z.so is not loaded");
+        return RET_ERR;
+    }
+    return pointerInstance_->GetPointerStyleForGroup(groupId, pid, windowId, style);
+}
+
+int32_t CursorDrawingComponent::SetPointerSizeForGroup(int32_t groupId, int32_t size)
+{
+    CHK_IS_LOADR(isLoaded_, pointerInstance_)
+    return pointerInstance_->SetPointerSizeForGroup(groupId, size);
+}
+
+int32_t CursorDrawingComponent::GetPointerSizeForGroup(int32_t groupId)
+{
+    CHK_IS_LOADR(isLoaded_, pointerInstance_)
+    return pointerInstance_->GetPointerSizeForGroup(groupId);
+}
+
+int32_t CursorDrawingComponent::SetPointerColorForGroup(int32_t groupId, int32_t color)
+{
+    CHK_IS_LOADR(isLoaded_, pointerInstance_)
+    return pointerInstance_->SetPointerColorForGroup(groupId, color);
+}
+
+int32_t CursorDrawingComponent::GetPointerColorForGroup(int32_t groupId)
+{
+    CHK_IS_LOADR(isLoaded_, pointerInstance_)
+    return pointerInstance_->GetPointerColorForGroup(groupId);
+}
+
 #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
 int32_t CursorDrawingComponent::GetPointerSnapshot(void *pixelMapPtr)
 {
