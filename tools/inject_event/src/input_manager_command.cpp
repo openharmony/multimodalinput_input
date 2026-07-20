@@ -996,15 +996,10 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                             keyEventTemp->AddKeyItem(item);
                             keyEventTemp->SetRepeat(true);
                             std::string isRepeat = keyEventTemp->IsRepeat() ? "true" : "false";
-                            if (!EventLogHelper::IsBetaVersion()) {
-                                MMI_HILOGI("KeyAction:%{public}s, IsRepeat:%{public}s",
-                                    KeyEvent::ActionToString(keyEventTemp->GetKeyAction()), isRepeat.c_str());
-                            } else {
-                                MMI_HILOGI("KeyCode:%{private}d, ActionTime:%{public}" PRId64
-                                    ",KeyAction:%{public}s, IsRepeat:%{public}s",
-                                    keyEventTemp->GetKeyCode(), keyEventTemp->GetActionTime(),
-                                    KeyEvent::ActionToString(keyEventTemp->GetKeyAction()), isRepeat.c_str());
-                            }
+                            MMI_HILOGI("KeyCode:%{private}d, ActionTime:%{public}" PRId64
+                                ",KeyAction:%{public}s, IsRepeat:%{public}s",
+                                keyEventTemp->GetKeyCode(), keyEventTemp->GetActionTime(),
+                                KeyEvent::ActionToString(keyEventTemp->GetKeyAction()), isRepeat.c_str());
                             InputManager::GetInstance()->SimulateInputEvent(keyEventTemp);
                             std::this_thread::sleep_for(std::chrono::milliseconds(pressTimeMs));
 
@@ -1015,15 +1010,10 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                             keyEvent->SetActionTime(time);
                             keyEvent->SetRepeat(true);
                             isRepeat = keyEvent->IsRepeat() ? "true" : "false";
-                            if (!OHOS::MMI::EventLogHelper::IsBetaVersion()) {
-                                MMI_HILOGI("KeyAction:%{public}s, IsRepeat:%{public}s",
-                                    KeyEvent::ActionToString(keyEvent->GetKeyAction()), isRepeat.c_str());
-                            } else {
-                                MMI_HILOGI("KeyCode:%{private}d, ActionTime:%{public}" PRId64
-                                    ",KeyAction:%{public}s, IsRepeat:%{public}s",
-                                    keyEvent->GetKeyCode(), keyEvent->GetActionTime(),
-                                    KeyEvent::ActionToString(keyEvent->GetKeyAction()), isRepeat.c_str());
-                            }
+                            MMI_HILOGI("KeyCode:%{private}d, ActionTime:%{public}" PRId64
+                                ",KeyAction:%{public}s, IsRepeat:%{public}s",
+                                keyEvent->GetKeyCode(), keyEvent->GetActionTime(),
+                                KeyEvent::ActionToString(keyEvent->GetKeyAction()), isRepeat.c_str());
                             InputManager::GetInstance()->SimulateInputEvent(keyEvent);
                             break;
                         }

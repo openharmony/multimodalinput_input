@@ -150,7 +150,7 @@ void JoystickEventInterface::OnDeviceAdded(std::shared_ptr<JoystickEventInterfac
             return dev.IsJoystick();
         });
     if (!isJoystick) {
-        MMI_HILOGI("Device[%{private}d] Not joystick", deviceId);
+        MMI_HILOGD("Device[%{private}d] Not joystick", deviceId);
         return;
     }
     RemoveUnloadingTimer();

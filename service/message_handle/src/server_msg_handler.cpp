@@ -550,13 +550,8 @@ int32_t ServerMsgHandler::AccelerateMotion(int32_t userId, std::shared_ptr<Point
         return ret;
     }
     WIN_MGR->UpdateAndAdjustMouseLocation(cursorPos.displayId, cursorPos.cursorPos.x, cursorPos.cursorPos.y);
-    if (EventLogHelper::IsBetaVersion() && !pointerEvent->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE)) {
-        MMI_HILOGD("Cursor move to (x:%.2f, y:%.2f, DisplayId:%d)",
-            cursorPos.cursorPos.x, cursorPos.cursorPos.y, cursorPos.displayId);
-    } else {
-        MMI_HILOGD("Cursor move to (x:%.2f, y:%.2f, DisplayId:%d)",
-            cursorPos.cursorPos.x, cursorPos.cursorPos.y, cursorPos.displayId);
-    }
+    MMI_HILOGD("Cursor move to (x:%.2f, y:%.2f, DisplayId:%d)",
+        cursorPos.cursorPos.x, cursorPos.cursorPos.y, cursorPos.displayId);
     return RET_OK;
 }
 
@@ -623,13 +618,8 @@ int32_t ServerMsgHandler::AccelerateMotionTouchpad(int32_t userId, std::shared_p
         return ret;
     }
     WIN_MGR->UpdateAndAdjustMouseLocation(cursorPos.displayId, cursorPos.cursorPos.x, cursorPos.cursorPos.y);
-    if (EventLogHelper::IsBetaVersion() && !pointerEvent->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE)) {
-        MMI_HILOGD("Cursor move to (x:%.2f, y:%.2f, DisplayId:%d)",
-            cursorPos.cursorPos.x, cursorPos.cursorPos.y, cursorPos.displayId);
-    } else {
-        MMI_HILOGD("Cursor move to (x:%.2f, y:%.2f, DisplayId:%d)",
-            cursorPos.cursorPos.x, cursorPos.cursorPos.y, cursorPos.displayId);
-    }
+    MMI_HILOGD("Cursor move to (x:%.2f, y:%.2f, DisplayId:%d)",
+        cursorPos.cursorPos.x, cursorPos.cursorPos.y, cursorPos.displayId);
     return RET_OK;
 }
 
