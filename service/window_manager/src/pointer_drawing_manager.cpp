@@ -3366,11 +3366,8 @@ void PointerDrawingManager::CreateRenderConfig(RenderConfig& cfg, std::shared_pt
     cfg.isBlur = isBlur && isHard && mouseStyle == MOUSE_ICON::DEFAULT && GetCursorBlurEnabled();
     float scale = isHard ? sp->GetScale() : 1.0f;
     cfg.dpi = sp->GetDPI() * scale;
-    Direction direction = sp->GetRenderDirection(isHard);
-    cfg.direction = direction;
-    Direction displayDirection = sp->GetDisplayDirection();
-    cfg.displayDirection = sp->IsMirror() ?
-        (displayDirection - direction + DIRECTION_NUM) % DIRECTION_NUM : displayDirection;
+    cfg.direction = sp->GetRenderDirection(isHard);
+    cfg.displayDirection = sp->IsMirror() ? Direction::DIRECTION0 : sp->GetDisplayDirection();
     if (mouseStyle == MOUSE_ICON::DEVELOPER_DEFINED_ICON) {
         MMI_HILOGD("Set mouseIcon by userIcon_");
         cfg.userIconPixelMap = GetUserIconCopy();
