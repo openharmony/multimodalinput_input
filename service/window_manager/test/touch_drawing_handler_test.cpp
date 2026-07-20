@@ -842,6 +842,50 @@ HWTEST_F(TouchDrawingHandlerTest, TouchDrawingManagerTest_DrawPointerPositionHan
 }
 
 /**
+ * @tc.name: TouchDrawingManagerTest_DrawPointerPositionHandler_003
+ * @tc.desc: Test DrawPointerPositionHandler
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(TouchDrawingHandlerTest, TouchDrawingManagerTest_DrawPointerPositionHandler_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    int32_t deviceId { 6 };
+    pointerEvent->SetDeviceId(deviceId);
+    int32_t pointerId { 1 };
+    pointerEvent->SetPointerId(pointerId);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
+
+    PointerEvent::PointerItem item {};
+    item.SetDeviceId(deviceId);
+    item.SetPointerId(pointerId);
+    pointerEvent->AddPointerItem(item);
+
+    TouchDrawingHandler touchDrawingHandler;
+    touchDrawingHandler.pointerEvent_ = pointerEvent;
+    touchDrawingHandler.DrawPointerPositionHandler();
+    EXPECT_EQ(touchDrawingHandler.currentDeviceId_, deviceId);
+    EXPECT_EQ(touchDrawingHandler.currentPointerId_, pointerId);
+
+    PointerEvent::PointerItem item1 {};
+    item1.SetDeviceId(deviceId);
+    item1.SetPointerId(2);
+    pointerEvent->AddPointerItem(item);
+    touchDrawingHandler.pointerEvent_ = pointerEvent;
+    touchDrawingHandler.DrawPointerPositionHandler();
+    EXPECT_EQ(touchDrawingHandler.currentDeviceId_, deviceId);
+    EXPECT_EQ(touchDrawingHandler.currentPointerId_, pointerId);
+
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
+    touchDrawingHandler.pointerEvent_ = pointerEvent;
+    touchDrawingHandler.DrawPointerPositionHandler();
+    EXPECT_EQ(touchDrawingHandler.currentDeviceId_, deviceId);
+    EXPECT_EQ(touchDrawingHandler.currentPointerId_, pointerId);
+}
+
+/**
  * @tc.name: TouchDrawingManagerTest_DrawTracker_001
  * @tc.desc: Test DrawTracker
  * @tc.type: Function
