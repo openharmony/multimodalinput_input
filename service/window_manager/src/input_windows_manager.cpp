@@ -7902,23 +7902,7 @@ void InputWindowsManager::DumpWindowInfo(int32_t fd, const WindowInfo &item)
 void InputWindowsManager::Dump(int32_t fd, const std::vector<std::string> &args)
 {
     CALL_DEBUG_ENTER;
-#ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
-    auto proxy = POINTER_DEV_MGR.GetDelegateProxy();
-    if (proxy != nullptr) {
-        CursorDrawingComponent::GetInstance().SetDelegateProxy(proxy);
-    }
-#endif  // OHOS_BUILD_ENABLE_POINTER_DRAWING
-    std::shared_ptr<DelegateInterface> delegateProxy =
-        CursorDrawingComponent::GetInstance().GetDelegateProxy();
-    CHKPV(delegateProxy);
-    std::map<int32_t, OLD::DisplayGroupInfo> displayGroupInfoMap;
-    delegateProxy->OnPostSyncTask([this, &displayGroupInfoMap] {
-        for (auto iter = displayGroupInfoMap_.begin(); iter != displayGroupInfoMap_.end(); ++iter) {
-            displayGroupInfoMap.insert(std::make_pair(iter->first, iter->second));
-        }
-        return RET_OK;
-    });
-    for (const auto &iterm : displayGroupInfoMap) {
+    for (const auto &iterm : displayGroupInfoMap_) {
         mprintf(fd, "Windows of displayGroupInfoMap information:\t");
         mprintf(fd, "windowsInfos,,groupId:%d,mainDisplayId:%d,num:%zu",
             iterm.first, iterm.second.mainDisplayId, iterm.second.windowsInfo.size());
@@ -7926,14 +7910,7 @@ void InputWindowsManager::Dump(int32_t fd, const std::vector<std::string> &args)
         DumpDisplayInfo(fd, iterm.second.displaysInfo);
         mprintf(fd, "Input device and display bind info:\n%s", bindInfo_.Dumps().c_str());
     }
-    std::map<int32_t, std::map<int32_t, WindowGroupInfo>> windowsPerDisplayMap;
-    delegateProxy->OnPostSyncTask([this, &windowsPerDisplayMap] {
-        for (auto iter = windowsPerDisplayMap_.begin(); iter != windowsPerDisplayMap_.end(); ++iter) {
-            windowsPerDisplayMap.insert(std::make_pair(iter->first, iter->second));
-        }
-        return RET_OK;
-    });
-    for (const auto &it : windowsPerDisplayMap) {
+    for (const auto &it : windowsPerDisplayMap_) {
         mprintf(fd, "windowsPerDisplayMap information:\t");
         mprintf(fd, "windowsInfos,groupId:%d\t", it.first);
         for (const auto &iter : it.second) {
