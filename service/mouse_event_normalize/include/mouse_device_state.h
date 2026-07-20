@@ -17,14 +17,11 @@
 #define MOUSE_DEVICE_STATE_H
 
 #include <map>
-#include <mutex>
-#include <vector>
 
 #include "singleton.h"
 
 #include "pointer_event.h"
 #include "struct_multimodal.h"
-#include "window_info.h"
 
 namespace OHOS {
 namespace MMI {
@@ -68,31 +65,12 @@ public:
     void MouseBtnStateCounts(uint32_t btnCode, const BUTTON_STATE btnState);
     int32_t LibinputChangeToPointer(const uint32_t keyValue);
 
-    // Per-group mouse state API.  DEFAULT_GROUP_ID (0) falls back to the
-    // original global mouseCoord_ / mouseBtnState_; non-default groupIds
-    // use groupStates_ map with lazy creation and mutex protection.
-    int32_t GetMouseCoordsX(int32_t groupId) const;
-    int32_t GetMouseCoordsY(int32_t groupId) const;
-    void SetMouseCoords(int32_t groupId, int32_t x, int32_t y);
-    bool IsLeftBtnPressed(int32_t groupId);
-    void GetPressedButtons(int32_t groupId, std::vector<int32_t>& pressedButtons);
-    void MouseBtnStateCounts(int32_t groupId, uint32_t btnCode, const BUTTON_STATE btnState);
-    void RemoveGroupState(int32_t groupId);
-    std::vector<int32_t> GetActiveGroupIds() const;
-
 private:
     void ChangeMouseState(const BUTTON_STATE btnState, int32_t& btnStateCount);
-
-    struct GroupMouseState {
-        MouseDeviceCoords mouseCoord;
-        std::map<uint32_t, int32_t> mouseBtnState;
-    };
 
 private:
     MouseDeviceCoords mouseCoord_;
     std::map<uint32_t, int32_t> mouseBtnState_;
-    std::map<int32_t, GroupMouseState> groupStates_;
-    mutable std::mutex groupStatesMutex_;
 };
 
 #define MouseState ::OHOS::DelayedSingleton<MouseDeviceState>::GetInstance()

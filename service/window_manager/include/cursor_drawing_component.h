@@ -113,21 +113,6 @@ public:
     }
     void OnSwitchUser(int32_t userId);
     IPointerDrawingManager* GetPointerInstance();
-
-    // Per-group pointer drawing forwarding methods
-    void RemoveContext(int32_t groupId);
-    void DrawPointer(int32_t groupId, uint64_t rsId, PhysicalCoord coord,
-        const PointerStyle pointerStyle, Direction direction);
-    void DrawMovePointer(int32_t groupId, uint64_t rsId, int32_t physicalX, int32_t physicalY);
-    void SetMouseDisplayState(int32_t groupId, bool state);
-    bool GetMouseDisplayState(int32_t groupId) const;
-    void SetPointerLocation(int32_t groupId, int32_t x, int32_t y, uint64_t rsId);
-    int32_t SetPointerStyleForGroup(int32_t groupId, int32_t pid, int32_t windowId, PointerStyle pointerStyle);
-    int32_t GetPointerStyleForGroup(int32_t groupId, int32_t pid, int32_t windowId, PointerStyle &style) const;
-    int32_t SetPointerSizeForGroup(int32_t groupId, int32_t size);
-    int32_t GetPointerSizeForGroup(int32_t groupId);
-    int32_t SetPointerColorForGroup(int32_t groupId, int32_t color);
-    int32_t GetPointerColorForGroup(int32_t groupId);
 private:
     CursorDrawingComponent();
     ~CursorDrawingComponent();

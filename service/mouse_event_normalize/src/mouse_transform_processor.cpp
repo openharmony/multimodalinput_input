@@ -91,10 +91,6 @@ MouseTransformProcessor::MouseTransformProcessor(IInputServiceContext *env, int3
         MMI_HILOGE("Env is nullptr");
         return;
     }
-    auto winMgr = GetInputWindowsManager();
-    if (winMgr != nullptr) {
-        groupId_ = winMgr->GetDeviceGroupId(deviceId);
-    }
 }
 
 MouseTransformProcessor::~MouseTransformProcessor()
@@ -211,7 +207,7 @@ MouseTransformProcessor::MotionDataContext MouseTransformProcessor::ExtractMotio
     ctx.libinputEventType = libinput_event_get_type(event);
     ctx.offset = Offset { unaccelerated_.dx, unaccelerated_.dy };
 
-    CursorPosition cursorPos = winMgr->GetCursorPos(groupId_);
+    CursorPosition cursorPos = winMgr->GetCursorPos();
     if (cursorPos.displayId < 0) {
         MMI_HILOGE("No display");
         return ctx;
@@ -675,7 +671,7 @@ int32_t MouseTransformProcessor::UpdateCursorPositionOnButtonPress()
         return RET_ERR;
     }
 
-    CursorPosition cursorPos = winMgr->GetCursorPos(groupId_);
+    CursorPosition cursorPos = winMgr->GetCursorPos();
     if (cursorPos.displayId < 0) {
         MMI_HILOGE("No display");
         return RET_ERR;
@@ -694,7 +690,7 @@ int32_t MouseTransformProcessor::UpdateCursorPositionOnButtonPress()
 int32_t MouseTransformProcessor::HandleButtonReleased(uint32_t button, uint32_t originButton, int32_t type)
 {
     SetPointerEventRightButtonSource(type, button);
-    MouseState->MouseBtnStateCounts(groupId_, button, BUTTON_STATE_RELEASED);
+    MouseState->MouseBtnStateCounts(button, BUTTON_STATE_RELEASED);
     pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_UP);
 
     int32_t buttonId = MouseState->LibinputChangeToPointer(button);
@@ -709,7 +705,7 @@ int32_t MouseTransformProcessor::HandleButtonReleased(uint32_t button, uint32_t 
 int32_t MouseTransformProcessor::HandleButtonPressed(uint32_t button, uint32_t originButton, int32_t type)
 {
     SetPointerEventRightButtonSource(type, button);
-    MouseState->MouseBtnStateCounts(groupId_, button, BUTTON_STATE_PRESSED);
+    MouseState->MouseBtnStateCounts(button, BUTTON_STATE_PRESSED);
     pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_DOWN);
 
     int32_t buttonId = MouseState->LibinputChangeToPointer(button);
@@ -998,7 +994,7 @@ int32_t MouseTransformProcessor::UpdateCursorLocationIfNeeded()
         MMI_HILOGE("winMgr is nullptr");
         return RET_ERR;
     }
-    CursorPosition cursorPos = winMgr->GetCursorPos(groupId_);
+    CursorPosition cursorPos = winMgr->GetCursorPos();
     if (cursorPos.displayId < 0) {
         MMI_HILOGE("No display");
         return RET_ERR;
@@ -1130,7 +1126,7 @@ void MouseTransformProcessor::HandleAxisPostInner(PointerEvent::PointerItem &poi
         return;
     }
     auto mouseInfo = winMgr->GetMouseInfo();
-    MouseState->SetMouseCoords(groupId_, mouseInfo.physicalX, mouseInfo.physicalY);
+    MouseState->SetMouseCoords(mouseInfo.physicalX, mouseInfo.physicalY);
     pointerItem.SetDisplayX(mouseInfo.physicalX);
     pointerItem.SetDisplayY(mouseInfo.physicalY);
     pointerItem.SetDisplayXPos(mouseInfo.physicalX);
@@ -1174,7 +1170,7 @@ bool MouseTransformProcessor::HandlePostInner(struct libinput_event_pointer* dat
         return false;
     }
     auto mouseInfo = winMgr->GetMouseInfo();
-    MouseState->SetMouseCoords(groupId_, mouseInfo.physicalX, mouseInfo.physicalY);
+    MouseState->SetMouseCoords(mouseInfo.physicalX, mouseInfo.physicalY);
     pointerItem.SetDisplayX(mouseInfo.physicalX);
     pointerItem.SetDisplayY(mouseInfo.physicalY);
     pointerItem.SetDisplayXPos(mouseInfo.physicalX);
@@ -1349,7 +1345,7 @@ void MouseTransformProcessor::HandleMotionMoveMouse(int32_t offsetX, int32_t off
         return;
     }
     pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
-    CursorPosition cursorPos = winMgr->GetCursorPos(groupId_);
+    CursorPosition cursorPos = winMgr->GetCursorPos();
     cursorPos.cursorPos.x += offsetX;
     cursorPos.cursorPos.y += offsetY;
     winMgr->UpdateAndAdjustMouseLocation(cursorPos.displayId, cursorPos.cursorPos.x,
@@ -1381,7 +1377,7 @@ void MouseTransformProcessor::HandlePostMoveMouse(PointerEvent::PointerItem& poi
     }
     auto mouseInfo = winMgr->GetMouseInfo();
     CHKPV(pointerEvent_);
-    MouseState->SetMouseCoords(groupId_, mouseInfo.physicalX, mouseInfo.physicalY);
+    MouseState->SetMouseCoords(mouseInfo.physicalX, mouseInfo.physicalY);
     pointerItem.SetDisplayX(mouseInfo.physicalX);
     pointerItem.SetDisplayY(mouseInfo.physicalY);
     pointerItem.SetDisplayXPos(mouseInfo.physicalX);

@@ -141,28 +141,6 @@ int32_t InputManagerImpl::SetDisplayBind(int32_t deviceId, int32_t displayId, st
     return RET_OK;
 }
 
-int32_t InputManagerImpl::BindDeviceToDisplayGroupByDisplay(int32_t deviceId, int32_t displayId, std::string &msg)
-{
-    CALL_INFO_TRACE;
-    int32_t ret = MULTIMODAL_INPUT_CONNECT_MGR->BindDeviceToDisplayGroupByDisplay(deviceId, displayId, msg);
-    if (ret != RET_OK) {
-        MMI_HILOGE("BindDeviceToDisplayGroupByDisplay failed, ret:%{public}d", ret);
-        return RET_ERR;
-    }
-    return RET_OK;
-}
-
-int32_t InputManagerImpl::UnbindDeviceFromDisplayGroup(int32_t deviceId, std::string &msg)
-{
-    CALL_INFO_TRACE;
-    int32_t ret = MULTIMODAL_INPUT_CONNECT_MGR->UnbindDeviceFromDisplayGroup(deviceId, msg);
-    if (ret != RET_OK) {
-        MMI_HILOGE("UnbindDeviceFromDisplayGroup failed, ret:%{public}d", ret);
-        return RET_ERR;
-    }
-    return RET_OK;
-}
-
 int32_t InputManagerImpl::GetWindowPid(int32_t windowId)
 {
     CALL_DEBUG_ENTER;

@@ -53,25 +53,6 @@ public:
     int32_t SetDisplayBind(int32_t deviceId, int32_t displayId, std::string &msg);
 
     /**
-     * @brief Binds a device to the display group that contains the specified display.
-     * @param deviceId Indicates the ID of the input device.
-     * @param displayId Indicates the ID of the display whose group the device will join.
-     * @param msg Indicates the output message describing the result.
-     * @return Returns <b>0</b> if success; returns a non-0 value otherwise.
-     * @since 26
-     */
-    int32_t BindDeviceToDisplayGroupByDisplay(int32_t deviceId, int32_t displayId, std::string &msg);
-
-    /**
-     * @brief Unbinds a device from its current display group, returning it to the default group.
-     * @param deviceId Indicates the ID of the input device.
-     * @param msg Indicates the output message describing the result.
-     * @return Returns <b>0</b> if success; returns a non-0 value otherwise.
-     * @since 26
-     */
-    int32_t UnbindDeviceFromDisplayGroup(int32_t deviceId, std::string &msg);
-
-    /**
      * @brief Updates the screen、display and window information array.
      * @param userScreenInfo Indicates the user screen、display and window information.
      * @since 20

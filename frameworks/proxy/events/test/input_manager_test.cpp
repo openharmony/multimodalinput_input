@@ -6661,42 +6661,5 @@ HWTEST_F(InputManagerTest, InputManagerTest_CreateKeyboardController_001, TestSi
     int32_t ret = InputManager::GetInstance()->CreateKeyboardController(controller);
     EXPECT_TRUE(ret == ERROR_NO_PERMISSION || ret == CAPABILITY_NOT_SUPPORTED);
 }
-
-/**
- * @tc.name: InputManagerTest_BindDeviceToDisplayGroupByDisplay_001
- * @tc.desc: Bind device to display group by display
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputManagerTest, InputManagerTest_BindDeviceToDisplayGroupByDisplay_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    int32_t deviceId = DEFAULT_DEVICE_ID;
-    int32_t displayId = INVAID_VALUE;
-    std::string msg;
-    int32_t ret = InputManager::GetInstance()->BindDeviceToDisplayGroupByDisplay(deviceId, displayId, msg);
-    ASSERT_TRUE(ret != RET_OK);
-    if (ret != RET_OK) {
-        MMI_HILOGE("Call BindDeviceToDisplayGroupByDisplay failed, ret:%{public}d", ret);
-    }
-}
-
-/**
- * @tc.name: InputManagerTest_UnbindDeviceFromDisplayGroup_001
- * @tc.desc: Unbind device from display group
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputManagerTest, InputManagerTest_UnbindDeviceFromDisplayGroup_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    int32_t deviceId = DEFAULT_DEVICE_ID;
-    std::string msg;
-    int32_t ret = InputManager::GetInstance()->UnbindDeviceFromDisplayGroup(deviceId, msg);
-    ASSERT_TRUE(ret != RET_OK);
-    if (ret != RET_OK) {
-        MMI_HILOGE("Call UnbindDeviceFromDisplayGroup failed, ret:%{public}d", ret);
-    }
-}
 } // namespace MMI
 } // namespace OHOS

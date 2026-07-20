@@ -192,9 +192,6 @@ group("input_ets_group") {
 group("mmi_tests") {
   testonly = true
   deps = [
-    "service:MultiGroupBindingTest",
-    "service:MultiGroupBindingSupplementTest",
-    "service/mouse_event_normalize/test:MouseDeviceStateGroupTest",
     "frameworks/ets/common/test:AniCommonTest",
     "frameworks/native/input:OHInputManagerEXTest",
     "frameworks/native/input:OHInputManagerTest",

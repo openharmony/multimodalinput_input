@@ -2893,36 +2893,5 @@ HWTEST_F(MultimodalInputConnectStubTest, StubSetClientInfo_001, TestSize.Level1)
     int32_t ret = stub->StubSetClientInfo(data, reply);
     EXPECT_EQ(ret, returnCode);
 }
-/**
- * @tc.name: StubBindDeviceToDisplayGroupByDisplay_001
- * @tc.desc: Test the function StubBindDeviceToDisplayGroupByDisplay
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(MultimodalInputConnectStubTest, StubBindDeviceToDisplayGroupByDisplay_001, TestSize.Level1)
-{
-    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIService>();
-    MessageParcel data;
-    MessageParcel reply;
-    int32_t returnCode = 65142800;
-    int32_t ret = stub->StubBindDeviceToDisplayGroupByDisplay(data, reply);
-    EXPECT_EQ(ret, returnCode);
-}
-
-/**
- * @tc.name: StubUnbindDeviceFromDisplayGroup_001
- * @tc.desc: Test the function StubUnbindDeviceFromDisplayGroup
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(MultimodalInputConnectStubTest, StubUnbindDeviceFromDisplayGroup_001, TestSize.Level1)
-{
-    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIService>();
-    MessageParcel data;
-    MessageParcel reply;
-    int32_t returnCode = 65142800;
-    int32_t ret = stub->StubUnbindDeviceFromDisplayGroup(data, reply);
-    EXPECT_EQ(ret, returnCode);
-}
 } // namespace MMI
 } // namespace OHOS
