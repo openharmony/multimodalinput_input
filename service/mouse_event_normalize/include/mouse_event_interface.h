@@ -107,16 +107,6 @@ public:
     void MouseBtnStateCounts(uint32_t btnCode, const BUTTON_STATE btnState);
     int32_t LibinputChangeToPointer(const uint32_t keyValue);
 
-    // Per-group overloads
-    int32_t GetMouseCoordsX(int32_t groupId);
-    int32_t GetMouseCoordsY(int32_t groupId);
-    void SetMouseCoords(int32_t groupId, int32_t x, int32_t y);
-    bool IsLeftBtnPressed(int32_t groupId);
-    void GetPressedButtons(int32_t groupId, std::vector<int32_t>& pressedButtons);
-    void MouseBtnStateCounts(int32_t groupId, uint32_t btnCode, const BUTTON_STATE btnState);
-
-    void OnGroupRemoved(int32_t groupId);
-
 private:
     void OnDeviceEnabled(std::shared_ptr<MouseEventInterface> self, int32_t deviceId);
     void OnDeviceDisabled(std::shared_ptr<MouseEventInterface> self, int32_t deviceId);

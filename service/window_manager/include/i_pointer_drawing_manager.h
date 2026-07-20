@@ -19,7 +19,6 @@
 #include "pointer_style.h"
 #include "old_display_info.h"
 #include "delegate_interface.h"
-#include "pointer_drawing_context.h"
 
 namespace OHOS {
 namespace MMI {
@@ -177,23 +176,6 @@ public:
     virtual void UpdatePointerItemCursorInfo(PointerEvent::PointerItem& pointerItem) {}
     virtual void AllPointerDeviceRemoved() {}
     virtual void ClearResources() {};
-
-    // Per-group pointer drawing methods for HID display group binding
-    virtual void RemoveContext(int32_t groupId) {}
-    virtual void DrawPointer(int32_t groupId, uint64_t rsId, PhysicalCoord coord,
-        const PointerStyle pointerStyle, Direction direction) {}
-    virtual void DrawMovePointer(int32_t groupId, uint64_t rsId, int32_t physicalX, int32_t physicalY) {}
-    virtual void SetMouseDisplayState(int32_t groupId, bool state) {}
-    virtual bool GetMouseDisplayState(int32_t groupId) const { return false; }
-    virtual void SetPointerLocation(int32_t groupId, int32_t x, int32_t y, uint64_t rsId) {}
-    virtual int32_t SetPointerStyleForGroup(int32_t groupId, int32_t pid, int32_t windowId,
-        PointerStyle pointerStyle) { return 0; }
-    virtual int32_t GetPointerStyleForGroup(int32_t groupId, int32_t pid, int32_t windowId,
-        PointerStyle &style) const { return 0; }
-    virtual int32_t SetPointerSizeForGroup(int32_t groupId, int32_t size) { return 0; }
-    virtual int32_t GetPointerSizeForGroup(int32_t groupId) { return 0; }
-    virtual int32_t SetPointerColorForGroup(int32_t groupId, int32_t color) { return 0; }
-    virtual int32_t GetPointerColorForGroup(int32_t groupId) { return 0; }
 };
 } // namespace MMI
 } // namespace OHOS

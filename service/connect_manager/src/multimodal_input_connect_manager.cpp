@@ -107,38 +107,6 @@ int32_t MultimodalInputConnectManager::SetDisplayBind(int32_t deviceId, int32_t 
     return ret;
 }
 
-int32_t MultimodalInputConnectManager::BindDeviceToDisplayGroupByDisplay(
-    int32_t deviceId, int32_t displayId, std::string &msg)
-{
-    std::lock_guard<std::mutex> guard(lock_);
-    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
-
-    int32_t ret = multimodalInputConnectService_->BindDeviceToDisplayGroupByDisplay(deviceId, displayId, msg);
-    if (ret != RET_OK) {
-        MMI_HILOGE("BindDeviceToDisplayGroupByDisplay failed, ret:%{public}d", ret);
-        return ret;
-    }
-
-    MMI_HILOGI("BindDeviceToDisplayGroupByDisplay success: deviceId:%{public}d, displayId:%{public}d",
-        deviceId, displayId);
-    return ret;
-}
-
-int32_t MultimodalInputConnectManager::UnbindDeviceFromDisplayGroup(int32_t deviceId, std::string &msg)
-{
-    std::lock_guard<std::mutex> guard(lock_);
-    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
-
-    int32_t ret = multimodalInputConnectService_->UnbindDeviceFromDisplayGroup(deviceId, msg);
-    if (ret != RET_OK) {
-        MMI_HILOGE("UnbindDeviceFromDisplayGroup failed, ret:%{public}d", ret);
-        return ret;
-    }
-
-    MMI_HILOGI("UnbindDeviceFromDisplayGroup success: deviceId:%{public}d", deviceId);
-    return ret;
-}
-
 int32_t MultimodalInputConnectManager::GetWindowPid(int32_t windowId)
 {
     std::lock_guard<std::mutex> guard(lock_);

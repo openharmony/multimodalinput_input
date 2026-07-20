@@ -198,8 +198,7 @@ int32_t TouchPadTransformProcessor::OnEventTouchPadAction(struct libinput_event 
     SetActionPointerItem(time);
 
     pointerEvent_->SetDeviceId(deviceId_);
-    int32_t groupId = WIN_MGR->GetDeviceGroupId(deviceId_);
-    auto mouseInfo = WIN_MGR->GetMouseInfo(groupId);
+    auto mouseInfo = WIN_MGR->GetMouseInfo();
     pointerEvent_->SetTargetDisplayId(mouseInfo.displayId);
     pointerEvent_->SetTargetWindowId(-1);
     pointerEvent_->SetPointerId(DEFAULT_POINTER_ID);
@@ -222,8 +221,7 @@ void TouchPadTransformProcessor::SetActionPointerItem(int64_t time)
     pointerItem.SetWindowY(0);
     pointerItem.SetWindowXPos(0.0);
     pointerItem.SetWindowYPos(0.0);
-    int32_t groupId = WIN_MGR->GetDeviceGroupId(deviceId_);
-    auto mouseInfo = WIN_MGR->GetMouseInfo(groupId);
+    auto mouseInfo = WIN_MGR->GetMouseInfo();
     pointerItem.SetDisplayX(mouseInfo.physicalX);
     pointerItem.SetDisplayY(mouseInfo.physicalY);
     pointerItem.SetDisplayXPos(mouseInfo.physicalX);
@@ -518,8 +516,7 @@ void TouchPadTransformProcessor::SetPinchPointerItem(int64_t time)
     pointerItem.SetWindowY(0);
     pointerItem.SetWindowXPos(0.0);
     pointerItem.SetWindowYPos(0.0);
-    int32_t groupId = WIN_MGR->GetDeviceGroupId(deviceId_);
-    auto mouseInfo = WIN_MGR->GetMouseInfo(groupId);
+    auto mouseInfo = WIN_MGR->GetMouseInfo();
     pointerItem.SetDisplayX(mouseInfo.physicalX);
     pointerItem.SetDisplayY(mouseInfo.physicalY);
     pointerItem.SetDisplayXPos(mouseInfo.physicalX);
@@ -542,8 +539,7 @@ void TouchPadTransformProcessor::ProcessTouchPadPinchDataEvent
 
     pointerEvent_->SetFingerCount(fingerCount);
     pointerEvent_->SetDeviceId(deviceId_);
-    int32_t groupId = WIN_MGR->GetDeviceGroupId(deviceId_);
-    auto mouseInfo = WIN_MGR->GetMouseInfo(groupId);
+    auto mouseInfo = WIN_MGR->GetMouseInfo();
     pointerEvent_->SetTargetDisplayId(mouseInfo.displayId);
     pointerEvent_->SetTargetWindowId(-1);
     pointerEvent_->SetPointerId(DEFAULT_POINTER_ID);

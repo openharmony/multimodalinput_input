@@ -30,8 +30,6 @@ public:
     virtual ~IKeyEventNormalize() = default;
 
     virtual std::shared_ptr<KeyEvent> GetKeyEvent() = 0;
-    virtual std::shared_ptr<KeyEvent> GetKeyEventForGroup(int32_t groupId) = 0;
-    virtual void RemoveGroupKeyEvent(int32_t groupId) = 0;
     virtual bool SyncLedStateFromKeyEvent(struct libinput_device*) = 0;
     virtual void SimulatedModifierKeyEventNormalize(const std::shared_ptr<KeyEvent>&) = 0;
     virtual bool CheckSimulatedModifierKeyEvent(const std::shared_ptr<KeyEvent>&) = 0;
@@ -50,8 +48,6 @@ public:
     virtual ~KeyEventNormalizeMock() override = default;
 
     MOCK_METHOD(std::shared_ptr<KeyEvent>, GetKeyEvent, ());
-    MOCK_METHOD(std::shared_ptr<KeyEvent>, GetKeyEventForGroup, (int32_t));
-    MOCK_METHOD(void, RemoveGroupKeyEvent, (int32_t));
     MOCK_METHOD(bool, SyncLedStateFromKeyEvent, (struct libinput_device*));
     MOCK_METHOD(void, SimulatedModifierKeyEventNormalize, (const std::shared_ptr<KeyEvent>&));
     MOCK_METHOD(bool, CheckSimulatedModifierKeyEvent, (const std::shared_ptr<KeyEvent>&));
