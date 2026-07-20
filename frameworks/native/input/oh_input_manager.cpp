@@ -2362,7 +2362,7 @@ Input_Result OH_Input_RemoveInputEventInterceptor(void)
     return retCode;
 }
 
-int32_t OH_Input_GetIntervalSinceLastInput(int64_t *intervalSinceLastInput)
+Input_Result OH_Input_GetIntervalSinceLastInput(int64_t *intervalSinceLastInput)
 {
     CALL_DEBUG_ENTER;
     MMI_HISTOGRAM_BOOLEAN("InputKit.OH_Input_GetIntervalSinceLastInput.Call", true);
