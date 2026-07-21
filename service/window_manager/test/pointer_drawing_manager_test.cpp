@@ -5001,5 +5001,187 @@ HWTEST_F(PointerDrawingManagerTest, PointerDrawingManagerTest_DestroyPointerWind
     EXPECT_EQ(pointerDrawingManager.rsUIDirector_, nullptr);
     EXPECT_EQ(pointerDrawingManager.rsUIContext_, nullptr);
 }
+
+/**
+ * @tc.name: PointerDrawingManagerTest_CalculateRenderDirection_001
+ * @tc.desc: Test CalculateRenderDirection with null ScreenPointer
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerTest, PointerDrawingManagerTest_CalculateRenderDirection_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerDrawingManager pointerDrawingManager;
+    std::shared_ptr<ScreenPointer> sp = nullptr;
+
+    Direction result = pointerDrawingManager.CalculateRenderDirection(false, sp);
+    EXPECT_EQ(result, Direction::DIRECTION0);
+}
+
+/**
+ * @tc.name: PointerDrawingManagerTest_CalculateRenderDirection_002
+ * @tc.desc: Test CalculateRenderDirection with isHard=true
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerTest, PointerDrawingManagerTest_CalculateRenderDirection_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerDrawingManager pointerDrawingManager;
+    hwcmgr_ptr_t hwcmgr = std::make_shared<HardwareCursorPointerManager>();
+    ASSERT_NE(hwcmgr, nullptr);
+    handler_ptr_t handler = nullptr;
+    OLD::DisplayInfo di;
+    auto sp = std::make_shared<ScreenPointer>(hwcmgr, handler, di);
+    ASSERT_NE(sp, nullptr);
+
+    sp->SetDirectionAndDisplayDirection(Direction::DIRECTION90, Direction::DIRECTION0);
+    Direction result = pointerDrawingManager.CalculateRenderDirection(true, sp);
+    EXPECT_EQ(result, Direction::DIRECTION90);
+}
+
+/**
+ * @tc.name: PointerDrawingManagerTest_CalculateRenderDirection_003
+ * @tc.desc: Test CalculateRenderDirection with isHard=false, direction=DIRECTION90, displayDirection=DIRECTION0
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerTest, PointerDrawingManagerTest_CalculateRenderDirection_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerDrawingManager pointerDrawingManager;
+    hwcmgr_ptr_t hwcmgr = std::make_shared<HardwareCursorPointerManager>();
+    ASSERT_NE(hwcmgr, nullptr);
+    handler_ptr_t handler = nullptr;
+    OLD::DisplayInfo di;
+    auto sp = std::make_shared<ScreenPointer>(hwcmgr, handler, di);
+    ASSERT_NE(sp, nullptr);
+
+    sp->SetDirectionAndDisplayDirection(Direction::DIRECTION90, Direction::DIRECTION0);
+    Direction result = pointerDrawingManager.CalculateRenderDirection(false, sp);
+    EXPECT_EQ(result, Direction::DIRECTION90);
+}
+
+/**
+ * @tc.name: PointerDrawingManagerTest_CalculateRenderDirection_004
+ * @tc.desc: Test CalculateRenderDirection with isHard=false, direction=DIRECTION180, displayDirection=DIRECTION90
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerTest, PointerDrawingManagerTest_CalculateRenderDirection_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerDrawingManager pointerDrawingManager;
+    hwcmgr_ptr_t hwcmgr = std::make_shared<HardwareCursorPointerManager>();
+    ASSERT_NE(hwcmgr, nullptr);
+    handler_ptr_t handler = nullptr;
+    OLD::DisplayInfo di;
+    auto sp = std::make_shared<ScreenPointer>(hwcmgr, handler, di);
+    ASSERT_NE(sp, nullptr);
+
+    sp->SetDirectionAndDisplayDirection(Direction::DIRECTION180, Direction::DIRECTION90);
+    Direction result = pointerDrawingManager.CalculateRenderDirection(false, sp);
+    EXPECT_EQ(result, Direction::DIRECTION90);
+}
+
+/**
+ * @tc.name: PointerDrawingManagerTest_CalculateRenderDirection_005
+ * @tc.desc: Test CalculateRenderDirection with isHard=false, direction=DIRECTION0, displayDirection=DIRECTION270
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerTest, PointerDrawingManagerTest_CalculateRenderDirection_005, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerDrawingManager pointerDrawingManager;
+    hwcmgr_ptr_t hwcmgr = std::make_shared<HardwareCursorPointerManager>();
+    ASSERT_NE(hwcmgr, nullptr);
+    handler_ptr_t handler = nullptr;
+    OLD::DisplayInfo di;
+    auto sp = std::make_shared<ScreenPointer>(hwcmgr, handler, di);
+    ASSERT_NE(sp, nullptr);
+
+    sp->SetDirectionAndDisplayDirection(Direction::DIRECTION0, Direction::DIRECTION270);
+    Direction result = pointerDrawingManager.CalculateRenderDirection(false, sp);
+    EXPECT_EQ(result, Direction::DIRECTION90);
+}
+
+/**
+ * @tc.name: PointerDrawingManagerTest_CalculateRenderDirection_006
+ * @tc.desc: Test CalculateRenderDirection with isHard=false, same direction and displayDirection
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerTest, PointerDrawingManagerTest_CalculateRenderDirection_006, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerDrawingManager pointerDrawingManager;
+    hwcmgr_ptr_t hwcmgr = std::make_shared<HardwareCursorPointerManager>();
+    ASSERT_NE(hwcmgr, nullptr);
+    handler_ptr_t handler = nullptr;
+    OLD::DisplayInfo di;
+    auto sp = std::make_shared<ScreenPointer>(hwcmgr, handler, di);
+    ASSERT_NE(sp, nullptr);
+
+    sp->SetDirectionAndDisplayDirection(Direction::DIRECTION90, Direction::DIRECTION90);
+    Direction result = pointerDrawingManager.CalculateRenderDirection(false, sp);
+    EXPECT_EQ(result, Direction::DIRECTION0);
+}
+
+/**
+ * @tc.name: PointerDrawingManagerTest_CalculateRenderDirection_007
+ * @tc.desc: Test CalculateRenderDirection with isHard=true and different directions
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerTest, PointerDrawingManagerTest_CalculateRenderDirection_007, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerDrawingManager pointerDrawingManager;
+    hwcmgr_ptr_t hwcmgr = std::make_shared<HardwareCursorPointerManager>();
+    ASSERT_NE(hwcmgr, nullptr);
+    handler_ptr_t handler = nullptr;
+    OLD::DisplayInfo di;
+    auto sp = std::make_shared<ScreenPointer>(hwcmgr, handler, di);
+    ASSERT_NE(sp, nullptr);
+
+    sp->SetDirectionAndDisplayDirection(Direction::DIRECTION0, Direction::DIRECTION0);
+    Direction result = pointerDrawingManager.CalculateRenderDirection(true, sp);
+    EXPECT_EQ(result, Direction::DIRECTION0);
+
+    sp->SetDirectionAndDisplayDirection(Direction::DIRECTION180, Direction::DIRECTION0);
+    result = pointerDrawingManager.CalculateRenderDirection(true, sp);
+    EXPECT_EQ(result, Direction::DIRECTION180);
+
+    sp->SetDirectionAndDisplayDirection(Direction::DIRECTION270, Direction::DIRECTION0);
+    result = pointerDrawingManager.CalculateRenderDirection(true, sp);
+    EXPECT_EQ(result, Direction::DIRECTION270);
+}
+
+/**
+ * @tc.name: PointerDrawingManagerTest_CalculateRenderDirection_008
+ * @tc.desc: Test CalculateRenderDirection with isHard=false, direction < displayDirection (negative modulo)
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerTest, PointerDrawingManagerTest_CalculateRenderDirection_008, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerDrawingManager pointerDrawingManager;
+    hwcmgr_ptr_t hwcmgr = std::make_shared<HardwareCursorPointerManager>();
+    ASSERT_NE(hwcmgr, nullptr);
+    handler_ptr_t handler = nullptr;
+    OLD::DisplayInfo di;
+    auto sp = std::make_shared<ScreenPointer>(hwcmgr, handler, di);
+    ASSERT_NE(sp, nullptr);
+
+    sp->SetDirectionAndDisplayDirection(Direction::DIRECTION0, Direction::DIRECTION90);
+    Direction result = pointerDrawingManager.CalculateRenderDirection(false, sp);
+    EXPECT_EQ(result, Direction::DIRECTION270);
+
+    sp->SetDirectionAndDisplayDirection(Direction::DIRECTION90, Direction::DIRECTION180);
+    result = pointerDrawingManager.CalculateRenderDirection(false, sp);
+    EXPECT_EQ(result, Direction::DIRECTION270);
+}
 } // namespace MMI
 } // namespace OHOS

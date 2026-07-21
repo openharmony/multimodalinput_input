@@ -144,25 +144,11 @@ public:
         return rotation_;
     }
 
-    void SetDisplayDirection(const Direction displayDirection)
-    {
-        switch (displayDirection) {
-            case DIRECTION0:
-            case DIRECTION90:
-            case DIRECTION180:
-            case DIRECTION270:
-                displayDirection_ = displayDirection;
-                break;
-            default: {
-                break;
-            }
-        }
-    }
+    void SetDirectionAndDisplayDirection(Direction direction, Direction displayDirection);
 
-    Direction GetDisplayDirection()
-    {
-        return displayDirection_;
-    }
+    Direction GetDirection();
+
+    Direction GetDisplayDirection();
 
     bool IsPositionOutScreen(int32_t x, int32_t y);
 
@@ -204,8 +190,6 @@ public:
 
     void DestroyPointerWindow();
 
-    Direction GetRenderDirection(bool isHard);
-
 private:
     bool InitSurfaceNode();
     bool FlushSerfaceBuffer();
@@ -231,6 +215,7 @@ private:
     mode_t mode_{mode_t::SCREEN_MAIN};
     std::atomic<rotation_t> rotation_{rotation_t::ROTATION_0};
     float dpi_{1.0f};
+    std::atomic<Direction> direction_{DIRECTION0};
     std::atomic<Direction> displayDirection_{DIRECTION0};
 
     // screen scale and padding info for mirror mode

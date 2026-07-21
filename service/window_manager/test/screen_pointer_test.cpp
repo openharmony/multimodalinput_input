@@ -2094,196 +2094,203 @@ HWTEST_F(ScreenPointerTest, ScreenPointerTest_UpdatePadding_012, TestSize.Level1
 }
 
 /**
- * @tc.name: ScreenPointerTest_GetRenderDirection_001
- * @tc.desc: Test GetRenderDirection when IsMirror returns true
+ * @tc.name: ScreenPointerTest_SetDirectionAndDisplayDirection_001
+ * @tc.desc: Test SetDirectionAndDisplayDirection with valid direction and displayDirection
  * @tc.type: Function
  * @tc.require:
  */
-HWTEST_F(ScreenPointerTest, ScreenPointerTest_GetRenderDirection_001, TestSize.Level1)
+HWTEST_F(ScreenPointerTest, ScreenPointerTest_SetDirectionAndDisplayDirection_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     hwcmgr_ptr_t hwcmgr = std::make_shared<HardwareCursorPointerManager>();
     ASSERT_NE(hwcmgr, nullptr);
     handler_ptr_t handler = nullptr;
     OLD::DisplayInfo di;
-    std::shared_ptr<ScreenPointer> screenpointer = std::make_shared<ScreenPointer>(hwcmgr, handler, di);
+    auto screenpointer = std::make_shared<ScreenPointer>(hwcmgr, handler, di);
     ASSERT_NE(screenpointer, nullptr);
-    screenpointer->mode_ = mode_t::SCREEN_MIRROR;
-    screenpointer->rotation_ = rotation_t::ROTATION_90;
-    Direction ret = screenpointer->GetRenderDirection(true);
-    EXPECT_EQ(ret, Direction::DIRECTION0);
-    ret = screenpointer->GetRenderDirection(false);
-    EXPECT_EQ(ret, Direction::DIRECTION0);
+
+    screenpointer->SetDirectionAndDisplayDirection(Direction::DIRECTION0, Direction::DIRECTION90);
+    EXPECT_EQ(screenpointer->GetDirection(), Direction::DIRECTION0);
+    EXPECT_EQ(screenpointer->GetDisplayDirection(), Direction::DIRECTION90);
 }
 
 /**
- * @tc.name: ScreenPointerTest_GetRenderDirection_002
- * @tc.desc: Test GetRenderDirection with isHard true and different rotation values
+ * @tc.name: ScreenPointerTest_SetDirectionAndDisplayDirection_002
+ * @tc.desc: Test SetDirectionAndDisplayDirection with invalid direction
  * @tc.type: Function
  * @tc.require:
  */
-HWTEST_F(ScreenPointerTest, ScreenPointerTest_GetRenderDirection_002, TestSize.Level1)
+HWTEST_F(ScreenPointerTest, ScreenPointerTest_SetDirectionAndDisplayDirection_002, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     hwcmgr_ptr_t hwcmgr = std::make_shared<HardwareCursorPointerManager>();
     ASSERT_NE(hwcmgr, nullptr);
     handler_ptr_t handler = nullptr;
     OLD::DisplayInfo di;
-    std::shared_ptr<ScreenPointer> screenpointer = std::make_shared<ScreenPointer>(hwcmgr, handler, di);
+    auto screenpointer = std::make_shared<ScreenPointer>(hwcmgr, handler, di);
     ASSERT_NE(screenpointer, nullptr);
-    screenpointer->mode_ = mode_t::SCREEN_MAIN;
-    screenpointer->rotation_ = rotation_t::ROTATION_0;
-    Direction ret = screenpointer->GetRenderDirection(true);
-    EXPECT_EQ(ret, Direction::DIRECTION0);
-    screenpointer->rotation_ = rotation_t::ROTATION_90;
-    ret = screenpointer->GetRenderDirection(true);
-    EXPECT_EQ(ret, Direction::DIRECTION90);
-    screenpointer->rotation_ = rotation_t::ROTATION_180;
-    ret = screenpointer->GetRenderDirection(true);
-    EXPECT_EQ(ret, Direction::DIRECTION180);
-    screenpointer->rotation_ = rotation_t::ROTATION_270;
-    ret = screenpointer->GetRenderDirection(true);
-    EXPECT_EQ(ret, Direction::DIRECTION270);
+
+    screenpointer->SetDirectionAndDisplayDirection(Direction::DIRECTION0, Direction::DIRECTION0);
+    Direction invalidDirection = static_cast<Direction>(5);
+    screenpointer->SetDirectionAndDisplayDirection(invalidDirection, Direction::DIRECTION90);
+    EXPECT_EQ(screenpointer->GetDirection(), Direction::DIRECTION0);
+    EXPECT_EQ(screenpointer->GetDisplayDirection(), Direction::DIRECTION0);
 }
 
 /**
- * @tc.name: ScreenPointerTest_GetRenderDirection_003
- * @tc.desc: Test GetRenderDirection with isHard false and same rotation and displayDirection
+ * @tc.name: ScreenPointerTest_SetDirectionAndDisplayDirection_003
+ * @tc.desc: Test SetDirectionAndDisplayDirection with invalid displayDirection
  * @tc.type: Function
  * @tc.require:
  */
-HWTEST_F(ScreenPointerTest, ScreenPointerTest_GetRenderDirection_003, TestSize.Level1)
+HWTEST_F(ScreenPointerTest, ScreenPointerTest_SetDirectionAndDisplayDirection_003, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     hwcmgr_ptr_t hwcmgr = std::make_shared<HardwareCursorPointerManager>();
     ASSERT_NE(hwcmgr, nullptr);
     handler_ptr_t handler = nullptr;
     OLD::DisplayInfo di;
-    std::shared_ptr<ScreenPointer> screenpointer = std::make_shared<ScreenPointer>(hwcmgr, handler, di);
+    auto screenpointer = std::make_shared<ScreenPointer>(hwcmgr, handler, di);
     ASSERT_NE(screenpointer, nullptr);
-    screenpointer->mode_ = mode_t::SCREEN_MAIN;
-    screenpointer->rotation_ = rotation_t::ROTATION_0;
-    screenpointer->displayDirection_ = Direction::DIRECTION0;
-    Direction ret = screenpointer->GetRenderDirection(false);
-    EXPECT_EQ(ret, Direction::DIRECTION0);
-    screenpointer->rotation_ = rotation_t::ROTATION_90;
-    screenpointer->displayDirection_ = Direction::DIRECTION90;
-    ret = screenpointer->GetRenderDirection(false);
-    EXPECT_EQ(ret, Direction::DIRECTION0);
-    screenpointer->rotation_ = rotation_t::ROTATION_180;
-    screenpointer->displayDirection_ = Direction::DIRECTION180;
-    ret = screenpointer->GetRenderDirection(false);
-    EXPECT_EQ(ret, Direction::DIRECTION0);
-    screenpointer->rotation_ = rotation_t::ROTATION_270;
-    screenpointer->displayDirection_ = Direction::DIRECTION270;
-    ret = screenpointer->GetRenderDirection(false);
-    EXPECT_EQ(ret, Direction::DIRECTION0);
+
+    screenpointer->SetDirectionAndDisplayDirection(Direction::DIRECTION0, Direction::DIRECTION0);
+    Direction invalidDirection = static_cast<Direction>(5);
+    screenpointer->SetDirectionAndDisplayDirection(Direction::DIRECTION90, invalidDirection);
+    EXPECT_EQ(screenpointer->GetDirection(), Direction::DIRECTION0);
+    EXPECT_EQ(screenpointer->GetDisplayDirection(), Direction::DIRECTION0);
 }
 
 /**
- * @tc.name: ScreenPointerTest_GetRenderDirection_004
- * @tc.desc: Test GetRenderDirection with isHard false and rotation > displayDirection
+ * @tc.name: ScreenPointerTest_SetDirectionAndDisplayDirection_004
+ * @tc.desc: Test SetDirectionAndDisplayDirection with same values as current (no update)
  * @tc.type: Function
  * @tc.require:
  */
-HWTEST_F(ScreenPointerTest, ScreenPointerTest_GetRenderDirection_004, TestSize.Level1)
+HWTEST_F(ScreenPointerTest, ScreenPointerTest_SetDirectionAndDisplayDirection_004, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     hwcmgr_ptr_t hwcmgr = std::make_shared<HardwareCursorPointerManager>();
     ASSERT_NE(hwcmgr, nullptr);
     handler_ptr_t handler = nullptr;
     OLD::DisplayInfo di;
-    std::shared_ptr<ScreenPointer> screenpointer = std::make_shared<ScreenPointer>(hwcmgr, handler, di);
+    auto screenpointer = std::make_shared<ScreenPointer>(hwcmgr, handler, di);
     ASSERT_NE(screenpointer, nullptr);
-    screenpointer->mode_ = mode_t::SCREEN_MAIN;
-    screenpointer->rotation_ = rotation_t::ROTATION_90;
-    screenpointer->displayDirection_ = Direction::DIRECTION0;
-    Direction ret = screenpointer->GetRenderDirection(false);
-    EXPECT_EQ(ret, Direction::DIRECTION90);
-    screenpointer->rotation_ = rotation_t::ROTATION_180;
-    screenpointer->displayDirection_ = Direction::DIRECTION0;
-    ret = screenpointer->GetRenderDirection(false);
-    EXPECT_EQ(ret, Direction::DIRECTION180);
-    screenpointer->rotation_ = rotation_t::ROTATION_270;
-    screenpointer->displayDirection_ = Direction::DIRECTION0;
-    ret = screenpointer->GetRenderDirection(false);
-    EXPECT_EQ(ret, Direction::DIRECTION270);
+
+    screenpointer->SetDirectionAndDisplayDirection(Direction::DIRECTION90, Direction::DIRECTION180);
+    screenpointer->SetDirectionAndDisplayDirection(Direction::DIRECTION90, Direction::DIRECTION180);
+    EXPECT_EQ(screenpointer->GetDirection(), Direction::DIRECTION90);
+    EXPECT_EQ(screenpointer->GetDisplayDirection(), Direction::DIRECTION180);
 }
 
 /**
- * @tc.name: ScreenPointerTest_GetRenderDirection_005
- * @tc.desc: Test GetRenderDirection with isHard false and rotation < displayDirection
+ * @tc.name: ScreenPointerTest_SetDirectionAndDisplayDirection_005
+ * @tc.desc: Test SetDirectionAndDisplayDirection with all valid direction combinations
  * @tc.type: Function
  * @tc.require:
  */
-HWTEST_F(ScreenPointerTest, ScreenPointerTest_GetRenderDirection_005, TestSize.Level1)
+HWTEST_F(ScreenPointerTest, ScreenPointerTest_SetDirectionAndDisplayDirection_005, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     hwcmgr_ptr_t hwcmgr = std::make_shared<HardwareCursorPointerManager>();
     ASSERT_NE(hwcmgr, nullptr);
     handler_ptr_t handler = nullptr;
     OLD::DisplayInfo di;
-    std::shared_ptr<ScreenPointer> screenpointer = std::make_shared<ScreenPointer>(hwcmgr, handler, di);
+    auto screenpointer = std::make_shared<ScreenPointer>(hwcmgr, handler, di);
     ASSERT_NE(screenpointer, nullptr);
-    screenpointer->mode_ = mode_t::SCREEN_MAIN;
-    screenpointer->rotation_ = rotation_t::ROTATION_0;
-    screenpointer->displayDirection_ = Direction::DIRECTION90;
-    Direction ret = screenpointer->GetRenderDirection(false);
-    EXPECT_EQ(ret, Direction::DIRECTION270);
-    screenpointer->rotation_ = rotation_t::ROTATION_0;
-    screenpointer->displayDirection_ = Direction::DIRECTION180;
-    ret = screenpointer->GetRenderDirection(false);
-    EXPECT_EQ(ret, Direction::DIRECTION180);
-    screenpointer->rotation_ = rotation_t::ROTATION_0;
-    screenpointer->displayDirection_ = Direction::DIRECTION270;
-    ret = screenpointer->GetRenderDirection(false);
-    EXPECT_EQ(ret, Direction::DIRECTION90);
+
+    screenpointer->SetDirectionAndDisplayDirection(Direction::DIRECTION0, Direction::DIRECTION0);
+    EXPECT_EQ(screenpointer->GetDirection(), Direction::DIRECTION0);
+
+    screenpointer->SetDirectionAndDisplayDirection(Direction::DIRECTION90, Direction::DIRECTION90);
+    EXPECT_EQ(screenpointer->GetDirection(), Direction::DIRECTION90);
+
+    screenpointer->SetDirectionAndDisplayDirection(Direction::DIRECTION180, Direction::DIRECTION180);
+    EXPECT_EQ(screenpointer->GetDirection(), Direction::DIRECTION180);
+
+    screenpointer->SetDirectionAndDisplayDirection(Direction::DIRECTION270, Direction::DIRECTION270);
+    EXPECT_EQ(screenpointer->GetDirection(), Direction::DIRECTION270);
 }
 
 /**
- * @tc.name: ScreenPointerTest_GetRenderDirection_006
- * @tc.desc: Test GetRenderDirection with isHard false and DIRECTION90 - DIRECTION270
+ * @tc.name: ScreenPointerTest_GetDirection_001
+ * @tc.desc: Test GetDirection returns correct value after SetDirectionAndDisplayDirection
  * @tc.type: Function
  * @tc.require:
  */
-HWTEST_F(ScreenPointerTest, ScreenPointerTest_GetRenderDirection_006, TestSize.Level1)
+HWTEST_F(ScreenPointerTest, ScreenPointerTest_GetDirection_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     hwcmgr_ptr_t hwcmgr = std::make_shared<HardwareCursorPointerManager>();
     ASSERT_NE(hwcmgr, nullptr);
     handler_ptr_t handler = nullptr;
     OLD::DisplayInfo di;
-    std::shared_ptr<ScreenPointer> screenpointer = std::make_shared<ScreenPointer>(hwcmgr, handler, di);
+    auto screenpointer = std::make_shared<ScreenPointer>(hwcmgr, handler, di);
     ASSERT_NE(screenpointer, nullptr);
-    screenpointer->mode_ = mode_t::SCREEN_MAIN;
-    screenpointer->rotation_ = rotation_t::ROTATION_90;
-    screenpointer->displayDirection_ = Direction::DIRECTION270;
-    Direction ret = screenpointer->GetRenderDirection(false);
-    EXPECT_EQ(ret, Direction::DIRECTION180);
+
+    screenpointer->SetDirectionAndDisplayDirection(Direction::DIRECTION90, Direction::DIRECTION0);
+    Direction result = screenpointer->GetDirection();
+    EXPECT_EQ(result, Direction::DIRECTION90);
 }
 
 /**
- * @tc.name: ScreenPointerTest_GetRenderDirection_007
- * @tc.desc: Test GetRenderDirection with SCREEN_EXTEND mode
+ * @tc.name: ScreenPointerTest_GetDirection_002
+ * @tc.desc: Test GetDirection returns default value (DIRECTION0) before setting
  * @tc.type: Function
  * @tc.require:
  */
-HWTEST_F(ScreenPointerTest, ScreenPointerTest_GetRenderDirection_007, TestSize.Level1)
+HWTEST_F(ScreenPointerTest, ScreenPointerTest_GetDirection_002, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     hwcmgr_ptr_t hwcmgr = std::make_shared<HardwareCursorPointerManager>();
     ASSERT_NE(hwcmgr, nullptr);
     handler_ptr_t handler = nullptr;
     OLD::DisplayInfo di;
-    std::shared_ptr<ScreenPointer> screenpointer = std::make_shared<ScreenPointer>(hwcmgr, handler, di);
+    auto screenpointer = std::make_shared<ScreenPointer>(hwcmgr, handler, di);
     ASSERT_NE(screenpointer, nullptr);
-    screenpointer->mode_ = mode_t::SCREEN_EXTEND;
-    screenpointer->rotation_ = rotation_t::ROTATION_90;
-    Direction ret = screenpointer->GetRenderDirection(true);
-    EXPECT_EQ(ret, Direction::DIRECTION90);
-    screenpointer->displayDirection_ = Direction::DIRECTION0;
-    ret = screenpointer->GetRenderDirection(false);
-    EXPECT_EQ(ret, Direction::DIRECTION90);
+
+    Direction result = screenpointer->GetDirection();
+    EXPECT_EQ(result, Direction::DIRECTION0);
+}
+
+/**
+ * @tc.name: ScreenPointerTest_GetDisplayDirection_001
+ * @tc.desc: Test GetDisplayDirection returns correct value after SetDirectionAndDisplayDirection
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(ScreenPointerTest, ScreenPointerTest_GetDisplayDirection_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    hwcmgr_ptr_t hwcmgr = std::make_shared<HardwareCursorPointerManager>();
+    ASSERT_NE(hwcmgr, nullptr);
+    handler_ptr_t handler = nullptr;
+    OLD::DisplayInfo di;
+    auto screenpointer = std::make_shared<ScreenPointer>(hwcmgr, handler, di);
+    ASSERT_NE(screenpointer, nullptr);
+
+    screenpointer->SetDirectionAndDisplayDirection(Direction::DIRECTION0, Direction::DIRECTION270);
+    Direction result = screenpointer->GetDisplayDirection();
+    EXPECT_EQ(result, Direction::DIRECTION270);
+}
+
+/**
+ * @tc.name: ScreenPointerTest_GetDisplayDirection_002
+ * @tc.desc: Test GetDisplayDirection returns default value (DIRECTION0) before setting
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(ScreenPointerTest, ScreenPointerTest_GetDisplayDirection_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    hwcmgr_ptr_t hwcmgr = std::make_shared<HardwareCursorPointerManager>();
+    ASSERT_NE(hwcmgr, nullptr);
+    handler_ptr_t handler = nullptr;
+    OLD::DisplayInfo di;
+    auto screenpointer = std::make_shared<ScreenPointer>(hwcmgr, handler, di);
+    ASSERT_NE(screenpointer, nullptr);
+
+    Direction result = screenpointer->GetDisplayDirection();
+    EXPECT_EQ(result, Direction::DIRECTION0);
 }
 } // namespace MMI
 } // namespace OHOS
