@@ -4088,7 +4088,7 @@ void PointerDrawingManager::UpdateCursorBlurEnabled()
     std::lock_guard<std::mutex> lock(cursorBlurEnableMutex_);
     lastCursorBlurEnabled_ = currentCursorBlurEnabled_;
     bool cursorBlurEnabled = OHOS::system::GetBoolParameter(
-        "rosen.multimodalinput.pc.support_blur_cursor", true);
+        "const.multimodalinput.support_blur_cursor", false);
     MMI_HILOGD("UpdateCursorBlurEnabled, now:%{public}d, current:%{public}d, last:%{public}d",
         cursorBlurEnabled, currentCursorBlurEnabled_, lastCursorBlurEnabled_);
     if (cursorBlurEnabled == lastCursorBlurEnabled_) {
