@@ -124,7 +124,9 @@ private:
     GetPointerInstanceFunc getPointerInstance_;
 
     std::atomic<bool> exitFlag_ { false };
-    std::atomic<bool> isLoaded_ { false };
+    // 0表示未加载(false)，1表示已加载(true)，-1表示卸载中(true)
+    std::atomic<int32_t> isLoaded_ { 0 };
+    std::atomic<int32_t> unloadSoInterval_ { 0 };
     void *soHandle_ { nullptr };
     IPointerDrawingManager* pointerInstance_ { nullptr };
     int32_t timerId_ { -1 };
