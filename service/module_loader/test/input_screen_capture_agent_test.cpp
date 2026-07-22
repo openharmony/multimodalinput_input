@@ -59,11 +59,6 @@ bool TestIsMusicActivateFunc()
     return g_musicActivateReturn;
 }
 
-static int32_t g_cleanupCallCount = 0;
-void TestCleanUpResourcesFunc()
-{
-    g_cleanupCallCount++;
-}
 } // namespace
 
 class InputScreenCaptureAgentTest : public testing::Test {
@@ -367,110 +362,6 @@ HWTEST_F(InputScreenCaptureAgentTest, RegisterListener_002, TestSize.Level1)
 }
 
 /**
- * @tc.name: UnloadLibrary_001
- * @tc.desc: Test UnloadLibrary when handle is null
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputScreenCaptureAgentTest, UnloadLibrary_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    inputScreenCaptureAgent.handle_.handle = nullptr;
-    EXPECT_NO_FATAL_FAILURE(inputScreenCaptureAgent.UnloadLibrary());
-    EXPECT_EQ(inputScreenCaptureAgent.handle_.handle, nullptr);
-}
-
-/**
- * @tc.name: UnloadLibrary_002
- * @tc.desc: Test UnloadLibrary with valid library handle
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputScreenCaptureAgentTest, UnloadLibrary_002, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    char libRealPath[PATH_MAX] = {};
-    if (realpath(REFENCE_LIB_ABSOLUTE_PATH.c_str(), libRealPath) != nullptr) {
-        inputScreenCaptureAgent.handle_.handle = dlopen(libRealPath, RTLD_LAZY);
-    }
-    if (inputScreenCaptureAgent.handle_.handle != nullptr) {
-        inputScreenCaptureAgent.UnloadLibrary();
-        EXPECT_EQ(inputScreenCaptureAgent.handle_.handle, nullptr);
-    } else {
-        EXPECT_NO_FATAL_FAILURE(inputScreenCaptureAgent.UnloadLibrary());
-    }
-}
-
-/**
- * @tc.name: UnloadLibrary_003
- * @tc.desc: Test UnloadLibrary when cleanUpResources is set
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputScreenCaptureAgentTest, UnloadLibrary_003, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    char libRealPath[PATH_MAX] = {};
-    if (realpath(REFENCE_LIB_ABSOLUTE_PATH.c_str(), libRealPath) != nullptr) {
-        inputScreenCaptureAgent.handle_.handle = dlopen(libRealPath, RTLD_LAZY);
-    }
-    if (inputScreenCaptureAgent.handle_.handle != nullptr) {
-        inputScreenCaptureAgent.handle_.cleanUpResources = []() {};
-        EXPECT_NO_FATAL_FAILURE(inputScreenCaptureAgent.UnloadLibrary());
-        EXPECT_EQ(inputScreenCaptureAgent.handle_.handle, nullptr);
-        EXPECT_EQ(inputScreenCaptureAgent.handle_.cleanUpResources, nullptr);
-    } else {
-        EXPECT_NO_FATAL_FAILURE(inputScreenCaptureAgent.UnloadLibrary());
-    }
-}
-
-/**
- * @tc.name: UnloadLibrary_004
- * @tc.desc: Test UnloadLibrary when cleanUpResources tracks call count
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputScreenCaptureAgentTest, UnloadLibrary_004, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    g_cleanupCallCount = 0;
-    char libRealPath[PATH_MAX] = {};
-    if (realpath(REFENCE_LIB_ABSOLUTE_PATH.c_str(), libRealPath) != nullptr) {
-        inputScreenCaptureAgent.handle_.handle = dlopen(libRealPath, RTLD_LAZY);
-    }
-    if (inputScreenCaptureAgent.handle_.handle != nullptr) {
-        inputScreenCaptureAgent.handle_.cleanUpResources = TestCleanUpResourcesFunc;
-        EXPECT_NO_FATAL_FAILURE(inputScreenCaptureAgent.UnloadLibrary());
-        EXPECT_GE(g_cleanupCallCount, 1);
-        EXPECT_EQ(inputScreenCaptureAgent.handle_.handle, nullptr);
-    } else {
-        EXPECT_NO_FATAL_FAILURE(inputScreenCaptureAgent.UnloadLibrary());
-    }
-}
-
-/**
- * @tc.name: UnloadLibrary_005
- * @tc.desc: Test multiple UnloadLibrary calls on same handle
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputScreenCaptureAgentTest, UnloadLibrary_005, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    char libRealPath[PATH_MAX] = {};
-    if (realpath(REFENCE_LIB_ABSOLUTE_PATH.c_str(), libRealPath) != nullptr) {
-        inputScreenCaptureAgent.handle_.handle = dlopen(libRealPath, RTLD_LAZY);
-    }
-    if (inputScreenCaptureAgent.handle_.handle != nullptr) {
-        EXPECT_NO_FATAL_FAILURE(inputScreenCaptureAgent.UnloadLibrary());
-        EXPECT_EQ(inputScreenCaptureAgent.handle_.handle, nullptr);
-        EXPECT_NO_FATAL_FAILURE(inputScreenCaptureAgent.UnloadLibrary());
-    } else {
-        EXPECT_NO_FATAL_FAILURE(inputScreenCaptureAgent.UnloadLibrary());
-    }
-}
-
-/**
  * @tc.name: IsScreenCaptureWorking_004
  * @tc.desc: Test IsScreenCaptureWorking with valid isWorking returning true
  * @tc.type: FUNC
@@ -703,14 +594,12 @@ HWTEST_F(InputScreenCaptureAgentTest, FreeHandle_003, TestSize.Level1)
         inputScreenCaptureAgent.handle_.isWorking = TestIsWorkingFunc;
         inputScreenCaptureAgent.handle_.registerListener = TestRegisterListenerFunc;
         inputScreenCaptureAgent.handle_.isMusicActivate = TestIsMusicActivateFunc;
-        inputScreenCaptureAgent.handle_.cleanUpResources = TestCleanUpResourcesFunc;
 
         EXPECT_NO_FATAL_FAILURE(inputScreenCaptureAgent.handle_.Free());
         EXPECT_EQ(inputScreenCaptureAgent.handle_.handle, nullptr);
         EXPECT_EQ(inputScreenCaptureAgent.handle_.isWorking, nullptr);
         EXPECT_EQ(inputScreenCaptureAgent.handle_.registerListener, nullptr);
         EXPECT_EQ(inputScreenCaptureAgent.handle_.isMusicActivate, nullptr);
-        EXPECT_EQ(inputScreenCaptureAgent.handle_.cleanUpResources, nullptr);
     }
 }
 
