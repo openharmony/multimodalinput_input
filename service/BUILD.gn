@@ -1378,6 +1378,7 @@ ohos_unittest("CursorDrawingComponentTest") {
     "${mmi_path}/service/common/setting_datashare/include",
     "${mmi_path}/service/setting_manager/include",
     "${mmi_path}/service/module_loader/include",
+    "${mmi_path}/service/device_manager/include",
   ]
   sources = [
     "${mmi_path}/service/window_manager/test/cursor_drawing_component_test.cpp",
