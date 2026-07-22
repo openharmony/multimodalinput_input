@@ -36,7 +36,7 @@
 #define MMI_LOG_TAG "CursorDrawingComponent"
 #define CHK_IS_LOADV(isLoaded, pointerInstance)                     \
     Load();                                                         \
-    if (!(isLoaded)) {                                              \
+    if ((isLoaded) == 0) {                                              \
         MMI_HILOGE("libcursor_drawing_adapter.z.so is not loaded"); \
         return;                                                     \
     }                                                               \
@@ -47,7 +47,7 @@
 
 #define CHK_IS_LOADF(isLoaded, pointerInstance)                     \
     Load();                                                         \
-    if (!(isLoaded)) {                                              \
+    if ((isLoaded) == 0) {                                              \
         MMI_HILOGE("libcursor_drawing_adapter.z.so is not loaded"); \
         return false;                                               \
     }                                                               \
@@ -58,7 +58,7 @@
 
 #define CHK_IS_LOADR(isLoaded, pointerInstance)                     \
     Load();                                                         \
-    if (!(isLoaded)) {                                              \
+    if ((isLoaded) == 0) {                                              \
         MMI_HILOGE("libcursor_drawing_adapter.z.so is not loaded"); \
         return RET_ERR;                                             \
     }                                                               \
@@ -110,7 +110,7 @@ void CursorDrawingComponent::Load()
     {
         std::lock_guard<ffrt::mutex> lockGuard(g_loadSoMutex);
         lastCallTime_ = std::chrono::steady_clock::now();
-        if (isLoaded_ && (soHandle_ != nullptr)) {
+        if (isLoaded_ == 1 && (soHandle_ != nullptr)) {
             return;
         }
 
@@ -167,7 +167,7 @@ bool CursorDrawingComponent::LoadLibrary()
         getPointerInstance_ = nullptr;
         return false;
     }
-    isLoaded_ = true;
+    isLoaded_ = 1;
     POINTER_DEV_MGR.isInitDefaultMouseIconPath = true;
 #ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
     pointerInstance_->SetLastMouseStyle(CursorDrawingInformation::GetInstance().GetLastMouseStyle());
@@ -181,15 +181,17 @@ bool CursorDrawingComponent::ResetUnloadTimer(int32_t unloadTime, int32_t checkI
         TimerMgr->RemoveTimer(timerId_);
     }
     if (unloadTime == -1) {
-        unloadTime = UNLOAD_TIME_MS;
+        unloadSoInterval_ = UNLOAD_TIME_MS;
+    } else {
+        unloadSoInterval_ = unloadTime;
     }
     if (checkInterval == -1) {
         checkInterval = CHECK_INTERVAL_MS;
     }
-    timerId_ = TimerMgr->AddLongTimer(checkInterval, CHECK_COUNT, [this, unloadTime] {
+    timerId_ = TimerMgr->AddLongTimer(checkInterval, CHECK_COUNT, [this] {
         auto idleTime = std::chrono::duration_cast<std::chrono::milliseconds>(
             std::chrono::steady_clock::now() - lastCallTime_).count();
-        if ((idleTime >= unloadTime) && !POINTER_DEV_MGR.isInit && !POINTER_DEV_MGR.isPointerVisible) {
+        if ((idleTime >= unloadSoInterval_) && !POINTER_DEV_MGR.isInit && !POINTER_DEV_MGR.isPointerVisible) {
             ffrt::submit([this] {
                 this->UnLoad();
             });
@@ -205,10 +207,11 @@ bool CursorDrawingComponent::ResetUnloadTimer(int32_t unloadTime, int32_t checkI
 void CursorDrawingComponent::UnLoad()
 {
     std::lock_guard<ffrt::mutex> lockGuard(g_loadSoMutex);
-    if (!isLoaded_ || (soHandle_ == nullptr)) {
+    if (isLoaded_ == 0 || (soHandle_ == nullptr)) {
         MMI_HILOGI("%{public}s has been UnLoaded", MULTIMODAL_PATH_NAME);
         return;
     }
+    isLoaded_ = -1;
     pointerInstance_->ClearResources();
     if (dlclose(soHandle_) != 0) {
         const char *errorMsg = dlerror();
@@ -217,7 +220,7 @@ void CursorDrawingComponent::UnLoad()
         return;
     }
     CleanupDirectory(IMAGE_POINTER_DEFAULT_PATH);
-    isLoaded_ = false;
+    isLoaded_ = 0;
     soHandle_ = nullptr;
     getPointerInstance_ = nullptr;
     pointerInstance_ = nullptr;
