@@ -63,6 +63,7 @@ ohos_shared_library("pointer") {
     "image_framework:image_native",
     "ipc:ipc_single",
     "napi:ace_napi",
+    "node:node_header_notice",
   ]
 
   if (input_feature_api_metrics_histogram) {
