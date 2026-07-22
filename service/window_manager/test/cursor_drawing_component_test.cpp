@@ -17,6 +17,7 @@
 
 #include "cursor_drawing_adapter.h"
 #include "cursor_drawing_component.h"
+#include "pointer_device_manager.h"
 
 using namespace testing::ext;
 namespace OHOS {
@@ -70,6 +71,9 @@ HWTEST_F(CursorDrawingComponentTest, CursorDrawingComponentTest_load_001, TestSi
     EXPECT_EQ(cursorDrawingComponent.isLoaded_, 1);
     EXPECT_NE(cursorDrawingComponent.soHandle_, nullptr);
 
+    cursorDrawingComponent.unloadSoInterval_ = -1;
+    POINTER_DEV_MGR.isInit = false;
+    POINTER_DEV_MGR.isPointerVisible = false;
     cursorDrawingComponent.UnLoad();
     EXPECT_EQ(cursorDrawingComponent.isLoaded_, 0);
     EXPECT_EQ(cursorDrawingComponent.soHandle_, nullptr);
