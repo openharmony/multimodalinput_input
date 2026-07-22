@@ -857,18 +857,30 @@ HWTEST_F(TouchDrawingHandlerTest, TouchDrawingManagerTest_DrawPointerPositionHan
     int32_t pointerId { 1 };
     pointerEvent->SetPointerId(pointerId);
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
-
+ 
     PointerEvent::PointerItem item {};
     item.SetDeviceId(deviceId);
     item.SetPointerId(pointerId);
     pointerEvent->AddPointerItem(item);
-
+ 
     TouchDrawingHandler touchDrawingHandler;
     touchDrawingHandler.pointerEvent_ = pointerEvent;
+    if (touchDrawingHandler.crosshairCanvasNode_ == nullptr) {
+        touchDrawingHandler.crosshairCanvasNode_ = Rosen::RSCanvasNode::Create(false, false, rsUIContext_);
+    }
+    if (touchDrawingHandler.trackerCanvasNode_ == nullptr) {
+        touchDrawingHandler.trackerCanvasNode_ = Rosen::RSCanvasDrawingNode::Create(false, false, rsUIContext_);
+    }
+    Rosen::RSSurfaceNodeConfig surfaceNodeConfig;
+    surfaceNodeConfig.SurfaceNodeName = "touch window";
+    Rosen::RSSurfaceNodeType surfaceNodeType = Rosen::RSSurfaceNodeType::SELF_DRAWING_WINDOW_NODE;
+    touchDrawingHandler.surfaceNode_ = Rosen::RSSurfaceNode::Create(surfaceNodeConfig, surfaceNodeType, true, false,
+        rsUIContext_);
+    
     touchDrawingHandler.DrawPointerPositionHandler();
     EXPECT_EQ(touchDrawingHandler.currentDeviceId_, deviceId);
     EXPECT_EQ(touchDrawingHandler.currentPointerId_, pointerId);
-
+ 
     PointerEvent::PointerItem item1 {};
     item1.SetDeviceId(deviceId);
     item1.SetPointerId(2);
@@ -877,7 +889,7 @@ HWTEST_F(TouchDrawingHandlerTest, TouchDrawingManagerTest_DrawPointerPositionHan
     touchDrawingHandler.DrawPointerPositionHandler();
     EXPECT_EQ(touchDrawingHandler.currentDeviceId_, deviceId);
     EXPECT_EQ(touchDrawingHandler.currentPointerId_, pointerId);
-
+ 
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
     touchDrawingHandler.pointerEvent_ = pointerEvent;
     touchDrawingHandler.DrawPointerPositionHandler();
