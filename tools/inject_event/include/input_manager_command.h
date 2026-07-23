@@ -61,6 +61,7 @@ private:
     int32_t QueryMouseInfo(int32_t argc, char *argv[]);
     int32_t SavePixelMapToFile(const char *filePath);
     std::atomic_bool isFoldPC_ { false };
+    int32_t targetDisplayId_ { -1 };
 };
 } // namespace MMI
 } // namespace OHOS
