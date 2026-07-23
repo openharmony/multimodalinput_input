@@ -1339,6 +1339,67 @@ HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_Inpu
 }
 
 /**
+ * @tc.name: MultimodalInputPluginManagerTest_InputPlugin_DispatchEvent_ActiveSubscriber_001
+ * @tc.desc: Test DispatchEvent with KeyEvent to InputActiveSubscriber stage
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputPluginManagerTest,
+    MultimodalInputPluginManagerTest_InputPlugin_DispatchEvent_ActiveSubscriber_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputDispatchStage stage = InputDispatchStage::InputActiveSubscriber;
+    std::shared_ptr<InputPlugin> inputPluginContext = std::make_shared<InputPlugin>(nullptr);
+    std::shared_ptr<KeyEvent> keyEvent = std::make_shared<KeyEvent>(KeyEvent::KEYCODE_BRIGHTNESS_DOWN);
+
+    InputHandler->inputActiveSubscriberHandler_ = std::make_shared<InputActiveSubscriberHandler>();
+    auto handler = InputHandler->GetInputActiveSubscriberHandler();
+    ASSERT_NE(handler, nullptr);
+    auto session = std::make_shared<UDSSession>("test_program", 1, 123, 1000, 2000);
+    ASSERT_NE(session, nullptr);
+    auto ret = handler->SubscribeInputActive(session, 0, 0);
+    EXPECT_EQ(ret, RET_OK);
+    inputPluginContext->DispatchEvent(keyEvent, stage);
+    ret = handler->UnsubscribeInputActive(session, 0);
+    EXPECT_EQ(ret, RET_OK);
+
+    InputHandler->inputActiveSubscriberHandler_ = nullptr;
+    EXPECT_EQ(InputHandler->GetInputActiveSubscriberHandler(), nullptr);
+    inputPluginContext->DispatchEvent(keyEvent, stage);
+}
+
+/**
+ * @tc.name: MultimodalInputPluginManagerTest_InputPlugin_DispatchEvent_ActiveSubscriber_002
+ * @tc.desc: Test DispatchEvent with PointerEvent to InputActiveSubscriber stage
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputPluginManagerTest,
+    MultimodalInputPluginManagerTest_InputPlugin_DispatchEvent_ActiveSubscriber_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputDispatchStage stage = InputDispatchStage::InputActiveSubscriber;
+    std::shared_ptr<InputPlugin> inputPluginContext = std::make_shared<InputPlugin>(nullptr);
+    std::shared_ptr<PointerEvent> pointerEvent =
+        std::make_shared<PointerEvent>(PointerEvent::POINTER_ACTION_DOWN);
+
+    InputHandler->inputActiveSubscriberHandler_ = std::make_shared<InputActiveSubscriberHandler>();
+    auto handler = InputHandler->GetInputActiveSubscriberHandler();
+    ASSERT_NE(handler, nullptr);
+    auto session = std::make_shared<UDSSession>("test_program", 1, 123, 1000, 2000);
+    ASSERT_NE(session, nullptr);
+    auto ret = handler->SubscribeInputActive(session, 0, 0);
+    EXPECT_EQ(ret, RET_OK);
+    inputPluginContext->DispatchEvent(pointerEvent, stage);
+    ret = handler->UnsubscribeInputActive(session, 0);
+    EXPECT_EQ(ret, RET_OK);
+
+    InputHandler->inputActiveSubscriberHandler_ = nullptr;
+    EXPECT_EQ(InputHandler->GetInputActiveSubscriberHandler(), nullptr);
+    inputPluginContext->DispatchEvent(pointerEvent, stage);
+}
+
+/**
  * @tc.name: MultimodalInputPluginManagerTest_HandleEvent_001
  * @tc.desc: Test_HandleEvent_001
  * @tc.require: test HandleEvent

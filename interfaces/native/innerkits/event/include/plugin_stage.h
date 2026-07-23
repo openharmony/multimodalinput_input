@@ -78,6 +78,7 @@ enum class InputDispatchStage {
     Intercept,
     KeyCommand,
     Monitor,
+    InputActiveSubscriber,
 };
 
 struct LibInputEventData {

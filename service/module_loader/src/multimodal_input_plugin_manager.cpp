@@ -849,6 +849,10 @@ void InputPlugin::DispatchEvent(PluginEventType pluginEvent, InputDispatchStage 
             break;
 #endif
         }
+        case InputDispatchStage::InputActiveSubscriber: {
+            eventHandler = InputHandler->GetInputActiveSubscriberHandler();
+            break;
+        }
         default: {
             MMI_HILOGD("Abnormal input dispatch stage");
             return;
