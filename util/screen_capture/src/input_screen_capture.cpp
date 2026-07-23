@@ -14,7 +14,6 @@
  */
 
 #include "audio_stream_manager.h"
-#include "audio_system_manager.h"
 #include "define_multimodal.h"
 #ifdef OHOS_BUILD_ENABLE_DFX_RADAR
 #include "dfx_hisysevent.h"
@@ -88,12 +87,6 @@ extern "C" bool IsMusicActivate()
         }
     }
     return false;
-}
-
-extern "C" void CleanUpScreenCaptureResources()
-{
-    CALL_DEBUG_ENTER;
-    AudioStandard::AudioSystemManager::GetInstance()->CleanUpResource();
 }
 #endif
 }
