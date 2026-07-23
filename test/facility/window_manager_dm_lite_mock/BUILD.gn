@@ -1,4 +1,4 @@
-# Copyright (c) 2025 Huawei Device Co., Ltd.
+# Copyright (c) 2026 Huawei Device Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -13,14 +13,11 @@
 
 import("../../../multimodalinput_mini.gni")
 
-config("key_command_mock_public_config") {
-  include_dirs = [
-    "include",
-    "${mmi_path}/test/facility/event_handler_mock/include",
-  ]
+config("window_manager_dm_lite_mock_public_config") {
+  include_dirs = [ "include" ]
 }
 
-ohos_source_set("key_command_mock") {
+ohos_source_set("window_manager_dm_lite_mock") {
   branch_protector_ret = "pac_ret"
   sanitize = {
     cfi = true
@@ -32,14 +29,12 @@ ohos_source_set("key_command_mock") {
 
   include_dirs = [ "include" ]
 
-  sources = [ "src/key_command_handler_util.cpp" ]
+  sources = [ "src/display_manager_lite.cpp" ]
 
-  public_configs = [ ":key_command_mock_public_config" ]
-
-  deps = [ "${mmi_path}/util:libmmi-util" ]
+  public_configs = [ ":window_manager_dm_lite_mock_public_config" ]
 
   external_deps = [
-    "data_share:datashare_consumer",
+    "c_utils:utils",
     "googletest:gmock_main",
   ]
 

@@ -17,17 +17,19 @@
 
 #include <linux/input.h>
 #include <parameters.h>
+
+#include "config_policy_utils.h"
+
 #include "device_state_manager.h"
 #include "display_manager_lite.h"
+#include "input_event_handler.h"
 #include "key_map_manager.h"
 #include "key_command_handler_util.h"
 #include "key_unicode_transformation.h"
 #include "misc_product_type_parser.h"
 #include "timer_manager.h"
-#include "libinput_adapter.h"
 #include "key_auto_repeat.h"
 #include "libinput_adapter.h"
-#include "key_auto_repeat.h"
 #include "input_device_manager.h"
 #include "event_dispatch_handler.h"
 
@@ -500,7 +502,6 @@ void KeyEventNormalize::HandleSimulatedModifierKeyActionFromShell(const std::sha
         return;
     }
 
-    int32_t keyAction = keyEvent->GetKeyAction();
     bool isShell = keyEvent->HasFlag(InputEvent::EVENT_FLAG_SHELL);
     bool isKeyDown = keyEvent->GetKeyAction() == KeyEvent::KEY_ACTION_DOWN;
     bool isAutoUp = isShell && isKeyDown && keyStatusRecordSwitch_;
