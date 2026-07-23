@@ -17,6 +17,7 @@
 
 #include "cursor_drawing_adapter.h"
 #include "cursor_drawing_component.h"
+#include "pointer_device_manager.h"
 
 using namespace testing::ext;
 namespace OHOS {
@@ -63,19 +64,22 @@ HWTEST_F(CursorDrawingAdapterTest, CursorDrawingAdapterTest_GetPointerInstance_0
 HWTEST_F(CursorDrawingComponentTest, CursorDrawingComponentTest_load_001, TestSize.Level1)
 {
     CursorDrawingComponent cursorDrawingComponent;
-    EXPECT_EQ(cursorDrawingComponent.isLoaded_, false);
+    EXPECT_EQ(cursorDrawingComponent.isLoaded_, 0);
     EXPECT_EQ(cursorDrawingComponent.soHandle_, nullptr);
 
     cursorDrawingComponent.Load();
-    EXPECT_EQ(cursorDrawingComponent.isLoaded_, true);
+    EXPECT_EQ(cursorDrawingComponent.isLoaded_, 1);
     EXPECT_NE(cursorDrawingComponent.soHandle_, nullptr);
 
+    cursorDrawingComponent.unloadSoInterval_ = -1;
+    POINTER_DEV_MGR.isInit = false;
+    POINTER_DEV_MGR.isPointerVisible = false;
     cursorDrawingComponent.UnLoad();
-    EXPECT_EQ(cursorDrawingComponent.isLoaded_, false);
+    EXPECT_EQ(cursorDrawingComponent.isLoaded_, 0);
     EXPECT_EQ(cursorDrawingComponent.soHandle_, nullptr);
 
     cursorDrawingComponent.~CursorDrawingComponent();
-    EXPECT_EQ(cursorDrawingComponent.isLoaded_, false);
+    EXPECT_EQ(cursorDrawingComponent.isLoaded_, 0);
     EXPECT_EQ(cursorDrawingComponent.soHandle_, nullptr);
 }
 
@@ -89,7 +93,7 @@ HWTEST_F(CursorDrawingComponentTest, CursorDrawingComponentTest_GetInstance_001,
 {
     instance_ = &CursorDrawingComponent::GetInstance();
     ASSERT_NE(instance_, nullptr);
-    ASSERT_NE(instance_->isLoaded_, true);
+    ASSERT_NE(instance_->isLoaded_, 1);
     ASSERT_EQ(instance_->soHandle_, nullptr);
     ASSERT_EQ(instance_->pointerInstance_, nullptr);
     EXPECT_EQ(instance_->Init(), true);
@@ -590,7 +594,7 @@ HWTEST_F(CursorDrawingComponentTest, CursorDrawingComponentTest_Load_002, TestSi
 {
     instance_ = &CursorDrawingComponent::GetInstance();
     ASSERT_NE(instance_, nullptr);
-    instance_->isLoaded_ = true;
+    instance_->isLoaded_ = 1;
     instance_->soHandle_ = nullptr;
     EXPECT_NO_FATAL_FAILURE(instance_->Load());
 }
@@ -605,7 +609,7 @@ HWTEST_F(CursorDrawingComponentTest, CursorDrawingComponentTest_UnLoad_002, Test
 {
     instance_ = &CursorDrawingComponent::GetInstance();
     ASSERT_NE(instance_, nullptr);
-    instance_->isLoaded_ = true;
+    instance_->isLoaded_ = 1;
     ASSERT_NE(instance_->soHandle_, nullptr);
     EXPECT_NO_FATAL_FAILURE(instance_->UnLoad());
 }
@@ -638,11 +642,11 @@ HWTEST_F(CursorDrawingComponentTest, CursorDrawingComponentTest_GetMouseIconPath
     int32_t userId = 100;
     CursorPixelMap curPixelMap;
     int32_t ret = instance_->SetMouseIcon(userId, pid, windowId, curPixelMap);
-    instance_->isLoaded_ = false;
+    instance_->isLoaded_ = 0;
     EXPECT_EQ(ret, RET_ERR);
     EXPECT_NO_FATAL_FAILURE(instance_->GetMouseIconPath());
 
-    instance_->isLoaded_ = true;
+    instance_->isLoaded_ = 1;
     EXPECT_NO_FATAL_FAILURE(instance_->GetMouseIconPath());
 }
 
@@ -654,10 +658,10 @@ HWTEST_F(CursorDrawingComponentTest, CursorDrawingComponentTest_GetMouseIconPath
  */
 HWTEST_F(CursorDrawingComponentTest, CursorDrawingComponentTest_RegisterDisplayStatusReceiver, TestSize.Level1)
 {
-    instance_->isLoaded_ = false;
+    instance_->isLoaded_ = 0;
     EXPECT_NO_FATAL_FAILURE(instance_->RegisterDisplayStatusReceiver());
 
-    instance_->isLoaded_ = true;
+    instance_->isLoaded_ = 1;
     EXPECT_NO_FATAL_FAILURE(instance_->RegisterDisplayStatusReceiver());
 }
 
@@ -680,10 +684,10 @@ HWTEST_F(CursorDrawingComponentTest, CursorDrawingComponentTest_InitPointerCallb
  */
 HWTEST_F(CursorDrawingComponentTest, CursorDrawingComponentTest_GetUserDefinedCursorPixelMap, TestSize.Level1)
 {
-    instance_->isLoaded_ = false;
+    instance_->isLoaded_ = 0;
     ASSERT_EQ(instance_->GetUserDefinedCursorPixelMap(nullptr), RET_ERR);
 
-    instance_->isLoaded_ = true;
+    instance_->isLoaded_ = 1;
     ASSERT_EQ(instance_->GetUserDefinedCursorPixelMap(nullptr), RET_ERR);
 }
 
@@ -695,7 +699,7 @@ HWTEST_F(CursorDrawingComponentTest, CursorDrawingComponentTest_GetUserDefinedCu
  */
 HWTEST_F(CursorDrawingComponentTest, CursorDrawingComponentTest_UpdatePointerItemCursorInfo_001, TestSize.Level1)
 {
-    instance_->isLoaded_ = false;
+    instance_->isLoaded_ = 0;
     PointerEvent::PointerItem pointerItem;
     int32_t pointerId = 1;
     pointerItem.SetPointerId(pointerId);
@@ -711,7 +715,7 @@ HWTEST_F(CursorDrawingComponentTest, CursorDrawingComponentTest_UpdatePointerIte
  */
 HWTEST_F(CursorDrawingComponentTest, CursorDrawingComponentTest_UpdatePointerItemCursorInfo_002, TestSize.Level1)
 {
-    instance_->isLoaded_ = true;
+    instance_->isLoaded_ = 1;
     PointerEvent::PointerItem pointerItem;
     int32_t pointerId = 1;
     pointerItem.SetPointerId(pointerId);
@@ -727,7 +731,7 @@ HWTEST_F(CursorDrawingComponentTest, CursorDrawingComponentTest_UpdatePointerIte
  */
 HWTEST_F(CursorDrawingComponentTest, CursorDrawingComponentTest_SetWorkerThreadId_001, TestSize.Level1)
 {
-    instance_->isLoaded_ = true;
+    instance_->isLoaded_ = 1;
     uint64_t tid = 1;
     instance_->SetWorkerThreadId(tid);
     ASSERT_EQ(instance_->workerThreadId_, tid);
@@ -777,9 +781,9 @@ HWTEST_F(CursorDrawingComponentTest, CursorDrawingComponentTest_ResetUnloadTimer
  */
 HWTEST_F(CursorDrawingComponentTest, CursorDrawingComponentTest_AllPointerDeviceRemoved_001, TestSize.Level1)
 {
-    instance_->isLoaded_ = false;
+    instance_->isLoaded_ = 0;
     EXPECT_NO_FATAL_FAILURE(instance_->AllPointerDeviceRemoved());
-    instance_->isLoaded_ = true;
+    instance_->isLoaded_ = 1;
     EXPECT_NO_FATAL_FAILURE(instance_->AllPointerDeviceRemoved());
 }
 
@@ -793,9 +797,9 @@ HWTEST_F(CursorDrawingComponentTest, CursorDrawingComponentTest_UpdateMouseLayer
 {
     int32_t x = 200;
     int32_t y = 200;
-    instance_->isLoaded_ = false;
+    instance_->isLoaded_ = 0;
     EXPECT_NO_FATAL_FAILURE(instance_->UpdateMouseLayer(x, y));
-    instance_->isLoaded_ = true;
+    instance_->isLoaded_ = 1;
     EXPECT_NO_FATAL_FAILURE(instance_->UpdateMouseLayer(x, y));
 }
 
@@ -807,9 +811,9 @@ HWTEST_F(CursorDrawingComponentTest, CursorDrawingComponentTest_UpdateMouseLayer
  */
 HWTEST_F(CursorDrawingComponentTest, CursorDrawingComponentTest_DrawNewDpiPointer_001, TestSize.Level1)
 {
-    instance_->isLoaded_ = false;
+    instance_->isLoaded_ = 0;
     EXPECT_NO_FATAL_FAILURE(instance_->DrawNewDpiPointer());
-    instance_->isLoaded_ = true;
+    instance_->isLoaded_ = 1;
     EXPECT_NO_FATAL_FAILURE(instance_->DrawNewDpiPointer());
 }
 
@@ -822,9 +826,9 @@ HWTEST_F(CursorDrawingComponentTest, CursorDrawingComponentTest_DrawNewDpiPointe
 HWTEST_F(CursorDrawingComponentTest, CursorDrawingComponentTest_OnSwitchUser_001, TestSize.Level1)
 {
     int32_t userId = 200;
-    instance_->isLoaded_ = false;
+    instance_->isLoaded_ = 0;
     EXPECT_NO_FATAL_FAILURE(instance_->OnSwitchUser(userId));
-    instance_->isLoaded_ = true;
+    instance_->isLoaded_ = 1;
     EXPECT_NO_FATAL_FAILURE(instance_->OnSwitchUser(userId));
 }
 
@@ -838,10 +842,10 @@ HWTEST_F(CursorDrawingComponentTest, CursorDrawingComponentTest_GetCurrentCursor
 {
     bool visible = false;
     PointerStyle style;
-    instance_->isLoaded_ = false;
+    instance_->isLoaded_ = 0;
     int32_t ret = instance_->GetCurrentCursorInfo(visible, style);
     EXPECT_EQ(ret, RET_OK);
-    instance_->isLoaded_ = true;
+    instance_->isLoaded_ = 1;
     ret = instance_->GetCurrentCursorInfo(visible, style);
     EXPECT_EQ(ret, RET_OK);
 }
@@ -877,10 +881,10 @@ HWTEST_F(CursorDrawingComponentTest, CursorDrawingComponentTest_SwitchPointerSty
 HWTEST_F(CursorDrawingComponentTest, CursorDrawingComponentTest_GetIconStyle_001, TestSize.Level1)
 {
     MOUSE_ICON style = MOUSE_ICON::DEFAULT;
-    instance_->isLoaded_ = false;
+    instance_->isLoaded_ = 0;
     IconStyle ret = instance_->GetIconStyle(style);
     EXPECT_EQ(ret.alignmentWay, 0);
-    instance_->isLoaded_ = true;
+    instance_->isLoaded_ = 1;
     ret = instance_->GetIconStyle(style);
     EXPECT_NE(ret.iconPath.empty(), true);
 }
@@ -893,7 +897,7 @@ HWTEST_F(CursorDrawingComponentTest, CursorDrawingComponentTest_GetIconStyle_001
  */
 HWTEST_F(CursorDrawingComponentTest, CursorDrawingComponentTest_UnLoad_003, TestSize.Level1)
 {
-    instance_->isLoaded_ = false;
+    instance_->isLoaded_ = 0;
     instance_->soHandle_ = nullptr;
     EXPECT_NO_FATAL_FAILURE(instance_->UnLoad());
 }
@@ -1130,10 +1134,10 @@ HWTEST_F(CursorDrawingComponentTest, CursorDrawingComponentTest_SetPointerVisibl
 HWTEST_F(CursorDrawingComponentTest, CursorDrawingComponentTest_UpdateBindDisplayId_001, TestSize.Level1)
 {
     uint64_t rsId = 1001;
-    instance_->isLoaded_ = false;
+    instance_->isLoaded_ = 0;
     EXPECT_NO_FATAL_FAILURE(instance_->UpdateBindDisplayId(rsId));
 
-    instance_->isLoaded_ = true;
+    instance_->isLoaded_ = 1;
     EXPECT_NO_FATAL_FAILURE(instance_->UpdateBindDisplayId(rsId));
 
     uint64_t invalidRsId = 0;
@@ -1172,12 +1176,12 @@ HWTEST_F(CursorDrawingComponentTest, CursorDrawingComponentTest_SetPointerStyle_
  */
 HWTEST_F(CursorDrawingComponentTest, CursorDrawingComponentTest_GetPointerInstance_001, TestSize.Level1)
 {
-    instance_->isLoaded_ = true;
+    instance_->isLoaded_ = 1;
     instance_->pointerInstance_ = nullptr;
     IPointerDrawingManager *ret = instance_->GetPointerInstance();
     EXPECT_EQ(ret, nullptr);
 
-    instance_->isLoaded_ = false;
+    instance_->isLoaded_ = 0;
     ret = instance_->GetPointerInstance();
     EXPECT_EQ(ret, nullptr);
 }
@@ -1207,7 +1211,7 @@ HWTEST_F(CursorDrawingComponentTest, CursorDrawingComponentTest_UnLoad_004, Test
 {
     instance_ = &CursorDrawingComponent::GetInstance();
     ASSERT_NE(instance_, nullptr);
-    instance_->isLoaded_ = false;
+    instance_->isLoaded_ = 0;
     instance_->soHandle_ = nullptr;
     EXPECT_NO_FATAL_FAILURE(instance_->UnLoad());
     EXPECT_EQ(instance_->isLoaded_, false);
@@ -1702,7 +1706,7 @@ HWTEST_F(CursorDrawingComponentTest, CursorDrawingComponentTest_Init_002, TestSi
 {
     instance_ = &CursorDrawingComponent::GetInstance();
     ASSERT_NE(instance_, nullptr);
-    instance_->isLoaded_ = true;
+    instance_->isLoaded_ = 1;
     bool ret = instance_->Init();
     EXPECT_TRUE(ret);
 }
@@ -1715,7 +1719,7 @@ HWTEST_F(CursorDrawingComponentTest, CursorDrawingComponentTest_Init_002, TestSi
  */
 HWTEST_F(CursorDrawingComponentTest, CursorDrawingComponentTest_GetCurrentDisplayInfo_002, TestSize.Level1)
 {
-    instance_->isLoaded_ = false;
+    instance_->isLoaded_ = 0;
     instance_->pointerInstance_ = nullptr;
     auto ret = instance_->GetCurrentDisplayInfo();
     EXPECT_EQ(ret.id, 0);
@@ -1729,7 +1733,7 @@ HWTEST_F(CursorDrawingComponentTest, CursorDrawingComponentTest_GetCurrentDispla
  */
 HWTEST_F(CursorDrawingComponentTest, CursorDrawingComponentTest_GetLastMouseStyle_002, TestSize.Level1)
 {
-    instance_->isLoaded_ = false;
+    instance_->isLoaded_ = 0;
     instance_->pointerInstance_ = nullptr;
     auto style = instance_->GetLastMouseStyle();
     EXPECT_EQ(style.id, 0);
@@ -1744,7 +1748,7 @@ HWTEST_F(CursorDrawingComponentTest, CursorDrawingComponentTest_GetLastMouseStyl
 HWTEST_F(CursorDrawingComponentTest, CursorDrawingComponentTest_GetIconStyle_002, TestSize.Level1)
 {
     MOUSE_ICON style = MOUSE_ICON::EAST;
-    instance_->isLoaded_ = false;
+    instance_->isLoaded_ = 0;
     IconStyle ret = instance_->GetIconStyle(style);
     EXPECT_EQ(ret.alignmentWay, 0);
 }
@@ -1758,7 +1762,7 @@ HWTEST_F(CursorDrawingComponentTest, CursorDrawingComponentTest_GetIconStyle_002
 HWTEST_F(CursorDrawingComponentTest, CursorDrawingComponentTest_GetIconStyle_003, TestSize.Level1)
 {
     MOUSE_ICON style = MOUSE_ICON::LASER_CURSOR_DOT_RED;
-    instance_->isLoaded_ = true;
+    instance_->isLoaded_ = 1;
     IconStyle ret = instance_->GetIconStyle(style);
     EXPECT_TRUE(ret.iconPath.empty() || !ret.iconPath.empty());
 }
@@ -1785,7 +1789,7 @@ HWTEST_F(CursorDrawingComponentTest, CursorDrawingComponentTest_DrawMovePointer_
  */
 HWTEST_F(CursorDrawingComponentTest, CursorDrawingComponentTest_InitPointerCallback_002, TestSize.Level1)
 {
-    instance_->isLoaded_ = false;
+    instance_->isLoaded_ = 0;
     EXPECT_NO_FATAL_FAILURE(instance_->InitPointerCallback());
 }
 
@@ -1797,7 +1801,7 @@ HWTEST_F(CursorDrawingComponentTest, CursorDrawingComponentTest_InitPointerCallb
  */
 HWTEST_F(CursorDrawingComponentTest, CursorDrawingComponentTest_InitScreenInfo_002, TestSize.Level1)
 {
-    instance_->isLoaded_ = false;
+    instance_->isLoaded_ = 0;
     EXPECT_NO_FATAL_FAILURE(instance_->InitScreenInfo());
 }
 
@@ -1809,7 +1813,7 @@ HWTEST_F(CursorDrawingComponentTest, CursorDrawingComponentTest_InitScreenInfo_0
  */
 HWTEST_F(CursorDrawingComponentTest, CursorDrawingComponentTest_ForceClearPointerVisibleStatus_002, TestSize.Level1)
 {
-    instance_->isLoaded_ = false;
+    instance_->isLoaded_ = 0;
     EXPECT_NO_FATAL_FAILURE(instance_->ForceClearPointerVisibleStatus());
 }
 
@@ -1821,7 +1825,7 @@ HWTEST_F(CursorDrawingComponentTest, CursorDrawingComponentTest_ForceClearPointe
  */
 HWTEST_F(CursorDrawingComponentTest, CursorDrawingComponentTest_InitPointerObserver_002, TestSize.Level1)
 {
-    instance_->isLoaded_ = false;
+    instance_->isLoaded_ = 0;
     EXPECT_NO_FATAL_FAILURE(instance_->InitPointerObserver());
 }
 
@@ -1833,7 +1837,7 @@ HWTEST_F(CursorDrawingComponentTest, CursorDrawingComponentTest_InitPointerObser
  */
 HWTEST_F(CursorDrawingComponentTest, CursorDrawingComponentTest_DestroyPointerWindow_002, TestSize.Level1)
 {
-    instance_->isLoaded_ = false;
+    instance_->isLoaded_ = 0;
     EXPECT_NO_FATAL_FAILURE(instance_->DestroyPointerWindow());
 }
 
@@ -1858,7 +1862,7 @@ HWTEST_F(CursorDrawingComponentTest, CursorDrawingComponentTest_DrawScreenCenter
  */
 HWTEST_F(CursorDrawingComponentTest, CursorDrawingComponentTest_SubscribeScreenModeChange_002, TestSize.Level1)
 {
-    instance_->isLoaded_ = false;
+    instance_->isLoaded_ = 0;
     EXPECT_NO_FATAL_FAILURE(instance_->SubscribeScreenModeChange());
 }
 
@@ -1870,7 +1874,7 @@ HWTEST_F(CursorDrawingComponentTest, CursorDrawingComponentTest_SubscribeScreenM
  */
 HWTEST_F(CursorDrawingComponentTest, CursorDrawingComponentTest_RegisterDisplayStatusReceiver_002, TestSize.Level1)
 {
-    instance_->isLoaded_ = false;
+    instance_->isLoaded_ = 0;
     EXPECT_NO_FATAL_FAILURE(instance_->RegisterDisplayStatusReceiver());
 }
 
@@ -1998,7 +2002,7 @@ HWTEST_F(CursorDrawingComponentTest, CursorDrawingComponentTest_GetUserDefinedCu
  */
 HWTEST_F(CursorDrawingComponentTest, CursorDrawingComponentTest_UpdatePointerItemCursorInfo_003, TestSize.Level1)
 {
-    instance_->isLoaded_ = true;
+    instance_->isLoaded_ = 1;
     PointerEvent::PointerItem pointerItem;
     int32_t pointerId = -1;
     pointerItem.SetPointerId(pointerId);
@@ -2014,7 +2018,7 @@ HWTEST_F(CursorDrawingComponentTest, CursorDrawingComponentTest_UpdatePointerIte
  */
 HWTEST_F(CursorDrawingComponentTest, CursorDrawingComponentTest_SetWorkerThreadId_002, TestSize.Level1)
 {
-    instance_->isLoaded_ = true;
+    instance_->isLoaded_ = 1;
     uint64_t tid = 0;
     instance_->SetWorkerThreadId(tid);
     ASSERT_EQ(instance_->workerThreadId_, tid);
@@ -2028,7 +2032,7 @@ HWTEST_F(CursorDrawingComponentTest, CursorDrawingComponentTest_SetWorkerThreadI
  */
 HWTEST_F(CursorDrawingComponentTest, CursorDrawingComponentTest_SetWorkerThreadId_003, TestSize.Level1)
 {
-    instance_->isLoaded_ = true;
+    instance_->isLoaded_ = 1;
     uint64_t tid = UINT64_MAX;
     instance_->SetWorkerThreadId(tid);
     ASSERT_EQ(instance_->workerThreadId_, tid);
