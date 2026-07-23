@@ -376,7 +376,7 @@ void ScreenPointer::OnDisplayInfo(const OLD::DisplayInfo &di)
     if (!IsMirror()) {
         rotation_ = static_cast<rotation_t>(di.direction);
     }
-    displayDirection_ = di.displayDirection;
+    SetDirectionAndDisplayDirection(di.direction, di.displayDirection);
     MMI_HILOGD("Update with DisplayInfo, id=%{public}" PRIu64 ", shape=(%{public}u, %{public}u), mode=%{public}u, "
         "rotation=%{public}u, dpi=%{public}f", screenId_, width_, height_, mode_, rotation_.load(), dpi_);
     if (isCurrentOffScreenRendering_) {
@@ -711,17 +711,33 @@ void ScreenPointer::DestroyPointerWindow()
     MMI_HILOGI("Destroy pointer window, screenId=%{public}" PRIu64, screenId_);
 }
 
-Direction ScreenPointer::GetRenderDirection(bool isHard)
+void ScreenPointer::SetDirectionAndDisplayDirection(Direction direction, Direction displayDirection)
 {
-    if (IsMirror()) {
-        return Direction::DIRECTION0;
+    if ((direction != DIRECTION0 && direction != DIRECTION90 &&
+        direction != DIRECTION180 && direction != DIRECTION270) ||
+        (displayDirection != DIRECTION0 && displayDirection != DIRECTION90 &&
+        displayDirection != DIRECTION180 && displayDirection != DIRECTION270)) {
+        MMI_HILOGE("SetDirection, rsId=%{public}" PRIu64 ", invalid direction=%{public}d, displayDirection=%{public}d",
+            screenId_, direction, displayDirection);
+        return;
     }
 
-    if (isHard) {
-        return static_cast<Direction>(rotation_.load());
-    } else {
-        return static_cast<Direction>((((static_cast<Direction>(rotation_.load()) - displayDirection_) *
-            ANGLE_90 + ANGLE_360) % ANGLE_360) / ANGLE_90);
+    if (direction_ != direction || displayDirection_ != displayDirection) {
+        MMI_HILOGI("SetDirection, rsId=%{public}" PRIu64 ", direction:%{public}d=>%{public}d, "
+            "displayDirection:%{public}d=>%{public}d",
+            screenId_, direction_.load(), direction, displayDirection_.load(), displayDirection);
+        direction_ = direction;
+        displayDirection_ = displayDirection;
     }
+}
+
+Direction ScreenPointer::GetDirection()
+{
+    return direction_;
+}
+
+Direction ScreenPointer::GetDisplayDirection()
+{
+    return displayDirection_;
 }
 } // namespace OHOS::MMI

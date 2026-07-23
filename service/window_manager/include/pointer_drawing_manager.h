@@ -277,6 +277,7 @@ private:
     void ClearDisappearedScreenPointer(const std::set<uint64_t> &screenIds);
     void CreateRenderConfig(RenderConfig& cfg, std::shared_ptr<ScreenPointer> sp, MOUSE_ICON mouseStyle, bool isHard,
         int32_t x, int32_t y, uint64_t screenId, bool isBlur = true);
+    Direction CalculateRenderDirection(bool isHard, std::shared_ptr<ScreenPointer> sp);
     void SoftwareCursorRender(MOUSE_ICON mouseStyle, int32_t x, int32_t y, uint64_t displayId);
     void HardwareCursorRender(MOUSE_ICON mouseStyle, int32_t x, int32_t y, uint64_t displayId, bool isBlur = true);
     void SoftwareCursorMove(uint64_t displayId, int32_t x, int32_t y);

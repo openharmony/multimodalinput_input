@@ -1207,7 +1207,8 @@ void PointerDrawingManager::SoftwareCursorDynamicRender(MOUSE_ICON mouseStyle, u
             .rotationAngle = currentFrame_ * DYNAMIC_ROTATION_ANGLE,
         };
         CHKPV(it.second);
-        cfg.direction = it.second->GetRenderDirection(false);
+        Direction direction = CalculateRenderDirection(false, it.second);
+        cfg.direction = it.second->IsMirror() ? DIRECTION0 : direction;
         auto sn = it.second->GetSurfaceNode();
         cfg.dpi = it.second->GetDPI();
         cfg.screenId = it.first;
@@ -3269,7 +3270,7 @@ void PointerDrawingManager::UpdateScreenScalesAndPadding(const sptr<OHOS::Rosen:
             sp->SetSourceScreenRotation(mainRotation);
             sp->UpdatePadding(mainWidth, mainHeight);
             if (hasDisplay_ && displayInfo_.displaySourceMode == DisplaySourceMode::SCREEN_MAIN) {
-                sp->SetDisplayDirection(displayInfo_.displayDirection);
+                sp->SetDirectionAndDisplayDirection(displayInfo_.direction, displayInfo_.displayDirection);
             }
             sp->SetDPI(mainDPI);
         }
@@ -3349,6 +3350,21 @@ void PointerDrawingManager::SetMainScreenTargetDevice(const std::vector<sptr<OHO
     }
 }
 
+Direction PointerDrawingManager::CalculateRenderDirection(bool isHard, std::shared_ptr<ScreenPointer> sp)
+{
+    if (sp == nullptr) {
+        MMI_HILOGE("ScreenPointer is null");
+        return Direction::DIRECTION0;
+    }
+
+    if (isHard) {
+        return static_cast<Direction>(sp->GetDirection());
+    } else {
+        return static_cast<Direction>((((sp->GetDirection() - sp->GetDisplayDirection()) *
+            ANGLE_90 + ANGLE_360) % ANGLE_360) / ANGLE_90);
+    }
+}
+
 void PointerDrawingManager::CreateRenderConfig(RenderConfig& cfg, std::shared_ptr<ScreenPointer> sp,
     MOUSE_ICON mouseStyle, bool isHard, int32_t x, int32_t y, uint64_t screenId, bool isBlur)
 {
@@ -3366,8 +3382,11 @@ void PointerDrawingManager::CreateRenderConfig(RenderConfig& cfg, std::shared_pt
     cfg.isBlur = isBlur && isHard && mouseStyle == MOUSE_ICON::DEFAULT && GetCursorBlurEnabled();
     float scale = isHard ? sp->GetScale() : 1.0f;
     cfg.dpi = sp->GetDPI() * scale;
-    cfg.direction = sp->GetRenderDirection(isHard);
-    cfg.displayDirection = sp->IsMirror() ? Direction::DIRECTION0 : sp->GetDisplayDirection();
+    Direction direction = CalculateRenderDirection(isHard, sp);
+    cfg.direction = sp->IsMirror() ? Direction::DIRECTION0 : direction;
+    Direction displayDirection = sp->GetDisplayDirection();
+    cfg.displayDirection = sp->IsMirror() ?
+        (displayDirection - direction + DIRECTION_NUM) % DIRECTION_NUM : displayDirection;
     if (mouseStyle == MOUSE_ICON::DEVELOPER_DEFINED_ICON) {
         MMI_HILOGD("Set mouseIcon by userIcon_");
         cfg.userIconPixelMap = GetUserIconCopy();
@@ -3507,10 +3526,9 @@ void PointerDrawingManager::UpdateMirrorScreens(std::shared_ptr<ScreenPointer> s
                 mirrorScreen->SetSourceScreenRotation(static_cast<rotation_t>(displayInfo.direction));
                 isDirectionChanged = true;
             }
-            if (mirrorScreen->GetDisplayDirection() != displayInfo.displayDirection) {
-                MMI_HILOGI("update mirror screen, displayDirection from %{public}d to %{public}d",
-                    mirrorScreen->GetDisplayDirection(), displayInfo.displayDirection);
-                mirrorScreen->SetDisplayDirection(displayInfo.displayDirection);
+            if (mirrorScreen->GetDirection() != displayInfo.displayDirection ||
+                mirrorScreen->GetDisplayDirection() != displayInfo.displayDirection) {
+                mirrorScreen->SetDirectionAndDisplayDirection(displayInfo.direction, displayInfo.displayDirection);
                 isDirectionChanged = true;
             }
             if (isDirectionChanged) {
