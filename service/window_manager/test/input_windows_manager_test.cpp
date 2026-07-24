@@ -16753,25 +16753,33 @@ struct AncoHideCursorTestConfig {
 struct AncoHideCursorTestContext {
     std::unique_ptr<InputWindowsManager> inputWindowsMgr;
     std::shared_ptr<PointerEvent> pointerEvent;
+    WindowInfo winInfo;
+    WindowInfoEX winEx;
 };
 
-std::unique_ptr<AncoHideCursorTestContext> SetupAncoHideCursorTest(const AncoHideCursorTestConfig& cfg)
+void SetupAncoDisplayInfo(AncoHideCursorTestContext& ctx)
 {
-    auto ctx = std::make_unique<AncoHideCursorTestContext>();
-    ctx->inputWindowsMgr = std::make_unique<InputWindowsManager>();
-    ctx->pointerEvent = PointerEvent::Create();
-    constexpr int32_t pointerId = 0;
     constexpr int32_t displayId = 1;
-    constexpr int32_t windowId = 1;
     OLD::DisplayInfo displayInfo;
     displayInfo.id = displayId;
     displayInfo.x = 300;
     displayInfo.y = 500;
     displayInfo.width = 100;
     displayInfo.height = 100;
-    ctx->pointerEvent->SetTargetDisplayId(displayId);
-    ctx->pointerEvent->SetPointerId(pointerId);
-    ctx->pointerEvent->SetDeviceId(1);
+    auto iter = ctx.inputWindowsMgr->displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
+    if (iter != ctx.inputWindowsMgr->displayGroupInfoMap_.end()) {
+        iter->second.displaysInfo.push_back(displayInfo);
+    }
+}
+
+void SetupAncoPointerEvent(AncoHideCursorTestContext& ctx, const AncoHideCursorTestConfig& cfg)
+{
+    constexpr int32_t pointerId = 0;
+    constexpr int32_t displayId = 1;
+    constexpr int32_t windowId = 1;
+    ctx.pointerEvent->SetTargetDisplayId(displayId);
+    ctx.pointerEvent->SetPointerId(pointerId);
+    ctx.pointerEvent->SetDeviceId(1);
     PointerEvent::PointerItem item;
     item.SetDeviceId(1);
     item.SetPointerId(pointerId);
@@ -16780,71 +16788,92 @@ std::unique_ptr<AncoHideCursorTestContext> SetupAncoHideCursorTest(const AncoHid
     item.SetTargetWindowId(windowId);
     item.SetToolType(cfg.toolType);
     item.SetPressure(1.0);
-    ctx->pointerEvent->AddPointerItem(item);
-    ctx->pointerEvent->SetZOrder(cfg.zOrder);
-    WindowInfo winInfo;
+    ctx.pointerEvent->AddPointerItem(item);
+    ctx.pointerEvent->SetZOrder(cfg.zOrder);
+    ctx.pointerEvent->SetPointerAction(cfg.pointerAction);
+}
+
+void SetupAncoWinInfo(AncoHideCursorTestContext& ctx)
+{
+    constexpr int32_t windowId = 1;
     Rect rect;
     rect.x = 300;
     rect.width = 1200;
     rect.y = 300;
     rect.height = 1200;
-    winInfo.defaultHotAreas.push_back(rect);
-    winInfo.id = windowId;
-    winInfo.flags = 0;
-    winInfo.pixelMap = nullptr;
-    winInfo.windowInputType = WindowInputType::NORMAL;
-    WindowInfoEX winEx;
-    winEx.flag = true;
-    winEx.window = winInfo;
-    ctx->inputWindowsMgr->extraData_.appended = cfg.extraDataAppended;
+    ctx.winInfo.defaultHotAreas.push_back(rect);
+    ctx.winInfo.id = windowId;
+    ctx.winInfo.flags = 0;
+    ctx.winInfo.pixelMap = nullptr;
+    ctx.winInfo.windowInputType = WindowInputType::NORMAL;
+    ctx.winEx.flag = true;
+    ctx.winEx.window = ctx.winInfo;
+}
+
+void SetupAncoExtraDataAndFlags(AncoHideCursorTestContext& ctx, const AncoHideCursorTestConfig& cfg)
+{
+    ctx.inputWindowsMgr->extraData_.appended = cfg.extraDataAppended;
     if (cfg.extraDataPointerId >= 0) {
-        ctx->inputWindowsMgr->extraData_.pointerId = cfg.extraDataPointerId;
+        ctx.inputWindowsMgr->extraData_.pointerId = cfg.extraDataPointerId;
     }
     if (cfg.extraDataSourceType >= 0) {
-        ctx->inputWindowsMgr->extraData_.sourceType = cfg.extraDataSourceType;
+        ctx.inputWindowsMgr->extraData_.sourceType = cfg.extraDataSourceType;
     }
     if (cfg.mouseDisplayStateOpt.has_value()) {
         POINTER_DEV_MGR.mouseDisplayState = cfg.mouseDisplayStateOpt.value();
     }
-    ctx->pointerEvent->SetPointerAction(cfg.pointerAction);
     if (cfg.flagMode == AncoHideCursorTestConfig::CLEAR) {
-        ctx->pointerEvent->ClearFlag();
+        ctx.pointerEvent->ClearFlag();
     } else if (cfg.flagMode == AncoHideCursorTestConfig::ADD_SHOW_CURSOR) {
-        ctx->pointerEvent->AddFlag(InputEvent::EVENT_FLAG_SHOW_CUSOR_WITH_TOUCH);
+        ctx.pointerEvent->AddFlag(InputEvent::EVENT_FLAG_SHOW_CUSOR_WITH_TOUCH);
     } else if (cfg.flagMode == AncoHideCursorTestConfig::ADD_SIMULATE) {
-        ctx->pointerEvent->AddFlag(InputEvent::EVENT_FLAG_SIMULATE);
+        ctx.pointerEvent->AddFlag(InputEvent::EVENT_FLAG_SIMULATE);
     }
     if (cfg.pointerEventSourceType >= 0) {
-        ctx->pointerEvent->SetSourceType(cfg.pointerEventSourceType);
+        ctx.pointerEvent->SetSourceType(cfg.pointerEventSourceType);
     }
     if (cfg.timerId >= 0) {
-        ctx->inputWindowsMgr->timerId_ = cfg.timerId;
+        ctx.inputWindowsMgr->timerId_ = cfg.timerId;
     }
+}
+
+void SetupAncoWindowMaps(AncoHideCursorTestContext& ctx)
+{
+    constexpr int32_t pointerId = 0;
+    constexpr int32_t windowId = 1;
     WindowGroupInfo winGroupInfo;
-    auto displayGroupIter = ctx->inputWindowsMgr->displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
-    if (displayGroupIter != ctx->inputWindowsMgr->displayGroupInfoMap_.end()) {
-        displayGroupIter->second.displaysInfo.push_back(displayInfo);
+    winGroupInfo.windowsInfo.push_back(ctx.winInfo);
+    auto iter = ctx.inputWindowsMgr->windowsPerDisplayMap_.find(DEFAULT_GROUP_ID);
+    if (iter != ctx.inputWindowsMgr->windowsPerDisplayMap_.end()) {
+        iter->second.insert(std::make_pair(windowId, winGroupInfo));
     }
-    winGroupInfo.windowsInfo.push_back(winInfo);
-    auto windowsPerDisplayIter = ctx->inputWindowsMgr->windowsPerDisplayMap_.find(DEFAULT_GROUP_ID);
-    if (windowsPerDisplayIter != ctx->inputWindowsMgr->windowsPerDisplayMap_.end()) {
-        windowsPerDisplayIter->second.insert(std::make_pair(windowId, winGroupInfo));
-    }
-    ctx->inputWindowsMgr->windowsPerDisplay_.insert(
-        std::make_pair(ctx->pointerEvent->GetTargetDisplayId(), winGroupInfo));
-    ctx->inputWindowsMgr->touchItemDownInfos_[1].insert(std::make_pair(pointerId, winEx));
-    ctx->inputWindowsMgr->ancoTouchDownInfos_[1].insert(std::make_pair(pointerId, winEx));
+    ctx.inputWindowsMgr->windowsPerDisplay_.insert(
+        std::make_pair(ctx.pointerEvent->GetTargetDisplayId(), winGroupInfo));
+    ctx.inputWindowsMgr->touchItemDownInfos_[1].insert(std::make_pair(pointerId, ctx.winEx));
+    ctx.inputWindowsMgr->ancoTouchDownInfos_[1].insert(std::make_pair(pointerId, ctx.winEx));
+}
+
+std::unique_ptr<AncoHideCursorTestContext> SetupAncoHideCursorTest(const AncoHideCursorTestConfig& cfg)
+{
+    auto ctx = std::make_unique<AncoHideCursorTestContext>();
+    ctx->inputWindowsMgr = std::make_unique<InputWindowsManager>();
+    ctx->pointerEvent = PointerEvent::Create();
+    SetupAncoPointerEvent(*ctx, cfg);
+    SetupAncoWinInfo(*ctx);
+    SetupAncoDisplayInfo(*ctx);
+    SetupAncoExtraDataAndFlags(*ctx, cfg);
+    SetupAncoWindowMaps(*ctx);
     return ctx;
 }
 }
 
 /**
- * @tc.name: InputWindowsManagerTest_UpdateTouchScreenTarget_AccoHideCursor_001
+ * @tc.name: InputWindowsManagerTest_UpdateTouchScreenTarget_AncoHideCursor_001
  * @tc.desc: Test anco touch hide cursor when tool type is THP_FEATURE, returns RET_OK early
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateTouchScreenTarget_AccoHideCursor_001, TestSize.Level1)
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateTouchScreenTarget_AncoHideCursor_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     AncoHideCursorTestConfig cfg;
@@ -16858,12 +16887,12 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateTouchScreenTarge
 }
 
 /**
- * @tc.name: InputWindowsManagerTest_UpdateTouchScreenTarget_AccoHideCursor_002
+ * @tc.name: InputWindowsManagerTest_UpdateTouchScreenTarget_AncoHideCursor_002
  * @tc.desc: Test anco touch hide cursor when IsNeedDrawPointer returns true, returns RET_OK early
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateTouchScreenTarget_AccoHideCursor_002, TestSize.Level1)
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateTouchScreenTarget_AncoHideCursor_002, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     AncoHideCursorTestConfig cfg;
@@ -16877,12 +16906,12 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateTouchScreenTarge
 }
 
 /**
- * @tc.name: InputWindowsManagerTest_UpdateTouchScreenTarget_AccoHideCursor_003
+ * @tc.name: InputWindowsManagerTest_UpdateTouchScreenTarget_AncoHideCursor_003
  * @tc.desc: Test anco touch hide cursor when mouseDisplayState is false, cursor hide logic not entered
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateTouchScreenTarget_AccoHideCursor_003, TestSize.Level1)
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateTouchScreenTarget_AncoHideCursor_003, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     AncoHideCursorTestConfig cfg;
@@ -16894,12 +16923,12 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateTouchScreenTarge
 }
 
 /**
- * @tc.name: InputWindowsManagerTest_UpdateTouchScreenTarget_AccoHideCursor_004
+ * @tc.name: InputWindowsManagerTest_UpdateTouchScreenTarget_AncoHideCursor_004
  * @tc.desc: Test anco touch hide cursor when checkExtraData is true (finger with extraData touchscreen)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateTouchScreenTarget_AccoHideCursor_004, TestSize.Level1)
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateTouchScreenTarget_AncoHideCursor_004, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     AncoHideCursorTestConfig cfg;
@@ -16914,12 +16943,12 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateTouchScreenTarge
 }
 
 /**
- * @tc.name: InputWindowsManagerTest_UpdateTouchScreenTarget_AccoHideCursor_005
+ * @tc.name: InputWindowsManagerTest_UpdateTouchScreenTarget_AncoHideCursor_005
  * @tc.desc: Test anco touch hide cursor when tool type is PEN with extraData touchscreen, checkExtraData true
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateTouchScreenTarget_AccoHideCursor_005, TestSize.Level1)
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateTouchScreenTarget_AncoHideCursor_005, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     AncoHideCursorTestConfig cfg;
@@ -16935,12 +16964,12 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateTouchScreenTarge
 }
 
 /**
- * @tc.name: InputWindowsManagerTest_UpdateTouchScreenTarget_AccoHideCursor_006
+ * @tc.name: InputWindowsManagerTest_UpdateTouchScreenTarget_AncoHideCursor_006
  * @tc.desc: Test anco touch hide cursor when POINTER_ACTION_PULL_UP makes checkExtraData true
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateTouchScreenTarget_AccoHideCursor_006, TestSize.Level1)
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateTouchScreenTarget_AncoHideCursor_006, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     AncoHideCursorTestConfig cfg;
@@ -16953,12 +16982,12 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateTouchScreenTarge
 }
 
 /**
- * @tc.name: InputWindowsManagerTest_UpdateTouchScreenTarget_AccoHideCursor_007
+ * @tc.name: InputWindowsManagerTest_UpdateTouchScreenTarget_AncoHideCursor_007
  * @tc.desc: Test anco touch hide cursor when extraData source is MOUSE, cursor hide timer not set
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateTouchScreenTarget_AccoHideCursor_007, TestSize.Level1)
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateTouchScreenTarget_AncoHideCursor_007, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     AncoHideCursorTestConfig cfg;
@@ -16972,12 +17001,12 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateTouchScreenTarge
 }
 
 /**
- * @tc.name: InputWindowsManagerTest_UpdateTouchScreenTarget_AccoHideCursor_008
+ * @tc.name: InputWindowsManagerTest_UpdateTouchScreenTarget_AncoHideCursor_008
  * @tc.desc: Test anco touch hide cursor when EVENT_FLAG_SHOW_CUSOR_WITH_TOUCH is set, timer not added
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateTouchScreenTarget_AccoHideCursor_008, TestSize.Level1)
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateTouchScreenTarget_AncoHideCursor_008, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     AncoHideCursorTestConfig cfg;
@@ -16989,12 +17018,12 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateTouchScreenTarge
 }
 
 /**
- * @tc.name: InputWindowsManagerTest_UpdateTouchScreenTarget_AccoHideCursor_009
+ * @tc.name: InputWindowsManagerTest_UpdateTouchScreenTarget_AncoHideCursor_009
  * @tc.desc: Test anco touch hide cursor when timerId_ is not DEFAULT_VALUE, timer not re-added
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateTouchScreenTarget_AccoHideCursor_009, TestSize.Level1)
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateTouchScreenTarget_AncoHideCursor_009, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     AncoHideCursorTestConfig cfg;
@@ -17008,12 +17037,12 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateTouchScreenTarge
 }
 
 /**
- * @tc.name: InputWindowsManagerTest_UpdateTouchScreenTarget_AccoHideCursor_010
+ * @tc.name: InputWindowsManagerTest_UpdateTouchScreenTarget_AncoHideCursor_010
  * @tc.desc: Test anco touch hide cursor with simulate flag and zOrder > 0, gestureInject is true
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateTouchScreenTarget_AccoHideCursor_010, TestSize.Level1)
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateTouchScreenTarget_AncoHideCursor_010, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     AncoHideCursorTestConfig cfg;
@@ -17025,12 +17054,12 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateTouchScreenTarge
 }
 
 /**
- * @tc.name: InputWindowsManagerTest_UpdateTouchScreenTarget_AccoHideCursor_011
+ * @tc.name: InputWindowsManagerTest_UpdateTouchScreenTarget_AncoHideCursor_011
  * @tc.desc: Test anco touch hide cursor with groupId != MAIN_GROUPID, gestureInject is true via groupId check
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateTouchScreenTarget_AccoHideCursor_011, TestSize.Level1)
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateTouchScreenTarget_AncoHideCursor_011, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     AncoHideCursorTestConfig cfg;
@@ -17043,12 +17072,12 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateTouchScreenTarge
 }
 
 /**
- * @tc.name: InputWindowsManagerTest_UpdateTouchScreenTarget_AccoHideCursor_012
+ * @tc.name: InputWindowsManagerTest_UpdateTouchScreenTarget_AncoHideCursor_012
  * @tc.desc: Test anco touch hide cursor when all conditions met, timer is added successfully
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateTouchScreenTarget_AccoHideCursor_012, TestSize.Level1)
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateTouchScreenTarget_AncoHideCursor_012, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     AncoHideCursorTestConfig cfg;
