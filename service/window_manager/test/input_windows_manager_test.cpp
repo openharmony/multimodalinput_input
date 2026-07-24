@@ -24,6 +24,7 @@
 #include "i_pointer_drawing_manager.h"
 #include "input_device_manager.h"
 #include "input_event_handler.h"
+#include "pointer_device_manager.h"
 #include "input_windows_manager.h"
 #include "mmi_log.h"
 #include "mock_input_windows_manager.h"
@@ -16731,6 +16732,867 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_TouchPointToDisplayPoi
     //   - TOOL_TYPE_THP_FEATURE removed from TouchPointToDisplayPoint
     //   - screenId.empty() branch retained
     SUCCEED();
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_UpdateTouchScreenTarget_AncoHideCursor_001
+ * @tc.desc: Test anco touch hide cursor when tool type is THP_FEATURE, returns RET_OK early
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateTouchScreenTarget_AncoHideCursor_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsMgr;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    OLD::DisplayInfo displayInfo;
+    WindowGroupInfo winGroupInfo;
+    WindowInfo winInfo;
+    Rect rect;
+    PointerEvent::PointerItem item;
+    constexpr int32_t pointerId = 0;
+    constexpr int32_t displayId = 1;
+    constexpr int32_t windowId = 1;
+    displayInfo.id = displayId;
+    displayInfo.x = 300;
+    displayInfo.y = 500;
+    displayInfo.width = 100;
+    displayInfo.height = 100;
+    pointerEvent->SetTargetDisplayId(displayId);
+    pointerEvent->SetPointerId(pointerId);
+    pointerEvent->SetDeviceId(1);
+    item.SetDeviceId(1);
+    item.SetPointerId(pointerId);
+    item.SetDisplayXPos(500);
+    item.SetDisplayYPos(500);
+    item.SetTargetWindowId(windowId);
+    item.SetToolType(PointerEvent::TOOL_TYPE_THP_FEATURE);
+    item.SetPressure(1.0);
+    pointerEvent->AddPointerItem(item);
+    pointerEvent->SetZOrder(15.5f);
+    rect.x = 300;
+    rect.width = 1200;
+    rect.y = 300;
+    rect.height = 1200;
+    winInfo.defaultHotAreas.push_back(rect);
+    winInfo.id = windowId;
+    winInfo.flags = 0;
+    winInfo.pixelMap = nullptr;
+    winInfo.windowInputType = WindowInputType::NORMAL;
+    OLD::DisplayGroupInfo displayGroupInfo;
+    displayGroupInfo.focusWindowId = windowId;
+    displayGroupInfo.windowsInfo.push_back(winInfo);
+    WindowInfoEX winEx;
+    winEx.flag = true;
+    winEx.window = winInfo;
+    inputWindowsMgr.extraData_.appended = true;
+    inputWindowsMgr.extraData_.pointerId = pointerId;
+    inputWindowsMgr.extraData_.sourceType = PointerEvent::SOURCE_TYPE_TOUCHSCREEN;
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
+    auto displayGroupIter = inputWindowsMgr.displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
+    if (displayGroupIter != inputWindowsMgr.displayGroupInfoMap_.end()) {
+        displayGroupIter->second.displaysInfo.push_back(displayInfo);
+    }
+    winGroupInfo.windowsInfo.push_back(winInfo);
+    auto windowsPerDisplayIter = inputWindowsMgr.windowsPerDisplayMap_.find(DEFAULT_GROUP_ID);
+    if (windowsPerDisplayIter != inputWindowsMgr.windowsPerDisplayMap_.end()) {
+        windowsPerDisplayIter->second.insert(std::make_pair(windowId, winGroupInfo));
+    }
+    inputWindowsMgr.windowsPerDisplay_.insert(std::make_pair(pointerEvent->GetTargetDisplayId(), winGroupInfo));
+    inputWindowsMgr.touchItemDownInfos_[1].insert(std::make_pair(pointerId, winEx));
+    inputWindowsMgr.ancoTouchDownInfos_[1].insert(std::make_pair(pointerId, winEx));
+    EXPECT_EQ(inputWindowsMgr.UpdateTouchScreenTarget(pointerEvent), RET_OK);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_UpdateTouchScreenTarget_AncoHideCursor_002
+ * @tc.desc: Test anco touch hide cursor when IsNeedDrawPointer returns true, returns RET_OK early
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateTouchScreenTarget_AncoHideCursor_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsMgr;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    OLD::DisplayInfo displayInfo;
+    WindowGroupInfo winGroupInfo;
+    WindowInfo winInfo;
+    Rect rect;
+    PointerEvent::PointerItem item;
+    constexpr int32_t pointerId = 0;
+    constexpr int32_t displayId = 1;
+    constexpr int32_t windowId = 1;
+    displayInfo.id = displayId;
+    displayInfo.x = 300;
+    displayInfo.y = 500;
+    displayInfo.width = 100;
+    displayInfo.height = 100;
+    pointerEvent->SetTargetDisplayId(displayId);
+    pointerEvent->SetPointerId(pointerId);
+    pointerEvent->SetDeviceId(1);
+    item.SetDeviceId(1);
+    item.SetPointerId(pointerId);
+    item.SetDisplayXPos(500);
+    item.SetDisplayYPos(500);
+    item.SetTargetWindowId(windowId);
+    item.SetToolType(PointerEvent::TOOL_TYPE_FINGER);
+    item.SetPressure(1.0);
+    pointerEvent->AddPointerItem(item);
+    pointerEvent->SetZOrder(15.5f);
+    rect.x = 300;
+    rect.width = 1200;
+    rect.y = 300;
+    rect.height = 1200;
+    winInfo.defaultHotAreas.push_back(rect);
+    winInfo.id = windowId;
+    winInfo.flags = 0;
+    winInfo.pixelMap = nullptr;
+    winInfo.windowInputType = WindowInputType::NORMAL;
+    OLD::DisplayGroupInfo displayGroupInfo;
+    displayGroupInfo.focusWindowId = windowId;
+    displayGroupInfo.windowsInfo.push_back(winInfo);
+    WindowInfoEX winEx;
+    winEx.flag = true;
+    winEx.window = winInfo;
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
+    inputWindowsMgr.extraData_.appended = true;
+    inputWindowsMgr.extraData_.pointerId = pointerId;
+    inputWindowsMgr.extraData_.sourceType = PointerEvent::SOURCE_TYPE_MOUSE;
+    auto displayGroupIter = inputWindowsMgr.displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
+    if (displayGroupIter != inputWindowsMgr.displayGroupInfoMap_.end()) {
+        displayGroupIter->second.displaysInfo.push_back(displayInfo);
+    }
+    winGroupInfo.windowsInfo.push_back(winInfo);
+    auto windowsPerDisplayIter = inputWindowsMgr.windowsPerDisplayMap_.find(DEFAULT_GROUP_ID);
+    if (windowsPerDisplayIter != inputWindowsMgr.windowsPerDisplayMap_.end()) {
+        windowsPerDisplayIter->second.insert(std::make_pair(windowId, winGroupInfo));
+    }
+    inputWindowsMgr.windowsPerDisplay_.insert(std::make_pair(pointerEvent->GetTargetDisplayId(), winGroupInfo));
+    inputWindowsMgr.touchItemDownInfos_[1].insert(std::make_pair(pointerId, winEx));
+    inputWindowsMgr.ancoTouchDownInfos_[1].insert(std::make_pair(pointerId, winEx));
+    EXPECT_NO_FATAL_FAILURE(inputWindowsMgr.UpdateTouchScreenTarget(pointerEvent));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_UpdateTouchScreenTarget_AncoHideCursor_003
+ * @tc.desc: Test anco touch hide cursor when mouseDisplayState is false, cursor hide logic not entered
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateTouchScreenTarget_AncoHideCursor_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsMgr;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    OLD::DisplayInfo displayInfo;
+    WindowGroupInfo winGroupInfo;
+    WindowInfo winInfo;
+    Rect rect;
+    PointerEvent::PointerItem item;
+    constexpr int32_t pointerId = 0;
+    constexpr int32_t displayId = 1;
+    constexpr int32_t windowId = 1;
+    displayInfo.id = displayId;
+    displayInfo.x = 300;
+    displayInfo.y = 500;
+    displayInfo.width = 100;
+    displayInfo.height = 100;
+    pointerEvent->SetTargetDisplayId(displayId);
+    pointerEvent->SetPointerId(pointerId);
+    pointerEvent->SetDeviceId(1);
+    item.SetDeviceId(1);
+    item.SetPointerId(pointerId);
+    item.SetDisplayXPos(500);
+    item.SetDisplayYPos(500);
+    item.SetTargetWindowId(windowId);
+    item.SetToolType(PointerEvent::TOOL_TYPE_FINGER);
+    item.SetPressure(1.0);
+    pointerEvent->AddPointerItem(item);
+    pointerEvent->SetZOrder(15.5f);
+    rect.x = 300;
+    rect.width = 1200;
+    rect.y = 300;
+    rect.height = 1200;
+    winInfo.defaultHotAreas.push_back(rect);
+    winInfo.id = windowId;
+    winInfo.flags = 0;
+    winInfo.pixelMap = nullptr;
+    winInfo.windowInputType = WindowInputType::NORMAL;
+    OLD::DisplayGroupInfo displayGroupInfo;
+    displayGroupInfo.focusWindowId = windowId;
+    displayGroupInfo.windowsInfo.push_back(winInfo);
+    WindowInfoEX winEx;
+    winEx.flag = true;
+    winEx.window = winInfo;
+    POINTER_DEV_MGR.mouseDisplayState = false;
+    inputWindowsMgr.extraData_.appended = false;
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
+    pointerEvent->ClearFlag();
+    auto displayGroupIter = inputWindowsMgr.displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
+    if (displayGroupIter != inputWindowsMgr.displayGroupInfoMap_.end()) {
+        displayGroupIter->second.displaysInfo.push_back(displayInfo);
+    }
+    winGroupInfo.windowsInfo.push_back(winInfo);
+    auto windowsPerDisplayIter = inputWindowsMgr.windowsPerDisplayMap_.find(DEFAULT_GROUP_ID);
+    if (windowsPerDisplayIter != inputWindowsMgr.windowsPerDisplayMap_.end()) {
+        windowsPerDisplayIter->second.insert(std::make_pair(windowId, winGroupInfo));
+    }
+    inputWindowsMgr.windowsPerDisplay_.insert(std::make_pair(pointerEvent->GetTargetDisplayId(), winGroupInfo));
+    inputWindowsMgr.touchItemDownInfos_[1].insert(std::make_pair(pointerId, winEx));
+    inputWindowsMgr.ancoTouchDownInfos_[1].insert(std::make_pair(pointerId, winEx));
+    EXPECT_EQ(inputWindowsMgr.UpdateTouchScreenTarget(pointerEvent), RET_OK);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_UpdateTouchScreenTarget_AncoHideCursor_004
+ * @tc.desc: Test anco touch hide cursor when checkExtraData is true (finger with extraData touchscreen)
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateTouchScreenTarget_AncoHideCursor_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsMgr;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    OLD::DisplayInfo displayInfo;
+    WindowGroupInfo winGroupInfo;
+    WindowInfo winInfo;
+    Rect rect;
+    PointerEvent::PointerItem item;
+    constexpr int32_t pointerId = 0;
+    constexpr int32_t displayId = 1;
+    constexpr int32_t windowId = 1;
+    displayInfo.id = displayId;
+    displayInfo.x = 300;
+    displayInfo.y = 500;
+    displayInfo.width = 100;
+    displayInfo.height = 100;
+    pointerEvent->SetTargetDisplayId(displayId);
+    pointerEvent->SetPointerId(pointerId);
+    pointerEvent->SetDeviceId(1);
+    item.SetDeviceId(1);
+    item.SetPointerId(pointerId);
+    item.SetDisplayXPos(500);
+    item.SetDisplayYPos(500);
+    item.SetTargetWindowId(windowId);
+    item.SetToolType(PointerEvent::TOOL_TYPE_FINGER);
+    item.SetPressure(1.0);
+    pointerEvent->AddPointerItem(item);
+    pointerEvent->SetZOrder(15.5f);
+    rect.x = 300;
+    rect.width = 1200;
+    rect.y = 300;
+    rect.height = 1200;
+    winInfo.defaultHotAreas.push_back(rect);
+    winInfo.id = windowId;
+    winInfo.flags = 0;
+    winInfo.pixelMap = nullptr;
+    winInfo.windowInputType = WindowInputType::NORMAL;
+    OLD::DisplayGroupInfo displayGroupInfo;
+    displayGroupInfo.focusWindowId = windowId;
+    displayGroupInfo.windowsInfo.push_back(winInfo);
+    WindowInfoEX winEx;
+    winEx.flag = true;
+    winEx.window = winInfo;
+    POINTER_DEV_MGR.mouseDisplayState = true;
+    inputWindowsMgr.extraData_.appended = true;
+    inputWindowsMgr.extraData_.pointerId = pointerId;
+    inputWindowsMgr.extraData_.sourceType = PointerEvent::SOURCE_TYPE_TOUCHSCREEN;
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
+    pointerEvent->ClearFlag();
+    auto displayGroupIter = inputWindowsMgr.displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
+    if (displayGroupIter != inputWindowsMgr.displayGroupInfoMap_.end()) {
+        displayGroupIter->second.displaysInfo.push_back(displayInfo);
+    }
+    winGroupInfo.windowsInfo.push_back(winInfo);
+    auto windowsPerDisplayIter = inputWindowsMgr.windowsPerDisplayMap_.find(DEFAULT_GROUP_ID);
+    if (windowsPerDisplayIter != inputWindowsMgr.windowsPerDisplayMap_.end()) {
+        windowsPerDisplayIter->second.insert(std::make_pair(windowId, winGroupInfo));
+    }
+    inputWindowsMgr.windowsPerDisplay_.insert(std::make_pair(pointerEvent->GetTargetDisplayId(), winGroupInfo));
+    inputWindowsMgr.touchItemDownInfos_[1].insert(std::make_pair(pointerId, winEx));
+    inputWindowsMgr.ancoTouchDownInfos_[1].insert(std::make_pair(pointerId, winEx));
+    EXPECT_EQ(inputWindowsMgr.UpdateTouchScreenTarget(pointerEvent), RET_OK);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_UpdateTouchScreenTarget_AncoHideCursor_005
+ * @tc.desc: Test anco touch hide cursor when tool type is PEN with extraData touchscreen, checkExtraData true
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateTouchScreenTarget_AncoHideCursor_005, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsMgr;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    OLD::DisplayInfo displayInfo;
+    WindowGroupInfo winGroupInfo;
+    WindowInfo winInfo;
+    Rect rect;
+    PointerEvent::PointerItem item;
+    constexpr int32_t pointerId = 0;
+    constexpr int32_t displayId = 1;
+    constexpr int32_t windowId = 1;
+    displayInfo.id = displayId;
+    displayInfo.x = 300;
+    displayInfo.y = 500;
+    displayInfo.width = 100;
+    displayInfo.height = 100;
+    pointerEvent->SetTargetDisplayId(displayId);
+    pointerEvent->SetPointerId(pointerId);
+    pointerEvent->SetDeviceId(1);
+    item.SetDeviceId(1);
+    item.SetPointerId(pointerId);
+    item.SetDisplayXPos(500);
+    item.SetDisplayYPos(500);
+    item.SetTargetWindowId(windowId);
+    item.SetToolType(PointerEvent::TOOL_TYPE_PEN);
+    item.SetPressure(1.0);
+    pointerEvent->AddPointerItem(item);
+    pointerEvent->SetZOrder(15.5f);
+    rect.x = 300;
+    rect.width = 1200;
+    rect.y = 300;
+    rect.height = 1200;
+    winInfo.defaultHotAreas.push_back(rect);
+    winInfo.id = windowId;
+    winInfo.flags = 0;
+    winInfo.pixelMap = nullptr;
+    winInfo.windowInputType = WindowInputType::NORMAL;
+    OLD::DisplayGroupInfo displayGroupInfo;
+    displayGroupInfo.focusWindowId = windowId;
+    displayGroupInfo.windowsInfo.push_back(winInfo);
+    WindowInfoEX winEx;
+    winEx.flag = true;
+    winEx.window = winInfo;
+    POINTER_DEV_MGR.mouseDisplayState = true;
+    inputWindowsMgr.extraData_.appended = true;
+    inputWindowsMgr.extraData_.pointerId = 999;
+    inputWindowsMgr.extraData_.sourceType = PointerEvent::SOURCE_TYPE_TOUCHSCREEN;
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
+    pointerEvent->ClearFlag();
+    auto displayGroupIter = inputWindowsMgr.displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
+    if (displayGroupIter != inputWindowsMgr.displayGroupInfoMap_.end()) {
+        displayGroupIter->second.displaysInfo.push_back(displayInfo);
+    }
+    winGroupInfo.windowsInfo.push_back(winInfo);
+    auto windowsPerDisplayIter = inputWindowsMgr.windowsPerDisplayMap_.find(DEFAULT_GROUP_ID);
+    if (windowsPerDisplayIter != inputWindowsMgr.windowsPerDisplayMap_.end()) {
+        windowsPerDisplayIter->second.insert(std::make_pair(windowId, winGroupInfo));
+    }
+    inputWindowsMgr.windowsPerDisplay_.insert(std::make_pair(pointerEvent->GetTargetDisplayId(), winGroupInfo));
+    inputWindowsMgr.touchItemDownInfos_[1].insert(std::make_pair(pointerId, winEx));
+    inputWindowsMgr.ancoTouchDownInfos_[1].insert(std::make_pair(pointerId, winEx));
+    EXPECT_EQ(inputWindowsMgr.UpdateTouchScreenTarget(pointerEvent), RET_OK);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_UpdateTouchScreenTarget_AncoHideCursor_006
+ * @tc.desc: Test anco touch hide cursor when POINTER_ACTION_PULL_UP makes checkExtraData true
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateTouchScreenTarget_AncoHideCursor_006, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsMgr;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    OLD::DisplayInfo displayInfo;
+    WindowGroupInfo winGroupInfo;
+    WindowInfo winInfo;
+    Rect rect;
+    PointerEvent::PointerItem item;
+    constexpr int32_t pointerId = 0;
+    constexpr int32_t displayId = 1;
+    constexpr int32_t windowId = 1;
+    displayInfo.id = displayId;
+    displayInfo.x = 300;
+    displayInfo.y = 500;
+    displayInfo.width = 100;
+    displayInfo.height = 100;
+    pointerEvent->SetTargetDisplayId(displayId);
+    pointerEvent->SetPointerId(pointerId);
+    pointerEvent->SetDeviceId(1);
+    item.SetDeviceId(1);
+    item.SetPointerId(pointerId);
+    item.SetDisplayXPos(500);
+    item.SetDisplayYPos(500);
+    item.SetTargetWindowId(windowId);
+    item.SetToolType(PointerEvent::TOOL_TYPE_FINGER);
+    item.SetPressure(1.0);
+    pointerEvent->AddPointerItem(item);
+    pointerEvent->SetZOrder(15.5f);
+    rect.x = 300;
+    rect.width = 1200;
+    rect.y = 300;
+    rect.height = 1200;
+    winInfo.defaultHotAreas.push_back(rect);
+    winInfo.id = windowId;
+    winInfo.flags = 0;
+    winInfo.pixelMap = nullptr;
+    winInfo.windowInputType = WindowInputType::NORMAL;
+    OLD::DisplayGroupInfo displayGroupInfo;
+    displayGroupInfo.focusWindowId = windowId;
+    displayGroupInfo.windowsInfo.push_back(winInfo);
+    WindowInfoEX winEx;
+    winEx.flag = true;
+    winEx.window = winInfo;
+    POINTER_DEV_MGR.mouseDisplayState = true;
+    inputWindowsMgr.extraData_.appended = false;
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_PULL_UP);
+    pointerEvent->ClearFlag();
+    auto displayGroupIter = inputWindowsMgr.displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
+    if (displayGroupIter != inputWindowsMgr.displayGroupInfoMap_.end()) {
+        displayGroupIter->second.displaysInfo.push_back(displayInfo);
+    }
+    winGroupInfo.windowsInfo.push_back(winInfo);
+    auto windowsPerDisplayIter = inputWindowsMgr.windowsPerDisplayMap_.find(DEFAULT_GROUP_ID);
+    if (windowsPerDisplayIter != inputWindowsMgr.windowsPerDisplayMap_.end()) {
+        windowsPerDisplayIter->second.insert(std::make_pair(windowId, winGroupInfo));
+    }
+    inputWindowsMgr.windowsPerDisplay_.insert(std::make_pair(pointerEvent->GetTargetDisplayId(), winGroupInfo));
+    inputWindowsMgr.touchItemDownInfos_[1].insert(std::make_pair(pointerId, winEx));
+    inputWindowsMgr.ancoTouchDownInfos_[1].insert(std::make_pair(pointerId, winEx));
+    EXPECT_EQ(inputWindowsMgr.UpdateTouchScreenTarget(pointerEvent), RET_OK);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_UpdateTouchScreenTarget_AncoHideCursor_007
+ * @tc.desc: Test anco touch hide cursor when extraData source is MOUSE, cursor hide timer not set
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateTouchScreenTarget_AncoHideCursor_007, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsMgr;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    OLD::DisplayInfo displayInfo;
+    WindowGroupInfo winGroupInfo;
+    WindowInfo winInfo;
+    Rect rect;
+    PointerEvent::PointerItem item;
+    constexpr int32_t pointerId = 0;
+    constexpr int32_t displayId = 1;
+    constexpr int32_t windowId = 1;
+    displayInfo.id = displayId;
+    displayInfo.x = 300;
+    displayInfo.y = 500;
+    displayInfo.width = 100;
+    displayInfo.height = 100;
+    pointerEvent->SetTargetDisplayId(displayId);
+    pointerEvent->SetPointerId(pointerId);
+    pointerEvent->SetDeviceId(1);
+    item.SetDeviceId(1);
+    item.SetPointerId(pointerId);
+    item.SetDisplayXPos(500);
+    item.SetDisplayYPos(500);
+    item.SetTargetWindowId(windowId);
+    item.SetToolType(PointerEvent::TOOL_TYPE_FINGER);
+    item.SetPressure(1.0);
+    pointerEvent->AddPointerItem(item);
+    pointerEvent->SetZOrder(15.5f);
+    rect.x = 300;
+    rect.width = 1200;
+    rect.y = 300;
+    rect.height = 1200;
+    winInfo.defaultHotAreas.push_back(rect);
+    winInfo.id = windowId;
+    winInfo.flags = 0;
+    winInfo.pixelMap = nullptr;
+    winInfo.windowInputType = WindowInputType::NORMAL;
+    OLD::DisplayGroupInfo displayGroupInfo;
+    displayGroupInfo.focusWindowId = windowId;
+    displayGroupInfo.windowsInfo.push_back(winInfo);
+    WindowInfoEX winEx;
+    winEx.flag = true;
+    winEx.window = winInfo;
+    POINTER_DEV_MGR.mouseDisplayState = true;
+    inputWindowsMgr.extraData_.appended = true;
+    inputWindowsMgr.extraData_.sourceType = PointerEvent::SOURCE_TYPE_MOUSE;
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
+    pointerEvent->ClearFlag();
+    auto displayGroupIter = inputWindowsMgr.displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
+    if (displayGroupIter != inputWindowsMgr.displayGroupInfoMap_.end()) {
+        displayGroupIter->second.displaysInfo.push_back(displayInfo);
+    }
+    winGroupInfo.windowsInfo.push_back(winInfo);
+    auto windowsPerDisplayIter = inputWindowsMgr.windowsPerDisplayMap_.find(DEFAULT_GROUP_ID);
+    if (windowsPerDisplayIter != inputWindowsMgr.windowsPerDisplayMap_.end()) {
+        windowsPerDisplayIter->second.insert(std::make_pair(windowId, winGroupInfo));
+    }
+    inputWindowsMgr.windowsPerDisplay_.insert(std::make_pair(pointerEvent->GetTargetDisplayId(), winGroupInfo));
+    inputWindowsMgr.touchItemDownInfos_[1].insert(std::make_pair(pointerId, winEx));
+    inputWindowsMgr.ancoTouchDownInfos_[1].insert(std::make_pair(pointerId, winEx));
+    EXPECT_EQ(inputWindowsMgr.UpdateTouchScreenTarget(pointerEvent), RET_OK);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_UpdateTouchScreenTarget_AncoHideCursor_008
+ * @tc.desc: Test anco touch hide cursor when EVENT_FLAG_SHOW_CUSOR_WITH_TOUCH is set, timer not added
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateTouchScreenTarget_AncoHideCursor_008, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsMgr;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    OLD::DisplayInfo displayInfo;
+    WindowGroupInfo winGroupInfo;
+    WindowInfo winInfo;
+    Rect rect;
+    PointerEvent::PointerItem item;
+    constexpr int32_t pointerId = 0;
+    constexpr int32_t displayId = 1;
+    constexpr int32_t windowId = 1;
+    displayInfo.id = displayId;
+    displayInfo.x = 300;
+    displayInfo.y = 500;
+    displayInfo.width = 100;
+    displayInfo.height = 100;
+    pointerEvent->SetTargetDisplayId(displayId);
+    pointerEvent->SetPointerId(pointerId);
+    pointerEvent->SetDeviceId(1);
+    item.SetDeviceId(1);
+    item.SetPointerId(pointerId);
+    item.SetDisplayXPos(500);
+    item.SetDisplayYPos(500);
+    item.SetTargetWindowId(windowId);
+    item.SetToolType(PointerEvent::TOOL_TYPE_FINGER);
+    item.SetPressure(1.0);
+    pointerEvent->AddPointerItem(item);
+    pointerEvent->SetZOrder(15.5f);
+    rect.x = 300;
+    rect.width = 1200;
+    rect.y = 300;
+    rect.height = 1200;
+    winInfo.defaultHotAreas.push_back(rect);
+    winInfo.id = windowId;
+    winInfo.flags = 0;
+    winInfo.pixelMap = nullptr;
+    winInfo.windowInputType = WindowInputType::NORMAL;
+    OLD::DisplayGroupInfo displayGroupInfo;
+    displayGroupInfo.focusWindowId = windowId;
+    displayGroupInfo.windowsInfo.push_back(winInfo);
+    WindowInfoEX winEx;
+    winEx.flag = true;
+    winEx.window = winInfo;
+    POINTER_DEV_MGR.mouseDisplayState = true;
+    inputWindowsMgr.extraData_.appended = false;
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
+    pointerEvent->AddFlag(InputEvent::EVENT_FLAG_SHOW_CUSOR_WITH_TOUCH);
+    auto displayGroupIter = inputWindowsMgr.displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
+    if (displayGroupIter != inputWindowsMgr.displayGroupInfoMap_.end()) {
+        displayGroupIter->second.displaysInfo.push_back(displayInfo);
+    }
+    winGroupInfo.windowsInfo.push_back(winInfo);
+    auto windowsPerDisplayIter = inputWindowsMgr.windowsPerDisplayMap_.find(DEFAULT_GROUP_ID);
+    if (windowsPerDisplayIter != inputWindowsMgr.windowsPerDisplayMap_.end()) {
+        windowsPerDisplayIter->second.insert(std::make_pair(windowId, winGroupInfo));
+    }
+    inputWindowsMgr.windowsPerDisplay_.insert(std::make_pair(pointerEvent->GetTargetDisplayId(), winGroupInfo));
+    inputWindowsMgr.touchItemDownInfos_[1].insert(std::make_pair(pointerId, winEx));
+    inputWindowsMgr.ancoTouchDownInfos_[1].insert(std::make_pair(pointerId, winEx));
+    EXPECT_EQ(inputWindowsMgr.UpdateTouchScreenTarget(pointerEvent), RET_OK);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_UpdateTouchScreenTarget_AncoHideCursor_009
+ * @tc.desc: Test anco touch hide cursor when timerId_ is not DEFAULT_VALUE, timer not re-added
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateTouchScreenTarget_AncoHideCursor_009, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsMgr;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    OLD::DisplayInfo displayInfo;
+    WindowGroupInfo winGroupInfo;
+    WindowInfo winInfo;
+    Rect rect;
+    PointerEvent::PointerItem item;
+    constexpr int32_t pointerId = 0;
+    constexpr int32_t displayId = 1;
+    constexpr int32_t windowId = 1;
+    displayInfo.id = displayId;
+    displayInfo.x = 300;
+    displayInfo.y = 500;
+    displayInfo.width = 100;
+    displayInfo.height = 100;
+    pointerEvent->SetTargetDisplayId(displayId);
+    pointerEvent->SetPointerId(pointerId);
+    pointerEvent->SetDeviceId(1);
+    item.SetDeviceId(1);
+    item.SetPointerId(pointerId);
+    item.SetDisplayXPos(500);
+    item.SetDisplayYPos(500);
+    item.SetTargetWindowId(windowId);
+    item.SetToolType(PointerEvent::TOOL_TYPE_FINGER);
+    item.SetPressure(1.0);
+    pointerEvent->AddPointerItem(item);
+    pointerEvent->SetZOrder(15.5f);
+    rect.x = 300;
+    rect.width = 1200;
+    rect.y = 300;
+    rect.height = 1200;
+    winInfo.defaultHotAreas.push_back(rect);
+    winInfo.id = windowId;
+    winInfo.flags = 0;
+    winInfo.pixelMap = nullptr;
+    winInfo.windowInputType = WindowInputType::NORMAL;
+    OLD::DisplayGroupInfo displayGroupInfo;
+    displayGroupInfo.focusWindowId = windowId;
+    displayGroupInfo.windowsInfo.push_back(winInfo);
+    WindowInfoEX winEx;
+    winEx.flag = true;
+    winEx.window = winInfo;
+    POINTER_DEV_MGR.mouseDisplayState = true;
+    inputWindowsMgr.extraData_.appended = false;
+    inputWindowsMgr.timerId_ = 5;
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
+    pointerEvent->ClearFlag();
+    auto displayGroupIter = inputWindowsMgr.displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
+    if (displayGroupIter != inputWindowsMgr.displayGroupInfoMap_.end()) {
+        displayGroupIter->second.displaysInfo.push_back(displayInfo);
+    }
+    winGroupInfo.windowsInfo.push_back(winInfo);
+    auto windowsPerDisplayIter = inputWindowsMgr.windowsPerDisplayMap_.find(DEFAULT_GROUP_ID);
+    if (windowsPerDisplayIter != inputWindowsMgr.windowsPerDisplayMap_.end()) {
+        windowsPerDisplayIter->second.insert(std::make_pair(windowId, winGroupInfo));
+    }
+    inputWindowsMgr.windowsPerDisplay_.insert(std::make_pair(pointerEvent->GetTargetDisplayId(), winGroupInfo));
+    inputWindowsMgr.touchItemDownInfos_[1].insert(std::make_pair(pointerId, winEx));
+    inputWindowsMgr.ancoTouchDownInfos_[1].insert(std::make_pair(pointerId, winEx));
+    EXPECT_NO_FATAL_FAILURE(inputWindowsMgr.UpdateTouchScreenTarget(pointerEvent));
+    EXPECT_EQ(inputWindowsMgr.timerId_, 5);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_UpdateTouchScreenTarget_AncoHideCursor_010
+ * @tc.desc: Test anco touch hide cursor with simulate flag and zOrder > 0, gestureInject is true
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateTouchScreenTarget_AncoHideCursor_010, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsMgr;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    OLD::DisplayInfo displayInfo;
+    WindowGroupInfo winGroupInfo;
+    WindowInfo winInfo;
+    Rect rect;
+    PointerEvent::PointerItem item;
+    constexpr int32_t pointerId = 0;
+    constexpr int32_t displayId = 1;
+    constexpr int32_t windowId = 1;
+    displayInfo.id = displayId;
+    displayInfo.x = 300;
+    displayInfo.y = 500;
+    displayInfo.width = 100;
+    displayInfo.height = 100;
+    pointerEvent->SetTargetDisplayId(displayId);
+    pointerEvent->SetPointerId(pointerId);
+    pointerEvent->SetDeviceId(1);
+    item.SetDeviceId(1);
+    item.SetPointerId(pointerId);
+    item.SetDisplayXPos(500);
+    item.SetDisplayYPos(500);
+    item.SetTargetWindowId(windowId);
+    item.SetToolType(PointerEvent::TOOL_TYPE_FINGER);
+    item.SetPressure(1.0);
+    pointerEvent->AddPointerItem(item);
+    pointerEvent->SetZOrder(15.5f);
+    rect.x = 300;
+    rect.width = 1200;
+    rect.y = 300;
+    rect.height = 1200;
+    winInfo.defaultHotAreas.push_back(rect);
+    winInfo.id = windowId;
+    winInfo.flags = 0;
+    winInfo.pixelMap = nullptr;
+    winInfo.windowInputType = WindowInputType::NORMAL;
+    OLD::DisplayGroupInfo displayGroupInfo;
+    displayGroupInfo.focusWindowId = windowId;
+    displayGroupInfo.windowsInfo.push_back(winInfo);
+    WindowInfoEX winEx;
+    winEx.flag = true;
+    winEx.window = winInfo;
+    POINTER_DEV_MGR.mouseDisplayState = true;
+    inputWindowsMgr.extraData_.appended = false;
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
+    pointerEvent->AddFlag(InputEvent::EVENT_FLAG_SIMULATE);
+    auto displayGroupIter = inputWindowsMgr.displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
+    if (displayGroupIter != inputWindowsMgr.displayGroupInfoMap_.end()) {
+        displayGroupIter->second.displaysInfo.push_back(displayInfo);
+    }
+    winGroupInfo.windowsInfo.push_back(winInfo);
+    auto windowsPerDisplayIter = inputWindowsMgr.windowsPerDisplayMap_.find(DEFAULT_GROUP_ID);
+    if (windowsPerDisplayIter != inputWindowsMgr.windowsPerDisplayMap_.end()) {
+        windowsPerDisplayIter->second.insert(std::make_pair(windowId, winGroupInfo));
+    }
+    inputWindowsMgr.windowsPerDisplay_.insert(std::make_pair(pointerEvent->GetTargetDisplayId(), winGroupInfo));
+    inputWindowsMgr.touchItemDownInfos_[1].insert(std::make_pair(pointerId, winEx));
+    inputWindowsMgr.ancoTouchDownInfos_[1].insert(std::make_pair(pointerId, winEx));
+    EXPECT_NO_FATAL_FAILURE(inputWindowsMgr.UpdateTouchScreenTarget(pointerEvent));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_UpdateTouchScreenTarget_AncoHideCursor_011
+ * @tc.desc: Test anco touch hide cursor with groupId != MAIN_GROUPID, gestureInject is true via groupId check
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateTouchScreenTarget_AncoHideCursor_011, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsMgr;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    OLD::DisplayInfo displayInfo;
+    WindowGroupInfo winGroupInfo;
+    WindowInfo winInfo;
+    Rect rect;
+    PointerEvent::PointerItem item;
+    constexpr int32_t pointerId = 0;
+    constexpr int32_t displayId = 1;
+    constexpr int32_t windowId = 1;
+    displayInfo.id = displayId;
+    displayInfo.x = 300;
+    displayInfo.y = 500;
+    displayInfo.width = 100;
+    displayInfo.height = 100;
+    pointerEvent->SetTargetDisplayId(displayId);
+    pointerEvent->SetPointerId(pointerId);
+    pointerEvent->SetDeviceId(1);
+    item.SetDeviceId(1);
+    item.SetPointerId(pointerId);
+    item.SetDisplayXPos(500);
+    item.SetDisplayYPos(500);
+    item.SetTargetWindowId(windowId);
+    item.SetToolType(PointerEvent::TOOL_TYPE_FINGER);
+    item.SetPressure(1.0);
+    pointerEvent->AddPointerItem(item);
+    pointerEvent->SetZOrder(15.5f);
+    rect.x = 300;
+    rect.width = 1200;
+    rect.y = 300;
+    rect.height = 1200;
+    winInfo.defaultHotAreas.push_back(rect);
+    winInfo.id = windowId;
+    winInfo.flags = 0;
+    winInfo.pixelMap = nullptr;
+    winInfo.windowInputType = WindowInputType::NORMAL;
+    OLD::DisplayGroupInfo displayGroupInfo;
+    displayGroupInfo.focusWindowId = windowId;
+    displayGroupInfo.windowsInfo.push_back(winInfo);
+    WindowInfoEX winEx;
+    winEx.flag = true;
+    winEx.window = winInfo;
+    POINTER_DEV_MGR.mouseDisplayState = true;
+    inputWindowsMgr.extraData_.appended = false;
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
+    pointerEvent->ClearFlag();
+    pointerEvent->SetZOrder(0.0f);
+    auto displayGroupIter = inputWindowsMgr.displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
+    if (displayGroupIter != inputWindowsMgr.displayGroupInfoMap_.end()) {
+        displayGroupIter->second.displaysInfo.push_back(displayInfo);
+    }
+    winGroupInfo.windowsInfo.push_back(winInfo);
+    auto windowsPerDisplayIter = inputWindowsMgr.windowsPerDisplayMap_.find(DEFAULT_GROUP_ID);
+    if (windowsPerDisplayIter != inputWindowsMgr.windowsPerDisplayMap_.end()) {
+        windowsPerDisplayIter->second.insert(std::make_pair(windowId, winGroupInfo));
+    }
+    inputWindowsMgr.windowsPerDisplay_.insert(std::make_pair(pointerEvent->GetTargetDisplayId(), winGroupInfo));
+    inputWindowsMgr.touchItemDownInfos_[1].insert(std::make_pair(pointerId, winEx));
+    inputWindowsMgr.ancoTouchDownInfos_[1].insert(std::make_pair(pointerId, winEx));
+    EXPECT_NO_FATAL_FAILURE(inputWindowsMgr.UpdateTouchScreenTarget(pointerEvent));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_UpdateTouchScreenTarget_AncoHideCursor_012
+ * @tc.desc: Test anco touch hide cursor when all conditions met, timer is added successfully
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateTouchScreenTarget_AncoHideCursor_012, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsMgr;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    OLD::DisplayInfo displayInfo;
+    WindowGroupInfo winGroupInfo;
+    WindowInfo winInfo;
+    Rect rect;
+    PointerEvent::PointerItem item;
+    constexpr int32_t pointerId = 0;
+    constexpr int32_t displayId = 1;
+    constexpr int32_t windowId = 1;
+    displayInfo.id = displayId;
+    displayInfo.x = 300;
+    displayInfo.y = 500;
+    displayInfo.width = 100;
+    displayInfo.height = 100;
+    pointerEvent->SetTargetDisplayId(displayId);
+    pointerEvent->SetPointerId(pointerId);
+    pointerEvent->SetDeviceId(1);
+    item.SetDeviceId(1);
+    item.SetPointerId(pointerId);
+    item.SetDisplayXPos(500);
+    item.SetDisplayYPos(500);
+    item.SetTargetWindowId(windowId);
+    item.SetToolType(PointerEvent::TOOL_TYPE_FINGER);
+    item.SetPressure(1.0);
+    pointerEvent->AddPointerItem(item);
+    pointerEvent->SetZOrder(15.5f);
+    rect.x = 300;
+    rect.width = 1200;
+    rect.y = 300;
+    rect.height = 1200;
+    winInfo.defaultHotAreas.push_back(rect);
+    winInfo.id = windowId;
+    winInfo.flags = 0;
+    winInfo.pixelMap = nullptr;
+    winInfo.windowInputType = WindowInputType::NORMAL;
+    OLD::DisplayGroupInfo displayGroupInfo;
+    displayGroupInfo.focusWindowId = windowId;
+    displayGroupInfo.windowsInfo.push_back(winInfo);
+    WindowInfoEX winEx;
+    winEx.flag = true;
+    winEx.window = winInfo;
+    POINTER_DEV_MGR.mouseDisplayState = true;
+    inputWindowsMgr.extraData_.appended = false;
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
+    pointerEvent->ClearFlag();
+    auto displayGroupIter = inputWindowsMgr.displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
+    if (displayGroupIter != inputWindowsMgr.displayGroupInfoMap_.end()) {
+        displayGroupIter->second.displaysInfo.push_back(displayInfo);
+    }
+    winGroupInfo.windowsInfo.push_back(winInfo);
+    auto windowsPerDisplayIter = inputWindowsMgr.windowsPerDisplayMap_.find(DEFAULT_GROUP_ID);
+    if (windowsPerDisplayIter != inputWindowsMgr.windowsPerDisplayMap_.end()) {
+        windowsPerDisplayIter->second.insert(std::make_pair(windowId, winGroupInfo));
+    }
+    inputWindowsMgr.windowsPerDisplay_.insert(std::make_pair(pointerEvent->GetTargetDisplayId(), winGroupInfo));
+    inputWindowsMgr.touchItemDownInfos_[1].insert(std::make_pair(pointerId, winEx));
+    inputWindowsMgr.ancoTouchDownInfos_[1].insert(std::make_pair(pointerId, winEx));
+    EXPECT_NO_FATAL_FAILURE(inputWindowsMgr.UpdateTouchScreenTarget(pointerEvent));
 }
 } // namespace MMI
 } // namespace OHOS
