@@ -1253,6 +1253,9 @@ bool EventNormalizeHandler::JudgeIfSwipeInward(std::shared_ptr<PointerEvent> poi
     if (!TOUCHPAD_MGR->SupportSwipeInward()) {
         return false;
     }
+    if (GetSysClockTime() - g_lastKeyboardEventTime < FREETOUCH_GES_BLOCK_THRETHOLD && g_isSwipeInward == false) {
+        return false;
+    }
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHPAD);
     pointerEvent->SetFingerCount(SWIPE_INWARD_FINGER_ONE);
     if (g_isSwipeInward == false &&
@@ -1261,9 +1264,7 @@ bool EventNormalizeHandler::JudgeIfSwipeInward(std::shared_ptr<PointerEvent> poi
         auto touchPadDevice = libinput_event_get_device(event);
         // product isolation
         uint32_t touchPadDeviceId = libinput_device_get_id_product(touchPadDevice);
-        if (touchPadDeviceId != TABLET_PRODUCT_DEVICE_ID && touchPadDeviceId != BLE_PRODUCT_DEVICE_ID &&
-            touchPadDeviceId != PHONE_PRODUCT_DEVICE_ID &&
-            (std::stoul(TOUCHPAD_TYPE) & TOUCHPAD_FEATURE_SWIPEINWARD) != TOUCHPAD_FEATURE_SWIPEINWARD) {
+        if (IsSwipeInwardProductIsolated(touchPadDeviceId)) {
             return g_isSwipeInward;
         }
         // get touchpad physic size
@@ -1293,6 +1294,19 @@ bool EventNormalizeHandler::JudgeIfSwipeInward(std::shared_ptr<PointerEvent> poi
         SwipeInwardButtonJudge(pointerEvent);
     }
     return g_isSwipeInward;
+}
+
+bool EventNormalizeHandler::IsSwipeInwardProductIsolated(uint32_t touchPadDeviceId)
+{
+    if (touchPadDeviceId == TABLET_PRODUCT_DEVICE_ID ||
+        touchPadDeviceId == BLE_PRODUCT_DEVICE_ID ||
+        touchPadDeviceId == PHONE_PRODUCT_DEVICE_ID) {
+        return false;
+    }
+    if (!IsNumeric(TOUCHPAD_TYPE)) {
+        return false;
+    }
+    return (std::stoul(TOUCHPAD_TYPE) & TOUCHPAD_FEATURE_SWIPEINWARD) != TOUCHPAD_FEATURE_SWIPEINWARD;
 }
 
 void EventNormalizeHandler::SwipeInwardButtonJudge(std::shared_ptr<PointerEvent> pointerEvent)

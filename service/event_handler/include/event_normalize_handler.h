@@ -66,6 +66,7 @@ private:
     int32_t HandleGestureEvent(libinput_event* event);
     bool JudgeIfSwipeInward(std::shared_ptr<PointerEvent> pointerEvent,
         enum libinput_event_type type, libinput_event* event);
+    bool IsSwipeInwardProductIsolated(uint32_t touchPadDeviceId);
     void SwipeInwardProcess(std::shared_ptr<PointerEvent> pointerEvent, libinput_event* event);
     void SwipeInwardButtonJudge(std::shared_ptr<PointerEvent> pointerEvent);
     void SwipeInwardSpeedJudge(std::shared_ptr<PointerEvent> pointerEvent);
