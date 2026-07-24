@@ -6182,16 +6182,20 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
                 return RET_OK;
             }
             if (POINTER_DEV_MGR.mouseDisplayState) {
-                bool checkExtraData = extraData_.appended && extraData_.sourceType == PointerEvent::SOURCE_TYPE_TOUCHSCREEN &&
-                    ((pointerItem.GetToolType() == PointerEvent::TOOL_TYPE_FINGER && extraData_.pointerId == pointerId) ||
+                bool checkExtraData = extraData_.appended &&
+                    extraData_.sourceType == PointerEvent::SOURCE_TYPE_TOUCHSCREEN &&
+                    ((pointerItem.GetToolType() == PointerEvent::TOOL_TYPE_FINGER &&
+                    extraData_.pointerId == pointerId) ||
                     pointerItem.GetToolType() == PointerEvent::TOOL_TYPE_PEN);
-                checkExtraData = checkExtraData || (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_PULL_UP);
+                checkExtraData = checkExtraData ||
+                    (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_PULL_UP);
                 if ((!checkExtraData) && (!(extraData_.appended &&
                     extraData_.sourceType == PointerEvent::SOURCE_TYPE_MOUSE)) &&
                     !pointerEvent->HasFlag(InputEvent::EVENT_FLAG_SHOW_CUSOR_WITH_TOUCH) &&
                     timerId_ == DEFAULT_VALUE) {
                     bool gestureInject = false;
-                    if ((pointerEvent->HasFlag(InputEvent::EVENT_FLAG_SIMULATE)) && MMI_GNE(pointerEvent->GetZOrder(), 0.0f)) {
+                    if ((pointerEvent->HasFlag(InputEvent::EVENT_FLAG_SIMULATE)) &&
+                        MMI_GNE(pointerEvent->GetZOrder(), 0.0f)) {
                         gestureInject = true;
                     } else {
                         gestureInject = groupId != MAIN_GROUPID ? true : gestureInject;
