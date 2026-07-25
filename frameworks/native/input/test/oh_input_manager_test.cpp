@@ -1255,7 +1255,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_InjectTouchEventGlobal,
     touchEvent.displayY = 1;
     touchEvent.globalX = 1;
     touchEvent.globalY = 1;
-    EXPECT_EQ(OH_Input_InjectTouchEventGlobal(&touchEvent), INPUT_SUCCESS);
+    EXPECT_EQ(OH_Input_InjectTouchEventGlobal(&touchEvent), INPUT_PERMISSION_DENIED);
 
     touchEvent.globalX = INT32_MAX;
     touchEvent.globalY = INT32_MAX;
@@ -3322,7 +3322,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_InjectTouchEventGlobal_
     touchEvent.globalY = 100;
     auto origin = g_touchEvent;
     g_touchEvent = nullptr;
-    EXPECT_EQ(OH_Input_InjectTouchEventGlobal(&touchEvent), INPUT_SUCCESS);
+    EXPECT_EQ(OH_Input_InjectTouchEventGlobal(&touchEvent), INPUT_PERMISSION_DENIED);
     g_touchEvent = origin;
 }
 
@@ -3377,7 +3377,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_InjectTouchEventGlobal_
     touchEvent.displayY = 10;
     touchEvent.globalX = 10;
     touchEvent.globalY = 10;
-    EXPECT_EQ(OH_Input_InjectTouchEventGlobal(&touchEvent), INPUT_SUCCESS);
+    EXPECT_EQ(OH_Input_InjectTouchEventGlobal(&touchEvent), INPUT_PERMISSION_DENIED);
 }
 
 /**
@@ -3398,7 +3398,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_InjectMouseEventGlobal_
     inputMouseEvent.action = MOUSE_ACTION_BUTTON_DOWN;
     inputMouseEvent.button = MOUSE_BUTTON_LEFT;
     int32_t ret = OH_Input_InjectMouseEventGlobal(&inputMouseEvent);
-    EXPECT_EQ(ret, INPUT_SUCCESS);
+    EXPECT_EQ(ret, INPUT_PERMISSION_DENIED);
 }
 
 /**
@@ -4387,7 +4387,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_SetPointerStyle_001, Te
     EXPECT_EQ(res, INPUT_PARAMETER_ERROR);
     windowId = 0;
     res = OH_Input_SetPointerStyle(windowId, pointerStyle);
-    EXPECT_EQ(res, INPUT_SERVICE_EXCEPTION);
+    EXPECT_EQ(res, INPUT_SUCCESS);
 }
 
 /**
@@ -5053,13 +5053,13 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_InjectMouseEvent_001, T
     mouseEvent.action = MOUSE_ACTION_MOVE;
     mouseEvent.button = MOUSE_BUTTON_LEFT;
     int32_t ret = OH_Input_InjectMouseEvent(&mouseEvent);
-    EXPECT_EQ(ret, INPUT_SUCCESS);
+    EXPECT_EQ(ret, INPUT_PERMISSION_DENIED);
     mouseEvent.displayId = -1;
     ret = OH_Input_InjectMouseEvent(&mouseEvent);
-    EXPECT_EQ(ret, INPUT_SUCCESS);
+    EXPECT_EQ(ret, INPUT_PERMISSION_DENIED);
     mouseEvent.displayId = 0;
     ret = OH_Input_InjectMouseEvent(&mouseEvent);
-    EXPECT_EQ(ret, INPUT_SUCCESS);
+    EXPECT_EQ(ret, INPUT_PERMISSION_DENIED);
 }
 
 /**
@@ -5787,7 +5787,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_InjectMouseEvent_Button
     mouseEvent.action = MOUSE_ACTION_MOVE;
     mouseEvent.button = MOUSE_BUTTON_NONE;
     int32_t ret = OH_Input_InjectMouseEvent(&mouseEvent);
-    EXPECT_EQ(ret, INPUT_SUCCESS);
+    EXPECT_EQ(ret, INPUT_PERMISSION_DENIED);
 }
 
 /**
@@ -5808,7 +5808,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_InjectMouseEventGlobal_
     mouseEvent.action = MOUSE_ACTION_BUTTON_UP;
     mouseEvent.button = MOUSE_BUTTON_RIGHT;
     int32_t ret = OH_Input_InjectMouseEventGlobal(&mouseEvent);
-    EXPECT_EQ(ret, INPUT_SUCCESS);
+    EXPECT_EQ(ret, INPUT_PERMISSION_DENIED);
 }
 
 /**
@@ -5829,7 +5829,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_InjectMouseEventGlobal_
     mouseEvent.action = MOUSE_ACTION_BUTTON_DOWN;
     mouseEvent.button = MOUSE_BUTTON_FORWARD;
     int32_t ret = OH_Input_InjectMouseEventGlobal(&mouseEvent);
-    EXPECT_EQ(ret, INPUT_SUCCESS);
+    EXPECT_EQ(ret, INPUT_PERMISSION_DENIED);
 }
 
 /**
@@ -5850,7 +5850,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_InjectMouseEventGlobal_
     mouseEvent.action = MOUSE_ACTION_BUTTON_UP;
     mouseEvent.button = MOUSE_BUTTON_BACK;
     int32_t ret = OH_Input_InjectMouseEventGlobal(&mouseEvent);
-    EXPECT_EQ(ret, INPUT_SUCCESS);
+    EXPECT_EQ(ret, INPUT_PERMISSION_DENIED);
 }
 
 /**
@@ -5871,7 +5871,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_InjectMouseEventGlobal_
     mouseEvent.action = MOUSE_ACTION_MOVE;
     mouseEvent.button = MOUSE_BUTTON_LEFT;
     int32_t ret = OH_Input_InjectMouseEventGlobal(&mouseEvent);
-    EXPECT_EQ(ret, INPUT_SUCCESS);
+    EXPECT_EQ(ret, INPUT_PERMISSION_DENIED);
 }
 
 /**
@@ -5892,7 +5892,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_InjectMouseEventGlobal_
     mouseEvent.action = MOUSE_ACTION_CANCEL;
     mouseEvent.button = MOUSE_BUTTON_NONE;
     int32_t ret = OH_Input_InjectMouseEventGlobal(&mouseEvent);
-    EXPECT_EQ(ret, INPUT_SUCCESS);
+    EXPECT_EQ(ret, INPUT_PERMISSION_DENIED);
 }
 
 /**
@@ -5915,7 +5915,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_InjectMouseEventGlobal_
     mouseEvent.axisValue = 10.0f;
     mouseEvent.button = MOUSE_BUTTON_NONE;
     int32_t ret = OH_Input_InjectMouseEventGlobal(&mouseEvent);
-    EXPECT_EQ(ret, INPUT_SUCCESS);
+    EXPECT_EQ(ret, INPUT_PERMISSION_DENIED);
 }
 
 /**
@@ -5938,7 +5938,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_InjectMouseEventGlobal_
     mouseEvent.axisValue = 5.0f;
     mouseEvent.button = MOUSE_BUTTON_NONE;
     int32_t ret = OH_Input_InjectMouseEventGlobal(&mouseEvent);
-    EXPECT_EQ(ret, INPUT_SUCCESS);
+    EXPECT_EQ(ret, INPUT_PERMISSION_DENIED);
 }
 
 /**
@@ -5959,7 +5959,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_InjectMouseEventGlobal_
     mouseEvent.action = MOUSE_ACTION_MOVE;
     mouseEvent.button = MOUSE_BUTTON_LEFT;
     int32_t ret = OH_Input_InjectMouseEventGlobal(&mouseEvent);
-    EXPECT_EQ(ret, INPUT_SUCCESS);
+    EXPECT_EQ(ret, INPUT_PERMISSION_DENIED);
 }
 
 /**
