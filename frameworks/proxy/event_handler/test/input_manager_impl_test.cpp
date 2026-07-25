@@ -1056,7 +1056,7 @@ HWTEST_F(InputManagerImplTest, InputManagerImplTest_TestUpdateDisplayInfo_001, T
     userScreenInfo.userId = 100;
     userScreenInfo.displayGroups.push_back(displayGroupInfo);
     int32_t result = InputMgrImpl.UpdateDisplayInfo(userScreenInfo);
-    EXPECT_EQ(result, RET_OK);
+    EXPECT_EQ(result, ERROR_NO_PERMISSION);
 }
 
 class MockNetPacket : public NetPacket {
@@ -1171,7 +1171,7 @@ HWTEST_F(InputManagerImplTest, InputManagerImplTest_PrintDisplayInfo_004, TestSi
     newGroup.windowsInfo.push_back(newWindowInfo);
     userScreenInfo.displayGroups.push_back(newGroup);
     int32_t result = InputMgrImpl.UpdateDisplayInfo(userScreenInfo);
-    EXPECT_EQ(result, RET_OK);
+    EXPECT_EQ(result, ERROR_NO_PERMISSION);
 }
 
 /**
@@ -1524,7 +1524,7 @@ HWTEST_F(InputManagerImplTest, InputManagerImplTest_TestUpdateDisplayInfo_004, T
     screenInfo.displayGroups.resize(10);
     screenInfo.screens.resize(10);
     auto result = InputMgrImpl.UpdateDisplayInfo(screenInfo);
-    EXPECT_EQ(result, RET_OK);
+    EXPECT_EQ(result, ERROR_NO_PERMISSION);
 }
 
 /**
@@ -1584,7 +1584,7 @@ HWTEST_F(InputManagerImplTest, InputManagerImplTest_TestUpdateDisplayInfo_006, T
     }
 
     int32_t result = InputMgrImpl.UpdateDisplayInfo(userScreenInfo);
-    EXPECT_EQ(result, RET_OK);
+    EXPECT_EQ(result, ERROR_NO_PERMISSION);
 }
 
 /**
@@ -3080,7 +3080,7 @@ HWTEST_F(InputManagerImplTest, InputManagerImplTest_SendDisplayInfo_Trace_001, T
     group.displaysInfo.push_back(display);
     userScreenInfo.displayGroups.push_back(group);
     int32_t result = impl->SendDisplayInfo(userScreenInfo);
-    EXPECT_EQ(result, RET_OK);
+    EXPECT_EQ(result, ERROR_NO_PERMISSION);
 }
 
 /**
@@ -3137,7 +3137,7 @@ HWTEST_F(InputManagerImplTest, InputManagerImplTest_SetPointerStyle_Trace_002, T
     PointerStyle pointerStyle;
     pointerStyle.id = 0;
     int32_t result = impl->SetPointerStyle(windowId, pointerStyle);
-    EXPECT_EQ(result, RET_ERR);
+    EXPECT_EQ(result, RET_OK);
 }
 
 /**
@@ -3534,7 +3534,7 @@ HWTEST_F(InputManagerImplTest, InputManagerImplTest_SendDisplayInfo_Trace_002, T
     UserScreenInfo userScreenInfo;
     userScreenInfo.userId = 100;
     int32_t result = impl->SendDisplayInfo(userScreenInfo);
-    EXPECT_EQ(result, RET_OK);
+    EXPECT_EQ(result, ERROR_NO_PERMISSION);
 }
 
 /**

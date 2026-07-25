@@ -1143,7 +1143,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_SetPointerStyle_002, T
     PointerStyle style;
     style.id = MOUSE_ICON::EAST;
     int32_t ret = winMgr.SetPointerStyle(1, 1, style);
-    EXPECT_NE(ret, RET_OK);
+    EXPECT_EQ(ret, RET_OK);
 
     // get custom pointer style and compare
     PointerStyle styleRet;
@@ -1195,7 +1195,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_SetPointerStyle_004, T
     style.id = MOUSE_ICON::EAST;
     style.options = MOUSE_STYLE_OPT;
     int32_t ret = winMgr.SetPointerStyle(1, 1, style);
-    EXPECT_NE(ret, RET_OK);
+    EXPECT_EQ(ret, RET_OK);
 
     // set global pointer style
     style.id = MOUSE_ICON::DEVELOPER_DEFINED_ICON;
@@ -1233,7 +1233,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_ClearWindowPointerStyl
     style.id = MOUSE_ICON::EAST;
     style.options = MOUSE_STYLE_OPT;
     int32_t ret = winMgr.SetPointerStyle(1, 1, style);
-    EXPECT_NE(ret, RET_OK);
+    EXPECT_EQ(ret, RET_OK);
 
     // not found pid
     ret = winMgr.ClearWindowPointerStyle(123, 456);

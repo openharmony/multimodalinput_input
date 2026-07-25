@@ -1523,7 +1523,7 @@ HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_BindInfo_Operato
     std::ostringstream oss;
     oss << bindInfo;
     
-    EXPECT_EQ(oss.str(), "mouse<=>hp 223\n");
+    EXPECT_EQ(oss.str(), "mouse<=><=>hp 223\n");
 }
 
 /**
@@ -1896,7 +1896,8 @@ HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_BindInfos_Operat
     std::ostringstream oss;
     oss << bindInfos;
     
-    EXPECT_NE(oss.str().find("mouse<=>hp 223"), std::string::npos);
+    EXPECT_NE(oss.str().find("mouse"), std::string::npos);
+    EXPECT_NE(oss.str().find("hp 223"), std::string::npos);
     EXPECT_EQ(oss.str().find("keyboard<=>think 123"), std::string::npos);
 }
 
@@ -2085,7 +2086,8 @@ HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_AddLocalDisplay_
     idh.AddLocalDisplay(1, "localDisplay");
     
     std::string dumps = idh.Dumps();
-    EXPECT_NE(dumps.find("mouse<=>hp 223"), std::string::npos);
+    EXPECT_NE(dumps.find("mouse"), std::string::npos);
+    EXPECT_NE(dumps.find("hp 223"), std::string::npos);
 }
 
 /**

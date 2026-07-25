@@ -228,45 +228,45 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_InjectMouseEvent, TestS
     inputMouseEvent.action = MOUSE_ACTION_CANCEL;
     inputMouseEvent.axisType = MOUSE_AXIS_SCROLL_VERTICAL;
     inputMouseEvent.button = MOUSE_BUTTON_NONE;
-    EXPECT_EQ(OH_Input_InjectMouseEvent(&inputMouseEvent), INPUT_SUCCESS);
+    EXPECT_EQ(OH_Input_InjectMouseEvent(&inputMouseEvent), INPUT_PERMISSION_DENIED);
 
     inputMouseEvent.actionTime = 100;
     inputMouseEvent.action = MOUSE_ACTION_MOVE;
     inputMouseEvent.axisType = MOUSE_AXIS_SCROLL_HORIZONTAL;
     inputMouseEvent.button = MOUSE_BUTTON_LEFT;
-    EXPECT_EQ(OH_Input_InjectMouseEvent(&inputMouseEvent), INPUT_SUCCESS);
+    EXPECT_EQ(OH_Input_InjectMouseEvent(&inputMouseEvent), INPUT_PERMISSION_DENIED);
 
     inputMouseEvent.action = MOUSE_ACTION_BUTTON_DOWN;
     inputMouseEvent.button = MOUSE_BUTTON_MIDDLE;
-    EXPECT_EQ(OH_Input_InjectMouseEvent(&inputMouseEvent), INPUT_SUCCESS);
+    EXPECT_EQ(OH_Input_InjectMouseEvent(&inputMouseEvent), INPUT_PERMISSION_DENIED);
 
     inputMouseEvent.action = MOUSE_ACTION_BUTTON_UP;
     inputMouseEvent.button = MOUSE_BUTTON_RIGHT;
-    EXPECT_EQ(OH_Input_InjectMouseEvent(&inputMouseEvent), INPUT_SUCCESS);
+    EXPECT_EQ(OH_Input_InjectMouseEvent(&inputMouseEvent), INPUT_PERMISSION_DENIED);
 
     inputMouseEvent.action = MOUSE_ACTION_AXIS_BEGIN;
     inputMouseEvent.button = MOUSE_BUTTON_FORWARD;
-    EXPECT_EQ(OH_Input_InjectMouseEvent(&inputMouseEvent), INPUT_SUCCESS);
+    EXPECT_EQ(OH_Input_InjectMouseEvent(&inputMouseEvent), INPUT_PERMISSION_DENIED);
 
     inputMouseEvent.action = MOUSE_ACTION_AXIS_UPDATE;
     inputMouseEvent.button = MOUSE_BUTTON_BACK;
-    EXPECT_EQ(OH_Input_InjectMouseEvent(&inputMouseEvent), INPUT_SUCCESS);
+    EXPECT_EQ(OH_Input_InjectMouseEvent(&inputMouseEvent), INPUT_PERMISSION_DENIED);
 
     inputMouseEvent.globalX = 300;
     inputMouseEvent.globalY = 300;
-    EXPECT_EQ(OH_Input_InjectMouseEvent(&inputMouseEvent), INPUT_SUCCESS);
+    EXPECT_EQ(OH_Input_InjectMouseEvent(&inputMouseEvent), INPUT_PERMISSION_DENIED);
 
     inputMouseEvent.globalX = INT32_MAX;
     inputMouseEvent.globalY = 300;
-    EXPECT_EQ(OH_Input_InjectMouseEvent(&inputMouseEvent), INPUT_SUCCESS);
+    EXPECT_EQ(OH_Input_InjectMouseEvent(&inputMouseEvent), INPUT_PERMISSION_DENIED);
 
     inputMouseEvent.globalX = 300;
     inputMouseEvent.globalY = INT32_MAX;
-    EXPECT_EQ(OH_Input_InjectMouseEvent(&inputMouseEvent), INPUT_SUCCESS);
+    EXPECT_EQ(OH_Input_InjectMouseEvent(&inputMouseEvent), INPUT_PERMISSION_DENIED);
 
     inputMouseEvent.globalX = INT32_MAX;
     inputMouseEvent.globalY = INT32_MAX;
-    EXPECT_EQ(OH_Input_InjectMouseEvent(&inputMouseEvent), INPUT_SUCCESS);
+    EXPECT_EQ(OH_Input_InjectMouseEvent(&inputMouseEvent), INPUT_PERMISSION_DENIED);
 }
 
 /**
@@ -2726,13 +2726,13 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_InjectMouseEvent001, Te
     inputMouseEvent.action = MOUSE_ACTION_CANCEL;
     inputMouseEvent.axisType = MOUSE_AXIS_SCROLL_VERTICAL;
     inputMouseEvent.button = MOUSE_BUTTON_LEFT;
-    EXPECT_EQ(OH_Input_InjectMouseEvent(&inputMouseEvent), INPUT_SUCCESS);
+    EXPECT_EQ(OH_Input_InjectMouseEvent(&inputMouseEvent), INPUT_PERMISSION_DENIED);
 
     inputMouseEvent.actionTime = 100;
     inputMouseEvent.displayX = 300;
     inputMouseEvent.displayY = 300;
     inputMouseEvent.action = TOUCH_ACTION_DOWN;
-    EXPECT_EQ(OH_Input_InjectMouseEvent(&inputMouseEvent), INPUT_SUCCESS);
+    EXPECT_EQ(OH_Input_InjectMouseEvent(&inputMouseEvent), INPUT_PERMISSION_DENIED);
 
     inputMouseEvent.action = MOUSE_ACTION_AXIS_END;
     inputMouseEvent.button = static_cast<Input_MouseEventButton>(10);

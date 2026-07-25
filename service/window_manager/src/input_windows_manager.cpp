@@ -2351,7 +2351,6 @@ void InputWindowsManager::PointerDrawingManagerOnDisplayInfo(const OLD::DisplayG
     bool isDisplayChanged)
 {
     if (!INPUT_DEV_MGR->HasPointerDeviceIncludingVirtual()) {
-        MMI_HILOGI("UT FIX TEST");
         MMI_HILOGI("OnDisplayInfo no pointer device");
         return;
     }
