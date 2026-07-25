@@ -6872,6 +6872,11 @@ void InputWindowsManager::DispatchTouch(int32_t pointerAction, int32_t groupId, 
                     "window:%{public}d, flags:%{public}d", item.id, item.flags);
                 continue;
             }
+            if (!IsValidZorderWindow(item, dispatchTouchEvent)) {
+                MMI_HILOGD("Skip the invalid zOrder window to continue searching, "
+                    "window:%{public}d, zOrder:%{public}f", item.id, item.zOrder);
+                continue;
+            }
             if ((item.flags & WindowInputPolicy::FLAG_DRAG_DISABLED) == WindowInputPolicy::FLAG_DRAG_DISABLED) {
                 continue;
             }
