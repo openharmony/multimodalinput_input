@@ -1987,7 +1987,7 @@ void InputDeviceManager::FillInputDeviceWithVirtualCapability(
 {
     // LCOV_EXCL_START
     CHKPV(inputDevice);
-    if (!deviceInfo.isTouchableDevice) {
+    if (!deviceInfo.isTouchableDevice || inputDevice->GetName() != "input_mt_wrapper") {
         // not adding capability from virtual devices for devices other than the touch screen.
         return;
     }
