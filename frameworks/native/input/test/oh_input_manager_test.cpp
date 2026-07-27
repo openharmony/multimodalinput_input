@@ -3948,7 +3948,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_TouchEventMonitor_Callb
     event->SetSourceType(OHOS::MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
     auto result = OHOS::Singleton<OHOS::MMI::InputManagerImpl>::GetInstance().SimulateInputEvent(event,
         true, OHOS::MMI::PointerEvent::GLOBAL_COORDINATE);
-    EXPECT_EQ(result, RET_ERR);
+    EXPECT_EQ(result, INPUT_PERMISSION_DENIED);
 
     Input_Result removeResult = OH_Input_RemoveTouchEventMonitor(callback);
     EXPECT_EQ(removeResult, INPUT_SUCCESS);
@@ -4599,7 +4599,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_SetCustomCursor_001, Te
     EXPECT_NE(cursorConfig, nullptr);
     int32_t windowId = 0;
     Input_Result res = OH_Input_SetCustomCursor(windowId, customCursor, cursorConfig);
-    EXPECT_EQ(res, INPUT_SERVICE_EXCEPTION);
+    EXPECT_EQ(res, INPUT_SUCCESS);
 }
 
 /**

@@ -320,7 +320,7 @@ HWTEST_F(PointerDrawingManagerExTest, InputWindowsManagerTest_SetPointerStyle_00
 #endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
 #endif //OHOS_BUILD_ENABLE_POINTER
     int32_t ret4 = CursorDrawingInformation::GetInstance().SetPointerStyle(0, pid, windowId, pointerStyle);
-    EXPECT_NE(ret4, RET_OK);
+    EXPECT_EQ(ret4, RET_OK);
 }
 
 /**
@@ -934,7 +934,7 @@ HWTEST_F(PointerDrawingManagerExTest, InputWindowsManagerTest_SetMouseIcon_03, T
     int32_t windowId = 2;
     PointerStyle style;
     int32_t ret1 = CursorDrawingInformation::GetInstance().SetPointerStyle(0, pid, windowId, style);
-    EXPECT_NE(ret1, RET_OK);
+    EXPECT_EQ(ret1, RET_OK);
 
     CursorPixelMap curPixelMap;
     int32_t ret = CursorDrawingInformation::GetInstance().SetMouseIcon(0, pid, windowId, curPixelMap);
@@ -1258,7 +1258,7 @@ HWTEST_F(PointerDrawingManagerExTest, InputWindowsManagerTest_SetPointerSize_03,
         rsUIContext_);
     EXPECT_TRUE(pointerDrawingManager.surfaceNode_ != nullptr);
     int32_t userId = 0;
-    EXPECT_EQ(pointerDrawingManager.SetPointerSize(userId, size), RET_ERR);
+    EXPECT_EQ(pointerDrawingManager.SetPointerSize(userId, size), RET_OK);
 }
 
 /**

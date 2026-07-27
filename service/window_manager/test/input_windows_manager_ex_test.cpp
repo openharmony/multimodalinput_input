@@ -900,6 +900,8 @@ HWTEST_F(InputWindowsManagerTest, CalculateTipPoint_002, TestSize.Level1)
     int32_t deviceId = 1;
     PointerEvent::PointerItem pointerItem {};
     pointerItem.SetToolType(PointerEvent::TOOL_TYPE_PEN);
+    auto inputDevice = std::make_shared<InputDevice>();
+    EXPECT_CALL(*messageParcelMock_, GetInputDevice(_, _)).WillOnce(Return(inputDevice));
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager->CalculateTipPoint(&event,
         displayId, coord, pointerItem, deviceId));
     it->second.displaysInfo.clear();

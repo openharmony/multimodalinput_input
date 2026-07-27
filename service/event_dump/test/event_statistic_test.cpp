@@ -398,9 +398,11 @@ HWTEST_F(EventStatisticTest, EventStatisticTest_PushPointerRecord, TestSize.Leve
     pointerItem.SetTiltX(0);
     pointerItem.SetTiltY(0);
     pointerEvent->AddPointerItem(pointerItem);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
     ASSERT_NO_FATAL_FAILURE(eventStatistic.PushPointerRecord(pointerEvent));
     for (auto i = 0; i <= RING_BUFFER_SIZE; ++i) {
         auto pointerEvent = PointerEvent::Create();
+        pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
         eventStatistic.PushPointerRecord(pointerEvent);
     }
     EXPECT_EQ(eventStatistic.ringSize_, RING_BUFFER_SIZE);
@@ -701,6 +703,7 @@ HWTEST_F(EventStatisticTest, EventStatisticTest_QueryPointerRecord_006, TestSize
     item2.SetTiltY(40.0f);
     pointerEvent->AddPointerItem(item2);
     pointerEvent->SetPointerId(1);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
     eventStatistic.PushPointerRecord(pointerEvent);
     EXPECT_EQ(eventStatistic.QueryPointerRecord(1, pointerList), RET_OK);
     EXPECT_EQ(pointerList.size(), 1u);
@@ -727,6 +730,7 @@ HWTEST_F(EventStatisticTest, EventStatisticTest_QueryPointerRecord_007, TestSize
     item.SetTiltX(15.0f);
     item.SetTiltY(25.0f);
     pointerEvent->AddPointerItem(item);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
     eventStatistic.PushPointerRecord(pointerEvent);
     EXPECT_EQ(eventStatistic.QueryPointerRecord(1, pointerList), RET_OK);
     EXPECT_EQ(pointerList.size(), 1u);
@@ -749,7 +753,7 @@ HWTEST_F(EventStatisticTest, EventStatisticTest_QueryPointerRecord_008, TestSize
     std::vector<std::shared_ptr<PointerEvent>> pointerList;
     for (int i = 0; i < 3; i++) {
         auto pointerEvent = PointerEvent::Create();
-        pointerEvent->SetAction(PointerEvent::POINTER_ACTION_DOWN);
+        pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
         eventStatistic.PushPointerRecord(pointerEvent);
     }
     EXPECT_EQ(eventStatistic.QueryPointerRecord(10, pointerList), RET_OK);
@@ -789,6 +793,7 @@ HWTEST_F(EventStatisticTest, EventStatisticTest_QueryPointerRecord_010, TestSize
         PointerEvent::PointerItem item;
         pointerEvent->AddPointerItem(item);
     }
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
     eventStatistic.PushPointerRecord(pointerEvent);
     EXPECT_EQ(eventStatistic.QueryPointerRecord(3, pointerList), RET_OK);
     EXPECT_EQ(pointerList.size(), 3u);

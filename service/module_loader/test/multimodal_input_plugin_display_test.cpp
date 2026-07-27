@@ -191,6 +191,7 @@ HWTEST_F(MultimodalInputPluginDisplayTest, InputPluginManager_DisplayChangeNotif
     mgr->NotifyDisplayChange();
     EXPECT_EQ(counterA.load(), 1);
     EXPECT_EQ(counterB.load(), 2);
+    ASSERT_TRUE(pluginB->UnregisterDisplayChangeCallback(idB));
 }
 
 /**
