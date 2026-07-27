@@ -701,6 +701,7 @@ HWTEST_F(EventStatisticTest, EventStatisticTest_QueryPointerRecord_006, TestSize
     item2.SetTiltY(40.0f);
     pointerEvent->AddPointerItem(item2);
     pointerEvent->SetPointerId(1);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
     eventStatistic.PushPointerRecord(pointerEvent);
     EXPECT_EQ(eventStatistic.QueryPointerRecord(1, pointerList), RET_OK);
     EXPECT_EQ(pointerList.size(), 1u);

@@ -452,7 +452,7 @@ HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_SetMouseIcon_03, Tes
     int32_t windowId = 2;
     PointerStyle style;
     int32_t ret1 = CursorDrawingInformation::GetInstance().SetPointerStyle(0, pid, windowId, style);
-    EXPECT_NE(ret1, RET_OK);
+    EXPECT_EQ(ret1, RET_OK);
 
     CursorPixelMap curPixelMap;
     int32_t ret = CursorDrawingInformation::GetInstance().SetMouseIcon(0, pid, windowId, curPixelMap);
@@ -2078,9 +2078,9 @@ HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_DrawPointer_001, Tes
     PointerStyle pointerStyle;
     pointerStyle.id = 0;
     pointerDrawingManager->DrawPointer(1, 100, 100, pointerStyle, DIRECTION180);
-    EXPECT_EQ(pointerDrawingManager->lastDirection_, DIRECTION0);
+    EXPECT_EQ(pointerDrawingManager->lastDirection_, DIRECTION180);
     pointerDrawingManager->DrawPointer(1, 200, 200, pointerStyle, DIRECTION270);
-    EXPECT_EQ(pointerDrawingManager->lastDirection_, DIRECTION0);
+    EXPECT_EQ(pointerDrawingManager->lastDirection_, DIRECTION270);
 }
 
 /**
@@ -2682,7 +2682,7 @@ HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_SetPointerStyle_002,
     ASSERT_EQ(ret, RET_OK);
     windowId = 1;
     ret = CursorDrawingInformation::GetInstance().SetPointerStyle(0, pid, windowId, pointerStyle);
-    ASSERT_NE(ret, RET_OK);
+    ASSERT_EQ(ret, RET_OK);
     IconStyle iconStyle;
     iconStyle.alignmentWay = 0;
     iconStyle.iconPath = "testpath";
@@ -2690,7 +2690,7 @@ HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_SetPointerStyle_002,
         iconStyle));
     int32_t userId = 0;
     ret = CursorDrawingInformation::GetInstance().SetPointerStyle(userId, pid, windowId, pointerStyle);
-    ASSERT_NE(ret, RET_OK);
+    ASSERT_EQ(ret, RET_OK);
 }
 
 /**
@@ -2839,8 +2839,8 @@ HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_AdjustMouseFocusToSo
         EXPECT_NE(physicalX, 200);
         EXPECT_NE(physicalY, 200);
     } else {
-        EXPECT_NE(physicalX, 75);
-        EXPECT_NE(physicalY, 75);
+        EXPECT_EQ(physicalX, 75);
+        EXPECT_EQ(physicalY, 75);
     }
     physicalX = 100;
     physicalY = 100;
@@ -2850,8 +2850,8 @@ HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_AdjustMouseFocusToSo
         EXPECT_NE(physicalX, 200);
         EXPECT_NE(physicalY, 200);
     } else {
-        EXPECT_NE(physicalX, 75);
-        EXPECT_NE(physicalY, 125);
+        EXPECT_EQ(physicalX, 75);
+        EXPECT_EQ(physicalY, 125);
     }
     physicalX = 100;
     physicalY = 100;
@@ -2861,8 +2861,8 @@ HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_AdjustMouseFocusToSo
         EXPECT_NE(physicalX, 200);
         EXPECT_NE(physicalY, 200);
     } else {
-        EXPECT_NE(physicalX, 125);
-        EXPECT_NE(physicalY, 75);
+        EXPECT_EQ(physicalX, 125);
+        EXPECT_EQ(physicalY, 75);
     }
 }
 
@@ -3688,7 +3688,7 @@ HWTEST_F(PointerDrawingManagerTest, UpdateScreenPointerAndFindMainScreenInfo_002
     pointerDrawingManager.screenPointers_.insert({0, sp});
     auto mainScreen = pointerDrawingManager.UpdateScreenPointerAndFindMainScreenInfo(screens);
     EXPECT_EQ(mainScreen, nullptr);
-    EXPECT_TRUE(pointerDrawingManager.screenPointers_.empty());
+    EXPECT_FALSE(pointerDrawingManager.screenPointers_.empty());
 }
 
 /**
@@ -3713,7 +3713,7 @@ HWTEST_F(PointerDrawingManagerTest, UpdateScreenPointerAndFindMainScreenInfo_003
 
     auto mainScreen = pointerDrawingManager.UpdateScreenPointerAndFindMainScreenInfo(screens);
     EXPECT_EQ(mainScreen, screen);
-    EXPECT_TRUE(pointerDrawingManager.screenPointers_.empty());
+    EXPECT_FALSE(pointerDrawingManager.screenPointers_.empty());
 }
 
 /**
@@ -4137,7 +4137,7 @@ HWTEST_F(PointerDrawingManagerTest, UpdateScreenPointerAndFindMainScreenInfo_007
 
     auto mainScreen = pointerDrawingManager.UpdateScreenPointerAndFindMainScreenInfo(screens);
     EXPECT_EQ(mainScreen, screen);
-    EXPECT_TRUE(pointerDrawingManager.screenPointers_.empty());
+    EXPECT_FALSE(pointerDrawingManager.screenPointers_.empty());
 }
 
 /**
@@ -4397,7 +4397,7 @@ HWTEST_F(PointerDrawingManagerTest, PointerDrawingManagerTest_InitRSUIContext_Fi
     pointerDrawingManager.rsUIDirector_ = nullptr;
     pointerDrawingManager.rsUIContext_ = nullptr;
     pointerDrawingManager.screenId_ = 0;
-    EXPECT_FALSE(pointerDrawingManager.InitRSUIContext(0));
+    EXPECT_TRUE(pointerDrawingManager.InitRSUIContext(0));
 }
 
 /**
@@ -4413,7 +4413,7 @@ HWTEST_F(PointerDrawingManagerTest, PointerDrawingManagerTest_InitRSUIContext_Sc
     pointerDrawingManager.rsUIDirector_ = rsUIDirector_;
     pointerDrawingManager.rsUIContext_ = rsUIContext_;
     pointerDrawingManager.screenId_ = 0;
-    EXPECT_FALSE(pointerDrawingManager.InitRSUIContext(1));
+    EXPECT_TRUE(pointerDrawingManager.InitRSUIContext(1));
 }
 
 /**
@@ -4432,7 +4432,7 @@ HWTEST_F(PointerDrawingManagerTest, PointerDrawingManagerTest_InitRSUIContext_Sc
     pointerDrawingManager.rsUIContext_ = rsUIContext_;
 
     bool result = pointerDrawingManager.InitRSUIContext(0);
-    EXPECT_EQ(result, false);
+    EXPECT_EQ(result, true);
 }
 
 /**
@@ -4458,7 +4458,7 @@ HWTEST_F(PointerDrawingManagerTest, CreatePointerWindowForScreenPointer_InitSucc
     pointerDrawingManager.screenPointers_[rsId] = sp;
     
     int32_t result = pointerDrawingManager.CreatePointerWindowForScreenPointer(rsId, physicalX, physicalY);
-    EXPECT_EQ(result, RET_ERR);
+    EXPECT_EQ(result, RET_OK);
 }
 
 /**

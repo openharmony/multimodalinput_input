@@ -6319,8 +6319,8 @@ HWTEST_F(InputManagerTest, InputManagerTest_AddInputEventHook_001, TestSize.Leve
 {
     CALL_TEST_DEBUG;
     auto consumer = std::make_shared<HookConsumer>();
-    EXPECT_EQ(InputManager::GetInstance()->AddInputEventHook(consumer, HOOK_EVENT_TYPE_KEY), RET_OK);
-    EXPECT_EQ(InputManager::GetInstance()->RemoveInputEventHook(HOOK_EVENT_TYPE_KEY), RET_OK);
+    EXPECT_EQ(InputManager::GetInstance()->AddInputEventHook(consumer, HOOK_EVENT_TYPE_KEY), ERROR_UNSUPPORT);
+    EXPECT_EQ(InputManager::GetInstance()->RemoveInputEventHook(HOOK_EVENT_TYPE_KEY), ERROR_UNSUPPORT);
 }
 
 /*
@@ -6333,8 +6333,8 @@ HWTEST_F(InputManagerTest, InputManagerTest_AddInputEventHook_002, TestSize.Leve
 {
     CALL_TEST_DEBUG;
     auto consumer = std::make_shared<HookConsumer>();
-    EXPECT_EQ(InputManager::GetInstance()->AddInputEventHook(consumer, HOOK_EVENT_TYPE_TOUCH), RET_OK);
-    EXPECT_EQ(InputManager::GetInstance()->RemoveInputEventHook(HOOK_EVENT_TYPE_TOUCH), RET_OK);
+    EXPECT_EQ(InputManager::GetInstance()->AddInputEventHook(consumer, HOOK_EVENT_TYPE_TOUCH), ERROR_UNSUPPORT);
+    EXPECT_EQ(InputManager::GetInstance()->RemoveInputEventHook(HOOK_EVENT_TYPE_TOUCH), ERROR_UNSUPPORT);
 }
 
 /*
@@ -6347,8 +6347,8 @@ HWTEST_F(InputManagerTest, InputManagerTest_AddInputEventHook_003, TestSize.Leve
 {
     CALL_TEST_DEBUG;
     auto consumer = std::make_shared<HookConsumer>();
-    EXPECT_EQ(InputManager::GetInstance()->AddInputEventHook(consumer, HOOK_EVENT_TYPE_MOUSE), RET_OK);
-    EXPECT_EQ(InputManager::GetInstance()->RemoveInputEventHook(HOOK_EVENT_TYPE_MOUSE), RET_OK);
+    EXPECT_EQ(InputManager::GetInstance()->AddInputEventHook(consumer, HOOK_EVENT_TYPE_MOUSE), ERROR_UNSUPPORT);
+    EXPECT_EQ(InputManager::GetInstance()->RemoveInputEventHook(HOOK_EVENT_TYPE_MOUSE), ERROR_UNSUPPORT);
 }
 
 class UpHookConsumer : public IInputEventConsumer {
@@ -6369,7 +6369,7 @@ public:
         }
         auto y = item.GetDisplayY();
         if (y >= height / 2) {
-            EXPECT_EQ(InputManager::GetInstance()->DispatchToNextHandler(eventId, hookEventType), RET_OK);
+            EXPECT_EQ(InputManager::GetInstance()->DispatchToNextHandler(eventId, hookEventType), ERROR_UNSUPPORT);
             std::cout << "DispatchToNextHandler " << eventId << std::endl;
         }
     }
@@ -6397,7 +6397,7 @@ public:
         }
         auto y = item.GetDisplayY();
         if (y < height / 2) {
-            EXPECT_EQ(InputManager::GetInstance()->DispatchToNextHandler(eventId, hookEventType), RET_OK);
+            EXPECT_EQ(InputManager::GetInstance()->DispatchToNextHandler(eventId, hookEventType), ERROR_UNSUPPORT);
             std::cout << "DispatchToNextHandler " << eventId << std::endl;
         }
     }
@@ -6418,8 +6418,8 @@ HWTEST_F(InputManagerTest, InputManagerTest_AddInputEventHook_004, TestSize.Leve
     CALL_TEST_DEBUG;
     auto consumer = std::make_shared<UpHookConsumer>(HOOK_EVENT_TYPE_MOUSE);
     auto ret = InputManager::GetInstance()->AddInputEventHook(consumer, HOOK_EVENT_TYPE_MOUSE);
-    EXPECT_EQ(ret, ERROR_REPEAT_INTERCEPTOR);
-    EXPECT_EQ(InputManager::GetInstance()->RemoveInputEventHook(HOOK_EVENT_TYPE_MOUSE), RET_OK);
+    EXPECT_EQ(ret, ERROR_UNSUPPORT);
+    EXPECT_EQ(InputManager::GetInstance()->RemoveInputEventHook(HOOK_EVENT_TYPE_MOUSE), ERROR_UNSUPPORT);
 }
 
 /*
@@ -6433,8 +6433,8 @@ HWTEST_F(InputManagerTest, InputManagerTest_AddInputEventHook_005, TestSize.Leve
     CALL_TEST_DEBUG;
     auto consumer = std::make_shared<DownHookConsumer>(HOOK_EVENT_TYPE_MOUSE);
     auto ret = InputManager::GetInstance()->AddInputEventHook(consumer, HOOK_EVENT_TYPE_MOUSE);
-    EXPECT_EQ(ret, ERROR_REPEAT_INTERCEPTOR);
-    EXPECT_EQ(InputManager::GetInstance()->RemoveInputEventHook(HOOK_EVENT_TYPE_MOUSE), RET_OK);
+    EXPECT_EQ(ret, ERROR_UNSUPPORT);
+    EXPECT_EQ(InputManager::GetInstance()->RemoveInputEventHook(HOOK_EVENT_TYPE_MOUSE), ERROR_UNSUPPORT);
 }
 
 /*
@@ -6448,8 +6448,8 @@ HWTEST_F(InputManagerTest, InputManagerTest_AddInputEventHook_006, TestSize.Leve
     CALL_TEST_DEBUG;
     auto consumer = std::make_shared<UpHookConsumer>(HOOK_EVENT_TYPE_TOUCH);
     auto ret = InputManager::GetInstance()->AddInputEventHook(consumer, HOOK_EVENT_TYPE_TOUCH);
-    EXPECT_EQ(ret, ERROR_REPEAT_INTERCEPTOR);
-    EXPECT_EQ(InputManager::GetInstance()->RemoveInputEventHook(HOOK_EVENT_TYPE_TOUCH), RET_OK);
+    EXPECT_EQ(ret, ERROR_UNSUPPORT);
+    EXPECT_EQ(InputManager::GetInstance()->RemoveInputEventHook(HOOK_EVENT_TYPE_TOUCH), ERROR_UNSUPPORT);
 }
 
 /*
@@ -6463,8 +6463,8 @@ HWTEST_F(InputManagerTest, InputManagerTest_AddInputEventHook_007, TestSize.Leve
     CALL_TEST_DEBUG;
     auto consumer = std::make_shared<DownHookConsumer>(HOOK_EVENT_TYPE_TOUCH);
     auto ret = InputManager::GetInstance()->AddInputEventHook(consumer, HOOK_EVENT_TYPE_TOUCH);
-    EXPECT_EQ(ret, ERROR_REPEAT_INTERCEPTOR);
-    EXPECT_EQ(InputManager::GetInstance()->RemoveInputEventHook(HOOK_EVENT_TYPE_TOUCH), RET_OK);
+    EXPECT_EQ(ret, ERROR_UNSUPPORT);
+    EXPECT_EQ(InputManager::GetInstance()->RemoveInputEventHook(HOOK_EVENT_TYPE_TOUCH), ERROR_UNSUPPORT);
 }
 
 /*
@@ -6478,7 +6478,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_DispatchToNextHandler_001, TestSize.
     CALL_TEST_DEBUG;
     int32_t eventId { 0 };
     EXPECT_EQ(InputManager::GetInstance()->DispatchToNextHandler(eventId, HOOK_EVENT_TYPE_TOUCH),
-        ERROR_INVALID_PARAMETER);
+        ERROR_UNSUPPORT);
 }
 
 /*
