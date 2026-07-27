@@ -25,10 +25,16 @@
 
 namespace OHOS {
 namespace MMI {
+
 enum class InputDeviceClass : uint32_t {
     ALPHAKEY,
-    GAMEPAD,
-    DPAD
+    DPAD,
+    GAMEPAD
+};
+
+enum class MATCH_TYPE : uint32_t {
+    ANY,
+    AND
 };
 
 class InputDeviceManager final : public IInputDeviceManager {
@@ -186,7 +192,7 @@ private:
     void MakeDeviceInfo(struct libinput_device *inputDevice, struct InputDeviceInfo& info);
     bool IsMatchKeys(struct libinput_device* device, const std::vector<int32_t> &keyCodes) const;
     bool IsMatchDeviceKeys(
-        int32_t deviceId, struct libinput_device *device, const std::vector<int32_t> &keyCodes) const;
+        int32_t deviceId, struct libinput_device *device, const std::vector<int32_t> &keyCodes, MATCH_TYPE matchType) const;
     void ScanPointerDevice();
     void FillInputDevice(std::shared_ptr<InputDevice> inputDevice, libinput_device *deviceOrigin) const;
     void FillInputDeviceWithVirtualCapability(
