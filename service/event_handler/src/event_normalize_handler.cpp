@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2025 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -80,6 +80,7 @@ constexpr int32_t PHONE_PRODUCT_DEVICE_ID { 4261 };
 constexpr int64_t FREETOUCH_GES_BLOCK_THRETHOLD { MS2US(800) };
 constexpr uint32_t TOUCHPAD_FEATURE_SWIPEINWARD { 1 << 3 };
 #endif // OHOS_BUILD_ENABLE_TOUCHPAD
+constexpr int64_t PLUGIN_TIME_THRESHOLD { MS2US(3000) };
 const std::string TOUCHPAD_TYPE = OHOS::system::GetParameter("const.settings.clickpad_type", "0");
 
 void LogNonFrequentPointerEvent(const std::shared_ptr<PointerEvent>& pointerEvent, const char* scenario)
@@ -688,7 +689,19 @@ bool EventNormalizeHandler::AfterInputEventNormalized(const std::shared_ptr<Poin
     }
     auto pData = std::make_shared<IPluginData>();
     pData->stage = InputPluginStage::INPUT_AFTER_NORMALIZED;
+    int64_t startTime = GetSysClockTime();
+    MMI_HILOGD("Plugin processing start, startTime:%{public}" PRId64 "", startTime);
     int32_t result = manager->HandleEvent(pointerEvent, pData);
+    int64_t endTime = GetSysClockTime();
+    int64_t costTime = endTime - startTime;
+    MMI_HILOGD("Plugin processing end, endTime:%{public}" PRId64 ", costTime:%{public}" PRId64 " (us)",
+        endTime, costTime);
+    if (costTime > PLUGIN_TIME_THRESHOLD) {
+        MMI_HILOGW("Plugin processing overtime! costTime:%{public}" PRId64 " (us), threshold:%{public}" PRId64 " (us),"
+            " pointerId:%{public}d, action:%{public}d, sourceType:%{public}d",
+            costTime, PLUGIN_TIME_THRESHOLD, pointerEvent->GetPointerId(),
+            pointerEvent->GetPointerAction(), pointerEvent->GetSourceType());
+    }
     if (result != RET_DO) {
         nextHandler_->HandlePointerEvent(pointerEvent);
     }
