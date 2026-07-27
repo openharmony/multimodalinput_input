@@ -1870,6 +1870,7 @@ HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_FillInputDeviceWithVirtu
 {
     CALL_TEST_DEBUG;
     auto inputDevice = std::make_shared<InputDevice>();
+    inputDevice->SetName("input_mt_wrapper");
     InputDeviceManager::InputDeviceInfo info;
     info.isTouchableDevice = true;
 
@@ -1893,6 +1894,7 @@ HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_FillInputDeviceWithVirtu
 {
     CALL_TEST_DEBUG;
     auto inputDevice = std::make_shared<InputDevice>();
+    inputDevice->SetName("input_mt_wrapper");
     InputDeviceManager::InputDeviceInfo info;
     info.isTouchableDevice = true;
 
@@ -1916,6 +1918,7 @@ HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_FillInputDeviceWithVirtu
 {
     CALL_TEST_DEBUG;
     auto inputDevice = std::make_shared<InputDevice>();
+    inputDevice->SetName("input_mt_wrapper");
     InputDeviceManager::InputDeviceInfo info;
     info.isTouchableDevice = true;
 
