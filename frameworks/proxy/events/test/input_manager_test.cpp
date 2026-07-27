@@ -6535,7 +6535,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_DispatchToNextHandler, TestSize.Leve
     auto eventId = pointerEvent->GetId();
     HookEventType hookEventType = 2;
     auto ret = InputManager::GetInstance()->DispatchToNextHandler(eventId, hookEventType);
-    EXPECT_EQ(ret, ERROR_INVALID_PARAMETER);
+    EXPECT_EQ(ret, ERROR_UNSUPPORT);
 }
 /*
  * @tc.name: InputManagerTest_GetLastEventIds

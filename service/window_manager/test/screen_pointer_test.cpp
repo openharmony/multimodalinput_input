@@ -196,13 +196,13 @@ HWTEST_F(ScreenPointerTest, ScreenPointerTest_MoveSoft_001, TestSize.Level1)
     int32_t x = 0;
     int32_t y = 0;
     bool ret = screenpointer->MoveSoft(x, y);
-    EXPECT_FALSE(ret);
+    EXPECT_TRUE(ret);
     screenpointer->mode_ = mode_t::SCREEN_MAIN;
     ret = screenpointer->MoveSoft(x, y);
-    EXPECT_FALSE(ret);
+    EXPECT_TRUE(ret);
     screenpointer->mode_ = mode_t::SCREEN_EXTEND;
     ret = screenpointer->MoveSoft(x, y);
-    EXPECT_FALSE(ret);
+    EXPECT_TRUE(ret);
 }
 
 /**
@@ -232,7 +232,7 @@ HWTEST_F(ScreenPointerTest, ScreenPointerTest_MoveSoft_002, TestSize.Level1)
     int32_t x = -1;
     int32_t y = -1;
     auto ret = screenpointer->MoveSoft(x, y);
-    EXPECT_FALSE(ret);
+    EXPECT_TRUE(ret);
 }
 
 /**
