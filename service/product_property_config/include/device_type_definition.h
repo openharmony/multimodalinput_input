@@ -55,7 +55,6 @@ static const std::unordered_map<std::string, DeviceType> gDeviceTypeMap {
     { "DEVICE_M_PC_PRO", DeviceType::DEVICE_M_PC_PRO },
     { "DEVICE_S_FOLD_PC", DeviceType::DEVICE_S_FOLD_PC },
     { "DEVICE_D_TABLET", DeviceType::DEVICE_D_TABLET },
-    { "DEVICE_D_TABLET", DeviceType::DEVICE_D_TABLET },
     { "DEVICE_SP_FOLD_PC", DeviceType::DEVICE_SP_FOLD_PC}
 };
 
