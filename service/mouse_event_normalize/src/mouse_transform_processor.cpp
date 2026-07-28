@@ -389,11 +389,13 @@ int32_t MouseTransformProcessor::UpdateTouchpadMoveLocation(const OLD::DisplayIn
             static_cast<DeviceType>(deviceType), abs_x, abs_y);
         return ret;
     } else if (isFoldPC && devName == "input_mt_wrapper") {
-        DeviceType deviceVirtType = DeviceType::DEVICE_FOLD_PC;
+        DeviceType deviceVirtType = DeviceType::DEVICE_FOLD_PC_VIRT;
+#ifdef OHOS_BUILD_ENABLE_VKEYBOARD
         if (PRODUCT_TYPE_PARSER.GetProductType(SYS_PRODUCT_TYPE, deviceVirtType) != RET_OK) {
             MMI_HILOGW("GetProductType failed, productType: %{public}s", SYS_PRODUCT_TYPE.c_str());
         }
         deviceVirtType = ConvertToVirtualDeviceType(deviceVirtType);
+#endif // OHOS_BUILD_ENABLE_VKEYBOARD
         pointerEvent_->AddFlag(InputEvent::EVENT_FLAG_VIRTUAL_TOUCHPAD_POINTER);
         ret = PointerMotionAcceleration::AccelerateTouchpad(offset, winMgr->GetMouseIsCaptureMode(),
             MousePreferenceAccessor::GetTouchpadSpeed(*env_, userId), static_cast<DeviceType>(deviceVirtType),
