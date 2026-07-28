@@ -33,7 +33,10 @@ class KeyEventNormalizeWithMockTest : public testing::Test {
 public:
     static void SetUpTestCase(void);
     static void TearDownTestCase(void);
-    void SetUp(){};
+    void SetUp()
+    {
+        KeyEventHdr->keyEventResetDone_ = false;
+    };
     void TearDown(){};
 };
 
@@ -202,6 +205,44 @@ HWTEST_F(KeyEventNormalizeWithMockTest, KeyEventNormalizeWithMockTest_ResetKeyEv
 }
 
 /**
+ * @tc.name: KeyEventNormalizeWithMockTest_ResetKeyEvent_Kbd_LedOn_OnceOnly_006
+ * @tc.desc: ResetKeyEvent reads the device lock state back into keyEvent_ only once (crash
+ *           recovery); subsequent calls must NOT overwrite keyEvent_, so a quirky keyboard-like
+ *           device (e.g. headset) hot-plugged at runtime cannot corrupt the global lock state.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyEventNormalizeWithMockTest, KeyEventNormalizeWithMockTest_ResetKeyEvent_Kbd_LedOn_OnceOnly_006,
+    TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    testing::NiceMock<LibinputInterfaceMock> libinputMock;
+    // create a node for keyboard.
+    struct libinput_device libDev {
+        .udevDev { 2 },
+        .busType = 1,
+        .version = 1,
+        .product = 1,
+        .vendor = 1,
+        .name = "test",
+    };
+    EXPECT_CALL(libinputMock, DeviceGetName).WillRepeatedly(testing::Return(libDev.name.data()));
+    ASSERT_EQ(INPUT_DEV_MGR->IsKeyboardDevice(&libDev), true);
+    KeyEventHdr->keyEvent_ = KeyEvent::Create();
+    ASSERT_TRUE(KeyEventHdr->keyEvent_ != nullptr);
+    KeyEventHdr->keyEventResetDone_ = false;   // simulate fresh process (recovery)
+    // 1st call: recovery -- read-back runs, overwrites keyEvent_ with device state (all lights on)
+    EXPECT_CALL(libinputMock, HasEventLedType).WillRepeatedly(testing::Return(1));
+    EXPECT_CALL(libinputMock, GetFuncKeyState).WillRepeatedly(testing::Return(1));
+    EXPECT_NO_FATAL_FAILURE(KeyEventHdr->ResetKeyEvent(&libDev));
+    EXPECT_EQ(KeyEventHdr->keyEvent_->GetFunctionKey(KeyEvent::NUM_LOCK_FUNCTION_KEY), true);
+    // 2nd call: runtime hot-plug -- read-back MUST be skipped, keyEvent_ NOT overwritten
+    KeyEventHdr->keyEvent_->SetFunctionKey(KeyEvent::NUM_LOCK_FUNCTION_KEY, 0);
+    EXPECT_NO_FATAL_FAILURE(KeyEventHdr->ResetKeyEvent(&libDev));
+    EXPECT_EQ(KeyEventHdr->keyEvent_->GetFunctionKey(KeyEvent::NUM_LOCK_FUNCTION_KEY), false);
+}
+
+/**
  * @tc.name: KeyEventNormalizeWithMockTest_SyncLedStateFromKeyEvent_NonKbd_LedOff_001
  * @tc.desc: Test SyncLedStateFromKeyEvent with a non-kbd device without led.
  * @tc.type: FUNC
@@ -234,7 +275,7 @@ HWTEST_F(KeyEventNormalizeWithMockTest, KeyEventNormalizeWithMockTest_SyncLedSta
     // led off
     EXPECT_CALL(libinputMock, HasEventLedType).Times(testing::AtMost(1)).WillOnce(testing::Return(0));
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
-    EXPECT_EQ(KeyEventHdr->SyncLedStateFromKeyEvent(&libDev), false);
+    EXPECT_NO_FATAL_FAILURE(KeyEventHdr->SyncLedStateFromKeyEvent(&libDev));
     if (vKeyboardDeviceId > 0) {
         INPUT_DEV_MGR->RemoveVirtualInputDevice(vKeyboardDeviceId);
     }
@@ -273,7 +314,7 @@ HWTEST_F(KeyEventNormalizeWithMockTest, KeyEventNormalizeWithMockTest_SyncLedSta
     // led off
     EXPECT_CALL(libinputMock, HasEventLedType).Times(testing::AtMost(1)).WillOnce(testing::Return(0));
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
-    EXPECT_EQ(KeyEventHdr->SyncLedStateFromKeyEvent(&libDev), false);
+    EXPECT_NO_FATAL_FAILURE(KeyEventHdr->SyncLedStateFromKeyEvent(&libDev));
     if (vKeyboardDeviceId > 0) {
         INPUT_DEV_MGR->RemoveVirtualInputDevice(vKeyboardDeviceId);
     }
@@ -312,7 +353,7 @@ HWTEST_F(KeyEventNormalizeWithMockTest, KeyEventNormalizeWithMockTest_SyncLedSta
     // led on
     EXPECT_CALL(libinputMock, HasEventLedType).Times(testing::AtMost(1)).WillOnce(testing::Return(1));
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
-    EXPECT_EQ(KeyEventHdr->SyncLedStateFromKeyEvent(&libDev), false);
+    EXPECT_NO_FATAL_FAILURE(KeyEventHdr->SyncLedStateFromKeyEvent(&libDev));
     if (vKeyboardDeviceId > 0) {
         INPUT_DEV_MGR->RemoveVirtualInputDevice(vKeyboardDeviceId);
     }

@@ -202,31 +202,24 @@ void KeyEventNormalize::HandleKeyAction(struct libinput_device* device, KeyEvent
     }
 }
 
-bool KeyEventNormalize::SyncLedStateFromKeyEvent(struct libinput_device* device)
+void KeyEventNormalize::SyncLedStateFromKeyEvent(struct libinput_device* device)
 {
-    CHKPR(device, false);
-    bool isKeyboardWithLed = INPUT_DEV_MGR->IsKeyboardDevice(device) &&
-        libinput_has_event_led_type(device);
-    if (isKeyboardWithLed) {
+    CHKPV(device);
+    if (INPUT_DEV_MGR->IsKeyboardDevice(device) && libinput_has_event_led_type(device)) {
         if (keyEvent_ == nullptr) {
             keyEvent_ = KeyEvent::Create();
         }
-        CHKPR(keyEvent_, false);
+        CHKPV(keyEvent_);
         const std::vector<int32_t> funcKeys = {
             KeyEvent::NUM_LOCK_FUNCTION_KEY,
             KeyEvent::CAPS_LOCK_FUNCTION_KEY,
             KeyEvent::SCROLL_LOCK_FUNCTION_KEY
         };
         for (const auto &funcKey : funcKeys) {
-            if (LibinputAdapter::DeviceLedUpdate(device, funcKey,
-                keyEvent_->GetFunctionKey(funcKey)) != RET_OK) {
-                MMI_HILOGE("Failed to set led state for funcKey:%{public}d", funcKey);
-                return false;
-            }
+            LibinputAdapter::DeviceLedUpdate(device, funcKey, keyEvent_->GetFunctionKey(funcKey));
         }
         MMI_HILOGI("Sync led state of added device from keyEvent");
     }
-    return isKeyboardWithLed;
 }
 
 void KeyEventNormalize::ResetKeyEvent(struct libinput_device* device)
@@ -235,7 +228,7 @@ void KeyEventNormalize::ResetKeyEvent(struct libinput_device* device)
         if (keyEvent_ == nullptr) {
             keyEvent_ = KeyEvent::Create();
         }
-        if (libinput_has_event_led_type(device)) {
+        if (libinput_has_event_led_type(device) && !keyEventResetDone_) {
             CHKPV(keyEvent_);
             const std::vector<int32_t> funcKeys = {
                 KeyEvent::NUM_LOCK_FUNCTION_KEY,
@@ -245,6 +238,7 @@ void KeyEventNormalize::ResetKeyEvent(struct libinput_device* device)
             for (const auto &funcKey : funcKeys) {
                 keyEvent_->SetFunctionKey(funcKey, libinput_get_funckey_state(device, funcKey));
             }
+            keyEventResetDone_ = true;
         }
     }
 }
