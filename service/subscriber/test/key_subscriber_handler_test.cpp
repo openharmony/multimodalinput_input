@@ -6496,5 +6496,121 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_ShouldProcessAllRele
     bool ret = handler.ShouldProcessAllReleasedRepeat(keyCode, keyOption, subscribers);
     EXPECT_TRUE(ret);
 }
+
+/**
+ * @tc.name: KeySubscriberHandlerTest_ProcessAllReleasedComboActivated_004
+ * @tc.desc: Test ProcessAllReleasedComboActivated with KEY_ACTION_DOWN tracks pressed key
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_ProcessAllReleasedComboActivated_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeySubscriberHandler handler;
+    int32_t subscribeId = 10;
+    auto keyOption = std::make_shared<KeyOption>();
+    keyOption->SetFinalKey(KeyEvent::KEYCODE_A);
+    std::set<int32_t> preKeys = { KeyEvent::KEYCODE_CTRL_LEFT };
+    keyOption->SetPreKeys(preKeys);
+    SessionPtr sess = std::make_shared<UDSSession>(PROGRAM_NAME, MODULE_TYPE, UDS_FD, UDS_UID, UDS_PID);
+    ASSERT_NE(sess, nullptr);
+    auto subscriber = std::make_shared<OHOS::MMI::KeySubscriberHandler::Subscriber>(subscribeId, sess, keyOption);
+    auto &state = handler.allReleasedStates_[subscribeId];
+    state.comboActivated = true;
+    state.pressedComboKeys.insert(KeyEvent::KEYCODE_CTRL_LEFT);
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_A);
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+    handler.isForegroundExits_ = true;
+    bool handled = false;
+    handler.ProcessAllReleasedComboActivated(keyEvent, keyOption, subscriber, handled);
+    EXPECT_TRUE(handled);
+    EXPECT_EQ(state.pressedComboKeys.size(), 2u);
+    EXPECT_GT(state.pressedComboKeys.count(KeyEvent::KEYCODE_A), 0u);
+    EXPECT_TRUE(state.comboActivated);
+}
+
+/**
+ * @tc.name: KeySubscriberHandlerTest_ProcessAllReleasedComboActivated_005
+ * @tc.desc: Test repress finalKey then release preKey keeps combo active (Alt+Tab regression)
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_ProcessAllReleasedComboActivated_005, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeySubscriberHandler handler;
+    int32_t subscribeId = 10;
+    auto keyOption = std::make_shared<KeyOption>();
+    keyOption->SetFinalKey(KeyEvent::KEYCODE_A);
+    std::set<int32_t> preKeys = { KeyEvent::KEYCODE_CTRL_LEFT };
+    keyOption->SetPreKeys(preKeys);
+    SessionPtr sess = std::make_shared<UDSSession>(PROGRAM_NAME, MODULE_TYPE, UDS_FD, UDS_UID, UDS_PID);
+    ASSERT_NE(sess, nullptr);
+    auto subscriber = std::make_shared<OHOS::MMI::KeySubscriberHandler::Subscriber>(subscribeId, sess, keyOption);
+    auto &state = handler.allReleasedStates_[subscribeId];
+    state.comboActivated = true;
+    state.pressedComboKeys = { KeyEvent::KEYCODE_CTRL_LEFT, KeyEvent::KEYCODE_A };
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    handler.isForegroundExits_ = true;
+    bool handled = false;
+
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_A);
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP);
+    handler.ProcessAllReleasedComboActivated(keyEvent, keyOption, subscriber, handled);
+    EXPECT_EQ(state.pressedComboKeys.size(), 1u);
+    EXPECT_TRUE(state.comboActivated);
+
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+    handler.ProcessAllReleasedComboActivated(keyEvent, keyOption, subscriber, handled);
+    EXPECT_EQ(state.pressedComboKeys.size(), 2u);
+    EXPECT_GT(state.pressedComboKeys.count(KeyEvent::KEYCODE_A), 0u);
+    EXPECT_TRUE(state.comboActivated);
+
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_CTRL_LEFT);
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP);
+    handler.ProcessAllReleasedComboActivated(keyEvent, keyOption, subscriber, handled);
+    EXPECT_EQ(state.pressedComboKeys.size(), 1u);
+    EXPECT_GT(state.pressedComboKeys.count(KeyEvent::KEYCODE_A), 0u);
+    EXPECT_TRUE(state.comboActivated);
+}
+
+/**
+ * @tc.name: KeySubscriberHandlerTest_ProcessAllReleasedComboActivated_006
+ * @tc.desc: Test DOWN idempotent insert and UP full release resets combo
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_ProcessAllReleasedComboActivated_006, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeySubscriberHandler handler;
+    int32_t subscribeId = 10;
+    auto keyOption = std::make_shared<KeyOption>();
+    keyOption->SetFinalKey(KeyEvent::KEYCODE_A);
+    SessionPtr sess = std::make_shared<UDSSession>(PROGRAM_NAME, MODULE_TYPE, UDS_FD, UDS_UID, UDS_PID);
+    ASSERT_NE(sess, nullptr);
+    auto subscriber = std::make_shared<OHOS::MMI::KeySubscriberHandler::Subscriber>(subscribeId, sess, keyOption);
+    auto &state = handler.allReleasedStates_[subscribeId];
+    state.comboActivated = true;
+    state.pressedComboKeys.insert(KeyEvent::KEYCODE_A);
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_A);
+    handler.isForegroundExits_ = true;
+    bool handled = false;
+
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+    handler.ProcessAllReleasedComboActivated(keyEvent, keyOption, subscriber, handled);
+    EXPECT_EQ(state.pressedComboKeys.size(), 1u);
+    EXPECT_TRUE(state.comboActivated);
+
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP);
+    handler.ProcessAllReleasedComboActivated(keyEvent, keyOption, subscriber, handled);
+    EXPECT_TRUE(state.pressedComboKeys.empty());
+    EXPECT_FALSE(state.comboActivated);
+}
 } // namespace MMI
 } // namespace OHOS
