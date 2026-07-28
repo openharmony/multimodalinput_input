@@ -1274,8 +1274,11 @@ void KeySubscriberHandler::ProcessAllReleasedComboActivated(
         NotifySubscriber(keyEvent, subscriber);
         handled = true;
     }
-    if (keyAction == KeyEvent::KEY_ACTION_UP) {
-        auto &state = allReleasedStates_[subscriber->id_];
+    auto &state = allReleasedStates_[subscriber->id_];
+    if (keyAction == KeyEvent::KEY_ACTION_DOWN) {
+        // Track finalKey/preKey DOWN while combo is active so a re-press does not lose state
+        state.pressedComboKeys.insert(keyCode);
+    } else if (keyAction == KeyEvent::KEY_ACTION_UP) {
         state.pressedComboKeys.erase(keyCode);
         if (state.pressedComboKeys.empty()) {
             MMI_HILOGD("ALL_RELEASED: all keys released, reset state for sub:%{public}d",
