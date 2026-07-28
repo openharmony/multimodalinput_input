@@ -99,6 +99,9 @@ static const std::vector<int32_t> GAMEPAD_KEYCODES = {
     KeyEvent::KEYCODE_BUTTON_MODE
 };
 
+static const std::vector<int32_t> ALPHA_KEYCODES = {
+    KeyEvent::KEYCODE_Q
+};
 } // namespace
 
 std::shared_ptr<InputDeviceManager> InputDeviceManager::instance_ = nullptr;
@@ -486,25 +489,29 @@ bool InputDeviceManager::IsMatchDeviceKeys(
         MMI_HILOGE("device is nullptr");
         return false;
     }
+
+    // Helper lambda: returns true if any mapped key for `key` exists on `device`.
+    auto hasMappedKey = [&](int32_t key) -> bool {
+        for (const auto &mapped : KeyMapMgr->InputTransferKeyValue(deviceId, key)) {
+            if (libinput_device_has_key(device, mapped) == SUPPORT_KEY) {
+                return true;
+            }
+        }
+        return false;
+    };
+
     if (matchType == MATCH_TYPE::ANY) {
         for (const auto &key : keyCodes) {
-            for (const auto &it : KeyMapMgr->InputTransferKeyValue(deviceId, key)) {
-                if (libinput_device_has_key(device, it) == SUPPORT_KEY) {
-                    return true;
-                }
+            if (hasMappedKey(key)) {
+                return true;
             }
         }
         return false;
     }
+
+    // MATCH_TYPE::AND: all keys must be present (after mapping)
     for (const auto &key : keyCodes) {
-        bool hasKey = false;
-        for (const auto &it : KeyMapMgr->InputTransferKeyValue(deviceId, key)) {
-            if (libinput_device_has_key(device, it) == SUPPORT_KEY) {
-                hasKey = true;
-                break;
-            }
-        }
-        if (!hasKey) {
+        if (!hasMappedKey(key)) {
             return false;
         }
     }
@@ -559,7 +566,7 @@ std::vector<int32_t> InputDeviceManager::GetInputDeviceClassKeyCodes(InputDevice
         case InputDeviceClass::DPAD:
             return DPAD_REQUIRED_KEYCODES;
         case InputDeviceClass::ALPHAKEY:
-            return { KeyEvent::KEYCODE_Q };
+            return ALPHA_KEYCODES;
         default:
             return std::vector<int32_t>();
     }
