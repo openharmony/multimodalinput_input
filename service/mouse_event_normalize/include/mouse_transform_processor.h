@@ -179,6 +179,7 @@ private:
     void ResetPointerItemCanceledState();
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
     void HandleVirtualDeviceEvent(struct libinput_event_pointer* data);
+    DeviceType ConvertToVirtualDeviceType(DeviceType deviceType);
 #endif
     bool IsTouchpadTapEnabled(int32_t type);
     int32_t HandleButtonReleased(uint32_t button, uint32_t originButton, int32_t type);

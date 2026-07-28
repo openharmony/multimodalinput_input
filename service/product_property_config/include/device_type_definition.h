@@ -36,6 +36,8 @@ enum class DeviceType {
     DEVICE_M_PC_PRO = 11,
     DEVICE_S_FOLD_PC = 12,
     DEVICE_D_TABLET = 13,
+    DEVICE_SP_FOLD_PC_VIRT = 14,
+    DEVICE_SP_FOLD_PC = 15,
 };
 
 static const std::unordered_map<std::string, DeviceType> gDeviceTypeMap {
@@ -52,7 +54,9 @@ static const std::unordered_map<std::string, DeviceType> gDeviceTypeMap {
     { "DEVICE_G_TABLET", DeviceType::DEVICE_G_TABLET },
     { "DEVICE_M_PC_PRO", DeviceType::DEVICE_M_PC_PRO },
     { "DEVICE_S_FOLD_PC", DeviceType::DEVICE_S_FOLD_PC },
-    { "DEVICE_D_TABLET", DeviceType::DEVICE_D_TABLET }
+    { "DEVICE_D_TABLET", DeviceType::DEVICE_D_TABLET },
+    { "DEVICE_D_TABLET", DeviceType::DEVICE_D_TABLET },
+    { "DEVICE_SP_FOLD_PC", DeviceType::DEVICE_SP_FOLD_PC}
 };
 
 } // namespace MMI
