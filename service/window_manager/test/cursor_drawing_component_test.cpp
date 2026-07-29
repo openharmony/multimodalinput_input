@@ -228,7 +228,6 @@ HWTEST_F(CursorDrawingComponentTest, CursorDrawingComponentTest_SetPointerColor_
 }
 
 /**
-/**
  * @tc.name: CursorDrawingComponentTest_SetPointerLocation_001
  * @tc.desc: Test DrawPointer
  * @tc.type: FUNC

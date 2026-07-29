@@ -3672,7 +3672,6 @@ HWTEST_F(PointerDrawingManagerTest, UpdateScreenPointerAndFindMainScreenInfo_001
 }
 
 /**
-/**
  * @tc.name: UpdateScreenPointerAndFindMainScreenInfo_003
  * @tc.desc: Test branches that the parameter screen contains main screenInfo and
  * and screenPointers_ is empty

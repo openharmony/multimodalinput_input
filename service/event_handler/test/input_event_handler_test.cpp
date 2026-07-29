@@ -430,7 +430,6 @@ HWTEST_F(InputEventHandlerTest, InputEventHandler_IsTouchpadButtonMistouch_001, 
 }
 
 /**
-/**
  * @tc.name: InputEventHandler_IsTouchpadMotionMistouch_001
  * @tc.desc: Test the function IsTouchpadMotionMistouch
  * @tc.type: FUNC

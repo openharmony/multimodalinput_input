@@ -2873,12 +2873,6 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_GetFunctionKeyState_001
  * @tc.type: FUNC
  * @tc.require:
  */
-/**
- * @tc.name: OHInputManagerTest_OH_Input_GetKeyboardType
- * @tc.desc: Test the function OH_Input_GetKeyboardType
- * @tc.type: FUNC
- * @tc.require:
- */
 HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_GetKeyboardType_007, TestSize.Level1)
 {
     int32_t deviceId = 99999;
