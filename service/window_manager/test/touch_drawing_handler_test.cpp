@@ -1741,6 +1741,5 @@ HWTEST_F(TouchDrawingHandlerTest, TouchDrawingHandlerTest_RsFlushImplicitTransac
     ASSERT_NO_FATAL_FAILURE(touchDrawingHandler.RsFlushImplicitTransaction());
 }
 
-/**
 } // namespace MMI
 } // namespace OHOS
