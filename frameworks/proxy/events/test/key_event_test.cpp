@@ -15,6 +15,11 @@
 
 #include <gtest/gtest.h>
 
+#include <thread>
+#include <chrono>
+
+constexpr int32_t TIME_WAIT_MS = 50;
+
 #include "define_multimodal.h"
 #include "event_util_test.h"
 #include "input_manager.h"
@@ -785,6 +790,7 @@ HWTEST_F(KeyEventTest, KeyEventTest_Hash_001, TestSize.Level1)
     CALL_TEST_DEBUG;
     auto KeyEvent = KeyEvent::Create();
     CHKPV(KeyEvent);
+    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_MS));
     auto KeyEvent2 = KeyEvent::Create();
     CHKPV(KeyEvent2);
     EXPECT_NE(KeyEvent->Hash(), KeyEvent2->Hash());

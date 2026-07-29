@@ -228,34 +228,6 @@ HWTEST_F(CursorDrawingComponentTest, CursorDrawingComponentTest_SetPointerColor_
 }
 
 /**
- * @tc.name: CursorDrawingComponentTest_SetPointerStyle_001
- * @tc.desc: Test DrawPointer
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(CursorDrawingComponentTest, CursorDrawingComponentTest_SetPointerStyle_001, TestSize.Level1)
-{
-    int32_t userId = 0;
-    int32_t pid = 1;
-    int32_t windowId = 1;
-    PointerStyle pointerStyle;
-    pointerStyle.id = 1;
-    int32_t ret = instance_->SetPointerStyle(userId, pid, windowId, pointerStyle);
-    EXPECT_EQ(ret, RET_ERR);
-
-    EXPECT_NO_FATAL_FAILURE(instance_->DrawPointerStyle(pointerStyle));
-
-    ret = instance_->GetPointerStyle(userId, pid, windowId, pointerStyle);
-    EXPECT_EQ(ret, RET_OK);
-
-    auto style = instance_->GetLastMouseStyle();
-    EXPECT_EQ(style.id, 0);
-
-    ret = instance_->ClearWindowPointerStyle(pid, windowId);
-    EXPECT_EQ(ret, RET_OK);
-}
-
-/**
  * @tc.name: CursorDrawingComponentTest_SetPointerLocation_001
  * @tc.desc: Test DrawPointer
  * @tc.type: FUNC

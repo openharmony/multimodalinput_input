@@ -70,6 +70,7 @@ HWTEST_F(JoystickEventNormalizeTest, InputDeviceObserver_OnDeviceAdded_001, Test
     int32_t deviceId { 2 };
     auto inputDev = std::make_shared<NiceMock<InputDeviceManagerMock::HiddenInputDevice>>();
     EXPECT_CALL(*inputDev, IsJoystick).WillRepeatedly(Return(true));
+    EXPECT_CALL(*inputDev, GetName).WillRepeatedly(Return("TestJoystick"));
     struct libinput_device rawDev {};
     EXPECT_CALL(*inputDev, GetRawDevice).WillRepeatedly(Return(&rawDev));
     INPUT_DEV_MGR->AddInputDevice(deviceId, inputDev);
@@ -168,6 +169,7 @@ HWTEST_F(JoystickEventNormalizeTest, JoystickEventNormalizeTest_OnDeviceAdded_00
     int32_t deviceId { 2 };
     auto inputDev = std::make_shared<NiceMock<InputDeviceManagerMock::HiddenInputDevice>>();
     EXPECT_CALL(*inputDev, IsJoystick).WillRepeatedly(Return(true));
+    EXPECT_CALL(*inputDev, GetName).WillRepeatedly(Return("TestJoystick"));
     struct libinput_device rawDev {};
     EXPECT_CALL(*inputDev, GetRawDevice).WillRepeatedly(Return(&rawDev));
     INPUT_DEV_MGR->AddInputDevice(deviceId, inputDev);
