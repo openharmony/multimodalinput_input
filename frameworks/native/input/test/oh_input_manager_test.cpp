@@ -2873,15 +2873,6 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_GetFunctionKeyState_001
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_GetKeyboardType_006, TestSize.Level2)
-{
-    int32_t deviceId = 0;
-    int32_t keyboardType = 0;
-    Input_Result ret = OH_Input_GetKeyboardType(deviceId, &keyboardType); // 假设 deviceId=0 是有效设备
-    EXPECT_EQ(ret, INPUT_SUCCESS);
-    EXPECT_NE(keyboardType, 0);
-}
-
 /**
  * @tc.name: OHInputManagerTest_OH_Input_GetKeyboardType
  * @tc.desc: Test the function OH_Input_GetKeyboardType

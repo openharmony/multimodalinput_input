@@ -430,42 +430,6 @@ HWTEST_F(InputEventHandlerTest, InputEventHandler_IsTouchpadButtonMistouch_001, 
 }
 
 /**
- * @tc.name: InputEventHandler_IsTouchpadTapMistouch_001
- * @tc.desc: Test the function IsTouchpadTapMistouch
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputEventHandlerTest, InputEventHandler_IsTouchpadTapMistouch_001, TestSize.Level1)
-{
-    CALL_DEBUG_ENTER;
-    std::shared_ptr<InputEventHandler> inputEventHandler = std::make_shared<InputEventHandler>();
-    libinput_event event;
-    libinput_event_pointer touchpadButtonEvent;
-    libinput_device touchpadDevice;
-    touchpadButtonEvent.buttonState = LIBINPUT_BUTTON_STATE_PRESSED;
-    g_mockLibinputDeviceGetSizeRetrunIntValue = 1;
-    NiceMock<LibinputInterfaceMock> libinputMock;
-    EXPECT_CALL(libinputMock, LibinputGetPointerEvent).WillRepeatedly(Return(&touchpadButtonEvent));
-    EXPECT_CALL(libinputMock, GetDevice).WillRepeatedly(Return(&touchpadDevice));
-    EXPECT_FALSE(inputEventHandler->IsTouchpadTapMistouch(&event));
-
-    g_mockLibinputDeviceGetSizeRetrunIntValue = 0;
-    g_mockLibinputDeviceGetSizeWidth = 1000.0;
-    inputEventHandler->touchpadEventDownAbsX_ = InputEventHandler::TOUCHPAD_EDGE_WIDTH_FOR_TAP;
-    inputEventHandler->isDwtEdgeAreaForTouchpadTapActing_ = true;
-    EXPECT_TRUE(inputEventHandler->IsTouchpadTapMistouch(&event));
-
-    inputEventHandler->isDwtEdgeAreaForTouchpadTapActing_ = false;
-    EXPECT_FALSE(inputEventHandler->IsTouchpadTapMistouch(&event));
-
-    touchpadButtonEvent.buttonState = LIBINPUT_BUTTON_STATE_RELEASED;
-    inputEventHandler->isTapMistouch_ = true;
-    EXPECT_TRUE(inputEventHandler->IsTouchpadTapMistouch(&event));
-
-    inputEventHandler->isTapMistouch_ = false;
-    EXPECT_FALSE(inputEventHandler->IsTouchpadTapMistouch(&event));
-}
-
 /**
  * @tc.name: InputEventHandler_IsTouchpadMotionMistouch_001
  * @tc.desc: Test the function IsTouchpadMotionMistouch

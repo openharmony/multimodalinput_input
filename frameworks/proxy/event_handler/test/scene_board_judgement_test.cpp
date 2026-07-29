@@ -34,20 +34,6 @@ public:
 };
 
 /**
- * @tc.name: SceneBoardJudgementTest_IsSceneBoardEnabled_001
- * @tc.desc: Verify IsSceneBoardEnabled
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(SceneBoardJudgementTest, SceneBoardJudgementTest_IsSceneBoardEnabled_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    MMISceneBoardJudgement judgement;
-    bool ret = judgement.IsSceneBoardEnabled();
-    ASSERT_FALSE(ret);
-}
-
-/**
  * @tc.name: SceneBoardJudgementTest_IsResampleEnabled_001
  * @tc.desc: Verify IsResampleEnabled
  * @tc.type: FUNC

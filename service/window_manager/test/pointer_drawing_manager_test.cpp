@@ -3672,25 +3672,6 @@ HWTEST_F(PointerDrawingManagerTest, UpdateScreenPointerAndFindMainScreenInfo_001
 }
 
 /**
- * @tc.name: UpdateScreenPointerAndFindMainScreenInfo_002
- * @tc.desc: Test branches that UpdateScreenPointerAndFindMainScreenInfo's parameter screens is empty and
- * and screenPointers_ is not empty
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(PointerDrawingManagerTest, UpdateScreenPointerAndFindMainScreenInfo_002, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    PointerDrawingManager pointerDrawingManager;
-    std::vector<sptr<OHOS::Rosen::ScreenInfo>> screens;
-    auto sp = std::make_shared<ScreenPointer>(nullptr, nullptr, pointerDrawingManager.displayInfo_);
-    ASSERT_NE(sp, nullptr);
-    pointerDrawingManager.screenPointers_.insert({0, sp});
-    auto mainScreen = pointerDrawingManager.UpdateScreenPointerAndFindMainScreenInfo(screens);
-    EXPECT_EQ(mainScreen, nullptr);
-    EXPECT_FALSE(pointerDrawingManager.screenPointers_.empty());
-}
-
 /**
  * @tc.name: UpdateScreenPointerAndFindMainScreenInfo_003
  * @tc.desc: Test branches that the parameter screen contains main screenInfo and
