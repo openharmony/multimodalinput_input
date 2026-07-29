@@ -99,6 +99,9 @@ static const std::vector<int32_t> GAMEPAD_KEYCODES = {
     KeyEvent::KEYCODE_BUTTON_MODE
 };
 
+static const std::vector<int32_t> ALPHA_KEYCODES = {
+    KeyEvent::KEYCODE_Q
+};
 } // namespace
 
 std::shared_ptr<InputDeviceManager> InputDeviceManager::instance_ = nullptr;
@@ -480,20 +483,39 @@ int32_t InputDeviceManager::SupportKeys(int32_t deviceId, std::vector<int32_t> &
 }
 
 bool InputDeviceManager::IsMatchDeviceKeys(
-    int32_t deviceId, struct libinput_device *device, const std::vector<int32_t> &keyCodes) const
+    int32_t deviceId, struct libinput_device *device, const std::vector<int32_t> &keyCodes, MATCH_TYPE matchType) const
 {
     if (device == nullptr) {
-        MMI_HILOGE("Input device is nullptr");
+        MMI_HILOGE("device is nullptr");
         return false;
     }
-    for (const auto &item : keyCodes) {
-        for (const auto &it : KeyMapMgr->InputTransferKeyValue(deviceId, item)) {
-            if (libinput_device_has_key(device, it) == SUPPORT_KEY) {
+
+    // Helper lambda: returns true if any mapped key for `key` exists on `device`.
+    auto hasMappedKey = [&](int32_t key) -> bool {
+        for (const auto &mapped : KeyMapMgr->InputTransferKeyValue(deviceId, key)) {
+            if (libinput_device_has_key(device, mapped) == SUPPORT_KEY) {
                 return true;
             }
         }
+        return false;
+    };
+
+    if (matchType == MATCH_TYPE::ANY) {
+        for (const auto &key : keyCodes) {
+            if (hasMappedKey(key)) {
+                return true;
+            }
+        }
+        return false;
     }
-    return false;
+
+    // MATCH_TYPE::AND: all keys must be present (after mapping)
+    for (const auto &key : keyCodes) {
+        if (!hasMappedKey(key)) {
+            return false;
+        }
+    }
+    return true;
 }
 
 bool InputDeviceManager::IsMatchKeys(struct libinput_device *device, const std::vector<int32_t> &keyCodes) const
@@ -544,7 +566,7 @@ std::vector<int32_t> InputDeviceManager::GetInputDeviceClassKeyCodes(InputDevice
         case InputDeviceClass::DPAD:
             return DPAD_REQUIRED_KEYCODES;
         case InputDeviceClass::ALPHAKEY:
-            return { KeyEvent::KEYCODE_Q };
+            return ALPHA_KEYCODES;
         default:
             return std::vector<int32_t>();
     }
@@ -567,7 +589,8 @@ bool InputDeviceManager::HasInputDeviceClass(int32_t deviceId, InputDeviceClass 
         MMI_HILOGE("Invalid device class");
         return false;
     }
-    return IsMatchDeviceKeys(deviceId, iter->second.inputDeviceOrigin, keyCodes);
+    MATCH_TYPE matchType = deviceClass == InputDeviceClass::DPAD ? MATCH_TYPE::AND : MATCH_TYPE::ANY;
+    return IsMatchDeviceKeys(deviceId, iter->second.inputDeviceOrigin, keyCodes, matchType);
 }
 
 int32_t InputDeviceManager::GetDeviceSupportKey(int32_t deviceId, int32_t &keyboardType)

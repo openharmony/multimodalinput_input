@@ -3288,5 +3288,271 @@ HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_ForOneDevice_002, TestSi
     
     INPUT_DEV_MGR->inputDevice_.clear();
 }
+
+
+// ==================== GetInputDeviceClassKeyCodes 测试 ====================
+
+/**
+ * @tc.name: InputDeviceManagerTest_GetInputDeviceClassKeyCodes_Gamepad
+ * @tc.desc: Test GetInputDeviceClassKeyCodes returns GAMEPAD_KEYCODES for GAMEPAD
+ * @tc.type: FUNC
+ */
+HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_GetInputDeviceClassKeyCodes_Gamepad, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputDeviceManager inputDevice;
+    auto keyCodes = inputDevice.GetInputDeviceClassKeyCodes(InputDeviceClass::GAMEPAD);
+    EXPECT_FALSE(keyCodes.empty());
+    EXPECT_EQ(keyCodes.size(), 15u);
+    EXPECT_NE(std::find(keyCodes.begin(), keyCodes.end(), KeyEvent::KEYCODE_BUTTON_A), keyCodes.end());
+    EXPECT_NE(std::find(keyCodes.begin(), keyCodes.end(), KeyEvent::KEYCODE_BUTTON_MODE), keyCodes.end());
+}
+
+/**
+ * @tc.name: InputDeviceManagerTest_GetInputDeviceClassKeyCodes_Dpad
+ * @tc.desc: Test GetInputDeviceClassKeyCodes returns DPAD_REQUIRED_KEYCODES for DPAD
+ * @tc.type: FUNC
+ */
+HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_GetInputDeviceClassKeyCodes_Dpad, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputDeviceManager inputDevice;
+    auto keyCodes = inputDevice.GetInputDeviceClassKeyCodes(InputDeviceClass::DPAD);
+    EXPECT_FALSE(keyCodes.empty());
+    EXPECT_EQ(keyCodes.size(), 5u);
+    EXPECT_NE(std::find(keyCodes.begin(), keyCodes.end(), KeyEvent::KEYCODE_DPAD_UP), keyCodes.end());
+    EXPECT_NE(std::find(keyCodes.begin(), keyCodes.end(), KeyEvent::KEYCODE_DPAD_CENTER), keyCodes.end());
+}
+
+/**
+ * @tc.name: InputDeviceManagerTest_GetInputDeviceClassKeyCodes_Alphakey
+ * @tc.desc: Test GetInputDeviceClassKeyCodes returns ALPHA_KEYCODES for ALPHAKEY
+ * @tc.type: FUNC
+ */
+HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_GetInputDeviceClassKeyCodes_Alphakey, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputDeviceManager inputDevice;
+    auto keyCodes = inputDevice.GetInputDeviceClassKeyCodes(InputDeviceClass::ALPHAKEY);
+    EXPECT_FALSE(keyCodes.empty());
+    EXPECT_EQ(keyCodes.size(), 1u);
+    EXPECT_NE(std::find(keyCodes.begin(), keyCodes.end(), KeyEvent::KEYCODE_Q), keyCodes.end());
+}
+
+/**
+ * @tc.name: InputDeviceManagerTest_GetInputDeviceClassKeyCodes_InvalidClass
+ * @tc.desc: Test GetInputDeviceClassKeyCodes returns empty vector for invalid class
+ * @tc.type: FUNC
+ */
+HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_GetInputDeviceClassKeyCodes_InvalidClass, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputDeviceManager inputDevice;
+    auto invalidClass = static_cast<InputDeviceClass>(100);
+    auto keyCodes = inputDevice.GetInputDeviceClassKeyCodes(invalidClass);
+    EXPECT_TRUE(keyCodes.empty());
+}
+
+// ==================== IsMatchDeviceKeys 测试 ====================
+
+/**
+ * @tc.name: InputDeviceManagerTest_IsMatchDeviceKeys_NullDevice
+ * @tc.desc: Test IsMatchDeviceKeys returns false when device is nullptr
+ * @tc.type: FUNC
+ */
+HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_IsMatchDeviceKeys_NullDevice, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputDeviceManager inputDevice;
+    std::vector<int32_t> keyCodes = {KeyEvent::KEYCODE_Q};
+    EXPECT_FALSE(inputDevice.IsMatchDeviceKeys(1, nullptr, keyCodes, MATCH_TYPE::ANY));
+    EXPECT_FALSE(inputDevice.IsMatchDeviceKeys(1, nullptr, keyCodes, MATCH_TYPE::AND));
+}
+
+/**
+ * @tc.name: InputDeviceManagerTest_IsMatchDeviceKeys_NullDeviceOrigin_Any
+ * @tc.desc: Test IsMatchDeviceKeys with MATCH_TYPE::ANY when inputDeviceOrigin is nullptr returns false
+ * @tc.type: FUNC
+ */
+HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_IsMatchDeviceKeys_NullDeviceOrigin_Any, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputDeviceManager inputDevice;
+    InputDeviceManager::InputDeviceInfo info;
+    info.enable = true;
+    info.inputDeviceOrigin = nullptr;
+    inputDevice.inputDevice_[1] = info;
+
+    std::vector<int32_t> keyCodes = {KeyEvent::KEYCODE_Q};
+    bool ret = inputDevice.IsMatchDeviceKeys(1, info.inputDeviceOrigin, keyCodes, MATCH_TYPE::ANY);
+    EXPECT_FALSE(ret);
+}
+
+/**
+ * @tc.name: InputDeviceManagerTest_IsMatchDeviceKeys_NullDeviceOrigin_And
+ * @tc.desc: Test IsMatchDeviceKeys with MATCH_TYPE::AND when inputDeviceOrigin is nullptr returns false
+ * @tc.type: FUNC
+ */
+HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_IsMatchDeviceKeys_NullDeviceOrigin_And, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputDeviceManager inputDevice;
+    InputDeviceManager::InputDeviceInfo info;
+    info.enable = true;
+    info.inputDeviceOrigin = nullptr;
+    inputDevice.inputDevice_[1] = info;
+
+    std::vector<int32_t> keyCodes = {KeyEvent::KEYCODE_Q, KeyEvent::KEYCODE_DPAD_UP};
+    bool ret = inputDevice.IsMatchDeviceKeys(1, info.inputDeviceOrigin, keyCodes, MATCH_TYPE::AND);
+    EXPECT_FALSE(ret);
+}
+
+/**
+ * @tc.name: InputDeviceManagerTest_IsMatchDeviceKeys_EmptyKeyCodes_Any
+ * @tc.desc: Test IsMatchDeviceKeys with MATCH_TYPE::ANY, nullptr device and empty keyCodes returns false
+ * @tc.type: FUNC
+ */
+HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_IsMatchDeviceKeys_EmptyKeyCodes_Any, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputDeviceManager inputDevice;
+    std::vector<int32_t> keyCodes;
+    bool ret = inputDevice.IsMatchDeviceKeys(1, nullptr, keyCodes, MATCH_TYPE::ANY);
+    EXPECT_FALSE(ret);
+}
+
+/**
+ * @tc.name: InputDeviceManagerTest_IsMatchDeviceKeys_EmptyKeyCodes_And
+ * @tc.desc: Test IsMatchDeviceKeys with MATCH_TYPE::AND, nullptr device and empty keyCodes returns false
+ * @tc.type: FUNC
+ */
+HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_IsMatchDeviceKeys_EmptyKeyCodes_And, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputDeviceManager inputDevice;
+    std::vector<int32_t> keyCodes;
+    bool ret = inputDevice.IsMatchDeviceKeys(1, nullptr, keyCodes, MATCH_TYPE::AND);
+    EXPECT_FALSE(ret);
+}
+
+// ==================== HasInputDeviceClass 测试 ====================
+
+/**
+ * @tc.name: InputDeviceManagerTest_HasInputDeviceClass_DeviceNotFound
+ * @tc.desc: Test HasInputDeviceClass returns false when deviceId not found
+ * @tc.type: FUNC
+ */
+HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_HasInputDeviceClass_DeviceNotFound, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputDeviceManager inputDevice;
+    EXPECT_FALSE(inputDevice.HasInputDeviceClass(999, InputDeviceClass::GAMEPAD));
+}
+
+/**
+ * @tc.name: InputDeviceManagerTest_HasInputDeviceClass_DeviceDisabled
+ * @tc.desc: Test HasInputDeviceClass returns false when device is disabled
+ * @tc.type: FUNC
+ */
+HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_HasInputDeviceClass_DeviceDisabled, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputDeviceManager inputDevice;
+    InputDeviceManager::InputDeviceInfo info;
+    info.enable = false;
+    inputDevice.inputDevice_[1] = info;
+    EXPECT_FALSE(inputDevice.HasInputDeviceClass(1, InputDeviceClass::GAMEPAD));
+}
+
+/**
+ * @tc.name: InputDeviceManagerTest_HasInputDeviceClass_InvalidClass
+ * @tc.desc: Test HasInputDeviceClass returns false for invalid device class (empty keyCodes)
+ * @tc.type: FUNC
+ */
+HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_HasInputDeviceClass_InvalidClass, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputDeviceManager inputDevice;
+    InputDeviceManager::InputDeviceInfo info;
+    info.enable = true;
+    info.inputDeviceOrigin = nullptr;
+    inputDevice.inputDevice_[1] = info;
+    auto invalidClass = static_cast<InputDeviceClass>(100);
+    EXPECT_FALSE(inputDevice.HasInputDeviceClass(1, invalidClass));
+}
+
+/**
+ * @tc.name: InputDeviceManagerTest_HasInputDeviceClass_Gamepad_NullDeviceOrigin
+ * @tc.desc: Test HasInputDeviceClass with GAMEPAD and nullptr inputDeviceOrigin returns false
+ * @tc.type: FUNC
+ */
+HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_HasInputDeviceClass_Gamepad_NullDeviceOrigin, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputDeviceManager inputDevice;
+    InputDeviceManager::InputDeviceInfo info;
+    info.enable = true;
+    info.inputDeviceOrigin = nullptr;
+    inputDevice.inputDevice_[1] = info;
+    bool ret = inputDevice.HasInputDeviceClass(1, InputDeviceClass::GAMEPAD);
+    EXPECT_FALSE(ret);
+}
+
+/**
+ * @tc.name: InputDeviceManagerTest_HasInputDeviceClass_Dpad_NullDeviceOrigin
+ * @tc.desc: Test HasInputDeviceClass with DPAD and nullptr inputDeviceOrigin returns false
+ * @tc.type: FUNC
+ */
+HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_HasInputDeviceClass_Dpad_NullDeviceOrigin, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputDeviceManager inputDevice;
+    InputDeviceManager::InputDeviceInfo info;
+    info.enable = true;
+    info.inputDeviceOrigin = nullptr;
+    inputDevice.inputDevice_[1] = info;
+    bool ret = inputDevice.HasInputDeviceClass(1, InputDeviceClass::DPAD);
+    EXPECT_FALSE(ret);
+}
+
+/**
+ * @tc.name: InputDeviceManagerTest_HasInputDeviceClass_Alphakey_NullDeviceOrigin
+ * @tc.desc: Test HasInputDeviceClass with ALPHAKEY and nullptr inputDeviceOrigin returns false
+ * @tc.type: FUNC
+ */
+HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_HasInputDeviceClass_Alphakey_NullDeviceOrigin, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputDeviceManager inputDevice;
+    InputDeviceManager::InputDeviceInfo info;
+    info.enable = true;
+    info.inputDeviceOrigin = nullptr;
+    inputDevice.inputDevice_[1] = info;
+    bool ret = inputDevice.HasInputDeviceClass(1, InputDeviceClass::ALPHAKEY);
+    EXPECT_FALSE(ret);
+}
+
+/**
+ * @tc.name: InputDeviceManagerTest_HasInputDeviceClass_MultipleDevices
+ * @tc.desc: Test HasInputDeviceClass with multiple devices in inputDevice_ map
+ * @tc.type: FUNC
+ */
+HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_HasInputDeviceClass_MultipleDevices, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputDeviceManager inputDevice;
+    InputDeviceManager::InputDeviceInfo info1;
+    info1.enable = true;
+    info1.inputDeviceOrigin = nullptr;
+    inputDevice.inputDevice_[1] = info1;
+
+    InputDeviceManager::InputDeviceInfo info2;
+    info2.enable = false;
+    info2.inputDeviceOrigin = nullptr;
+    inputDevice.inputDevice_[2] = info2;
+
+    EXPECT_FALSE(inputDevice.HasInputDeviceClass(2, InputDeviceClass::GAMEPAD));
+    EXPECT_FALSE(inputDevice.HasInputDeviceClass(3, InputDeviceClass::GAMEPAD));
+}
 } // namespace MMI
 } // namespace OHOS
