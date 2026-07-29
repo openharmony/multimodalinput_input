@@ -27,28 +27,10 @@
 namespace OHOS {
 namespace MMI {
 
-class SuspendStateObserver : public ResourceSchedule::SuspendStateObserverBaseStub {
-public:
-    ~SuspendStateObserver();
-    static sptr<SuspendStateObserver> GetInstance();
-    virtual ErrCode OnActive(const std::vector<int32_t> &pidList, int32_t uid) override;
-    virtual ErrCode OnDoze(const std::vector<int32_t> &pidList, int32_t uid) override
-    {
-        return RET_OK;
-    }
-    virtual ErrCode OnFrozen(const std::vector<int32_t> &pidList, int32_t uid) override;
-    bool IsFrozenPid(int32_t pid);
-    std::unordered_set<int32_t> GetFrozenPidList();
-
-private:
-    std::mutex mutex_;
-    std::unordered_set<int32_t> frozenPidList_;
-};
-
 class SuspendStateManager {
 public:
     SuspendStateManager();
-    ~SuspendStateManager();
+    ~SuspendStateManager() = default;
     DISALLOW_COPY_AND_MOVE(SuspendStateManager);
 
     static SuspendStateManager &GetInstance();
@@ -61,6 +43,25 @@ public:
     void Dump(int32_t fd);
 
 private:
+    class SuspendStateObserver : public ResourceSchedule::SuspendStateObserverBaseStub {
+    public:
+        static sptr<SuspendStateObserver> GetInstance();
+        virtual ErrCode OnActive(const std::vector<int32_t> &pidList, int32_t uid) override;
+        virtual ErrCode OnDoze(const std::vector<int32_t> &pidList, int32_t uid) override
+        {
+            return RET_OK;
+        }
+        virtual ErrCode OnFrozen(const std::vector<int32_t> &pidList, int32_t uid) override;
+        bool IsFrozenPid(int32_t pid);
+        void ClearFrozenPidList();
+        std::unordered_set<int32_t> GetFrozenPidList();
+
+    private:
+        ~SuspendStateObserver();
+        std::mutex mutex_;
+        std::unordered_set<int32_t> frozenPidList_;
+    };
+
     sptr<SuspendStateObserver> suspendStateObserver_;
     std::atomic_bool isRssSaReady_ { false };
     std::atomic_bool isSuspendManagerSaReady_ { false };

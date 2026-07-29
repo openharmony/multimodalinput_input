@@ -31,6 +31,9 @@
 #include "resource_decompress.h"
 #include "timer_manager.h"
 #include "i_setting_manager.h"
+#ifdef OHOS_SUSPEND_STATE_MANAGER
+#include "suspend_state_manager.h"
+#endif //OHOS_SUSPEND_STATE_MANAGER
 
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "CursorDrawingComponent"
@@ -1072,6 +1075,13 @@ int32_t CursorDrawingInformation::GetPointerStyle(int32_t userId, int32_t pid, i
         INPUT_SETTING_MANAGER->GetIntValue(userId, MOUSE_KEY_SETTING, FIELD_MOUSE_POINTER_SIZE, pointerStyle.size);
         int32_t style = DEFAULT_POINTER_STYLE;
         INPUT_SETTING_MANAGER->GetIntValue(userId, MOUSE_KEY_SETTING, FIELD_MOUSE_POINTER_STYLE, style);
+#ifdef OHOS_SUSPEND_STATE_MANAGER
+        if (SuspendStateManager::GetInstance().IsFrozen(pid)) {
+            pointerStyle.id = MOUSE_ICON::LOADING;
+            MMI_HILOGD("Getting frozen pointer style:%{public}d", pointerStyle.id);
+            return RET_OK;
+        }
+#endif //OHOS_SUSPEND_STATE_MANAGER
         MMI_HILOGD("Get pointer style successfully, pointerStyle:%{public}d", style);
         if (style == CURSOR_CIRCLE_STYLE || style == AECH_DEVELOPER_DEFINED_STYLE) {
             pointerStyle.id = style;
