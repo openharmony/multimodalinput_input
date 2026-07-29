@@ -575,7 +575,7 @@ HWTEST_F(KeyEventNormalizeTest, KeyEventNormalizeTest_KeyEventAutoUp_InvalidTime
 HWTEST_F(KeyEventNormalizeTest, KeyEventNormalizeTest_SyncLedStateFromKeyEvent_Nullptr, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    EXPECT_EQ(KeyEventHdr->SyncLedStateFromKeyEvent(nullptr), false);
+    EXPECT_NO_FATAL_FAILURE(KeyEventHdr->SyncLedStateFromKeyEvent(nullptr));
 }
 
 /**
