@@ -1223,7 +1223,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_021, TestSize.Leve
     InputManager::GetInstance()->UnsubscribeKeyEvent(subscribeId);
     std::this_thread::sleep_for(std::chrono::milliseconds(SLEEP_MILLISECONDS));
 }
-/**
+
 static int32_t g_deviceIDtest = 0;
 static void GetKeyboardTypeCallback(int32_t keyboardType)
 {
