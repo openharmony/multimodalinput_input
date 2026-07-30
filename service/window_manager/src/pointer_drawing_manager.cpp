@@ -368,7 +368,6 @@ void PointerDrawingManager::ClearResources()
         }
     }
     UnsubscribeScreenModeChange();
-    INPUT_DEV_MGR->Detach(self_);
     Rosen::RSInterfaces::GetInstance().SetOnRemoteDiedCallback(nullptr);
     ResetMoveRetryTimer();
     if (initLoadingAndLoadingRightPixelTimerId_ != DEFAULT_VALUE) {
@@ -4060,6 +4059,7 @@ void PointerDrawingManager::UpdatePointerItemCursorInfo(PointerEvent::PointerIte
 
 void PointerDrawingManager::AllPointerDeviceRemoved()
 {
+    INPUT_DEV_MGR->Detach(self_);
     UnsubscribeScreenModeChange();
     DestroyPointerWindowOfHardCursor();
 }
