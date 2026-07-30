@@ -2928,6 +2928,7 @@ HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_DoHa
 
     int32_t result = manager->DoHandleEvent(keyEvent, data, mockPlugin1.get());
     EXPECT_EQ(result, RET_NOTDO);
+    manager->plugins_.clear();
 }
 /**
  * @tc.name: MultimodalInputPluginManagerTest_InputPlugin_AddTimer_Overflow_001
