@@ -28,7 +28,6 @@ namespace OHOS {
 namespace MMI {
 namespace {
 constexpr int32_t DEFAULT_DEVICE_ID { 0 };
-constexpr int32_t TIME_WAIT_FOR_OP { 50 };
 }
 using namespace testing::ext;
 
