@@ -79,6 +79,8 @@ public:
     void DispatchEvent(PluginEventType pluginEvent, int64_t frameTime) override;
     void DispatchEvent(PluginEventType pluginEvent, InputDispatchStage stage) override;
     void DispatchEvent(NetPacket &pkt, int32_t pid) override;
+    void NotifyInputActive(std::shared_ptr<KeyEvent> keyEvent) override;
+    void NotifyInputActive(std::shared_ptr<PointerEvent> pointerEvent) override;
     void HandleMonitorStatus(bool monitorStatus, const std::string &monitorType) override;
     std::string GetFocusedAppInfo() override;
     bool IsFingerPressed() const override;

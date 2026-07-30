@@ -41,6 +41,8 @@ public:
 #endif // OHOS_BUILD_ENABLE_SWITCH
     int32_t SubscribeInputActive(SessionPtr sess, int32_t subscribeId, int64_t interval);
     int32_t UnsubscribeInputActive(SessionPtr sess, int32_t subscribeId);
+    void NotifyInputActive(const std::shared_ptr<KeyEvent> keyEvent);
+    void NotifyInputActive(const std::shared_ptr<PointerEvent> pointerEvent);
     void Dump(int32_t fd, const std::vector<std::string> &args);
 private:
     enum EventType : uint32_t {
