@@ -6173,6 +6173,41 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
                 auto& deviceMap = ancoTouchDownInfos_[pointerEvent->GetDeviceId()];
                 deviceMap[pointerId] = WindowInfoEX{ *touchWindow, true };
             }
+            // hide cursor when touch anco window
+#if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
+            if (pointerItem.GetToolType() == PointerEvent::TOOL_TYPE_THP_FEATURE) {
+                return RET_OK;
+            }
+            if (IsNeedDrawPointer(pointerItem)) {
+                return RET_OK;
+            }
+            if (POINTER_DEV_MGR.mouseDisplayState) {
+                bool checkExtraData = extraData_.appended &&
+                    extraData_.sourceType == PointerEvent::SOURCE_TYPE_TOUCHSCREEN &&
+                    ((pointerItem.GetToolType() == PointerEvent::TOOL_TYPE_FINGER &&
+                    extraData_.pointerId == pointerId) ||
+                    pointerItem.GetToolType() == PointerEvent::TOOL_TYPE_PEN);
+                checkExtraData = checkExtraData ||
+                    (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_PULL_UP);
+                if ((!checkExtraData) && (!(extraData_.appended &&
+                    extraData_.sourceType == PointerEvent::SOURCE_TYPE_MOUSE)) &&
+                    !pointerEvent->HasFlag(InputEvent::EVENT_FLAG_SHOW_CUSOR_WITH_TOUCH) &&
+                    timerId_ == DEFAULT_VALUE) {
+                    bool gestureInject = false;
+                    if ((pointerEvent->HasFlag(InputEvent::EVENT_FLAG_SIMULATE)) &&
+                        MMI_GNE(pointerEvent->GetZOrder(), 0.0f)) {
+                        gestureInject = true;
+                    } else {
+                        gestureInject = groupId != MAIN_GROUPID ? true : gestureInject;
+                    }
+                    timerId_ = TimerMgr->AddTimer(REPEAT_COOLING_TIME, REPEAT_ONCE, [this, gestureInject]() {
+                        MMI_HILOGI("anco touch hide cursor, gestureInject=%{public}d", gestureInject);
+                        HandleGestureInjection(gestureInject);
+                        timerId_ = DEFAULT_VALUE;
+                    }, "InputWindowsManager");
+                }
+            }
+#endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
             return RET_OK;
         }
         if (isExtraData) {
@@ -6341,6 +6376,7 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
             if (!pointerEvent->HasFlag(InputEvent::EVENT_FLAG_SHOW_CUSOR_WITH_TOUCH) && timerId_ == DEFAULT_VALUE) {
                 timerId_ = TimerMgr->AddTimer(REPEAT_COOLING_TIME, REPEAT_ONCE, [this, gestureInject]() {
                     DispatchPointer(PointerEvent::POINTER_ACTION_LEAVE_WINDOW);
+                    MMI_HILOGI("touch hide cursor, gestureInject=%{public}d", gestureInject);
                     HandleGestureInjection(gestureInject);
                     timerId_ = DEFAULT_VALUE;
                 }, "InputWindowsManager");
