@@ -72,6 +72,7 @@ ohos_unittest("MultimodalEventHandlerTest") {
     "${mmi_path}/frameworks/proxy/event_handler/src/input_device_consumer.cpp",
     "${mmi_path}/frameworks/proxy/event_handler/src/input_device_consumer_proxy.cpp",
     "${mmi_path}/frameworks/proxy/event_handler/src/input_manager_impl.cpp",
+    "${mmi_path}/frameworks/proxy/event_handler/src/pointer_event_recorder.cpp",
     "${mmi_path}/frameworks/proxy/event_handler/src/key_event_input_subscribe_manager.cpp",
     "${mmi_path}/frameworks/proxy/event_handler/src/long_press_event_subscribe_manager.cpp",
     "${mmi_path}/frameworks/proxy/event_handler/src/multimodal_event_handler.cpp",

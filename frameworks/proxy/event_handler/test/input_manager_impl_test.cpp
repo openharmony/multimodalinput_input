@@ -26,6 +26,7 @@
 #include "multimodal_event_handler.h"
 #include "multimodal_input_connect_manager.h"
 #include "net_packet.h"
+#include "pointer_event_recorder.h"
 #include "touch_controller_impl.h"
 
 
@@ -3551,6 +3552,284 @@ HWTEST_F(InputManagerImplTest, InputManagerImplTest_SendWindowInfo_Trace_002, Te
     impl->windowGroupInfo_.displayId = 0;
     int32_t result = impl->SendWindowInfo();
     EXPECT_EQ(result, RET_OK);
+}
+
+/**
+ * @tc.name: PointerEventRecorder_Enable_001
+ * @tc.desc: AC-1.1 Enable with valid maxCount
+ * @tc.type: FUNC
+ */
+HWTEST_F(InputManagerImplTest, PointerEventRecorder_Enable_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerEventRecorder recorder;
+    int32_t ret = recorder.Enable(50);
+    EXPECT_EQ(ret, RET_OK);
+    auto event = PointerEvent::Create();
+    CHKPV(event);
+    event->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
+    recorder.PushEvent(event);
+    std::vector<std::shared_ptr<PointerEvent>> list;
+    ret = recorder.Query(list);
+    EXPECT_EQ(ret, RET_OK);
+    EXPECT_EQ(list.size(), 1u);
+}
+
+/**
+ * @tc.name: PointerEventRecorder_Enable_002
+ * @tc.desc: AC-1.2 Enable with maxCount > 100, clamp to 100
+ * @tc.type: FUNC
+ */
+HWTEST_F(InputManagerImplTest, PointerEventRecorder_Enable_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerEventRecorder recorder;
+    int32_t ret = recorder.Enable(101);
+    EXPECT_EQ(ret, RET_OK);
+    for (int32_t i = 0; i < 101; ++i) {
+        auto event = PointerEvent::Create();
+        CHKPV(event);
+        event->SetActionTime(i);
+        recorder.PushEvent(event);
+    }
+    std::vector<std::shared_ptr<PointerEvent>> list;
+    ret = recorder.Query(list);
+    EXPECT_EQ(ret, RET_OK);
+    EXPECT_EQ(list.size(), 100u);
+    EXPECT_EQ(list.front()->GetActionTime(), 1);
+    EXPECT_EQ(list.back()->GetActionTime(), 100);
+}
+
+/**
+ * @tc.name: PointerEventRecorder_Enable_003
+ * @tc.desc: AC-1.3 Enable with maxCount <= 0, reject
+ * @tc.type: FUNC
+ */
+HWTEST_F(InputManagerImplTest, PointerEventRecorder_Enable_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerEventRecorder recorder;
+    EXPECT_EQ(recorder.Enable(0), RET_ERR);
+    EXPECT_EQ(recorder.Enable(-1), RET_ERR);
+    std::vector<std::shared_ptr<PointerEvent>> list;
+    recorder.Query(list);
+    EXPECT_TRUE(list.empty());
+}
+
+/**
+ * @tc.name: PointerEventRecorder_Enable_004
+ * @tc.desc: AC-1.4 Re-enable clears old buffer
+ * @tc.type: FUNC
+ */
+HWTEST_F(InputManagerImplTest, PointerEventRecorder_Enable_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerEventRecorder recorder;
+    EXPECT_EQ(recorder.Enable(10), RET_OK);
+    auto event = PointerEvent::Create();
+    CHKPV(event);
+    recorder.PushEvent(event);
+    recorder.PushEvent(event);
+    recorder.PushEvent(event);
+    EXPECT_EQ(recorder.Enable(20), RET_OK);
+    std::vector<std::shared_ptr<PointerEvent>> list;
+    recorder.Query(list);
+    EXPECT_TRUE(list.empty());
+}
+
+/**
+ * @tc.name: PointerEventRecorder_Disable_001
+ * @tc.desc: AC-2.1 Disable clears buffer
+ * @tc.type: FUNC
+ */
+HWTEST_F(InputManagerImplTest, PointerEventRecorder_Disable_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerEventRecorder recorder;
+    EXPECT_EQ(recorder.Enable(10), RET_OK);
+    auto event = PointerEvent::Create();
+    CHKPV(event);
+    recorder.PushEvent(event);
+    EXPECT_EQ(recorder.Disable(), RET_OK);
+    std::vector<std::shared_ptr<PointerEvent>> list;
+    recorder.Query(list);
+    EXPECT_TRUE(list.empty());
+}
+
+/**
+ * @tc.name: PointerEventRecorder_Disable_002
+ * @tc.desc: AC-2.2 Disable when not enabled, no-op
+ * @tc.type: FUNC
+ */
+HWTEST_F(InputManagerImplTest, PointerEventRecorder_Disable_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerEventRecorder recorder;
+    EXPECT_EQ(recorder.Disable(), RET_OK);
+}
+
+/**
+ * @tc.name: PointerEventRecorder_Query_001
+ * @tc.desc: AC-3.1 Query after N events, verify 5 fields
+ * @tc.type: FUNC
+ */
+HWTEST_F(InputManagerImplTest, PointerEventRecorder_Query_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerEventRecorder recorder;
+    EXPECT_EQ(recorder.Enable(10), RET_OK);
+    auto event = PointerEvent::Create();
+    CHKPV(event);
+    event->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+    PointerEvent::PointerItem item;
+    item.SetPointerId(0);
+    item.SetToolType(PointerEvent::TOOL_TYPE_FINGER);
+    event->AddPointerItem(item);
+    event->SetPointerId(0);
+    event->SetDeviceId(5);
+    event->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
+    event->SetActionTime(12345);
+    recorder.PushEvent(event);
+    std::vector<std::shared_ptr<PointerEvent>> list;
+    EXPECT_EQ(recorder.Query(list), RET_OK);
+    EXPECT_EQ(list.size(), 1u);
+    EXPECT_EQ(list[0]->GetSourceType(), PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+    PointerEvent::PointerItem outItem;
+    EXPECT_TRUE(list[0]->GetPointerItem(0, outItem));
+    EXPECT_EQ(outItem.GetToolType(), PointerEvent::TOOL_TYPE_FINGER);
+    EXPECT_EQ(list[0]->GetDeviceId(), 5);
+    EXPECT_EQ(list[0]->GetPointerAction(), PointerEvent::POINTER_ACTION_DOWN);
+    EXPECT_EQ(list[0]->GetActionTime(), 12345);
+}
+
+/**
+ * @tc.name: PointerEventRecorder_Query_002
+ * @tc.desc: AC-3.2 Query when empty returns empty vector
+ * @tc.type: FUNC
+ */
+HWTEST_F(InputManagerImplTest, PointerEventRecorder_Query_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerEventRecorder recorder;
+    std::vector<std::shared_ptr<PointerEvent>> list;
+    EXPECT_EQ(recorder.Query(list), RET_OK);
+    EXPECT_TRUE(list.empty());
+}
+
+/**
+ * @tc.name: PointerEventRecorder_Query_003
+ * @tc.desc: AC-3.3 FIFO eviction when buffer full
+ * @tc.type: FUNC
+ */
+HWTEST_F(InputManagerImplTest, PointerEventRecorder_Query_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerEventRecorder recorder;
+    EXPECT_EQ(recorder.Enable(5), RET_OK);
+    for (int32_t i = 0; i < 10; ++i) {
+        auto event = PointerEvent::Create();
+        CHKPV(event);
+        event->SetDeviceId(i);
+        recorder.PushEvent(event);
+    }
+    std::vector<std::shared_ptr<PointerEvent>> list;
+    EXPECT_EQ(recorder.Query(list), RET_OK);
+    EXPECT_EQ(list.size(), 5u);
+    EXPECT_EQ(list[0]->GetDeviceId(), 5);
+    EXPECT_EQ(list[1]->GetDeviceId(), 6);
+    EXPECT_EQ(list[2]->GetDeviceId(), 7);
+    EXPECT_EQ(list[3]->GetDeviceId(), 8);
+    EXPECT_EQ(list[4]->GetDeviceId(), 9);
+}
+
+/**
+ * @tc.name: PointerEventRecorder_Query_004
+ * @tc.desc: AC-3.4 Returned objects are independent from internal buffer
+ * @tc.type: FUNC
+ */
+HWTEST_F(InputManagerImplTest, PointerEventRecorder_Query_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerEventRecorder recorder;
+    EXPECT_EQ(recorder.Enable(10), RET_OK);
+    auto event = PointerEvent::Create();
+    CHKPV(event);
+    event->SetDeviceId(42);
+    recorder.PushEvent(event);
+    std::vector<std::shared_ptr<PointerEvent>> list1;
+    recorder.Query(list1);
+    ASSERT_EQ(list1.size(), 1u);
+    list1[0]->SetDeviceId(999);
+    std::vector<std::shared_ptr<PointerEvent>> list2;
+    recorder.Query(list2);
+    ASSERT_EQ(list2.size(), 1u);
+    EXPECT_EQ(list2[0]->GetDeviceId(), 42);
+}
+
+/**
+ * @tc.name: InputManagerImpl_PointerEventRecord_EnableDisableGet_001
+ * @tc.desc: AC-1.1/2.1/3.1 Integration: Enable → PushEvent → Get → Disable → Get through InputManagerImpl
+ * @tc.type: FUNC
+ */
+HWTEST_F(InputManagerImplTest, InputManagerImpl_PointerEventRecord_EnableDisableGet_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto impl = std::make_shared<InputManagerImpl>();
+    EXPECT_EQ(impl->EnablePointerEventRecord(10), RET_OK);
+    auto event = PointerEvent::Create();
+    CHKPV(event);
+    event->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
+    PointerEvent::PointerItem item;
+    item.SetPointerId(0);
+    item.SetToolType(PointerEvent::TOOL_TYPE_FINGER);
+    event->AddPointerItem(item);
+    event->SetPointerId(0);
+    event->SetDeviceId(7);
+    event->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
+    event->SetActionTime(99999);
+    impl->pointerEventRecorder_.PushEvent(event);
+    std::vector<std::shared_ptr<PointerEvent>> list;
+    EXPECT_EQ(impl->GetPointerEventRecord(list), RET_OK);
+    EXPECT_EQ(list.size(), 1u);
+    EXPECT_EQ(list[0]->GetSourceType(), PointerEvent::SOURCE_TYPE_MOUSE);
+    EXPECT_EQ(list[0]->GetDeviceId(), 7);
+    EXPECT_EQ(impl->DisablePointerEventRecord(), RET_OK);
+    std::vector<std::shared_ptr<PointerEvent>> list2;
+    EXPECT_EQ(impl->GetPointerEventRecord(list2), RET_OK);
+    EXPECT_TRUE(list2.empty());
+}
+
+/**
+ * @tc.name: InputManagerImpl_PointerEventRecord_Disabled_NoRecord_001
+ * @tc.desc: AC-4.2 When disabled, PushEvent is a no-op
+ * @tc.type: FUNC
+ */
+HWTEST_F(InputManagerImplTest, InputManagerImpl_PointerEventRecord_Disabled_NoRecord_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto impl = std::make_shared<InputManagerImpl>();
+    auto event = PointerEvent::Create();
+    CHKPV(event);
+    impl->pointerEventRecorder_.PushEvent(event);
+    std::vector<std::shared_ptr<PointerEvent>> list;
+    EXPECT_EQ(impl->GetPointerEventRecord(list), RET_OK);
+    EXPECT_TRUE(list.empty());
+}
+
+/**
+ * @tc.name: InputManagerImpl_PointerEventRecord_RejectInvalid_001
+ * @tc.desc: AC-1.3 Enable with maxCount <= 0 returns RET_ERR
+ * @tc.type: FUNC
+ */
+HWTEST_F(InputManagerImplTest, InputManagerImpl_PointerEventRecord_RejectInvalid_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto impl = std::make_shared<InputManagerImpl>();
+    EXPECT_EQ(impl->EnablePointerEventRecord(0), RET_ERR);
+    EXPECT_EQ(impl->EnablePointerEventRecord(-5), RET_ERR);
+    std::vector<std::shared_ptr<PointerEvent>> list;
+    EXPECT_EQ(impl->GetPointerEventRecord(list), RET_OK);
+    EXPECT_TRUE(list.empty());
 }
 } // namespace MMI
 } // namespace OHOS

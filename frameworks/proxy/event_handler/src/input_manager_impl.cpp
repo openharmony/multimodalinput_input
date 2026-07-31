@@ -692,6 +692,7 @@ void InputManagerImpl::OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent
         inputConsumer = consumer_;
         lastPointerEvent_ = std::make_shared<PointerEvent>(*pointerEvent);
     }
+    pointerEventRecorder_.PushEvent(pointerEvent);
     BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_STOP, BytraceAdapter::POINT_DISPATCH_EVENT);
     MMIClientPtr client = MMIEventHdl.GetMMIClient();
     CHKPV(client);
@@ -3324,6 +3325,21 @@ int32_t InputManagerImpl::ClearMouseHideFlag(int32_t eventId)
 int32_t InputManagerImpl::QueryPointerRecord(int32_t count, std::vector<std::shared_ptr<PointerEvent>> &pointerList)
 {
     return MULTIMODAL_INPUT_CONNECT_MGR->QueryPointerRecord(count, pointerList);
+}
+
+int32_t InputManagerImpl::EnablePointerEventRecord(int32_t maxCount)
+{
+    return pointerEventRecorder_.Enable(maxCount);
+}
+
+int32_t InputManagerImpl::DisablePointerEventRecord()
+{
+    return pointerEventRecorder_.Disable();
+}
+
+int32_t InputManagerImpl::GetPointerEventRecord(std::vector<std::shared_ptr<PointerEvent>> &pointerList)
+{
+    return pointerEventRecorder_.Query(pointerList);
 }
 
 int32_t InputManagerImpl::AddKeyEventHook(std::function<void(std::shared_ptr<KeyEvent>)> callback, int32_t &hookId)

@@ -1141,5 +1141,20 @@ int32_t InputManager::EnableInputExtension(const std::string &uuid, bool enabled
 {
     return InputMgrImpl.EnableInputExtension(uuid, enabled);
 }
+
+int32_t InputManager::EnablePointerEventRecord(int32_t maxCount)
+{
+    return InputMgrImpl.EnablePointerEventRecord(maxCount);
+}
+
+int32_t InputManager::DisablePointerEventRecord()
+{
+    return InputMgrImpl.DisablePointerEventRecord();
+}
+
+int32_t InputManager::GetPointerEventRecord(std::vector<std::shared_ptr<PointerEvent>> &pointerList)
+{
+    return InputMgrImpl.GetPointerEventRecord(pointerList);
+}
 } // namespace MMI
 } // namespace OHOS
