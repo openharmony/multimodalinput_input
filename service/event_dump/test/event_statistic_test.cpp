@@ -644,6 +644,63 @@ HWTEST_F(EventStatisticTest, EventStatisticTest_PushKeyEvent_003, TestSize.Level
 }
 
 /**
+ * @tc.name: EventStatisticTest_PushKeyEvent_PrivacyUnicode_001
+ * @tc.desc: Verify keycode and Unicode are anonymized for privacy events
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventStatisticTest, EventStatisticTest_PushKeyEvent_PrivacyUnicode_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EventStatistic eventStatistic;
+    eventStatistic.dumperEventList_.clear();
+    auto keyEvent = KeyEvent::Create();
+    keyEvent->SetAction(KeyEvent::KEY_ACTION_DOWN);
+    keyEvent->SetKeyCode(7777);
+    keyEvent->AddFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE);
+    KeyEvent::KeyItem keyItem;
+    keyItem.SetKeyCode(7777);
+    keyItem.SetUnicode(9731);
+    keyEvent->AddKeyItem(keyItem);
+
+    eventStatistic.PushKeyEvent(keyEvent);
+
+    ASSERT_EQ(eventStatistic.dumperEventList_.size(), 1);
+    const std::string &eventStr = eventStatistic.dumperEventList_.back();
+    EXPECT_NE(eventStr.find("keyCode:***"), std::string::npos);
+    EXPECT_NE(eventStr.find("unicode:***"), std::string::npos);
+    EXPECT_EQ(eventStr.find("7777"), std::string::npos);
+    EXPECT_EQ(eventStr.find("9731"), std::string::npos);
+}
+
+/**
+ * @tc.name: EventStatisticTest_PushKeyEvent_NonPrivacyUnicode_001
+ * @tc.desc: Verify Unicode remains available for non-privacy events
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventStatisticTest, EventStatisticTest_PushKeyEvent_NonPrivacyUnicode_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EventStatistic eventStatistic;
+    eventStatistic.dumperEventList_.clear();
+    auto keyEvent = KeyEvent::Create();
+    keyEvent->SetAction(KeyEvent::KEY_ACTION_DOWN);
+    keyEvent->SetKeyCode(7777);
+    KeyEvent::KeyItem keyItem;
+    keyItem.SetKeyCode(7777);
+    keyItem.SetUnicode(9731);
+    keyEvent->AddKeyItem(keyItem);
+
+    eventStatistic.PushKeyEvent(keyEvent);
+
+    ASSERT_EQ(eventStatistic.dumperEventList_.size(), 1);
+    const std::string &eventStr = eventStatistic.dumperEventList_.back();
+    EXPECT_NE(eventStr.find("keyCode:7777"), std::string::npos);
+    EXPECT_NE(eventStr.find("unicode:9731"), std::string::npos);
+}
+
+/**
  * @tc.name: EventStatisticTest_PushKeyEvent_004
  * @tc.desc: Verify PushKeyEvent with KEY_ACTION_UP and multiple key items
  * @tc.type: FUNC
