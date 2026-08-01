@@ -636,6 +636,7 @@ ohos_unittest("PointerEventRecordTest") {
   include_dirs = [
     "${mmi_path}/frameworks/proxy/events/test",
     "${mmi_path}/frameworks/proxy/event_handler/include",
+    "${mmi_path}/test/unittest/common/include",
   ]
 
   sources = [
@@ -643,7 +644,7 @@ ohos_unittest("PointerEventRecordTest") {
     "${mmi_path}/test/unittest/common/src/system_info.cpp",
     "${mmi_path}/test/unittest/common/src/window_utils_test.cpp",
     "events/test/input_manager_util.cpp",
-    "events/test/pointer_event_record_test.cpp",
+    "event_handler/test/pointer_event_record_test.cpp",
   ]
 
   configs = [
