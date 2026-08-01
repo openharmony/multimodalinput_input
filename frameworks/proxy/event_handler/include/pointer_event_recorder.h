@@ -37,10 +37,12 @@ public:
 private:
     struct EventRecord {
         int32_t sourceType { 0 };
-        int32_t toolType { 0 };
         int32_t deviceId { 0 };
         int32_t pointerAction { 0 };
         int64_t actionTime { 0 };
+        int32_t pointerId { 0 };
+        std::vector<int32_t> itemPointerIds;
+        std::vector<int32_t> itemToolTypes;
     };
 
     static constexpr int32_t MAX_RECORD_COUNT = 100;

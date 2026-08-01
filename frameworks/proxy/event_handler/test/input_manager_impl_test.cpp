@@ -3700,6 +3700,7 @@ HWTEST_F(InputManagerImplTest, PointerEventRecorder_Query_001, TestSize.Level1)
     EXPECT_EQ(list[0]->GetDeviceId(), 5);
     EXPECT_EQ(list[0]->GetPointerAction(), PointerEvent::POINTER_ACTION_DOWN);
     EXPECT_EQ(list[0]->GetActionTime(), 12345);
+    EXPECT_EQ(list[0]->GetPointerId(), 0);
 }
 
 /**
@@ -3767,6 +3768,46 @@ HWTEST_F(InputManagerImplTest, PointerEventRecorder_Query_004, TestSize.Level1)
 }
 
 /**
+ * @tc.name: PointerEventRecorder_Query_005
+ * @tc.desc: AC-4.1 Multi-touch: multiple PointerItems recorded and reconstructed correctly
+ * @tc.type: FUNC
+ */
+HWTEST_F(InputManagerImplTest, PointerEventRecorder_Query_005, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerEventRecorder recorder;
+    EXPECT_EQ(recorder.Enable(10), RET_OK);
+    auto event = PointerEvent::Create();
+    CHKPV(event);
+    event->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+    PointerEvent::PointerItem item1;
+    item1.SetPointerId(0);
+    item1.SetToolType(PointerEvent::TOOL_TYPE_FINGER);
+    event->AddPointerItem(item1);
+    PointerEvent::PointerItem item2;
+    item2.SetPointerId(1);
+    item2.SetToolType(PointerEvent::TOOL_TYPE_PEN);
+    event->AddPointerItem(item2);
+    event->SetPointerId(0);
+    event->SetDeviceId(3);
+    event->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
+    event->SetActionTime(67890);
+    recorder.PushEvent(event);
+    std::vector<std::shared_ptr<PointerEvent>> list;
+    EXPECT_EQ(recorder.Query(list), RET_OK);
+    EXPECT_EQ(list.size(), 1u);
+    EXPECT_EQ(list[0]->GetPointerId(), 0);
+    auto outItems = list[0]->GetAllPointerItems();
+    EXPECT_EQ(outItems.size(), 2u);
+    PointerEvent::PointerItem outItem0;
+    EXPECT_TRUE(list[0]->GetPointerItem(0, outItem0));
+    EXPECT_EQ(outItem0.GetToolType(), PointerEvent::TOOL_TYPE_FINGER);
+    PointerEvent::PointerItem outItem1;
+    EXPECT_TRUE(list[0]->GetPointerItem(1, outItem1));
+    EXPECT_EQ(outItem1.GetToolType(), PointerEvent::TOOL_TYPE_PEN);
+}
+
+/**
  * @tc.name: InputManagerImpl_PointerEventRecord_EnableDisableGet_001
  * @tc.desc: AC-1.1/2.1/3.1 Integration: Enable → PushEvent → Get → Disable → Get through InputManagerImpl
  * @tc.type: FUNC
@@ -3793,6 +3834,7 @@ HWTEST_F(InputManagerImplTest, InputManagerImpl_PointerEventRecord_EnableDisable
     EXPECT_EQ(list.size(), 1u);
     EXPECT_EQ(list[0]->GetSourceType(), PointerEvent::SOURCE_TYPE_MOUSE);
     EXPECT_EQ(list[0]->GetDeviceId(), 7);
+    EXPECT_EQ(list[0]->GetPointerId(), 0);
     EXPECT_EQ(impl->DisablePointerEventRecord(), RET_OK);
     std::vector<std::shared_ptr<PointerEvent>> list2;
     EXPECT_EQ(impl->GetPointerEventRecord(list2), RET_OK);

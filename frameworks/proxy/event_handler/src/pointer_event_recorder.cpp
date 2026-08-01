@@ -54,6 +54,7 @@ int32_t PointerEventRecorder::Disable()
     size_ = 0;
     capacity_ = 0;
     buffer_.clear();
+    buffer_.shrink_to_fit();
     MMI_HILOGI("Disable pointer event record");
     return RET_OK;
 }
@@ -70,15 +71,17 @@ void PointerEventRecorder::PushEvent(const std::shared_ptr<PointerEvent> &event)
     }
     auto &record = buffer_[tail_];
     record.sourceType = event->GetSourceType();
-    PointerEvent::PointerItem pointerItem;
-    if (event->GetPointerItem(event->GetPointerId(), pointerItem)) {
-        record.toolType = pointerItem.GetToolType();
-    } else {
-        record.toolType = 0;
-    }
     record.deviceId = event->GetDeviceId();
     record.pointerAction = event->GetPointerAction();
     record.actionTime = event->GetActionTime();
+    record.pointerId = event->GetPointerId();
+    record.itemPointerIds.clear();
+    record.itemToolTypes.clear();
+    std::list<PointerEvent::PointerItem> pointerItems = event->GetAllPointerItems();
+    for (const auto &item : pointerItems) {
+        record.itemPointerIds.push_back(item.GetPointerId());
+        record.itemToolTypes.push_back(item.GetToolType());
+    }
     tail_ = (tail_ + 1) % capacity_;
     if (size_ < capacity_) {
         size_++;
@@ -100,9 +103,17 @@ int32_t PointerEventRecorder::Query(std::vector<std::shared_ptr<PointerEvent>> &
         pointerEvent->SetDeviceId(record.deviceId);
         pointerEvent->SetPointerAction(record.pointerAction);
         pointerEvent->SetActionTime(record.actionTime);
-        PointerEvent::PointerItem item;
-        item.SetToolType(record.toolType);
-        pointerEvent->AddPointerItem(item);
+        pointerEvent->SetPointerId(record.pointerId);
+        auto pidIt = record.itemPointerIds.begin();
+        auto toolIt = record.itemToolTypes.begin();
+        while (pidIt != record.itemPointerIds.end() && toolIt != record.itemToolTypes.end()) {
+            PointerEvent::PointerItem item;
+            item.SetPointerId(*pidIt);
+            item.SetToolType(*toolIt);
+            pointerEvent->AddPointerItem(item);
+            ++pidIt;
+            ++toolIt;
+        }
         pointerList.push_back(pointerEvent);
     }
     return RET_OK;
