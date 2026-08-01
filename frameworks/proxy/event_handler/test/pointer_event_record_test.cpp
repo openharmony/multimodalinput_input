@@ -26,6 +26,8 @@
 namespace OHOS {
 namespace MMI {
 namespace {
+using namespace testing;
+using namespace testing::ext;
 constexpr int32_t MAX_RECORD_COUNT = 100;
 constexpr int32_t POINTER_ITEM_DISPLAY_X = 520;
 constexpr int32_t POINTER_ITEM_DISPLAY_Y = 222;
@@ -60,12 +62,12 @@ public:
         ASSERT_TRUE(eventHandler_ != nullptr);
         consumer_ = std::make_shared<RecordEventConsumer>();
         ASSERT_TRUE(consumer_ != nullptr);
-        int32_t ret = InputManager::GetInstance()->SetWindowInputEventConsumer(consumer_, eventHandler_);
+        int32_t ret = InputMgrImpl.SetWindowInputEventConsumer(consumer_, eventHandler_);
         ASSERT_EQ(ret, RET_OK);
     }
     void TearDown() override
     {
-        InputManager::GetInstance()->DisablePointerEventRecord();
+        InputMgrImpl.DisablePointerEventRecord();
     }
 
 private:
@@ -83,7 +85,7 @@ private:
 HWTEST_F(PointerEventRecordTest, PointerEventRecord_EnableQueryDisable_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    EXPECT_EQ(InputManager::GetInstance()->EnablePointerEventRecord(10), RET_OK);
+    EXPECT_EQ(InputMgrImpl.EnablePointerEventRecord(10), RET_OK);
 
     auto event = PointerEvent::Create();
     ASSERT_TRUE(event != nullptr);
@@ -100,8 +102,9 @@ HWTEST_F(PointerEventRecordTest, PointerEventRecord_EnableQueryDisable_001, Test
     InputMgrImpl.OnPointerEvent(event);
 
     ASSERT_EQ(consumer_->GetReceivedCount(), 1u);
+
     std::vector<std::shared_ptr<PointerEvent>> records;
-    EXPECT_EQ(InputManager::GetInstance()->GetPointerEventRecord(records), RET_OK);
+    EXPECT_EQ(InputMgrImpl.GetPointerEventRecord(records), RET_OK);
     ASSERT_EQ(records.size(), 1u);
     auto &last = records.back();
     EXPECT_EQ(last->GetSourceType(), PointerEvent::SOURCE_TYPE_MOUSE);
@@ -114,9 +117,9 @@ HWTEST_F(PointerEventRecordTest, PointerEventRecord_EnableQueryDisable_001, Test
     EXPECT_EQ(items.front().GetPointerId(), 0);
     EXPECT_EQ(items.front().GetToolType(), PointerEvent::TOOL_TYPE_MOUSE);
 
-    EXPECT_EQ(InputManager::GetInstance()->DisablePointerEventRecord(), RET_OK);
+    EXPECT_EQ(InputMgrImpl.DisablePointerEventRecord(), RET_OK);
     records.clear();
-    EXPECT_EQ(InputManager::GetInstance()->GetPointerEventRecord(records), RET_OK);
+    EXPECT_EQ(InputMgrImpl.GetPointerEventRecord(records), RET_OK);
     EXPECT_TRUE(records.empty());
 }
 
@@ -129,7 +132,7 @@ HWTEST_F(PointerEventRecordTest, PointerEventRecord_EnableQueryDisable_001, Test
 HWTEST_F(PointerEventRecordTest, PointerEventRecord_MultiTouchItems_002, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    EXPECT_EQ(InputManager::GetInstance()->EnablePointerEventRecord(10), RET_OK);
+    EXPECT_EQ(InputMgrImpl.EnablePointerEventRecord(10), RET_OK);
 
     auto event = PointerEvent::Create();
     ASSERT_TRUE(event != nullptr);
@@ -149,7 +152,7 @@ HWTEST_F(PointerEventRecordTest, PointerEventRecord_MultiTouchItems_002, TestSiz
 
     ASSERT_EQ(consumer_->GetReceivedCount(), 1u);
     std::vector<std::shared_ptr<PointerEvent>> records;
-    EXPECT_EQ(InputManager::GetInstance()->GetPointerEventRecord(records), RET_OK);
+    EXPECT_EQ(InputMgrImpl.GetPointerEventRecord(records), RET_OK);
     ASSERT_EQ(records.size(), 1u);
     auto &last = records.back();
     EXPECT_EQ(last->GetSourceType(), PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
@@ -162,7 +165,7 @@ HWTEST_F(PointerEventRecordTest, PointerEventRecord_MultiTouchItems_002, TestSiz
     EXPECT_EQ(it->GetPointerId(), 1);
     EXPECT_EQ(it->GetToolType(), PointerEvent::TOOL_TYPE_PEN);
 
-    EXPECT_EQ(InputManager::GetInstance()->DisablePointerEventRecord(), RET_OK);
+    EXPECT_EQ(InputMgrImpl.DisablePointerEventRecord(), RET_OK);
 }
 
 /**
@@ -176,7 +179,7 @@ HWTEST_F(PointerEventRecordTest, PointerEventRecord_FifoEvict_003, TestSize.Leve
     CALL_TEST_DEBUG;
     constexpr int32_t recordCapacity = 5;
     constexpr int32_t driveCount = 8;
-    EXPECT_EQ(InputManager::GetInstance()->EnablePointerEventRecord(recordCapacity), RET_OK);
+    EXPECT_EQ(InputMgrImpl.EnablePointerEventRecord(recordCapacity), RET_OK);
 
     for (int32_t i = 0; i < driveCount; ++i) {
         auto event = PointerEvent::Create();
@@ -194,12 +197,12 @@ HWTEST_F(PointerEventRecordTest, PointerEventRecord_FifoEvict_003, TestSize.Leve
 
     ASSERT_EQ(consumer_->GetReceivedCount(), static_cast<uint32_t>(driveCount));
     std::vector<std::shared_ptr<PointerEvent>> records;
-    EXPECT_EQ(InputManager::GetInstance()->GetPointerEventRecord(records), RET_OK);
+    EXPECT_EQ(InputMgrImpl.GetPointerEventRecord(records), RET_OK);
     ASSERT_EQ(records.size(), recordCapacity);
     EXPECT_EQ(records.front()->GetPointerId(), driveCount - recordCapacity);
     EXPECT_EQ(records.back()->GetPointerId(), driveCount - 1);
 
-    EXPECT_EQ(InputManager::GetInstance()->DisablePointerEventRecord(), RET_OK);
+    EXPECT_EQ(InputMgrImpl.DisablePointerEventRecord(), RET_OK);
 }
 
 /**
@@ -210,16 +213,16 @@ HWTEST_F(PointerEventRecordTest, PointerEventRecord_FifoEvict_003, TestSize.Leve
 HWTEST_F(PointerEventRecordTest, PointerEventRecord_ClampAndReject_004, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    EXPECT_EQ(InputManager::GetInstance()->EnablePointerEventRecord(MAX_RECORD_COUNT + 1), RET_OK);
+    EXPECT_EQ(InputMgrImpl.EnablePointerEventRecord(MAX_RECORD_COUNT + 1), RET_OK);
     std::vector<std::shared_ptr<PointerEvent>> records;
-    EXPECT_EQ(InputManager::GetInstance()->GetPointerEventRecord(records), RET_OK);
+    EXPECT_EQ(InputMgrImpl.GetPointerEventRecord(records), RET_OK);
     EXPECT_TRUE(records.empty());
-    EXPECT_EQ(InputManager::GetInstance()->DisablePointerEventRecord(), RET_OK);
+    EXPECT_EQ(InputMgrImpl.DisablePointerEventRecord(), RET_OK);
 
-    EXPECT_EQ(InputManager::GetInstance()->EnablePointerEventRecord(0), RET_ERR);
-    EXPECT_EQ(InputManager::GetInstance()->EnablePointerEventRecord(-1), RET_ERR);
+    EXPECT_EQ(InputMgrImpl.EnablePointerEventRecord(0), RET_ERR);
+    EXPECT_EQ(InputMgrImpl.EnablePointerEventRecord(-1), RET_ERR);
     records.clear();
-    EXPECT_EQ(InputManager::GetInstance()->GetPointerEventRecord(records), RET_OK);
+    EXPECT_EQ(InputMgrImpl.GetPointerEventRecord(records), RET_OK);
     EXPECT_TRUE(records.empty());
 }
 
@@ -247,7 +250,7 @@ HWTEST_F(PointerEventRecordTest, PointerEventRecord_DisabledNoRecord_005, TestSi
 
     ASSERT_EQ(consumer_->GetReceivedCount(), 1u);
     std::vector<std::shared_ptr<PointerEvent>> records;
-    EXPECT_EQ(InputManager::GetInstance()->GetPointerEventRecord(records), RET_OK);
+    EXPECT_EQ(InputMgrImpl.GetPointerEventRecord(records), RET_OK);
     EXPECT_TRUE(records.empty());
 }
 } // namespace MMI
