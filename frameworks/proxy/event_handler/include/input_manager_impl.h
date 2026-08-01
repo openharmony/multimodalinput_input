@@ -37,6 +37,7 @@
 #include "long_press_event.h"
 #include "mmi_event_observer.h"
 #include "pointer_style.h"
+#include "pointer_event_recorder.h"
 #include "touchpad_control_display_gain.h"
 #include "shift_info.h"
 
@@ -284,6 +285,9 @@ public:
     void GetLastEventIds(int32_t &markedId, int32_t &processedId, int32_t &dispatchedEventId);
     int32_t DeliverNonce(const std::string &nonce);
     int32_t RedispatchInputEvent(std::shared_ptr<PointerEvent> pointerEvent);
+    int32_t EnablePointerEventRecord(int32_t maxCount);
+    int32_t DisablePointerEventRecord();
+    int32_t GetPointerEventRecord(std::vector<std::shared_ptr<PointerEvent>> &pointerList);
 #ifdef OHOS_BUILD_ENABLE_ANCO_GAME_EVENT_MAPPING
     int32_t ControlMouseEventToAnco(int32_t windowId, bool enable);
 #endif // OHOS_BUILD_ENABLE_ANCO_GAME_EVENT_MAPPING
@@ -351,6 +355,7 @@ private:
     std::thread ehThread_;
     std::shared_ptr<AppExecFwk::EventHandler> eventHandler_ { nullptr };
     std::shared_ptr<PointerEvent> lastPointerEvent_ { nullptr };
+    PointerEventRecorder pointerEventRecorder_;
     std::function<void(int32_t, int32_t)> windowStatecallback_;
     UserScreenInfo userScreenInfo_ = {0};
     std::atomic_int32_t currentUserId_ { -1 };

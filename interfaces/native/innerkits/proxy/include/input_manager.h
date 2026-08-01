@@ -1462,6 +1462,29 @@ public:
      */
     int32_t EnableInputExtension(const std::string &uuid, bool enabled);
 
+    /**
+    * @brief Enable pointer event recording with a specified maximum count.
+    * @param maxCount The maximum number of records (up to 100, clamped if exceeded).
+    * @return Returns <b>0</b> if successful; returns a non-0 value otherwise.
+    * @since 26.0.0
+    */
+    int32_t EnablePointerEventRecord(int32_t maxCount);
+
+    /**
+    * @brief Disable pointer event recording and clear all records.
+    * @return Returns <b>0</b> if successful; returns a non-0 value otherwise.
+    * @since 26.0.0
+    */
+    int32_t DisablePointerEventRecord();
+
+    /**
+    * @brief Query all recorded pointer events.
+    * @param pointerList A reference to a vector that will store the recorded pointer events.
+    * @return Returns <b>0</b> if successful; returns a non-0 value otherwise.
+    * @since 26.0.0
+    */
+    int32_t GetPointerEventRecord(std::vector<std::shared_ptr<PointerEvent>> &pointerList);
+
 private:
     InputManager() = default;
     DISALLOW_COPY_AND_MOVE(InputManager);

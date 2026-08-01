@@ -129,6 +129,7 @@ ohos_shared_library("libmmi-client") {
   sources += [ "event_handler/src/mouse_controller_impl.cpp" ]
   sources += [ "event_handler/src/keyboard_controller_impl.cpp" ]
   sources += [ "event_handler/src/touch_controller_impl.cpp" ]
+  sources += [ "event_handler/src/pointer_event_recorder.cpp" ]
   if (input_feature_interceptor) {
     sources += [ "event_handler/src/input_interceptor_manager.cpp" ]
   }
@@ -436,6 +437,7 @@ ohos_unittest("InputMonitorManagerTest") {
     "event_handler/src/multimodal_event_handler.cpp",
     "event_handler/src/pre_monitor_manager.cpp",
     "event_handler/src/tablet_event_input_subscribe_manager.cpp",
+    "event_handler/src/pointer_event_recorder.cpp",
     "event_handler/test/input_monitor_manager_test.cpp",
     "event_handler/test/tablet_event_input_subscribe_manager_test.cpp",
   ]
@@ -510,6 +512,7 @@ ohos_unittest("InputManagerImplTest") {
     "event_handler/src/pre_monitor_manager.cpp",
     "event_handler/src/switch_event_input_subscribe_manager.cpp",
     "event_handler/src/tablet_event_input_subscribe_manager.cpp",
+    "event_handler/src/pointer_event_recorder.cpp",
     "event_handler/test/input_manager_impl_test.cpp",
     "event_handler/test/pre_monitor_manager_test.cpp",
   ]
@@ -627,6 +630,85 @@ ohos_unittest("InputManagerTest") {
     "window_manager:libwm",
     "window_manager:libwsutils",
   ]
+}
+
+ohos_unittest("PointerEventRecordTest") {
+  module_out_path = module_output_path
+  include_dirs = [
+    "${mmi_path}/common/anco/comm/include",
+    "${mmi_path}/service/connect_manager/include",
+    "${mmi_path}/service/filter/include",
+    "${mmi_path}/service/module_loader/include",
+    "${mmi_path}/service/nap_process/include",
+    "${mmi_path}/frameworks/proxy/event_handler/include",
+  ]
+
+  sources = [
+    "event_handler/src/anr_handler.cpp",
+    "event_handler/src/bytrace_adapter.cpp",
+    "event_handler/src/input_active_subscribe_manager.cpp",
+    "event_handler/src/input_handler_manager.cpp",
+    "event_handler/src/input_manager_impl.cpp",
+    "event_handler/src/key_event_input_subscribe_manager.cpp",
+    "event_handler/src/long_press_event_subscribe_manager.cpp",
+    "event_handler/src/multimodal_event_handler.cpp",
+    "event_handler/src/pre_monitor_manager.cpp",
+    "event_handler/src/switch_event_input_subscribe_manager.cpp",
+    "event_handler/src/tablet_event_input_subscribe_manager.cpp",
+    "event_handler/src/pointer_event_recorder.cpp",
+    "event_handler/test/pointer_event_record_test.cpp",
+  ]
+
+  configs = [
+    "${mmi_path}:coverage_flags",
+    ":libmmi_test_util",
+    "${mmi_path}/service/filter:mmi_event_filter_config",
+    "${mmi_path}/service/connect_manager:mmi_connect_manager_config",
+  ]
+
+  cflags = [
+    "-Dprivate=public",
+    "-Dprotected=public",
+  ]
+
+  branch_protector_ret = "pac_ret"
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = true
+    blocklist = "./ipc_blocklist.txt"
+  }
+
+  deps = [
+    "${mmi_path}/common/anco/comm:mmi_anco_channel_stub",
+    "${mmi_path}/frameworks/proxy:libmmi-client",
+    "${mmi_path}/frameworks/proxy:libmmi-common",
+    "${mmi_path}/service:libmmi-server",
+    "${mmi_path}/service/connect_manager:mmi_connect_manager_proxy",
+    "${mmi_path}/service/filter:mmi_event_filter_service",
+    "${mmi_path}/util:libmmi-util",
+  ]
+
+  external_deps = [
+    "ability_runtime:abilitykit_native",
+    "cJSON:cjson",
+    "c_utils:utils",
+    "config_policy:configpolicy_util",
+    "eventhandler:libeventhandler",
+    "ffrt:libffrt",
+    "googletest:gmock_main",
+    "googletest:gtest_main",
+    "hilog:libhilog",
+    "init:libbegetutil",
+    "ipc:ipc_single",
+    "samgr:samgr_proxy",
+    "window_manager:libwm",
+    "window_manager:libwsutils",
+  ]
+
+  if (hitrace_enabled) {
+    external_deps += [ "hitrace:hitrace_meter" ]
+  }
 }
 
 ohos_unittest("LongPressEventSubscribeManagerTest") {
@@ -837,6 +919,7 @@ ohos_unittest("KeyEventHookHandlerTest") {
     "event_handler/src/multimodal_event_handler.cpp",
     "event_handler/src/pre_monitor_manager.cpp",
     "event_handler/src/tablet_event_input_subscribe_manager.cpp",
+    "event_handler/src/pointer_event_recorder.cpp",
     "event_handler/src/key_event_hook_handler.cpp",
     "event_handler/test/input_monitor_manager_test.cpp",
     "event_handler/test/key_event_hook_handler_test.cpp",
