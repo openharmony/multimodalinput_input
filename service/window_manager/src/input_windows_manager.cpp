@@ -14,6 +14,7 @@
  */
 
 #include "input_windows_manager.h"
+#include "error_multimodal.h"
 #include <algorithm>
 #include <linux/input.h>
 
@@ -1053,11 +1054,31 @@ int32_t InputWindowsManager::GetDisplayBindInfo(DisplayBindInfos &infos)
     return bindInfo_.GetDisplayBindInfo(infos);
 }
 
+int32_t InputWindowsManager::GetBindDisplayIdByInputDevice(int32_t inputDeviceId) const
+{
+    return bindInfo_.GetBindDisplayIdByInputDevice(inputDeviceId);
+}
+
 int32_t InputWindowsManager::SetDisplayBind(int32_t deviceId, int32_t displayId, std::string &msg)
 {
     CALL_DEBUG_ENTER;
     MMI_HILOGD("deviceId:%{public}d, displayId:%{public}d", deviceId, displayId);
     return bindInfo_.SetDisplayBind(deviceId, displayId, msg);
+}
+
+int32_t InputWindowsManager::BindToDisplay(int32_t deviceId, int32_t displayId, std::string &msg)
+{
+    CALL_DEBUG_ENTER;
+    MMI_HILOGD("deviceId:%{public}d, displayId:%{public}d", deviceId, displayId);
+    // Validate the display against the authoritative display list (not the bind relations), so a
+    // display that exists but has no bind entry yet is still accepted.
+    const auto *displayInfo = GetPhysicalDisplay(displayId);
+    if (displayInfo == nullptr) {
+        msg = "The specified display does not exist.";
+        MMI_HILOGE("%s", msg.c_str());
+        return ERR_DISPLAY_NOT_EXIST;
+    }
+    return bindInfo_.BindToDisplay(deviceId, displayId, displayInfo->uniq, msg);
 }
 
 void InputWindowsManager::UpdateCaptureMode(const OLD::DisplayGroupInfo &displayGroupInfo)
@@ -7154,6 +7175,15 @@ void InputWindowsManager::CreatePrivacyProtectionObserver(T& item)
 }
 
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
+void InputWindowsManager::ApplyBoundDisplayId(std::shared_ptr<InputEvent> event)
+{
+    CHKPV(event);
+    int32_t bindDisplayId = bindInfo_.GetBindDisplayIdByInputDevice(event->GetDeviceId());
+    if (bindDisplayId >= 0) {
+        event->SetTargetDisplayId(bindDisplayId);
+    }
+}
+
 int32_t InputWindowsManager::UpdateTargetPointer(std::shared_ptr<PointerEvent> pointerEvent)
 {
     CALL_DEBUG_ENTER;

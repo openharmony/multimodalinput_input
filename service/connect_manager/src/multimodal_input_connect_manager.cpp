@@ -107,6 +107,17 @@ int32_t MultimodalInputConnectManager::SetDisplayBind(int32_t deviceId, int32_t 
     return ret;
 }
 
+int32_t MultimodalInputConnectManager::BindToDisplay(int32_t deviceId, int32_t displayId)
+{
+    std::lock_guard<std::mutex> guard(lock_);
+    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    int32_t ret = multimodalInputConnectService_->BindToDisplay(deviceId, displayId);
+    if (ret != RET_OK) {
+        MMI_HILOGE("BindToDisplay failed, ret:%{public}d", ret);
+    }
+    return ret;
+}
+
 int32_t MultimodalInputConnectManager::GetWindowPid(int32_t windowId)
 {
     std::lock_guard<std::mutex> guard(lock_);

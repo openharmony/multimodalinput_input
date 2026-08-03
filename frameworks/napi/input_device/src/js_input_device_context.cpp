@@ -833,6 +833,62 @@ napi_value JsInputDeviceContext::IsFunctionKeyEnabled(napi_env env, napi_callbac
     return jsInputDeviceMgr->IsFunctionKeyEnabled(env, funcKey);
 }
 
+napi_value JsInputDeviceContext::BindToDisplay(napi_env env, napi_callback_info info)
+{
+    CALL_DEBUG_ENTER;
+    MMI_HISTOGRAM_BOOLEAN("InputKit.inputDevice.bindToDisplay.Call", true);
+    size_t argc = 2;
+    napi_value argv[2] = { 0 };
+    if (napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr) != napi_ok) {
+        MMI_HILOGE("GET_CB_INFO failed");
+        return nullptr;
+    }
+    if (argc < INPUT_PARAMETER) {
+        MMI_HILOGE("At least 2 parameter is required");
+        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "deviceId", "number");
+        MMI_HISTOGRAM_ERROR("InputKit.inputDevice.bindToDisplay.Error", COMMON_PARAMETER_ERROR);
+        return nullptr;
+    }
+
+    if (!JsUtil::TypeOf(env, argv[0], napi_number)) {
+        MMI_HILOGE("deviceId parameter type is invalid");
+        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "deviceId", "number");
+        MMI_HISTOGRAM_ERROR("InputKit.inputDevice.bindToDisplay.Error", COMMON_PARAMETER_ERROR);
+        return nullptr;
+    }
+    int32_t deviceId = -1;
+    if (napi_get_value_int32(env, argv[0], &deviceId) != napi_ok) {
+        MMI_HILOGE("GET_VALUE_INT32 failed");
+        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "deviceId", "number");
+        MMI_HISTOGRAM_ERROR("InputKit.inputDevice.bindToDisplay.Error", COMMON_PARAMETER_ERROR);
+        return nullptr;
+    }
+
+    if (!JsUtil::TypeOf(env, argv[1], napi_number)) {
+        MMI_HILOGE("displayId parameter type is invalid");
+        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "displayId", "number");
+        MMI_HISTOGRAM_ERROR("InputKit.inputDevice.bindToDisplay.Error", COMMON_PARAMETER_ERROR);
+        return nullptr;
+    }
+    int32_t displayId = -1;
+    if (napi_get_value_int32(env, argv[1], &displayId) != napi_ok) {
+        MMI_HILOGE("GET_VALUE_INT32 failed");
+        return nullptr;
+    }
+
+    JsInputDeviceContext *jsIds = JsInputDeviceContext::GetInstance(env);
+    if (jsIds == nullptr) {
+        MMI_HILOGE("jsIds is nullptr");
+        return nullptr;
+    }
+    auto jsInputDeviceMgr = jsIds->GetJsInputDeviceMgr();
+    if (jsInputDeviceMgr == nullptr) {
+        MMI_HILOGE("jsInputDeviceMgr is nullptr");
+        return nullptr;
+    }
+    return jsInputDeviceMgr->BindToDisplay(env, deviceId, displayId);
+}
+
 napi_value JsInputDeviceContext::EnumClassConstructor(napi_env env, napi_callback_info info)
 {
     CALL_DEBUG_ENTER;
@@ -913,6 +969,7 @@ napi_value JsInputDeviceContext::Export(napi_env env, napi_value exports)
         DECLARE_NAPI_STATIC_FUNCTION("setInputDeviceEnabled", SetInputDeviceEnabled),
         DECLARE_NAPI_STATIC_FUNCTION("setFunctionKeyEnabled", SetFunctionKeyEnabled),
         DECLARE_NAPI_STATIC_FUNCTION("isFunctionKeyEnabled", IsFunctionKeyEnabled),
+        DECLARE_NAPI_STATIC_FUNCTION("bindToDisplay", BindToDisplay),
     };
     CHKRP(napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc), DEFINE_PROPERTIES);
     CHKPP(CreateEnumKeyboardType(env, exports));

@@ -22,6 +22,7 @@
 #include <gmock/gmock.h>
 
 #include "config_policy_utils.h"
+#include "error_multimodal.h"
 #include "input_display_bind_helper.h"
 #include "mmi_log.h"
 #include "securec.h"
@@ -2139,6 +2140,157 @@ HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_SetDisplayBind_1
     int32_t ret = idh.SetDisplayBind(1, 0, msg);
     EXPECT_EQ(ret, RET_ERR);
     EXPECT_NE(msg.find("alread bind"), std::string::npos);
+}
+
+/**
+ * @tc.name: InputDisplayBindHelperTest_BindToDisplay_001
+ * @tc.desc: Test BindToDisplay with invalid deviceId
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_BindToDisplay_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputDisplayBindHelperTest::WriteConfigFile("");
+    InputDisplayBindHelper idh(InputDisplayBindHelperTest::GetCfgFileName());
+    idh.Load();
+    std::string msg;
+    EXPECT_EQ(idh.BindToDisplay(-1, 0, "default0", msg), RET_ERR);
+    EXPECT_NE(msg.find("invalid"), std::string::npos);
+}
+
+/**
+ * @tc.name: InputDisplayBindHelperTest_BindToDisplay_002
+ * @tc.desc: Test BindToDisplay with invalid displayId
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_BindToDisplay_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputDisplayBindHelperTest::WriteConfigFile("");
+    InputDisplayBindHelper idh(InputDisplayBindHelperTest::GetCfgFileName());
+    idh.Load();
+    std::string msg;
+    EXPECT_EQ(idh.BindToDisplay(1, -1, "default0", msg), RET_ERR);
+    EXPECT_NE(msg.find("invalid"), std::string::npos);
+}
+
+/**
+ * @tc.name: InputDisplayBindHelperTest_BindToDisplay_003
+ * @tc.desc: Test BindToDisplay when the input device does not exist
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_BindToDisplay_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputDisplayBindHelperTest::WriteConfigFile("");
+    InputDisplayBindHelper idh(InputDisplayBindHelperTest::GetCfgFileName());
+    idh.Load();
+    std::string msg;
+    // Device 99 is neither in the bind relations nor reported by INPUT_DEV_MGR (mock returns null).
+    EXPECT_EQ(idh.BindToDisplay(99, 0, "default0", msg), ERR_BIND_DEVICE_NOT_EXIST);
+}
+
+/**
+ * @tc.name: InputDisplayBindHelperTest_BindToDisplay_004
+ * @tc.desc: Test BindToDisplay binds a device that exists in the bind relations
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_BindToDisplay_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputDisplayBindHelperTest::WriteConfigFile("");
+    InputDisplayBindHelper idh(InputDisplayBindHelperTest::GetCfgFileName());
+    idh.Load();
+    idh.AddInputDevice(1, "input0", "mouse");
+    std::string msg;
+    EXPECT_EQ(idh.BindToDisplay(1, 5, "default5", msg), RET_OK);
+    EXPECT_EQ(idh.GetBindDisplayIdByInputDevice(1), 5);
+}
+
+/**
+ * @tc.name: InputDisplayBindHelperTest_BindToDisplay_005
+ * @tc.desc: Test BindToDisplay is idempotent when re-binding the same device-display pair
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_BindToDisplay_005, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputDisplayBindHelperTest::WriteConfigFile("");
+    InputDisplayBindHelper idh(InputDisplayBindHelperTest::GetCfgFileName());
+    idh.Load();
+    idh.AddInputDevice(1, "input0", "mouse");
+    std::string msg;
+    EXPECT_EQ(idh.BindToDisplay(1, 5, "default5", msg), RET_OK);
+    // Re-binding the same pair succeeds and is a no-op.
+    EXPECT_EQ(idh.BindToDisplay(1, 5, "default5", msg), RET_OK);
+    EXPECT_NE(msg.find("already bound"), std::string::npos);
+}
+
+/**
+ * @tc.name: InputDisplayBindHelperTest_BindToDisplay_006
+ * @tc.desc: Test BindToDisplay allows one display to bind multiple devices
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_BindToDisplay_006, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputDisplayBindHelperTest::WriteConfigFile("");
+    InputDisplayBindHelper idh(InputDisplayBindHelperTest::GetCfgFileName());
+    idh.Load();
+    idh.AddInputDevice(1, "input0", "mouse");
+    idh.AddInputDevice(2, "input1", "keyboard");
+    std::string msg;
+    EXPECT_EQ(idh.BindToDisplay(1, 5, "default5", msg), RET_OK);
+    // Binding a second device to the same display must not evict the first one.
+    EXPECT_EQ(idh.BindToDisplay(2, 5, "default5", msg), RET_OK);
+    EXPECT_EQ(idh.GetBindDisplayIdByInputDevice(1), 5);
+    EXPECT_EQ(idh.GetBindDisplayIdByInputDevice(2), 5);
+}
+
+/**
+ * @tc.name: InputDisplayBindHelperTest_BindToDisplay_007
+ * @tc.desc: Test BindToDisplay reassigns a device to a different display
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_BindToDisplay_007, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputDisplayBindHelperTest::WriteConfigFile("");
+    InputDisplayBindHelper idh(InputDisplayBindHelperTest::GetCfgFileName());
+    idh.Load();
+    idh.AddInputDevice(1, "input0", "mouse");
+    std::string msg;
+    EXPECT_EQ(idh.BindToDisplay(1, 5, "default5", msg), RET_OK);
+    // A device is bound to at most one display: moving it releases the previous binding.
+    EXPECT_EQ(idh.BindToDisplay(1, 6, "default6", msg), RET_OK);
+    EXPECT_EQ(idh.GetBindDisplayIdByInputDevice(1), 6);
+}
+
+/**
+ * @tc.name: InputDisplayBindHelperTest_GetBindDisplayIdByInputDevice_001
+ * @tc.desc: Test GetBindDisplayIdByInputDevice for bound and unbound devices
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_GetBindDisplayIdByInputDevice_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputDisplayBindHelperTest::WriteConfigFile("");
+    InputDisplayBindHelper idh(InputDisplayBindHelperTest::GetCfgFileName());
+    idh.Load();
+    idh.AddInputDevice(1, "input0", "mouse");
+    std::string msg;
+    ASSERT_EQ(idh.BindToDisplay(1, 2, "default2", msg), RET_OK);
+    EXPECT_EQ(idh.GetBindDisplayIdByInputDevice(1), 2);
+    // An unbound device reports -1.
+    EXPECT_EQ(idh.GetBindDisplayIdByInputDevice(999), -1);
 }
 
 /**
