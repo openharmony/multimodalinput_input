@@ -340,7 +340,6 @@ const std::vector<WindowInfo> InputWindowsManager::GetWindowGroupInfoByDisplayId
     }
     std::map<int32_t, WindowGroupInfo>& windowsPerDisplay =
         const_cast<std::map<int32_t, WindowGroupInfo> &>(windowsPerDisplay_);
-
     const auto& iter = windowsPerDisplayMap_.find(groupId);
     windowsPerDisplay = (iter != windowsPerDisplayMap_.end()) ? iter->second : windowsPerDisplay_;
     const auto& it = windowsPerDisplay.find(displayId);
@@ -1502,17 +1501,17 @@ void InputWindowsManager::OnScreenModeChangeForMirrorScreen(size_t screenCount)
 {
     CALL_DEBUG_ENTER;
     MMI_HILOGD("OnScreenModeChangeForMirrorScreen enter, screenCount:%{public}zu", screenCount);
- 
+
 #ifdef OHOS_BUILD_ENABLE_EXTERNAL_SCREEN
     if (screenCount == lastScreenCount_) {
         MMI_HILOGD("Screen count not changed, skip cursor center reset");
         return;
     }
- 
+
     MMI_HILOGD("Screen count changed from %{public}zu to %{public}zu, triggering cursor center reset",
         lastScreenCount_, screenCount);
     lastScreenCount_ = screenCount;
- 
+
     const auto iter = displayGroupInfoMap_.find(MAIN_GROUPID);
     if (iter != displayGroupInfoMap_.end() && !iter->second.displaysInfo.empty()) {
         MMI_HILOGD("Triggering ResetPointerPosition due to screen change");
