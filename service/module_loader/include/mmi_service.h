@@ -145,6 +145,7 @@ public:
     ErrCode GetDisplayBindInfo(std::vector<DisplayBindInfo>& infos) override;
     ErrCode GetAllMmiSubscribedEvents(MmiEventMap& mmiEventMap) override;
     ErrCode SetDisplayBind(int32_t deviceId, int32_t displayId, std::string &msg) override;
+    ErrCode BindToDisplay(int32_t deviceId, int32_t displayId) override;
     ErrCode GetFunctionKeyState(int32_t funcKey, bool &state) override;
     ErrCode SetFunctionKeyState(int32_t funcKey, bool enable) override;
     ErrCode SetPointerLocation(int32_t x, int32_t y, int32_t displayId) override;
@@ -393,6 +394,7 @@ private:
     void RegisterForDisplayManagerService(int32_t systemAbilityId);
 #endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
     int32_t CheckSetDisplayBindPermission(int32_t deviceId);
+    int32_t CheckBindToDisplayParam(int32_t deviceId);
 
     std::atomic<ServiceRunningState> state_ = ServiceRunningState::STATE_NOT_START;
     int32_t mmiFd_ { -1 };

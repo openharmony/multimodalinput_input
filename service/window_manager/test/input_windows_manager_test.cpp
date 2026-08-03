@@ -23,6 +23,7 @@
 #include "event_filter_handler.h"
 #include "knuckle_handler_component.h"
 #include "i_pointer_drawing_manager.h"
+#include "error_multimodal.h"
 #include "input_device_manager.h"
 #include "input_event_handler.h"
 #include "pointer_device_manager.h"
@@ -17086,6 +17087,41 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateTouchScreenTarge
     auto ctx = SetupAncoHideCursorTest(cfg);
     ASSERT_NE(ctx->pointerEvent, nullptr);
     EXPECT_NO_FATAL_FAILURE(ctx->inputWindowsMgr->UpdateTouchScreenTarget(ctx->pointerEvent));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_BindToDisplay_001
+ * @tc.desc: Test BindToDisplay when the display does not exist
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_BindToDisplay_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    UDSServer udsServer;
+    WIN_MGR->Init(udsServer);
+    std::string msg;
+    // Display 999 was never registered, so GetPhysicalDisplay returns nullptr.
+    EXPECT_EQ(WIN_MGR->BindToDisplay(2, 999, msg), ERR_DISPLAY_NOT_EXIST);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_BindToDisplay_002
+ * @tc.desc: Test BindToDisplay succeeds when the display exists
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_BindToDisplay_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    UDSServer udsServer;
+    WIN_MGR->Init(udsServer);
+    auto displayGroupInfo = CreateDisplayGroupInfo(1, 1);
+    WIN_MGR->UpdateDisplayInfo(displayGroupInfo);
+    std::string msg;
+    // Display 1 exists, so the call delegates to bindInfo_.BindToDisplay. Device 2 is unknown, so
+    // binding is rejected with ERR_BIND_DEVICE_NOT_EXIST (exercises the display-found branch).
+    EXPECT_EQ(WIN_MGR->BindToDisplay(2, 1, msg), ERR_BIND_DEVICE_NOT_EXIST);
 }
 } // namespace MMI
 } // namespace OHOS

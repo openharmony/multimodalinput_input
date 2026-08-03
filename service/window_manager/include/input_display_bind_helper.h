@@ -88,7 +88,10 @@ public:
     void Store();
     int32_t GetDisplayBindInfo(DisplayBindInfos &infos);
     int32_t SetDisplayBind(int32_t deviceId, int32_t displayId, std::string &msg);
+    int32_t BindToDisplay(int32_t deviceId, int32_t displayId, const std::string &displayName,
+        std::string &msg);
 
+    int32_t GetBindDisplayIdByInputDevice(int32_t inputDeviceId) const;
     std::string GetInputDeviceById(int32_t id);
     std::string GetInputNodeNameByCfg(int32_t id);
     void GetInputNodeNamesByCfg(int32_t id, std::vector<std::string> &nodeNames);

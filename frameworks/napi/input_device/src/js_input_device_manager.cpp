@@ -320,5 +320,25 @@ napi_value JsInputDeviceManager::IsFunctionKeyEnabled(napi_env env, int32_t func
     EmitJsGetFunctionKeyState(cb, funcKey);
     return ret;
 }
+napi_value JsInputDeviceManager::BindToDisplay(napi_env env, int32_t deviceId, int32_t displayId, napi_value handle)
+{
+    CALL_DEBUG_ENTER;
+    sptr<JsUtil::CallbackInfo> cb = new (std::nothrow) JsUtil::CallbackInfo();
+    if (cb == nullptr) {
+        MMI_HILOGE("cb is nullptr");
+        return nullptr;
+    }
+    cb->histogramError = [](int32_t errorCode) {
+        MMI_HISTOGRAM_ERROR("InputKit.inputDevice.bindToDisplay.Error", errorCode);
+    };
+    napi_value ret = CreateCallbackInfo(env, nullptr, cb);
+    auto callback = [cb] (int32_t errCode) { return EmitJsBindToDisplay(cb, errCode); };
+    int32_t napiCode = InputManager::GetInstance()->BindToDisplay(deviceId, displayId, callback);
+    if (napiCode != RET_OK) {
+        MMI_HILOGE("BindToDisplay failed, napiCode:%{public}d", napiCode);
+    }
+    return ret;
+}
+
 } // namespace MMI
 } // namespace OHOS

@@ -51,6 +51,7 @@ public:
         napi_handle_scope scope, napi_value &callResult);
     static void EmitJsDevInternal(sptr<JsUtil::CallbackInfo> cb);
     static void EmitJsIdsInternal(sptr<JsUtil::CallbackInfo> cb);
+    static void EmitJsBindToDisplay(sptr<JsUtil::CallbackInfo> cb, int32_t errCode);
 private:
     static void CallIdsPromiseWork(uv_work_t *work, int32_t status);
     static void CallIdsAsyncWork(uv_work_t *work, int32_t status);
@@ -73,6 +74,8 @@ private:
     static void EmitRemoveDeviceEvent(sptr<JsUtil::ReportData> reportData);
     static napi_value GreateBusinessError(napi_env env, int32_t errCode, std::string errMessage);
     static void CallSetInputDeviceEnabledPromise(uv_work_t *work, int32_t status);
+    static void ResolveOrRejectBindToDisplay(sptr<JsUtil::CallbackInfo> cb);
+    static void CallBindToDisplayPromise(uv_work_t *work, int32_t status);
     static void CallKeyboardRepeatDelayTask(uv_work_t *work, const std::string& operateType);
     static void CallKeyboardRepeatRateTask(uv_work_t *work, const std::string& operateType);
     static void CallGetKeyboardTypeTask(uv_work_t *work);

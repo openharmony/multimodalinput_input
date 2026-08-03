@@ -3873,5 +3873,34 @@ HWTEST_F(InputManagerImplTest, InputManagerImpl_PointerEventRecord_RejectInvalid
     EXPECT_EQ(impl->GetPointerEventRecord(list), RET_OK);
     EXPECT_TRUE(list.empty());
 }
+
+/**
+ * @tc.name: InputManagerImplTest_BindToDisplay_001
+ * @tc.desc: Test BindToDisplay with nullptr callback
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerImplTest, InputManagerImplTest_BindToDisplay_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputManagerImpl inputManagerImpl;
+    EXPECT_EQ(inputManagerImpl.BindToDisplay(1, 0, nullptr), RET_ERR);
+}
+
+/**
+ * @tc.name: InputManagerImplTest_BindToDisplay_002
+ * @tc.desc: Test BindToDisplay invokes the callback and returns RET_OK
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerImplTest, InputManagerImplTest_BindToDisplay_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputManagerImpl inputManagerImpl;
+    bool invoked = false;
+    auto callback = [&invoked](int32_t ret) { invoked = true; };
+    EXPECT_EQ(inputManagerImpl.BindToDisplay(1, 0, callback), RET_OK);
+    EXPECT_TRUE(invoked);
+}
 } // namespace MMI
 } // namespace OHOS

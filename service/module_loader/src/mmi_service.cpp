@@ -3263,6 +3263,55 @@ ErrCode MMIService::SetDisplayBind(int32_t deviceId, int32_t displayId, std::str
     return RET_OK;
 }
 
+int32_t MMIService::CheckBindToDisplayParam(int32_t deviceId)
+{
+    CALL_DEBUG_ENTER;
+    auto device = INPUT_DEV_MGR->GetInputDevice(deviceId);
+    if (device == nullptr) {
+        MMI_HILOGE("Input device does not exist, deviceId:%{public}d", deviceId);
+        return ERR_BIND_DEVICE_NOT_EXIST;
+    }
+    std::string connectType = INPUT_DEV_MGR->GetDeviceConnectionType(deviceId);
+    if (connectType != "USB" && connectType != "BLUETOOTH") {
+        MMI_HILOGE("Incorrect connection type [%{public}s]", connectType.c_str());
+        return ERR_UNSUPPORTED_DEVICE;
+    }
+    return RET_OK;
+}
+
+ErrCode MMIService::BindToDisplay(int32_t deviceId, int32_t displayId)
+{
+    CALL_DEBUG_ENTER;
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
+    if (!PER_HELPER->CheckInputDeviceController()) {
+        MMI_HILOGE("Controller permission check failed");
+        return ERROR_NO_PERMISSION;
+    }
+    if (!IsRunning()) {
+        MMI_HILOGE("Service is not running");
+        return ERR_SERVICE_EXCEPTION;
+    }
+    auto msg = std::make_shared<std::string>();
+    int32_t ret = delegateTasks_.PostSyncTask(
+        [this, deviceId, displayId, msg]() -> int32_t {
+            int32_t code = CheckBindToDisplayParam(deviceId);
+            if (code != RET_OK) {
+                return code;
+            }
+            auto winMgr = ::OHOS::MMI::IInputWindowsManager::GetInstance();
+            return winMgr->BindToDisplay(deviceId, displayId, *msg);
+        });
+    if (ret != RET_OK) {
+        MMI_HILOGE("BindToDisplay failed, ret:%{public}d", ret);
+        return ret;
+    }
+    MMI_HILOGI("BindToDisplay success, deviceId:%{public}d, displayId:%{public}d", deviceId, displayId);
+    return RET_OK;
+}
+
 ErrCode MMIService::GetFunctionKeyState(int32_t funcKey, bool &state)
 {
     CALL_DEBUG_ENTER;

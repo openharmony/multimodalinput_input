@@ -222,6 +222,7 @@ public:
         return retMmiSubscribedEvents_;
     }
     int32_t SetDisplayBind(int32_t deviceId, int32_t displayId, std::string &msg) override { return deviceId; }
+    int32_t BindToDisplay(int32_t deviceId, int32_t displayId) override { return deviceId; }
     int32_t GetFunctionKeyState(int32_t funckey, bool &state) override { return funckey; }
     int32_t SetFunctionKeyState(int32_t funcKey, bool enable) override { return funcKey; }
     int32_t SetPointerLocation(int32_t x, int32_t y, int32_t displayId) override { return x; }
@@ -4332,6 +4333,87 @@ HWTEST_F(MultimodalInputConnectStubTest, StubSetDisplayBind_004, TestSize.Level1
     MessageParcel data;
     MessageParcel reply;
     EXPECT_NO_FATAL_FAILURE(stub->StubSetDisplayBind(data, reply));
+}
+
+/**
+ * @tc.name: StubBindToDisplay_001
+ * @tc.desc: Test the function StubBindToDisplay with non-system app
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubTest, StubBindToDisplay_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EXPECT_CALL(*messageParcelMock_, VerifySystemApp()).WillOnce(Return(false));
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIServiceTest>();
+    ASSERT_NE(stub, nullptr);
+    MessageParcel data;
+    MessageParcel reply;
+    EXPECT_NO_FATAL_FAILURE(stub->StubBindToDisplay(data, reply));
+}
+
+/**
+ * @tc.name: StubBindToDisplay_002
+ * @tc.desc: Test the function StubBindToDisplay without controller permission
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubTest, StubBindToDisplay_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EXPECT_CALL(*messageParcelMock_, VerifySystemApp()).WillOnce(Return(true));
+    EXPECT_CALL(*messageParcelMock_, CheckInputDeviceController()).WillOnce(Return(false));
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIServiceTest>();
+    ASSERT_NE(stub, nullptr);
+    MessageParcel data;
+    MessageParcel reply;
+    EXPECT_NO_FATAL_FAILURE(stub->StubBindToDisplay(data, reply));
+}
+
+/**
+ * @tc.name: StubBindToDisplay_003
+ * @tc.desc: Test the function StubBindToDisplay with valid parameters
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubTest, StubBindToDisplay_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EXPECT_CALL(*messageParcelMock_, VerifySystemApp()).WillOnce(Return(true));
+    EXPECT_CALL(*messageParcelMock_, CheckInputDeviceController()).WillOnce(Return(true));
+    EXPECT_CALL(*messageParcelMock_, ReadInt32(_))
+        .WillOnce(DoAll(SetArgReferee<0>(-1), Return(true)))
+        .WillOnce(DoAll(SetArgReferee<0>(-1), Return(true)));
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIServiceTest>();
+    ASSERT_NE(stub, nullptr);
+    std::shared_ptr<MMIServiceTest> service = std::static_pointer_cast<MMIServiceTest>(stub);
+    service->state_ = ServiceRunningState::STATE_RUNNING;
+    MessageParcel data;
+    MessageParcel reply;
+    EXPECT_NO_FATAL_FAILURE(stub->StubBindToDisplay(data, reply));
+}
+
+/**
+ * @tc.name: StubBindToDisplay_004
+ * @tc.desc: Test the function StubBindToDisplay with service not running
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubTest, StubBindToDisplay_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EXPECT_CALL(*messageParcelMock_, VerifySystemApp()).WillOnce(Return(true));
+    EXPECT_CALL(*messageParcelMock_, CheckInputDeviceController()).WillOnce(Return(true));
+    EXPECT_CALL(*messageParcelMock_, ReadInt32(_))
+        .WillOnce(DoAll(SetArgReferee<0>(0), Return(true)))
+        .WillOnce(DoAll(SetArgReferee<0>(-1), Return(true)));
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIServiceTest>();
+    ASSERT_NE(stub, nullptr);
+    std::shared_ptr<MMIServiceTest> service = std::static_pointer_cast<MMIServiceTest>(stub);
+    service->state_ = ServiceRunningState::STATE_NOT_RUNNING;
+    MessageParcel data;
+    MessageParcel reply;
+    EXPECT_NO_FATAL_FAILURE(stub->StubBindToDisplay(data, reply));
 }
 
 /**

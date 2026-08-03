@@ -141,6 +141,22 @@ int32_t InputManagerImpl::SetDisplayBind(int32_t deviceId, int32_t displayId, st
     return RET_OK;
 }
 
+int32_t InputManagerImpl::BindToDisplay(int32_t deviceId, int32_t displayId, std::function<void(int32_t)> callback)
+{
+    CALL_INFO_TRACE;
+    std::lock_guard<std::mutex> guard(mtx_);
+    if (callback == nullptr) {
+        MMI_HILOGE("callback is nullptr");
+        return RET_ERR;
+    }
+    int32_t ret = MULTIMODAL_INPUT_CONNECT_MGR->BindToDisplay(deviceId, displayId);
+    if (ret != RET_OK) {
+        MMI_HILOGE("BindToDisplay failed, ret:%{public}d", ret);
+    }
+    callback(ret);
+    return RET_OK;
+}
+
 int32_t InputManagerImpl::GetWindowPid(int32_t windowId)
 {
     CALL_DEBUG_ENTER;

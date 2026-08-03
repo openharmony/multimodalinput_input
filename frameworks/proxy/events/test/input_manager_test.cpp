@@ -6661,5 +6661,17 @@ HWTEST_F(InputManagerTest, InputManagerTest_CreateKeyboardController_001, TestSi
     int32_t ret = InputManager::GetInstance()->CreateKeyboardController(controller);
     EXPECT_TRUE(ret == ERROR_NO_PERMISSION || ret == CAPABILITY_NOT_SUPPORTED);
 }
+
+/**
+ * @tc.name: InputManagerTest_BindToDisplay_001
+ * @tc.desc: Test BindToDisplay with nullptr callback
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_BindToDisplay_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EXPECT_EQ(InputManager::GetInstance()->BindToDisplay(1, 0, nullptr), RET_ERR);
+}
 } // namespace MMI
 } // namespace OHOS
