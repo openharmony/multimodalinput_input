@@ -95,7 +95,8 @@ public:
     virtual int32_t SetDisplayBind(int32_t deviceId, int32_t displayId, std::string &msg) = 0;
     virtual int32_t BindToDisplay(int32_t deviceId, int32_t displayId, std::string &msg) = 0;
     virtual int32_t GetBindDisplayIdByInputDevice(int32_t inputDeviceId) const = 0;
-    virtual void ApplyBoundDisplayId(std::shared_ptr<InputEvent> event) = 0;
+    virtual void ApplyBoundDisplayId(std::shared_ptr<PointerEvent> pointerEvent) = 0;
+    virtual void ApplyBoundDisplayId(std::shared_ptr<KeyEvent> keyEvent) = 0;
     virtual int32_t AppendExtraData(const ExtraData& extraData) = 0;
     virtual bool IsWindowVisible(int32_t pid) = 0;
     virtual ExtraData GetExtraData() const = 0;

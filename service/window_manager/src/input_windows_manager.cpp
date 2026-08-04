@@ -228,6 +228,10 @@ void InputWindowsManager::DeviceStatusChanged(int32_t deviceId, const std::strin
         bindInfo_.AddInputDevice(deviceId, name, sysUid);
     } else {
         bindInfo_.RemoveInputDevice(deviceId);
+        // A disconnected device can no longer complete an in-flight sequence; drop its sequence
+        // counter and any deferred BindToDisplay so neither is left orphaned.
+        activeSequenceCount_.erase(deviceId);
+        pendingBinds_.erase(deviceId);
         TouchDispatchEventCache().ClearDeviceEvents(deviceId);
     }
 }
@@ -766,6 +770,7 @@ void InputWindowsManager::HandleKeyEventWindowId(std::shared_ptr<KeyEvent> keyEv
 {
     CALL_DEBUG_ENTER;
     CHKPV(keyEvent);
+    ApplyBoundDisplayId(keyEvent);
     int32_t groupId = FindDisplayGroupId(keyEvent->GetTargetDisplayId());
     int32_t focusWindowId = GetFocusWindowId(groupId);
     std::vector<WindowInfo> windowsInfo = GetWindowGroupInfoByDisplayId(keyEvent->GetTargetDisplayId());
@@ -1078,7 +1083,71 @@ int32_t InputWindowsManager::BindToDisplay(int32_t deviceId, int32_t displayId, 
         MMI_HILOGE("%s", msg.c_str());
         return ERR_DISPLAY_NOT_EXIST;
     }
+    // Defer the binding change until the device's current event sequence completes, so an in-flight
+    // gesture (e.g. mouse pressed) keeps its original target until it ends.
+    auto it = activeSequenceCount_.find(deviceId);
+    if (it != activeSequenceCount_.end() && it->second > 0) {
+        pendingBinds_[deviceId] = displayId;
+        return RET_OK;
+    }
     return bindInfo_.BindToDisplay(deviceId, displayId, displayInfo->uniq, msg);
+}
+
+void InputWindowsManager::UpdateActiveSequence(int32_t deviceId, int32_t delta)
+{
+    if (delta == 0) {
+        return;
+    }
+    int32_t count = activeSequenceCount_[deviceId] + delta;
+    if (count > 0) {
+        activeSequenceCount_[deviceId] = count;
+    } else {
+        activeSequenceCount_.erase(deviceId);
+        FlushPendingBind(deviceId);
+    }
+}
+
+void InputWindowsManager::FlushPendingBind(int32_t deviceId)
+{
+    auto it = pendingBinds_.find(deviceId);
+    if (it == pendingBinds_.end()) {
+        return;
+    }
+    int32_t displayId = it->second;
+    pendingBinds_.erase(it);
+    const auto *displayInfo = GetPhysicalDisplay(displayId);
+    if (displayInfo == nullptr) {
+        MMI_HILOGE("Pending bind dropped, display gone, deviceId:%{public}d", deviceId);
+        return;
+    }
+    std::string bindMsg;
+    bindInfo_.BindToDisplay(deviceId, displayId, displayInfo->uniq, bindMsg);
+}
+
+bool InputWindowsManager::IsPointerSequenceBegin(int32_t action) const
+{
+    return action == PointerEvent::POINTER_ACTION_DOWN
+        || action == PointerEvent::POINTER_ACTION_AXIS_BEGIN
+        || action == PointerEvent::POINTER_ACTION_BUTTON_DOWN
+        || action == PointerEvent::POINTER_ACTION_PULL_DOWN
+        || action == PointerEvent::POINTER_ACTION_SWIPE_BEGIN
+        || action == PointerEvent::POINTER_ACTION_ROTATE_BEGIN
+        || action == PointerEvent::POINTER_ACTION_FINGERPRINT_DOWN;
+}
+
+bool InputWindowsManager::IsPointerSequenceEnd(int32_t action) const
+{
+    return action == PointerEvent::POINTER_ACTION_UP
+        || action == PointerEvent::POINTER_ACTION_CANCEL
+        || action == PointerEvent::POINTER_ACTION_AXIS_END
+        || action == PointerEvent::POINTER_ACTION_BUTTON_UP
+        || action == PointerEvent::POINTER_ACTION_PULL_UP
+        || action == PointerEvent::POINTER_ACTION_PULL_CANCEL
+        || action == PointerEvent::POINTER_ACTION_SWIPE_END
+        || action == PointerEvent::POINTER_ACTION_ROTATE_END
+        || action == PointerEvent::POINTER_ACTION_FINGERPRINT_UP
+        || action == PointerEvent::POINTER_ACTION_HOVER_CANCEL
+        || action == PointerEvent::POINTER_ACTION_FINGERPRINT_CANCEL;
 }
 
 void InputWindowsManager::UpdateCaptureMode(const OLD::DisplayGroupInfo &displayGroupInfo)
@@ -7174,13 +7243,36 @@ void InputWindowsManager::CreatePrivacyProtectionObserver(T& item)
     }
 }
 
-#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
-void InputWindowsManager::ApplyBoundDisplayId(std::shared_ptr<InputEvent> event)
+void InputWindowsManager::ApplyBoundDisplayId(std::shared_ptr<KeyEvent> keyEvent)
 {
-    CHKPV(event);
-    int32_t bindDisplayId = bindInfo_.GetBindDisplayIdByInputDevice(event->GetDeviceId());
+    CHKPV(keyEvent);
+    int32_t deviceId = keyEvent->GetDeviceId();
+    int32_t bindDisplayId = bindInfo_.GetBindDisplayIdByInputDevice(deviceId);
     if (bindDisplayId >= 0) {
-        event->SetTargetDisplayId(bindDisplayId);
+        keyEvent->SetTargetDisplayId(bindDisplayId);
+    }
+    int32_t keyAction = keyEvent->GetKeyAction();
+    if (keyAction == KeyEvent::KEY_ACTION_DOWN) {
+        UpdateActiveSequence(deviceId, 1);
+    } else if (keyAction == KeyEvent::KEY_ACTION_UP || keyAction == KeyEvent::KEY_ACTION_CANCEL) {
+        UpdateActiveSequence(deviceId, -1);
+    }
+}
+
+#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
+void InputWindowsManager::ApplyBoundDisplayId(std::shared_ptr<PointerEvent> pointerEvent)
+{
+    CHKPV(pointerEvent);
+    int32_t deviceId = pointerEvent->GetDeviceId();
+    int32_t bindDisplayId = bindInfo_.GetBindDisplayIdByInputDevice(deviceId);
+    if (bindDisplayId >= 0) {
+        pointerEvent->SetTargetDisplayId(bindDisplayId);
+    }
+    int32_t action = pointerEvent->GetPointerAction();
+    if (IsPointerSequenceBegin(action)) {
+        UpdateActiveSequence(deviceId, 1);
+    } else if (IsPointerSequenceEnd(action)) {
+        UpdateActiveSequence(deviceId, -1);
     }
 }
 
