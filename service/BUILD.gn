@@ -2053,6 +2053,7 @@ ohos_unittest("AccountManagerTest") {
 
   deps = [
     "${mmi_path}/service:libmmi-server",
+    "${mmi_path}/service:libmmi-server-common",
     "${mmi_path}/util:libmmi-util",
   ]
 

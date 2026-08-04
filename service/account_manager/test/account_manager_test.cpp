@@ -14,13 +14,17 @@
  */
 
 #include <cstdio>
+#include <functional>
 #include <gtest/gtest.h>
 #include <securec.h>
 
 #include "account_manager.h"
+#include "common_event_data.h"
+#include "common_event_support.h"
 #include "key_event.h"
 #include "mmi_log.h"
 #include "multimodal_input_plugin_manager.h"
+#include "setting_datashare.h"
 #include "want.h"
 
 #undef MMI_LOG_TAG
@@ -36,6 +40,7 @@ constexpr int32_t MAIN_ACCOUNT_ID { 100 };
 constexpr size_t DEFAULT_BUFFER_LENGTH { 512 };
 const std::string SECURE_SETTING_URI_PROXY {""};
 const std::string TEST_STR_DISPLAY_ID { "0" };
+const std::string EDM_ADMIN_ENABLED_ACTION { "com.ohos.edm.edmadminenabled" };
 } // namespace
 
 class AccountManagerTest : public testing::Test {
@@ -1964,6 +1969,170 @@ HWTEST_F(AccountManagerTest, AccountManagerTest_AccountSetting_Destructor_03, Te
     accountSetting->timerId_ = 100;
     accountSetting.reset();
     EXPECT_TRUE(true);
+}
+
+/**
+ * @tc.name: AccountManagerTest_OnSwitchUser_DisplayId_Valid_01
+ * @tc.desc: Test OnSwitchUser with a valid numeric main displayId, user should switch to the target account
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(AccountManagerTest, AccountManagerTest_OnSwitchUser_DisplayId_Valid_01, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t accountId = TEST_ACCOUNT_ID_001;
+    ACCOUNT_MGR->currentAccountId_ = MAIN_ACCOUNT_ID;
+    EventFwk::CommonEventData data;
+    data.SetCode(accountId);
+    EventFwk::Want want;
+    want.SetParam("displayId", TEST_STR_DISPLAY_ID);
+    data.SetWant(want);
+    ASSERT_NO_FATAL_FAILURE(ACCOUNT_MGR->OnSwitchUser(data));
+    EXPECT_EQ(ACCOUNT_MGR->currentAccountId_, accountId);
+    EXPECT_EQ(ACCOUNT_MGR->accounts_.count(accountId), 1);
+    ACCOUNT_MGR->currentAccountId_ = MAIN_ACCOUNT_ID;
+}
+
+/**
+ * @tc.name: AccountManagerTest_OnSwitchUser_DisplayId_NonMain_02
+ * @tc.desc: Test OnSwitchUser with a non-main displayId, current user should NOT be switched
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(AccountManagerTest, AccountManagerTest_OnSwitchUser_DisplayId_NonMain_02, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t accountId = 77;
+    ACCOUNT_MGR->currentAccountId_ = MAIN_ACCOUNT_ID;
+    ACCOUNT_MGR->accounts_.erase(accountId);
+    EventFwk::CommonEventData data;
+    data.SetCode(accountId);
+    EventFwk::Want want;
+    want.SetParam("displayId", std::string("5"));
+    data.SetWant(want);
+    ASSERT_NO_FATAL_FAILURE(ACCOUNT_MGR->OnSwitchUser(data));
+    EXPECT_EQ(ACCOUNT_MGR->currentAccountId_, MAIN_ACCOUNT_ID);
+    EXPECT_EQ(ACCOUNT_MGR->accounts_.count(accountId), 0);
+}
+
+/**
+ * @tc.name: AccountManagerTest_OnSwitchUser_DisplayId_NonNumeric_03
+ * @tc.desc: Test OnSwitchUser with a non-numeric displayId, treated as main display and user should switch
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(AccountManagerTest, AccountManagerTest_OnSwitchUser_DisplayId_NonNumeric_03, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t accountId = TEST_ACCOUNT_ID_001;
+    ACCOUNT_MGR->currentAccountId_ = MAIN_ACCOUNT_ID;
+    EventFwk::CommonEventData data;
+    data.SetCode(accountId);
+    EventFwk::Want want;
+    want.SetParam("displayId", std::string("abc"));
+    data.SetWant(want);
+    ASSERT_NO_FATAL_FAILURE(ACCOUNT_MGR->OnSwitchUser(data));
+    EXPECT_EQ(ACCOUNT_MGR->currentAccountId_, accountId);
+    ACCOUNT_MGR->currentAccountId_ = MAIN_ACCOUNT_ID;
+}
+
+/**
+ * @tc.name: AccountManagerTest_OnCommonEvent_UserAdded_01
+ * @tc.desc: Test OnCommonEvent dispatches to the real USER_ADDED handler
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(AccountManagerTest, AccountManagerTest_OnCommonEvent_UserAdded_01, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t accountId = TEST_ACCOUNT_ID_002;
+    EventFwk::CommonEventData data;
+    data.SetCode(accountId);
+    EventFwk::Want want;
+    want.SetAction(EventFwk::CommonEventSupport::COMMON_EVENT_USER_ADDED);
+    data.SetWant(want);
+    ASSERT_NO_FATAL_FAILURE(ACCOUNT_MGR->OnCommonEvent(data));
+    EXPECT_EQ(ACCOUNT_MGR->accounts_.count(accountId), 1);
+    ACCOUNT_MGR->accounts_.erase(accountId);
+}
+
+/**
+ * @tc.name: AccountManagerTest_InitEdmCommonEventSubscriber_01
+ * @tc.desc: Test InitEdmCommonEventSubscriber subscribes and can be unsubscribed
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(AccountManagerTest, AccountManagerTest_InitEdmCommonEventSubscriber_01, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ACCOUNT_MGR->edmSubscriber_ = nullptr;
+    ASSERT_NO_FATAL_FAILURE(ACCOUNT_MGR->InitEdmCommonEventSubscriber());
+    ACCOUNT_MGR->UnsubscribeEdmCommonEvent();
+    EXPECT_EQ(ACCOUNT_MGR->edmSubscriber_, nullptr);
+}
+
+/**
+ * @tc.name: AccountManagerTest_UnsubscribeEdmCommonEvent_WithSubscriber_02
+ * @tc.desc: Test UnsubscribeEdmCommonEvent clears an existing edm subscriber
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(AccountManagerTest, AccountManagerTest_UnsubscribeEdmCommonEvent_WithSubscriber_02, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ACCOUNT_MGR->InitEdmCommonEventSubscriber();
+    ASSERT_NE(ACCOUNT_MGR->edmSubscriber_, nullptr);
+    ACCOUNT_MGR->UnsubscribeEdmCommonEvent();
+    EXPECT_EQ(ACCOUNT_MGR->edmSubscriber_, nullptr);
+}
+
+/**
+ * @tc.name: AccountManagerTest_AccountSetting_Destructor_WithObservers_01
+ * @tc.desc: Test AccountSetting destructor unregisters non-null observers
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(AccountManagerTest, AccountManagerTest_AccountSetting_Destructor_WithObservers_01, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t accountId = TEST_ACCOUNT_ID_001;
+    auto accountSetting = std::make_unique<AccountManager::AccountSetting>(accountId);
+    auto &settingHelper = SettingDataShare::GetInstance(3101);
+    std::function<void(const std::string &)> onUpdate = [](const std::string &) {};
+    accountSetting->switchObserver_ = settingHelper.CreateObserver("destructor_switch_key", onUpdate);
+    accountSetting->onScreenLockedSwitchObserver_ = settingHelper.CreateObserver("destructor_locked_key", onUpdate);
+    accountSetting->configObserver_ = settingHelper.CreateObserver("destructor_config_key", onUpdate);
+    ASSERT_NE(accountSetting->switchObserver_, nullptr);
+    ASSERT_NE(accountSetting->onScreenLockedSwitchObserver_, nullptr);
+    ASSERT_NE(accountSetting->configObserver_, nullptr);
+    accountSetting.reset();
+}
+
+/**
+ * @tc.name: AccountManagerTest_InitializeSetting_AllObserversSet_01
+ * @tc.desc: Test InitializeSetting with all observers already registered, no timer is scheduled
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(AccountManagerTest, AccountManagerTest_InitializeSetting_AllObserversSet_01, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t accountId = TEST_ACCOUNT_ID_002;
+    AccountManager::AccountSetting baseAccountSetting(accountId);
+    AccountManager::AccountSetting accountSetting(baseAccountSetting);
+    auto &settingHelper = SettingDataShare::GetInstance(3101);
+    std::function<void(const std::string &)> onUpdate = [](const std::string &) {};
+    accountSetting.switchObserver_ = settingHelper.CreateObserver("init_switch_key", onUpdate);
+    accountSetting.onScreenLockedSwitchObserver_ = settingHelper.CreateObserver("init_locked_key", onUpdate);
+    accountSetting.configObserver_ = settingHelper.CreateObserver("init_config_key", onUpdate);
+    ASSERT_NE(accountSetting.switchObserver_, nullptr);
+    ASSERT_NE(accountSetting.onScreenLockedSwitchObserver_, nullptr);
+    ASSERT_NE(accountSetting.configObserver_, nullptr);
+    ASSERT_NO_FATAL_FAILURE(accountSetting.InitializeSetting());
+    EXPECT_EQ(accountSetting.timerId_, -1);
+    EXPECT_NE(accountSetting.switchObserver_, nullptr);
+    EXPECT_NE(accountSetting.onScreenLockedSwitchObserver_, nullptr);
+    EXPECT_NE(accountSetting.configObserver_, nullptr);
 }
 
 } // namespace MMI
