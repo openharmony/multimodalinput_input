@@ -7002,6 +7002,8 @@ void InputWindowsManager::DispatchTouch(int32_t pointerAction, int32_t groupId, 
     if (pointerAction == PointerEvent::POINTER_ACTION_LEVITATE_IN_WINDOW ||
         pointerAction == PointerEvent::POINTER_ACTION_LEVITATE_OUT_WINDOW) {
         currentPointerItem.SetToolType(PointerEvent::TOOL_TYPE_PEN);
+        currentPointerItem.SetTiltX(lastPointerItem.GetTiltX());
+        currentPointerItem.SetTiltY(lastPointerItem.GetTiltY());
     }
 
     pointerEvent->UpdateId();
