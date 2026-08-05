@@ -6971,17 +6971,17 @@ void InputWindowsManager::DispatchTouch(int32_t pointerAction, int32_t groupId, 
     bool isOneHand = dispatchTouchEvent->GetFixedMode() == PointerEvent::FixedMode::AUTO;
     double windowX = isOneHand ? lastWinX_ : (lastInfo.lastTouchLogicX - lastInfo.lastTouchWindowInfo.area.x);
     double windowY = isOneHand ? lastWinY_ : (lastInfo.lastTouchLogicY - lastInfo.lastTouchWindowInfo.area.y);
+    if (!(lastInfo.lastTouchWindowInfo.transform.empty())) {
+        auto windowXY = TransformWindowXY(lastInfo.lastTouchWindowInfo, lastInfo.lastTouchLogicX,
+            lastInfo.lastTouchLogicY);
+        windowX = windowXY.first;
+        windowY = windowXY.second;
+    }
     if (isOneHand) {
         WindowInputType windowInputType = lastInfo.lastTouchWindowInfo.windowInputType;
         if (windowInputType != WindowInputType::MIX_LEFT_RIGHT_ANTI_AXIS_MOVE &&
             windowInputType != WindowInputType::DUALTRIGGER_TOUCH &&
             windowInputType != WindowInputType::MIX_BUTTOM_ANTI_AXIS_MOVE) {
-            if (!(lastInfo.lastTouchWindowInfo.transform.empty())) {
-                auto windowXY = TransformWindowXY(lastInfo.lastTouchWindowInfo, lastInfo.lastTouchLogicX,
-                    lastInfo.lastTouchLogicY);
-                windowX = windowXY.first;
-                windowY = windowXY.second;
-            }
             currentPointerItem.SetFixedDisplayXPos(lastPointerItem.GetFixedDisplayXPos());
             currentPointerItem.SetFixedDisplayYPos(lastPointerItem.GetFixedDisplayYPos());
             pointerEvent->SetFixedMode(PointerEvent::FixedMode::AUTO);
