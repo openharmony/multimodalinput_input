@@ -568,6 +568,15 @@ int32_t JsInputMonitor::GetAction(int32_t action)
         case PointerEvent::POINTER_ACTION_UP: {
             return static_cast<int32_t>(JsTouchEvent::Action::UP);
         }
+        case PointerEvent::POINTER_ACTION_PULL_DOWN: {
+            return static_cast<int32_t>(JsTouchEvent::Action::PULL_DOWN);
+        }
+        case PointerEvent::POINTER_ACTION_PULL_MOVE: {
+            return static_cast<int32_t>(JsTouchEvent::Action::PULL_MOVE);
+        }
+        case PointerEvent::POINTER_ACTION_PULL_UP: {
+            return static_cast<int32_t>(JsTouchEvent::Action::PULL_UP);
+        }
         case PointerEvent::POINTER_ACTION_PROXIMITY_IN: {
             return static_cast<int32_t>(JsTouchEvent::Action::PROXIMITY_IN);
         }
@@ -582,15 +591,6 @@ int32_t JsInputMonitor::GetAction(int32_t action)
         }
         case PointerEvent::POINTER_ACTION_LEVITATE_OUT_WINDOW: {
             return static_cast<int32_t>(JsTouchEvent::Action::LEVITATE_OUT_WINDOW);
-        }
-        case PointerEvent::POINTER_ACTION_PULL_DOWN: {
-            return static_cast<int32_t>(JsTouchEvent::Action::PULL_DOWN);
-        }
-        case PointerEvent::POINTER_ACTION_PULL_MOVE: {
-            return static_cast<int32_t>(JsTouchEvent::Action::PULL_MOVE);
-        }
-        case PointerEvent::POINTER_ACTION_PULL_UP: {
-            return static_cast<int32_t>(JsTouchEvent::Action::PULL_UP);
         }
         default: {
             return RET_ERR;
