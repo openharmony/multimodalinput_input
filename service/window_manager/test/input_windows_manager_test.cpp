@@ -14,9 +14,11 @@
  */
 
 #include <cstdio>
+#include <fcntl.h>
 #include <fstream>
 #include <gmock/gmock.h>
 #include <optional>
+#include <unistd.h>
 
 #include "account_manager.h"
 #include "cursor_drawing_component.h"
@@ -17122,6 +17124,605 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_BindToDisplay_002, Tes
     // Display 1 exists, so the call delegates to bindInfo_.BindToDisplay. Device 2 is unknown, so
     // binding is rejected with ERR_BIND_DEVICE_NOT_EXIST (exercises the display-found branch).
     EXPECT_EQ(WIN_MGR->BindToDisplay(2, 1, msg), ERR_BIND_DEVICE_NOT_EXIST);
+}
+
+// =====================================================================================
+// Coverage for the deferred BindToDisplay / sequence-tracking feature.
+// The helper below wipes the singleton's deferred-bind internals (sequence counters,
+// pending binds and any armed watchdog timers) so each case starts from a clean slate
+// regardless of what earlier cases left behind.
+// =====================================================================================
+static void ResetDeferredBindState(InputWindowsManager *mgr)
+{
+    mgr->activeSequenceCount_.clear();
+    mgr->pendingBinds_.clear();
+    // CancelPendingBindTimer mutates the map, so iterate over a snapshot.
+    auto timers = mgr->pendingBindTimers_;
+    for (const auto &it : timers) {
+        mgr->CancelPendingBindTimer(it.first);
+    }
+}
+
+// Register a device into bindInfo_ so BindToDisplay can resolve it by id.
+static void RegisterBindDevice(InputWindowsManager *mgr, int32_t deviceId)
+{
+    mgr->DeviceStatusChanged(deviceId, "mouse_deferred", "sysUid_deferred", "add");
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_BindToDisplay_003
+ * @tc.desc: BindToDisplay succeeds for a registered device with no active sequence (display-found,
+ *           no-deferral branch), and the binding is observable via GetBindDisplayIdByInputDevice.
+ * @tc.type: FUNC
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_BindToDisplay_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    UDSServer udsServer;
+    WIN_MGR->Init(udsServer);
+    ResetDeferredBindState(WIN_MGR);
+    constexpr int32_t devId { 8801 };
+    RegisterBindDevice(WIN_MGR, devId);
+    std::string msg;
+    // Display 1 is registered by SetUp; device is registered; no active sequence -> immediate bind.
+    EXPECT_EQ(WIN_MGR->BindToDisplay(devId, 1, msg), RET_OK);
+    EXPECT_EQ(WIN_MGR->GetBindDisplayIdByInputDevice(devId), 1);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_BindToDisplay_004
+ * @tc.desc: BindToDisplay is deferred when the device has an active sequence; the request is stored
+ *           as pending, a watchdog timer is armed, and RET_OK is returned without binding yet.
+ * @tc.type: FUNC
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_BindToDisplay_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    UDSServer udsServer;
+    WIN_MGR->Init(udsServer);
+    ResetDeferredBindState(WIN_MGR);
+    constexpr int32_t devId { 8802 };
+    RegisterBindDevice(WIN_MGR, devId);
+    WIN_MGR->activeSequenceCount_[devId] = 1; // an in-flight sequence blocks immediate binding
+    std::string msg;
+    EXPECT_EQ(WIN_MGR->BindToDisplay(devId, 1, msg), RET_OK);
+    EXPECT_EQ(WIN_MGR->pendingBinds_.count(devId), 1u);
+    EXPECT_EQ(WIN_MGR->pendingBinds_[devId], 1);
+    EXPECT_EQ(WIN_MGR->pendingBindTimers_.count(devId), 1u);
+    // Still deferred: the bind relation is not established yet.
+    EXPECT_EQ(WIN_MGR->GetBindDisplayIdByInputDevice(devId), -1);
+    ResetDeferredBindState(WIN_MGR);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_DeferredBind_FlushOnSequenceEnd
+ * @tc.desc: End-to-end: a deferred bind is applied once the in-flight sequence ends
+ *           (UpdateActiveSequence -> FlushPendingBind -> bindInfo_.BindToDisplay).
+ * @tc.type: FUNC
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_DeferredBind_FlushOnSequenceEnd, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    UDSServer udsServer;
+    WIN_MGR->Init(udsServer);
+    ResetDeferredBindState(WIN_MGR);
+    constexpr int32_t devId { 8803 };
+    RegisterBindDevice(WIN_MGR, devId);
+    WIN_MGR->activeSequenceCount_[devId] = 1;
+    std::string msg;
+    ASSERT_EQ(WIN_MGR->BindToDisplay(devId, 1, msg), RET_OK);
+    // Sequence completes -> counter drops to 0 -> pending bind is flushed.
+    WIN_MGR->UpdateActiveSequence(devId, -1);
+    EXPECT_EQ(WIN_MGR->activeSequenceCount_.count(devId), 0u);
+    EXPECT_EQ(WIN_MGR->pendingBinds_.count(devId), 0u);
+    EXPECT_EQ(WIN_MGR->pendingBindTimers_.count(devId), 0u);
+    EXPECT_EQ(WIN_MGR->GetBindDisplayIdByInputDevice(devId), 1);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_UpdateActiveSequence_001
+ * @tc.desc: delta == 0 is a no-op (counter untouched).
+ * @tc.type: FUNC
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateActiveSequence_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ResetDeferredBindState(WIN_MGR);
+    constexpr int32_t devId { 8804 };
+    WIN_MGR->activeSequenceCount_[devId] = 2;
+    WIN_MGR->UpdateActiveSequence(devId, 0);
+    EXPECT_EQ(WIN_MGR->activeSequenceCount_[devId], 2);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_UpdateActiveSequence_002
+ * @tc.desc: positive delta increments the counter.
+ * @tc.type: FUNC
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateActiveSequence_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ResetDeferredBindState(WIN_MGR);
+    constexpr int32_t devId { 8805 };
+    WIN_MGR->activeSequenceCount_[devId] = 1;
+    WIN_MGR->UpdateActiveSequence(devId, 3);
+    EXPECT_EQ(WIN_MGR->activeSequenceCount_[devId], 4);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_FlushPendingBind_001
+ * @tc.desc: FlushPendingBind with no pending entry is a no-op.
+ * @tc.type: FUNC
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_FlushPendingBind_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ResetDeferredBindState(WIN_MGR);
+    constexpr int32_t devId { 8806 };
+    EXPECT_NO_FATAL_FAILURE(WIN_MGR->FlushPendingBind(devId));
+    EXPECT_EQ(WIN_MGR->pendingBinds_.count(devId), 0u);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_FlushPendingBind_002
+ * @tc.desc: FlushPendingBind drops a pending bind whose target display has disappeared
+ *           (GetPhysicalDisplay returns nullptr) without touching bindInfo_.
+ * @tc.type: FUNC
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_FlushPendingBind_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ResetDeferredBindState(WIN_MGR);
+    constexpr int32_t devId { 8807 };
+    constexpr int32_t goneDisplay { 9999 };
+    WIN_MGR->pendingBinds_[devId] = goneDisplay;
+    EXPECT_NO_FATAL_FAILURE(WIN_MGR->FlushPendingBind(devId));
+    EXPECT_EQ(WIN_MGR->pendingBinds_.count(devId), 0u);
+    EXPECT_EQ(WIN_MGR->GetBindDisplayIdByInputDevice(devId), -1);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_FlushPendingBind_003
+ * @tc.desc: FlushPendingBind applies a pending bind to a registered device when the display exists.
+ * @tc.type: FUNC
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_FlushPendingBind_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    UDSServer udsServer;
+    WIN_MGR->Init(udsServer);
+    ResetDeferredBindState(WIN_MGR);
+    constexpr int32_t devId { 8808 };
+    RegisterBindDevice(WIN_MGR, devId);
+    WIN_MGR->pendingBinds_[devId] = 1;
+    WIN_MGR->FlushPendingBind(devId);
+    EXPECT_EQ(WIN_MGR->pendingBinds_.count(devId), 0u);
+    EXPECT_EQ(WIN_MGR->GetBindDisplayIdByInputDevice(devId), 1);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_ArmPendingBindTimer_001
+ * @tc.desc: ArmPendingBindTimer is idempotent: a second deferral for the same device does not arm a
+ *           second watchdog.
+ * @tc.type: FUNC
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_ArmPendingBindTimer_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ResetDeferredBindState(WIN_MGR);
+    constexpr int32_t devId { 8809 };
+    WIN_MGR->ArmPendingBindTimer(devId);
+    ASSERT_EQ(WIN_MGR->pendingBindTimers_.count(devId), 1u);
+    int32_t firstTimer = WIN_MGR->pendingBindTimers_[devId];
+    WIN_MGR->ArmPendingBindTimer(devId); // already armed -> no-op
+    ASSERT_EQ(WIN_MGR->pendingBindTimers_.count(devId), 1u);
+    EXPECT_EQ(WIN_MGR->pendingBindTimers_[devId], firstTimer);
+    ResetDeferredBindState(WIN_MGR);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_CancelPendingBindTimer_001
+ * @tc.desc: CancelPendingBindTimer is a no-op when no timer is armed, and removes it when armed.
+ * @tc.type: FUNC
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_CancelPendingBindTimer_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ResetDeferredBindState(WIN_MGR);
+    constexpr int32_t devId { 8810 };
+    // No timer armed -> no-op.
+    EXPECT_NO_FATAL_FAILURE(WIN_MGR->CancelPendingBindTimer(devId));
+    EXPECT_EQ(WIN_MGR->pendingBindTimers_.count(devId), 0u);
+    // Arm then cancel.
+    WIN_MGR->ArmPendingBindTimer(devId);
+    ASSERT_EQ(WIN_MGR->pendingBindTimers_.count(devId), 1u);
+    WIN_MGR->CancelPendingBindTimer(devId);
+    EXPECT_EQ(WIN_MGR->pendingBindTimers_.count(devId), 0u);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_OnPendingBindTimeout_001
+ * @tc.desc: Watchdog firing after the bind was already applied on the normal path is a no-op.
+ * @tc.type: FUNC
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_OnPendingBindTimeout_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ResetDeferredBindState(WIN_MGR);
+    constexpr int32_t devId { 8811 };
+    WIN_MGR->pendingBindTimers_[devId] = 1234; // sentinel; not a real TimerMgr id
+    EXPECT_NO_FATAL_FAILURE(WIN_MGR->OnPendingBindTimeout(devId));
+    EXPECT_EQ(WIN_MGR->pendingBindTimers_.count(devId), 0u);
+    EXPECT_EQ(WIN_MGR->activeSequenceCount_.count(devId), 0u);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_OnPendingBindTimeout_002
+ * @tc.desc: Watchdog firing with a stuck sequence force-applies the pending bind and clears the
+ *           stuck counter.
+ * @tc.type: FUNC
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_OnPendingBindTimeout_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    UDSServer udsServer;
+    WIN_MGR->Init(udsServer);
+    ResetDeferredBindState(WIN_MGR);
+    constexpr int32_t devId { 8812 };
+    RegisterBindDevice(WIN_MGR, devId);
+    WIN_MGR->pendingBindTimers_[devId] = 1234; // sentinel; OnPendingBindTimeout just erases it
+    WIN_MGR->pendingBinds_[devId] = 1;
+    WIN_MGR->activeSequenceCount_[devId] = 2; // stuck sequence
+    EXPECT_NO_FATAL_FAILURE(WIN_MGR->OnPendingBindTimeout(devId));
+    EXPECT_EQ(WIN_MGR->pendingBindTimers_.count(devId), 0u);
+    EXPECT_EQ(WIN_MGR->activeSequenceCount_.count(devId), 0u);
+    EXPECT_EQ(WIN_MGR->pendingBinds_.count(devId), 0u);
+    EXPECT_EQ(WIN_MGR->GetBindDisplayIdByInputDevice(devId), 1);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_OnPendingBindTimeout_003
+ * @tc.desc: Watchdog firing with no stuck sequence still force-applies a pending bind.
+ * @tc.type: FUNC
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_OnPendingBindTimeout_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    UDSServer udsServer;
+    WIN_MGR->Init(udsServer);
+    ResetDeferredBindState(WIN_MGR);
+    constexpr int32_t devId { 8813 };
+    RegisterBindDevice(WIN_MGR, devId);
+    WIN_MGR->pendingBindTimers_[devId] = 1234;
+    WIN_MGR->pendingBinds_[devId] = 1;
+    // No activeSequenceCount_ entry -> stuckCount stays 0.
+    EXPECT_NO_FATAL_FAILURE(WIN_MGR->OnPendingBindTimeout(devId));
+    EXPECT_EQ(WIN_MGR->GetBindDisplayIdByInputDevice(devId), 1);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_IsPointerSequenceBegin_001
+ * @tc.desc: Every begin action returns true; a non-begin action returns false.
+ * @tc.type: FUNC
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsPointerSequenceBegin_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EXPECT_TRUE(WIN_MGR->IsPointerSequenceBegin(PointerEvent::POINTER_ACTION_DOWN));
+    EXPECT_TRUE(WIN_MGR->IsPointerSequenceBegin(PointerEvent::POINTER_ACTION_AXIS_BEGIN));
+    EXPECT_TRUE(WIN_MGR->IsPointerSequenceBegin(PointerEvent::POINTER_ACTION_BUTTON_DOWN));
+    EXPECT_TRUE(WIN_MGR->IsPointerSequenceBegin(PointerEvent::POINTER_ACTION_PULL_DOWN));
+    EXPECT_TRUE(WIN_MGR->IsPointerSequenceBegin(PointerEvent::POINTER_ACTION_SWIPE_BEGIN));
+    EXPECT_TRUE(WIN_MGR->IsPointerSequenceBegin(PointerEvent::POINTER_ACTION_ROTATE_BEGIN));
+    EXPECT_TRUE(WIN_MGR->IsPointerSequenceBegin(PointerEvent::POINTER_ACTION_FINGERPRINT_DOWN));
+    EXPECT_FALSE(WIN_MGR->IsPointerSequenceBegin(PointerEvent::POINTER_ACTION_MOVE));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_IsPointerSequenceEnd_001
+ * @tc.desc: Every end action returns true; a non-end action returns false.
+ * @tc.type: FUNC
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsPointerSequenceEnd_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EXPECT_TRUE(WIN_MGR->IsPointerSequenceEnd(PointerEvent::POINTER_ACTION_UP));
+    EXPECT_TRUE(WIN_MGR->IsPointerSequenceEnd(PointerEvent::POINTER_ACTION_CANCEL));
+    EXPECT_TRUE(WIN_MGR->IsPointerSequenceEnd(PointerEvent::POINTER_ACTION_AXIS_END));
+    EXPECT_TRUE(WIN_MGR->IsPointerSequenceEnd(PointerEvent::POINTER_ACTION_BUTTON_UP));
+    EXPECT_TRUE(WIN_MGR->IsPointerSequenceEnd(PointerEvent::POINTER_ACTION_PULL_UP));
+    EXPECT_TRUE(WIN_MGR->IsPointerSequenceEnd(PointerEvent::POINTER_ACTION_PULL_CANCEL));
+    EXPECT_TRUE(WIN_MGR->IsPointerSequenceEnd(PointerEvent::POINTER_ACTION_SWIPE_END));
+    EXPECT_TRUE(WIN_MGR->IsPointerSequenceEnd(PointerEvent::POINTER_ACTION_ROTATE_END));
+    EXPECT_TRUE(WIN_MGR->IsPointerSequenceEnd(PointerEvent::POINTER_ACTION_FINGERPRINT_UP));
+    EXPECT_TRUE(WIN_MGR->IsPointerSequenceEnd(PointerEvent::POINTER_ACTION_HOVER_CANCEL));
+    EXPECT_TRUE(WIN_MGR->IsPointerSequenceEnd(PointerEvent::POINTER_ACTION_FINGERPRINT_CANCEL));
+    EXPECT_FALSE(WIN_MGR->IsPointerSequenceEnd(PointerEvent::POINTER_ACTION_MOVE));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_UpdatePointerSequence_001
+ * @tc.desc: Null event, simulated event, and a neutral action leave the counter untouched.
+ * @tc.type: FUNC
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdatePointerSequence_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ResetDeferredBindState(WIN_MGR);
+    constexpr int32_t devId { 8814 };
+    EXPECT_NO_FATAL_FAILURE(WIN_MGR->UpdatePointerSequence(nullptr));
+
+    auto simulated = PointerEvent::Create();
+    simulated->SetDeviceId(devId);
+    simulated->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
+    simulated->AddFlag(InputEvent::EVENT_FLAG_SIMULATE);
+    WIN_MGR->UpdatePointerSequence(simulated);
+    EXPECT_EQ(WIN_MGR->activeSequenceCount_.count(devId), 0u);
+
+    auto neutral = PointerEvent::Create();
+    neutral->SetDeviceId(devId);
+    neutral->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
+    WIN_MGR->UpdatePointerSequence(neutral);
+    EXPECT_EQ(WIN_MGR->activeSequenceCount_.count(devId), 0u);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_UpdatePointerSequence_002
+ * @tc.desc: A begin action increments and an end action decrements the device's sequence counter.
+ * @tc.type: FUNC
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdatePointerSequence_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ResetDeferredBindState(WIN_MGR);
+    constexpr int32_t devId { 8815 };
+    auto begin = PointerEvent::Create();
+    begin->SetDeviceId(devId);
+    begin->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_DOWN);
+    WIN_MGR->UpdatePointerSequence(begin);
+    EXPECT_EQ(WIN_MGR->activeSequenceCount_[devId], 1);
+
+    auto end = PointerEvent::Create();
+    end->SetDeviceId(devId);
+    end->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_UP);
+    WIN_MGR->UpdatePointerSequence(end);
+    EXPECT_EQ(WIN_MGR->activeSequenceCount_.count(devId), 0u);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_ApplyBoundDisplayId_Key_001
+ * @tc.desc: KeyEvent ApplyBoundDisplayId: null event is a no-op; an unbound device leaves the
+ *           target display id untouched.
+ * @tc.type: FUNC
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_ApplyBoundDisplayId_Key_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ResetDeferredBindState(WIN_MGR);
+    EXPECT_NO_FATAL_FAILURE(WIN_MGR->ApplyBoundDisplayId(std::shared_ptr<KeyEvent>(nullptr)));
+    auto keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    constexpr int32_t unboundDev { 8816 };
+    keyEvent->SetDeviceId(unboundDev);
+    keyEvent->SetTargetDisplayId(-1);
+    WIN_MGR->ApplyBoundDisplayId(keyEvent);
+    EXPECT_EQ(keyEvent->GetTargetDisplayId(), -1);
+    EXPECT_EQ(WIN_MGR->activeSequenceCount_.count(unboundDev), 0u);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_ApplyBoundDisplayId_Key_002
+ * @tc.desc: KeyEvent ApplyBoundDisplayId for a bound device sets the target display id and records
+ *           the pressed-key count as the sequence counter.
+ * @tc.type: FUNC
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_ApplyBoundDisplayId_Key_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    UDSServer udsServer;
+    WIN_MGR->Init(udsServer);
+    ResetDeferredBindState(WIN_MGR);
+    constexpr int32_t devId { 8817 };
+    RegisterBindDevice(WIN_MGR, devId);
+    std::string msg;
+    ASSERT_EQ(WIN_MGR->BindToDisplay(devId, 1, msg), RET_OK);
+
+    auto keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    keyEvent->SetDeviceId(devId);
+    keyEvent->SetTargetDisplayId(-1);
+    KeyEvent::KeyItem item;
+    item.SetKeyCode(17); // KEYCODE_CTRL
+    item.SetPressed(true);
+    keyEvent->AddKeyItem(item);
+    WIN_MGR->ApplyBoundDisplayId(keyEvent);
+    EXPECT_EQ(keyEvent->GetTargetDisplayId(), 1);
+    EXPECT_EQ(WIN_MGR->activeSequenceCount_[devId], 1);
+
+    // Simulated key events must not touch the sequence counter.
+    auto simulated = KeyEvent::Create();
+    ASSERT_NE(simulated, nullptr);
+    simulated->SetDeviceId(devId);
+    simulated->SetTargetDisplayId(-1);
+    simulated->AddFlag(InputEvent::EVENT_FLAG_SIMULATE);
+    WIN_MGR->ApplyBoundDisplayId(simulated);
+    EXPECT_EQ(simulated->GetTargetDisplayId(), 1); // bound display still applied
+    EXPECT_EQ(WIN_MGR->activeSequenceCount_[devId], 1); // counter unchanged by simulated event
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_ApplyBoundDisplayId_Key_003
+ * @tc.desc: KeyEvent ApplyBoundDisplayId with no pressed keys drops the counter and flushes a
+ *           pending bind.
+ * @tc.type: FUNC
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_ApplyBoundDisplayId_Key_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    UDSServer udsServer;
+    WIN_MGR->Init(udsServer);
+    ResetDeferredBindState(WIN_MGR);
+    constexpr int32_t devId { 8818 };
+    RegisterBindDevice(WIN_MGR, devId);
+    WIN_MGR->activeSequenceCount_[devId] = 1;
+    WIN_MGR->pendingBinds_[devId] = 1;
+
+    auto keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    keyEvent->SetDeviceId(devId);
+    keyEvent->SetTargetDisplayId(-1);
+    // No key items -> pressedCount == 0 -> erase counter + flush pending bind.
+    WIN_MGR->ApplyBoundDisplayId(keyEvent);
+    EXPECT_EQ(WIN_MGR->activeSequenceCount_.count(devId), 0u);
+    EXPECT_EQ(WIN_MGR->pendingBinds_.count(devId), 0u);
+    EXPECT_EQ(WIN_MGR->GetBindDisplayIdByInputDevice(devId), 1);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_ApplyBoundDisplayId_Pointer_001
+ * @tc.desc: PointerEvent ApplyBoundDisplayId: null event is a no-op; an unbound device leaves the
+ *           target display id untouched.
+ * @tc.type: FUNC
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_ApplyBoundDisplayId_Pointer_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ResetDeferredBindState(WIN_MGR);
+    EXPECT_NO_FATAL_FAILURE(WIN_MGR->ApplyBoundDisplayId(std::shared_ptr<PointerEvent>(nullptr)));
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    constexpr int32_t unboundDev { 8819 };
+    pointerEvent->SetDeviceId(unboundDev);
+    pointerEvent->SetTargetDisplayId(5);
+    WIN_MGR->ApplyBoundDisplayId(pointerEvent);
+    EXPECT_EQ(pointerEvent->GetTargetDisplayId(), 5);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_ApplyBoundDisplayId_Pointer_002
+ * @tc.desc: PointerEvent ApplyBoundDisplayId keeps the pointer on its current display when it is
+ *           already in the bound display's group (no jump).
+ * @tc.type: FUNC
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_ApplyBoundDisplayId_Pointer_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    UDSServer udsServer;
+    WIN_MGR->Init(udsServer);
+    ResetDeferredBindState(WIN_MGR);
+    // Register displays 1 and 2 in the same (default) group, then bind the device to display 1.
+    auto groupInfo = CreateDisplayGroupInfo(0, 1, 2);
+    WIN_MGR->UpdateDisplayInfo(groupInfo);
+    constexpr int32_t devId { 8820 };
+    RegisterBindDevice(WIN_MGR, devId);
+    std::string msg;
+    ASSERT_EQ(WIN_MGR->BindToDisplay(devId, 1, msg), RET_OK);
+
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetDeviceId(devId);
+    pointerEvent->SetTargetDisplayId(2); // same group as bound display 1
+    WIN_MGR->ApplyBoundDisplayId(pointerEvent);
+    EXPECT_EQ(pointerEvent->GetTargetDisplayId(), 2); // unchanged
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_ApplyBoundDisplayId_Pointer_003
+ * @tc.desc: PointerEvent ApplyBoundDisplayId redirects the pointer to the bound display when its
+ *           current display is in a different group.
+ * @tc.type: FUNC
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_ApplyBoundDisplayId_Pointer_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    UDSServer udsServer;
+    WIN_MGR->Init(udsServer);
+    ResetDeferredBindState(WIN_MGR);
+    // Register display 1 in group 0 and display 5 in a separate group so the groups genuinely differ.
+    // UpdateDisplayInfo takes a non-const reference, so bind each result to a local lvalue first.
+    auto group0 = CreateDisplayGroupInfo(0, 1);
+    WIN_MGR->UpdateDisplayInfo(group0);
+    auto group7 = CreateDisplayGroupInfo(7, 5);
+    WIN_MGR->UpdateDisplayInfo(group7);
+    constexpr int32_t devId { 8821 };
+    RegisterBindDevice(WIN_MGR, devId);
+    std::string msg;
+    ASSERT_EQ(WIN_MGR->BindToDisplay(devId, 1, msg), RET_OK);
+
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetDeviceId(devId);
+    pointerEvent->SetTargetDisplayId(5); // group 7 != bound group 0 -> redirect
+    WIN_MGR->ApplyBoundDisplayId(pointerEvent);
+    EXPECT_EQ(pointerEvent->GetTargetDisplayId(), 1);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_DeviceStatusChanged_RemoveClearsDeferredState
+ * @tc.desc: On device disconnection the orphaned sequence counter, pending bind and watchdog timer
+ *           are all removed (exercises the new else-branch cleanup in DeviceStatusChanged).
+ * @tc.type: FUNC
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_DeviceStatusChanged_RemoveClearsDeferredState, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    UDSServer udsServer;
+    WIN_MGR->Init(udsServer);
+    ResetDeferredBindState(WIN_MGR);
+    constexpr int32_t devId { 8822 };
+    WIN_MGR->activeSequenceCount_[devId] = 2;
+    WIN_MGR->pendingBinds_[devId] = 1;
+    WIN_MGR->ArmPendingBindTimer(devId);
+    ASSERT_EQ(WIN_MGR->pendingBindTimers_.count(devId), 1u);
+
+    WIN_MGR->DeviceStatusChanged(devId, "mouse_deferred", "sysUid_deferred", "remove");
+    EXPECT_EQ(WIN_MGR->activeSequenceCount_.count(devId), 0u);
+    EXPECT_EQ(WIN_MGR->pendingBinds_.count(devId), 0u);
+    EXPECT_EQ(WIN_MGR->pendingBindTimers_.count(devId), 0u);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_GetBindDisplayIdByInputDevice_001
+ * @tc.desc: GetBindDisplayIdByInputDevice returns -1 for an unbound device and the bound display id
+ *           for a bound one.
+ * @tc.type: FUNC
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetBindDisplayIdByInputDevice_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    UDSServer udsServer;
+    WIN_MGR->Init(udsServer);
+    ResetDeferredBindState(WIN_MGR);
+    EXPECT_EQ(WIN_MGR->GetBindDisplayIdByInputDevice(8823), -1);
+    constexpr int32_t devId { 8824 };
+    RegisterBindDevice(WIN_MGR, devId);
+    std::string msg;
+    ASSERT_EQ(WIN_MGR->BindToDisplay(devId, 1, msg), RET_OK);
+    EXPECT_EQ(WIN_MGR->GetBindDisplayIdByInputDevice(devId), 1);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_DumpPendingBindState_001
+ * @tc.desc: DumpPendingBindState runs without crashing whether the deferred state is empty or
+ *           populated, and exercises the per-map iteration loops.
+ * @tc.type: FUNC
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_DumpPendingBindState_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t fd = open("/dev/null", O_WRONLY);
+    ASSERT_GE(fd, 0) << "open(/dev/null) failed";
+    // Empty state -> only the header lines are printed.
+    ResetDeferredBindState(WIN_MGR);
+    EXPECT_NO_FATAL_FAILURE(WIN_MGR->DumpPendingBindState(fd));
+    // Populated state -> exercises all three iteration loops.
+    constexpr int32_t devId { 8825 };
+    WIN_MGR->activeSequenceCount_[devId] = 1;
+    WIN_MGR->pendingBinds_[devId] = 1;
+    WIN_MGR->pendingBindTimers_[devId] = 1234;
+    EXPECT_NO_FATAL_FAILURE(WIN_MGR->DumpPendingBindState(fd));
+    ResetDeferredBindState(WIN_MGR);
+    close(fd);
 }
 } // namespace MMI
 } // namespace OHOS

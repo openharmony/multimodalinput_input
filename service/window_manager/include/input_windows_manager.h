@@ -74,6 +74,7 @@ public:
     void DumpDisplayInfo(int32_t fd, const std::vector<OLD::DisplayInfo>& displaysInfo);
     void DumpWindowsInfo(int32_t fd, const std::vector<WindowInfo>& windowsInfo);
     void DumpWindowInfo(int32_t fd, const WindowInfo &item);
+    void DumpPendingBindState(int32_t fd);
     int32_t GetWindowPid(int32_t windowId, const std::vector<WindowInfo> &windowsInfo) const;
     int32_t GetWindowPid(int32_t windowId) const;
     int32_t GetWindowAgentPid(int32_t windowId) const;
@@ -630,10 +631,16 @@ private:
     // BindToDisplay request for a device with an active sequence is deferred until it completes.
     std::map<int32_t, int32_t> activeSequenceCount_;
     std::map<int32_t, int32_t> pendingBinds_;
+    // Watchdog timers (one per deferred device) guaranteeing a stuck sequence still gets applied.
+    std::map<int32_t, int32_t> pendingBindTimers_;
     void UpdateActiveSequence(int32_t deviceId, int32_t delta);
     void FlushPendingBind(int32_t deviceId);
+    void ArmPendingBindTimer(int32_t deviceId);
+    void CancelPendingBindTimer(int32_t deviceId);
+    void OnPendingBindTimeout(int32_t deviceId);
     bool IsPointerSequenceBegin(int32_t action) const;
     bool IsPointerSequenceEnd(int32_t action) const;
+    void UpdatePointerSequence(std::shared_ptr<PointerEvent> pointerEvent);
     struct CaptureModeInfo {
         int32_t windowId { -1 };
         bool isCaptureMode { false };

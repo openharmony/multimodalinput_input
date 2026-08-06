@@ -785,7 +785,7 @@ int32_t InputDisplayBindHelper::BindToDisplay(int32_t deviceId, int32_t displayI
             MMI_HILOGE("%{public}s", msg.c_str());
             return ERR_BIND_DEVICE_NOT_EXIST;
         }
-        bindByDevice.AddInputDevice(deviceId, "", device->GetName());
+        bindByDevice.AddInputDevice(deviceId, device->GetName(), INPUT_DEV_MGR->GetSysUid(deviceId));
     }
 
     // A device is bound to at most one display: drop its previous binding. Devices already bound to

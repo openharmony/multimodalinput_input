@@ -50,6 +50,7 @@ public:
     MOCK_METHOD(std::shared_ptr<InputDevice>, GetInputDevice, (int32_t), (const));
     MOCK_METHOD(std::shared_ptr<InputDevice>, GetInputDevice, (int32_t, bool), (const));
     MOCK_METHOD(struct libinput_device*, GetLibinputDevice, (int32_t), (const));
+    std::string GetSysUid(int32_t deviceId) { return ""; }
     MOCK_METHOD(bool, IsRemoteInputDevice, (int32_t), (const));
     MOCK_METHOD(int32_t, FindInputDeviceId, (struct libinput_device*));
     MOCK_METHOD(void, Attach, (std::shared_ptr<IDeviceObserver>));

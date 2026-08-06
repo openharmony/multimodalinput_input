@@ -104,6 +104,11 @@ constexpr uint32_t FOLD_STATUS_MASK { 1U << 27U };
 constexpr int32_t REPEAT_COOLING_TIME { 100 };
 constexpr int32_t REPEAT_ONCE { 1 };
 constexpr int32_t DEFAULT_VALUE { -1 };
+// Watchdog fallback for a deferred BindToDisplay: if an in-flight event sequence never reaches
+// its end (lost up/cancel event, device gone silent, begin/end misalignment), force-apply the
+// pending bind after this timeout instead of leaving it pending forever. Tunable; long legit
+// gestures (e.g. press-hold/drag) longer than this will trigger the fallback mid-sequence.
+constexpr int32_t BIND_DEFER_TIMEOUT_MS { 5000 };
 constexpr int32_t ANGLE_90 { 90 };
 constexpr int32_t ANGLE_360 { 360 };
 constexpr int32_t POINTER_MOVEFLAG = { 7 };
@@ -229,9 +234,10 @@ void InputWindowsManager::DeviceStatusChanged(int32_t deviceId, const std::strin
     } else {
         bindInfo_.RemoveInputDevice(deviceId);
         // A disconnected device can no longer complete an in-flight sequence; drop its sequence
-        // counter and any deferred BindToDisplay so neither is left orphaned.
+        // counter, any deferred BindToDisplay, and its watchdog so none is left orphaned.
         activeSequenceCount_.erase(deviceId);
         pendingBinds_.erase(deviceId);
+        CancelPendingBindTimer(deviceId);
         TouchDispatchEventCache().ClearDeviceEvents(deviceId);
     }
 }
@@ -770,7 +776,6 @@ void InputWindowsManager::HandleKeyEventWindowId(std::shared_ptr<KeyEvent> keyEv
 {
     CALL_DEBUG_ENTER;
     CHKPV(keyEvent);
-    ApplyBoundDisplayId(keyEvent);
     int32_t groupId = FindDisplayGroupId(keyEvent->GetTargetDisplayId());
     int32_t focusWindowId = GetFocusWindowId(groupId);
     std::vector<WindowInfo> windowsInfo = GetWindowGroupInfoByDisplayId(keyEvent->GetTargetDisplayId());
@@ -1087,7 +1092,10 @@ int32_t InputWindowsManager::BindToDisplay(int32_t deviceId, int32_t displayId, 
     // gesture (e.g. mouse pressed) keeps its original target until it ends.
     auto it = activeSequenceCount_.find(deviceId);
     if (it != activeSequenceCount_.end() && it->second > 0) {
+        MMI_HILOGI("pending binds deviceId:%{public}d, displayId:%{public}d, count:%{public}d",
+            deviceId, displayId, it->second);
         pendingBinds_[deviceId] = displayId;
+        ArmPendingBindTimer(deviceId);
         return RET_OK;
     }
     return bindInfo_.BindToDisplay(deviceId, displayId, displayInfo->uniq, msg);
@@ -1115,6 +1123,7 @@ void InputWindowsManager::FlushPendingBind(int32_t deviceId)
     }
     int32_t displayId = it->second;
     pendingBinds_.erase(it);
+    CancelPendingBindTimer(deviceId);
     const auto *displayInfo = GetPhysicalDisplay(displayId);
     if (displayInfo == nullptr) {
         MMI_HILOGE("Pending bind dropped, display gone, deviceId:%{public}d", deviceId);
@@ -1122,6 +1131,55 @@ void InputWindowsManager::FlushPendingBind(int32_t deviceId)
     }
     std::string bindMsg;
     bindInfo_.BindToDisplay(deviceId, displayId, displayInfo->uniq, bindMsg);
+}
+
+void InputWindowsManager::ArmPendingBindTimer(int32_t deviceId)
+{
+    // Idempotent: a device keeps the watchdog it got on its first deferral. A later BindToDisplay
+    // that only overwrites the target leaves the original deadline in place, so the worst-case wait
+    // is bounded by a single BIND_DEFER_TIMEOUT_MS window from the initial deferral.
+    if (pendingBindTimers_.find(deviceId) != pendingBindTimers_.end()) {
+        return;
+    }
+    // The timer fires on the same epoll worker thread that runs pointer/key dispatch and
+    // BindToDisplay (TimerMgr->ProcessTimers is invoked from that loop), so it may touch the
+    // pending-bind state without an extra lock, mirroring the existing sequence-counter accesses.
+    int32_t timerId = TimerMgr->AddTimer(BIND_DEFER_TIMEOUT_MS, REPEAT_ONCE,
+        [this, deviceId]() { OnPendingBindTimeout(deviceId); }, "IwmPendingBindWatchdog");
+    if (timerId < 0) {
+        MMI_HILOGE("Failed to arm pending-bind watchdog, deviceId:%{public}d", deviceId);
+        return;
+    }
+    pendingBindTimers_[deviceId] = timerId;
+}
+
+void InputWindowsManager::CancelPendingBindTimer(int32_t deviceId)
+{
+    auto it = pendingBindTimers_.find(deviceId);
+    if (it == pendingBindTimers_.end()) {
+        return;
+    }
+    TimerMgr->RemoveTimer(it->second);
+    pendingBindTimers_.erase(it);
+}
+
+void InputWindowsManager::OnPendingBindTimeout(int32_t deviceId)
+{
+    // The timer has fired; clear its record first so the normal flush path's CancelPendingBindTimer
+    // becomes a no-op instead of removing an already-fired timer.
+    pendingBindTimers_.erase(deviceId);
+    if (pendingBinds_.find(deviceId) == pendingBinds_.end()) {
+        return; // Already applied on the normal path; nothing to force.
+    }
+    int32_t stuckCount = 0;
+    auto it = activeSequenceCount_.find(deviceId);
+    if (it != activeSequenceCount_.end()) {
+        stuckCount = it->second;
+        activeSequenceCount_.erase(it);
+    }
+    MMI_HILOGW("Pending-bind watchdog fired (sequence stuck), force-applying, "
+               "deviceId:%{public}d, stuckCount:%{public}d", deviceId, stuckCount);
+    FlushPendingBind(deviceId);
 }
 
 bool InputWindowsManager::IsPointerSequenceBegin(int32_t action) const
@@ -1148,6 +1206,22 @@ bool InputWindowsManager::IsPointerSequenceEnd(int32_t action) const
         || action == PointerEvent::POINTER_ACTION_FINGERPRINT_UP
         || action == PointerEvent::POINTER_ACTION_HOVER_CANCEL
         || action == PointerEvent::POINTER_ACTION_FINGERPRINT_CANCEL;
+}
+
+void InputWindowsManager::UpdatePointerSequence(std::shared_ptr<PointerEvent> pointerEvent)
+{
+    CHKPV(pointerEvent);
+    // Skip injected (simulated) events: they are not real user interactions and would corrupt the
+    // sequence counter.
+    if (pointerEvent->HasFlag(InputEvent::EVENT_FLAG_SIMULATE)) {
+        return;
+    }
+    int32_t action = pointerEvent->GetPointerAction();
+    if (IsPointerSequenceBegin(action)) {
+        UpdateActiveSequence(pointerEvent->GetDeviceId(), 1);
+    } else if (IsPointerSequenceEnd(action)) {
+        UpdateActiveSequence(pointerEvent->GetDeviceId(), -1);
+    }
 }
 
 void InputWindowsManager::UpdateCaptureMode(const OLD::DisplayGroupInfo &displayGroupInfo)
@@ -7251,11 +7325,18 @@ void InputWindowsManager::ApplyBoundDisplayId(std::shared_ptr<KeyEvent> keyEvent
     if (bindDisplayId >= 0) {
         keyEvent->SetTargetDisplayId(bindDisplayId);
     }
-    int32_t keyAction = keyEvent->GetKeyAction();
-    if (keyAction == KeyEvent::KEY_ACTION_DOWN) {
-        UpdateActiveSequence(deviceId, 1);
-    } else if (keyAction == KeyEvent::KEY_ACTION_UP || keyAction == KeyEvent::KEY_ACTION_CANCEL) {
-        UpdateActiveSequence(deviceId, -1);
+    if (!keyEvent->HasFlag(InputEvent::EVENT_FLAG_SIMULATE)) {
+        // Assign the counter directly from the authoritative pressed-keys count. This is
+        // state-based, so it is idempotent under the double-dispatch (pre/post Normalize) of this
+        // function and immune to auto-repeat ticks (a repeat does not change how many keys are
+        // held). When no key is held, drop the counter and flush any pending bind.
+        int32_t pressedCount = static_cast<int32_t>(keyEvent->GetPressedKeys().size());
+        if (pressedCount > 0) {
+            activeSequenceCount_[deviceId] = pressedCount;
+        } else {
+            activeSequenceCount_.erase(deviceId);
+            FlushPendingBind(deviceId);
+        }
     }
 }
 
@@ -7266,13 +7347,12 @@ void InputWindowsManager::ApplyBoundDisplayId(std::shared_ptr<PointerEvent> poin
     int32_t deviceId = pointerEvent->GetDeviceId();
     int32_t bindDisplayId = bindInfo_.GetBindDisplayIdByInputDevice(deviceId);
     if (bindDisplayId >= 0) {
-        pointerEvent->SetTargetDisplayId(bindDisplayId);
-    }
-    int32_t action = pointerEvent->GetPointerAction();
-    if (IsPointerSequenceBegin(action)) {
-        UpdateActiveSequence(deviceId, 1);
-    } else if (IsPointerSequenceEnd(action)) {
-        UpdateActiveSequence(deviceId, -1);
+        // The binding confines the device to the bound display's group. If the pointer is already
+        // on a display in that group, leave it there instead of jumping to the bound display.
+        int32_t currentDisplayId = pointerEvent->GetTargetDisplayId();
+        if (FindDisplayGroupId(bindDisplayId) != FindDisplayGroupId(currentDisplayId)) {
+            pointerEvent->SetTargetDisplayId(bindDisplayId);
+        }
     }
 }
 
@@ -7289,6 +7369,7 @@ int32_t InputWindowsManager::UpdateTargetPointer(std::shared_ptr<PointerEvent> p
         MMI_HILOG_DISPATCHD("Ignore touch event, pointerAction:%{public}d", pointerActionFlag_);
         return RET_OK;
     };
+    UpdatePointerSequence(pointerEvent);
     int32_t ret { RET_ERR };
     switch (source) {
 #ifdef OHOS_BUILD_ENABLE_TOUCH
@@ -8059,6 +8140,23 @@ void InputWindowsManager::DumpWindowInfo(int32_t fd, const WindowInfo &item)
     std::string line;
     while (std::getline(stream, line, '\n')) {
         mprintf(fd, "%s\n", line.c_str());
+    }
+}
+
+void InputWindowsManager::DumpPendingBindState(int32_t fd)
+{
+    mprintf(fd, "Deferred bind state:\n");
+    mprintf(fd, "  activeSequenceCount: num:%zu\n", activeSequenceCount_.size());
+    for (const auto &it : activeSequenceCount_) {
+        mprintf(fd, "    deviceId:%d | count:%d\n", it.first, it.second);
+    }
+    mprintf(fd, "  pendingBinds: num:%zu\n", pendingBinds_.size());
+    for (const auto &it : pendingBinds_) {
+        mprintf(fd, "    deviceId:%d | displayId:%d\n", it.first, it.second);
+    }
+    mprintf(fd, "  pendingBindTimers: num:%zu\n", pendingBindTimers_.size());
+    for (const auto &it : pendingBindTimers_) {
+        mprintf(fd, "    deviceId:%d | timerId:%d\n", it.first, it.second);
     }
 }
 
