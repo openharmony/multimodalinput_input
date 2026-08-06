@@ -330,7 +330,6 @@ bool ScreenPointer::InitSurface(bool needDrawPointer)
 #else
     canvasNode_->SetBackgroundColor(Rosen::Drawing::Color::COLOR_TRANSPARENT);
 #endif // USE_ROSEN_DRAWING
-
     canvasNode_->SetCornerRadius(1);
     canvasNode_->SetPositionZ(Rosen::RSSurfaceNode::POINTER_WINDOW_POSITION_Z);
     canvasNode_->SetRotation(float(rotation_.load()));
@@ -385,13 +384,11 @@ void ScreenPointer::OnDisplayInfo(const OLD::DisplayInfo &di)
                 di.width, di.screenRealWidth, di.screenRealHeight);
             return;
         }
-
         int32_t realWidth = di.screenRealWidth;
         int32_t realHeight = di.screenRealHeight;
         if ((rotation_ == rotation_t::ROTATION_90 || rotation_ == rotation_t::ROTATION_270)) {
             std::swap(realWidth, realHeight);
         }
-
         offRenderScale_ = float(realWidth) / di.width;
         MMI_HILOGD("Update with DisplayInfo, screenRealDPI=%{public}d, offRenderScale_=(%{public}f ",
             di.screenRealDPI, offRenderScale_);
