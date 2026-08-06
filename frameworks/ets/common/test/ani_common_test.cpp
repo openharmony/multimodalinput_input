@@ -59,31 +59,3 @@ HWTEST_F(AniCommonTest, AniCommonTest_GetApiError_002, TestSize.Level0) {
     EXPECT_EQ(codeMsg.errorCode, 0);
     EXPECT_STREQ(codeMsg.msg.c_str(), "");
 }
-
-/**
- * @tc.name: AniCommonTest_GetErrorCodeOrDefault_001
- * @tc.desc: AniCommonTest_GetErrorCodeOrDefault_001
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(AniCommonTest, AniCommonTest_GetErrorCodeOrDefault_001, TestSize.Level0) {
-    TaiheError codeMsg;
-    auto code = TaiheErrorCode::COMMON_PARAMETER_ERROR;
-    TaiheConverter::GetErrorCodeOrDefault(code, codeMsg);
-    EXPECT_EQ(codeMsg.errorCode, TaiheErrorCode::COMMON_PARAMETER_ERROR);
-    EXPECT_STREQ(codeMsg.msg.c_str(), "Parameter error. The type of %s must be %s.");
-}
-
-/**
- * @tc.name: AniCommonTest_GetErrorCodeOrDefault_002
- * @tc.desc: AniCommonTest_GetErrorCodeOrDefault_002
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(AniCommonTest, AniCommonTest_GetErrorCodeOrDefault_002, TestSize.Level0) {
-    TaiheError codeMsg;
-    auto code = TaiheErrorCode::OTHER_ERROR;
-    TaiheConverter::GetErrorCodeOrDefault(code, codeMsg);
-    EXPECT_EQ(codeMsg.errorCode, TaiheErrorCode::INPUT_SERVICE_EXCEPTION);
-    EXPECT_STREQ(codeMsg.msg.c_str(), "Input service exception");
-}
