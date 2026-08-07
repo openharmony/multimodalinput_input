@@ -87,6 +87,9 @@ public:
     virtual void UpdateWindowInfo(const WindowGroupInfo &windowGroupInfo) = 0;
     virtual int32_t ClearWindowPointerStyle(int32_t pid, int32_t windowId) = 0;
     virtual void Dump(int32_t fd, const std::vector<std::string> &args) = 0;
+    // Dumps only the deferred-bind watchdog state (active sequence count, pending binds, timers).
+    // Non-pure with an empty default so facility mocks need not override it.
+    virtual void DumpPendingBindState(int32_t fd) {}
     virtual int32_t GetWindowPid(int32_t windowId) const = 0;
     virtual int32_t GetWindowAgentPid(int32_t windowId) const = 0;
     virtual int32_t SetMouseCaptureMode(int32_t windowId, bool isCaptureMode) = 0;
@@ -95,7 +98,8 @@ public:
     virtual int32_t SetDisplayBind(int32_t deviceId, int32_t displayId, std::string &msg) = 0;
     virtual int32_t BindToDisplay(int32_t deviceId, int32_t displayId, std::string &msg) = 0;
     virtual int32_t GetBindDisplayIdByInputDevice(int32_t inputDeviceId) const = 0;
-    virtual void ApplyBoundDisplayId(std::shared_ptr<InputEvent> event) = 0;
+    virtual void ApplyBoundDisplayId(std::shared_ptr<PointerEvent> pointerEvent) = 0;
+    virtual void ApplyBoundDisplayId(std::shared_ptr<KeyEvent> keyEvent) = 0;
     virtual int32_t AppendExtraData(const ExtraData& extraData) = 0;
     virtual bool IsWindowVisible(int32_t pid) = 0;
     virtual ExtraData GetExtraData() const = 0;

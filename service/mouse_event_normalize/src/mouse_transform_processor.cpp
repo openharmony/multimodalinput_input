@@ -282,6 +282,7 @@ int32_t MouseTransformProcessor::UpdateMotionEventState(MotionDataContext& ctx)
     pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
     pointerEvent_->SetButtonId(buttonId_);
     pointerEvent_->SetTargetDisplayId(ctx.displayId);
+    WIN_MGR->ApplyBoundDisplayId(pointerEvent_);
     MMI_HILOGD("Change coordinate: x:%.2f, y:%.2f, currentDisplayId:%d",
                 ctx.cursorX, ctx.cursorY, ctx.displayId);
     return RET_OK;
@@ -1175,6 +1176,7 @@ void MouseTransformProcessor::HandleAxisPostInner(PointerEvent::PointerItem &poi
     pointerEvent_->SetPointerId(0);
     pointerEvent_->SetDeviceId(deviceId_);
     pointerEvent_->SetTargetDisplayId(mouseInfo.displayId);
+    WIN_MGR->ApplyBoundDisplayId(pointerEvent_);
     pointerEvent_->SetTargetWindowId(-1);
     pointerEvent_->SetAgentWindowId(-1);
 }
@@ -1224,6 +1226,7 @@ bool MouseTransformProcessor::HandlePostInner(struct libinput_event_pointer* dat
     pointerEvent_->SetDeviceId(deviceId_);
     pointerEvent_->SetPointerId(0);
     pointerEvent_->SetTargetDisplayId(mouseInfo.displayId);
+    WIN_MGR->ApplyBoundDisplayId(pointerEvent_);
     pointerEvent_->SetTargetWindowId(-1);
     pointerEvent_->SetAgentWindowId(-1);
     if (data == nullptr) {

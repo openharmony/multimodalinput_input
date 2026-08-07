@@ -580,6 +580,7 @@ void EventNormalizeHandler::UpdateKeyEventHandlerChain(const std::shared_ptr<Key
     CHKPV(keyEvent);
     MMI_HILOGD("Handle event (KC:%{private}d, KA:%{public}d, KEYS:%{private}s)",
         keyEvent->GetKeyCode(), keyEvent->GetKeyAction(), DumpVec(keyEvent->GetPressedKeys()).c_str());
+    WIN_MGR->ApplyBoundDisplayId(keyEvent);
     WIN_MGR->HandleKeyEventWindowId(keyEvent);
     if (keyEvent->HasFlag(InputEvent::EVENT_FLAG_INJECT_UNDER_LOCK) &&
         !WIN_MGR->IsWindowInjectableUnderLock(keyEvent->GetTargetWindowId(), keyEvent->GetTargetDisplayId())) {
@@ -1022,6 +1023,7 @@ int32_t EventNormalizeHandler::HandleJoystickButtonEvent(libinput_event *event)
     BytraceAdapter::StartBytrace(keyEvent);
     EventStatistic::PushKeyEvent(keyEvent);
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
+    WIN_MGR->ApplyBoundDisplayId(keyEvent);
     nextHandler_->HandleKeyEvent(keyEvent);
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
     return RET_OK;
@@ -1045,6 +1047,7 @@ int32_t EventNormalizeHandler::HandleJoystickAxisEvent(libinput_event *event)
         BytraceAdapter::StartBytrace(keyEvent);
         EventStatistic::PushKeyEvent(keyEvent);
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
+        WIN_MGR->ApplyBoundDisplayId(keyEvent);
         nextHandler_->HandleKeyEvent(keyEvent);
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
     });

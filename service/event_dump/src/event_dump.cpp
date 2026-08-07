@@ -112,6 +112,7 @@ void EventDump::ParseCommand(int32_t fd, const std::vector<std::string> &args)
         { "tabletStandState", no_argument, 0, 'b' },
         { "tripleFingerSnapshot", no_argument, 0, 'n' },
         { "frozenPid", no_argument, 0, 'p' },
+        { "pendingBind", no_argument, 0, 'B' },
         { nullptr, 0, 0, 0 }
     };
     if (args.empty()) {
@@ -139,7 +140,7 @@ void EventDump::ParseCommand(int32_t fd, const std::vector<std::string> &args)
     }
     optind = 1;
     int32_t c;
-    while ((c = getopt_long (args.size(), argv, "hdlwusoifmckKetbnp", dumpOptions, &optionIndex)) != -1) {
+    while ((c = getopt_long (args.size(), argv, "hdlwusoifmckKetbnpB", dumpOptions, &optionIndex)) != -1) {
         switch (c) {
             case 'h': {
                 DumpEventHelp(fd, args);
@@ -315,6 +316,10 @@ void EventDump::ParseCommand(int32_t fd, const std::vector<std::string> &args)
 #endif // OHOS_SUSPEND_STATE_MANAGER
                 break;
             }
+            case 'B': {
+                WIN_MGR->DumpPendingBindState(fd);
+                break;
+            }
             default: {
                 mprintf(fd, "cmd param is error\n");
                 DumpHelp(fd);
@@ -357,6 +362,7 @@ void EventDump::DumpHelp(int32_t fd)
     mprintf(fd, "      -b, --tabletStandState: dump the status of the tablet stand\t");
     mprintf(fd, "      -n, --triple finger snapshot: dump the triple finger snapshot information\t");
     mprintf(fd, "      -p, --frozen pid: dump frozen pid list\t");
+    mprintf(fd, "      -B, --pendingBind: dump the deferred bind (active sequence/pending/timer) state\t");
 }
 
 void EventDump::AttachTouchGestureMgr(std::shared_ptr<ITouchGestureManager> touchGestureMgr)

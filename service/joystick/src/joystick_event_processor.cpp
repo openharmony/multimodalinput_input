@@ -182,6 +182,7 @@ std::shared_ptr<PointerEvent> JoystickEventProcessor::OnAxisEvent(struct libinpu
         MMI_HILOGE("No windows manager");
         return nullptr;
     }
+    winMgr->ApplyBoundDisplayId(pointerEvent_);
     winMgr->UpdateTargetPointer(pointerEvent_);
 #endif // OHOS_BUILD_ENABLE_POINTER
     MMI_HILOGI("Joystick_axis_event, %{public}s", DumpJoystickAxisEvent(pointerEvent_).c_str());

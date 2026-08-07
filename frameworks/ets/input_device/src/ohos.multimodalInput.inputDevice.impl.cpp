@@ -458,6 +458,11 @@ uintptr_t BindToDisplayPromise(int32_t deviceId, int32_t displayId)
         MMI_HILOGE("Invalid deviceId");
         return 0;
     }
+    if (displayId < 0) {
+        taihe::set_business_error(COMMON_PARAMETER_ERROR, "Parameter error.Invalid displayId!");
+        MMI_HILOGE("Invalid displayId");
+        return 0;
+    }
     ani_env *env = taihe::get_env();
     if (!env) {
         MMI_HILOGE("env is null");

@@ -74,6 +74,7 @@ public:
     void DumpDisplayInfo(int32_t fd, const std::vector<OLD::DisplayInfo>& displaysInfo);
     void DumpWindowsInfo(int32_t fd, const std::vector<WindowInfo>& windowsInfo);
     void DumpWindowInfo(int32_t fd, const WindowInfo &item);
+    void DumpPendingBindState(int32_t fd);
     int32_t GetWindowPid(int32_t windowId, const std::vector<WindowInfo> &windowsInfo) const;
     int32_t GetWindowPid(int32_t windowId) const;
     int32_t GetWindowAgentPid(int32_t windowId) const;
@@ -82,7 +83,8 @@ public:
     void DeviceStatusChanged(int32_t deviceId, const std::string &name, const std::string &sysUid,
         const std::string devStatus);
     int32_t GetBindDisplayIdByInputDevice(int32_t inputDeviceId) const;
-    void ApplyBoundDisplayId(std::shared_ptr<InputEvent> event);
+    void ApplyBoundDisplayId(std::shared_ptr<PointerEvent> pointerEvent);
+    void ApplyBoundDisplayId(std::shared_ptr<KeyEvent> keyEvent);
     int32_t GetDisplayBindInfo(DisplayBindInfos &infos);
     int32_t SetDisplayBind(int32_t deviceId, int32_t displayId, std::string &msg);
     int32_t BindToDisplay(int32_t deviceId, int32_t displayId, std::string &msg);
@@ -625,6 +627,20 @@ private:
     std::map<int32_t, std::map<int32_t, std::vector<Rect>>> windowsHotAreasMap_;
     std::map<int32_t, WindowPartInfo> firstTouchWindowInfos_;
     InputDisplayBindHelper bindInfo_;
+    // Per-device count of in-flight event sequences (button/axis/gesture/key begin..end). A
+    // BindToDisplay request for a device with an active sequence is deferred until it completes.
+    std::map<int32_t, int32_t> activeSequenceCount_;
+    std::map<int32_t, int32_t> pendingBinds_;
+    // Watchdog timers (one per deferred device) guaranteeing a stuck sequence still gets applied.
+    std::map<int32_t, int32_t> pendingBindTimers_;
+    void UpdateActiveSequence(int32_t deviceId, int32_t delta);
+    void FlushPendingBind(int32_t deviceId);
+    void ArmPendingBindTimer(int32_t deviceId);
+    void CancelPendingBindTimer(int32_t deviceId);
+    void OnPendingBindTimeout(int32_t deviceId);
+    bool IsPointerSequenceBegin(int32_t action) const;
+    bool IsPointerSequenceEnd(int32_t action) const;
+    void UpdatePointerSequence(std::shared_ptr<PointerEvent> pointerEvent);
     struct CaptureModeInfo {
         int32_t windowId { -1 };
         bool isCaptureMode { false };

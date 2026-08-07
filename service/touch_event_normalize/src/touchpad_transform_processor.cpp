@@ -200,6 +200,7 @@ int32_t TouchPadTransformProcessor::OnEventTouchPadAction(struct libinput_event 
     pointerEvent_->SetDeviceId(deviceId_);
     auto mouseInfo = WIN_MGR->GetMouseInfo();
     pointerEvent_->SetTargetDisplayId(mouseInfo.displayId);
+    WIN_MGR->ApplyBoundDisplayId(pointerEvent_);
     pointerEvent_->SetTargetWindowId(-1);
     pointerEvent_->SetPointerId(DEFAULT_POINTER_ID);
     pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_TOUCHPAD_ACTIVE);
@@ -541,6 +542,7 @@ void TouchPadTransformProcessor::ProcessTouchPadPinchDataEvent
     pointerEvent_->SetDeviceId(deviceId_);
     auto mouseInfo = WIN_MGR->GetMouseInfo();
     pointerEvent_->SetTargetDisplayId(mouseInfo.displayId);
+    WIN_MGR->ApplyBoundDisplayId(pointerEvent_);
     pointerEvent_->SetTargetWindowId(-1);
     pointerEvent_->SetPointerId(DEFAULT_POINTER_ID);
     pointerEvent_->SetPointerAction(action);

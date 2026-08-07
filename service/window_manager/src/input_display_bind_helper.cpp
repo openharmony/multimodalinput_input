@@ -755,12 +755,12 @@ int32_t InputDisplayBindHelper::BindToDisplay(int32_t deviceId, int32_t displayI
     MMI_HILOGI("Param: deviceId:%{public}d, displayId:%{public}d", deviceId, displayId);
     if ((deviceId == -1) || (displayId == -1)) {
         msg = "The deviceId or displayId is invalid";
-        MMI_HILOGE("%s", msg.c_str());
+        MMI_HILOGE("%{public}s", msg.c_str());
         return RET_ERR;
     }
     if (infos_ == nullptr) {
         msg = "Infos_ is nullptr";
-        MMI_HILOGE("%s", msg.c_str());
+        MMI_HILOGE("%{public}s", msg.c_str());
         return RET_ERR;
     }
 
@@ -768,7 +768,7 @@ int32_t InputDisplayBindHelper::BindToDisplay(int32_t deviceId, int32_t displayI
     // no-op and succeeds.
     if (infos_->GetBindDisplayIdByInputDevice(deviceId) == displayId) {
         msg = "The input device and display are already bound";
-        MMI_HILOGI("%s", msg.c_str());
+        MMI_HILOGI("%{public}s", msg.c_str());
         return RET_OK;
     }
 
@@ -782,10 +782,10 @@ int32_t InputDisplayBindHelper::BindToDisplay(int32_t deviceId, int32_t displayI
         auto device = INPUT_DEV_MGR->GetInputDevice(deviceId);
         if (device == nullptr) {
             msg = "The specified input device does not exist.";
-            MMI_HILOGE("%s", msg.c_str());
+            MMI_HILOGE("%{public}s", msg.c_str());
             return ERR_BIND_DEVICE_NOT_EXIST;
         }
-        bindByDevice.AddInputDevice(deviceId, "", device->GetName());
+        bindByDevice.AddInputDevice(deviceId, device->GetName(), INPUT_DEV_MGR->GetSysUid(deviceId));
     }
 
     // A device is bound to at most one display: drop its previous binding. Devices already bound to
