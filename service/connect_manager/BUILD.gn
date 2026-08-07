@@ -95,6 +95,7 @@ ohos_source_set("mmi_connect_manager_service") {
     "config_policy:configpolicy_util",
     "cJSON:cjson",
     "eventhandler:libeventhandler",
+    "hilog:libhilog",
     "image_framework:image_native",
     "ipc:ipc_single",
     "samgr:samgr_proxy",
