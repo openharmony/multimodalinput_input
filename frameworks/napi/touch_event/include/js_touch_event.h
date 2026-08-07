@@ -31,6 +31,11 @@ public:
         PULL_DOWN = 4,
         PULL_MOVE = 5,
         PULL_UP = 6,
+        PROXIMITY_IN = 7,
+        PROXIMITY_OUT = 8,
+        LEVITATE_MOVE = 9,
+        LEVITATE_IN_WINDOW = 10,
+        LEVITATE_OUT_WINDOW = 11,
     };
 
     enum class ToolType : int32_t {
