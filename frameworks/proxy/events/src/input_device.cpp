@@ -240,5 +240,15 @@ bool InputDevice::IsLocal() const
 {
     return isLocal_;
 }
+
+void InputDevice::SetDisplayId(int32_t displayId)
+{
+    displayId_ = displayId;
+}
+
+int32_t InputDevice::GetDisplayId() const
+{
+    return displayId_;
+}
 } // namespace MMI
 } // namespace OHOS

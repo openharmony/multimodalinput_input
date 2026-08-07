@@ -36,6 +36,47 @@ public:
     static std::shared_ptr<PointerEvent> CreatePointEvent();
 };
 
+/**
+ * @tc.name: PointerEventTest_InputDeviceDisplayIdParcel_001
+ * @tc.desc: InputDevice displayId survives a Marshalling/Unmarshalling round-trip (bound device).
+ * @tc.type: FUNC
+ */
+HWTEST_F(PointerEventTest, PointerEventTest_InputDeviceDisplayIdParcel_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto dev = std::make_shared<InputDevice>();
+    ASSERT_NE(dev, nullptr);
+    dev->SetId(7);
+    dev->SetDisplayId(3);
+    EXPECT_EQ(dev->GetDisplayId(), 3);
+    Parcel parcel;
+    ASSERT_TRUE(dev->Marshalling(parcel));
+    auto *restored = InputDevice::Unmarshalling(parcel);
+    ASSERT_NE(restored, nullptr);
+    EXPECT_EQ(restored->GetId(), 7);
+    EXPECT_EQ(restored->GetDisplayId(), 3);
+    delete restored;
+}
+
+/**
+ * @tc.name: PointerEventTest_InputDeviceDisplayIdParcel_002
+ * @tc.desc: An unbound InputDevice keeps the default displayId (-1) across the parcel round-trip.
+ * @tc.type: FUNC
+ */
+HWTEST_F(PointerEventTest, PointerEventTest_InputDeviceDisplayIdParcel_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto dev = std::make_shared<InputDevice>();
+    ASSERT_NE(dev, nullptr);
+    EXPECT_EQ(dev->GetDisplayId(), -1);
+    Parcel parcel;
+    ASSERT_TRUE(dev->Marshalling(parcel));
+    auto *restored = InputDevice::Unmarshalling(parcel);
+    ASSERT_NE(restored, nullptr);
+    EXPECT_EQ(restored->GetDisplayId(), -1);
+    delete restored;
+}
+
 #ifdef OHOS_BUILD_ENABLE_POINTER
 std::shared_ptr<PointerEvent> PointerEventTest::CreatePointEvent()
 {
