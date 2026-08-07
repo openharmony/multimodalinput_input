@@ -6294,7 +6294,7 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_ProcessAllReleasedCo
     SessionPtr sess = std::make_shared<UDSSession>(PROGRAM_NAME, MODULE_TYPE, UDS_FD, UDS_UID, UDS_PID);
     ASSERT_NE(sess, nullptr);
     auto subscriber = std::make_shared<OHOS::MMI::KeySubscriberHandler::Subscriber>(subscribeId, sess, keyOption);
-    auto &state = handler.allReleasedStates_[subscribeId];
+    auto &state = handler.allReleasedStates_[subscriber.get()];
     state.comboActivated = true;
     state.pressedComboKeys.insert(KeyEvent::KEYCODE_A);
     std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
@@ -6332,7 +6332,7 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_ProcessAllReleasedCo
     bool ret = handler.ProcessAllReleasedComboActivate(keyEvent, keyOption, subscriber, handled);
     EXPECT_TRUE(ret);
     EXPECT_FALSE(handled);
-    auto iter = handler.allReleasedStates_.find(1);
+    auto iter = handler.allReleasedStates_.find(subscriber.get());
     EXPECT_EQ(iter, handler.allReleasedStates_.end());
 }
 
@@ -6369,7 +6369,7 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_ProcessAllReleasedCo
     bool ret = handler.ProcessAllReleasedComboActivate(keyEvent, keyOption, subscriber, handled);
     EXPECT_TRUE(ret);
     EXPECT_TRUE(handled);
-    auto iter = handler.allReleasedStates_.find(subscribeId);
+    auto iter = handler.allReleasedStates_.find(subscriber.get());
     ASSERT_NE(iter, handler.allReleasedStates_.end());
     EXPECT_TRUE(iter->second.comboActivated);
     EXPECT_EQ(iter->second.pressedComboKeys.size(), 2u);
@@ -6466,7 +6466,7 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_ShouldProcessAllRele
     auto subscriber = std::make_shared<OHOS::MMI::KeySubscriberHandler::Subscriber>(subscribeId, sess, keyOption);
     std::list<std::shared_ptr<OHOS::MMI::KeySubscriberHandler::Subscriber>> subscribers;
     subscribers.push_back(subscriber);
-    auto &state = handler.allReleasedStates_[subscribeId];
+    auto &state = handler.allReleasedStates_[subscriber.get()];
     state.comboActivated = false;
     bool ret = handler.ShouldProcessAllReleasedRepeat(keyCode, keyOption, subscribers);
     EXPECT_FALSE(ret);
@@ -6491,7 +6491,7 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_ShouldProcessAllRele
     auto subscriber = std::make_shared<OHOS::MMI::KeySubscriberHandler::Subscriber>(subscribeId, sess, keyOption);
     std::list<std::shared_ptr<OHOS::MMI::KeySubscriberHandler::Subscriber>> subscribers;
     subscribers.push_back(subscriber);
-    auto &state = handler.allReleasedStates_[subscribeId];
+    auto &state = handler.allReleasedStates_[subscriber.get()];
     state.comboActivated = true;
     bool ret = handler.ShouldProcessAllReleasedRepeat(keyCode, keyOption, subscribers);
     EXPECT_TRUE(ret);
@@ -6515,7 +6515,7 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_ProcessAllReleasedCo
     SessionPtr sess = std::make_shared<UDSSession>(PROGRAM_NAME, MODULE_TYPE, UDS_FD, UDS_UID, UDS_PID);
     ASSERT_NE(sess, nullptr);
     auto subscriber = std::make_shared<OHOS::MMI::KeySubscriberHandler::Subscriber>(subscribeId, sess, keyOption);
-    auto &state = handler.allReleasedStates_[subscribeId];
+    auto &state = handler.allReleasedStates_[subscriber.get()];
     state.comboActivated = true;
     state.pressedComboKeys.insert(KeyEvent::KEYCODE_CTRL_LEFT);
     std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
@@ -6549,7 +6549,7 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_ProcessAllReleasedCo
     SessionPtr sess = std::make_shared<UDSSession>(PROGRAM_NAME, MODULE_TYPE, UDS_FD, UDS_UID, UDS_PID);
     ASSERT_NE(sess, nullptr);
     auto subscriber = std::make_shared<OHOS::MMI::KeySubscriberHandler::Subscriber>(subscribeId, sess, keyOption);
-    auto &state = handler.allReleasedStates_[subscribeId];
+    auto &state = handler.allReleasedStates_[subscriber.get()];
     state.comboActivated = true;
     state.pressedComboKeys = { KeyEvent::KEYCODE_CTRL_LEFT, KeyEvent::KEYCODE_A };
     std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
@@ -6593,7 +6593,7 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_ProcessAllReleasedCo
     SessionPtr sess = std::make_shared<UDSSession>(PROGRAM_NAME, MODULE_TYPE, UDS_FD, UDS_UID, UDS_PID);
     ASSERT_NE(sess, nullptr);
     auto subscriber = std::make_shared<OHOS::MMI::KeySubscriberHandler::Subscriber>(subscribeId, sess, keyOption);
-    auto &state = handler.allReleasedStates_[subscribeId];
+    auto &state = handler.allReleasedStates_[subscriber.get()];
     state.comboActivated = true;
     state.pressedComboKeys.insert(KeyEvent::KEYCODE_A);
     std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
@@ -6611,6 +6611,149 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_ProcessAllReleasedCo
     handler.ProcessAllReleasedComboActivated(keyEvent, keyOption, subscriber, handled);
     EXPECT_TRUE(state.pressedComboKeys.empty());
     EXPECT_FALSE(state.comboActivated);
+}
+
+/**
+ * @tc.name: KeySubscriberHandlerTest_AllReleasedStates_MultiProcessSameId_001
+ * @tc.desc: Test subscribers from different processes with the same subscribeId have
+ *           isolated allReleasedStates_ entries (multi-user-space Alt+Tab regression)
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_AllReleasedStates_MultiProcessSameId_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeySubscriberHandler handler;
+    const int32_t sameSubscribeId = 38; // two user-space processes yield the same subscribeId
+    auto keyOption = std::make_shared<KeyOption>();
+    keyOption->SetFinalKey(KeyEvent::KEYCODE_TAB);
+    std::set<int32_t> preKeys = { KeyEvent::KEYCODE_ALT_LEFT };
+    keyOption->SetPreKeys(preKeys);
+    // subscriber of user-space A (pid 6817)
+    SessionPtr sessA = std::make_shared<UDSSession>(PROGRAM_NAME, MODULE_TYPE, UDS_FD, UDS_UID, 6817);
+    ASSERT_NE(sessA, nullptr);
+    auto subscriberA = std::make_shared<OHOS::MMI::KeySubscriberHandler::Subscriber>(sameSubscribeId, sessA, keyOption);
+    // subscriber of user-space B (pid 13174), same subscribeId
+    SessionPtr sessB = std::make_shared<UDSSession>(PROGRAM_NAME, MODULE_TYPE, UDS_FD, UDS_UID, 13174);
+    ASSERT_NE(sessB, nullptr);
+    auto subscriberB = std::make_shared<OHOS::MMI::KeySubscriberHandler::Subscriber>(sameSubscribeId, sessB, keyOption);
+    ASSERT_NE(subscriberA.get(), subscriberB.get());
+    // both combos activated, Alt+Tab pressed
+    auto &stateA = handler.allReleasedStates_[subscriberA.get()];
+    stateA.comboActivated = true;
+    stateA.pressedComboKeys = { KeyEvent::KEYCODE_ALT_LEFT, KeyEvent::KEYCODE_TAB };
+    auto &stateB = handler.allReleasedStates_[subscriberB.get()];
+    stateB.comboActivated = true;
+    stateB.pressedComboKeys = { KeyEvent::KEYCODE_ALT_LEFT, KeyEvent::KEYCODE_TAB };
+    // key assertion: two independent entries (old int-key impl kept only one shared entry)
+    EXPECT_EQ(handler.allReleasedStates_.size(), 2u);
+    // subscriberA handles Tab UP -> only its own combo resets
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_TAB);
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP);
+    handler.isForegroundExits_ = true;
+    bool handled = false;
+    handler.ProcessAllReleasedComboActivated(keyEvent, keyOption, subscriberA, handled);
+    EXPECT_TRUE(handled);
+    EXPECT_FALSE(stateA.comboActivated);
+    EXPECT_TRUE(stateA.pressedComboKeys.empty());
+    // B must be unaffected (old impl wrongly reset B here because A and B shared one state)
+    EXPECT_TRUE(stateB.comboActivated);
+    EXPECT_EQ(stateB.pressedComboKeys.size(), 2u);
+}
+
+/**
+ * @tc.name: KeySubscriberHandlerTest_HandleKeyForAllReleased_MultiProcessTabUp_001
+ * @tc.desc: Test Tab UP is processed for both subscribers when two processes share the
+ *           same subscribeId (end-to-end multi-user-space Alt+Tab UP loss regression)
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_HandleKeyForAllReleased_MultiProcessTabUp_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeySubscriberHandler handler;
+    const int32_t sameSubscribeId = 38;
+    auto keyOption = std::make_shared<KeyOption>();
+    keyOption->SetFinalKey(KeyEvent::KEYCODE_TAB);
+    std::set<int32_t> preKeys = { KeyEvent::KEYCODE_ALT_LEFT };
+    keyOption->SetPreKeys(preKeys);
+    SessionPtr sessA = std::make_shared<UDSSession>(PROGRAM_NAME, MODULE_TYPE, UDS_FD, UDS_UID, 6817);
+    ASSERT_NE(sessA, nullptr);
+    auto subscriberA = std::make_shared<OHOS::MMI::KeySubscriberHandler::Subscriber>(sameSubscribeId, sessA, keyOption);
+    SessionPtr sessB = std::make_shared<UDSSession>(PROGRAM_NAME, MODULE_TYPE, UDS_FD, UDS_UID, 13174);
+    ASSERT_NE(sessB, nullptr);
+    auto subscriberB = std::make_shared<OHOS::MMI::KeySubscriberHandler::Subscriber>(sameSubscribeId, sessB, keyOption);
+    std::list<std::shared_ptr<OHOS::MMI::KeySubscriberHandler::Subscriber>> subscribers;
+    subscribers.push_back(subscriberA);
+    subscribers.push_back(subscriberB);
+    // Alt already released in a prior Alt UP: each combo now tracks only Tab
+    auto &stateA = handler.allReleasedStates_[subscriberA.get()];
+    stateA.comboActivated = true;
+    stateA.pressedComboKeys = { KeyEvent::KEYCODE_TAB };
+    auto &stateB = handler.allReleasedStates_[subscriberB.get()];
+    stateB.comboActivated = true;
+    stateB.pressedComboKeys = { KeyEvent::KEYCODE_TAB };
+    EXPECT_EQ(handler.allReleasedStates_.size(), 2u);
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_TAB);
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP);
+    handler.isForegroundExits_ = true;
+    bool handled = false;
+    bool ret = handler.HandleKeyForAllReleased(keyEvent, keyOption, subscribers, handled);
+    EXPECT_TRUE(ret);
+    EXPECT_TRUE(handled);
+    // both subscribers walked PATH A and reset; isolation held (old impl collapsed to 1 shared entry)
+    EXPECT_EQ(handler.allReleasedStates_.size(), 2u);
+    EXPECT_FALSE(handler.allReleasedStates_[subscriberA.get()].comboActivated);
+    EXPECT_FALSE(handler.allReleasedStates_[subscriberB.get()].comboActivated);
+}
+
+/**
+ * @tc.name: KeySubscriberHandlerTest_ResetAllReleasedState_001
+ * @tc.desc: Test ResetAllReleasedState(subscriber*) erases the per-subscriber state and is
+ *           idempotent when no entry exists (cleanup primitive used by OnSessionDelete)
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_ResetAllReleasedState_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeySubscriberHandler handler;
+    int32_t subscribeId = 38;
+    auto keyOption = std::make_shared<KeyOption>();
+    keyOption->SetFinalKey(KeyEvent::KEYCODE_TAB);
+    SessionPtr sess = std::make_shared<UDSSession>(PROGRAM_NAME, MODULE_TYPE, UDS_FD, UDS_UID, UDS_PID);
+    ASSERT_NE(sess, nullptr);
+    auto subscriber = std::make_shared<OHOS::MMI::KeySubscriberHandler::Subscriber>(subscribeId, sess, keyOption);
+    auto &state = handler.allReleasedStates_[subscriber.get()];
+    state.comboActivated = true;
+    state.pressedComboKeys.insert(KeyEvent::KEYCODE_TAB);
+    EXPECT_EQ(handler.allReleasedStates_.size(), 1u);
+    // entry exists -> erased
+    handler.ResetAllReleasedState(subscriber.get());
+    EXPECT_EQ(handler.allReleasedStates_.find(subscriber.get()), handler.allReleasedStates_.end());
+    EXPECT_TRUE(handler.allReleasedStates_.empty());
+    // no entry -> no-op, no crash (covers find == end branch)
+    handler.ResetAllReleasedState(subscriber.get());
+    EXPECT_TRUE(handler.allReleasedStates_.empty());
+}
+
+/**
+ * @tc.name: KeySubscriberHandlerTest_ResetAllReleasedState_002
+ * @tc.desc: Test ResetAllReleasedState(nullptr) is safe (defensive CHKPV guard)
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_ResetAllReleasedState_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeySubscriberHandler handler;
+    // nullptr must not crash the %{public}d log dereference inside ResetAllReleasedState
+    handler.ResetAllReleasedState(nullptr);
+    EXPECT_TRUE(handler.allReleasedStates_.empty());
 }
 } // namespace MMI
 } // namespace OHOS

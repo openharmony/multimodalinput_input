@@ -138,7 +138,7 @@ private:
         const std::shared_ptr<KeyOption> &keyOption,
         std::list<std::shared_ptr<Subscriber>> &subscribers,
         bool &handled);
-    void ResetAllReleasedState(int32_t subscriberId);
+    void ResetAllReleasedState(Subscriber* subscriber);
     bool ShouldProcessRepeatEvent(const std::shared_ptr<KeyEvent> &keyEvent);
     void HandleKeyDownForPressedType(const std::shared_ptr<KeyEvent> &keyEvent,
         int32_t keyCode, const std::vector<int32_t> &pressedKeys,
@@ -164,7 +164,7 @@ private:
         std::set<int32_t> pressedComboKeys;
     };
 private:
-    std::map<int32_t, AllReleasedState> allReleasedStates_;
+    std::map<Subscriber*, AllReleasedState> allReleasedStates_;
     SubscriberCollection subscriberMap_;
     std::mutex subscriberMapMutex_;
     SubscriberCollection keyGestures_;

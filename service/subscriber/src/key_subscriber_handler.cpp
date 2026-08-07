@@ -210,8 +210,8 @@ int32_t KeySubscriberHandler::RemoveSubscriber(SessionPtr sess, int32_t subscrib
                 MMI_HILOGD("SubscribeId:%{public}d, finalKey:%{private}d, isFinalKeyDown:%{public}s,"
                     "finalKeyDownDuration:%{public}d, pid:%{public}d", subscribeId, option->GetFinalKey(),
                     option->IsFinalKeyDown() ? "true" : "false", option->GetFinalKeyDownDuration(), sess->GetPid());
+                ResetAllReleasedState((*it).get());
                 subscribers.erase(it);
-                ResetAllReleasedState(subscribeId);
                 DfxHisysevent::ReportUnSubscribeKeyEvent(subscribeId, option->GetFinalKey(),
                     sess->GetProgramName(), sess->GetPid());
                 return RET_OK;
@@ -745,6 +745,7 @@ void KeySubscriberHandler::OnSessionDelete(SessionPtr sess)
 #ifdef SHORTCUT_KEY_MANAGER_ENABLED
                     DeleteShortcutId(*it);
 #endif // SHORTCUT_KEY_MANAGER_ENABLED
+                    ResetAllReleasedState((*it).get());
                     subscribers.erase(it++);
                     continue;
                 }
@@ -1274,7 +1275,7 @@ void KeySubscriberHandler::ProcessAllReleasedComboActivated(
         NotifySubscriber(keyEvent, subscriber);
         handled = true;
     }
-    auto &state = allReleasedStates_[subscriber->id_];
+    auto &state = allReleasedStates_[subscriber.get()];
     if (keyAction == KeyEvent::KEY_ACTION_DOWN) {
         // Track finalKey/preKey DOWN while combo is active so a re-press does not lose state
         state.pressedComboKeys.insert(keyCode);
@@ -1310,7 +1311,7 @@ bool KeySubscriberHandler::ProcessAllReleasedComboActivate(
             return true;
         }
     }
-    auto &state = allReleasedStates_[subscriber->id_];
+    auto &state = allReleasedStates_[subscriber.get()];
     state.comboActivated = true;
     state.pressedComboKeys.clear();
     state.pressedComboKeys.insert(keyOption->GetFinalKey());
@@ -1347,7 +1348,7 @@ bool KeySubscriberHandler::HandleKeyForAllReleased(const std::shared_ptr<KeyEven
 
     for (auto &subscriber : subscribers) {
         CHKPC(subscriber);
-        auto &state = allReleasedStates_[subscriber->id_];
+        auto &state = allReleasedStates_[subscriber.get()];
         if (state.comboActivated) {
             ProcessAllReleasedComboActivated(keyEvent, keyOption, subscriber, handled);
             continue;
@@ -1361,14 +1362,15 @@ bool KeySubscriberHandler::HandleKeyForAllReleased(const std::shared_ptr<KeyEven
     return handled;
 }
 
-void KeySubscriberHandler::ResetAllReleasedState(int32_t subscriberId)
+void KeySubscriberHandler::ResetAllReleasedState(Subscriber* subscriber)
 {
     CALL_DEBUG_ENTER;
-    auto iter = allReleasedStates_.find(subscriberId);
+    CHKPV(subscriber);
+    auto iter = allReleasedStates_.find(subscriber);
     if (iter != allReleasedStates_.end()) {
         allReleasedStates_.erase(iter);
     }
-    MMI_HILOGD("ALL_RELEASED state reset for subscriber:%{public}d", subscriberId);
+    MMI_HILOGD("ALL_RELEASED state reset for subscriberId:%{public}d", subscriber->id_);
 }
 
 bool KeySubscriberHandler::ShouldProcessAllReleasedRepeat(int32_t keyCode,
@@ -1383,7 +1385,7 @@ bool KeySubscriberHandler::ShouldProcessAllReleasedRepeat(int32_t keyCode,
     }
     for (const auto &subscriber : subscribers) {
         CHKPC(subscriber);
-        auto stateIter = allReleasedStates_.find(subscriber->id_);
+        auto stateIter = allReleasedStates_.find(subscriber.get());
         if (stateIter != allReleasedStates_.end() && stateIter->second.comboActivated) {
             MMI_HILOGD("ALL_RELEASED combo active, process repeat event");
             return true;
@@ -1431,7 +1433,7 @@ bool KeySubscriberHandler::HandleKeyCancel(const std::shared_ptr<KeyEvent> &keyE
             PrintKeyUpLog(subscriber);
             ClearTimer(subscriber);
             if (keyOption != nullptr && keyOption->GetTriggerType() == KeyCommandTriggerType::ALL_RELEASED) {
-                ResetAllReleasedState(subscriber->id_);
+                ResetAllReleasedState(subscriber.get());
             }
         }
     }
