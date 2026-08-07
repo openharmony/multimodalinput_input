@@ -128,6 +128,11 @@ TaiheInputDeviceData TaiheInputDeviceUtils::ConverterInputDevice(std::shared_ptr
     result.uniq = std::string_view(device->GetUniq());
     result.isVirtual = taihe::optional<bool>(std::in_place, device->IsVirtual());
     result.isLocal = taihe::optional<bool>(std::in_place, device->IsLocal());
+    // Optional field: present only when the device is bound to a display (displayId >= 0).
+    int32_t displayId = device->GetDisplayId();
+    if (displayId >= 0) {
+        result.displayId = taihe::optional<int32_t>(std::in_place, displayId);
+    }
     return result;
 }
 
