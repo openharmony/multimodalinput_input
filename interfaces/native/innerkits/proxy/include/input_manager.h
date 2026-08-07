@@ -53,6 +53,17 @@ public:
     int32_t SetDisplayBind(int32_t deviceId, int32_t displayId, std::string &msg);
 
     /**
+     * @brief Binds an input device to a display. Only external USB and Bluetooth devices are supported.
+     * This API uses a callback to return the result with specific error codes.
+     * @param deviceId Indicates the ID of the input device.
+     * @param displayId Indicates the ID of the target display.
+     * @param callback Indicates the callback to receive the result error code.
+     * @return Returns <b>0</b> if the IPC call was sent; returns a non-0 value otherwise.
+     * @since 26
+     */
+    int32_t BindToDisplay(int32_t deviceId, int32_t displayId, std::function<void(int32_t)> callback);
+
+    /**
      * @brief Updates the screen、display and window information array.
      * @param userScreenInfo Indicates the user screen、display and window information.
      * @since 20
@@ -1461,6 +1472,29 @@ public:
      * @since 26
      */
     int32_t EnableInputExtension(const std::string &uuid, bool enabled);
+
+    /**
+    * @brief Enable pointer event recording with a specified maximum count.
+    * @param maxCount The maximum number of records (up to 100, clamped if exceeded).
+    * @return Returns <b>0</b> if successful; returns a non-0 value otherwise.
+    * @since 26.0.0
+    */
+    int32_t EnablePointerEventRecord(int32_t maxCount);
+
+    /**
+    * @brief Disable pointer event recording and clear all records.
+    * @return Returns <b>0</b> if successful; returns a non-0 value otherwise.
+    * @since 26.0.0
+    */
+    int32_t DisablePointerEventRecord();
+
+    /**
+    * @brief Query all recorded pointer events.
+    * @param pointerList A reference to a vector that will store the recorded pointer events.
+    * @return Returns <b>0</b> if successful; returns a non-0 value otherwise.
+    * @since 26.0.0
+    */
+    int32_t GetPointerEventRecord(std::vector<std::shared_ptr<PointerEvent>> &pointerList);
 
 private:
     InputManager() = default;

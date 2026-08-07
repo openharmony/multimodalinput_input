@@ -17,8 +17,8 @@
 #define INPUT_ENABLEKEYSTATUS_COMMAND_H
 
 #include <map>
-#include <vector>
 #include <string>
+#include <vector>
 
 #include "nocopyable.h"
 

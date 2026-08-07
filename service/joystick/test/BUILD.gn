@@ -49,6 +49,7 @@ ohos_unittest("JoystickLayoutMapTest") {
     "${mmi_path}/util/common/include",
     "${mmi_path}/service/common/include",
     "${mmi_path}/service/device_config/include",
+    "${mmi_path}/service/setting_manager/include",
   ]
 
   sources = [

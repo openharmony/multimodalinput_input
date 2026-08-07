@@ -133,7 +133,7 @@ int32_t MiscProductTypeParser::InsertToMiscProductTypes(const std::string &key, 
 
 void MiscProductTypeParser::PrintMiscProductTypes()
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     std::shared_lock<std::shared_mutex> lock(lock_);
     for (const auto &elem : miscProductTypes_) {
         MMI_HILOGI("bizKey:%{public}s", elem.first.c_str());

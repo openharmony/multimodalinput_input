@@ -591,5 +591,25 @@ HWTEST_F(PointerEventHookTest, PointerEventHookTest025, TestSize.Level0)
     bool result = hook.OnPointerEvent(pointerEvent);
     EXPECT_FALSE(result);
 }
+
+/**
+ * @tc.name: PointerEventHookTest026
+ * @tc.desc: Test OnPointerEvent with MOUSE source and HOOK_EVENT_TYPE_TOUCH mismatch
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerEventHookTest, PointerEventHookTest026, TestSize.Level0)
+{
+    SessionPtr sess = std::make_shared<UDSSession>(PROGRAM_NAME, MODULE_TYPE, UDS_FD, UDS_UID, UDS_PID);
+    NextHookGetter nextHookGetter = [this] (std::shared_ptr<InputEventHook> hook) -> std::shared_ptr<InputEventHook> {
+        return nullptr;
+    };
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
+    PointerEventHook hook(sess, HOOK_EVENT_TYPE_TOUCH, nextHookGetter);
+    bool result = hook.OnPointerEvent(pointerEvent);
+    EXPECT_FALSE(result);
+}
 } // namespace MMI
 } // namespace OHOS

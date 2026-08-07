@@ -430,7 +430,7 @@ bool SettingManager::GetValueInner(int32_t userId, const std::string &settingKey
                 auto settingData = iter->second;
                 if (settingData.ContainsField(settingKey, field)) {
                     settingData.GetField(settingKey, field, value);
-                    MMI_HILOGI("Get field:%{public}s, value:%{public}d success, id:%{private}d, in temp",
+                    MMI_HILOGD("Get field:%{public}s, value:%{public}d success, id:%{private}d, in temp",
                         field.c_str(), static_cast<int32_t>(value), userId);
                     return true;
                 }
@@ -443,13 +443,13 @@ bool SettingManager::GetValueInner(int32_t userId, const std::string &settingKey
             auto settingData = iter->second;
             if (settingData.ContainsField(settingKey, field)) {
                 settingData.GetField(settingKey, field, value);
-                MMI_HILOGI("Get field:%{public}s, value:%{public}d success, id:%{private}d in cache",
+                MMI_HILOGD("Get field:%{public}s, value:%{public}d success, id:%{private}d in cache",
                     field.c_str(), static_cast<int32_t>(value), userId);
                 return true;
             }
         }
     }
-    MMI_HILOGI("Get field:%{public}s,success, id:%{private}d, from default",
+    MMI_HILOGD("Get field:%{public}s,success, id:%{private}d, from default",
         field.c_str(), userId);
     return defaultSettingData_.GetField(settingKey, field, value);
 }

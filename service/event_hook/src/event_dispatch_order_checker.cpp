@@ -52,7 +52,7 @@ int32_t EventDispatchOrderChecker::UpdateLastDispatchedId(int32_t hookId, int32_
 
 int32_t EventDispatchOrderChecker::RemoveChecker(int32_t hookId)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     std::unique_lock<std::shared_mutex> lock(rwMutex_);
     if (dispatchedEventIds_.find(hookId) == dispatchedEventIds_.end()) {
         MMI_HILOGW("No checker of hook:%{public}d existed", hookId);

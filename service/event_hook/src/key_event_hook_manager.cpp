@@ -55,7 +55,7 @@ bool KeyEventHookManager::IsValidKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
 
 int32_t KeyEventHookManager::AddKeyEventHook(int32_t pid, SessionPtr sess, int32_t &hookId)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     CHKPR(sess, RET_ERR);
     Init();
     if (IsHookExisted(pid)) {
@@ -74,7 +74,7 @@ int32_t KeyEventHookManager::AddKeyEventHook(int32_t pid, SessionPtr sess, int32
 
 int32_t KeyEventHookManager::RemoveKeyEventHook(int32_t pid, int32_t hookId)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     if (!IsHookExisted(pid)) {
         MMI_HILOGW("No hook from pid:%{public}d", pid);
         return RET_OK;
@@ -132,7 +132,7 @@ int32_t KeyEventHookManager::DispatchToNextHandler(int32_t pid, int32_t eventId)
 
 void KeyEventHookManager::InitSessionLostCallback()
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     auto udsServerPtr = InputHandler->GetUDSServer();
     CHKPV(udsServerPtr);
     udsServerPtr->AddSessionDeletedCallback(
@@ -144,7 +144,7 @@ void KeyEventHookManager::InitSessionLostCallback()
 
 void KeyEventHookManager::Init()
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     std::unique_lock<std::shared_mutex> lock(rwMutex_);
     if (isInitialized_.load())  {
         return;
@@ -155,7 +155,7 @@ void KeyEventHookManager::Init()
 
 void KeyEventHookManager::OnSessionLost(SessionPtr session)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     CHKPV(session);
     auto pid = session->GetPid();
     auto hook = GetHookByPid(pid);
@@ -223,7 +223,7 @@ bool KeyEventHookManager::IsHooksExisted()
 
 void KeyEventHookManager::Dump(int32_t fd, const std::vector<std::string> &args)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     mprintf(fd, "Hook information:\t");
     mprintf(fd, "Hook count: %zu", GetHookNum());
     std::shared_lock<std::shared_mutex> lock(rwMutex_);

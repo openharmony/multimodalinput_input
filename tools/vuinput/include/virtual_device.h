@@ -23,35 +23,35 @@ namespace OHOS {
 namespace MMI {
 class VirtualDevice {
 public:
-    static std::vector<std::string> BrowseDirectory(const std::string& filePath);
-    static std::string ReadFile(const std::string& filePath);
-    static int32_t GetFileSize(const std::string& filePath);
-    static std::string ReadUinputToolFile(const std::string& filePath);
-    static bool ClearFileResidues(const std::string& fileName);
-    static bool CreateHandle(const std::string& deviceArgv);
-    static bool AddDevice(const std::string& startDeviceName);
-    static bool CloseDevice(const std::string& closeDeviceName, const std::vector<std::string>& deviceList);
-    static bool CheckCommand(int32_t argc, char **argv);
-    static bool SelectOptions(int32_t argc, char **argv, int32_t &opt);
-    static bool ListOption(int32_t argc, char **argv);
-    static bool StartOption(int32_t argc, char **argv);
-    static bool CloseOption(int32_t argc, char **argv);
-    static bool HelpOption(int32_t argc, char **argv);
-    static void ShowUsage();
     VirtualDevice(const std::string& deviceName, uint16_t busType, uint16_t vendorId, uint16_t productId);
     DISALLOW_COPY_AND_MOVE(VirtualDevice);
     virtual ~VirtualDevice();
-    bool SetUp();
+
+    static bool AddDevice(const std::string& startDeviceName);
+    static bool CheckCommand(int32_t argc, char **argv);
+    static bool CloseDevice(const std::string& closeDeviceName, const std::vector<std::string>& deviceList);
+    static bool CloseOption(int32_t argc, char **argv);
+    static bool CreateHandle(const std::string& deviceArgv);
+    static bool HelpOption(int32_t argc, char **argv);
+    static bool ListOption(int32_t argc, char **argv);
+    static bool SelectOptions(int32_t argc, char **argv, int32_t &opt);
+    static bool StartOption(int32_t argc, char **argv);
+    static void ShowUsage();
+    static std::string ReadFile(const std::string& filePath);
+    static std::string ReadUinputToolFile(const std::string& filePath);
+    static std::vector<std::string> BrowseDirectory(const std::string& filePath);
+    static bool ClearFileResidues(const std::string& fileName);
+    static int32_t GetFileSize(const std::string& filePath);
+
     void Close();
     bool CreateKey();
+    bool DoIoctl(int32_t fd, int32_t request, const uint32_t value);
     bool SetAbsResolution();
     bool SetPhys(const std::string& deviceName);
-    bool DoIoctl(int32_t fd, int32_t request, const uint32_t value);
+    bool SetUp();
     void SetDeviceId();
 
 protected:
-    void SetResolution(const ResolutionInfo& resolutionInfo);
-    void SetAbsValue(const AbsInfo& absInfo);
     virtual const std::vector<uint32_t>& GetAbs() const;
     virtual const std::vector<uint32_t>& GetEventTypes() const;
     virtual const std::vector<uint32_t>& GetKeys() const;
@@ -61,6 +61,8 @@ protected:
     virtual const std::vector<uint32_t>& GetRelBits() const;
     virtual const std::vector<uint32_t>& GetRepeats() const;
     virtual const std::vector<uint32_t>& GetSwitches() const;
+    void SetAbsValue(const AbsInfo& absInfo);
+    void SetResolution(const ResolutionInfo& resolutionInfo);
 
 protected:
     int32_t fd_ { -1 };

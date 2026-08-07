@@ -17,20 +17,19 @@
 #define MSG_HEAD_H
 
 #include <algorithm>
-#include <ctime>
 #include <cstdio>
 #include <cstring>
-#include <functional>
-#include <fstream>
-#include <iostream>
-#include <vector>
-
+#include <ctime>
 #include <fcntl.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <unistd.h>
+#include <fstream>
+#include <functional>
+#include <iostream>
 #include <linux/input.h>
 #include <linux/uinput.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <unistd.h>
+#include <vector>
 
 #include "define_multimodal.h"
 #include "input_parse.h"

@@ -47,6 +47,15 @@ bool EventIntegrity::IsCompleteEvent(const std::shared_ptr<PointerEvent> pointer
         case PointerEvent::POINTER_ACTION_SWIPE_END: {
             return HandleSwipeEnd(pointerEvent);
         }
+        case PointerEvent::POINTER_ACTION_AXIS_BEGIN: {
+            return HandleAxisBegin(pointerEvent);
+        }
+        case PointerEvent::POINTER_ACTION_AXIS_UPDATE: {
+            return HandleAxisUpdate(pointerEvent);
+        }
+        case PointerEvent::POINTER_ACTION_AXIS_END: {
+            return HandleAxisEnd(pointerEvent);
+        }
         default: {
             break;
         }
@@ -76,6 +85,34 @@ bool EventIntegrity::HandleSwipeEnd(const std::shared_ptr<PointerEvent>& pointer
 {
     if (eventAction_ == PointerEvent::POINTER_ACTION_SWIPE_BEGIN ||
         eventAction_ == PointerEvent::POINTER_ACTION_SWIPE_UPDATE) {
+        eventAction_ = PointerEvent::POINTER_ACTION_UNKNOWN;
+        return true;
+    }
+    return false;
+}
+
+bool EventIntegrity::HandleAxisBegin(const std::shared_ptr<PointerEvent>& pointerEvent)
+{
+    int32_t action = pointerEvent->GetPointerAction();
+    eventAction_ = action;
+    return true;
+}
+
+bool EventIntegrity::HandleAxisUpdate(const std::shared_ptr<PointerEvent>& pointerEvent)
+{
+    if (eventAction_ == PointerEvent::POINTER_ACTION_AXIS_BEGIN ||
+        eventAction_ == PointerEvent::POINTER_ACTION_AXIS_UPDATE) {
+        int32_t action = pointerEvent->GetPointerAction();
+        eventAction_ = action;
+        return true;
+    }
+    return false;
+}
+
+bool EventIntegrity::HandleAxisEnd(const std::shared_ptr<PointerEvent>& pointerEvent)
+{
+    if (eventAction_ == PointerEvent::POINTER_ACTION_AXIS_BEGIN ||
+        eventAction_ == PointerEvent::POINTER_ACTION_AXIS_UPDATE) {
         eventAction_ = PointerEvent::POINTER_ACTION_UNKNOWN;
         return true;
     }

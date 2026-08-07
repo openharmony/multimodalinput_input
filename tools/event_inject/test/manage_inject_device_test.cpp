@@ -15,9 +15,9 @@
 
 #include <gtest/gtest.h>
 
+#include "manage_inject_device.h"
 #include "msg_head.h"
 #include "proto.h"
-#include "manage_inject_device.h"
 
 namespace OHOS {
 namespace MMI {

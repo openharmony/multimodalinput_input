@@ -46,7 +46,9 @@ ohos_prebuilt_etc("multimodal_input_plugins_config") {
 }
 
 group("input_system_etc") {
-  deps = [ ":multimodal_input_plugins_config" ]
+  deps = [
+    ":multimodal_input_plugins_config",
+  ]
 
   if (input_feature_mouse) {
     deps += [ ":pointer_motion_acceleration_config" ]

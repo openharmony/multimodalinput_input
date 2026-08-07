@@ -19,7 +19,6 @@
 #include <singleton.h>
 
 #include "define_multimodal.h"
-
 #include "input_manager.h"
 #include "pixel_map.h"
 

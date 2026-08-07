@@ -115,7 +115,8 @@ int32_t UDSServer::AddEpoll(EpollEventType type, int32_t fd, bool readOnly)
 int32_t UDSServer::AddSocketPairInfo(const std::string& programName,
     const int32_t moduleType, const int32_t uid, const int32_t pid,
     int32_t& serverFd, int32_t& toReturnClientFd, int32_t& tokenType,
-    uint32_t tokenId, bool isRealProcessName)
+    uint32_t tokenId, bool isRealProcessName,
+    std::shared_ptr<SocketPairFlag> socketPairClosedFlag)
 {
     return RET_ERR;
 }
@@ -194,7 +195,7 @@ void PointerDrawingManager::UpdatePointerDevice(bool hasPointerDevice, bool isPo
 void PointerDrawingManager::DrawPointer(uint64_t rsId, int32_t physicalX, int32_t physicalY,
     const PointerStyle pointerStyle, Direction direction) {}
 void PointerDrawingManager::UpdateDisplayInfo(const OLD::DisplayInfo& displayInfo) {}
-void PointerDrawingManager::OnDisplayInfo(const OLD::DisplayGroupInfo& displayGroupInfo) {}
+void PointerDrawingManager::OnDisplayInfo(const OLD::DisplayGroupInfo& displayGroupInfo, bool isDisplayChanged) {}
 void PointerDrawingManager::OnWindowInfo(const WinInfo &info) {}
 bool PointerDrawingManager::Init()
 {

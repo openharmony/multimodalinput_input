@@ -219,7 +219,7 @@ void SwitchSubscriberHandler::SubmitWaitAndPublishEvent(const std::shared_ptr<Sw
 
 int32_t SwitchSubscriberHandler::SubscribeSwitchEvent(SessionPtr sess, int32_t subscribeId, int32_t switchType)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     if (subscribeId < 0) {
         MMI_HILOGE("Invalid subscribeId");
         return RET_ERR;
@@ -239,7 +239,7 @@ int32_t SwitchSubscriberHandler::SubscribeSwitchEvent(SessionPtr sess, int32_t s
 
 int32_t SwitchSubscriberHandler::UnsubscribeSwitchEvent(SessionPtr sess, int32_t subscribeId)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     MMI_HILOGD("subscribeId:%{public}d", subscribeId);
     for (auto it = subscribers_.begin(); it != subscribers_.end(); ++it) {
         if ((*it)->id_ == subscribeId && (*it)->sess_ == sess) {
@@ -379,7 +379,7 @@ bool SwitchSubscriberHandler::UpdateSwitchState(const std::shared_ptr<SwitchEven
 
 int32_t SwitchSubscriberHandler::QuerySwitchStatus(int32_t switchType, int32_t& state)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     MMI_HILOGD("QuerySwitchStatus");
     if (switchStateRecord_.find(switchType) != switchStateRecord_.end()) {
         if (switchStateRecord_[switchType] == SwitchEvent::SWITCH_ON) {

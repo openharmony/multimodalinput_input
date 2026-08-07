@@ -50,7 +50,6 @@ public:
     virtual void Attach(std::shared_ptr<IDeviceObserver> observer) = 0;
     virtual void Detach(std::shared_ptr<IDeviceObserver> observer) = 0;
     virtual void GetMultiKeyboardDevice(std::vector<struct libinput_device*> &inputDevice) = 0;
-    virtual bool HasLocalMouseDevice() = 0;
     virtual bool HasPointerDevice() = 0;
     virtual std::vector<libinput_device*> GetTouchPadDeviceOrigins() = 0;
     virtual bool GetIsDeviceReportEvent(int32_t deviceId) = 0;

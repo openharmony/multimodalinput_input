@@ -152,5 +152,87 @@ HWTEST_F(InputEventHookTest, InputEventHookTest004, TestSize.Level0)
     int32_t result = hook.DispatchToNextHandler(pointerEvent);
     EXPECT_EQ(result, RET_OK);
 }
+
+/**
+ * @tc.name: InputEventHookTest005
+ * @tc.desc: Test GetHookEventType returns correct type
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputEventHookTest, InputEventHookTest005, TestSize.Level0)
+{
+    SessionPtr sess = std::make_shared<UDSSession>(PROGRAM_NAME, MODULE_TYPE, UDS_FD, UDS_UID, UDS_PID);
+    NextHookGetter nextHookGetter = [] (std::shared_ptr<InputEventHook> hook) -> std::shared_ptr<InputEventHook> {
+        return nullptr;
+    };
+    InputEventHook hook(sess, HOOK_EVENT_TYPE_MOUSE, nextHookGetter);
+    EXPECT_EQ(hook.GetHookEventType(), HOOK_EVENT_TYPE_MOUSE);
+}
+
+/**
+ * @tc.name: InputEventHookTest006
+ * @tc.desc: Test GetHookEventType with KEY event type
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputEventHookTest, InputEventHookTest006, TestSize.Level0)
+{
+    SessionPtr sess = std::make_shared<UDSSession>(PROGRAM_NAME, MODULE_TYPE, UDS_FD, UDS_UID, UDS_PID);
+    NextHookGetter nextHookGetter = [] (std::shared_ptr<InputEventHook> hook) -> std::shared_ptr<InputEventHook> {
+        return nullptr;
+    };
+    InputEventHook hook(sess, HOOK_EVENT_TYPE_KEY, nextHookGetter);
+    EXPECT_EQ(hook.GetHookEventType(), HOOK_EVENT_TYPE_KEY);
+}
+
+/**
+ * @tc.name: InputEventHookTest007
+ * @tc.desc: Test GetHookPid returns session pid
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputEventHookTest, InputEventHookTest007, TestSize.Level0)
+{
+    SessionPtr sess = std::make_shared<UDSSession>(PROGRAM_NAME, MODULE_TYPE, UDS_FD, UDS_UID, UDS_PID);
+    NextHookGetter nextHookGetter = [] (std::shared_ptr<InputEventHook> hook) -> std::shared_ptr<InputEventHook> {
+        return nullptr;
+    };
+    InputEventHook hook(sess, HOOK_EVENT_TYPE_MOUSE, nextHookGetter);
+    EXPECT_EQ(hook.GetHookPid(), UDS_PID);
+}
+
+/**
+ * @tc.name: InputEventHookTest008
+ * @tc.desc: Test GetProgramName returns session program name
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputEventHookTest, InputEventHookTest008, TestSize.Level0)
+{
+    SessionPtr sess = std::make_shared<UDSSession>(PROGRAM_NAME, MODULE_TYPE, UDS_FD, UDS_UID, UDS_PID);
+    NextHookGetter nextHookGetter = [] (std::shared_ptr<InputEventHook> hook) -> std::shared_ptr<InputEventHook> {
+        return nullptr;
+    };
+    InputEventHook hook(sess, HOOK_EVENT_TYPE_MOUSE, nextHookGetter);
+    EXPECT_EQ(hook.GetProgramName(), PROGRAM_NAME);
+}
+
+/**
+ * @tc.name: InputEventHookTest009
+ * @tc.desc: Test SendNetPacketToHook returns false when send fails
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputEventHookTest, InputEventHookTest010, TestSize.Level0)
+{
+    SessionPtr sess = std::make_shared<UDSSession>(PROGRAM_NAME, MODULE_TYPE, UDS_FD, UDS_UID, UDS_PID);
+    NextHookGetter nextHookGetter = [] (std::shared_ptr<InputEventHook> hook) -> std::shared_ptr<InputEventHook> {
+        return nullptr;
+    };
+    InputEventHook hook(sess, HOOK_EVENT_TYPE_MOUSE, nextHookGetter);
+    NetPacket pkt(MmiMessageId::ON_HOOK_KEY_EVENT);
+    bool result = hook.SendNetPacketToHook(pkt);
+    EXPECT_FALSE(result);
+}
 } // namespace MMI
 } // namespace OHOS

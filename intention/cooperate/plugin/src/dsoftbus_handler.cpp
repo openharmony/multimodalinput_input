@@ -93,7 +93,7 @@ void DSoftbusHandler::AttachSender(Channel<CooperateEvent>::Sender sender)
 
 int32_t DSoftbusHandler::OpenSession(const std::string &networkId)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     auto tokenId = OHOS::IPCSkeleton::GetCallingTokenID();
     int ret = SetFirstCallerTokenID(tokenId);
     if (ret != RET_OK) {
@@ -104,19 +104,19 @@ int32_t DSoftbusHandler::OpenSession(const std::string &networkId)
 
 void DSoftbusHandler::CloseSession(const std::string &networkId)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     env_->GetDSoftbus().CloseSession(networkId);
 }
 
 void DSoftbusHandler::CloseAllSessions()
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     env_->GetDSoftbus().CloseAllSessions();
 }
 
 int32_t DSoftbusHandler::StartCooperate(const std::string &networkId, const DSoftbusStartCooperate &event)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     NetPacket packet(MessageId::DSOFTBUS_START_COOPERATE);
     packet << event.originNetworkId << event.cursorPos.x
         << event.cursorPos.y << event.success << event.extra.priv;
@@ -133,7 +133,7 @@ int32_t DSoftbusHandler::StartCooperate(const std::string &networkId, const DSof
 
 int32_t DSoftbusHandler::StopCooperate(const std::string &networkId, const DSoftbusStopCooperate &event)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     NetPacket packet(MessageId::DSOFTBUS_STOP_COOPERATE);
     int32_t ret = env_->GetDSoftbus().SendPacket(networkId, packet);
     if (ret != RET_OK) {
@@ -144,7 +144,7 @@ int32_t DSoftbusHandler::StopCooperate(const std::string &networkId, const DSoft
 
 int32_t DSoftbusHandler::ComeBack(const std::string &networkId, const DSoftbusComeBack &event)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     NetPacket packet(MessageId::DSOFTBUS_COME_BACK);
     packet << event.originNetworkId << event.cursorPos.x << event.cursorPos.y << event.extra.priv;
     if (packet.ChkRWError()) {
@@ -160,7 +160,7 @@ int32_t DSoftbusHandler::ComeBack(const std::string &networkId, const DSoftbusCo
 
 int32_t DSoftbusHandler::RelayCooperate(const std::string &networkId, const DSoftbusRelayCooperate &event)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     NetPacket packet(MessageId::DSOFTBUS_RELAY_COOPERATE);
     packet << event.targetNetworkId;
     if (packet.ChkRWError()) {
@@ -176,7 +176,7 @@ int32_t DSoftbusHandler::RelayCooperate(const std::string &networkId, const DSof
 
 int32_t DSoftbusHandler::RelayCooperateFinish(const std::string &networkId, const DSoftbusRelayCooperateFinished &event)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     NetPacket packet(MessageId::DSOFTBUS_RELAY_COOPERATE_FINISHED);
     packet << event.targetNetworkId << event.normal;
     if (packet.ChkRWError()) {
@@ -261,7 +261,7 @@ void DSoftbusHandler::OnCommunicationFailure(const std::string &networkId)
 
 void DSoftbusHandler::OnStartCooperate(const std::string &networkId, NetPacket &packet)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     DSoftbusStartCooperate event {
         .networkId = networkId,
     };
@@ -282,7 +282,7 @@ void DSoftbusHandler::OnStartCooperate(const std::string &networkId, NetPacket &
 
 void DSoftbusHandler::OnStopCooperate(const std::string &networkId, NetPacket &packet)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     DSoftbusStopCooperate event {
         .networkId = networkId,
         .normal = true,
@@ -294,7 +294,7 @@ void DSoftbusHandler::OnStopCooperate(const std::string &networkId, NetPacket &p
 
 void DSoftbusHandler::OnComeBack(const std::string &networkId, NetPacket &packet)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     DSoftbusComeBack event {
         .networkId = networkId,
         .success = true,
@@ -315,7 +315,7 @@ void DSoftbusHandler::OnComeBack(const std::string &networkId, NetPacket &packet
 
 void DSoftbusHandler::OnRelayCooperate(const std::string &networkId, NetPacket &packet)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     DSoftbusRelayCooperate event {
         .networkId = networkId,
         .normal = true,
@@ -332,7 +332,7 @@ void DSoftbusHandler::OnRelayCooperate(const std::string &networkId, NetPacket &
 
 void DSoftbusHandler::OnRelayCooperateFinish(const std::string &networkId, NetPacket &packet)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     DSoftbusRelayCooperate event {
         .networkId = networkId,
     };
@@ -348,7 +348,7 @@ void DSoftbusHandler::OnRelayCooperateFinish(const std::string &networkId, NetPa
 
 void DSoftbusHandler::OnSubscribeMouseLocation(const std::string &networKId, NetPacket &packet)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     DSoftbusSubscribeMouseLocation event;
     packet >> event.networkId >> event.remoteNetworkId;
     if (packet.ChkRWError()) {
@@ -362,7 +362,7 @@ void DSoftbusHandler::OnSubscribeMouseLocation(const std::string &networKId, Net
 
 void DSoftbusHandler::OnUnSubscribeMouseLocation(const std::string& networKId, NetPacket &packet)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     DSoftbusUnSubscribeMouseLocation event;
     packet >> event.networkId >> event.remoteNetworkId;
     if (packet.ChkRWError()) {
@@ -376,7 +376,7 @@ void DSoftbusHandler::OnUnSubscribeMouseLocation(const std::string& networKId, N
 
 void DSoftbusHandler::OnReplySubscribeLocation(const std::string& networKId, NetPacket &packet)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     DSoftbusReplySubscribeMouseLocation event;
     packet >> event.networkId >> event.remoteNetworkId >> event.result;
     if (packet.ChkRWError()) {
@@ -390,7 +390,7 @@ void DSoftbusHandler::OnReplySubscribeLocation(const std::string& networKId, Net
 
 void DSoftbusHandler::OnReplyUnSubscribeLocation(const std::string& networKId, NetPacket &packet)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     DSoftbusReplyUnSubscribeMouseLocation event;
     packet >> event.networkId >> event.remoteNetworkId >> event.result;
     if (packet.ChkRWError()) {
@@ -419,7 +419,7 @@ void DSoftbusHandler::OnRemoteMouseLocation(const std::string& networKId, NetPac
 
 void DSoftbusHandler::OnRemoteInputDevice(const std::string& networkId, NetPacket &packet)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     DSoftbusSyncInputDevice event;
     int32_t devNum { -1 };
     packet >> devNum;
@@ -444,7 +444,7 @@ void DSoftbusHandler::OnRemoteInputDevice(const std::string& networkId, NetPacke
 
 void DSoftbusHandler::OnRemoteHotPlug(const std::string &networkId, NetPacket &packet)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     DSoftbusHotPlugEvent event;
     packet >> event.type;
     FI_HILOGI("Hot plug type:%{public}d", event.type);

@@ -18,36 +18,36 @@
 #include <getopt.h>
 #include <sys/stat.h>
 
+#include "virtual_crown.h"
 #include "virtual_finger.h"
+#include "virtual_fingerprint_key.h"
+#include "virtual_fingerprint_mouse.h"
 #include "virtual_gamepad.h"
 #include "virtual_joystick.h"
 #include "virtual_keyboard.h"
-#include "virtual_keyboard_sys_ctrl.h"
 #include "virtual_keyboard_consumer_ctrl.h"
 #include "virtual_keyboard_ext.h"
+#include "virtual_keyboard_sys_ctrl.h"
 #include "virtual_knob.h"
-#include "virtual_knob_sys_ctrl.h"
 #include "virtual_knob_consumer_ctrl.h"
 #include "virtual_knob_mouse.h"
+#include "virtual_knob_sys_ctrl.h"
 #include "virtual_mouse.h"
 #include "virtual_pen.h"
-#include "virtual_pen_mouse.h"
 #include "virtual_pen_keyboard.h"
+#include "virtual_pen_mouse.h"
+#include "virtual_pc_switch.h"
+#include "virtual_pc_touchpad.h"
 #include "virtual_remote_control.h"
 #include "virtual_single_finger.h"
 #include "virtual_single_touchscreen.h"
 #include "virtual_stylus.h"
+#include "virtual_touchpad.h"
+#include "virtual_touchscreen.h"
 #include "virtual_trackball.h"
 #include "virtual_trackpad.h"
-#include "virtual_trackpad_sys_ctrl.h"
-#include "virtual_touchpad.h"
-#include "virtual_pc_switch.h"
-#include "virtual_pc_touchpad.h"
-#include "virtual_touchscreen.h"
 #include "virtual_trackpad_mouse.h"
-#include "virtual_fingerprint_key.h"
-#include "virtual_fingerprint_mouse.h"
-#include "virtual_crown.h"
+#include "virtual_trackpad_sys_ctrl.h"
 #include "virtual_uwb_remote_control.h"
 
 namespace OHOS {
@@ -145,22 +145,24 @@ static void RemoveDir(const std::string& filePath)
     }
 }
 
-static void StartMouse()
+static void StartCrown()
 {
-    static VirtualMouse virtualMouse;
-    virtualMouse.SetUp();
+    static VirtualCrown virtualCrown;
+    virtualCrown.SetUp();
 }
 
-static void StartKeyboard()
+static void StartFingerprint()
 {
-    static VirtualKeyboard virtualKey;
-    virtualKey.SetUp();
-    static VirtualKeyboardSysCtrl virtualKeyboardSysCtrl;
-    virtualKeyboardSysCtrl.SetUp();
-    static VirtualKeyboardConsumerCtrl virtualKeyboardConsumerCtrl;
-    virtualKeyboardConsumerCtrl.SetUp();
-    static VirtualKeyboardExt virtualKeyext;
-    virtualKeyext.SetUp();
+    static VirtualFingerprintKey fingerprintKey;
+    fingerprintKey.SetUp();
+    static VirtualFingerprintMouse fingerprintMouse;
+    fingerprintMouse.SetUp();
+}
+
+static void StartGamePad()
+{
+    static VirtualGamePad virtualGamePad;
+    virtualGamePad.SetUp();
 }
 
 static void StartJoystick()
@@ -169,34 +171,16 @@ static void StartJoystick()
     virtualJoystick.SetUp();
 }
 
-static void StartTrackball()
+static void StartKeyboard()
 {
-    static VirtualTrackball virtualTrackball;
-    virtualTrackball.SetUp();
-}
-
-static void StartRemoteControl()
-{
-    static VirtualRemoteControl virtualRemoteControl;
-    virtualRemoteControl.SetUp();
-}
-
-static void StartTrackpad()
-{
-    static VirtualTrackpad virtualTrackpad;
-    virtualTrackpad.SetUp();
-    static VirtualTrackpadMouse virtualMousepadMouse;
-    virtualMousepadMouse.SetUp();
-    static VirtualTrackpadSysCtrl virtualTrackpadSysCtrl;
-    virtualTrackpadSysCtrl.SetUp();
-}
-
-static void StartPc()
-{
-    static VirtualPcTouchpad virtualPcTouchpad;
-    virtualPcTouchpad.SetUp();
-    static VirtualPcSwitch virtualPcSwitch;
-    virtualPcSwitch.SetUp();
+    static VirtualKeyboard virtualKey;
+    virtualKey.SetUp();
+    static VirtualKeyboardConsumerCtrl virtualKeyboardConsumerCtrl;
+    virtualKeyboardConsumerCtrl.SetUp();
+    static VirtualKeyboardExt virtualKeyext;
+    virtualKeyext.SetUp();
+    static VirtualKeyboardSysCtrl virtualKeyboardSysCtrl;
+    virtualKeyboardSysCtrl.SetUp();
 }
 
 static void StartKnob()
@@ -211,54 +195,70 @@ static void StartKnob()
     virtualKnobSysCtrl.SetUp();
 }
 
-static void StartGamePad()
+static void StartMouse()
 {
-    static VirtualGamePad virtualGamePad;
-    virtualGamePad.SetUp();
+    static VirtualMouse virtualMouse;
+    virtualMouse.SetUp();
 }
 
-static void StartTouchPad()
+static void StartPc()
 {
-    static VirtualStylus virtualStylus;
-    virtualStylus.SetUp();
-    static VirtualTouchpad virtualTouchpad;
-    virtualTouchpad.SetUp();
-    static VirtualFinger virtualFinger;
-    virtualFinger.SetUp();
-    static VirtualSingleFinger virtualSingleFinger;
-    virtualSingleFinger.SetUp();
-}
-
-static void StartTouchScreen()
-{
-    static VirtualTouchScreen virtualTouchScreen;
-    virtualTouchScreen.SetUp();
-    static VirtualSingleTouchScreen virtualSingleTouchScreen;
-    virtualSingleTouchScreen.SetUp();
+    static VirtualPcSwitch virtualPcSwitch;
+    virtualPcSwitch.SetUp();
+    static VirtualPcTouchpad virtualPcTouchpad;
+    virtualPcTouchpad.SetUp();
 }
 
 static void StartPen()
 {
     static VirtualPen virtualPen;
     virtualPen.SetUp();
-    static VirtualPenMouse virtualPenMouse;
-    virtualPenMouse.SetUp();
     static VirtualPenKeyboard virtualPenKeyboard;
     virtualPenKeyboard.SetUp();
+    static VirtualPenMouse virtualPenMouse;
+    virtualPenMouse.SetUp();
 }
 
-static void StartFingerprint()
+static void StartRemoteControl()
 {
-    static VirtualFingerprintKey fingerprintKey;
-    fingerprintKey.SetUp();
-    static VirtualFingerprintMouse fingerprintMouse;
-    fingerprintMouse.SetUp();
+    static VirtualRemoteControl virtualRemoteControl;
+    virtualRemoteControl.SetUp();
 }
 
-static void StartCrown()
+static void StartTouchPad()
 {
-    static VirtualCrown virtualCrown;
-    virtualCrown.SetUp();
+    static VirtualFinger virtualFinger;
+    virtualFinger.SetUp();
+    static VirtualSingleFinger virtualSingleFinger;
+    virtualSingleFinger.SetUp();
+    static VirtualStylus virtualStylus;
+    virtualStylus.SetUp();
+    static VirtualTouchpad virtualTouchpad;
+    virtualTouchpad.SetUp();
+}
+
+static void StartTouchScreen()
+{
+    static VirtualSingleTouchScreen virtualSingleTouchScreen;
+    virtualSingleTouchScreen.SetUp();
+    static VirtualTouchScreen virtualTouchScreen;
+    virtualTouchScreen.SetUp();
+}
+
+static void StartTrackball()
+{
+    static VirtualTrackball virtualTrackball;
+    virtualTrackball.SetUp();
+}
+
+static void StartTrackpad()
+{
+    static VirtualTrackpad virtualTrackpad;
+    virtualTrackpad.SetUp();
+    static VirtualTrackpadMouse virtualMousepadMouse;
+    virtualMousepadMouse.SetUp();
+    static VirtualTrackpadSysCtrl virtualTrackpadSysCtrl;
+    virtualTrackpadSysCtrl.SetUp();
 }
 
 static void StartUwbRemoteControl()
@@ -269,21 +269,21 @@ static void StartUwbRemoteControl()
 
 using VirtualFun = void (*)();
 std::map<std::string, VirtualFun> mapFun = {
-    {"mouse", &StartMouse},
-    {"keyboard", &StartKeyboard},
-    {"joystick", &StartJoystick},
-    {"trackball", &StartTrackball},
-    {"remotecontrol", &StartRemoteControl},
-    {"trackpad", &StartTrackpad},
-    {"knob", &StartKnob},
-    {"gamepad", &StartGamePad},
-    {"touchpad", &StartTouchPad},
-    {"pc", &StartPc},
-    {"touchscreen", &StartTouchScreen},
-    {"pen", &StartPen},
-    {"fingerprint", &StartFingerprint},
     {"crown", &StartCrown},
-    {"uwbremotecontrol", &StartUwbRemoteControl}
+    {"fingerprint", &StartFingerprint},
+    {"gamepad", &StartGamePad},
+    {"joystick", &StartJoystick},
+    {"keyboard", &StartKeyboard},
+    {"knob", &StartKnob},
+    {"mouse", &StartMouse},
+    {"pc", &StartPc},
+    {"pen", &StartPen},
+    {"remotecontrol", &StartRemoteControl},
+    {"touchpad", &StartTouchPad},
+    {"touchscreen", &StartTouchScreen},
+    {"trackball", &StartTrackball},
+    {"trackpad", &StartTrackpad},
+    {"uwbremotecontrol", &StartUwbRemoteControl},
 };
 
 static void StartAllDevices()
@@ -311,6 +311,28 @@ VirtualDevice::~VirtualDevice()
     Close();
 }
 
+bool VirtualDevice::AddDevice(const std::string& startDeviceName)
+{
+    if (startDeviceName.empty()) {
+        std::cout << "StartDeviceName is empty" << std::endl;
+        return false;
+    }
+    if (!CreateHandle(startDeviceName)) {
+        std::cout << "Failed to start device: " << startDeviceName <<std::endl;
+        return false;
+    }
+    std::string symbolFile;
+    symbolFile.append(g_folderPath).append(g_pid).append("_").append(startDeviceName);
+    std::ofstream flagFile;
+    flagFile.open(symbolFile.c_str());
+    if (!flagFile.is_open()) {
+        std::cout << "Failed to create file" <<std::endl;
+        return false;
+    }
+    flagFile.close();
+    return true;
+}
+
 std::vector<std::string> VirtualDevice::BrowseDirectory(const std::string& filePath)
 {
     std::vector<std::string> fileList;
@@ -331,6 +353,53 @@ std::vector<std::string> VirtualDevice::BrowseDirectory(const std::string& fileP
         std::cout << "Close dir:" << filePath << " failed" << std::endl;
     }
     return fileList;
+}
+
+bool VirtualDevice::CheckCommand(int32_t argc, char **argv)
+{
+    int32_t c = -1;
+    if (!SelectOptions(argc, argv, c)) {
+        std::cout << "Select option failed" << std::endl;
+        return false;
+    }
+    if (!IsFileExists(g_folderPath)) {
+        mkdir(g_folderPath.c_str(), FILE_POWER);
+    }
+    switch (c) {
+        case 'L': {
+            if (!ListOption(argc, argv)) {
+                std::cout << "Device query failed" << std::endl;
+                return false;
+            }
+            break;
+        }
+        case 'S': {
+            if (!StartOption(argc, argv)) {
+                std::cout << "Device start failed" << std::endl;
+                return false;
+            }
+            break;
+        }
+        case 'C': {
+            if (!CloseOption(argc, argv)) {
+                std::cout << "Device close failed" << std::endl;
+                return false;
+            }
+            break;
+        }
+        case '?': {
+            if (!HelpOption(argc, argv)) {
+                std::cout << "Failed to ask for help" << std::endl;
+                return false;
+            }
+            break;
+        }
+        default: {
+            std::cout << "The command line format is incorrect" << std::endl;
+            return false;
+        }
+    }
+    return true;
 }
 
 bool VirtualDevice::ClearFileResidues(const std::string& fileName)
@@ -384,6 +453,63 @@ bool VirtualDevice::ClearFileResidues(const std::string& fileName)
     return false;
 }
 
+bool VirtualDevice::CloseDevice(const std::string& closeDeviceName, const std::vector<std::string>& deviceList)
+{
+    if (deviceList.empty()) {
+        RemoveDir(g_folderPath);
+        std::cout << "No start device" <<std::endl;
+        return false;
+    }
+    if (closeDeviceName == "all") {
+        for (const auto &it : deviceList) {
+            kill(std::stoi(it), SIGKILL);
+        }
+        RemoveDir(g_folderPath);
+        return true;
+    }
+    for (const auto &it : deviceList) {
+        if (it.find(closeDeviceName) == 0) {
+            kill(std::stoi(it), SIGKILL);
+            remove((g_folderPath + it).c_str());
+            if (BrowseDirectory(g_folderPath).empty()) {
+                    RemoveDir(g_folderPath);
+            }
+            return true;
+        }
+    }
+    std::cout << "Device shutdown failed! The PID format is incorrect" <<std::endl;
+    return false;
+}
+
+bool VirtualDevice::CloseOption(int32_t argc, char **argv)
+{
+    std::vector<std::string> deviceList = BrowseDirectory(g_folderPath);
+    if (argc != PARAMETERS_NUMBER) {
+        std::cout << "Invalid Input Param, Please Check the validity of the para" << std::endl;
+        return false;
+    }
+    if (!CloseDevice(argv[optind], deviceList)) {
+        std::cout << "Failed to closed device" << std::endl;
+        return false;
+    }
+    std::cout << "device closed successfully" << std::endl;
+    return true;
+}
+
+bool VirtualDevice::CreateHandle(const std::string& deviceArgv)
+{
+    if (deviceArgv == "all") {
+        StartAllDevices();
+        return true;
+    }
+    if (mapFun.find(deviceArgv) == mapFun.end()) {
+        std::cout << "Please enter the device type correctly" << std::endl;
+        return false;
+    }
+    (*mapFun[deviceArgv])();
+    return true;
+}
+
 bool VirtualDevice::CreateKey()
 {
     auto fun = [&](int32_t uiSet, const std::vector<uint32_t>& list) ->bool {
@@ -415,56 +541,13 @@ bool VirtualDevice::CreateKey()
     return true;
 }
 
-bool VirtualDevice::SetAbsResolution()
+void VirtualDevice::Close()
 {
-    for (const auto &item : absInit_) {
-        ioctl(fd_, UI_ABS_SETUP, &item);
+    if (fd_ >= 0) {
+        ioctl(fd_, UI_DEV_DESTROY);
+        close(fd_);
+        fd_ = -1;
     }
-    return true;
-}
-
-bool VirtualDevice::SetPhys(const std::string& deviceName)
-{
-    std::string phys;
-    std::map<std::string, std::string> typeDevice = {
-        {"Virtual Mouse",                "mouse"},
-        {"Virtual Crown",                "mouse"},
-        {"Virtual keyboard",             "keyboard"},
-        {"Virtual KeyboardConsumerCtrl", "keyboard"},
-        {"Virtual keyboardExt",          "keyboard"},
-        {"Virtual KeyboardSysCtrl",      "keyboard"},
-        {"Virtual Knob",                 "knob"},
-        {"Virtual KnobConsumerCtrl",     "knob"},
-        {"Virtual KnobMouse",            "knob"},
-        {"Virtual KnobSysCtrl",          "knob"},
-        {"Virtual Trackpad",             "trackpad"},
-        {"Virtual TrackPadMouse",        "trackpad"},
-        {"Virtual TrackpadSysCtrl",      "trackpad"},
-        {"Virtual Finger",               "touchpad"},
-        {"Virtual SingleFinger",         "touchpad"},
-        {"Virtual Stylus",               "touchpad"},
-        {"Virtual Touchpad",             "touchpad"},
-        {"Virtual PcSwitch",             "pc"},
-        {"Virtual PcTouchPad",           "pc"},
-        {"Virtual RemoteControl",        "remotecontrol"},
-        {"Virtual Joystick",             "joystick"},
-        {"Virtual GamePad",              "gamepad"},
-        {"Virtual Trackball",            "trackball"},
-        {"Virtual TouchScreen",          "touchscreen"},
-        {"Virtual SingleTouchScreen",    "touchscreen"},
-        {"V-Pencil",                     "pen"},
-        {"V-Pencil-mouse",               "pen"},
-        {"V-Pencil-keyboard",            "pen"},
-        {"Virtual UWB RemoteControl",    "uwbremotecontrol"}
-    };
-    std::string deviceType = typeDevice.find(deviceName)->second;
-    phys.append(deviceType).append(g_pid).append("/").append(g_pid);
-
-    if (ioctl(fd_, UI_SET_PHYS, phys.c_str()) < 0) {
-        std::cout << "Failed to set uinput phys" << std::endl;
-        return false;
-    }
-    return true;
 }
 
 bool VirtualDevice::DoIoctl(int32_t fd, int32_t request, const uint32_t value)
@@ -477,57 +560,91 @@ bool VirtualDevice::DoIoctl(int32_t fd, int32_t request, const uint32_t value)
     return true;
 }
 
-void VirtualDevice::SetDeviceId()
+const std::vector<uint32_t>& VirtualDevice::GetAbs() const
 {
-    uinputDev_.id.bustype = busTtype_;
-    uinputDev_.id.vendor = vendorId_;
-    uinputDev_.id.product = productId_;
-    uinputDev_.id.version = version_;
+    return abs_;
 }
 
-bool VirtualDevice::SetUp()
+const std::vector<uint32_t>& VirtualDevice::GetEventTypes() const
 {
-    fd_ = open("/dev/uinput", O_WRONLY | O_NONBLOCK);
-    if (fd_ < 0) {
-        std::cout << "Failed to open uinput: " << fd_ << std::endl;
-        return false;
-    }
+    return eventTypes_;
+}
 
-    if (strncpy_s(uinputDev_.name, sizeof(uinputDev_.name), deviceName_.c_str(), deviceName_.size()) != 0) {
-        std::cout << "Failed to copied device name: " << uinputDev_.name << std::endl;
-        return false;
-    };
-    SetDeviceId();
-    if (!SetAbsResolution()) {
-        std::cout << "Failed to set uinput abs resolution" << std::endl;
+int32_t VirtualDevice::GetFileSize(const std::string& filePath)
+{
+    struct stat statbuf = { 0 };
+    if (stat(filePath.c_str(), &statbuf) != 0) {
+        std::cout << "Get file size error" << std::endl;
+        return INVALID_FILE_SIZE;
+    }
+    return statbuf.st_size;
+}
+
+const std::vector<uint32_t>& VirtualDevice::GetKeys() const
+{
+    return keys_;
+}
+
+const std::vector<uint32_t>& VirtualDevice::GetLeds() const
+{
+    return leds_;
+}
+
+const std::vector<uint32_t>& VirtualDevice::GetMiscellaneous() const
+{
+    return miscellaneous_;
+}
+
+const std::vector<uint32_t>& VirtualDevice::GetProperties() const
+{
+    return properties_;
+}
+
+const std::vector<uint32_t>& VirtualDevice::GetRelBits() const
+{
+    return relBits_;
+}
+
+const std::vector<uint32_t>& VirtualDevice::GetRepeats() const
+{
+    return repeats_;
+}
+
+const std::vector<uint32_t>& VirtualDevice::GetSwitches() const
+{
+    return switches_;
+}
+
+bool VirtualDevice::HelpOption(int32_t argc, char **argv)
+{
+    if (argc != PARAMETERS_QUERY_NUMBER) {
+        std::cout << "Invalid Input Param, Please Check the validity of the para" << std::endl;
         return false;
     }
-    if (!SetPhys(deviceName_)) {
-        std::cout << "Failed to set uinput phys" << std::endl;
-        return false;
-    }
-    if (!CreateKey()) {
-        std::cout << "Failed to create uinput KeyValue" << std::endl;
-        return false;
-    }
-    if (write(fd_, &uinputDev_, sizeof(uinputDev_)) < 0) {
-        std::cout << "Unable to write device info to target" << std::endl;
-        return false;
-    }
-    if (ioctl(fd_, UI_DEV_CREATE) < 0) {
-        std::cout << "Try to create uinput device filed in fd: " << fd_ << std::endl;
-        return false;
-    }
+    ShowUsage();
     return true;
 }
 
-void VirtualDevice::Close()
+bool VirtualDevice::ListOption(int32_t argc, char **argv)
 {
-    if (fd_ >= 0) {
-        ioctl(fd_, UI_DEV_DESTROY);
-        close(fd_);
-        fd_ = -1;
+    if (argc != PARAMETERS_QUERY_NUMBER) {
+        std::cout << "Invalid Input Param, Please Check the validity of the para" << std::endl;
+        return false;
     }
+    std::vector<std::string> deviceList = BrowseDirectory(g_folderPath);
+    if (deviceList.empty()) {
+        std::cout << "No device information to query" << std::endl;
+        return true;
+    }
+    std::string::size_type pos;
+    std::cout << "PID\tDEVICE" << std::endl;
+    for (const auto &item : deviceList) {
+        pos = item.find("_");
+        if (pos != std::string::npos) {
+            std::cout << item.substr(0, pos) << "\t" << item.substr(pos + 1, item.size() - pos - 1) << std::endl;
+        }
+    }
+    return true;
 }
 
 std::string VirtualDevice::ReadFile(const std::string& filePath)
@@ -546,16 +663,6 @@ std::string VirtualDevice::ReadFile(const std::string& filePath)
         std::cout << "Failed to close file" << std::endl;
     }
     return dataStr;
-}
-
-int32_t VirtualDevice::GetFileSize(const std::string& filePath)
-{
-    struct stat statbuf = { 0 };
-    if (stat(filePath.c_str(), &statbuf) != 0) {
-        std::cout << "Get file size error" << std::endl;
-        return INVALID_FILE_SIZE;
-    }
-    return statbuf.st_size;
 }
 
 std::string VirtualDevice::ReadUinputToolFile(const std::string& filePath)
@@ -583,117 +690,6 @@ std::string VirtualDevice::ReadUinputToolFile(const std::string& filePath)
         return "";
     }
     return ReadFile(filePath);
-}
-
-bool VirtualDevice::CreateHandle(const std::string& deviceArgv)
-{
-    if (deviceArgv == "all") {
-        StartAllDevices();
-        return true;
-    }
-    if (mapFun.find(deviceArgv) == mapFun.end()) {
-        std::cout << "Please enter the device type correctly" << std::endl;
-        return false;
-    }
-    (*mapFun[deviceArgv])();
-    return true;
-}
-
-bool VirtualDevice::AddDevice(const std::string& startDeviceName)
-{
-    if (startDeviceName.empty()) {
-        std::cout << "StartDeviceName is empty" << std::endl;
-        return false;
-    }
-    if (!CreateHandle(startDeviceName)) {
-        std::cout << "Failed to start device: " << startDeviceName <<std::endl;
-        return false;
-    }
-    std::string symbolFile;
-    symbolFile.append(g_folderPath).append(g_pid).append("_").append(startDeviceName);
-    std::ofstream flagFile;
-    flagFile.open(symbolFile.c_str());
-    if (!flagFile.is_open()) {
-        std::cout << "Failed to create file" <<std::endl;
-        return false;
-    }
-    flagFile.close();
-    return true;
-}
-
-bool VirtualDevice::CloseDevice(const std::string& closeDeviceName, const std::vector<std::string>& deviceList)
-{
-    if (deviceList.empty()) {
-        RemoveDir(g_folderPath);
-        std::cout << "No start device" <<std::endl;
-        return false;
-    }
-    if (closeDeviceName == "all") {
-        for (const auto &it : deviceList) {
-            kill(std::stoi(it), SIGKILL);
-        }
-        RemoveDir(g_folderPath);
-        return true;
-    }
-    for (const auto &it : deviceList) {
-        if (it.find(closeDeviceName) == 0) {
-            kill(std::stoi(it), SIGKILL);
-            remove((g_folderPath + it).c_str());
-            if (BrowseDirectory(g_folderPath).empty()) {
-                    RemoveDir(g_folderPath);
-            }
-            return true;
-        }
-    }
-    std::cout << "Device shutdown failed! The PID format is incorrect" <<std::endl;
-    return false;
-}
-
-bool VirtualDevice::CheckCommand(int32_t argc, char **argv)
-{
-    int32_t c = -1;
-    if (!SelectOptions(argc, argv, c)) {
-        std::cout << "Select option failed" << std::endl;
-        return false;
-    }
-    if (!IsFileExists(g_folderPath)) {
-        mkdir(g_folderPath.c_str(), FILE_POWER);
-    }
-    switch (c) {
-        case 'L': {
-            if (!ListOption(argc, argv)) {
-                std::cout << "Device query failed" << std::endl;
-                return false;
-            }
-            break;
-        }
-        case 'S': {
-            if (!StartOption(argc, argv)) {
-                std::cout << "Device start failed" << std::endl;
-                return false;
-            }
-            break;
-        }
-        case 'C': {
-            if (!CloseOption(argc, argv)) {
-                std::cout << "Device close failed" << std::endl;
-                return false;
-            }
-            break;
-        }
-        case '?': {
-            if (!HelpOption(argc, argv)) {
-                std::cout << "Failed to ask for help" << std::endl;
-                return false;
-            }
-            break;
-        }
-        default: {
-            std::cout << "The command line format is incorrect" << std::endl;
-            return false;
-        }
-    }
-    return true;
 }
 
 bool VirtualDevice::SelectOptions(int32_t argc, char **argv, int32_t &opt)
@@ -733,74 +729,12 @@ bool VirtualDevice::SelectOptions(int32_t argc, char **argv, int32_t &opt)
     return true;
 }
 
-bool VirtualDevice::ListOption(int32_t argc, char **argv)
+bool VirtualDevice::SetAbsResolution()
 {
-    if (argc != PARAMETERS_QUERY_NUMBER) {
-        std::cout << "Invalid Input Param, Please Check the validity of the para" << std::endl;
-        return false;
-    }
-    std::vector<std::string> deviceList = BrowseDirectory(g_folderPath);
-    if (deviceList.empty()) {
-        std::cout << "No device information to query" << std::endl;
-        return true;
-    }
-    std::string::size_type pos;
-    std::cout << "PID\tDEVICE" << std::endl;
-    for (const auto &item : deviceList) {
-        pos = item.find("_");
-        if (pos != std::string::npos) {
-            std::cout << item.substr(0, pos) << "\t" << item.substr(pos + 1, item.size() - pos - 1) << std::endl;
-        }
+    for (const auto &item : absInit_) {
+        ioctl(fd_, UI_ABS_SETUP, &item);
     }
     return true;
-}
-
-bool VirtualDevice::StartOption(int32_t argc, char **argv)
-{
-    if (argc != PARAMETERS_NUMBER) {
-        std::cout << "Invalid Input Param, Please Check the validity of the para" << std::endl;
-        return false;
-    }
-    if (!AddDevice(argv[optind])) {
-        std::cout << "Failed to create device" << std::endl;
-        return false;
-    }
-    while (true) {
-        usleep(SLEEP_TIME);
-    }
-    return true;
-}
-
-bool VirtualDevice::CloseOption(int32_t argc, char **argv)
-{
-    std::vector<std::string> deviceList = BrowseDirectory(g_folderPath);
-    if (argc != PARAMETERS_NUMBER) {
-        std::cout << "Invalid Input Param, Please Check the validity of the para" << std::endl;
-        return false;
-    }
-    if (!CloseDevice(argv[optind], deviceList)) {
-        std::cout << "Failed to closed device" << std::endl;
-        return false;
-    }
-    std::cout << "device closed successfully" << std::endl;
-    return true;
-}
-
-bool VirtualDevice::HelpOption(int32_t argc, char **argv)
-{
-    if (argc != PARAMETERS_QUERY_NUMBER) {
-        std::cout << "Invalid Input Param, Please Check the validity of the para" << std::endl;
-        return false;
-    }
-    ShowUsage();
-    return true;
-}
-
-void VirtualDevice::SetResolution(const ResolutionInfo& resolutionInfo)
-{
-    uinputAbs_.code = resolutionInfo.axisCode;
-    uinputAbs_.absinfo.resolution = resolutionInfo.absResolution;
-    absInit_.push_back(uinputAbs_);
 }
 
 void VirtualDevice::SetAbsValue(const AbsInfo& absInfo)
@@ -811,49 +745,99 @@ void VirtualDevice::SetAbsValue(const AbsInfo& absInfo)
     uinputDev_.absflat[absInfo.code] = absInfo.flat;
 }
 
-const std::vector<uint32_t>& VirtualDevice::GetEventTypes() const
+void VirtualDevice::SetDeviceId()
 {
-    return eventTypes_;
+    uinputDev_.id.bustype = busTtype_;
+    uinputDev_.id.vendor = vendorId_;
+    uinputDev_.id.product = productId_;
+    uinputDev_.id.version = version_;
 }
 
-const std::vector<uint32_t>& VirtualDevice::GetKeys() const
+bool VirtualDevice::SetPhys(const std::string& deviceName)
 {
-    return keys_;
+    std::string phys;
+    std::map<std::string, std::string> typeDevice = {
+        {"V-Pencil",                     "pen"},
+        {"V-Pencil-keyboard",            "pen"},
+        {"V-Pencil-mouse",               "pen"},
+        {"Virtual Finger",               "touchpad"},
+        {"Virtual GamePad",              "gamepad"},
+        {"Virtual Joystick",             "joystick"},
+        {"Virtual KeyboardConsumerCtrl", "keyboard"},
+        {"Virtual KeyboardSysCtrl",      "keyboard"},
+        {"Virtual Knob",                 "knob"},
+        {"Virtual KnobConsumerCtrl",     "knob"},
+        {"Virtual KnobMouse",            "knob"},
+        {"Virtual KnobSysCtrl",          "knob"},
+        {"Virtual Mouse",                "mouse"},
+        {"Virtual PcSwitch",             "pc"},
+        {"Virtual PcTouchPad",           "pc"},
+        {"Virtual RemoteControl",        "remotecontrol"},
+        {"Virtual SingleFinger",         "touchpad"},
+        {"Virtual SingleTouchScreen",    "touchscreen"},
+        {"Virtual Stylus",               "touchpad"},
+        {"Virtual TouchScreen",          "touchscreen"},
+        {"Virtual Touchpad",             "touchpad"},
+        {"Virtual TrackPadMouse",        "trackpad"},
+        {"Virtual Trackball",            "trackball"},
+        {"Virtual Trackpad",             "trackpad"},
+        {"Virtual TrackpadSysCtrl",      "trackpad"},
+        {"Virtual UWB RemoteControl",    "uwbremotecontrol"},
+        {"Virtual Crown",                "mouse"},
+        {"Virtual keyboard",             "keyboard"},
+        {"Virtual keyboardExt",          "keyboard"},
+    };
+    std::string deviceType = typeDevice.find(deviceName)->second;
+    phys.append(deviceType).append(g_pid).append("/").append(g_pid);
+
+    if (ioctl(fd_, UI_SET_PHYS, phys.c_str()) < 0) {
+        std::cout << "Failed to set uinput phys" << std::endl;
+        return false;
+    }
+    return true;
 }
 
-const std::vector<uint32_t>& VirtualDevice::GetProperties() const
+void VirtualDevice::SetResolution(const ResolutionInfo& resolutionInfo)
 {
-    return properties_;
+    uinputAbs_.code = resolutionInfo.axisCode;
+    uinputAbs_.absinfo.resolution = resolutionInfo.absResolution;
+    absInit_.push_back(uinputAbs_);
 }
 
-const std::vector<uint32_t>& VirtualDevice::GetAbs() const
+bool VirtualDevice::SetUp()
 {
-    return abs_;
-}
+    fd_ = open("/dev/uinput", O_WRONLY | O_NONBLOCK);
+    if (fd_ < 0) {
+        std::cout << "Failed to open uinput: " << fd_ << std::endl;
+        return false;
+    }
 
-const std::vector<uint32_t>& VirtualDevice::GetRelBits() const
-{
-    return relBits_;
-}
-
-const std::vector<uint32_t>& VirtualDevice::GetLeds() const
-{
-    return leds_;
-}
-
-const std::vector<uint32_t>& VirtualDevice::GetRepeats() const
-{
-    return repeats_;
-}
-
-const std::vector<uint32_t>& VirtualDevice::GetMiscellaneous() const
-{
-    return miscellaneous_;
-}
-
-const std::vector<uint32_t>& VirtualDevice::GetSwitches() const
-{
-    return switches_;
+    if (strncpy_s(uinputDev_.name, sizeof(uinputDev_.name), deviceName_.c_str(), deviceName_.size()) != 0) {
+        std::cout << "Failed to copied device name: " << uinputDev_.name << std::endl;
+        return false;
+    };
+    SetDeviceId();
+    if (!SetAbsResolution()) {
+        std::cout << "Failed to set uinput abs resolution" << std::endl;
+        return false;
+    }
+    if (!SetPhys(deviceName_)) {
+        std::cout << "Failed to set uinput phys" << std::endl;
+        return false;
+    }
+    if (!CreateKey()) {
+        std::cout << "Failed to create uinput KeyValue" << std::endl;
+        return false;
+    }
+    if (write(fd_, &uinputDev_, sizeof(uinputDev_)) < 0) {
+        std::cout << "Unable to write device info to target" << std::endl;
+        return false;
+    }
+    if (ioctl(fd_, UI_DEV_CREATE) < 0) {
+        std::cout << "Try to create uinput device filed in fd: " << fd_ << std::endl;
+        return false;
+    }
+    return true;
 }
 
 void VirtualDevice::ShowUsage()
@@ -881,6 +865,22 @@ void VirtualDevice::ShowUsage()
     std::cout << "-C <pid>        --close <pid>        close <pid>           -close a pid   " << std::endl;
     std::cout << "-C all          --close all          close all             -close pids    " << std::endl;
     std::cout << "-?  --help   help                                                         " << std::endl;
+}
+
+bool VirtualDevice::StartOption(int32_t argc, char **argv)
+{
+    if (argc != PARAMETERS_NUMBER) {
+        std::cout << "Invalid Input Param, Please Check the validity of the para" << std::endl;
+        return false;
+    }
+    if (!AddDevice(argv[optind])) {
+        std::cout << "Failed to create device" << std::endl;
+        return false;
+    }
+    while (true) {
+        usleep(SLEEP_TIME);
+    }
+    return true;
 }
 } // namespace MMI
 } // namespace OHOS

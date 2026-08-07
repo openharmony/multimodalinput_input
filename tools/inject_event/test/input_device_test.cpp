@@ -14,8 +14,8 @@
  */
 
 #include <gtest/gtest.h>
-#include <fcntl.h>
 
+#include <fcntl.h>
 #include "input_device.h"
 
 namespace OHOS {

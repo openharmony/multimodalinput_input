@@ -15,9 +15,9 @@
 
 #include <gtest/gtest.h>
 
+#include "get_device_node.h"
 #include "msg_head.h"
 #include "proto.h"
-#include "get_device_node.h"
 
 namespace OHOS {
 namespace MMI {

@@ -31,6 +31,9 @@ private:
     bool HandleSwipeBegin(const std::shared_ptr<PointerEvent>& pointerEvent);
     bool HandleSwipeUpdate(const std::shared_ptr<PointerEvent>& pointerEvent);
     bool HandleSwipeEnd(const std::shared_ptr<PointerEvent>& pointerEvent);
+    bool HandleAxisBegin(const std::shared_ptr<PointerEvent>& pointerEvent);
+    bool HandleAxisUpdate(const std::shared_ptr<PointerEvent>& pointerEvent);
+    bool HandleAxisEnd(const std::shared_ptr<PointerEvent>& pointerEvent);
 
 private:
     int32_t eventAction_ { PointerEvent::POINTER_ACTION_UNKNOWN };

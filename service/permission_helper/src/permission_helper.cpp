@@ -60,9 +60,11 @@ bool PermissionHelper::VerifySystemApp()
     return true;
 }
 
-bool PermissionHelper::CheckInjectPermission()
+bool PermissionHelper::CheckInjectPermission(uint32_t tokenId)
 {
-    auto tokenId = IPCSkeleton::GetCallingTokenID();
+    if (tokenId == 0) {
+        tokenId = IPCSkeleton::GetCallingTokenID();
+    }
     auto tokenType = OHOS::Security::AccessToken::AccessTokenKit::GetTokenTypeFlag(tokenId);
     if (tokenType == OHOS::Security::AccessToken::ATokenTypeEnum::TOKEN_SHELL) {
         MMI_HILOGD("called tokenType is shell, verify success");

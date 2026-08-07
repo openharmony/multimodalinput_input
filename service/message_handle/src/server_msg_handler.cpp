@@ -158,6 +158,9 @@ int32_t ServerMsgHandler::OnInjectKeyEvent(const std::shared_ptr<KeyEvent> keyEv
         if (checkReturn != RET_OK) {
             return checkReturn;
         }
+        if (DISPLAY_MONITOR->GetScreenLocked()) {
+            keyEvent->AddFlag(InputEvent::EVENT_FLAG_INJECT_UNDER_LOCK);
+        }
     }
     keyEvent->SetKeyIntention(KeyItemsTransKeyIntention(keyEvent->GetKeyItems()));
     auto inputEventNormalizeHandler = InputHandler->GetEventNormalizeHandler();
@@ -172,7 +175,7 @@ int32_t ServerMsgHandler::OnInjectKeyEvent(const std::shared_ptr<KeyEvent> keyEv
 
 int32_t ServerMsgHandler::OnGetFunctionKeyState(int32_t funcKey, bool &state)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     bool hasVirtualKeyboard = false;
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
     hasVirtualKeyboard = INPUT_DEV_MGR->HasVirtualKeyboardDevice();
@@ -192,7 +195,7 @@ int32_t ServerMsgHandler::OnGetFunctionKeyState(int32_t funcKey, bool &state)
 
 int32_t ServerMsgHandler::OnSetFunctionKeyState(int32_t pid, int32_t funcKey, bool enable)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     AppExecFwk::RunningProcessInfo processInfo;
     auto appMgrClient = DelayedSingleton<AppExecFwk::AppMgrClient>::GetInstance();
     CHKPR(appMgrClient, ERROR_NULL_POINTER);
@@ -265,6 +268,9 @@ int32_t ServerMsgHandler::OnInjectPointerEvent(int32_t userId, const std::shared
         if (checkReturn != RET_OK) {
             return checkReturn;
         }
+        if (DISPLAY_MONITOR->GetScreenLocked()) {
+            pointerEvent->AddFlag(InputEvent::EVENT_FLAG_INJECT_UNDER_LOCK);
+        }
     }
     return OnInjectPointerEventExt(userId, pointerEvent, isShell, useCoordinate);
 }
@@ -279,6 +285,9 @@ int32_t ServerMsgHandler::OnInjectTouchPadEvent(int32_t userId, const std::share
         int32_t checkReturn = NativeInjectCheck(pid);
         if (checkReturn != RET_OK) {
             return checkReturn;
+        }
+        if (DISPLAY_MONITOR->GetScreenLocked()) {
+            pointerEvent->AddFlag(InputEvent::EVENT_FLAG_INJECT_UNDER_LOCK);
         }
     }
     return OnInjectTouchPadEventExt(userId, pointerEvent, touchpadCDG, isShell);
@@ -541,13 +550,8 @@ int32_t ServerMsgHandler::AccelerateMotion(int32_t userId, std::shared_ptr<Point
         return ret;
     }
     WIN_MGR->UpdateAndAdjustMouseLocation(cursorPos.displayId, cursorPos.cursorPos.x, cursorPos.cursorPos.y);
-    if (EventLogHelper::IsBetaVersion() && !pointerEvent->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE)) {
-        MMI_HILOGD("Cursor move to (x:%.2f, y:%.2f, DisplayId:%d)",
-            cursorPos.cursorPos.x, cursorPos.cursorPos.y, cursorPos.displayId);
-    } else {
-        MMI_HILOGD("Cursor move to (x:%.2f, y:%.2f, DisplayId:%d)",
-            cursorPos.cursorPos.x, cursorPos.cursorPos.y, cursorPos.displayId);
-    }
+    MMI_HILOGD("Cursor move to (x:%.2f, y:%.2f, DisplayId:%d)",
+        cursorPos.cursorPos.x, cursorPos.cursorPos.y, cursorPos.displayId);
     return RET_OK;
 }
 
@@ -614,13 +618,8 @@ int32_t ServerMsgHandler::AccelerateMotionTouchpad(int32_t userId, std::shared_p
         return ret;
     }
     WIN_MGR->UpdateAndAdjustMouseLocation(cursorPos.displayId, cursorPos.cursorPos.x, cursorPos.cursorPos.y);
-    if (EventLogHelper::IsBetaVersion() && !pointerEvent->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE)) {
-        MMI_HILOGD("Cursor move to (x:%.2f, y:%.2f, DisplayId:%d)",
-            cursorPos.cursorPos.x, cursorPos.cursorPos.y, cursorPos.displayId);
-    } else {
-        MMI_HILOGD("Cursor move to (x:%.2f, y:%.2f, DisplayId:%d)",
-            cursorPos.cursorPos.x, cursorPos.cursorPos.y, cursorPos.displayId);
-    }
+    MMI_HILOGD("Cursor move to (x:%.2f, y:%.2f, DisplayId:%d)",
+        cursorPos.cursorPos.x, cursorPos.cursorPos.y, cursorPos.displayId);
     return RET_OK;
 }
 
@@ -1832,11 +1831,6 @@ int32_t ServerMsgHandler::NativeInjectCheck(int32_t pid)
         MMI_HILOGW("Current device has no permission");
         return COMMON_PERMISSION_CHECK_ERROR;
     }
-    bool screenLocked = DISPLAY_MONITOR->GetScreenLocked();
-    if (screenLocked) {
-        MMI_HILOGW("Screen locked, no permission");
-        return COMMON_PERMISSION_CHECK_ERROR;
-    }
     if (pid <= 0) {
         MMI_HILOGW("Invalid process id pid:%{public}d", pid);
         return COMMON_PERMISSION_CHECK_ERROR;
@@ -1845,6 +1839,17 @@ int32_t ServerMsgHandler::NativeInjectCheck(int32_t pid)
         MMI_HILOGI("Native inject permitted by CONTROL_DEVICE permission, pid:%{public}d", pid);
         return RET_OK;
     }
+    bool screenLocked = DISPLAY_MONITOR->GetScreenLocked();
+    if (screenLocked) {
+        MMI_HILOGW("Screen locked, no permission");
+        return COMMON_PERMISSION_CHECK_ERROR;
+    }
+#ifdef OHOS_BUILD_ENABLE_VKEYBOARD
+    if (PER_HELPER->VerifySystemApp() && PER_HELPER->CheckInjectPermission()) {
+        MMI_HILOGI("Native inject permitted by system app and inject permission, pid:%{public}d", pid);
+        return RET_OK;
+    }
+#endif // OHOS_BUILD_ENABLE_VKEYBOARD
     auto state = AUTHORIZE_HELPER->GetAuthorizeState();
     MMI_HILOGI("The process is already being processed,s:%{public}d,pid:%{public}d,inputPid:%{public}d",
         state, AUTHORIZE_HELPER->GetAuthorizePid(), pid);
@@ -1859,11 +1864,9 @@ int32_t ServerMsgHandler::NativeInjectCheck(int32_t pid)
     }
 
     if (state == AuthorizeState::STATE_SELECTION_AUTHORIZE) {
-        if (pid == AUTHORIZE_HELPER->GetAuthorizePid()) {
-            MMI_HILOGI("The current PID is waiting for user authorization");
-        } else {
-            MMI_HILOGI("Another PID is waiting for user authorization");
-        }
+        MMI_HILOGI("%{public}s", pid == AUTHORIZE_HELPER->GetAuthorizePid()
+            ? "The current PID is waiting for user authorization"
+            : "Another PID is waiting for user authorization");
         return COMMON_PERMISSION_CHECK_ERROR;
     }
 
@@ -1907,7 +1910,7 @@ int32_t ServerMsgHandler::EnableInputExtension(int32_t uid, const std::string &u
 
 bool ServerMsgHandler::IsApplicationType(int32_t pid)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     AppExecFwk::RunningProcessInfo processInfo;
     auto appMgrClient = DelayedSingleton<AppExecFwk::AppMgrClient>::GetInstance();
     CHKPF(appMgrClient);

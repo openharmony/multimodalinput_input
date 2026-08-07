@@ -49,7 +49,7 @@ int32_t WhitelistDataShareAccessor::Init()
 {
     // To avoid blocking the main thread; dispatch the task asynchronously.
     // In the worst case, the allowlist check for *IsWhitelisted* will be ineffective.
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     ffrt::submit([this] () {
         this->InitializeImpl();
     });
@@ -58,7 +58,7 @@ int32_t WhitelistDataShareAccessor::Init()
 
 int32_t WhitelistDataShareAccessor::InitializeImpl()
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     if (initialized_.load()) {
         MMI_HILOGE("Init already");
         return RET_OK;
@@ -89,7 +89,7 @@ bool WhitelistDataShareAccessor::IsWhitelisted(const std::string &bundleName)
  
 int32_t WhitelistDataShareAccessor::ReadWhitelistFromDB(std::vector<std::string> &whitelist)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     auto &settingHelper = SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID);
     std::string value;
     if (auto ret = settingHelper.GetStringValue(CONFIG_WHITELIST, value, SETTING_URI_PROXY); ret != RET_OK) {
@@ -103,7 +103,7 @@ int32_t WhitelistDataShareAccessor::ReadWhitelistFromDB(std::vector<std::string>
  
 int32_t WhitelistDataShareAccessor::AddWhitelistObserver()
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     auto &settingHelper = SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID);
     SettingObserver::UpdateFunc updateFunc = [this](const std::string &key) {
         this->OnUpdate(key);
@@ -122,7 +122,7 @@ int32_t WhitelistDataShareAccessor::AddWhitelistObserver()
  
 void WhitelistDataShareAccessor::OnUpdate(const std::string &whitelistKey)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     MMI_HILOGI("Whitelist updated, %{public}s", whitelistKey.c_str());
     std::vector<std::string> whitelist;
     if (ReadWhitelistFromDB(whitelist) != RET_OK) {
@@ -151,7 +151,7 @@ std::vector<std::string> WhitelistDataShareAccessor::Split(const std::string& st
  
 void WhitelistDataShareAccessor::UpdateWhitelist(const std::vector<std::string> &whitelist)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     std::unique_lock<std::shared_mutex> lock(mtx_);
     whitelist_ = std::unordered_set<std::string>(whitelist.begin(), whitelist.end());
 }

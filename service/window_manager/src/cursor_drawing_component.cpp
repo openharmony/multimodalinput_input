@@ -16,23 +16,30 @@
 #include "cursor_drawing_component.h"
 
 #include <dlfcn.h>
+#include <filesystem>
 #include <securec.h>
+#include <unistd.h>
 
 #include "account_manager.h"
+#include "config_multimodal.h"
 #include "ffrt.h"
 #include "input_device_manager.h"
 #include "i_input_windows_manager.h"
 #include "i_preference_manager.h"
 #include "mmi_log.h"
 #include "pointer_device_manager.h"
+#include "resource_decompress.h"
 #include "timer_manager.h"
 #include "i_setting_manager.h"
+#ifdef OHOS_SUSPEND_STATE_MANAGER
+#include "suspend_state_manager.h"
+#endif //OHOS_SUSPEND_STATE_MANAGER
 
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "CursorDrawingComponent"
 #define CHK_IS_LOADV(isLoaded, pointerInstance)                     \
     Load();                                                         \
-    if (!(isLoaded)) {                                              \
+    if ((isLoaded) == 0) {                                              \
         MMI_HILOGE("libcursor_drawing_adapter.z.so is not loaded"); \
         return;                                                     \
     }                                                               \
@@ -43,7 +50,7 @@
 
 #define CHK_IS_LOADF(isLoaded, pointerInstance)                     \
     Load();                                                         \
-    if (!(isLoaded)) {                                              \
+    if ((isLoaded) == 0) {                                              \
         MMI_HILOGE("libcursor_drawing_adapter.z.so is not loaded"); \
         return false;                                               \
     }                                                               \
@@ -54,7 +61,7 @@
 
 #define CHK_IS_LOADR(isLoaded, pointerInstance)                     \
     Load();                                                         \
-    if (!(isLoaded)) {                                              \
+    if ((isLoaded) == 0) {                                              \
         MMI_HILOGE("libcursor_drawing_adapter.z.so is not loaded"); \
         return RET_ERR;                                             \
     }                                                               \
@@ -78,7 +85,7 @@ constexpr int32_t DEFAULT_POINTER_STYLE { 0 };
 const char *POINTER_COLOR = "pointerColor";
 const char *POINTER_SIZE = "pointerSize";
 const std::string MOUSE_FILE_NAME { "mouse_settings.xml" };
-const std::string IMAGE_POINTER_DEFAULT_PATH = "/system/etc/multimodalinput/mouse_icon/";
+const std::string IMAGE_POINTER_DEFAULT_PATH = "/data/service/el1/public/multimodalinput/mouse_icon/";
 const std::string DefaultIconPath = IMAGE_POINTER_DEFAULT_PATH + "Default.svg";
 constexpr int32_t INVALID_USER { -1 };
 ffrt::mutex g_loadSoMutex;
@@ -106,7 +113,7 @@ void CursorDrawingComponent::Load()
     {
         std::lock_guard<ffrt::mutex> lockGuard(g_loadSoMutex);
         lastCallTime_ = std::chrono::steady_clock::now();
-        if (isLoaded_ && (soHandle_ != nullptr)) {
+        if (isLoaded_ == 1 && (soHandle_ != nullptr)) {
             return;
         }
 
@@ -146,6 +153,11 @@ bool CursorDrawingComponent::LoadLibrary()
         return false;
     }
 
+    DecompressToDisk(DEF_MOUSE_ICONS_DAT_PATH, IMAGE_POINTER_DEFAULT_PATH);
+#ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
+    CursorDrawingInformation::GetInstance().CheckMouseIconPath();
+#endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
+
     pointerInstance_ = reinterpret_cast<IPointerDrawingManager*>(getPointerInstance_());
     if (pointerInstance_ == nullptr) {
         MMI_HILOGE("pointerInstance_ is nullptr");
@@ -158,7 +170,7 @@ bool CursorDrawingComponent::LoadLibrary()
         getPointerInstance_ = nullptr;
         return false;
     }
-    isLoaded_ = true;
+    isLoaded_ = 1;
     POINTER_DEV_MGR.isInitDefaultMouseIconPath = true;
 #ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
     pointerInstance_->SetLastMouseStyle(CursorDrawingInformation::GetInstance().GetLastMouseStyle());
@@ -172,15 +184,17 @@ bool CursorDrawingComponent::ResetUnloadTimer(int32_t unloadTime, int32_t checkI
         TimerMgr->RemoveTimer(timerId_);
     }
     if (unloadTime == -1) {
-        unloadTime = UNLOAD_TIME_MS;
+        unloadSoInterval_ = UNLOAD_TIME_MS;
+    } else {
+        unloadSoInterval_ = unloadTime;
     }
     if (checkInterval == -1) {
         checkInterval = CHECK_INTERVAL_MS;
     }
-    timerId_ = TimerMgr->AddLongTimer(checkInterval, CHECK_COUNT, [this, unloadTime] {
+    timerId_ = TimerMgr->AddLongTimer(checkInterval, CHECK_COUNT, [this] {
         auto idleTime = std::chrono::duration_cast<std::chrono::milliseconds>(
             std::chrono::steady_clock::now() - lastCallTime_).count();
-        if ((idleTime >= unloadTime) && !POINTER_DEV_MGR.isInit && !POINTER_DEV_MGR.isPointerVisible) {
+        if ((idleTime >= unloadSoInterval_) && !POINTER_DEV_MGR.isInit && !POINTER_DEV_MGR.isPointerVisible) {
             ffrt::submit([this] {
                 this->UnLoad();
             });
@@ -196,10 +210,11 @@ bool CursorDrawingComponent::ResetUnloadTimer(int32_t unloadTime, int32_t checkI
 void CursorDrawingComponent::UnLoad()
 {
     std::lock_guard<ffrt::mutex> lockGuard(g_loadSoMutex);
-    if (!isLoaded_ || (soHandle_ == nullptr)) {
+    if (isLoaded_ == 0 || (soHandle_ == nullptr)) {
         MMI_HILOGI("%{public}s has been UnLoaded", MULTIMODAL_PATH_NAME);
         return;
     }
+    isLoaded_ = -1;
     pointerInstance_->ClearResources();
     if (dlclose(soHandle_) != 0) {
         const char *errorMsg = dlerror();
@@ -207,7 +222,8 @@ void CursorDrawingComponent::UnLoad()
             (errorMsg != nullptr) ? errorMsg : "");
         return;
     }
-    isLoaded_ = false;
+    CleanupDirectory(IMAGE_POINTER_DEFAULT_PATH);
+    isLoaded_ = 0;
     soHandle_ = nullptr;
     getPointerInstance_ = nullptr;
     pointerInstance_ = nullptr;
@@ -233,10 +249,10 @@ void CursorDrawingComponent::UpdateBindDisplayId(uint64_t rsId)
     pointerInstance_->UpdateBindDisplayId(rsId);
 }
 
-void CursorDrawingComponent::OnDisplayInfo(const OLD::DisplayGroupInfo &displayGroupInfo)
+void CursorDrawingComponent::OnDisplayInfo(const OLD::DisplayGroupInfo &displayGroupInfo, bool isDisplayChanged)
 {
     CHK_IS_LOADV(isLoaded_, pointerInstance_)
-    pointerInstance_->OnDisplayInfo(displayGroupInfo);
+    pointerInstance_->OnDisplayInfo(displayGroupInfo, isDisplayChanged);
 }
 
 void CursorDrawingComponent::OnWindowInfo(const WinInfo &info)
@@ -677,9 +693,9 @@ int32_t CursorDrawingInformation::UpdateDefaultPointerStyle(int32_t pid, int32_t
     PointerStyle style;
     WIN_MGR->GetPointerStyle(pid, GLOBAL_WINDOW_ID, style);
     if (pointerStyle.id != style.id) {
-        auto iconPath = GetMouseIconPath();
-        auto it = iconPath.find(MOUSE_ICON(MOUSE_ICON::DEFAULT));
-        if (it == iconPath.end()) {
+        auto iconPaths = GetMouseIconPath();
+        auto it = iconPaths.find(MOUSE_ICON(MOUSE_ICON::DEFAULT));
+        if (it == iconPaths.end()) {
             MMI_HILOGE("Cannot find the default style");
             return RET_ERR;
         }
@@ -687,7 +703,13 @@ int32_t CursorDrawingInformation::UpdateDefaultPointerStyle(int32_t pid, int32_t
         if (pointerStyle.id == MOUSE_ICON::DEFAULT) {
             newIconPath = DefaultIconPath;
         } else {
-            newIconPath = iconPath.at(MOUSE_ICON(pointerStyle.id)).iconPath;
+            auto iter = iconPaths.find(MOUSE_ICON(pointerStyle.id));
+            if (iter == iconPaths.end()) {
+                MMI_HILOGE("id:%{public}d is not in iconPaths", pointerStyle.id);
+                newIconPath = DefaultIconPath;
+            } else {
+                newIconPath = iter->second.iconPath;
+            }
         }
         MMI_HILOGD("Default path has changed from %{private}s to %{private}s",
             it->second.iconPath.c_str(), newIconPath.c_str());
@@ -739,8 +761,16 @@ void CursorDrawingInformation::InitDefaultMouseIconPath()
 
 void CursorDrawingInformation::CheckMouseIconPath()
 {
+    namespace fs = std::filesystem;
+    std::error_code ec;
+    if (!fs::exists(IMAGE_POINTER_DEFAULT_PATH, ec) ||
+        fs::is_empty(IMAGE_POINTER_DEFAULT_PATH, ec)) {
+        MMI_HILOGI("Icon directory not ready, skipping check");
+        return;
+    }
     for (auto iter = mouseIcons_.begin(); iter != mouseIcons_.end();) {
         if ((ReadCursorStyleFile(iter->second.iconPath)) != RET_OK) {
+            MMI_HILOGI("invalid iconPath");
             iter = mouseIcons_.erase(iter);
             continue;
         }
@@ -1045,6 +1075,13 @@ int32_t CursorDrawingInformation::GetPointerStyle(int32_t userId, int32_t pid, i
         INPUT_SETTING_MANAGER->GetIntValue(userId, MOUSE_KEY_SETTING, FIELD_MOUSE_POINTER_SIZE, pointerStyle.size);
         int32_t style = DEFAULT_POINTER_STYLE;
         INPUT_SETTING_MANAGER->GetIntValue(userId, MOUSE_KEY_SETTING, FIELD_MOUSE_POINTER_STYLE, style);
+#ifdef OHOS_SUSPEND_STATE_MANAGER
+        if (SuspendStateManager::GetInstance().IsFrozen(pid)) {
+            pointerStyle.id = MOUSE_ICON::LOADING;
+            MMI_HILOGD("Getting frozen pointer style:%{public}d", pointerStyle.id);
+            return RET_OK;
+        }
+#endif //OHOS_SUSPEND_STATE_MANAGER
         MMI_HILOGD("Get pointer style successfully, pointerStyle:%{public}d", style);
         if (style == CURSOR_CIRCLE_STYLE || style == AECH_DEVELOPER_DEFINED_STYLE) {
             pointerStyle.id = style;

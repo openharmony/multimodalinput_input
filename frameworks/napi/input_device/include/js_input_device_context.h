@@ -46,6 +46,7 @@ public:
     static napi_value SetInputDeviceEnabled(napi_env env, napi_callback_info info);
     static napi_value SetFunctionKeyEnabled(napi_env env, napi_callback_info info);
     static napi_value IsFunctionKeyEnabled(napi_env env, napi_callback_info info);
+    static napi_value BindToDisplay(napi_env env, napi_callback_info info);
 private:
     static napi_value CreateInstance(napi_env env);
     static JsInputDeviceContext* GetInstance(napi_env env);
@@ -53,6 +54,8 @@ private:
     static napi_value EnumClassConstructor(napi_env env, napi_callback_info info);
     static napi_value CreateEnumKeyboardType(napi_env env, napi_value exports);
     static napi_value CreateEnumFunctionKey(napi_env env, napi_value exports);
+    static bool ParseInt32IdParam(napi_env env, napi_value value, const char *paramName,
+        const char *invalidMsg, int32_t &outValue);
     std::shared_ptr<JsInputDeviceManager> mgr_ { nullptr };
     napi_ref contextRef_ { nullptr };
     std::mutex mtx_;

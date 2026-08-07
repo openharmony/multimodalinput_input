@@ -17,11 +17,10 @@
 
 #include <charconv>
 #include <cstring>
-#include <sstream>
-#include <unistd.h>
-
 #include <fcntl.h>
+#include <sstream>
 #include <sys/ioctl.h>
+#include <unistd.h>
 
 namespace OHOS {
 namespace MMI {
@@ -75,179 +74,12 @@ InputDevice& InputDevice::operator=(InputDevice&& other) noexcept
     return *this;
 }
 
-bool InputDevice::IsOpen() const
-{
-    return fd_ >= 0;
-}
-
 void InputDevice::Close()
 {
     if (fd_ >= 0) {
         ::close(fd_);
         fd_ = -1;
     }
-}
-
-bool InputDevice::OpenForReading()
-{
-    return OpenDevice(O_RDONLY | O_NONBLOCK);
-}
-
-bool InputDevice::OpenForWriting()
-{
-    if (!VerifyDeviceMatch()) {
-        return false;
-    }
-    return OpenDevice(O_WRONLY);
-}
-
-int32_t InputDevice::GetFd() const
-{
-    return fd_;
-}
-
-const std::string& InputDevice::GetPath() const
-{
-    return path_;
-}
-
-const std::string& InputDevice::GetName() const
-{
-    return name_;
-}
-
-uint32_t InputDevice::GetId() const
-{
-    return id_;
-}
-
-std::string InputDevice::GetHash() const
-{
-    return hash_;
-}
-
-void InputDevice::SetId(uint32_t id)
-{
-    id_ = id;
-}
-
-void InputDevice::SetPath(const std::string& path)
-{
-    path_ = path;
-}
-
-void InputDevice::SetName(const std::string& name)
-{
-    name_ = name;
-}
-
-bool InputDevice::ReadEvent(input_event& event)
-{
-    if (fd_ < 0) {
-        return false;
-    }
-    ssize_t bytesRead = read(fd_, &event, sizeof(event));
-    return bytesRead == sizeof(event);
-}
-
-bool InputDevice::WriteEvents(const std::vector<input_event>& events)
-{
-    if (fd_ < 0 || events.empty()) {
-        return false;
-    }
-    ssize_t eventBytes = static_cast<ssize_t>(sizeof(input_event) * events.size());
-    ssize_t bytesWritten = write(fd_, &events[0], eventBytes);
-    return bytesWritten == eventBytes;
-}
-
-bool InputDevice::VerifyDeviceMatch() const
-{
-    if (name_.empty()) {
-        return true;
-    }
-
-    // ensure the out coming path safe
-    char resolvedPath[PATH_MAX] = {};
-    if (realpath(path_.c_str(), resolvedPath) == nullptr) {
-        PrintError("Realpath failed. path:%{private}s", path_.c_str());
-        return false;
-    }
-
-    int32_t tempFd = ::open(resolvedPath, O_RDONLY | O_NONBLOCK);
-    if (tempFd < 0) {
-        PrintWarning("Cannot verify device %s: %s", path_.c_str(), strerror(errno));
-        return true;
-    }
-    bool matches = false;
-    char currentDeviceName[MAX_DEVICE_NAME] = "Unknown";
-    if (ioctl(tempFd, EVIOCGNAME(sizeof(currentDeviceName)), currentDeviceName) >= 0) {
-        if (name_ == currentDeviceName) {
-            matches = true;
-        } else {
-            PrintError("Device name mismatch for %s: expected '%s' but got '%s'",
-                path_.c_str(), name_.c_str(), currentDeviceName);
-        }
-    } else {
-        PrintWarning("Could not get device name for verification: %s", strerror(errno));
-        matches = true;
-    }
-    ::close(tempFd);
-    return matches;
-}
-
-bool InputDevice::OpenDevice(int32_t flags)
-{
-    Close();  // Close if already open
-
-    // ensure the out coming path safe
-    char resolvedPath[PATH_MAX] = {};
-    if (realpath(path_.c_str(), resolvedPath) == nullptr) {
-        PrintError("Realpath failed. path:%{private}s", path_.c_str());
-        return false;
-    }
-
-    fd_ = ::open(resolvedPath, flags);
-    if (fd_ < 0) {
-        PrintError("Failed to open device %s: %s", path_.c_str(), strerror(errno));
-        return false;
-    }
-    return true;
-}
-
-void InputDevice::QueryDeviceInfo()
-{
-    char name[MAX_DEVICE_NAME] = "Unknown";
-    if (ioctl(fd_, EVIOCGNAME(sizeof(name)), name) >= 0) {
-        name_ = name;
-    }
-    CalculateDeviceHash();
-}
-
-void InputDevice::CalculateDeviceHash()
-{
-    std::ostringstream hashInput;
-    hashInput << "Name:" << name_ << "|";
-    struct input_id device_id;
-    if (ioctl(fd_, EVIOCGID, &device_id) >= 0) {
-        hashInput << "BusType:" << std::hex << device_id.bustype << "|"
-                   << "Vendor:" << std::hex << device_id.vendor << "|"
-                   << "Product:" << std::hex << device_id.product << "|"
-                   << "Version:" << std::hex << device_id.version << "|";
-    }
-    unsigned long eventBits[EV_MAX/UINT_BIT_COUNT + 1] = {0};
-    if (ioctl(fd_, EVIOCGBIT(0, sizeof(eventBits)), eventBits) >= 0) {
-        hashInput << "Events:";
-        for (int i = 0; i <= EV_MAX; i++) {
-            if (eventBits[i / UINT_BIT_COUNT] & (1UL << (i % UINT_BIT_COUNT))) {
-                hashInput << std::hex << i << ",";
-            }
-        }
-    }
-    std::string hashStr = hashInput.str();
-    if (hashStr.back() == ',') {
-        hashStr.pop_back();
-    }
-    hash_ = std::to_string(std::hash<std::string>{}(hashStr));
 }
 
 bool InputDevice::InitFromTextLine(const std::string& line)
@@ -287,6 +119,173 @@ bool InputDevice::InitFromTextLine(const std::string& line)
     name_ = deviceName;
     hash_ = deviceHash;
     return true;
+}
+
+bool InputDevice::IsOpen() const
+{
+    return fd_ >= 0;
+}
+
+bool InputDevice::OpenForReading()
+{
+    return OpenDevice(O_RDONLY | O_NONBLOCK);
+}
+
+bool InputDevice::OpenForWriting()
+{
+    if (!VerifyDeviceMatch()) {
+        return false;
+    }
+    return OpenDevice(O_WRONLY);
+}
+
+bool InputDevice::ReadEvent(input_event& event)
+{
+    if (fd_ < 0) {
+        return false;
+    }
+    ssize_t bytesRead = read(fd_, &event, sizeof(event));
+    return bytesRead == sizeof(event);
+}
+
+bool InputDevice::WriteEvents(const std::vector<input_event>& events)
+{
+    if (fd_ < 0 || events.empty()) {
+        return false;
+    }
+    ssize_t eventBytes = static_cast<ssize_t>(sizeof(input_event) * events.size());
+    ssize_t bytesWritten = write(fd_, &events[0], eventBytes);
+    return bytesWritten == eventBytes;
+}
+
+const std::string& InputDevice::GetName() const
+{
+    return name_;
+}
+
+const std::string& InputDevice::GetPath() const
+{
+    return path_;
+}
+
+int32_t InputDevice::GetFd() const
+{
+    return fd_;
+}
+
+std::string InputDevice::GetHash() const
+{
+    return hash_;
+}
+
+uint32_t InputDevice::GetId() const
+{
+    return id_;
+}
+
+void InputDevice::SetId(uint32_t id)
+{
+    id_ = id;
+}
+
+void InputDevice::SetName(const std::string& name)
+{
+    name_ = name;
+}
+
+void InputDevice::SetPath(const std::string& path)
+{
+    path_ = path;
+}
+
+void InputDevice::CalculateDeviceHash()
+{
+    std::ostringstream hashInput;
+    hashInput << "Name:" << name_ << "|";
+    struct input_id device_id;
+    if (ioctl(fd_, EVIOCGID, &device_id) >= 0) {
+        hashInput << "BusType:" << std::hex << device_id.bustype << "|"
+                   << "Vendor:" << std::hex << device_id.vendor << "|"
+                   << "Product:" << std::hex << device_id.product << "|"
+                   << "Version:" << std::hex << device_id.version << "|";
+    }
+    unsigned long eventBits[EV_MAX/UINT_BIT_COUNT + 1] = {0};
+    if (ioctl(fd_, EVIOCGBIT(0, sizeof(eventBits)), eventBits) >= 0) {
+        hashInput << "Events:";
+        for (int i = 0; i <= EV_MAX; i++) {
+            if (eventBits[i / UINT_BIT_COUNT] & (1UL << (i % UINT_BIT_COUNT))) {
+                hashInput << std::hex << i << ",";
+            }
+        }
+    }
+    std::string hashStr = hashInput.str();
+    if (hashStr.back() == ',') {
+        hashStr.pop_back();
+    }
+    hash_ = std::to_string(std::hash<std::string>{}(hashStr));
+}
+
+void InputDevice::QueryDeviceInfo()
+{
+    char name[MAX_DEVICE_NAME] = "Unknown";
+    if (ioctl(fd_, EVIOCGNAME(sizeof(name)), name) >= 0) {
+        name_ = name;
+    }
+    CalculateDeviceHash();
+}
+
+bool InputDevice::OpenDevice(int32_t flags)
+{
+    Close();  // Close if already open
+
+    // ensure the out coming path safe
+    char resolvedPath[PATH_MAX] = {};
+    if (realpath(path_.c_str(), resolvedPath) == nullptr) {
+        PrintError("Realpath failed. path:%{private}s", path_.c_str());
+        return false;
+    }
+
+    fd_ = ::open(resolvedPath, flags);
+    if (fd_ < 0) {
+        PrintError("Failed to open device %s: %s", path_.c_str(), strerror(errno));
+        return false;
+    }
+    return true;
+}
+
+bool InputDevice::VerifyDeviceMatch() const
+{
+    if (name_.empty()) {
+        return true;
+    }
+
+    // ensure the out coming path safe
+    char resolvedPath[PATH_MAX] = {};
+    if (realpath(path_.c_str(), resolvedPath) == nullptr) {
+        PrintError("Realpath failed. path:%{private}s", path_.c_str());
+        return false;
+    }
+
+    int32_t tempFd = ::open(resolvedPath, O_RDONLY | O_NONBLOCK);
+    if (tempFd < 0) {
+        PrintWarning("Cannot verify device %s: %s", path_.c_str(), strerror(errno));
+        return true;
+    }
+    bool matches = false;
+    char currentDeviceName[MAX_DEVICE_NAME] = "Unknown";
+    if (ioctl(tempFd, EVIOCGNAME(sizeof(currentDeviceName)), currentDeviceName) >= 0) {
+        if (name_ == currentDeviceName) {
+            matches = true;
+        } else {
+            PrintError("Device name mismatch for %s: expected '%s' but got '%s'",
+                path_.c_str(), name_.c_str(), currentDeviceName);
+        }
+    } else {
+        PrintWarning("Could not get device name for verification: %s", strerror(errno));
+        matches = true;
+    }
+    ::close(tempFd);
+    return matches;
 }
 } // namespace MMI
 } // namespace OHOS

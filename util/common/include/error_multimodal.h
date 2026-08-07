@@ -27,6 +27,12 @@ inline constexpr int32_t ERROR_NO_PERMISSION { -201 };
 inline constexpr int32_t ERROR_KEYBOARD_NO_PERMISSION { 201 };
 inline constexpr int32_t ERROR_NOT_SYSAPI { 202 };
 inline constexpr int32_t ERROR_DEVICE_NOT_EXIST { 3900001 };
+inline constexpr int32_t ERROR_DISPLAY_NOT_EXIST { 3900004 };
+inline constexpr int32_t ERROR_UNSUPPORTED_DEVICE { 3900005 };
+inline constexpr int32_t ERR_BIND_DEVICE_NOT_EXIST { -3900001 };
+inline constexpr int32_t ERR_DISPLAY_NOT_EXIST { -3900004 };
+inline constexpr int32_t ERR_UNSUPPORTED_DEVICE { -3900005 };
+inline constexpr int32_t ERR_SERVICE_EXCEPTION { -3800001 };
 inline constexpr int32_t ERROR_OPERATION_FREQUENT { -1001 };
 inline constexpr int32_t ERROR_DEVICE_NOT_SUPPORTED { -1002 };
 inline constexpr int32_t ERROR_REPEAT_INTERCEPTOR { -1003 };
@@ -126,6 +132,8 @@ enum {
     ERROR_FILTER_ADD_FAIL,
     // buffer过长失败
     ERROR_OVER_SIZE_BUFFER,
+    // 委托任务wait超时但已经执行
+    ETASKS_WAIT_TIMEOUT_BUT_RUNNING,
 };
 
 enum {

@@ -281,6 +281,26 @@ HWTEST_F(MMIServerTest, AllocSocketFd_001, TestSize.Level1)
 }
 
 /**
+ * @tc.name: AllocSocketFdResult_001
+ * @tc.desc: Test the function AllocSocketFdResult
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIServerTest, AllocSocketFdResult_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MMIService mmiService;
+    int32_t ret = 0;
+    int32_t pid = 1;
+    int32_t uid = 1;
+    const int32_t moduleType = 1;
+    const std::string programName = "programName";
+    std::shared_ptr<SocketPairFlag> socketPairClosedFlag = std::make_shared<SocketPairFlag>();
+    ASSERT_NO_FATAL_FAILURE(mmiService.AllocSocketFdResult(ret, pid, uid, moduleType, programName,
+        socketPairClosedFlag));
+}
+
+/**
  * @tc.name: AddInputEventFilter_001
  * @tc.desc: Test the function AddInputEventFilter and RemoveInputEventFilter
  * @tc.type: FUNC
@@ -5348,6 +5368,86 @@ HWTEST_F(MMIServerTest, MMIService_SetDisplayBind_ServiceNotRunning_004, TestSiz
     std::string msg;
     ErrCode ret = mmiService.SetDisplayBind(deviceId, displayId, msg);
     EXPECT_NE(ret, RET_OK);
+}
+
+/**
+* @tc.name: MMIService_BindToDisplay_001
+* @tc.desc: Test BindToDisplay with non-system app, expect ERROR_NOT_SYSAPI
+* @tc.type: FUNC
+* @tc.require: AR000H5VSG
+*/
+HWTEST_F(MMIServerTest, MMIService_BindToDisplay_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MMIService mmiService;
+    int32_t deviceId = 1;
+    int32_t displayId = 0;
+    ErrCode ret = mmiService.BindToDisplay(deviceId, displayId);
+    EXPECT_NE(ret, RET_OK);
+}
+
+/**
+* @tc.name: MMIService_BindToDisplay_002
+* @tc.desc: Test BindToDisplay without controller permission, expect ERROR_NO_PERMISSION
+* @tc.type: FUNC
+* @tc.require: AR000H5VSG
+*/
+HWTEST_F(MMIServerTest, MMIService_BindToDisplay_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MMIService mmiService;
+    int32_t deviceId = 1;
+    int32_t displayId = 0;
+    ErrCode ret = mmiService.BindToDisplay(deviceId, displayId);
+    EXPECT_NE(ret, RET_OK);
+}
+
+/**
+* @tc.name: MMIService_BindToDisplay_003
+* @tc.desc: Test BindToDisplay with unsupported device (non USB/BT), expect ERR_UNSUPPORTED_DEVICE
+* @tc.type: FUNC
+* @tc.require: AR000H5VSG
+*/
+HWTEST_F(MMIServerTest, MMIService_BindToDisplay_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MMIService mmiService;
+    int32_t deviceId = 1;
+    int32_t displayId = 0;
+    ErrCode ret = mmiService.BindToDisplay(deviceId, displayId);
+    EXPECT_NE(ret, RET_OK);
+}
+
+/**
+* @tc.name: MMIService_BindToDisplay_004
+* @tc.desc: Test BindToDisplay when service is not running, expect ERR_SERVICE_EXCEPTION
+* @tc.type: FUNC
+* @tc.require: AR000H5VSG
+*/
+HWTEST_F(MMIServerTest, MMIService_BindToDisplay_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MMIService mmiService;
+    mmiService.state_ = ServiceRunningState::STATE_EXIT;
+    int32_t deviceId = 1;
+    int32_t displayId = 0;
+    ErrCode ret = mmiService.BindToDisplay(deviceId, displayId);
+    EXPECT_NE(ret, RET_OK);
+}
+
+/**
+* @tc.name: MMIService_CheckBindToDisplayParam_001
+* @tc.desc: CheckBindToDisplayParam with a non-existent device, expect ERR_BIND_DEVICE_NOT_EXIST
+* @tc.type: FUNC
+* @tc.require:
+*/
+HWTEST_F(MMIServerTest, MMIService_CheckBindToDisplayParam_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MMIService mmiService;
+    // Device 99 does not exist (INPUT_DEV_MGR has no devices in the test), so the device-not-found
+    // branch is taken.
+    EXPECT_EQ(mmiService.CheckBindToDisplayParam(99), ERR_BIND_DEVICE_NOT_EXIST);
 }
 
 /**

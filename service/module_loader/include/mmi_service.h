@@ -55,6 +55,9 @@ public:
     int32_t Dump(int32_t fd, const std::vector<std::u16string> &args) override;
     ErrCode AllocSocketFd(const std::string &programName, const int32_t moduleType,
         int32_t &toReturnClientFd, int32_t &tokenType) override;
+    void AllocSocketFdResult(int32_t ret, const int32_t pid, const int32_t uid,
+        const int32_t moduleType, const std::string& programName,
+        std::shared_ptr<SocketPairFlag> socketPairClosedFlag);
     ErrCode AddInputEventFilter(const sptr<IEventFilter>& filter, int32_t filterId, int32_t priority,
         uint32_t deviceTags) override;
     ErrCode RemoveInputEventFilter(int32_t filterId) override;
@@ -142,6 +145,7 @@ public:
     ErrCode GetDisplayBindInfo(std::vector<DisplayBindInfo>& infos) override;
     ErrCode GetAllMmiSubscribedEvents(MmiEventMap& mmiEventMap) override;
     ErrCode SetDisplayBind(int32_t deviceId, int32_t displayId, std::string &msg) override;
+    ErrCode BindToDisplay(int32_t deviceId, int32_t displayId) override;
     ErrCode GetFunctionKeyState(int32_t funcKey, bool &state) override;
     ErrCode SetFunctionKeyState(int32_t funcKey, bool enable) override;
     ErrCode SetPointerLocation(int32_t x, int32_t y, int32_t displayId) override;
@@ -390,6 +394,7 @@ private:
     void RegisterForDisplayManagerService(int32_t systemAbilityId);
 #endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
     int32_t CheckSetDisplayBindPermission(int32_t deviceId);
+    int32_t CheckBindToDisplayParam(int32_t deviceId);
 
     std::atomic<ServiceRunningState> state_ = ServiceRunningState::STATE_NOT_START;
     int32_t mmiFd_ { -1 };

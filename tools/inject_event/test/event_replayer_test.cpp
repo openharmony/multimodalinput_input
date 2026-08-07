@@ -14,10 +14,10 @@
  */
 
 #include <gtest/gtest.h>
-#include <fstream>
-#include <string>
-#include <map>
 
+#include <fstream>
+#include <map>
+#include <string>
 #include "event_replayer.h"
 
 namespace OHOS {

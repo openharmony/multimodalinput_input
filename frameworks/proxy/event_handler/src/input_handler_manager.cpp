@@ -792,7 +792,7 @@ void InputHandlerManager::OnInputEvent(std::shared_ptr<PointerEvent> pointerEven
 template<typename T>
 bool InputHandlerManager::RecoverPointerEvent(std::initializer_list<T> pointerActionEvents, T pointerActionEvent)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     std::unique_lock lock(mtxHandlers_);
     CHKPF(lastPointerEvent_);
     int32_t pointerAction = lastPointerEvent_->GetPointerAction();
@@ -821,7 +821,7 @@ bool InputHandlerManager::RecoverPointerEvent(std::initializer_list<T> pointerAc
 
 void InputHandlerManager::OnDisconnected()
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     std::initializer_list<int32_t> pointerActionSwipeEvents { PointerEvent::POINTER_ACTION_SWIPE_UPDATE,
         PointerEvent::POINTER_ACTION_SWIPE_BEGIN };
     if (RecoverPointerEvent(pointerActionSwipeEvents, PointerEvent::POINTER_ACTION_SWIPE_END)) {

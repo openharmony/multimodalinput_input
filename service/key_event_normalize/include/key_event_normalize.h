@@ -95,6 +95,7 @@ private:
 
 private:
     std::shared_ptr<KeyEvent> keyEvent_ { nullptr };
+    bool keyEventResetDone_ { false };
     std::map<int32_t, bool> shieldStatus_ {
         {SHIELD_MODE::FACTORY_MODE, false},
         {SHIELD_MODE::OOBE_MODE, false},

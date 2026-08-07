@@ -17,10 +17,9 @@
 
 #include <algorithm>
 #include <iostream>
-#include <unistd.h>
 #include <string>
-
 #include <sys/select.h>
+#include <unistd.h>
 
 #include "event_utils.h"
 
@@ -115,64 +114,6 @@ void EventRecorder::Stop()
     PrintInfo("Recording stopped");
 }
 
-void EventRecorder::ProcessDeviceEvents(fd_set& readFds)
-{
-    for (InputDevice& device : devices_) {
-        if (!device.IsOpen()) {
-            continue;
-        }
-        int32_t fd = device.GetFd();
-        if (FD_ISSET(fd, &readFds)) {
-            input_event event;
-            if (device.ReadEvent(event)) {
-                EventRecord record;
-                record.deviceId = device.GetId();
-                record.event = event;
-                auto& currentDeviceBuffer = deviceEventBuffers_[record.deviceId];
-                currentDeviceBuffer.push_back(record);
-                FlushDeviceEvents(record);
-            }
-        }
-    }
-}
-
-void EventRecorder::MainLoop()
-{
-    fd_set readFds;
-    struct timeval timeout;
-    PrintDebug("Started event recording main loop");
-    PrintInfo("Recording started. Press Ctrl+C to stop.");
-    while (running_ && !g_shutdown.load()) {
-        FD_ZERO(&readFds);
-        int32_t maxFd = -1;
-        for (const auto& device : devices_) {
-            if (device.IsOpen()) {
-                int32_t fd = device.GetFd();
-                FD_SET(fd, &readFds);
-                maxFd = std::max(maxFd, fd);
-            }
-        }
-        if (maxFd < 0) {
-            PrintError("No valid devices to monitor");
-            break;
-        }
-        timeout.tv_sec = 0;
-        timeout.tv_usec = TIME_OUT;  // 100ms timeout
-        int32_t result = select(maxFd + 1, &readFds, nullptr, nullptr, &timeout);
-        if (result < 0) {
-            if (errno == EINTR) {
-                continue;
-            }
-            PrintError("Select error: %d", errno);
-            break;
-        }
-        if (result > 0) {
-            ProcessDeviceEvents(readFds);
-        }
-    }
-    PrintDebug("Stopped event recording main loop");
-}
-
 void EventRecorder::FlushDeviceEvents(const EventRecord& record)
 {
     if (record.event.type != EV_SYN || record.event.code != SYN_REPORT) {
@@ -186,29 +127,49 @@ void EventRecorder::FlushDeviceEvents(const EventRecord& record)
     currentDeviceBuffer.clear();
 }
 
-void EventRecorder::WriteEventText(const EventRecord& record)
+std::string EventRecorder::GetEventCodeString(uint16_t type, uint16_t code)
 {
-    struct input_event event = record.event;
-    std::string typeStr = GetEventTypeString(event.type);
-    std::string codeStr = GetEventCodeString(event.type, event.code);
-    outputFile_ << "["
-             << record.deviceId << ", "
-             << event.type << ", "
-             << event.code << ", "
-             << event.value<<", "
-             << event.input_event_sec << ", "
-             << event.input_event_usec
-             << "] # " << typeStr << " / " << codeStr << " " << event.value
-             << std::endl;
-    std::cout << "["
-             << record.deviceId << ", "
-             << event.type << ", "
-             << event.code << ", "
-             << event.value << ", "
-             << event.input_event_sec << ", "
-             << event.input_event_usec
-             << "] # " << typeStr << " / " << codeStr << " " << event.value
-             << std::endl;
+    switch (type) {
+        case EV_SYN: {
+            auto it = SYN_CODE_MAP.find(code);
+            if (it != SYN_CODE_MAP.end()) {
+                return it->second;
+            }
+            break;
+        }
+        case EV_KEY: {
+            auto it = KEY_CODE_MAP.find(code);
+            if (it != KEY_CODE_MAP.end()) {
+                return it->second;
+            }
+            if (code >= KEY_A && code <= KEY_Z) {
+                return "KEY_" + std::string(1, 'A' + (code - KEY_A));
+            }
+            break;
+        }
+        case EV_REL: {
+            auto it = REL_CODE_MAP.find(code);
+            if (it != REL_CODE_MAP.end()) {
+                return it->second;
+            }
+            break;
+        }
+        case EV_ABS: {
+            auto it = ABS_CODE_MAP.find(code);
+            if (it != ABS_CODE_MAP.end()) {
+                return it->second;
+            }
+            break;
+        }
+    }
+    std::string secondaryResult = GetSecondaryEventCodeString(type, code);
+    if (!secondaryResult.empty()) {
+        return secondaryResult;
+    }
+    std::string result = "CODE(";
+    result += std::to_string(code);
+    result += ")";
+    return result;
 }
 
 std::string EventRecorder::GetEventTypeString(uint16_t type)
@@ -265,49 +226,87 @@ std::string EventRecorder::GetSecondaryEventCodeString(uint16_t type, uint16_t c
     return "";
 }
 
-std::string EventRecorder::GetEventCodeString(uint16_t type, uint16_t code)
+void EventRecorder::MainLoop()
 {
-    switch (type) {
-        case EV_SYN: {
-            auto it = SYN_CODE_MAP.find(code);
-            if (it != SYN_CODE_MAP.end()) {
-                return it->second;
+    fd_set readFds;
+    struct timeval timeout;
+    PrintDebug("Started event recording main loop");
+    PrintInfo("Recording started. Press Ctrl+C to stop.");
+    while (running_ && !g_shutdown.load()) {
+        FD_ZERO(&readFds);
+        int32_t maxFd = -1;
+        for (const auto& device : devices_) {
+            if (device.IsOpen()) {
+                int32_t fd = device.GetFd();
+                FD_SET(fd, &readFds);
+                maxFd = std::max(maxFd, fd);
             }
+        }
+        if (maxFd < 0) {
+            PrintError("No valid devices to monitor");
             break;
         }
-        case EV_KEY: {
-            auto it = KEY_CODE_MAP.find(code);
-            if (it != KEY_CODE_MAP.end()) {
-                return it->second;
+        timeout.tv_sec = 0;
+        timeout.tv_usec = TIME_OUT;  // 100ms timeout
+        int32_t result = select(maxFd + 1, &readFds, nullptr, nullptr, &timeout);
+        if (result < 0) {
+            if (errno == EINTR) {
+                continue;
             }
-            if (code >= KEY_A && code <= KEY_Z) {
-                return "KEY_" + std::string(1, 'A' + (code - KEY_A));
-            }
+            PrintError("Select error: %d", errno);
             break;
         }
-        case EV_REL: {
-            auto it = REL_CODE_MAP.find(code);
-            if (it != REL_CODE_MAP.end()) {
-                return it->second;
-            }
-            break;
-        }
-        case EV_ABS: {
-            auto it = ABS_CODE_MAP.find(code);
-            if (it != ABS_CODE_MAP.end()) {
-                return it->second;
-            }
-            break;
+        if (result > 0) {
+            ProcessDeviceEvents(readFds);
         }
     }
-    std::string secondaryResult = GetSecondaryEventCodeString(type, code);
-    if (!secondaryResult.empty()) {
-        return secondaryResult;
+    PrintDebug("Stopped event recording main loop");
+}
+
+void EventRecorder::ProcessDeviceEvents(fd_set& readFds)
+{
+    for (InputDevice& device : devices_) {
+        if (!device.IsOpen()) {
+            continue;
+        }
+        int32_t fd = device.GetFd();
+        if (FD_ISSET(fd, &readFds)) {
+            input_event event;
+            if (device.ReadEvent(event)) {
+                EventRecord record;
+                record.deviceId = device.GetId();
+                record.event = event;
+                auto& currentDeviceBuffer = deviceEventBuffers_[record.deviceId];
+                currentDeviceBuffer.push_back(record);
+                FlushDeviceEvents(record);
+            }
+        }
     }
-    std::string result = "CODE(";
-    result += std::to_string(code);
-    result += ")";
-    return result;
+}
+
+void EventRecorder::WriteEventText(const EventRecord& record)
+{
+    struct input_event event = record.event;
+    std::string typeStr = GetEventTypeString(event.type);
+    std::string codeStr = GetEventCodeString(event.type, event.code);
+    outputFile_ << "["
+             << record.deviceId << ", "
+             << event.type << ", "
+             << event.code << ", "
+             << event.value<<", "
+             << event.input_event_sec << ", "
+             << event.input_event_usec
+             << "] # " << typeStr << " / " << codeStr << " " << event.value
+             << std::endl;
+    std::cout << "["
+             << record.deviceId << ", "
+             << event.type << ", "
+             << event.code << ", "
+             << event.value << ", "
+             << event.input_event_sec << ", "
+             << event.input_event_usec
+             << "] # " << typeStr << " / " << codeStr << " " << event.value
+             << std::endl;
 }
 } // namespace MMI
 } // namespace OHOS

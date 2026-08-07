@@ -66,7 +66,7 @@ int32_t LongPressSubscriberHandler::SubscribeLongPressEvent(SessionPtr sess, int
 
 int32_t LongPressSubscriberHandler::UnsubscribeLongPressEvent(SessionPtr sess, int32_t subscribeId)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     CHKPR(sess, ERROR_NULL_POINTER);
     if (subscribeId < 0) {
         MMI_HILOGE("Invalid subscribeId:%{public}d", subscribeId);

@@ -20,16 +20,16 @@
 #include <cstdio>
 #include <fcntl.h>
 #include <iostream>
+#include <linux/input.h>
 #include <regex>
 #include <string>
 #include <typeinfo>
 #include <unistd.h>
-#include <linux/input.h>
 
 #include "error_multimodal.h"
+#include "input_manager.h"
 #include "proto.h"
 #include "util.h"
-#include "input_manager.h"
 
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "InputEnableKeyStatusCommand"

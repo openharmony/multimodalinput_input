@@ -34,6 +34,7 @@ ohos_source_set("libmmi-virtual-device") {
   configs = [ ":libmmi_virtual_device_config" ]
 
   external_deps = [
+    "bounds_checking_function:libsec_shared",
     "c_utils:utils",
     "libinput:libinput-third-mmi",
   ]
@@ -69,6 +70,7 @@ module_output_path = "input/input"
 ohos_unittest("ut-virtual-device-out") {
   module_out_path = module_output_path
   include_dirs = [
+    "$root_out_dir/diff_libinput_mmi/export_include",
     "${mmi_path}/tools/vuinput/include",
     "${mmi_path}/util/common",
     "${mmi_path}/util/common/include",
@@ -76,7 +78,6 @@ ohos_unittest("ut-virtual-device-out") {
     "${mmi_path}/util/network/include",
     "${mmi_path}/util/socket",
     "${mmi_path}/util/socket/include",
-    "$root_out_dir/diff_libinput_mmi/export_include",
   ]
 
   sources = [ "test/virtual_device_test.cpp" ]

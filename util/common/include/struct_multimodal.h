@@ -258,6 +258,11 @@ struct PhysicalCoordinate {
     double y {};
 };
 
+struct AbsoluteCoordinate {
+    double x {};
+    double y {};
+};
+
 struct LogicalCoordinate {
     int32_t x {};
     int32_t y {};
@@ -409,6 +414,7 @@ struct EventTouch {
     PhysicalCoordinate coordF {};
     LogicalCoordinate point {};
     GlobalCoords globalCoord {}; // 全局坐标
+    AbsoluteCoordinate absCoord {}; // 绝对坐标（TP坐标）
     LogicalRectangle toolRect {};
     DEVICE_TYPE deviceType { DEVICE_TYPE::DEVICE_TYPE_UNKNOWN };
     double pressure {};

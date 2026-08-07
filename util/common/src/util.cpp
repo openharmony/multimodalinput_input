@@ -51,7 +51,7 @@ const std::string CONFIG_ITEM_REPEAT = "Key.autorepeat";
 const std::string CONFIG_ITEM_DELAY = "Key.autorepeat.delaytime";
 const std::string CONFIG_ITEM_INTERVAL = "Key.autorepeat.intervaltime";
 const std::string CONFIG_ITEM_TYPE = "Key.keyboard.type";
-const std::string CURSORSTYLE_PATH = "/system/etc/multimodalinput/mouse_icon/";
+const std::string CURSORSTYLE_PATH = "/data/service/el1/public/multimodalinput/mouse_icon/";
 const std::string DATA_PATH = "/data";
 const std::string INPUT_PATH = "/system/";
 const std::string SYS_PROD_PATH = "/sys_prod/";
@@ -385,7 +385,6 @@ void ReadProConfigFile(const std::string &realPath, int32_t deviceId,
             realLine = nullptr;
             return;
         }
-        *(realLine + len + 1) = '\0';
         int32_t ret = ReadConfigInfo(realLine, len, &elementKey, &elementValue);
         free(realLine);
         realLine = nullptr;
@@ -670,7 +669,7 @@ void SetAccessTokenReady()
 
 std::string GetProcessName(uint32_t tokenId, int32_t pid)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     if (!g_isAccessTokenReady.load()) {
         MMI_HILOGW("access token is not ready");
         return "";
@@ -713,7 +712,7 @@ std::string GetProcessName(uint32_t tokenId, int32_t pid)
 
 std::string GetBundleName(uint32_t tokenId)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     std::string bundleName = "";
     int32_t tokenType = Security::AccessToken::AccessTokenKit::GetTokenTypeFlag(tokenId);
     if (tokenType == Security::AccessToken::ATokenTypeEnum::TOKEN_HAP) {

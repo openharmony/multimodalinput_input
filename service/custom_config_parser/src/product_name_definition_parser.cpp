@@ -55,7 +55,7 @@ int32_t ProductNameDefinitionParser::Init()
 int32_t ProductNameDefinitionParser::InitializeImpl()
 {
     // LCOV_EXCL_START
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     std::string jsonStr = ReadJsonFile(std::string(productNameDefinitionConfigDir));
     if (jsonStr.empty()) {
         MMI_HILOGE("Read productName failed");
@@ -156,7 +156,7 @@ int32_t ProductNameDefinitionParser::ParserProductNameItem(const cJSON *json,
 void ProductNameDefinitionParser::PrintProductNames()
 {
     // LCOV_EXCL_START
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     std::shared_lock<std::shared_mutex> lock(lock_);
     for (const auto &productName: productNames_) {
         MMI_HILOGD("key:%{public}s -> value:%{public}s", productName.first.c_str(), productName.second.c_str());

@@ -48,7 +48,7 @@ InputEventBuilder::~InputEventBuilder()
 
 void InputEventBuilder::Enable(Context &context)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     if (enable_) {
         return;
     }
@@ -64,7 +64,7 @@ void InputEventBuilder::Enable(Context &context)
 
 void InputEventBuilder::Disable()
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     if (enable_) {
         enable_ = false;
         env_->GetDSoftbus().RemoveObserver(observer_);

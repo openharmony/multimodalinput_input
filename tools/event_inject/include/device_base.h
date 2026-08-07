@@ -16,9 +16,9 @@
 #ifndef DEVICE_BASE_H
 #define DEVICE_BASE_H
 
-#include "nocopyable.h"
-
 #include "msg_head.h"
+
+#include "nocopyable.h"
 
 namespace OHOS {
 namespace MMI {
@@ -29,49 +29,49 @@ public:
     virtual ~DeviceBase() = default;
     virtual int32_t TransformJsonDataToInputData(const DeviceItem& inputEventArrays,
                                                  InputEventArray& inputEventArray) = 0;
-    void SetTimeToLibinputEvent(InjectEvent& injectEvent);
-    void SetSynReport(InputEventArray& inputEventArray, int64_t blockTime = 0);
-    void SetSynConfigReport(InputEventArray& inputEventArray, int64_t blockTime);
-    void SetKeyPressEvent(InputEventArray& inputEventArray, int64_t blockTime, uint16_t code);
-    void SetKeyLongPressEvent(InputEventArray& inputEventArray, int64_t blockTime, int32_t code);
-    void SetKeyReleaseEvent(InputEventArray& inputEventArray, int64_t blockTime, uint16_t code);
-    void SetMtSlot(InputEventArray& inputEventArray, int64_t blockTime, int32_t value = 0);
-    void SetTrackingId(InputEventArray& inputEventArray, int64_t blockTime, int32_t value = 0);
-    void SetPositionX(InputEventArray& inputEventArray, int64_t blockTime, int32_t value = 0);
-    void SetPositionY(InputEventArray& inputEventArray, int64_t blockTime, int32_t value = 0);
-    void SetMtTouchMajor(InputEventArray& inputEventArray, int64_t blockTime, int32_t value = 0);
-    void SetMtTouchMinor(InputEventArray& inputEventArray, int64_t blockTime, int32_t value = 0);
-    void SetMtOrientation(InputEventArray& inputEventArray, int64_t blockTime, int32_t value = 0);
+    void SetAbsDistance(InputEventArray& inputEventArray, int64_t blockTime, int32_t value = 0);
+    void SetAbsMisc(InputEventArray& inputEventArray, int64_t blockTime, int32_t value = 0);
+    void SetAbsPressure(InputEventArray& inputEventArray, int64_t blockTime, int32_t value = 0);
+    void SetAbsTiltX(InputEventArray& inputEventArray, int64_t blockTime, int32_t value = 0);
+    void SetAbsTiltY(InputEventArray& inputEventArray, int64_t blockTime, int32_t value = 0);
+    void SetBtnPen(InputEventArray& inputEventArray, int64_t blockTime, int32_t value = 0);
+    void SetBtnRubber(InputEventArray& inputEventArray, int64_t blockTime, int32_t value = 0);
+    void SetBtnStylus(InputEventArray& inputEventArray, int64_t blockTime,
+                      uint16_t code = BTN_STYLUS_DEFAULT_CODE, int32_t value = 0);
     void SetBtnTouch(InputEventArray& inputEventArray, int64_t blockTime, int32_t value = 0);
-    void SetEvAbsX(InputEventArray& inputEventArray, int64_t blockTime, int32_t value = 0);
-    void SetEvAbsY(InputEventArray& inputEventArray, int64_t blockTime, int32_t value = 0);
-    void SetEvAbsZ(InputEventArray& inputEventArray, int64_t blockTime, int32_t value = 0);
-    void SetMtTouchFingerType(InputEventArray& inputEventArray, int64_t blockTime, int32_t value = 0,
-                              int32_t status = 1);
+    void SetEvAbs(InputEventArray& inputEventArray, int64_t blockTime, uint16_t code, int32_t value);
+    void SetEvAbsHat0X(InputEventArray& inputEventArray, int64_t blockTime, int32_t value);
+    void SetEvAbsHat0Y(InputEventArray& inputEventArray, int64_t blockTime, int32_t value);
     void SetEvAbsRx(InputEventArray& inputEventArray, int64_t blockTime, int32_t value);
     void SetEvAbsRy(InputEventArray& inputEventArray, int64_t blockTime, int32_t value);
     void SetEvAbsRz(InputEventArray& inputEventArray, int64_t blockTime, int32_t value);
-    void SetEvAbsHat0X(InputEventArray& inputEventArray, int64_t blockTime, int32_t value);
-    void SetEvAbsHat0Y(InputEventArray& inputEventArray, int64_t blockTime, int32_t value);
-    void SetEvAbs(InputEventArray& inputEventArray, int64_t blockTime, uint16_t code, int32_t value);
-    void SetRelX(InputEventArray& inputEventArray, int64_t blockTime, int32_t value = 0);
-    void SetRelY(InputEventArray& inputEventArray, int64_t blockTime, int32_t value = 0);
-    void SetRelWheel(InputEventArray& inputEventArray, int64_t blockTime, int32_t value = 0);
-    void SetRelHwheel(InputEventArray& inputEventArray, int64_t blockTime, int32_t value = 0);
     void SetEvAbsWheel(InputEventArray& inputEventArray, int64_t blockTime, int32_t value);
-    void SetAbsMisc(InputEventArray& inputEventArray, int64_t blockTime, int32_t value = 0);
-    void SetAbsTiltX(InputEventArray& inputEventArray, int64_t blockTime, int32_t value = 0);
-    void SetAbsTiltY(InputEventArray& inputEventArray, int64_t blockTime, int32_t value = 0);
-    void SetAbsPressure(InputEventArray& inputEventArray, int64_t blockTime, int32_t value = 0);
-    void SetAbsDistance(InputEventArray& inputEventArray, int64_t blockTime, int32_t value = 0);
-    void SetBtnPen(InputEventArray& inputEventArray, int64_t blockTime, int32_t value = 0);
-    void SetBtnStylus(InputEventArray& inputEventArray, int64_t blockTime,
-                      uint16_t code = BTN_STYLUS_DEFAULT_CODE, int32_t value = 0);
-    void SetBtnRubber(InputEventArray& inputEventArray, int64_t blockTime, int32_t value = 0);
+    void SetEvAbsX(InputEventArray& inputEventArray, int64_t blockTime, int32_t value = 0);
+    void SetEvAbsY(InputEventArray& inputEventArray, int64_t blockTime, int32_t value = 0);
+    void SetEvAbsZ(InputEventArray& inputEventArray, int64_t blockTime, int32_t value = 0);
+    void SetKeyLongPressEvent(InputEventArray& inputEventArray, int64_t blockTime, int32_t code);
+    void SetKeyPressEvent(InputEventArray& inputEventArray, int64_t blockTime, uint16_t code);
+    void SetKeyReleaseEvent(InputEventArray& inputEventArray, int64_t blockTime, uint16_t code);
     void SetMscSerial(InputEventArray& inputEventArray, int64_t blockTime,
                       int32_t value = BTN_MSC_SERIAL_DEFAULT_VALUE);
-    void SetThrottle(InputEventArray& inputEventArray, int64_t blockTime, int32_t value);
+    void SetMtOrientation(InputEventArray& inputEventArray, int64_t blockTime, int32_t value = 0);
+    void SetMtSlot(InputEventArray& inputEventArray, int64_t blockTime, int32_t value = 0);
+    void SetMtTouchFingerType(InputEventArray& inputEventArray, int64_t blockTime, int32_t value = 0,
+                              int32_t status = 1);
+    void SetMtTouchMajor(InputEventArray& inputEventArray, int64_t blockTime, int32_t value = 0);
+    void SetMtTouchMinor(InputEventArray& inputEventArray, int64_t blockTime, int32_t value = 0);
+    void SetPositionX(InputEventArray& inputEventArray, int64_t blockTime, int32_t value = 0);
+    void SetPositionY(InputEventArray& inputEventArray, int64_t blockTime, int32_t value = 0);
+    void SetRelHwheel(InputEventArray& inputEventArray, int64_t blockTime, int32_t value = 0);
+    void SetRelWheel(InputEventArray& inputEventArray, int64_t blockTime, int32_t value = 0);
+    void SetRelX(InputEventArray& inputEventArray, int64_t blockTime, int32_t value = 0);
+    void SetRelY(InputEventArray& inputEventArray, int64_t blockTime, int32_t value = 0);
+    void SetSynConfigReport(InputEventArray& inputEventArray, int64_t blockTime);
     void SetSynMtReport(InputEventArray& inputEventArray, int64_t blockTime, int32_t value = 0);
+    void SetSynReport(InputEventArray& inputEventArray, int64_t blockTime = 0);
+    void SetThrottle(InputEventArray& inputEventArray, int64_t blockTime, int32_t value);
+    void SetTimeToLibinputEvent(InjectEvent& injectEvent);
+    void SetTrackingId(InputEventArray& inputEventArray, int64_t blockTime, int32_t value = 0);
 private:
     static constexpr int32_t BTN_STYLUS_DEFAULT_CODE { 331 };
     static constexpr int32_t BTN_MSC_SERIAL_DEFAULT_VALUE { 0xA806D21 };

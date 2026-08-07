@@ -54,6 +54,8 @@ const std::map<int32_t, NapiError> NAPI_ERRORS = {
     { CONTROLLER_DISPLAY_NOT_EXIST, { CONTROLLER_DISPLAY_NOT_EXIST,
         "The display does not exist." } },
     { INPUT_SERVICE_EXCEPTION, { INPUT_SERVICE_EXCEPTION, "Input service exception." } },
+    { COMMON_DISPLAY_NOT_EXIST, { COMMON_DISPLAY_NOT_EXIST, "The specified display does not exist." } },
+    { COMMON_UNSUPPORTED_DEVICE, { COMMON_UNSUPPORTED_DEVICE, "Unsupported input device." } },
 };
 
 #define THROWERR_CUSTOM(env, code, msg) \

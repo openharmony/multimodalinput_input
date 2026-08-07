@@ -13,7 +13,9 @@
  * limitations under the License.
  */
 
+#include "config_multimodal.h"
 #include "joystick_event_normalize.h"
+#include "resource_decompress.h"
 
 #undef MMI_LOG_DOMAIN
 #define MMI_LOG_DOMAIN MMI_LOG_DISPATCH
@@ -23,7 +25,16 @@
 namespace OHOS {
 namespace MMI {
 JoystickEventNormalize::JoystickEventNormalize(IInputServiceContext *env)
-    : env_(env) {}
+    : env_(env)
+{
+    DecompressToDisk(DEF_JOYSTICK_LAYOUTS_DAT_PATH,
+        "/data/service/el1/public/multimodalinput/joystick/layout");
+}
+
+JoystickEventNormalize::~JoystickEventNormalize()
+{
+    CleanupDirectory("/data/service/el1/public/multimodalinput/joystick/layout");
+}
 
 bool JoystickEventNormalize::HasJoystick() const
 {

@@ -73,7 +73,7 @@ bool TouchGestureDetector::OnTouchEvent(std::shared_ptr<PointerEvent> event)
 
 void TouchGestureDetector::HandleDownEvent(std::shared_ptr<PointerEvent> event)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     if (isRecognized_) {
         if (haveGestureWinEmerged_) {
             return;
@@ -221,7 +221,7 @@ bool TouchGestureDetector::InOppositeDirections(const std::unordered_set<SlideSt
 
 void TouchGestureDetector::HandleUpEvent(std::shared_ptr<PointerEvent> event)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     downPoint_.erase(event->GetPointerId());
     movePoint_.erase(event->GetPointerId());
     MMI_HILOGI("The gestureType:%{public}d, touches:%{public}s, isFingerReady:%{public}d, pointerId:%{public}d",
@@ -275,7 +275,7 @@ bool TouchGestureDetector::IsPhysicalPointer(std::shared_ptr<PointerEvent> event
 
 void TouchGestureDetector::ReleaseData()
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     if (gestureTimer_ >= 0) {
         auto timerMgr = TouchGestureAdapter::GetTimerManager(env_);
         if (timerMgr == nullptr) {
@@ -497,57 +497,6 @@ Point TouchGestureDetector::CalcClusterCenter(const std::map<int32_t, Point> &po
     return Point { acc.x / points.size(), acc.y / points.size() };
 }
 
-Point TouchGestureDetector::CalcGravityCenter(std::map<int32_t, Point> &points)
-{
-    double xSum = 0.0;
-    double ySum = 0.0;
-    double area = 0.0;
-    const int32_t arrCount = 2;
-    int32_t count = static_cast<int32_t>(points.size());
-    if (count < FOUR_FINGER_COUNT || count > MAX_FINGERS_COUNT) {
-        return Point(static_cast<float>(xSum), static_cast<float>(ySum));
-    }
-    double **vertices = new (std::nothrow) double *[count];
-    if (vertices == nullptr) {
-        return Point(static_cast<float>(xSum), static_cast<float>(ySum));
-    }
-    int32_t i = 0;
-    std::vector<std::pair<int32_t, Point>> sequence = SortPoints(points);
-    if (sequence.empty()) {
-        MMI_HILOGW("Points sorting failed");
-        goto end;
-    }
-    for (const auto &pointData : sequence) {
-        vertices[i] = new (std::nothrow) double[arrCount];
-        if (vertices[i] == nullptr) {
-            goto end;
-        }
-        Point value = pointData.second;
-        vertices[i][0] = value.x;
-        vertices[i][1] = value.y;
-        ++i;
-    }
-    for (int32_t j = 0; j < count; ++j) {
-        double *current = vertices[j];
-        double *next = vertices[(j + 1) % count];
-        double crossProduct = current[0] * next[1] - next[0] * current[1];
-        area += crossProduct;
-        xSum += (current[0] + next[0]) * crossProduct;
-        ySum += (current[1] + next[1]) * crossProduct;
-    }
-    area /= arrCount;
-    xSum /= count * area;
-    ySum /= count * area;
-end:
-    for (int32_t n = 0; n < count; ++n) {
-        if (vertices[n] != nullptr) {
-            delete[] vertices[n];
-        }
-    }
-    delete[] vertices;
-    return Point(static_cast<float>(xSum), static_cast<float>(ySum));
-}
-
 void TouchGestureDetector::CalcAndStoreDistance()
 {
     if (!TouchGestureParameter::Load().DoesSupportGesture(gestureType_, static_cast<int32_t>(downPoint_.size()))) {
@@ -764,7 +713,7 @@ bool TouchGestureDetector::IsLastTouchUp(std::shared_ptr<PointerEvent> event) co
 
 void TouchGestureDetector::OnGestureSendEvent(std::shared_ptr<PointerEvent> event) const
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     CHKPV(event);
     event->SetTargetWindowId(-1);
     auto pointerEvent = std::make_shared<PointerEvent>(*event);

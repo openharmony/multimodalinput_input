@@ -76,7 +76,7 @@ int32_t LongPressEventSubscribeManager::SubscribeLongPressEvent(
 
 int32_t LongPressEventSubscribeManager::UnsubscribeLongPressEvent(int32_t subscribeId)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     if (subscribeId < 0) {
         MMI_HILOGE("The subscribe id is less than 0");
         return RET_ERR;

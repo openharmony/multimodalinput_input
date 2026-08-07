@@ -2810,6 +2810,20 @@ public:
     static const int32_t KEYCODE_KEY_PEN_MODE_SWITCH;
 
     /**
+     * Pen lift key
+     *
+     * @since 26.0.0
+     */
+    static const int32_t KEYCODE_KEY_LIFT_PEN;
+ 
+     /**
+     * Pen down key
+     *
+     * @since 26.0.0
+     */
+    static const int32_t KEYCODE_KEY_DOWN_PEN;
+
+    /**
      * KEYCODE_MMX_TOUCH
      *
      * @since 24

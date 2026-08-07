@@ -34,12 +34,12 @@ public:
     void Stop();
 
 private:
-    void ProcessDeviceEvents(fd_set& readFds);
-    void MainLoop();
     void FlushDeviceEvents(const EventRecord& record);
+    static std::string GetEventCodeString(uint16_t type, uint16_t code);
     static std::string GetEventTypeString(uint16_t type);
     static std::string GetSecondaryEventCodeString(uint16_t type, uint16_t code);
-    static std::string GetEventCodeString(uint16_t type, uint16_t code);
+    void MainLoop();
+    void ProcessDeviceEvents(fd_set& readFds);
     void WriteEventText(const EventRecord& record);
 
     std::string outputPath_;

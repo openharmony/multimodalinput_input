@@ -104,6 +104,7 @@ ohos_source_set("joystick_event_normalization") {
     "ffrt:libffrt",
     "hilog:libhilog",
     "ipc:ipc_single",
+    "libinput:libinput-third-mmi",
     "preferences:native_preferences",
   ]
 

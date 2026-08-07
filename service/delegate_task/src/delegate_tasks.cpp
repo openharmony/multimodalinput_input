@@ -40,6 +40,7 @@ void DelegateTasks::Task::ProcessTask()
         MMI_HILOGE("Expired tasks will be discarded. id:%{public}" PRId64, id_);
         return;
     }
+    taskIsRunning = true;
     int32_t ret = fun_();
     std::string taskType = ((promise_ == nullptr) ? "Async" : "Sync");
     MMI_HILOGD("Process taskType:%{public}s, taskId:%{public}" PRId64 ", ret:%{public}d", taskType.c_str(), id_, ret);
@@ -130,6 +131,9 @@ int32_t DelegateTasks::PostSyncTask(DTaskCallback callback)
         HiviewDFX::GetBacktraceStringByTid(stackTrace, workerThreadId, SKIP_FRAME_NUM, false);
         MMI_HILOGE("taskId:%{public}" PRId64 ", num of tasks:%{public}zu, stack of workerThread:%{public}s",
                     id_, tasks_.size(), stackTrace.c_str());
+        if (task->TaskIsRunning()) {
+            return ETASKS_WAIT_TIMEOUT_BUT_RUNNING;
+        }
         return ETASKS_WAIT_TIMEOUT;
     } else if (res == std::future_status::deferred) {
         MMI_HILOGE("Task deferred");

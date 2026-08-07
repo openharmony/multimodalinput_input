@@ -15,8 +15,8 @@
 
 #include <gtest/gtest.h>
 
-#include "mmi_log.h"
 #include "input_replay_command.h"
+#include "mmi_log.h"
 
 namespace OHOS {
 namespace MMI {

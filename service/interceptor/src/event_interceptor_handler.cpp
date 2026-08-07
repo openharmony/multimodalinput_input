@@ -93,7 +93,7 @@ void EventInterceptorHandler::HandleTouchEvent(const std::shared_ptr<PointerEven
 int32_t EventInterceptorHandler::AddInputHandler(InputHandlerType handlerType,
     HandleEventType eventType, int32_t priority, uint32_t deviceTags, SessionPtr session)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     CHKPR(session, RET_ERR);
     if ((eventType & HANDLE_EVENT_TYPE_ALL) == HANDLE_EVENT_TYPE_NONE) {
         MMI_HILOGE("Invalid event type");
@@ -109,7 +109,7 @@ int32_t EventInterceptorHandler::AddInputHandler(InputHandlerType handlerType,
 void EventInterceptorHandler::RemoveInputHandler(InputHandlerType handlerType,
     HandleEventType eventType, int32_t priority, uint32_t deviceTags, SessionPtr session)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     CHKPV(session);
     if (handlerType == InputHandlerType::INTERCEPTOR) {
         SessionHandler interceptor { handlerType, eventType, priority, deviceTags, session };
@@ -425,7 +425,7 @@ void EventInterceptorHandler::InterceptorCollection::RemoveInterceptor(const Ses
 
 void EventInterceptorHandler::InterceptorCollection::OnSessionLost(SessionPtr session)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     auto iter = interceptors_.cbegin();
     while (iter != interceptors_.cend()) {
         if (iter->session_ != session) {

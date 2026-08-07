@@ -39,7 +39,7 @@ constexpr int32_t REPEAT_ONCE { 1 };
 } // namespace
 
 std::vector<std::filesystem::path> JoystickLayoutMap::configBasePaths_ {
-    "/system/etc/multimodalinput/joystick/layout"
+    "/data/service/el1/public/multimodalinput/joystick/layout"
 };
 const std::unordered_map<JoystickLayoutMap::AxisMode, std::string> JoystickLayoutMap::axisModeNames_ {
     { AxisMode::AXIS_MODE_NORMAL, "NORMAL" },

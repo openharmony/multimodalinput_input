@@ -292,6 +292,13 @@ enum WindowInputPolicy : uint32_t {
      * @since 24
      */
     FLAG_TOUCHPAD_AXIS_SCROLL_REDISPATCH = 1 << 11,
+    /**
+     * Injectable under lock screen. A window with this flag is allowed to receive
+     * injected events while the screen is locked.
+     *
+     * @since 26
+     */
+    FLAG_INJECTABLE_UNDER_LOCK = 1 << 12,
 };
 
 struct WindowInfo {

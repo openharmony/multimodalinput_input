@@ -198,5 +198,29 @@ HWTEST_F(InputEventDataTransformationTest, KeyEventToNetPacket, TestSize.Level1)
     ASSERT_TRUE(outItem.has_value());
     EXPECT_EQ(outItem->GetRawCode(), 30);
 }
+
+/**
+ * @tc.name: Unmarshalling_001
+ * @tc.desc: Test Unmarshalling
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputEventDataTransformationTest, Unmarshalling_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    int32_t callingUid = 1111;
+    pointerEvent->SetCallingUid(callingUid);
+    NetPacket pkt(MmiMessageId::ON_POINTER_EVENT);
+    int32_t marshallingResult = InputEventDataTransformation::Marshalling(pointerEvent, pkt);
+    EXPECT_EQ(marshallingResult, RET_OK);
+
+    auto newEvent = PointerEvent::Create();
+    ASSERT_NE(newEvent, nullptr);
+    int32_t ret = InputEventDataTransformation::Unmarshalling(pkt, newEvent);
+    ASSERT_EQ(ret, RET_OK);
+    EXPECT_EQ(newEvent->GetCallingUid(), callingUid);
+}
 } // namespace MMI
 } // namespace OHOS

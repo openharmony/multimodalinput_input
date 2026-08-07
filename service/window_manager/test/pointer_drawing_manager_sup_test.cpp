@@ -119,7 +119,7 @@ HWTEST_F(PointerDrawingManagerSupTest, PointerDrawingManagerSupTest_DrawDynamicH
     screenpointer->bufferId_.store(5, std::memory_order_relaxed);
     cfg.style_ = TRANSPARENT_ICON;
     rlt = pointerDrawingManager.DrawDynamicHardwareCursor(screenpointer, cfg);
-    EXPECT_EQ(rlt, RET_ERR);
+    EXPECT_EQ(rlt, RET_OK);
 }
 
 /**
@@ -1360,13 +1360,15 @@ HWTEST_F(PointerDrawingManagerSupTest, PointerDrawingManagerSupTest_HardwareCurs
     pointerDrawingManager.screenPointers_[displaysInfo.rsId] = spMirror;
     pointerDrawingManager.displayId_ = 100;
     uint64_t displayId = 100;
-    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.HardwareCursorMove(displayId, x, y));
+    std::unordered_set<uint64_t> failedScreens;
+    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.HardwareCursorMoveInner(displayId, x, y, failedScreens));
     ASSERT_NO_FATAL_FAILURE(
         pointerDrawingManager.SoftwareCursorMove(pointerDrawingManager.displayId_, x, y));
     spMirror->mode_ = mode_t::SCREEN_EXTEND;
     pointerDrawingManager.displayId_ = 200;
     displayId = 200;
-    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.HardwareCursorMove(displayId, x, y));
+    failedScreens.clear();
+    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.HardwareCursorMoveInner(displayId, x, y, failedScreens));
     ASSERT_NO_FATAL_FAILURE(
         pointerDrawingManager.SoftwareCursorMoveAsync(pointerDrawingManager.displayId_, x, y));
 }

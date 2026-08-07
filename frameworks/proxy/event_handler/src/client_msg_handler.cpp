@@ -25,7 +25,9 @@
 #ifdef OHOS_BUILD_ENABLE_KEY_HOOK
 #include "key_event_hook_handler.h"
 #endif // OHOS_BUILD_ENABLE_KEY_HOOK
+#ifdef OHOS_BUILD_ENABLE_INPUT_EVENT_HOOK
 #include "input_event_hook_handler.h"
+#endif // OHOS_BUILD_ENABLE_INPUT_EVENT_HOOK
 #include "long_press_event_subscribe_manager.h"
 #include "mmi_client.h"
 #include "multimodal_event_handler.h"
@@ -162,7 +164,10 @@ int32_t ClientMsgHandler::OnKeyEvent(const UDSClient& client, NetPacket& pkt)
         MMI_HILOG_DISPATCHE("Packet read fd failed");
         return PACKET_READ_FAIL;
     }
-    MMI_HILOG_DISPATCHW("The client receives a key, Fd:%{public}d", fd);
+    MMI_HILOG_DISPATCHW("The client receives a key, NL:%{public}d, CL:%{public}d, SL:%{public}d, Fd:%{public}d",
+        key->GetFunctionKey(KeyEvent::NUM_LOCK_FUNCTION_KEY),
+        key->GetFunctionKey(KeyEvent::CAPS_LOCK_FUNCTION_KEY),
+        key->GetFunctionKey(KeyEvent::SCROLL_LOCK_FUNCTION_KEY), fd);
     BytraceAdapter::StartBytrace(key, BytraceAdapter::TRACE_START, BytraceAdapter::KEY_DISPATCH_EVENT);
     key->SetProcessedCallback(dispatchCallback_);
     InputMgrImpl.OnKeyEvent(key);
@@ -319,17 +324,10 @@ int32_t ClientMsgHandler::OnSubscribeKeyEventCallback(const UDSClient &client, N
         return PACKET_READ_FAIL;
     }
     if (keyEvent->GetKeyCode() == KeyEvent::KEYCODE_POWER) {
-        if (!EventLogHelper::IsBetaVersion()) {
-            MMI_HILOGI("Subscribe:%{public}d,Fd:%{public}d,KeyEvent:%{public}d, "
-                "Action:%{public}d, KeyAction:%{public}d, EventType:%{public}d,Flag:%{public}u",
-                subscribeId, fd, keyEvent->GetId(), keyEvent->GetAction(), keyEvent->GetKeyAction(),
-                keyEvent->GetEventType(), keyEvent->GetFlag());
-        } else {
-            MMI_HILOGW("Subscribe:%{public}d,Fd:%{public}d,KeyEvent:%{public}d, "
-                "Action:%{public}d, KeyAction:%{public}d, EventType:%{public}d,Flag:%{public}u",
-                subscribeId, fd, keyEvent->GetId(), keyEvent->GetAction(), keyEvent->GetKeyAction(),
-                keyEvent->GetEventType(), keyEvent->GetFlag());
-        }
+        MMI_HILOGI("Subscribe:%{public}d,Fd:%{public}d,KeyEvent:%{public}d, "
+            "Action:%{public}d, KeyAction:%{public}d, EventType:%{public}d,Flag:%{public}u",
+            subscribeId, fd, keyEvent->GetId(), keyEvent->GetAction(), keyEvent->GetKeyAction(),
+            keyEvent->GetEventType(), keyEvent->GetFlag());
     } else {
         MMI_HILOGD("Subscribe:%{public}d,Fd:%{public}d,KeyEvent:%{public}d,"
             "KeyCode:%{private}d,ActionTime:%{public}" PRId64 ",ActionStartTime:%{public}" PRId64 ","
@@ -622,7 +620,9 @@ int32_t ClientMsgHandler::OnHookKey(const UDSClient &client, NetPacket &pkt)
         return RET_ERR;
     }
     BytraceAdapter::StartBytrace(keyEvent, BytraceAdapter::TRACE_START, BytraceAdapter::KEY_HOOK_EVENT);
+#ifdef OHOS_BUILD_ENABLE_INPUT_EVENT_HOOK
     INPUT_EVENT_HOOK_HANDLER.OnKeyEvent(keyEvent);
+#endif // OHOS_BUILD_ENABLE_INPUT_EVENT_HOOK
     return RET_OK;
 }
 
@@ -634,7 +634,9 @@ int32_t ClientMsgHandler::OnHookTouch(const UDSClient &client, NetPacket &pkt)
         MMI_HILOGE("Read net packet failed");
         return PACKET_READ_FAIL;
     }
+#ifdef OHOS_BUILD_ENABLE_INPUT_EVENT_HOOK
     INPUT_EVENT_HOOK_HANDLER.OnPointerEvent(pointerEvent);
+#endif // OHOS_BUILD_ENABLE_INPUT_EVENT_HOOK
     return RET_OK;
 }
 
@@ -646,7 +648,9 @@ int32_t ClientMsgHandler::OnHookMouse(const UDSClient &client, NetPacket &pkt)
         MMI_HILOGE("Read net packet failed");
         return PACKET_READ_FAIL;
     }
+#ifdef OHOS_BUILD_ENABLE_INPUT_EVENT_HOOK
     INPUT_EVENT_HOOK_HANDLER.OnPointerEvent(pointerEvent);
+#endif // OHOS_BUILD_ENABLE_INPUT_EVENT_HOOK
     return RET_OK;
 }
 } // namespace MMI

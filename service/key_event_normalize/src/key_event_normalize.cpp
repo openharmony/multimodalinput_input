@@ -231,7 +231,7 @@ void KeyEventNormalize::ResetKeyEvent(struct libinput_device* device)
         if (keyEvent_ == nullptr) {
             keyEvent_ = KeyEvent::Create();
         }
-        if (libinput_has_event_led_type(device)) {
+        if (libinput_has_event_led_type(device) && !keyEventResetDone_) {
             CHKPV(keyEvent_);
             const std::vector<int32_t> funcKeys = {
                 KeyEvent::NUM_LOCK_FUNCTION_KEY,
@@ -241,6 +241,7 @@ void KeyEventNormalize::ResetKeyEvent(struct libinput_device* device)
             for (const auto &funcKey : funcKeys) {
                 keyEvent_->SetFunctionKey(funcKey, libinput_get_funckey_state(device, funcKey));
             }
+            keyEventResetDone_ = true;
         }
     }
 }
@@ -314,7 +315,7 @@ void KeyEventNormalize::ReadProductConfig(InputProductConfig &config) const
         MMI_HILOGE("No '%{private}s' was found", cfgName);
         return;
     }
-    MMI_HILOGI("Input product config:%{private}s", cfgPath);
+    MMI_HILOGD("Input product config:%{private}s", cfgPath);
     ReadProductConfig(std::string(cfgPath), config);
 }
 
@@ -618,12 +619,6 @@ bool KeyEventNormalize::CheckSimulatedModifierKeyEventFromShell(const std::share
 
     if (!keyStatusRecordSwitch_) {
         MMI_HILOGW("The simulated modifier key status record switch is not enabled");
-        return false;
-    }
-
-    const int32_t funcKey = keyEvent->TransitionFunctionKey(keyEvent->GetKeyCode());
-    if (funcKey == KeyEvent::UNKNOWN_FUNCTION_KEY) {
-        MMI_HILOGW("The shell simulate not function key");
         return false;
     }
 

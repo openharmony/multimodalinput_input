@@ -17,8 +17,8 @@
 
 #include <atomic>
 #include <charconv>
-#include <cstring>
 #include <csignal>
+#include <cstring>
 #include <getopt.h>
 #include <iostream>
 #include <thread>

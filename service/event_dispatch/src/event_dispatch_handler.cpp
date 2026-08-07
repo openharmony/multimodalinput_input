@@ -22,7 +22,9 @@
 #include "event_log_helper.h"
 #include "input_event_data_transformation.h"
 #include "input_event_handler.h"
+#ifdef OHOS_BUILD_ENABLE_INPUT_EVENT_HOOK
 #include "input_event_hook_manager.h"
+#endif // OHOS_BUILD_ENABLE_INPUT_EVENT_HOOK
 #ifdef OHOS_BUILD_ENABLE_KEY_HOOK
 #include "key_event_hook_manager.h"
 #endif // OHOS_BUILD_ENABLE_KEY_HOOK
@@ -33,6 +35,9 @@
 #ifdef OHOS_BUILD_ENABLE_DRAG_SECURITY
 #include "drag_security_manager.h"
 #endif // OHOS_BUILD_ENABLE_DRAG_SECURITY
+#ifdef OHOS_SUSPEND_STATE_MANAGER
+#include "suspend_state_manager.h"
+#endif //OHOS_SUSPEND_STATE_MANAGER
 
 #undef MMI_LOG_DOMAIN
 #define MMI_LOG_DOMAIN MMI_LOG_DISPATCH
@@ -392,7 +397,7 @@ void EventDispatchHandler::HandlePointerEventInner(const std::shared_ptr<Pointer
     int32_t pointerId = point->GetPointerId();
     PointerEvent::PointerItem pointerItem;
     if (!point->GetPointerItem(pointerId, pointerItem)) {
-        MMI_HILOGE("Can't find pointer item, pointer:%{public}d", pointerId);
+        MMI_HILOGD("Can't find pointer item, pointer:%{public}d", pointerId);
         return;
     }
     UpdateDisplayXY(point);
@@ -523,6 +528,22 @@ void EventDispatchHandler::DispatchPointerEventInner(std::shared_ptr<PointerEven
     if (sess == nullptr) {
         return;
     }
+#ifdef OHOS_SUSPEND_STATE_MANAGER
+    if (SuspendStateManager::GetInstance().IsFrozen(sess->GetPid())) {
+        const int32_t pointerAc = point->GetPointerAction();
+        const auto shouldLogFreezeEvent = [](int32_t action) {
+            return action != PointerEvent::POINTER_ACTION_MOVE &&
+                action != PointerEvent::POINTER_ACTION_AXIS_UPDATE &&
+                action != PointerEvent::POINTER_ACTION_ROTATE_UPDATE &&
+                action != PointerEvent::POINTER_ACTION_PULL_MOVE;
+        };
+        if (shouldLogFreezeEvent(pointerAc)) {
+            MMI_HILOG_FREEZEI("Pointer event is in frozen pid. Pid:%{public}d, pointerAc:%{public}d, PI:%{public}d",
+                sess->GetPid(), pointerAc, point->GetPointerId());
+        }
+        return;
+    }
+#endif //OHOS_SUSPEND_STATE_MANAGER
     auto currentTime = GetSysClockTime();
     BytraceAdapter::StartBytrace(point, BytraceAdapter::TRACE_STOP);
     if (ANRMgr->TriggerANR(ANR_DISPATCH, currentTime, sess)) {
@@ -608,17 +629,16 @@ int32_t EventDispatchHandler::DispatchKeyEvent(int32_t fd, UDSServer& udsServer,
         "Fd:%{public}d", key->GetKeyCode(), key->GetAction(), key->GetEventType(), fd);
     auto session = udsServer.GetSession(fd);
     CHKPR(session, RET_ERR);
+#ifdef OHOS_SUSPEND_STATE_MANAGER
+    if (SuspendStateManager::GetInstance().IsFrozen(session->GetPid())) {
+        return RET_OK;
+    }
+#endif //OHOS_SUSPEND_STATE_MANAGER
     auto currentTime = GetSysClockTime();
     if (ANRMgr->TriggerANR(ANR_DISPATCH, currentTime, session)) {
-        if (!EventLogHelper::IsBetaVersion()) {
-            MMI_HILOGW("The key event does not report normally, application not response."
-                "KeyEvent(deviceid:%{public}d, key action:%{public}d)",
-                key->GetDeviceId(), key->GetKeyAction());
-        } else {
-            MMI_HILOGW("The key event does not report normally, application not response."
-                "KeyEvent(deviceid:%{public}d, keycode:%{private}d, key action:%{public}d)",
-                key->GetDeviceId(), key->GetKeyCode(), key->GetKeyAction());
-        }
+        MMI_HILOGW("The key event does not report normally, application not response."
+            "KeyEvent(deviceid:%{public}d, key action:%{public}d)",
+            key->GetDeviceId(), key->GetKeyAction());
         ANRMgr->HandleAnrState(session, ANR_DISPATCH, currentTime);
     }
     auto keyHandler = InputHandler->GetEventNormalizeHandler();

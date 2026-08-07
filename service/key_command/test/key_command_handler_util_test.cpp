@@ -226,5 +226,62 @@ HWTEST_F(KeyCommandHandlerUtilTest, KeyCommandHandlerUtilTest_GetAbilityStartDel
     EXPECT_TRUE(OHOS::MMI::GetAbilityStartDelay(jsonData, abilityStartDelayInt));
     cJSON_Delete(jsonData);
 }
+/**
+ * @tc.name: KeyCommandHandlerUtilTest_IsSpecialType_005
+ * @tc.desc: Test IsSpecialType returns true when keyCode matches and type matches
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerUtilTest, KeyCommandHandlerUtilTest_IsSpecialType_005, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EXPECT_TRUE(OHOS::MMI::IsSpecialType(KeyEvent::KEYCODE_POWER, SpecialType::KEY_DOWN_ACTION));
+    EXPECT_TRUE(OHOS::MMI::IsSpecialType(KeyEvent::KEYCODE_VOLUME_DOWN, SpecialType::KEY_DOWN_ACTION));
+    EXPECT_TRUE(OHOS::MMI::IsSpecialType(KeyEvent::KEYCODE_VOLUME_UP, SpecialType::KEY_DOWN_ACTION));
+}
+
+/**
+ * @tc.name: KeyCommandHandlerUtilTest_IsSpecialType_006
+ * @tc.desc: Test IsSpecialType returns false when keyCode in SPECIAL_KEYS but type mismatch
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerUtilTest, KeyCommandHandlerUtilTest_IsSpecialType_006, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EXPECT_FALSE(OHOS::MMI::IsSpecialType(KeyEvent::KEYCODE_POWER, SpecialType::SPECIAL_ALL));
+    EXPECT_FALSE(OHOS::MMI::IsSpecialType(KeyEvent::KEYCODE_POWER, SpecialType::SUBSCRIBER_BEFORE_DELAY));
+}
+
+/**
+ * @tc.name: KeyCommandHandlerUtilTest_GetAbilityStartDelay_009
+ * @tc.desc: Test GetAbilityStartDelay with missing abilityStartDelay key
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerUtilTest, KeyCommandHandlerUtilTest_GetAbilityStartDelay_009, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    cJSON* jsonData = cJSON_CreateObject();
+    int64_t delay = 1;
+    EXPECT_FALSE(OHOS::MMI::GetAbilityStartDelay(jsonData, delay));
+    cJSON_Delete(jsonData);
+}
+
+/**
+ * @tc.name: KeyCommandHandlerUtilTest_GetAbilityStartDelay_010
+ * @tc.desc: Test GetAbilityStartDelay with value exceeding upper bound
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerUtilTest, KeyCommandHandlerUtilTest_GetAbilityStartDelay_010, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    cJSON* jsonData = cJSON_CreateObject();
+    cJSON_AddNumberToObject(jsonData, "abilityStartDelay", 3001);
+    int64_t delay = 1;
+    EXPECT_FALSE(OHOS::MMI::GetAbilityStartDelay(jsonData, delay));
+    cJSON_Delete(jsonData);
+}
 } // namespace MMI
 } // namespace OHOS

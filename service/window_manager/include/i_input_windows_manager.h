@@ -30,6 +30,7 @@
 #include "struct_multimodal.h"
 #include "uds_server.h"
 #include "old_display_info.h"
+#include "plugin_stage.h"
 #include "shift_info.h"
 
 struct libinput_device;
@@ -86,12 +87,19 @@ public:
     virtual void UpdateWindowInfo(const WindowGroupInfo &windowGroupInfo) = 0;
     virtual int32_t ClearWindowPointerStyle(int32_t pid, int32_t windowId) = 0;
     virtual void Dump(int32_t fd, const std::vector<std::string> &args) = 0;
+    // Dumps only the deferred-bind watchdog state (active sequence count, pending binds, timers).
+    // Non-pure with an empty default so facility mocks need not override it.
+    virtual void DumpPendingBindState(int32_t fd) {}
     virtual int32_t GetWindowPid(int32_t windowId) const = 0;
     virtual int32_t GetWindowAgentPid(int32_t windowId) const = 0;
     virtual int32_t SetMouseCaptureMode(int32_t windowId, bool isCaptureMode) = 0;
     virtual bool GetMouseIsCaptureMode() const = 0;
     virtual int32_t GetDisplayBindInfo(DisplayBindInfos &infos) = 0;
     virtual int32_t SetDisplayBind(int32_t deviceId, int32_t displayId, std::string &msg) = 0;
+    virtual int32_t BindToDisplay(int32_t deviceId, int32_t displayId, std::string &msg) = 0;
+    virtual int32_t GetBindDisplayIdByInputDevice(int32_t inputDeviceId) const = 0;
+    virtual void ApplyBoundDisplayId(std::shared_ptr<PointerEvent> pointerEvent) = 0;
+    virtual void ApplyBoundDisplayId(std::shared_ptr<KeyEvent> keyEvent) = 0;
     virtual int32_t AppendExtraData(const ExtraData& extraData) = 0;
     virtual bool IsWindowVisible(int32_t pid) = 0;
     virtual ExtraData GetExtraData() const = 0;
@@ -139,6 +147,7 @@ public:
     virtual void SendPointerEvent(int32_t pointerAction) = 0;
     virtual bool IsMouseSimulate() = 0;
     virtual bool HasMouseHideFlag() = 0;
+    virtual void OnScreenModeChangeForMirrorScreen(size_t screenCount) = 0;
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
@@ -177,6 +186,7 @@ public:
     virtual bool SelectPointerChangeArea(int32_t windowId, int32_t logicalX, int32_t logicalY);
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
     virtual std::optional<WindowInfo> GetWindowAndDisplayInfo(int32_t windowId, int32_t displayId) = 0;
+    virtual bool IsWindowInjectableUnderLock(int32_t windowId, int32_t displayId) = 0;
     virtual void GetTargetWindowIds(int32_t pointerItemId, int32_t sourceType, std::set<int32_t> &windowIds,
         int32_t deviceId) = 0;
     virtual int32_t SetCurrentUser(int32_t userId) = 0;
@@ -232,6 +242,7 @@ public:
     virtual int32_t ControlMouseEventToAnco(int32_t windowId, bool enable, const std::string &callingTokenName) = 0;
 #endif // OHOS_BUILD_ENABLE_ANCO_GAME_EVENT_MAPPING
     virtual const OLD::DisplayGroupInfo& GetDefaultDisplayGroupInfo() = 0;
+    virtual std::vector<PluginDisplayGroupInfo> GetDisplayGroupInfos() = 0;
 private:
     static std::mutex mutex_;
     static std::shared_ptr<IInputWindowsManager> instance_;

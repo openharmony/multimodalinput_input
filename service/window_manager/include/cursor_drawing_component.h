@@ -49,7 +49,7 @@ public:
         const PointerStyle pointerStyle, Direction direction);
     void UpdateDisplayInfo(const OLD::DisplayInfo &displayInfo);
     void UpdateBindDisplayId(uint64_t rsId);
-    void OnDisplayInfo(const OLD::DisplayGroupInfo &displayGroupInfo);
+    void OnDisplayInfo(const OLD::DisplayGroupInfo &displayGroupInfo, bool isDisplayChanged = false);
     void OnWindowInfo(const WinInfo &info);
     bool Init();
     void DeletePointerVisible(int32_t pid);
@@ -124,7 +124,9 @@ private:
     GetPointerInstanceFunc getPointerInstance_;
 
     std::atomic<bool> exitFlag_ { false };
-    std::atomic<bool> isLoaded_ { false };
+    // 0表示未加载(false)，1表示已加载(true)，-1表示卸载中(true)
+    std::atomic<int32_t> isLoaded_ { 0 };
+    std::atomic<int32_t> unloadSoInterval_ { 0 };
     void *soHandle_ { nullptr };
     IPointerDrawingManager* pointerInstance_ { nullptr };
     int32_t timerId_ { -1 };

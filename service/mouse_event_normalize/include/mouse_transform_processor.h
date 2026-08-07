@@ -173,10 +173,13 @@ private:
     void RecordActiveOperations();
     void SendButtonUpEvents();
     void SendAxisEndEvent();
+    void RefreshLastPointerEvent();
+    bool RestoreLastPointerEvent();
     // Helper functions for button handling refactoring
     void ResetPointerItemCanceledState();
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
     void HandleVirtualDeviceEvent(struct libinput_event_pointer* data);
+    DeviceType ConvertToVirtualDeviceType(DeviceType deviceType);
 #endif
     bool IsTouchpadTapEnabled(int32_t type);
     int32_t HandleButtonReleased(uint32_t button, uint32_t originButton, int32_t type);
@@ -212,6 +215,7 @@ private:
     static std::atomic_bool isVirtualDeviceEvent_;
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
     std::shared_ptr<PointerEvent> pointerEvent_ { nullptr };
+    std::shared_ptr<PointerEvent> lastPointerEvent_ { nullptr };
     int32_t timerId_ { -1 };
     int32_t buttonId_ { -1 };
     uint32_t pressedButton_ { 0 };

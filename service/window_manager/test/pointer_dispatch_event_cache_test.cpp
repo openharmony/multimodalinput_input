@@ -64,8 +64,8 @@ HWTEST_F(PointerDispatchEventCacheTest, PointerDispatchEventCacheTest_001, TestS
     cache.Update(nullptr);
 
     EXPECT_EQ(cache.GetTouchEvent(), nullptr);
-    EXPECT_EQ(cache.GetForDispatch(PointerEvent::POINTER_ACTION_MOVE), nullptr);
-    EXPECT_EQ(cache.GetForDispatch(PointerEvent::POINTER_ACTION_LEVITATE_IN_WINDOW), nullptr);
+    EXPECT_EQ(cache.GetForDispatch(PointerEvent::TOOL_TYPE_FINGER), nullptr);
+    EXPECT_EQ(cache.GetForDispatch(PointerEvent::TOOL_TYPE_PEN), nullptr);
 }
 
 /**
@@ -86,9 +86,9 @@ HWTEST_F(PointerDispatchEventCacheTest, PointerDispatchEventCacheTest_002, TestS
     cache.Update(stylusEvent);
 
     EXPECT_EQ(cache.GetTouchEvent(), touchEvent);
-    EXPECT_EQ(cache.GetForDispatch(PointerEvent::POINTER_ACTION_MOVE), touchEvent);
-    EXPECT_EQ(cache.GetForDispatch(PointerEvent::POINTER_ACTION_LEVITATE_IN_WINDOW), stylusEvent);
-    EXPECT_EQ(cache.GetForDispatch(PointerEvent::POINTER_ACTION_LEVITATE_OUT_WINDOW), stylusEvent);
+    EXPECT_EQ(cache.GetForDispatch(PointerEvent::TOOL_TYPE_FINGER), touchEvent);
+    EXPECT_EQ(cache.GetForDispatch(PointerEvent::TOOL_TYPE_PEN), stylusEvent);
+    EXPECT_EQ(cache.GetForDispatch(PointerEvent::TOOL_TYPE_PEN), stylusEvent);
 }
 
 /**
@@ -106,8 +106,8 @@ HWTEST_F(PointerDispatchEventCacheTest, PointerDispatchEventCacheTest_003, TestS
     cache.Update(pencilEvent);
 
     EXPECT_EQ(cache.GetTouchEvent(), nullptr);
-    EXPECT_EQ(cache.GetForDispatch(PointerEvent::POINTER_ACTION_LEVITATE_IN_WINDOW), pencilEvent);
-    EXPECT_EQ(cache.GetForDispatch(PointerEvent::POINTER_ACTION_MOVE), nullptr);
+    EXPECT_EQ(cache.GetForDispatch(PointerEvent::TOOL_TYPE_PENCIL), pencilEvent);
+    EXPECT_EQ(cache.GetForDispatch(PointerEvent::TOOL_TYPE_FINGER), nullptr);
 }
 
 /**
@@ -127,8 +127,8 @@ HWTEST_F(PointerDispatchEventCacheTest, PointerDispatchEventCacheTest_004, TestS
     cache.Update(pointerEvent);
 
     EXPECT_EQ(cache.GetTouchEvent(), pointerEvent);
-    EXPECT_EQ(cache.GetForDispatch(PointerEvent::POINTER_ACTION_MOVE), pointerEvent);
-    EXPECT_EQ(cache.GetForDispatch(PointerEvent::POINTER_ACTION_LEVITATE_IN_WINDOW), nullptr);
+    EXPECT_EQ(cache.GetForDispatch(PointerEvent::TOOL_TYPE_FINGER), pointerEvent);
+    EXPECT_EQ(cache.GetForDispatch(PointerEvent::TOOL_TYPE_PEN), nullptr);
 }
 
 /**
@@ -150,14 +150,14 @@ HWTEST_F(PointerDispatchEventCacheTest, PointerDispatchEventCacheTest_005, TestS
     cache.ClearDeviceEvents(OTHER_DEVICE_ID);
 
     EXPECT_EQ(cache.GetTouchEvent(), touchEvent);
-    EXPECT_EQ(cache.GetForDispatch(PointerEvent::POINTER_ACTION_LEVITATE_IN_WINDOW), stylusEvent);
+    EXPECT_EQ(cache.GetForDispatch(PointerEvent::TOOL_TYPE_PEN), stylusEvent);
 
     cache.ClearDeviceEvents(TOUCH_DEVICE_ID);
     EXPECT_EQ(cache.GetTouchEvent(), nullptr);
-    EXPECT_EQ(cache.GetForDispatch(PointerEvent::POINTER_ACTION_LEVITATE_IN_WINDOW), stylusEvent);
+    EXPECT_EQ(cache.GetForDispatch(PointerEvent::TOOL_TYPE_PEN), stylusEvent);
 
     cache.ClearDeviceEvents(STYLUS_DEVICE_ID);
-    EXPECT_EQ(cache.GetForDispatch(PointerEvent::POINTER_ACTION_LEVITATE_IN_WINDOW), nullptr);
+    EXPECT_EQ(cache.GetForDispatch(PointerEvent::TOOL_TYPE_PEN), nullptr);
 }
 
 /**
@@ -179,13 +179,13 @@ HWTEST_F(PointerDispatchEventCacheTest, PointerDispatchEventCacheTest_006, TestS
     cache.ClearTouch();
 
     EXPECT_EQ(cache.GetTouchEvent(), nullptr);
-    EXPECT_EQ(cache.GetForDispatch(PointerEvent::POINTER_ACTION_LEVITATE_IN_WINDOW), stylusEvent);
+    EXPECT_EQ(cache.GetForDispatch(PointerEvent::TOOL_TYPE_PEN), stylusEvent);
 
     cache.Reset();
 
     EXPECT_EQ(cache.GetTouchEvent(), nullptr);
-    EXPECT_EQ(cache.GetForDispatch(PointerEvent::POINTER_ACTION_LEVITATE_IN_WINDOW), nullptr);
-    EXPECT_EQ(cache.GetForDispatch(PointerEvent::POINTER_ACTION_MOVE), nullptr);
+    EXPECT_EQ(cache.GetForDispatch(PointerEvent::TOOL_TYPE_PEN), nullptr);
+    EXPECT_EQ(cache.GetForDispatch(PointerEvent::TOOL_TYPE_FINGER), nullptr);
 }
 } // namespace MMI
 } // namespace OHOS

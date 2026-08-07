@@ -24,7 +24,7 @@ namespace MMI {
 class JoystickEventNormalize final : public IJoystickEventNormalize {
 public:
     explicit JoystickEventNormalize(IInputServiceContext *env);
-    ~JoystickEventNormalize() = default;
+    ~JoystickEventNormalize();
     DISALLOW_COPY_AND_MOVE(JoystickEventNormalize);
 
     void OnDeviceAdded(int32_t deviceId) override;

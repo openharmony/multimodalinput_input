@@ -149,8 +149,9 @@ HWTEST_F(PointerDrawingManagerHardCursorTest, PointerDrawingManagerHardCursorTes
     pointerDrawingManager.screenPointers_.insert({1, mirrorSp});
     pointerDrawingManager.screenPointers_.insert({2, extendSp});
     pointerDrawingManager.displayId_ = 0;
-    int32_t ret = pointerDrawingManager.HardwareCursorMove(0, 10, 20);
-    EXPECT_EQ(ret, RET_ERR);
+    std::unordered_set<uint64_t> failedScreens;
+    int32_t ret = pointerDrawingManager.HardwareCursorMoveInner(0, 10, 20, failedScreens);
+    EXPECT_EQ(ret, RET_OK);
 }
 
 /**
@@ -183,8 +184,109 @@ HWTEST_F(PointerDrawingManagerHardCursorTest, PointerDrawingManagerHardCursorTes
     pointerDrawingManager.screenPointers_.insert({1, mirrorSp});
     pointerDrawingManager.screenPointers_.insert({2, extendSp});
     pointerDrawingManager.displayId_ = 0;
-    int32_t ret = pointerDrawingManager.HardwareCursorMove(0, 10, 20);
+    std::unordered_set<uint64_t> failedScreens;
+    int32_t ret = pointerDrawingManager.HardwareCursorMoveInner(0, 10, 20, failedScreens);
     EXPECT_EQ(ret, RET_ERR);
+}
+
+/**
+ * @tc.name: PointerDrawingManagerHardCursorTest_HardwareCursorMove_003
+ * @tc.desc: Test HardwareCursorMove failedScreens output with partial failure
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerHardCursorTest, PointerDrawingManagerHardCursorTest_HardwareCursorMove_003,
+    TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerDrawingManager pointerDrawingManager;
+    ASSERT_NE(pointerDrawingManager.hardwareCursorPointerManager_, nullptr);
+    EXPECT_CALL(*pointerDrawingManager.hardwareCursorPointerManager_, IsSupported).WillRepeatedly(Return(true));
+    EXPECT_CALL(*pointerDrawingManager.hardwareCursorPointerManager_, SetPosition).WillRepeatedly(Return(RET_ERR));
+    sptr<Rosen::ScreenInfo> mainScreenInfo = CreateScreenInfo(0, 0, Rosen::ScreenSourceMode::SCREEN_MAIN);
+    sptr<Rosen::ScreenInfo> mirrorScreenInfo = CreateScreenInfo(1, 1, Rosen::ScreenSourceMode::SCREEN_MIRROR);
+    sptr<Rosen::ScreenInfo> extendScreenInfo = CreateScreenInfo(2, 2, Rosen::ScreenSourceMode::SCREEN_EXTEND);
+    auto mainSp = CreateScreenPointer(pointerDrawingManager.pointerRenderer_,
+        pointerDrawingManager.hardwareCursorPointerManager_, pointerDrawingManager.handler_, mainScreenInfo);
+    auto mirrorSp = CreateScreenPointer(pointerDrawingManager.pointerRenderer_,
+        pointerDrawingManager.hardwareCursorPointerManager_, pointerDrawingManager.handler_, mirrorScreenInfo);
+    auto extendSp = CreateScreenPointer(pointerDrawingManager.pointerRenderer_,
+        pointerDrawingManager.hardwareCursorPointerManager_, pointerDrawingManager.handler_, extendScreenInfo);
+    ASSERT_NE(mainSp, nullptr);
+    ASSERT_NE(mirrorSp, nullptr);
+    ASSERT_NE(extendSp, nullptr);
+    pointerDrawingManager.screenPointers_.insert({0, mainSp});
+    pointerDrawingManager.screenPointers_.insert({1, mirrorSp});
+    pointerDrawingManager.screenPointers_.insert({2, extendSp});
+    pointerDrawingManager.displayId_ = 0;
+    std::unordered_set<uint64_t> failedScreens;
+    int32_t ret = pointerDrawingManager.HardwareCursorMoveInner(0, 10, 20, failedScreens);
+    EXPECT_EQ(ret, RET_ERR);
+    EXPECT_EQ(failedScreens.size(), 3u);
+    EXPECT_TRUE(failedScreens.find(0) != failedScreens.end());
+    EXPECT_TRUE(failedScreens.find(1) != failedScreens.end());
+    EXPECT_TRUE(failedScreens.find(2) != failedScreens.end());
+}
+
+/**
+ * @tc.name: PointerDrawingManagerHardCursorTest_HardwareCursorMoveRetry_001
+ * @tc.desc: Test HardwareCursorMoveRetry only retries specified failed screens
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerHardCursorTest, PointerDrawingManagerHardCursorTest_HardwareCursorMoveRetry_001,
+    TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerDrawingManager pointerDrawingManager;
+    ASSERT_NE(pointerDrawingManager.hardwareCursorPointerManager_, nullptr);
+    EXPECT_CALL(*pointerDrawingManager.hardwareCursorPointerManager_, IsSupported).WillRepeatedly(Return(true));
+    EXPECT_CALL(*pointerDrawingManager.hardwareCursorPointerManager_, SetPosition).WillRepeatedly(Return(RET_ERR));
+    sptr<Rosen::ScreenInfo> mainScreenInfo = CreateScreenInfo(0, 0, Rosen::ScreenSourceMode::SCREEN_MAIN);
+    sptr<Rosen::ScreenInfo> mirrorScreenInfo = CreateScreenInfo(1, 1, Rosen::ScreenSourceMode::SCREEN_MIRROR);
+    auto mainSp = CreateScreenPointer(pointerDrawingManager.pointerRenderer_,
+        pointerDrawingManager.hardwareCursorPointerManager_, pointerDrawingManager.handler_, mainScreenInfo);
+    auto mirrorSp = CreateScreenPointer(pointerDrawingManager.pointerRenderer_,
+        pointerDrawingManager.hardwareCursorPointerManager_, pointerDrawingManager.handler_, mirrorScreenInfo);
+    ASSERT_NE(mainSp, nullptr);
+    ASSERT_NE(mirrorSp, nullptr);
+    pointerDrawingManager.screenPointers_.insert({0, mainSp});
+    pointerDrawingManager.screenPointers_.insert({1, mirrorSp});
+    pointerDrawingManager.displayId_ = 0;
+    std::unordered_set<uint64_t> failedScreens = {1};
+    std::unordered_set<uint64_t> stillFailedScreens;
+    int32_t ret = pointerDrawingManager.HardwareCursorMoveRetry(0, 10, 20,
+        failedScreens, stillFailedScreens);
+    EXPECT_EQ(ret, RET_ERR);
+    EXPECT_TRUE(stillFailedScreens.find(1) != stillFailedScreens.end());
+    EXPECT_EQ(stillFailedScreens.size(), 1u);
+}
+
+/**
+ * @tc.name: PointerDrawingManagerHardCursorTest_HardwareCursorMoveRetry_002
+ * @tc.desc: Test HardwareCursorMoveRetry with empty failedScreens
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerHardCursorTest, PointerDrawingManagerHardCursorTest_HardwareCursorMoveRetry_002,
+    TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerDrawingManager pointerDrawingManager;
+    ASSERT_NE(pointerDrawingManager.hardwareCursorPointerManager_, nullptr);
+    EXPECT_CALL(*pointerDrawingManager.hardwareCursorPointerManager_, IsSupported).WillRepeatedly(Return(true));
+    sptr<Rosen::ScreenInfo> mainScreenInfo = CreateScreenInfo(0, 0, Rosen::ScreenSourceMode::SCREEN_MAIN);
+    auto mainSp = CreateScreenPointer(pointerDrawingManager.pointerRenderer_,
+        pointerDrawingManager.hardwareCursorPointerManager_, pointerDrawingManager.handler_, mainScreenInfo);
+    ASSERT_NE(mainSp, nullptr);
+    pointerDrawingManager.screenPointers_.insert({0, mainSp});
+    pointerDrawingManager.displayId_ = 0;
+    std::unordered_set<uint64_t> failedScreens;
+    std::unordered_set<uint64_t> stillFailedScreens;
+    int32_t ret = pointerDrawingManager.HardwareCursorMoveRetry(0, 10, 20,
+        failedScreens, stillFailedScreens);
+    EXPECT_EQ(ret, RET_OK);
+    EXPECT_TRUE(stillFailedScreens.empty());
 }
 
 /**
@@ -206,7 +308,7 @@ HWTEST_F(PointerDrawingManagerHardCursorTest, PointerDrawingManagerHardCursorTes
     pointerDrawingManager.lastPhysicalY_ = 20;
     pointerDrawingManager.displayId_ = 0;
     int32_t ret = pointerDrawingManager.CheckHwcReady();
-    EXPECT_EQ(ret, RET_ERR);
+    EXPECT_EQ(ret, RET_OK);
 }
 
 /**
@@ -419,6 +521,93 @@ HWTEST_F(PointerDrawingManagerHardCursorTest, PointerDrawingManagerHardCursorTes
     pointerDrawingManager.UpdateBindDisplayId(displayId);
     EXPECT_EQ(pointerDrawingManager.screenId_, 1);
     EXPECT_EQ(pointerDrawingManager.mouseStylePending_.load(), 1);
+}
+
+/**
+ * @tc.name: PointerDrawingManagerHardCursorTest_SetPointerSize_001
+ * @tc.desc: Test SetPointerSize when hard cursor and cursor blur are both enabled
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerHardCursorTest, PointerDrawingManagerHardCursorTest_SetPointerSize_001,
+    TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerDrawingManager pointerDrawingManager;
+    ASSERT_NE(pointerDrawingManager.hardwareCursorPointerManager_, nullptr);
+    EXPECT_CALL(*pointerDrawingManager.hardwareCursorPointerManager_, IsSupported).WillRepeatedly(Return(true));
+    pointerDrawingManager.currentCursorBlurEnabled_ = true;
+    pointerDrawingManager.lastPhysicalX_ = 100;
+    pointerDrawingManager.lastPhysicalY_ = 100;
+    pointerDrawingManager.displayId_ = 0;
+    pointerDrawingManager.displayInfo_.dpi = 160;
+    pointerDrawingManager.lastMouseStyle_.id = MOUSE_ICON::DEFAULT;
+    Rosen::RSSurfaceNodeConfig surfaceNodeConfig;
+    surfaceNodeConfig.SurfaceNodeName = "pointer window";
+    Rosen::RSSurfaceNodeType surfaceNodeType = Rosen::RSSurfaceNodeType::SELF_DRAWING_WINDOW_NODE;
+    pointerDrawingManager.surfaceNode_ = Rosen::RSSurfaceNode::Create(surfaceNodeConfig, surfaceNodeType);
+    ASSERT_TRUE(pointerDrawingManager.surfaceNode_ != nullptr);
+    int32_t userId = 0;
+    int32_t size = 3;
+    EXPECT_NO_FATAL_FAILURE(pointerDrawingManager.SetPointerSize(userId, size));
+}
+
+/**
+ * @tc.name: PointerDrawingManagerHardCursorTest_SetPointerSize_002
+ * @tc.desc: Test SetPointerSize when cursor blur is disabled
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerHardCursorTest, PointerDrawingManagerHardCursorTest_SetPointerSize_002,
+    TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerDrawingManager pointerDrawingManager;
+    ASSERT_NE(pointerDrawingManager.hardwareCursorPointerManager_, nullptr);
+    EXPECT_CALL(*pointerDrawingManager.hardwareCursorPointerManager_, IsSupported).WillRepeatedly(Return(true));
+    pointerDrawingManager.currentCursorBlurEnabled_ = false;
+    pointerDrawingManager.lastPhysicalX_ = 100;
+    pointerDrawingManager.lastPhysicalY_ = 100;
+    pointerDrawingManager.displayId_ = 0;
+    pointerDrawingManager.displayInfo_.dpi = 160;
+    pointerDrawingManager.lastMouseStyle_.id = MOUSE_ICON::DEFAULT;
+    Rosen::RSSurfaceNodeConfig surfaceNodeConfig;
+    surfaceNodeConfig.SurfaceNodeName = "pointer window";
+    Rosen::RSSurfaceNodeType surfaceNodeType = Rosen::RSSurfaceNodeType::SELF_DRAWING_WINDOW_NODE;
+    pointerDrawingManager.surfaceNode_ = Rosen::RSSurfaceNode::Create(surfaceNodeConfig, surfaceNodeType);
+    ASSERT_TRUE(pointerDrawingManager.surfaceNode_ != nullptr);
+    int32_t userId = 0;
+    int32_t size = 3;
+    EXPECT_NO_FATAL_FAILURE(pointerDrawingManager.SetPointerSize(userId, size));
+}
+
+/**
+ * @tc.name: PointerDrawingManagerHardCursorTest_SetPointerSize_003
+ * @tc.desc: Test SetPointerSize when hard cursor is disabled
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerHardCursorTest, PointerDrawingManagerHardCursorTest_SetPointerSize_003,
+    TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerDrawingManager pointerDrawingManager;
+    ASSERT_NE(pointerDrawingManager.hardwareCursorPointerManager_, nullptr);
+    EXPECT_CALL(*pointerDrawingManager.hardwareCursorPointerManager_, IsSupported).WillRepeatedly(Return(false));
+    pointerDrawingManager.currentCursorBlurEnabled_ = true;
+    pointerDrawingManager.lastPhysicalX_ = 100;
+    pointerDrawingManager.lastPhysicalY_ = 100;
+    pointerDrawingManager.displayId_ = 0;
+    pointerDrawingManager.displayInfo_.dpi = 160;
+    pointerDrawingManager.lastMouseStyle_.id = MOUSE_ICON::DEFAULT;
+    Rosen::RSSurfaceNodeConfig surfaceNodeConfig;
+    surfaceNodeConfig.SurfaceNodeName = "pointer window";
+    Rosen::RSSurfaceNodeType surfaceNodeType = Rosen::RSSurfaceNodeType::SELF_DRAWING_WINDOW_NODE;
+    pointerDrawingManager.surfaceNode_ = Rosen::RSSurfaceNode::Create(surfaceNodeConfig, surfaceNodeType);
+    ASSERT_TRUE(pointerDrawingManager.surfaceNode_ != nullptr);
+    int32_t userId = 0;
+    int32_t size = 3;
+    EXPECT_NO_FATAL_FAILURE(pointerDrawingManager.SetPointerSize(userId, size));
 }
 } // namespace MMI
 } // namespace OHOS

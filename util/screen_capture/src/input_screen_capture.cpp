@@ -14,7 +14,6 @@
  */
 
 #include "audio_stream_manager.h"
-#include "audio_system_manager.h"
 #include "define_multimodal.h"
 #ifdef OHOS_BUILD_ENABLE_DFX_RADAR
 #include "dfx_hisysevent.h"
@@ -59,7 +58,7 @@ extern "C" void RegisterListener(ScreenCaptureCallback callback)
 
 extern "C" bool IsMusicActivate()
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     std::vector<std::shared_ptr<AudioStandard::AudioRendererChangeInfo>> rendererChangeInfo;
 #ifdef OHOS_BUILD_ENABLE_DFX_RADAR
     auto begin = std::chrono::high_resolution_clock::now();
@@ -88,12 +87,6 @@ extern "C" bool IsMusicActivate()
         }
     }
     return false;
-}
-
-extern "C" void CleanUpScreenCaptureResources()
-{
-    CALL_INFO_TRACE;
-    AudioStandard::AudioSystemManager::GetInstance()->CleanUpResource();
 }
 #endif
 }

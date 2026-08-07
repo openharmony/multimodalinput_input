@@ -18,6 +18,7 @@
 
 #include <gtest/gtest.h>
 
+#include "config_multimodal.h"
 #include "event_log_helper.h"
 #include "image_source.h"
 #include "input_device_manager.h"
@@ -31,6 +32,7 @@
 #include "pointer_event.h"
 #include "pointer_style.h"
 #include "preferences_manager_mock.h"
+#include "resource_decompress.h"
 #include "ui/rs_ui_context.h"
 #include "ui/rs_ui_director.h"
 #include "transaction/rs_interfaces.h"
@@ -58,7 +60,7 @@ constexpr uint32_t RGB_CHANNEL_BITS_LENGTH { 24 };
 constexpr float MAX_ALPHA_VALUE { 255.f };
 const std::string MOUSE_FILE_NAME { "mouse_settings.xml" };
 const int32_t ROTATE_POLICY = system::GetIntParameter("const.window.device.rotate_policy", 0);
-const std::string IMAGE_POINTER_DEFAULT_PATH = "/system/etc/multimodalinput/mouse_icon/";
+const std::string IMAGE_POINTER_DEFAULT_PATH = "/data/service/el1/public/multimodalinput/mouse_icon/";
 } // namespace
 
 class PointerDrawingManagerExTest : public testing::Test {
@@ -78,6 +80,7 @@ public:
     }
     static void SetUpTestCase(void)
     {
+        DecompressToDisk(DEF_MOUSE_ICONS_DAT_PATH, "/data/service/el1/public/multimodalinput/mouse_icon/");
         rsUIContext_ = GetRSUIContext(0);
     }
     static void TearDownTestCase(void)
@@ -406,18 +409,18 @@ HWTEST_F(PointerDrawingManagerExTest, InputWindowsManagerTest_UpdateIconPath_01,
 {
     CALL_TEST_DEBUG;
     CursorDrawingInformation::GetInstance().mouseIcons_[DEFAULT] =
-        {0, "/system/etc/multimodalinput/mouse_icon/default_icon.svg"};
+        {0, "/data/service/el1/public/multimodalinput/mouse_icon/default_icon.svg"};
     CursorDrawingInformation::GetInstance().mouseIcons_[EAST] =
-        {1, "/system/etc/multimodalinput/mouse_icon/east_icon.png"};
+        {1, "/data/service/el1/public/multimodalinput/mouse_icon/east_icon.png"};
     CursorDrawingInformation::GetInstance().mouseIcons_[WEST] =
-        {2, "/system/etc/multimodalinput/mouse_icon/west_icon.png"};
+        {2, "/data/service/el1/public/multimodalinput/mouse_icon/west_icon.png"};
     CursorDrawingInformation::GetInstance().mouseIcons_[SOUTH] =
-        {3, "/system/etc/multimodalinput/mouse_icon/south_icon.png"};
+        {3, "/data/service/el1/public/multimodalinput/mouse_icon/south_icon.png"};
     CursorDrawingInformation::GetInstance().mouseIcons_[NORTH] =
-        {4, "/system/etc/multimodalinput/mouse_icon/north_icon.png"};
+        {4, "/data/service/el1/public/multimodalinput/mouse_icon/north_icon.png"};
 
     MOUSE_ICON mouseStyle = EAST;
-    std::string iconPath = ("/system/etc/multimodalinput/mouse_icon/Loading_Left.svg");
+    std::string iconPath = ("/data/service/el1/public/multimodalinput/mouse_icon/Loading_Left.svg");
     ASSERT_NO_FATAL_FAILURE(CursorDrawingInformation::GetInstance().UpdateIconPath(mouseStyle, iconPath));
 }
 
@@ -431,18 +434,18 @@ HWTEST_F(PointerDrawingManagerExTest, InputWindowsManagerTest_UpdateIconPath_02,
 {
     CALL_TEST_DEBUG;
     CursorDrawingInformation::GetInstance().mouseIcons_[DEFAULT] =
-        {0, "/system/etc/multimodalinput/mouse_icon/default_icon.svg"};
+        {0, "/data/service/el1/public/multimodalinput/mouse_icon/default_icon.svg"};
     CursorDrawingInformation::GetInstance().mouseIcons_[EAST] =
-        {1, "/system/etc/multimodalinput/mouse_icon/east_icon.png"};
+        {1, "/data/service/el1/public/multimodalinput/mouse_icon/east_icon.png"};
     CursorDrawingInformation::GetInstance().mouseIcons_[WEST] =
-        {2, "/system/etc/multimodalinput/mouse_icon/west_icon.png"};
+        {2, "/data/service/el1/public/multimodalinput/mouse_icon/west_icon.png"};
     CursorDrawingInformation::GetInstance().mouseIcons_[SOUTH] =
-        {3, "/system/etc/multimodalinput/mouse_icon/south_icon.png"};
+        {3, "/data/service/el1/public/multimodalinput/mouse_icon/south_icon.png"};
     CursorDrawingInformation::GetInstance().mouseIcons_[NORTH] =
-        {4, "/system/etc/multimodalinput/mouse_icon/north_icon.png"};
+        {4, "/data/service/el1/public/multimodalinput/mouse_icon/north_icon.png"};
 
     MOUSE_ICON mouseStyle = WEST_EAST;
-    std::string iconPath = ("/system/etc/multimodalinput/mouse_icon/Loading_Left.svg");
+    std::string iconPath = ("/data/service/el1/public/multimodalinput/mouse_icon/Loading_Left.svg");
     ASSERT_NO_FATAL_FAILURE(CursorDrawingInformation::GetInstance().UpdateIconPath(mouseStyle, iconPath));
 }
 
@@ -1135,7 +1138,7 @@ HWTEST_F(PointerDrawingManagerExTest, InputWindowsManagerTest_SetCustomCursor_00
 {
     CALL_TEST_DEBUG;
     PointerDrawingManager pointerDrawingManager;
-    const std::string iconPath = "/system/etc/multimodalinput/mouse_icon/North_South.svg";
+    const std::string iconPath = "/data/service/el1/public/multimodalinput/mouse_icon/North_South.svg";
     std::unique_ptr<OHOS::Media::PixelMap> pixelMap = SetMouseIconTest(iconPath);
     ASSERT_NE(pixelMap, nullptr);
     int32_t pid = -1;
@@ -1876,7 +1879,32 @@ HWTEST_F(PointerDrawingManagerExTest, PointerDrawingManagerExTest_RenderAndMoveO
     pointerDrawMgr.currentMouseStyle_.id = MOUSE_ICON::DEFAULT;
     pointerDrawMgr.mouseStylePending_.store(1);
     ASSERT_NO_FATAL_FAILURE(pointerDrawMgr.RenderAndMoveOnVsync(0, 0, 0));
+    pointerDrawMgr.mouseStylePending_.store(1);
+    ASSERT_NO_FATAL_FAILURE(pointerDrawMgr.RenderAndMoveOnVsync(0, 0, 0, false));
     pointerDrawMgr.mouseStylePending_.store(0);
+    ASSERT_NO_FATAL_FAILURE(pointerDrawMgr.RenderAndMoveOnVsync(0, 0, 0));
+}
+
+/**
+@tc.name: PointerDrawingManagerExTest_RenderAndMoveOnVsync_002
+@tc.desc: Test the function RenderAndMoveOnVsync
+@tc.type: FUNC
+@tc.require:
+*/
+HWTEST_F(PointerDrawingManagerExTest, PointerDrawingManagerExTest_RenderAndMoveOnVsync_002,
+    TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerDrawingManager pointerDrawMgr;
+    PointerStyle style;
+    pointerDrawMgr.mouseDisplayState_ = true;
+    pointerDrawMgr.currentMouseStyle_ = style;
+    pointerDrawMgr.currentMouseStyle_.id = MOUSE_ICON::DEFAULT;
+    pointerDrawMgr.mouseStylePending_.store(0);
+    pointerDrawMgr.lastRenderDisplayId_.store(0);
+    ASSERT_NO_FATAL_FAILURE(pointerDrawMgr.RenderAndMoveOnVsync(0, 0, 0));
+    pointerDrawMgr.mouseStylePending_.store(0);
+    pointerDrawMgr.lastRenderDisplayId_.store(1);
     ASSERT_NO_FATAL_FAILURE(pointerDrawMgr.RenderAndMoveOnVsync(0, 0, 0));
 }
 
@@ -2104,6 +2132,8 @@ HWTEST_F(PointerDrawingManagerExTest, PointerDrawingManagerExTest_RA_HasCoords00
     pointerDrawMgr.resample_.keepResample_ = 2;
     ret = pointerDrawMgr.resample_.HasCoords();
     EXPECT_EQ(ret, true);
+    ret = pointerDrawMgr.resample_.HasCoords(false);
+    EXPECT_EQ(ret, false);
     pointerDrawMgr.resample_.keepResample_ = 0;
     ret = pointerDrawMgr.resample_.HasCoords();
     EXPECT_EQ(ret, false);

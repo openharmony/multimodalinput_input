@@ -16,6 +16,7 @@
 #ifndef POINTER_DRAWING_MANAGER_H
 #define POINTER_DRAWING_MANAGER_H
 
+#include <unordered_set>
 #include "transaction/rs_transaction.h"
 #include "transaction/rs_interfaces.h"
 
@@ -95,7 +96,7 @@ public:
     ResampleAlgorithm() = default;
     ~ResampleAlgorithm() = default;
     void AddPoint(int32_t physicalX, int32_t physicalY, uint64_t displayId);
-    bool HasCoords();
+    bool HasCoords(bool isResample = true);
     bool GetResampledPoint(int32_t &outX, int32_t &outY, uint64_t &displayId, uint64_t timestamp);
 private:
     bool CheckDifferentDisplayId();
@@ -118,7 +119,7 @@ public:
     void DrawPointer(uint64_t rsId, int32_t physicalX, int32_t physicalY,
         const PointerStyle pointerStyle, Direction direction) override;
     void UpdateDisplayInfo(const OLD::DisplayInfo& displayInfo) override;
-    void OnDisplayInfo(const OLD::DisplayGroupInfo& displayGroupInfo) override;
+    void OnDisplayInfo(const OLD::DisplayGroupInfo& displayGroupInfo, bool isDisplayChanged = false) override;
     void OnWindowInfo(const WinInfo &info) override;
     void UpdatePointerDevice(bool hasPointerDevice, bool isPointerVisible, bool isHotPlug) override;
     bool Init() override;
@@ -247,9 +248,9 @@ private:
     void SoftCursorRenderThreadLoop();
     void MoveRetryThreadLoop();
     int32_t RequestNextVSync();
-    void RenderAndMoveOnVsync(int32_t x, int32_t y, uint64_t displayId);
+    void RenderAndMoveOnVsync(int32_t x, int32_t y, uint64_t displayId, bool isBlur = true);
     void OnVsync(uint64_t timestamp);
-    void PostTask(std::function<void()> task);
+    void PostTask(std::function<void()> task, int64_t offset = 0);
     void PostSoftCursorTask(std::function<void()> task);
     void PostMoveRetryTask(std::function<void()> task);
     int32_t FlushBuffer();
@@ -273,18 +274,24 @@ private:
     std::pair<ScreenPointersIter, bool> UpdateScreenPointer(uint64_t screenId,
         std::shared_ptr<ScreenPointer> screenPointer);
     bool DeleteScreenPointer(uint64_t screenId);
-    void ClearScreenPointer();
     void ClearDisappearedScreenPointer(const std::set<uint64_t> &screenIds);
     void CreateRenderConfig(RenderConfig& cfg, std::shared_ptr<ScreenPointer> sp, MOUSE_ICON mouseStyle, bool isHard,
-        int32_t x, int32_t y, uint64_t screenId);
-    Direction CalculateRenderDirection(bool isHard);
+        int32_t x, int32_t y, uint64_t screenId, bool isBlur = true);
+    Direction CalculateRenderDirection(bool isHard, std::shared_ptr<ScreenPointer> sp);
     void SoftwareCursorRender(MOUSE_ICON mouseStyle, int32_t x, int32_t y, uint64_t displayId);
-    void HardwareCursorRender(MOUSE_ICON mouseStyle, int32_t x, int32_t y, uint64_t displayId);
+    void HardwareCursorRender(MOUSE_ICON mouseStyle, int32_t x, int32_t y, uint64_t displayId, bool isBlur = true);
     void SoftwareCursorMove(uint64_t displayId, int32_t x, int32_t y);
     void SoftwareCursorMoveAsync(uint64_t displayId, int32_t x, int32_t y);
-    void MoveRetryAsync(uint64_t displayId, int32_t x, int32_t y);
+    void MoveRetryAsync(uint64_t displayId, int32_t x, int32_t y,
+        const std::unordered_set<uint64_t>& failedScreens);
     void ResetMoveRetryTimer();
-    int32_t HardwareCursorMove(uint64_t displayId, int32_t x, int32_t y);
+    void HardwareCursorMoveAsync(uint64_t displayId, int32_t x, int32_t y);
+    int32_t HardwareCursorMoveInner(uint64_t displayId, int32_t x, int32_t y,
+        std::unordered_set<uint64_t>& failedScreens);
+    int32_t HardwareCursorMoveRetry(uint64_t displayId, int32_t x, int32_t y,
+        const std::unordered_set<uint64_t>& failedScreens, std::unordered_set<uint64_t>& stillFailedScreens);
+    std::unordered_set<uint64_t> GetMoveRetryFailedScreens();
+    void SetMoveRetryFailedScreens(const std::unordered_set<uint64_t> &failedScreens);
     void HideHardwareCursors();
     int32_t GetMainScreenDisplayInfo(const OLD::DisplayGroupInfo &displayGroupInfo,
         OLD::DisplayInfo &mainScreenDisplayInfo) const;
@@ -317,6 +324,7 @@ private:
     void InitPointerThread();
     void DestroyPointerWindowOfHardCursor();
     void DestroyPointerWindowOfSoftCursor();
+    void ScalePixelMap(Media::PixelMap* pixelMap, float xScale, float yScale);
 private:
     bool hasDisplay_ { false };
     bool hasPointerDevice_ { false };
@@ -376,6 +384,8 @@ private:
     std::atomic<int32_t> moveRetryTimerId_ { -1 };
     std::atomic<int32_t> moveRetryCount_ { 0 };
     std::atomic<bool> moveRetryActive_ { false };
+    std::unordered_set<uint64_t> moveRetryFailedScreens_;
+    std::mutex moveRetryFailedScreensMutex_;
     float hardwareCanvasSize_ { HARDWARE_CANVAS_SIZE };
 #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
     std::shared_ptr<OHOS::Media::PixelMap> pixelMap_ { nullptr };
@@ -400,6 +410,7 @@ private:
     std::atomic<uint64_t> workerThreadId_ { 0 };
     std::atomic<bool> vsyncStart_ { false };
     std::atomic<int32_t> mouseStylePending_ { 0 };
+    std::atomic<uint64_t> lastRenderDisplayId_ { 0 };
     ResampleAlgorithm resample_;
     bool currentCursorBlurEnabled_ { true };
     bool lastCursorBlurEnabled_ { true };

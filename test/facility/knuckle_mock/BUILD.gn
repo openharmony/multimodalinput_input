@@ -41,6 +41,7 @@ ohos_source_set("knuckle_mock") {
 
   external_deps = [
     "googletest:gmock_main",
+    "ipc:ipc_single",
   ]
 
   part_name = "${mmi_part_name}"

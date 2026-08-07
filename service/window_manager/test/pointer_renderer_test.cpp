@@ -16,9 +16,11 @@
 #include <fstream>
 #include <gtest/gtest.h>
 
+#include "config_multimodal.h"
 #include "image_source.h"
 #include "mmi_log.h"
 #include "pointer_renderer.h"
+#include "resource_decompress.h"
 
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "PointerRendererTest"
@@ -34,7 +36,10 @@ using namespace testing::ext;
 } // namespace
 class PointerRendererTest : public testing::Test {
 public:
-    static void SetUpTestCase(void) {};
+    static void SetUpTestCase(void)
+    {
+        DecompressToDisk(DEF_MOUSE_ICONS_DAT_PATH, "/data/service/el1/public/multimodalinput/mouse_icon/");
+    };
     static void TearDownTestCase(void) {};
     void SetUp(void) {};
 };
@@ -187,7 +192,7 @@ HWTEST_F(PointerRendererTest, PointerRendererTest_Render_002, TestSize.Level1)
     uint8_t addr[800] = {10};
     config.style_ = MOUSE_ICON::AECH_DEVELOPER_DEFINED_ICON;
 
-    std::string imagePath = "/system/etc/multimodalinput/mouse_icon/Default.svg";
+    std::string imagePath = "/data/service/el1/public/multimodalinput/mouse_icon/Default.svg";
     OHOS::Media::SourceOptions opts;
     uint32_t ret = 0;
     auto imageSource = OHOS::Media::ImageSource::CreateImageSource(imagePath, opts, ret);
@@ -615,7 +620,7 @@ HWTEST_F(PointerRendererTest, PointerRendererTest_LoadPointerToCache_001, TestSi
 {
     CALL_TEST_DEBUG;
     PointerRenderer renderer;
-    const std::string path = "/system/etc/multimodalinput/mouse_icon/";
+    const std::string path = "/data/service/el1/public/multimodalinput/mouse_icon/";
     EXPECT_TRUE(renderer.mouseIcons_.empty());
     std::map<MOUSE_ICON, IconStyle> mouseIcons = {};
     renderer.LoadPointerToCache(mouseIcons);
@@ -640,7 +645,7 @@ HWTEST_F(PointerRendererTest, PointerRendererTest_GetPointerFromCache_001, TestS
     RenderConfig config;
     std::string svgContent;
     config.style_ = MOUSE_ICON::DEFAULT;
-    config.path_ = "/system/etc/multimodalinput/mouse_icon/Default.svg";
+    config.path_ = "/data/service/el1/public/multimodalinput/mouse_icon/Default.svg";
     EXPECT_TRUE(renderer.mouseIcons_.empty());
     bool ret = renderer.GetPointerFromCache(config, svgContent);
     EXPECT_EQ(ret, true);
@@ -855,7 +860,7 @@ HWTEST_F(PointerRendererTest, PointerRendererTest_DrawImage_002, TestSize.Level1
     OHOS::Rosen::Drawing::Canvas canvas;
     RenderConfig config;
     config.style_ = MOUSE_ICON::LOADING;
-    config.path_ = "/system/etc/multimodalinput/mouse_icon/Default.svg";
+    config.path_ = "/data/service/el1/public/multimodalinput/mouse_icon/Default.svg";
     int32_t ret = renderer.DrawImage(canvas, config);
     EXPECT_EQ(ret, RET_OK);
 
@@ -908,7 +913,7 @@ HWTEST_F(PointerRendererTest, PointerRendererTest_LoadCursorSvgWithColor_002, Te
     CALL_TEST_DEBUG;
     RenderConfig config;
     PointerRenderer renderer;
-    config.path_ = "/system/etc/multimodalinput/mouse_icon/Default.svg";
+    config.path_ = "/data/service/el1/public/multimodalinput/mouse_icon/Default.svg";
     config.style_ = MOUSE_ICON::CURSOR_COPY;
     config.color = MAX_POINTER_COLOR;
     pixelmap_ptr_t ret = renderer.LoadCursorSvgWithColor(config);
@@ -930,7 +935,7 @@ HWTEST_F(PointerRendererTest, PointerRendererTest_LoadCursorSvgWithColor_003, Te
     CALL_TEST_DEBUG;
     RenderConfig config;
     PointerRenderer renderer;
-    config.path_ = "/system/etc/multimodalinput/mouse_icon/Default.svg";
+    config.path_ = "/data/service/el1/public/multimodalinput/mouse_icon/Default.svg";
 
     config.style_ = MOUSE_ICON::DEFAULT;
     config.color = MIN_POINTER_COLOR;

@@ -83,7 +83,6 @@ private:
     bool WhetherDiscardTouchEvent(std::shared_ptr<PointerEvent> event);
 
     Point CalcClusterCenter(const std::map<int32_t, Point> &points) const;
-    Point CalcGravityCenter(std::map<int32_t, Point> &map);
     float CalcTwoPointsDistance(const Point &p1, const Point &p2) const;
     void CalcAndStoreDistance();
     int32_t CalcMultiFingerMovement(std::map<int32_t, Point> &map);

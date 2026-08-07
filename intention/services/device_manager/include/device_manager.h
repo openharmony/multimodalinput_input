@@ -22,10 +22,10 @@
 #include <string>
 #include <unordered_map>
 
-#include "enumerator.h"
-#include "epoll_manager.h"
 #include "i_context.h"
 #include "i_device_mgr.h"
+#include "enumerator.h"
+#include "epoll_manager.h"
 #include "monitor.h"
 #include "nocopyable.h"
 

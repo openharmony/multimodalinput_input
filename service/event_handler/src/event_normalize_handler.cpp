@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2025 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -80,7 +80,20 @@ constexpr int32_t PHONE_PRODUCT_DEVICE_ID { 4261 };
 constexpr int64_t FREETOUCH_GES_BLOCK_THRETHOLD { MS2US(800) };
 constexpr uint32_t TOUCHPAD_FEATURE_SWIPEINWARD { 1 << 3 };
 #endif // OHOS_BUILD_ENABLE_TOUCHPAD
+constexpr int64_t PLUGIN_TIME_THRESHOLD { MS2US(3000) };
 const std::string TOUCHPAD_TYPE = OHOS::system::GetParameter("const.settings.clickpad_type", "0");
+
+void LogNonFrequentPointerEvent(const std::shared_ptr<PointerEvent>& pointerEvent, const char* scenario)
+{
+    auto pointerAc = pointerEvent->GetPointerAction();
+    if (pointerAc != PointerEvent::POINTER_ACTION_MOVE &&
+        pointerAc != PointerEvent::POINTER_ACTION_AXIS_UPDATE &&
+        pointerAc != PointerEvent::POINTER_ACTION_ROTATE_UPDATE &&
+        pointerAc != PointerEvent::POINTER_ACTION_PULL_MOVE) {
+        MMI_HILOG_FREEZEI("Injected %{public}s event under lock dropped, pointerAc:%{public}d, PI:%{public}d",
+            scenario, pointerAc, pointerEvent->GetPointerId());
+    }
+}
 #ifdef OHOS_BUILD_ENABLE_TOUCHPAD
 double g_touchPadDeviceWidth { 1 }; // physic size
 double g_touchPadDeviceHeight { 1 };
@@ -377,7 +390,6 @@ int32_t EventNormalizeHandler::OnEventDeviceAdded(libinput_event *event)
     KeyRepeat->AddDeviceConfig(device);
 
     KeyEventHdr->SyncLedStateFromKeyEvent(device);
-
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     KeyEventHdr->ResetKeyEvent(device);
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
@@ -436,22 +448,22 @@ void EventNormalizeHandler::HandlePointerEvent(const std::shared_ptr<PointerEven
             pointerEvent->GetPointerAction(), pointerEvent->GetPointerId(), pointerEvent->GetSourceType(),
             pointerEvent->GetButtonId(), pointerEvent->GetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_VERTICAL),
             pointerEvent->GetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_HORIZONTAL));
-        if (!EventLogHelper::IsBetaVersion()) {
-            MMI_HILOGI("MouseEvent Item Normalization Results, IsPressed:%{public}d, Pressure:%{public}f"
-                       ", Device:%{public}d",
-                static_cast<int32_t>(item.IsPressed()), item.GetPressure(), item.GetDeviceId());
-        } else {
-            MMI_HILOGI("MouseEvent Item Normalization Results, DownTime:%{public}" PRId64 ", IsPressed:%{public}d,"
-                "DisplayX:%{private}d, DisplayY:%{private}d, WindowX:%{private}d, WindowY:%{private}d,"
-                "Width:%{public}d, Height:%{public}d, Pressure:%{public}f, MoveFlag:%{public}d, Device:%{public}d",
-                item.GetDownTime(), static_cast<int32_t>(item.IsPressed()), item.GetDisplayX(), item.GetDisplayY(),
-                item.GetWindowX(), item.GetWindowY(), item.GetWidth(), item.GetHeight(), item.GetPressure(),
-                item.GetMoveFlag(), item.GetDeviceId());
-        }
+        MMI_HILOGI("MouseEvent Item Normalization Results, DownTime:%{public}" PRId64 ", IsPressed:%{public}d,"
+            "DisplayX:%{private}d, DisplayY:%{private}d, WindowX:%{private}d, WindowY:%{private}d,"
+            "Width:%{public}d, Height:%{public}d, Pressure:%{public}f, MoveFlag:%{public}d, Device:%{public}d",
+            item.GetDownTime(), static_cast<int32_t>(item.IsPressed()), item.GetDisplayX(), item.GetDisplayY(),
+            item.GetWindowX(), item.GetWindowY(), item.GetWidth(), item.GetHeight(), item.GetPressure(),
+            item.GetMoveFlag(), item.GetDeviceId());
     }
     if (pointerEvent->GetSourceType() != PointerEvent::SOURCE_TYPE_TOUCHPAD ||
         pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_TOUCHPAD_ACTIVE) {
         WIN_MGR->UpdateTargetPointer(pointerEvent);
+    }
+    if (pointerEvent->HasFlag(InputEvent::EVENT_FLAG_INJECT_UNDER_LOCK) &&
+        !WIN_MGR->IsWindowInjectableUnderLock(pointerEvent->GetTargetWindowId(),
+            pointerEvent->GetTargetDisplayId())) {
+        LogNonFrequentPointerEvent(pointerEvent, "pointer");
+        return;
     }
     if (IsAccessibilityEventWithZOrder(pointerEvent)) {
         BypassChainAndDispatchDirectly(pointerEvent);
@@ -471,6 +483,12 @@ void EventNormalizeHandler::HandleTouchEvent(const std::shared_ptr<PointerEvent>
     DfxHisysevent::GetDispStartTime();
     CHKPV(pointerEvent);
     WIN_MGR->UpdateTargetPointer(pointerEvent);
+    if (pointerEvent->HasFlag(InputEvent::EVENT_FLAG_INJECT_UNDER_LOCK) &&
+        !WIN_MGR->IsWindowInjectableUnderLock(pointerEvent->GetTargetWindowId(),
+            pointerEvent->GetTargetDisplayId())) {
+        LogNonFrequentPointerEvent(pointerEvent, "touch");
+        return;
+    }
     BytraceAdapter::StartTouchEvent(pointerEvent->GetId());
     PointerEvent::PointerItem item;
     if (!pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), item)) {
@@ -562,7 +580,13 @@ void EventNormalizeHandler::UpdateKeyEventHandlerChain(const std::shared_ptr<Key
     CHKPV(keyEvent);
     MMI_HILOGD("Handle event (KC:%{private}d, KA:%{public}d, KEYS:%{private}s)",
         keyEvent->GetKeyCode(), keyEvent->GetKeyAction(), DumpVec(keyEvent->GetPressedKeys()).c_str());
+    WIN_MGR->ApplyBoundDisplayId(keyEvent);
     WIN_MGR->HandleKeyEventWindowId(keyEvent);
+    if (keyEvent->HasFlag(InputEvent::EVENT_FLAG_INJECT_UNDER_LOCK) &&
+        !WIN_MGR->IsWindowInjectableUnderLock(keyEvent->GetTargetWindowId(), keyEvent->GetTargetDisplayId())) {
+        MMI_HILOG_FREEZEI("Injected key event under lock dropped, focus window not injectable");
+        return;
+    }
     currentHandleKeyCode_ = keyEvent->GetKeyCode();
 
     int32_t currentShieldMode = KeyEventHdr->GetCurrentShieldMode();
@@ -664,7 +688,19 @@ bool EventNormalizeHandler::AfterInputEventNormalized(const std::shared_ptr<Poin
     }
     auto pData = std::make_shared<IPluginData>();
     pData->stage = InputPluginStage::INPUT_AFTER_NORMALIZED;
+    int64_t startTime = GetSysClockTime();
+    MMI_HILOGD("Plugin processing start, startTime:%{public}" PRId64 "", startTime);
     int32_t result = manager->HandleEvent(pointerEvent, pData);
+    int64_t endTime = GetSysClockTime();
+    int64_t costTime = endTime - startTime;
+    MMI_HILOGD("Plugin processing end, endTime:%{public}" PRId64 ", costTime:%{public}" PRId64 " (us)",
+        endTime, costTime);
+    if (costTime > PLUGIN_TIME_THRESHOLD) {
+        MMI_HILOGW("Plugin processing overtime! costTime:%{public}" PRId64 " (us), threshold:%{public}" PRId64 " (us),"
+            " pointerId:%{public}d, action:%{public}d, sourceType:%{public}d",
+            costTime, PLUGIN_TIME_THRESHOLD, pointerEvent->GetPointerId(),
+            pointerEvent->GetPointerAction(), pointerEvent->GetSourceType());
+    }
     if (result != RET_DO) {
         nextHandler_->HandlePointerEvent(pointerEvent);
     }
@@ -987,6 +1023,7 @@ int32_t EventNormalizeHandler::HandleJoystickButtonEvent(libinput_event *event)
     BytraceAdapter::StartBytrace(keyEvent);
     EventStatistic::PushKeyEvent(keyEvent);
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
+    WIN_MGR->ApplyBoundDisplayId(keyEvent);
     nextHandler_->HandleKeyEvent(keyEvent);
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
     return RET_OK;
@@ -1010,6 +1047,7 @@ int32_t EventNormalizeHandler::HandleJoystickAxisEvent(libinput_event *event)
         BytraceAdapter::StartBytrace(keyEvent);
         EventStatistic::PushKeyEvent(keyEvent);
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
+        WIN_MGR->ApplyBoundDisplayId(keyEvent);
         nextHandler_->HandleKeyEvent(keyEvent);
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
     });
@@ -1158,7 +1196,7 @@ void EventNormalizeHandler::HandleSwitchEvent(const std::shared_ptr<SwitchEvent>
 
 void EventNormalizeHandler::RestoreTouchPadStatus()
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
 #ifdef OHOS_BUILD_ENABLE_TOUCHPAD
     auto ids = INPUT_DEV_MGR->GetTouchPadIds();
     for (auto id : ids) {
@@ -1229,6 +1267,9 @@ bool EventNormalizeHandler::JudgeIfSwipeInward(std::shared_ptr<PointerEvent> poi
     if (!TOUCHPAD_MGR->SupportSwipeInward()) {
         return false;
     }
+    if (GetSysClockTime() - g_lastKeyboardEventTime < FREETOUCH_GES_BLOCK_THRETHOLD && g_isSwipeInward == false) {
+        return false;
+    }
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHPAD);
     pointerEvent->SetFingerCount(SWIPE_INWARD_FINGER_ONE);
     if (g_isSwipeInward == false &&
@@ -1237,9 +1278,7 @@ bool EventNormalizeHandler::JudgeIfSwipeInward(std::shared_ptr<PointerEvent> poi
         auto touchPadDevice = libinput_event_get_device(event);
         // product isolation
         uint32_t touchPadDeviceId = libinput_device_get_id_product(touchPadDevice);
-        if (touchPadDeviceId != TABLET_PRODUCT_DEVICE_ID && touchPadDeviceId != BLE_PRODUCT_DEVICE_ID &&
-            touchPadDeviceId != PHONE_PRODUCT_DEVICE_ID &&
-            (std::stoul(TOUCHPAD_TYPE) & TOUCHPAD_FEATURE_SWIPEINWARD) != TOUCHPAD_FEATURE_SWIPEINWARD) {
+        if (IsSwipeInwardProductIsolated(touchPadDeviceId)) {
             return g_isSwipeInward;
         }
         // get touchpad physic size
@@ -1269,6 +1308,19 @@ bool EventNormalizeHandler::JudgeIfSwipeInward(std::shared_ptr<PointerEvent> poi
         SwipeInwardButtonJudge(pointerEvent);
     }
     return g_isSwipeInward;
+}
+
+bool EventNormalizeHandler::IsSwipeInwardProductIsolated(uint32_t touchPadDeviceId)
+{
+    if (touchPadDeviceId == TABLET_PRODUCT_DEVICE_ID ||
+        touchPadDeviceId == BLE_PRODUCT_DEVICE_ID ||
+        touchPadDeviceId == PHONE_PRODUCT_DEVICE_ID) {
+        return false;
+    }
+    if (!IsNumeric(TOUCHPAD_TYPE)) {
+        return false;
+    }
+    return (std::stoul(TOUCHPAD_TYPE) & TOUCHPAD_FEATURE_SWIPEINWARD) != TOUCHPAD_FEATURE_SWIPEINWARD;
 }
 
 void EventNormalizeHandler::SwipeInwardButtonJudge(std::shared_ptr<PointerEvent> pointerEvent)

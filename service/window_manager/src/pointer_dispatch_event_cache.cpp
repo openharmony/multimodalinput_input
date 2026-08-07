@@ -37,10 +37,9 @@ void PointerDispatchEventCache::Update(const std::shared_ptr<PointerEvent>& poin
     lastTouchEvent_ = pointerEvent;
 }
 
-std::shared_ptr<PointerEvent> PointerDispatchEventCache::GetForDispatch(int32_t pointerAction) const
+std::shared_ptr<PointerEvent> PointerDispatchEventCache::GetForDispatch(int32_t toolType) const
 {
-    if (pointerAction == PointerEvent::POINTER_ACTION_LEVITATE_IN_WINDOW ||
-        pointerAction == PointerEvent::POINTER_ACTION_LEVITATE_OUT_WINDOW) {
+    if (toolType == PointerEvent::TOOL_TYPE_PEN || toolType == PointerEvent::TOOL_TYPE_PENCIL) {
         return lastStylusEvent_;
     }
     return lastTouchEvent_;

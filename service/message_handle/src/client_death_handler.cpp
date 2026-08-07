@@ -109,10 +109,12 @@ bool ClientDeathHandler::AddClientPid(const sptr<IRemoteObject> &binderClientSrv
     CHKPF(binderClientSrv);
     std::lock_guard<std::mutex> lockPidMap(mutexPidMap_);
     auto it = clientPidMap_.find(pid);
-    if (it == clientPidMap_.end()) {
-        MMI_HILOGI("Insert Death recipient pid:%{public}d has existed", pid);
+    if (it != clientPidMap_.end()) {
+        MMI_HILOGI("Update Death recipient pid:%{public}d has existed", pid);
+        it->second = binderClientSrv;
+    } else {
+        clientPidMap_.insert(std::make_pair(pid, binderClientSrv));
     }
-    clientPidMap_.insert(std::make_pair(pid, binderClientSrv));
     return true;
 }
 

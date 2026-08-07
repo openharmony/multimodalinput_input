@@ -37,6 +37,8 @@ enum TaiheErrorCode : int32_t {
     COMMON_DEVICE_NOT_EXIST = 3900001,
     COMMON_KEYBOARD_DEVICE_NOT_EXIST = 3900002,
     COMMON_NON_INPUT_APPLICATION = 3900003,
+    COMMON_DISPLAY_NOT_EXIST = 3900004,
+    COMMON_UNSUPPORTED_DEVICE = 3900005,
     PRE_KEY_NOT_SUPPORTED = 4100001,
     INPUT_OCCUPIED_BY_SYSTEM = 4200002,
     INPUT_OCCUPIED_BY_OTHER = 4200003,
@@ -66,6 +68,10 @@ const std::map<int32_t, TaiheError> TAIHE_ERRORS = {
     { ERROR_CODE_STATE_ERROR, { ERROR_CODE_STATE_ERROR, "Invalid input event sequence." } },
     { CONTROLLER_DISPLAY_NOT_EXIST, { CONTROLLER_DISPLAY_NOT_EXIST,
         "The display does not exist." } },
+    { COMMON_DISPLAY_NOT_EXIST, { COMMON_DISPLAY_NOT_EXIST,
+        "The specified display does not exist." } },
+    { COMMON_UNSUPPORTED_DEVICE, { COMMON_UNSUPPORTED_DEVICE,
+        "Unsupported input device." } },
 };
 
 class TaiheConverter {

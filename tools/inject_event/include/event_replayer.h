@@ -33,15 +33,15 @@ public:
     static bool ParseInputLine(const std::string& line, uint32_t& deviceId, struct input_event& evt);
 
 private:
-    bool SeekToDevicesSection(std::ifstream& inputFile);
-    bool SeekToEventsSection(std::ifstream& inputFile);
-    bool ProcessDeviceLines(std::ifstream& inputFile,
-        std::map<uint32_t, std::unique_ptr<InputDevice>>& outputDevices, uint32_t deviceCount);
+    void ApplyEventDelay(const struct input_event& currentEvent);
     bool InitializeOutputDevices(std::ifstream& inputFile,
         std::map<uint32_t, std::unique_ptr<InputDevice>>& outputDevices);
+    bool ProcessDeviceLines(std::ifstream& inputFile,
+        std::map<uint32_t, std::unique_ptr<InputDevice>>& outputDevices, uint32_t deviceCount);
     bool ReplayEvents(std::ifstream& inputFile,
         const std::map<uint32_t, std::unique_ptr<InputDevice>>& outputDevices);
-    void ApplyEventDelay(const struct input_event& currentEvent);
+    bool SeekToDevicesSection(std::ifstream& inputFile);
+    bool SeekToEventsSection(std::ifstream& inputFile);
 
     std::string inputPath_;
     std::unordered_map<uint32_t, std::vector<input_event>> deviceEventBuffers_;

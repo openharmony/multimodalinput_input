@@ -15,20 +15,17 @@
 
 #include "input_manager_command.h"
 
-#include <getopt.h>
-
 #include <fcntl.h>
-
+#include <getopt.h>
 #include <iostream>
-
-#include "string_ex.h"
 
 #include "event_log_helper.h"
 #include "hos_key_event.h"
 #include "input_manager.h"
+#include "pixel_map.h"
 #include "product_name_definition.h"
 #include "product_type_parser.h"
-#include "pixel_map.h"
+#include "string_ex.h"
 
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "InputManagerCommand"
@@ -137,7 +134,7 @@ const std::map<int32_t, KeyUnicode> KEY_UNICODE_TRANSFORMATION = {
     { HOS_KEY_9,                { 0x0039, 0x0028 } },
     { HOS_KEY_GRAVE,            { 0x0060, 0x007E } },
     { HOS_KEY_MINUS,            { 0x002D, 0x005F } },
-    { HOS_KEY_EQUALS,           { 0x002B, 0x003D } },
+    { HOS_KEY_EQUALS,           { 0x003D, 0x002B } },
     { HOS_KEY_LEFT_BRACKET,     { 0x005B, 0x007B } },
     { HOS_KEY_RIGHT_BRACKET,    { 0x005D, 0x007D } },
     { HOS_KEY_BACKSLASH,        { 0x005C, 0x007C } },
@@ -157,7 +154,7 @@ const std::map<int32_t, KeyUnicode> KEY_UNICODE_TRANSFORMATION = {
     { HOS_KEY_NUMPAD_8,         { 0x0038, 0x0000 } },
     { HOS_KEY_NUMPAD_9,         { 0x0039, 0x0000 } },
     { HOS_KEY_NUMPAD_DIVIDE,    { 0x002F, 0x0000 } },
-    { HOS_KEY_NUMPAD_MULTIPLY,  { 0x0038, 0x0000 } },
+    { HOS_KEY_NUMPAD_MULTIPLY,  { 0x002A, 0x0000 } },
     { HOS_KEY_NUMPAD_SUBTRACT,  { 0x002D, 0x0000 } },
     { HOS_KEY_NUMPAD_ADD,       { 0x002B, 0x0000 } },
     { HOS_KEY_NUMPAD_DOT,       { 0x002E, 0x0000 } }
@@ -257,6 +254,20 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
     };
     int32_t c = 0;
     int32_t optionIndex = 0;
+    for (int32_t i = 1; i < argc - 1; i++) {
+        std::string arg = argv[i];
+        if ((arg == "-D" || arg == "--display") && i + 1 < argc) {
+            if (!StrToInt(argv[i + 1], targetDisplayId_) || targetDisplayId_ < 0) {
+                std::cout << "invalid displayId" << std::endl;
+                return RET_ERR;
+            }
+            for (int32_t j = i; j + 2 <= argc; j++) {
+                argv[j] = argv[j + 2];
+            }
+            argc -= 2;
+            break;
+        }
+    }
     optind = 0;
     if ((c = getopt_long(argc, argv, "JKMPST?", headOptions, &optionIndex)) != -1) {
         switch (c) {
@@ -268,7 +279,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
 
                 int32_t ppx = 0;
                 int32_t ppy = 0;
-                auto simulateMouseEvent = [&ppx, &ppy](std::shared_ptr<PointerEvent> pointerEvent) {
+                auto simulateMouseEvent = [this, &ppx, &ppy](std::shared_ptr<PointerEvent> pointerEvent) {
                     PointerEvent::PointerItem item;
                     pointerEvent->GetPointerItem(0, item);
                     item.SetToolType(PointerEvent::TOOL_TYPE_MOUSE);
@@ -279,6 +290,9 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                     pointerEvent->UpdatePointerItem(0, item);
                     ppx = x;
                     ppy = y;
+                    if (targetDisplayId_ >= 0) {
+                        pointerEvent->SetTargetDisplayId(targetDisplayId_);
+                    }
                     return InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
                 };
                 while ((c = getopt_long(argc, argv, "m:d:u:c:b:s:g:i:", mouseSensorOptions, &optionIndex)) != -1) {
@@ -834,6 +848,9 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                     item[i].SetPressed(true);
                                     KeyEvent->AddKeyItem(item[i]);
                                 }
+                                if (targetDisplayId_ >= 0) {
+                                    KeyEvent->SetTargetDisplayId(targetDisplayId_);
+                                }
                                 InputManager::GetInstance()->SimulateInputEvent(KeyEvent);
                                 break;
                             }
@@ -849,6 +866,9 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                             item1.SetUnicode(KeyCodeToUnicode(keyCode));
                             item1.SetDownTime(time);
                             KeyEvent->AddKeyItem(item1);
+                            if (targetDisplayId_ >= 0) {
+                                KeyEvent->SetTargetDisplayId(targetDisplayId_);
+                            }
                             InputManager::GetInstance()->SimulateInputEvent(KeyEvent);
                             isCombinationKey = optind;
                             break;
@@ -872,6 +892,9 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                 item1.SetUnicode(KeyCodeToUnicode(keyCode));
                                 item1.SetDownTime(time);
                                 KeyEvent->AddKeyItem(item1);
+                                if (targetDisplayId_ >= 0) {
+                                    KeyEvent->SetTargetDisplayId(targetDisplayId_);
+                                }
                                 InputManager::GetInstance()->SimulateInputEvent(KeyEvent);
                                 iter = downKey.erase(iter);
                                 break;
@@ -932,12 +955,18 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                 return RET_ERR;
                             }
                             keyEventTemp->AddKeyItem(item);
+                            if (targetDisplayId_ >= 0) {
+                                keyEventTemp->SetTargetDisplayId(targetDisplayId_);
+                            }
                             InputManager::GetInstance()->SimulateInputEvent(keyEventTemp);
                             std::this_thread::sleep_for(std::chrono::milliseconds(pressTimeMs));
 
                             keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP);
                             item.SetPressed(false);
                             keyEvent->AddKeyItem(item);
+                            if (targetDisplayId_ >= 0) {
+                                keyEvent->SetTargetDisplayId(targetDisplayId_);
+                            }
                             InputManager::GetInstance()->SimulateInputEvent(keyEvent);
                             break;
                         }
@@ -999,14 +1028,12 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                             keyEventTemp->AddKeyItem(item);
                             keyEventTemp->SetRepeat(true);
                             std::string isRepeat = keyEventTemp->IsRepeat() ? "true" : "false";
-                            if (!EventLogHelper::IsBetaVersion()) {
-                                MMI_HILOGI("KeyAction:%{public}s, IsRepeat:%{public}s",
-                                    KeyEvent::ActionToString(keyEventTemp->GetKeyAction()), isRepeat.c_str());
-                            } else {
-                                MMI_HILOGI("KeyCode:%{private}d, ActionTime:%{public}" PRId64
-                                    ",KeyAction:%{public}s, IsRepeat:%{public}s",
-                                    keyEventTemp->GetKeyCode(), keyEventTemp->GetActionTime(),
-                                    KeyEvent::ActionToString(keyEventTemp->GetKeyAction()), isRepeat.c_str());
+                            MMI_HILOGI("KeyCode:%{private}d, ActionTime:%{public}" PRId64
+                                ",KeyAction:%{public}s, IsRepeat:%{public}s",
+                                keyEventTemp->GetKeyCode(), keyEventTemp->GetActionTime(),
+                                KeyEvent::ActionToString(keyEventTemp->GetKeyAction()), isRepeat.c_str());
+                            if (targetDisplayId_ >= 0) {
+                                keyEventTemp->SetTargetDisplayId(targetDisplayId_);
                             }
                             InputManager::GetInstance()->SimulateInputEvent(keyEventTemp);
                             std::this_thread::sleep_for(std::chrono::milliseconds(pressTimeMs));
@@ -1018,14 +1045,12 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                             keyEvent->SetActionTime(time);
                             keyEvent->SetRepeat(true);
                             isRepeat = keyEvent->IsRepeat() ? "true" : "false";
-                            if (!OHOS::MMI::EventLogHelper::IsBetaVersion()) {
-                                MMI_HILOGI("KeyAction:%{public}s, IsRepeat:%{public}s",
-                                    KeyEvent::ActionToString(keyEvent->GetKeyAction()), isRepeat.c_str());
-                            } else {
-                                MMI_HILOGI("KeyCode:%{private}d, ActionTime:%{public}" PRId64
-                                    ",KeyAction:%{public}s, IsRepeat:%{public}s",
-                                    keyEvent->GetKeyCode(), keyEvent->GetActionTime(),
-                                    KeyEvent::ActionToString(keyEvent->GetKeyAction()), isRepeat.c_str());
+                            MMI_HILOGI("KeyCode:%{private}d, ActionTime:%{public}" PRId64
+                                ",KeyAction:%{public}s, IsRepeat:%{public}s",
+                                keyEvent->GetKeyCode(), keyEvent->GetActionTime(),
+                                KeyEvent::ActionToString(keyEvent->GetKeyAction()), isRepeat.c_str());
+                            if (targetDisplayId_ >= 0) {
+                                keyEvent->SetTargetDisplayId(targetDisplayId_);
                             }
                             InputManager::GetInstance()->SimulateInputEvent(keyEvent);
                             break;
@@ -1217,6 +1242,9 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                 item.SetPointerId(DEFAULT_POINTER_ID_FIRST + i);
                                 pointerEvent->AddPointerItem(item);
                                 pointerEvent->SetPointerId(DEFAULT_POINTER_ID_FIRST + i);
+                                if (targetDisplayId_ >= 0) {
+                                    pointerEvent->SetTargetDisplayId(targetDisplayId_);
+                                }
                                 InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
                                 isFoldPC_ = SYS_PRODUCT_TYPE == DEVICE_TYPE_FOLD_PC;
                                 if (isFoldPC_) {
@@ -1262,6 +1290,9 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                     pointerEvent->UpdatePointerItem(pointerId, item);
                                     pointerEvent->SetPointerId(pointerId);
                                     pointerEvent->SetActionTime(currentTimeMs * TIME_TRANSITION);
+                                    if (targetDisplayId_ >= 0) {
+                                        pointerEvent->SetTargetDisplayId(targetDisplayId_);
+                                    }
                                     InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
                                     isFoldPC_ = SYS_PRODUCT_TYPE == DEVICE_TYPE_FOLD_PC;
                                     if (isFoldPC_) {
@@ -1289,6 +1320,9 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                 pointerEvent->UpdatePointerItem(pointerId, item);
                                 pointerEvent->SetPointerId(pointerId);
                                 pointerEvent->SetActionTime(currentTimeMs * TIME_TRANSITION);
+                                if (targetDisplayId_ >= 0) {
+                                    pointerEvent->SetTargetDisplayId(targetDisplayId_);
+                                }
                                 InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
                                 isFoldPC_ = SYS_PRODUCT_TYPE == DEVICE_TYPE_FOLD_PC;
                                 if (isFoldPC_) {
@@ -1319,6 +1353,9 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                         pointerEvent->UpdatePointerItem(pointerId, item);
                                         pointerEvent->SetPointerId(pointerId);
                                         pointerEvent->SetActionTime(currentTimeMs * TIME_TRANSITION);
+                                        if (targetDisplayId_ >= 0) {
+                                            pointerEvent->SetTargetDisplayId(targetDisplayId_);
+                                        }
                                         InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
                                         isFoldPC_ = SYS_PRODUCT_TYPE == DEVICE_TYPE_FOLD_PC;
                                         if (isFoldPC_) {
@@ -1344,6 +1381,9 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                 }
                                 pointerEvent->UpdatePointerItem(pointerId, item);
                                 pointerEvent->SetPointerId(pointerId);
+                                if (targetDisplayId_ >= 0) {
+                                    pointerEvent->SetTargetDisplayId(targetDisplayId_);
+                                }
                                 InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
                                 isFoldPC_ = SYS_PRODUCT_TYPE == DEVICE_TYPE_FOLD_PC;
                                 if (isFoldPC_) {
@@ -1379,6 +1419,9 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                             pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
                             pointerEvent->AddPointerItem(item);
                             pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+                            if (targetDisplayId_ >= 0) {
+                                pointerEvent->SetTargetDisplayId(targetDisplayId_);
+                            }
                             InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
                             optind++;
                             break;
@@ -1409,6 +1452,9 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                             pointerEvent->AddPointerItem(item);
                             pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
                             pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
+                            if (targetDisplayId_ >= 0) {
+                                pointerEvent->SetTargetDisplayId(targetDisplayId_);
+                            }
                             InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
                             optind++;
                             break;
@@ -1459,6 +1505,9 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                             pointerEvent->AddPointerItem(item);
                             pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
                             pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+                            if (targetDisplayId_ >= 0) {
+                                pointerEvent->SetTargetDisplayId(targetDisplayId_);
+                            }
                             InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
                             std::this_thread::sleep_for(std::chrono::milliseconds(intervalTimeMs));
 
@@ -1469,6 +1518,9 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                             item.SetRawDisplayX(px1);
                             pointerEvent->UpdatePointerItem(DEFAULT_POINTER_ID_FIRST, item);
                             pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
+                            if (targetDisplayId_ >= 0) {
+                                pointerEvent->SetTargetDisplayId(targetDisplayId_);
+                            }
                             InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
                             break;
                         }
@@ -1556,6 +1608,9 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                             pointerEvent->SetPointerId(DEFAULT_POINTER_ID_FIRST);
                             pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
                             pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+                            if (targetDisplayId_ >= 0) {
+                                pointerEvent->SetTargetDisplayId(targetDisplayId_);
+                            }
                             InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
                             const int32_t conversionRate = 1000;
                             int64_t startTimeMs = GetSysClockTime() / conversionRate;
@@ -1580,6 +1635,9 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                     pointerEvent->UpdatePointerItem(DEFAULT_POINTER_ID_FIRST, item);
                                     pointerEvent->SetActionTime(currentTimeMs * TIME_TRANSITION);
                                     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
+                                    if (targetDisplayId_ >= 0) {
+                                        pointerEvent->SetTargetDisplayId(targetDisplayId_);
+                                    }
                                     InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
                                 }
                                 std::this_thread::sleep_for(std::chrono::milliseconds(BLOCK_TIME_MS));
@@ -1593,6 +1651,9 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                             pointerEvent->UpdatePointerItem(DEFAULT_POINTER_ID_FIRST, item);
                             pointerEvent->SetActionTime(endTimeMs * TIME_TRANSITION);
                             pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
+                            if (targetDisplayId_ >= 0) {
+                                pointerEvent->SetTargetDisplayId(targetDisplayId_);
+                            }
                             InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
                             break;
                         }
@@ -1712,6 +1773,9 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                 }
                 auto pointerEvent = PointerEvent::Create();
                 if (pointerEvent != nullptr) {
+                    if (targetDisplayId_ >= 0) {
+                        pointerEvent->SetTargetDisplayId(targetDisplayId_);
+                    }
                     if (optind < argc) {
                         std::cout << "non-option argv elements: ";
                         while (optind < argc) {
@@ -1745,6 +1809,9 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                             pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_DOWN);
                             pointerEvent->SetButtonPressed(it.second.buttonId);
                             pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_JOYSTICK);
+                            if (targetDisplayId_ >= 0) {
+                                pointerEvent->SetTargetDisplayId(targetDisplayId_);
+                            }
                             InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
 
                             pointerEvent->SetButtonPressed(it.second.buttonId);
@@ -1760,6 +1827,9 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                         }
                         pointerEvent->SetPointerId(0);
                         pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_JOYSTICK);
+                        if (targetDisplayId_ >= 0) {
+                            pointerEvent->SetTargetDisplayId(targetDisplayId_);
+                        }
                         InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
                     }
                 }
@@ -1936,6 +2006,9 @@ int32_t InputManagerCommand::PrintKeyboardTextChar(int32_t keyCode, bool isPress
         item.SetKeyCode(KeyEvent::KEYCODE_SHIFT_LEFT);
         item.SetPressed(true);
         keyEvent->AddKeyItem(item);
+        if (targetDisplayId_ >= 0) {
+            keyEvent->SetTargetDisplayId(targetDisplayId_);
+        }
         InputManager::GetInstance()->SimulateInputEvent(keyEvent);
     }
 
@@ -1944,6 +2017,9 @@ int32_t InputManagerCommand::PrintKeyboardTextChar(int32_t keyCode, bool isPress
     item.SetKeyCode(keyCode);
     item.SetPressed(true);
     keyEvent->AddKeyItem(item);
+    if (targetDisplayId_ >= 0) {
+        keyEvent->SetTargetDisplayId(targetDisplayId_);
+    }
     InputManager::GetInstance()->SimulateInputEvent(keyEvent);
 
     std::this_thread::sleep_for(std::chrono::milliseconds(SLEEPTIME));
@@ -1951,6 +2027,9 @@ int32_t InputManagerCommand::PrintKeyboardTextChar(int32_t keyCode, bool isPress
     keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP);
     item.SetPressed(false);
     keyEvent->AddKeyItem(item);
+    if (targetDisplayId_ >= 0) {
+        keyEvent->SetTargetDisplayId(targetDisplayId_);
+    }
     InputManager::GetInstance()->SimulateInputEvent(keyEvent);
 
     if (isPressShift) {
@@ -1959,6 +2038,9 @@ int32_t InputManagerCommand::PrintKeyboardTextChar(int32_t keyCode, bool isPress
         item.SetKeyCode(KeyEvent::KEYCODE_SHIFT_LEFT);
         item.SetPressed(false);
         keyEvent->AddKeyItem(item);
+        if (targetDisplayId_ >= 0) {
+            keyEvent->SetTargetDisplayId(targetDisplayId_);
+        }
         InputManager::GetInstance()->SimulateInputEvent(keyEvent);
     }
     return RET_OK;
@@ -2160,6 +2242,9 @@ int32_t InputManagerCommand::SingleKnuckleClickEvent(int32_t downX, int32_t down
     pointerEvent->AddPointerItem(item);
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+    if (targetDisplayId_ >= 0) {
+        pointerEvent->SetTargetDisplayId(targetDisplayId_);
+    }
     InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
 
     item.SetPressed(false);
@@ -2170,6 +2255,9 @@ int32_t InputManagerCommand::SingleKnuckleClickEvent(int32_t downX, int32_t down
     item.SetToolType(PointerEvent::TOOL_TYPE_KNUCKLE);
     pointerEvent->UpdatePointerItem(0, item);
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
+    if (targetDisplayId_ >= 0) {
+        pointerEvent->SetTargetDisplayId(targetDisplayId_);
+    }
     InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
     return ERR_OK;
 }
@@ -2191,6 +2279,9 @@ int32_t InputManagerCommand::DoubleKnuckleClickEvent(int32_t downX, int32_t down
     pointerEvent->AddPointerItem(item);
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+    if (targetDisplayId_ >= 0) {
+        pointerEvent->SetTargetDisplayId(targetDisplayId_);
+    }
     InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
 
     item2.SetPointerId(1);
@@ -2202,6 +2293,9 @@ int32_t InputManagerCommand::DoubleKnuckleClickEvent(int32_t downX, int32_t down
     item2.SetPressed(true);
     pointerEvent->SetPointerId(1);
     pointerEvent->AddPointerItem(item2);
+    if (targetDisplayId_ >= 0) {
+        pointerEvent->SetTargetDisplayId(targetDisplayId_);
+    }
     InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
 
     auto upEvent0 = PointerEvent::Create();
@@ -2218,6 +2312,9 @@ int32_t InputManagerCommand::DoubleKnuckleClickEvent(int32_t downX, int32_t down
     upEvent0->SetPointerId(0);
     upEvent0->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
     upEvent0->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+    if (targetDisplayId_ >= 0) {
+        upEvent0->SetTargetDisplayId(targetDisplayId_);
+    }
     InputManager::GetInstance()->SimulateInputEvent(upEvent0);
 
     auto upEvent1 = PointerEvent::Create();
@@ -2232,6 +2329,9 @@ int32_t InputManagerCommand::DoubleKnuckleClickEvent(int32_t downX, int32_t down
     upEvent1->SetPointerId(1);
     upEvent1->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
     upEvent1->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+    if (targetDisplayId_ >= 0) {
+        upEvent1->SetTargetDisplayId(targetDisplayId_);
+    }
     InputManager::GetInstance()->SimulateInputEvent(upEvent1);
     return ERR_OK;
 }
@@ -2303,6 +2403,9 @@ int32_t InputManagerCommand::ProcessRotateGesture(int32_t argc, char *argv[])
         item.SetPointerId(0);
         pointerEvent->AddPointerItem(item);
         pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHPAD);
+        if (targetDisplayId_ >= 0) {
+            pointerEvent->SetTargetDisplayId(targetDisplayId_);
+        }
         InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
     } else {
         std::cout << "Invalid angle data,Input parameter example: uinput - P - r 45" << std::endl;
@@ -2389,6 +2492,9 @@ int32_t InputManagerCommand::SwipeActionEvent(int32_t startX, int32_t startY, in
         pointerEvent->AddPointerItem(item);
         pointerEvent->AddPointerItem(item);
         std::this_thread::sleep_for(std::chrono::microseconds(SLEEPTIME));
+        if (targetDisplayId_ >= 0) {
+            pointerEvent->SetTargetDisplayId(targetDisplayId_);
+        }
         InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
     }
     return ERR_OK;
@@ -2484,6 +2590,9 @@ int32_t InputManagerCommand::ActionPinchEvent(int32_t centerX, int32_t centerY, 
         itemFirst.SetToolType(PointerEvent::TOOL_TYPE_TOUCHPAD);
         pointerEvent->AddPointerItem(itemFirst);
         pointerEvent->SetPointerId(0);
+        if (targetDisplayId_ >= 0) {
+            pointerEvent->SetTargetDisplayId(targetDisplayId_);
+        }
         InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
         std::this_thread::sleep_for(std::chrono::microseconds(SLEEPTIME * timesForSleep));
     }
@@ -2502,6 +2611,9 @@ void InputManagerCommand::SendTouchDownForPinch(int32_t topX, int32_t topY, int3
     FillPointerItem(itemFirst, topX, topY, itemId, true);
     itemFirst.SetToolType(PointerEvent::TOOL_TYPE_MOUSE);
     pointerEvent->AddPointerItem(itemFirst);
+    if (targetDisplayId_ >= 0) {
+        pointerEvent->SetTargetDisplayId(targetDisplayId_);
+    }
     InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
     std::this_thread::sleep_for(std::chrono::microseconds(SLEEPTIME));
     pointerEvent = CreateEvent(0, PointerEvent::POINTER_ACTION_DOWN, 0,
@@ -2513,6 +2625,9 @@ void InputManagerCommand::SendTouchDownForPinch(int32_t topX, int32_t topY, int3
     FillPointerItem(itemSecond, bottomX, bottomY, itemId, true);
     pointerEvent->AddPointerItem(itemFirst);
     pointerEvent->AddPointerItem(itemSecond);
+    if (targetDisplayId_ >= 0) {
+        pointerEvent->SetTargetDisplayId(targetDisplayId_);
+    }
     InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
 }
 
@@ -2648,6 +2763,9 @@ void InputManagerCommand::PrintEnableKeyStatusRecordUsage()
 void InputManagerCommand::ShowUsage()
 {
     std::cout << "Usage: uinput <option> <command> <arg>..." << std::endl;
+    std::cout << "-D <displayId>  --display <displayId>  -inject event to target display (optional, before device option)" << std::endl;
+    std::cout << "example: uinput -D 0 -M -m 100 200" << std::endl;
+    std::cout << std::endl;
     std::cout << "The option are:                                " << std::endl;
     std::cout << "-K  --keyboard                                                " << std::endl;
     std::cout << "commands for keyboard:                                        " << std::endl;

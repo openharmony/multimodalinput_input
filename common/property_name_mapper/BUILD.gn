@@ -53,6 +53,7 @@ ohos_shared_library("mmi_property_name_mapper") {
     "cJSON:cjson",
     "hilog:libhilog",
     "ipc:ipc_single",
+    "libinput:libinput-third-mmi",
     "preferences:native_preferences",
   ]
 
@@ -95,6 +96,7 @@ ohos_source_set("property_name_mapper") {
     "c_utils:utils",
     "hilog:libhilog",
     "ipc:ipc_single",
+    "libinput:libinput-third-mmi",
     "preferences:native_preferences",
   ]
 

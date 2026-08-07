@@ -319,6 +319,9 @@ bool InputEventHandler::IsTouchpadTapMistouch(libinput_event* event)
         if (libinput_device_get_size(touchpadDevice, &touchpadSizeX, &touchpadSizeY) != 0) {
             return false;
         }
+        if (touchpadSizeX < TOUCHPAD_MIN_X_SIZE_FOR_DWT) {
+            return false;
+        }
         double coordX = touchpadEventDownAbsX_;
         if (isDwtEdgeAreaForTouchpadTapActing_ &&
             (coordX <= TOUCHPAD_EDGE_WIDTH_FOR_TAP || coordX >= touchpadSizeX - TOUCHPAD_EDGE_WIDTH_FOR_TAP)) {
@@ -505,7 +508,7 @@ std::shared_ptr<EventPreMonitorHandler> InputEventHandler::GetEventPreMonitorHan
 
 int32_t InputEventHandler::SetMoveEventFilters(bool flag)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
 #ifdef OHOS_BUILD_ENABLE_MOVE_EVENT_FILTERS
     CHKPR(eventNormalizeHandler_, INVALID_HANDLER_ID);
     return eventNormalizeHandler_->SetMoveEventFilters(flag);
@@ -520,9 +523,11 @@ std::shared_ptr<InputActiveSubscriberHandler> InputEventHandler::GetInputActiveS
     return inputActiveSubscriberHandler_;
 }
 
+#ifdef OHOS_BUILD_ENABLE_INPUT_EVENT_HOOK
 std::shared_ptr<InputEventHookManager> InputEventHandler::GetInputEventHook() const
 {
     return inputEventHookMgr_;
 }
+#endif // OHOS_BUILD_ENABLE_INPUT_EVENT_HOOK
 } // namespace MMI
 } // namespace OHOS

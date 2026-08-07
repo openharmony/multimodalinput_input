@@ -1540,6 +1540,105 @@ void JsEventTarget::EmitJsSetInputDeviceEnabled(sptr<JsUtil::CallbackInfo> cb, i
     }
 }
 
+void JsEventTarget::EmitJsBindToDisplay(sptr<JsUtil::CallbackInfo> cb, int32_t errCode)
+{
+    CALL_DEBUG_ENTER;
+    if (cb == nullptr) {
+        MMI_HILOGE("cb is nullptr");
+        return;
+    }
+    if (cb->env == nullptr) {
+        MMI_HILOGE("cb->env is nullptr");
+        return;
+    }
+    cb->errCode = abs(errCode);
+    uv_loop_s *loop = nullptr;
+    if (napi_get_uv_event_loop(cb->env, &loop) != napi_ok) {
+        MMI_HILOGE("GET_UV_EVENT_LOOP failed");
+        return;
+    }
+
+    uv_work_t *work = new (std::nothrow) uv_work_t;
+    if (work == nullptr) {
+        MMI_HILOGE("work is nullptr");
+        return;
+    }
+    cb->IncStrongRef(nullptr);
+    work->data = cb.GetRefPtr();
+    int32_t ret = -1;
+    if (cb->ref == nullptr) {
+        ret = uv_queue_work_with_qos_internal(
+            loop, work,
+            [](uv_work_t *work) {
+                MMI_HILOGD("uv_queue_work callback function is called");
+            },
+            CallBindToDisplayPromise, uv_qos_user_initiated, "bindToDisplay");
+    }
+    if (ret != 0) {
+        MMI_HILOGE("uv_queue_work_with_qos failed");
+        JsUtil::DeletePtr<uv_work_t *>(work);
+        cb->DecStrongRef(nullptr);
+    }
+}
+
+void JsEventTarget::ResolveOrRejectBindToDisplay(sptr<JsUtil::CallbackInfo> cb)
+{
+    napi_value result = nullptr;
+    if (cb->errCode == RET_OK) {
+        if (napi_get_undefined(cb->env, &result) != napi_ok) {
+            MMI_HILOGE("GET_UNDEFINED failed");
+            return;
+        }
+        if (napi_resolve_deferred(cb->env, cb->deferred, result) != napi_ok) {
+            MMI_HILOGE("RESOLVE_DEFERRED failed");
+        }
+        return;
+    }
+    NapiError codeMsg;
+    UtilNapiError::GetErrorCodeOrDefault(cb->errCode, codeMsg);
+    if (cb->histogramError) {
+        cb->histogramError(codeMsg.errorCode);
+    }
+    result = GreateBusinessError(cb->env, codeMsg.errorCode, codeMsg.msg);
+    if (result == nullptr) {
+        MMI_HILOGE("GreateBusinessError failed");
+        napi_value undefined = nullptr;
+        napi_get_undefined(cb->env, &undefined);
+        napi_reject_deferred(cb->env, cb->deferred, undefined);
+        return;
+    }
+    if (napi_reject_deferred(cb->env, cb->deferred, result) != napi_ok) {
+        MMI_HILOGE("Reject deferred failed");
+    }
+}
+
+void JsEventTarget::CallBindToDisplayPromise(uv_work_t *work, int32_t status)
+{
+    CALL_DEBUG_ENTER;
+    if (work == nullptr || work->data == nullptr) {
+        if (work != nullptr) {
+            JsUtil::DeletePtr<uv_work_t *>(work);
+        }
+        MMI_HILOGE("work or work->data is nullptr");
+        return;
+    }
+    sptr<JsUtil::CallbackInfo> cb(static_cast<JsUtil::CallbackInfo *>(work->data));
+    JsUtil::DeletePtr<uv_work_t *>(work);
+    cb->DecStrongRef(nullptr);
+    if (cb->env == nullptr) {
+        MMI_HILOGE("cb->env is nullptr");
+        return;
+    }
+    napi_handle_scope scope = nullptr;
+    napi_open_handle_scope(cb->env, &scope);
+    if (scope == nullptr) {
+        MMI_HILOGE("scope is nullptr");
+        return;
+    }
+    ResolveOrRejectBindToDisplay(cb);
+    napi_close_handle_scope(cb->env, scope);
+}
+
 void JsEventTarget::EmitJsSetFunctionKeyState(sptr<JsUtil::CallbackInfo> cb, int32_t funcKey, bool state)
 {
     CALL_DEBUG_ENTER;

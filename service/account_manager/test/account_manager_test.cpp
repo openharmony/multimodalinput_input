@@ -20,6 +20,7 @@
 #include "account_manager.h"
 #include "key_event.h"
 #include "mmi_log.h"
+#include "multimodal_input_plugin_manager.h"
 #include "want.h"
 
 #undef MMI_LOG_TAG
@@ -1964,5 +1965,6 @@ HWTEST_F(AccountManagerTest, AccountManagerTest_AccountSetting_Destructor_03, Te
     accountSetting.reset();
     EXPECT_TRUE(true);
 }
+
 } // namespace MMI
 } // namespace OHOS

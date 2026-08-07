@@ -298,6 +298,10 @@ int32_t libinput_event_touch_get_tool_type(struct libinput_event_touch *event);
 
 int libinput_device_touch_btn_tool_type_down(struct libinput_device *device, int32_t btnToolType);
 
+double libinput_event_touch_get_x(struct libinput_event_touch *event);
+
+double libinput_event_touch_get_y(struct libinput_event_touch *event);
+
 double libinput_event_touch_get_x_transformed(struct libinput_event_touch *event, uint32_t width);
 
 double libinput_event_touch_get_y_transformed(struct libinput_event_touch *event, uint32_t height);

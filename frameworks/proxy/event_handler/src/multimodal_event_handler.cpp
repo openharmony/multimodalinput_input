@@ -21,7 +21,9 @@
 #include "config_policy_utils.h"
 
 #include "event_log_helper.h"
+#ifdef OHOS_BUILD_ENABLE_INPUT_EVENT_HOOK
 #include "input_event_hook_handler.h"
+#endif // OHOS_BUILD_ENABLE_INPUT_EVENT_HOOK
 #include "input_manager_impl.h"
 #ifdef OHOS_BUILD_ENABLE_KEY_HOOK
 #include "key_event_hook_handler.h"
@@ -72,7 +74,9 @@ void OnConnected(const IfMMIClient& client)
 #ifdef OHOS_BUILD_ENABLE_KEY_HOOK
     KEY_EVENT_HOOK_HANDLER.OnConnected();
 #endif // OHOS_BUILD_ENABLE_KEY_HOOK
+#ifdef OHOS_BUILD_ENABLE_INPUT_EVENT_HOOK
     INPUT_EVENT_HOOK_HANDLER.OnConnected();
+#endif // OHOS_BUILD_ENABLE_INPUT_EVENT_HOOK
     LONG_PRESS_EVENT_SUBSCRIBE_MGR.OnConnected();
 }
 
@@ -135,9 +139,7 @@ int32_t MultimodalEventHandler::InjectEvent(const std::shared_ptr<KeyEvent> keyE
     EndLogTraceId(keyEvent->GetId());
     LogTracer lt(keyEvent->GetId(), keyEvent->GetEventType(), keyEvent->GetKeyAction());
     if (keyEvent->GetKeyCode() < 0) {
-        if (EventLogHelper::IsBetaVersion()) {
-            MMI_HILOGE("KeyCode is invalid:%{private}u", keyEvent->GetKeyCode());
-        }
+        MMI_HILOGE("KeyCode is invalid");
         return RET_ERR;
     }
     CHKPR(MULTIMODAL_INPUT_CONNECT_MGR, RET_ERR);

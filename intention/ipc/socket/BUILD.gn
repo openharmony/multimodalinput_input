@@ -13,8 +13,57 @@
 
 import("../../../device_status.gni")
 
+config("intention_socket_connection_public_config") {
+  include_dirs = [ "include" ]
+}
+
 config("intention_socket_server_public_config") {
   include_dirs = [ "include" ]
+}
+
+config("intention_socket_session_manager_public_config") {
+  include_dirs = [ "include" ]
+}
+
+ohos_source_set("intention_socket_connection") {
+  sanitize = {
+    integer_overflow = true
+    ubsan = true
+    boundary_sanitize = true
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
+
+  branch_protector_ret = "pac_ret"
+
+  defines = device_status_default_defines
+
+  include_dirs = [ "include" ]
+
+  sources = [
+    "src/socket_client.cpp",
+    "src/socket_connection.cpp",
+    "src/socket_params.cpp",
+  ]
+
+  public_configs = [ ":intention_socket_connection_public_config" ]
+
+  deps = [
+    "${device_status_root_path}/intention/common/epoll:intention_epoll",
+    "${device_status_root_path}/intention/prototype:intention_prototype",
+    "${device_status_root_path}/utils/common:devicestatus_util",
+    "${device_status_root_path}/utils/ipc:devicestatus_ipc",
+  ]
+
+  external_deps = [
+    "c_utils:utils",
+    "eventhandler:libeventhandler",
+    "hilog:libhilog",
+  ]
+
+  subsystem_name = "${device_status_subsystem_name}"
+  part_name = "${device_status_part_name}"
 }
 
 ohos_source_set("intention_socket_server") {
@@ -58,10 +107,6 @@ ohos_source_set("intention_socket_server") {
   part_name = "${device_status_part_name}"
 }
 
-config("intention_socket_session_manager_public_config") {
-  include_dirs = [ "include" ]
-}
-
 ohos_source_set("intention_socket_session_manager") {
   sanitize = {
     integer_overflow = true
@@ -99,51 +144,6 @@ ohos_source_set("intention_socket_session_manager") {
     "image_framework:image_native",
     "input:libmmi-client",
     "samgr:samgr_proxy",
-  ]
-
-  subsystem_name = "${device_status_subsystem_name}"
-  part_name = "${device_status_part_name}"
-}
-
-config("intention_socket_connection_public_config") {
-  include_dirs = [ "include" ]
-}
-
-ohos_source_set("intention_socket_connection") {
-  sanitize = {
-    integer_overflow = true
-    ubsan = true
-    boundary_sanitize = true
-    cfi = true
-    cfi_cross_dso = true
-    debug = false
-  }
-
-  branch_protector_ret = "pac_ret"
-
-  defines = device_status_default_defines
-
-  include_dirs = [ "include" ]
-
-  sources = [
-    "src/socket_client.cpp",
-    "src/socket_connection.cpp",
-    "src/socket_params.cpp",
-  ]
-
-  public_configs = [ ":intention_socket_connection_public_config" ]
-
-  deps = [
-    "${device_status_root_path}/intention/common/epoll:intention_epoll",
-    "${device_status_root_path}/intention/prototype:intention_prototype",
-    "${device_status_root_path}/utils/common:devicestatus_util",
-    "${device_status_root_path}/utils/ipc:devicestatus_ipc",
-  ]
-
-  external_deps = [
-    "c_utils:utils",
-    "eventhandler:libeventhandler",
-    "hilog:libhilog",
   ]
 
   subsystem_name = "${device_status_subsystem_name}"

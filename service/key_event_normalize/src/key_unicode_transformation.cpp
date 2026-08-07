@@ -72,7 +72,7 @@ const std::map<int32_t, KeyUnicode> KEY_UNICODE_TRANSFORMATION = {
     { HOS_KEY_9,                { 0x0039, 0x0028 } },
     { HOS_KEY_GRAVE,            { 0x0060, 0x007E } },
     { HOS_KEY_MINUS,            { 0x002D, 0x005F } },
-    { HOS_KEY_EQUALS,           { 0x002B, 0x003D } },
+    { HOS_KEY_EQUALS,           { 0x003D, 0x002B } },
     { HOS_KEY_LEFT_BRACKET,     { 0x005B, 0x007B } },
     { HOS_KEY_RIGHT_BRACKET,    { 0x005D, 0x007D } },
     { HOS_KEY_BACKSLASH,        { 0x005C, 0x007C } },
@@ -92,7 +92,7 @@ const std::map<int32_t, KeyUnicode> KEY_UNICODE_TRANSFORMATION = {
     { HOS_KEY_NUMPAD_8,         { 0x0038, 0x0000 } },
     { HOS_KEY_NUMPAD_9,         { 0x0039, 0x0000 } },
     { HOS_KEY_NUMPAD_DIVIDE,    { 0x002F, 0x0000 } },
-    { HOS_KEY_NUMPAD_MULTIPLY,  { 0x0038, 0x0000 } },
+    { HOS_KEY_NUMPAD_MULTIPLY,  { 0x002A, 0x0000 } },
     { HOS_KEY_NUMPAD_SUBTRACT,  { 0x002D, 0x0000 } },
     { HOS_KEY_NUMPAD_ADD,       { 0x002B, 0x0000 } },
     { HOS_KEY_NUMPAD_DOT,       { 0x002E, 0x0000 } }

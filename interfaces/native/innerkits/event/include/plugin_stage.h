@@ -16,6 +16,8 @@
 #ifndef PLUGIN_STAGE_H
 #define PLUGIN_STAGE_H
 
+#include <cstdint>
+
 #include "key_event.h"
 #include "pointer_event.h"
 #include "axis_event.h"
@@ -76,6 +78,7 @@ enum class InputDispatchStage {
     Intercept,
     KeyCommand,
     Monitor,
+    InputActiveSubscriber,
 };
 
 struct LibInputEventData {
@@ -140,7 +143,20 @@ struct IInputPlugin {
     virtual bool HandleSequenceKeys(const std::vector<ISequenceKey> &sequenceKeys) { return false; }
 };
 
+struct PluginDisplayInfo {
+    int32_t displayId { -1 };
+    uint64_t rsId { 0 };
+    int32_t mode { 0 };
+};
+
+struct PluginDisplayGroupInfo {
+    int32_t groupId { -1 };
+    int32_t mainDisplayId { -1 };
+    std::vector<PluginDisplayInfo> displayInfos;
+};
+
 struct IPluginContext {
+    using DisplayChangeCallback = std::function<void()>;
     virtual ~IPluginContext() = default;
     virtual std::string GetName() = 0;
     virtual int32_t GetPriority() = 0;
@@ -151,6 +167,8 @@ struct IPluginContext {
     virtual void DispatchEvent(PluginEventType pluginEvent, int64_t frameTime) = 0;
     virtual void DispatchEvent(PluginEventType pluginEvent, InputDispatchStage stage) = 0;
     virtual void DispatchEvent(NetPacket &pkt, int32_t pid) = 0;
+    virtual void NotifyInputActive(std::shared_ptr<KeyEvent> keyEvent) = 0;
+    virtual void NotifyInputActive(std::shared_ptr<PointerEvent> pointerEvent) = 0;
     virtual PluginResult HandleEvent(libinput_event *event, std::shared_ptr<IPluginData> data) =  0;
     virtual PluginResult HandleEvent(
         std::shared_ptr<PointerEvent> pointerEvent, std::shared_ptr<IPluginData> data) =  0;
@@ -161,7 +179,6 @@ struct IPluginContext {
     virtual bool IsFingerPressed() const = 0;
     virtual const ISessionHandlerCollection *GetMonitorCollection() const = 0;
     virtual int32_t GetFocusedPid() const = 0;
-    virtual bool HasLocalMouseDevice() const = 0;
     virtual bool AttachDeviceObserver(const std::shared_ptr<IDeviceObserver> &observer) = 0;
     virtual bool DetachDeviceObserver(const std::shared_ptr<IDeviceObserver> &observer) = 0;
     virtual int32_t GetCurrentAccountId() const = 0;
@@ -188,6 +205,12 @@ struct IPluginContext {
 #endif
     virtual void AddFlagForDevice(libinput_event *event) = 0;
     virtual void RemoveFlagForDevice(libinput_event *event) = 0;
+    virtual std::vector<PluginDisplayGroupInfo> GetDisplayGroupInfos() const = 0;
+    virtual std::vector<std::shared_ptr<InputDevice>> GetInputDeviceInfos() const = 0;
+    virtual int32_t RegisterDisplayChangeCallback(const DisplayChangeCallback &callback) = 0;
+    virtual bool UnregisterDisplayChangeCallback(int32_t callbackId) = 0;
+    virtual int32_t EnableInputDeviceForPlugin(int32_t deviceId) = 0;
+    virtual int32_t DisableInputDeviceForPlugin(int32_t deviceId) = 0;
 };
 
 inline bool checkPluginEventNull(PluginEventType &event)

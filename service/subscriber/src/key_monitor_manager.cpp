@@ -388,17 +388,13 @@ void KeyMonitorManager::NotifyKeyMonitor(std::shared_ptr<KeyEvent> keyEvent,
         MMI_HILOGE("Failed to notify key monitor");
         return;
     }
-    if (!EventLogHelper::IsBetaVersion()) {
-        MMI_HILOGI("Notify key monitor(PID:%{public}d)", session);
-    } else {
-        MMI_HILOGI("Notify key monitor(KC:%{private}d, KA:%{public}d, PID:%{public}d)",
-            keyEvent->GetKeyCode(), keyEvent->GetKeyAction(), session);
-    }
+    MMI_HILOGI("Notify key monitor(KC:%{private}d, KA:%{public}d, PID:%{public}d)",
+        keyEvent->GetKeyCode(), keyEvent->GetKeyAction(), session);
 }
 
 void KeyMonitorManager::SetMeeTimeSubcriber(bool status, std::string monitorType)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     isMeeTimeSubcriber_ = status;
     auto manager = InputPluginManager::GetInstance();
     CHKPV(manager);

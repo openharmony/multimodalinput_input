@@ -1838,5 +1838,81 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_ExtendedFunctionKey_NullEv
     ASSERT_NO_FATAL_FAILURE(handler.HandleKeyEvent(keyEvent));
 }
 
+/**
+ * @tc.name: KeyCommandHandlerTest_ClearSpecialKeys_001
+ * @tc.desc: Test ClearSpecialKeys clears the special keys set
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_ClearSpecialKeys_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+    handler.context_.specialKeys_.emplace(KeyEvent::KEYCODE_POWER, 1);
+    handler.ClearSpecialKeys();
+    EXPECT_TRUE(handler.context_.specialKeys_.empty());
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_ResetLaunchAbilityCount_001
+ * @tc.desc: Test ResetLaunchAbilityCount resets count to zero
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_ResetLaunchAbilityCount_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+    handler.context_.launchAbilityCount_ = 5;
+    handler.ResetLaunchAbilityCount();
+    EXPECT_EQ(handler.context_.launchAbilityCount_, 0);
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_ClearRepeatKeyCountMap_001
+ * @tc.desc: Test ClearRepeatKeyCountMap clears the repeat key map
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_ClearRepeatKeyCountMap_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+    handler.context_.repeatKeyCountMap_["testKey"] = 10;
+    handler.ClearRepeatKeyCountMap();
+    EXPECT_TRUE(handler.context_.repeatKeyCountMap_.empty());
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_GetRetValue_001
+ * @tc.desc: Test GetRetValue returns the stored ret value
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_GetRetValue_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+    handler.ret_.store(42, std::memory_order_relaxed);
+    EXPECT_EQ(handler.GetRetValue(), 42);
+    handler.ret_.store(0, std::memory_order_relaxed);
+    EXPECT_EQ(handler.GetRetValue(), 0);
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_GetScreenCapturePermission_001
+ * @tc.desc: Test GetScreenCapturePermission returns the permission value
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_GetScreenCapturePermission_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+    handler.screenCapturePermission_ = 1;
+    EXPECT_EQ(handler.GetScreenCapturePermission(), 1u);
+    handler.screenCapturePermission_ = 0;
+    EXPECT_EQ(handler.GetScreenCapturePermission(), 0u);
+}
 } // namespace MMI
 } // namespace OHOS

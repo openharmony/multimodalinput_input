@@ -38,7 +38,7 @@ InputEventHookManager::~InputEventHookManager() {}
 
 int32_t InputEventHookManager::AddInputEventHook(int32_t pid, HookEventType hookEventType)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     Init();
     auto udsServerPtr = InputHandler->GetUDSServer();
     CHKPR(udsServerPtr, RET_ERR);
@@ -64,7 +64,7 @@ int32_t InputEventHookManager::AddInputEventHook(int32_t pid, HookEventType hook
 
 int32_t InputEventHookManager::RemoveInputEventHook(int32_t pid, HookEventType hookEventType)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     if (hookEventType & HOOK_EVENT_TYPE_KEY) {
         RemoveHookByPid(pid, HOOK_EVENT_TYPE_KEY);
     }
@@ -141,7 +141,7 @@ bool InputEventHookManager::IsHooksExisted(HookEventType hookEventType)
 
 void InputEventHookManager::Dump(int32_t fd, const std::vector<std::string> &args)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     mprintf(fd, "Hook information:\t");
     std::shared_lock<std::shared_mutex> lock(rwMutex_);
     for (const auto &[hookType, hooks] : hooks_) {
@@ -165,7 +165,7 @@ void InputEventHookManager::Init()
 
 void InputEventHookManager::InitSessionLostCallback()
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     auto udsServerPtr = InputHandler->GetUDSServer();
     CHKPV(udsServerPtr);
     udsServerPtr->AddSessionDeletedCallback(
@@ -177,7 +177,7 @@ void InputEventHookManager::InitSessionLostCallback()
 
 void InputEventHookManager::OnSessionLost(SessionPtr session)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     CHKPV(session);
     auto pid = session->GetPid();
     RemoveHookByPid(pid, HOOK_EVENT_TYPE_KEY);

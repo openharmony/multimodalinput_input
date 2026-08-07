@@ -177,6 +177,9 @@ ohos_unittest("TouchEventNormalizeTest") {
     "ability_runtime:ability_manager",
     "image_framework:image_native",
     "image_framework:pixelmap",
+    "napi:ace_napi",
+    "node:node_header_notice",
+    "icu:shared_icuuc",
   ]
 }
 
@@ -332,6 +335,7 @@ ohos_unittest("GestureTransformTest") {
     "init:libbegetutil",
     "ipc:ipc_single",
     "napi:ace_napi",
+    "node:node_header_notice",
     "preferences:native_preferences",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
@@ -484,6 +488,7 @@ ohos_unittest("TabletToolTransformTest") {
     "init:libbegetutil",
     "ipc:ipc_single",
     "napi:ace_napi",
+    "node:node_header_notice",
     "preferences:native_preferences",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
@@ -678,6 +683,7 @@ ohos_unittest("TouchTransformProcessorTestWithMock") {
     "init:libbegetutil",
     "ipc:ipc_single",
     "napi:ace_napi",
+    "node:node_header_notice",
     "preferences:native_preferences",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
@@ -842,6 +848,7 @@ ohos_unittest("TouchpadGestureTest") {
     "init:libbegetutil",
     "ipc:ipc_single",
     "napi:ace_napi",
+    "node:node_header_notice",
     "preferences:native_preferences",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
@@ -999,6 +1006,7 @@ ohos_unittest("TouchPadTransformProcessorMockTest") {
     "init:libbegetutil",
     "ipc:ipc_single",
     "napi:ace_napi",
+    "node:node_header_notice",
     "preferences:native_preferences",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
@@ -1083,6 +1091,9 @@ ohos_unittest("TouchGestureAdapterTest") {
     "samgr:samgr_proxy",
     "image_framework:image_native",
     "image_framework:pixelmap",
+    "napi:ace_napi",
+    "node:node_header_notice",
+    "icu:shared_icuuc",
   ]
 
   if (enable_player_framework) {
@@ -1151,6 +1162,9 @@ ohos_unittest("TouchGestureManagerTest") {
     "samgr:samgr_proxy",
     "image_framework:image_native",
     "image_framework:pixelmap",
+    "napi:ace_napi",
+    "node:node_header_notice",
+    "icu:shared_icuuc",
   ]
 
   if (enable_player_framework) {

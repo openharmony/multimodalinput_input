@@ -36,6 +36,7 @@ constexpr int32_t REPEAT_ONCE { 1 };
 constexpr int32_t REPEAT_THIRTY_TIMES { 30 };
 constexpr int32_t REPEAT_COOLING_TIME { 1000 }; // ms
 const std::string SHOW_CURSOR_SWITCH_NAME { "settings.input.show_touch_hint" };
+const std::string SHOW_CURSOR_SWITCH_APP_NAME { "settings.app.show_touch_hint" };
 const std::string POINTER_POSITION_SWITCH_NAME { "settings.developer.show_touch_track" };
 const int32_t ROTATE_POLICY = system::GetIntParameter("const.window.device.rotate_policy", 0);
 const std::string FOLDABLE_DEVICE_POLICY = system::GetParameter("const.window.foldabledevice.rotate_policy", "");
@@ -184,7 +185,9 @@ void TouchDrawingManager::AddUpdateLabelsTimer()
 int32_t TouchDrawingManager::UpdateBubbleData()
 {
     CALL_DEBUG_ENTER;
-    if (bubbleMode_.isShow) {
+    bool isShow = (screenRecondingBubbleStatus_ == "true") ||
+        ((screenRecondingBubbleStatus_ == "") && (bubbleMode_.isShow == true));
+    if (isShow) {
         auto touchDrawingHandler = LoadTouchDrawingHandler();
         if (touchDrawingHandler == nullptr) {
             MMI_HILOGE("Failed to load touch drawing handler");
@@ -218,7 +221,9 @@ void TouchDrawingManager::CreateObserver()
     if (!hasBubbleObserver_) {
         MMI_HILOGI("Setup observer of show-touch-track");
         bubbleMode_.SwitchName = SHOW_CURSOR_SWITCH_NAME;
+        bubbleModeByApp_.SwitchName = SHOW_CURSOR_SWITCH_APP_NAME;
         CreateBubbleObserver(bubbleMode_);
+        CreateBubbleObserverByApp(bubbleModeByApp_);
     }
     if (!hasPointerObserver_) {
         MMI_HILOGI("Setup observer of show-touch-position");
@@ -255,6 +260,37 @@ void TouchDrawingManager::CreateBubbleObserver(T &item)
         return;
     }
     hasBubbleObserver_ = true;
+}
+
+template <class T>
+void TouchDrawingManager::CreateBubbleObserverByApp(T &item)
+{
+    CALL_DEBUG_ENTER;
+    SettingObserver::UpdateFunc updateFunc = [&item, this](const std::string& key) {
+        auto ret = SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID)
+            .GetBoolValue(key, item.isShow);
+        if (ret != RET_OK) {
+            MMI_HILOGI("Get value from setting date fail");
+            screenRecondingBubbleStatus_ = "";
+            return;
+        }
+        if (item.isShow) {
+            screenRecondingBubbleStatus_ = "true";
+        } else {
+            screenRecondingBubbleStatus_ = "false";
+        }
+        CHKPV(delegateProxy_);
+        delegateProxy_->OnPostSyncTask(std::bind(&TouchDrawingManager::UpdateBubbleData, this));
+        MMI_HILOGI("The key:%{public}s, statusValue:%{public}d", key.c_str(), item.isShow);
+    };
+    sptr<SettingObserver> statusObserver = SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID)
+        .CreateObserver(item.SwitchName, updateFunc);
+    ErrCode ret = SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID).
+        RegisterObserver(statusObserver);
+    if (ret != ERR_OK) {
+        MMI_HILOGE("Register setting observer failed, ret:%{public}d", ret);
+        statusObserver = nullptr;
+    }
 }
 
 template <class T>

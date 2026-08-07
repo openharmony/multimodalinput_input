@@ -176,6 +176,14 @@ public:
     static constexpr uint32_t EVENT_FLAG_STYLUS_MOUSE_MODE = 0x00400000;
 
     /**
+     * Flag indicating an injected event permitted to dispatch while the screen is locked.
+     * The event is allowed to enter the dispatch pipeline, but it is dropped unless it
+     * hits a window marked with FLAG_INJECTABLE_UNDER_LOCK.
+     * @since 26
+     */
+    static constexpr uint32_t EVENT_FLAG_INJECT_UNDER_LOCK = 0x00800000;
+
+    /**
      * The multimodal input event for the device to enable the intercom mode flag.
      *
      * @since 21

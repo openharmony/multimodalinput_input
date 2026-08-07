@@ -585,9 +585,12 @@ HWTEST_F(SettingDataMigratorTest, SettingDataMigrator_Integration_003, TestSize.
     SettingDataMigrator& migrator = SettingDataMigrator::GetInstance();
     migrator.Initialize(data);
 
-    migrator.MigratorUserData(TEST_USER_ID_DEFAULT);
-    migrator.MigratorUserData(TEST_USER_ID_SECONDARY);
-    migrator.MigratorUserData(TEST_USER_ID_DEFAULT + 2);
+    bool result1 = migrator.MigratorUserData(TEST_USER_ID_DEFAULT);
+    EXPECT_TRUE(result1);
+    bool result2 = migrator.MigratorUserData(TEST_USER_ID_SECONDARY);
+    EXPECT_TRUE(result2);
+    bool result3 = migrator.MigratorUserData(TEST_USER_ID_DEFAULT + 2);
+    EXPECT_TRUE(result3);
 }
 
 /**
@@ -1544,5 +1547,96 @@ HWTEST_F(SettingDataMigratorTest, SettingDataMigrator_Initialize_014, TestSize.L
     EXPECT_EQ(rightClickType, TOUCHPAD_TWO_FINGER_TAP_OR_RIGHT);
 }
 
+/**
+ * @tc.name: SettingItem_FromJson_True_001
+ * @tc.desc: Test FromJson with boolean true value
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(SettingDataMigratorTest, SettingItem_FromJson_True_001, TestSize.Level1)
+{
+    SettingItem item;
+    std::string jsonStr = "{\"enabled\": true}";
+    EXPECT_TRUE(item.FromJson("testKey", jsonStr));
+    EXPECT_TRUE(item.Contains("enabled"));
+}
+
+/**
+ * @tc.name: SettingItem_FromJson_False_001
+ * @tc.desc: Test FromJson with boolean false value
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(SettingDataMigratorTest, SettingItem_FromJson_False_001, TestSize.Level1)
+{
+    SettingItem item;
+    std::string jsonStr = "{\"enabled\": false}";
+    EXPECT_TRUE(item.FromJson("testKey", jsonStr));
+    EXPECT_TRUE(item.Contains("enabled"));
+}
+
+/**
+ * @tc.name: SettingItem_MergeFrom_Unchanged_001
+ * @tc.desc: Test MergeFrom with same value (no change)
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(SettingDataMigratorTest, SettingItem_MergeFrom_Unchanged_001, TestSize.Level1)
+{
+    SettingItem item1;
+    SettingItem item2;
+    EXPECT_TRUE(item1.FromJson("key", "{\"field\": 42}"));
+    EXPECT_TRUE(item2.FromJson("key", "{\"field\": 42}"));
+    item1.MergeFrom(item2);
+    EXPECT_TRUE(item1.Contains("field"));
+}
+
+/**
+ * @tc.name: SettingData_MergeFrom_Unchanged_001
+ * @tc.desc: Test MergeFrom with identical data returns false
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(SettingDataMigratorTest, SettingData_MergeFrom_Unchanged_001, TestSize.Level1)
+{
+    SettingData data1;
+    SettingData data2;
+    data1.SetField("testKey", "testField", FieldValue(42));
+    data2.SetField("testKey", "testField", FieldValue(42));
+    bool changed = data1.MergeFrom(data2);
+    EXPECT_FALSE(changed);
+}
+
+/**
+ * @tc.name: SettingData_SetField_SameValue_001
+ * @tc.desc: Test SetField with same value returns false
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(SettingDataMigratorTest, SettingData_SetField_SameValue_001, TestSize.Level1)
+{
+    SettingData data;
+    data.SetField("testKey", "testField", FieldValue(42));
+    bool changed = data.SetField("testKey", "testField", FieldValue(42));
+    EXPECT_FALSE(changed);
+    int32_t val = 0;
+    EXPECT_TRUE(data.GetField("testKey", "testField", val));
+    EXPECT_EQ(val, 42);
+}
+
+/**
+ * @tc.name: SettingData_GetVersion_AllLatest_001
+ * @tc.desc: Test GetVersion returns LATEST when all versions are latest
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(SettingDataMigratorTest, SettingData_GetVersion_AllLatest_001, TestSize.Level1)
+{
+    SettingData data;
+    data.SetField(MOUSE_KEY_SETTING, FIELD_VERSION, FieldValue(VERSION_NUMBERS_LATEST));
+    data.SetField(TOUCHPAD_KEY_SETTING, FIELD_VERSION, FieldValue(VERSION_NUMBERS_LATEST));
+    data.SetField(KEYBOARD_KEY_SETTING, FIELD_VERSION, FieldValue(VERSION_NUMBERS_LATEST));
+    EXPECT_EQ(data.GetVersion(), VERSION_NUMBERS_LATEST);
+}
 } // namespace MMI
 } // namespace OHOS

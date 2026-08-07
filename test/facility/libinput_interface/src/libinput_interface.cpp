@@ -210,6 +210,16 @@ int libinput_device_touch_btn_tool_type_down(struct libinput_device *device, int
     return g_instance->TouchEventGetBtnToolTypeDown(device, btnToolType);
 }
 
+double libinput_event_touch_get_x(struct libinput_event_touch *event)
+{
+    return -1.0;
+}
+
+double libinput_event_touch_get_y(struct libinput_event_touch *event)
+{
+    return -1.0;
+}
+
 double libinput_event_touch_get_x_transformed(struct libinput_event_touch *event, uint32_t width)
 {
     return -1.0;

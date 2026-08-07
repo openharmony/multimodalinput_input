@@ -14,10 +14,10 @@
  */
 
 #include <gtest/gtest.h>
-#include <unistd.h>
 
-#include "input_sendevent_command.h"
+#include <unistd.h>
 #include "define_multimodal.h"
+#include "input_sendevent_command.h"
 
 namespace OHOS {
 namespace MMI {

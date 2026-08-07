@@ -16,16 +16,21 @@ import("../../../../device_status.gni")
 
 module_output_path = "input/input"
 
-ohos_unittest("MonitorTest") {
-  module_out_path = module_output_path
+ohos_unittest("DeviceTest") {
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+    blocklist = "./ipc_blocklist.txt"
+  }
 
+  module_out_path = module_output_path
   include_dirs = [
     "${device_status_root_path}/intention/services/device_manager/include",
     "${device_status_root_path}/libs/interface",
     "${device_status_service_path}/communication/service/include",
   ]
-
-  sources = [ "src/monitor_test.cpp" ]
+  sources = [ "src/device_test.cpp" ]
 
   cflags = [
     "-Dprivate=public",
@@ -46,8 +51,6 @@ ohos_unittest("MonitorTest") {
     "graphic_2d:librender_service_client",
     "hilog:libhilog",
     "input:libmmi-client",
-    "ipc:ipc_core",
-    "preferences:native_preferences",
   ]
 }
 
@@ -68,44 +71,6 @@ ohos_unittest("EnumeratorTest") {
   ]
 
   sources = [ "src/enumerator_test.cpp" ]
-
-  cflags = [
-    "-Dprivate=public",
-    "-Dprotected=public",
-  ]
-
-  deps = [
-    "${device_status_interfaces_path}/innerkits:devicestatus_client",
-    "${device_status_root_path}/intention/prototype:intention_prototype",
-    "${device_status_root_path}/services:devicestatus_static_service",
-    "${device_status_root_path}/utils/ipc:devicestatus_ipc",
-    "${device_status_utils_path}:devicestatus_util",
-  ]
-
-  external_deps = [
-    "access_token:libaccesstoken_sdk",
-    "c_utils:utils",
-    "graphic_2d:librender_service_client",
-    "hilog:libhilog",
-    "input:libmmi-client",
-  ]
-}
-
-ohos_unittest("DeviceTest") {
-  sanitize = {
-    cfi = true
-    cfi_cross_dso = true
-    debug = false
-    blocklist = "./ipc_blocklist.txt"
-  }
-
-  module_out_path = module_output_path
-  include_dirs = [
-    "${device_status_root_path}/intention/services/device_manager/include",
-    "${device_status_root_path}/libs/interface",
-    "${device_status_service_path}/communication/service/include",
-  ]
-  sources = [ "src/device_test.cpp" ]
 
   cflags = [
     "-Dprivate=public",
@@ -191,11 +156,44 @@ ohos_unittest("IntentionDeviceManagerTest") {
   ]
 }
 
+ohos_unittest("MonitorTest") {
+  module_out_path = module_output_path
+
+  include_dirs = [
+    "${device_status_root_path}/intention/services/device_manager/include",
+    "${device_status_root_path}/libs/interface",
+    "${device_status_service_path}/communication/service/include",
+  ]
+
+  sources = [ "src/monitor_test.cpp" ]
+
+  cflags = [
+    "-Dprivate=public",
+    "-Dprotected=public",
+  ]
+
+  deps = [
+    "${device_status_interfaces_path}/innerkits:devicestatus_client",
+    "${device_status_root_path}/intention/prototype:intention_prototype",
+    "${device_status_root_path}/services:devicestatus_static_service",
+    "${device_status_root_path}/utils/ipc:devicestatus_ipc",
+    "${device_status_utils_path}:devicestatus_util",
+  ]
+
+  external_deps = [
+    "access_token:libaccesstoken_sdk",
+    "c_utils:utils",
+    "graphic_2d:librender_service_client",
+    "hilog:libhilog",
+    "input:libmmi-client",
+    "ipc:ipc_core",
+    "preferences:native_preferences",
+  ]
+}
+
 group("unittest") {
   testonly = true
-  deps = []
-
-  deps += [
+  deps = [
     ":DeviceTest",
     ":EnumeratorTest",
     ":IntentionDeviceManagerTest",

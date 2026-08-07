@@ -450,6 +450,52 @@ uintptr_t SetInputDeviceEnablePromise(int32_t deviceId, bool enabled)
     return reinterpret_cast<uintptr_t>(promise);
 }
 
+uintptr_t BindToDisplayPromise(int32_t deviceId, int32_t displayId)
+{
+    MMI_HISTOGRAM_BOOLEAN("InputKit.inputDevice.bindToDisplay.Call", true);
+    if (deviceId < 0) {
+        taihe::set_business_error(COMMON_PARAMETER_ERROR, "Parameter error.Invalid deviceId!");
+        MMI_HILOGE("Invalid deviceId");
+        return 0;
+    }
+    if (displayId < 0) {
+        taihe::set_business_error(COMMON_PARAMETER_ERROR, "Parameter error.Invalid displayId!");
+        MMI_HILOGE("Invalid displayId");
+        return 0;
+    }
+    ani_env *env = taihe::get_env();
+    if (!env) {
+        MMI_HILOGE("env is null");
+        return 0;
+    }
+    ani_status status = ANI_OK;
+    ani_object promise;
+    ani_resolver deferred = nullptr;
+    if ((status = env->Promise_New(&deferred, &promise)) != ANI_OK) {
+        MMI_HILOGE("create promise object failed, status = %{public}d", status);
+        return reinterpret_cast<uintptr_t>(promise);
+    }
+    std::function<void(int32_t)> callback = [env, deferred](int32_t errcode) {
+        CALL_DEBUG_ENTER;
+        ani_env* etsEnv = env;
+        // Server returns negative error codes (e.g., -3900004), but TAIHE_ERRORS uses positive keys
+        int32_t absCode = (errcode < 0) ? -errcode : errcode;
+        ANIPromiseVoidCallback(etsEnv, deferred, absCode);
+    };
+    int32_t ret = InputManager_t::GetInstance()->BindToDisplay(deviceId, displayId, callback);
+    MMI_HILOGI("ret code:%{public}d", ret);
+    if (ret != RET_OK) {
+        TaiheError_t codeMsg;
+        if (!TaiheConverter::GetApiError(ret, codeMsg)) {
+            MMI_HILOGE("Error code %{public}d not found", ret);
+        }
+        taihe::set_business_error(ret, codeMsg.msg);
+        MMI_HISTOGRAM_ERROR("InputKit.inputDevice.bindToDisplay.Error", ret);
+        return 0;
+    }
+    return reinterpret_cast<uintptr_t>(promise);
+}
+
 static TaiheKeyboardType GetKeyboardType(int32_t deviceId, std::function<void(int32_t)> histogramError)
 {
     CALL_DEBUG_ENTER;
@@ -522,6 +568,7 @@ TH_EXPORT_CPP_API_GetIntervalSinceLastInputAsync(GetIntervalSinceLastInputAsync)
 TH_EXPORT_CPP_API_SetFunctionKeyEnabledAsync(SetFunctionKeyEnabledAsync);
 TH_EXPORT_CPP_API_IsFunctionKeyEnabledAsync(IsFunctionKeyEnabledAsync);
 TH_EXPORT_CPP_API_SetInputDeviceEnablePromise(SetInputDeviceEnablePromise);
+TH_EXPORT_CPP_API_BindToDisplayPromise(BindToDisplayPromise);
 TH_EXPORT_CPP_API_GetKeyboardTypeSyncWrapper(GetKeyboardTypeSyncWrapper);
 TH_EXPORT_CPP_API_GetKeyboardTypeSync(GetKeyboardTypeSync);
 TH_EXPORT_CPP_API_onKeyImpl(onKeyImpl);

@@ -57,7 +57,7 @@ bool SocketSession::SendMsg(NetPacket &pkt) const
 
 bool SocketSession::SendMsg(const char *buf, size_t size) const
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     CHKPF(buf);
     if ((size == 0) || (size > MAX_PACKET_BUF_SIZE)) {
         FI_HILOGE("buf size:%{public}zu", size);

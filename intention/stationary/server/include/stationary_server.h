@@ -18,8 +18,8 @@
 
 #include "nocopyable.h"
 
-#include "devicestatus_manager.h"
 #include "i_plugin.h"
+#include "devicestatus_manager.h"
 
 namespace OHOS {
 namespace Msdp {

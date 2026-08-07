@@ -55,6 +55,10 @@ public:
     MOCK_METHOD(bool, GetMouseIsCaptureMode, (), (const));
     MOCK_METHOD(int32_t, GetDisplayBindInfo, (DisplayBindInfos&));
     MOCK_METHOD(int32_t, SetDisplayBind, (int32_t, int32_t, std::string&));
+    MOCK_METHOD(int32_t, BindToDisplay, (int32_t, int32_t, std::string&));
+    int32_t GetBindDisplayIdByInputDevice(int32_t inputDeviceId) const override { return -1; }
+    void ApplyBoundDisplayId(std::shared_ptr<PointerEvent> pointerEvent) override {}
+    void ApplyBoundDisplayId(std::shared_ptr<KeyEvent> keyEvent) override {}
     MOCK_METHOD(int32_t, AppendExtraData, (const ExtraData&));
     MOCK_METHOD(bool, IsWindowVisible, (int32_t));
     MOCK_METHOD(ExtraData, GetExtraData, (), (const));
@@ -92,6 +96,9 @@ public:
     MOCK_METHOD(int32_t, GetMainDisplayId, (int32_t), (const));
     MOCK_METHOD(bool, IsMouseSimulate, ());
     MOCK_METHOD(bool, HasMouseHideFlag, ());
+#ifdef OHOS_BUILD_ENABLE_EXTERNAL_SCREEN
+    MOCK_METHOD(void, OnScreenModeChangeForMirrorScreen, (size_t screenCount));
+#endif // OHOS_BUILD_ENABLE_EXTERNAL_SCREEN
     MOCK_METHOD(bool, SelectPointerChangeArea, (int32_t, int32_t, int32_t));
 #endif // OHOS_BUILD_ENABLE_POINTER
 
@@ -135,6 +142,7 @@ public:
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 
     MOCK_METHOD(std::optional<WindowInfo>, GetWindowAndDisplayInfo, (int32_t, int32_t));
+    MOCK_METHOD(bool, IsWindowInjectableUnderLock, (int32_t, int32_t));
     void SetWindowStateNotifyPid(int32_t userId, int32_t pid) override {}
     int32_t GetWindowStateNotifyPid(int32_t userId) override { return 0; }
     int32_t GetPidByDisplayIdAndWindowId(int32_t displayId, int32_t windowId) override { return 0; }
@@ -191,6 +199,7 @@ public:
     MOCK_METHOD(int32_t, ControlMouseEventToAnco, (int32_t, bool, const std::string &));
 #endif // OHOS_BUILD_ENABLE_ANCO_GAME_EVENT_MAPPING
     MOCK_METHOD(OLD::DisplayGroupInfo&, GetDefaultDisplayGroupInfo, ());
+    MOCK_METHOD(std::vector<PluginDisplayGroupInfo>, GetDisplayGroupInfos, ());
     static std::shared_ptr<InputWindowsManagerMock> GetInstance();
     static void ReleaseInstance();
 

@@ -28,7 +28,10 @@
 /**
  * @file oh_axis_type.h
  *
- * @brief Defines the axis event-specific structure and enumerations.
+ * @brief Defines the device axis event struct and enumerates device axis events. The axis type defines the physical
+ * behavior characteristics of an input device in different interaction scenarios. The system uses the axis type to
+ * distinguish and transmit different gesture interaction information.
+ *
  * @kit InputKit
  * @syscap SystemCapability.MultimodalInput.Input.Core
  * @library liboh_input.so
@@ -40,66 +43,61 @@ extern "C" {
 #endif
 
 /**
- * @brief Enumerates axis types.
+ * @brief Defines the axis type of an input device.
  *
  * @since 12
  */
 typedef enum InputEvent_AxisType {
     /**
-     * Indicates an unknown axis type. It is generally used as the initial value.
-     *
+     * Unknown axis type, which is usually used as the initial value.
      * @since 12
      */
     AXIS_TYPE_UNKNOWN,
 
     /**
-     * Indicates the vertical scroll axis. When you scroll the mouse wheel or make certain gestures on the touchpad,
-     * the status of the vertical scroll axis changes.
-     *
+     * Vertical scroll axis. When you scroll the mouse wheel or slide with one or two fingers on the touchpad, the
+     * status of the vertical scroll axis changes.
      * @since 12
      */
     AXIS_TYPE_SCROLL_VERTICAL,
 
     /**
-     * Indicates the horizontal scroll axis.
-     * When you scroll the mouse wheel or make certain gestures on the touchpad,
-     * the status of the horizontal scroll axis changes.
-     *
+     * Horizontal scroll axis. When you scroll the mouse wheel or slide with two fingers on the touchpad, the status of
+     * the horizontal scroll axis changes.
      * @since 12
      */
     AXIS_TYPE_SCROLL_HORIZONTAL,
 
     /**
-     * Indicates the pinch axis, which is used to describe a pinch gesture on the touchscreen or touchpad.
-     *
+     * Pinch axis, which is used to describe a two-finger pinch gesture on the touchpad.
      * @since 12
      */
     AXIS_TYPE_PINCH,
 
     /**
-     * Indicates the rotate axis, which is used to describe a rotate gesture on the touchpad.
-     *
+     * Rotation axis, which is used to describe a two-finger rotation gesture on the touchpad.
      * @since 12
      */
     AXIS_TYPE_ROTATE
 } InputEvent_AxisType;
 
 /**
- * @brief Enumerates axis event types.
+ * @brief Event type of the input device.
  *
  * @since 12
  */
 typedef enum InputEvent_AxisEventType {
     /**
-     * @brief Enumerates two-finger pinch events. The axis value can be AXIS_TYPE_PINCH or AXIS_TYPE_ROTATE.
+     * @brief Two-finger pinch event. The value can be **AXIS_TYPE_PINCH** or **AXIS_TYPE_ROTATE**, both of which are
+     * of the {@link InputEvent_AxisType} type.
      *
      * @since 12
      */
     AXIS_EVENT_TYPE_PINCH = 1,
     /**
-     * @brief Enumerates scroll axis events.
-     * The axis value can be AXIS_TYPE_SCROLL_VERTICAL or AXIS_TYPE_SCROLL_HORIZONTAL.
-     * Wherein, the value of AXIS_TYPE_SCROLL_HORIZONTAL is 0 for a mouse wheel event.
+     * @brief Scroll event. The value can be **AXIS_TYPE_SCROLL_VERTICAL** or **AXIS_TYPE_SCROLL_HORIZONTAL**, both of
+     * which are of the {@link InputEvent_AxisType} type. For a mouse wheel event, only **AXIS_TYPE_SCROLL_VERTICAL**
+     * is supported.
      *
      * @since 12
      */
@@ -107,32 +105,28 @@ typedef enum InputEvent_AxisEventType {
 } InputEvent_AxisEventType;
 
 /**
- * @brief Enumerates axis event actions.
+ * @brief Action of the input device.
  *
  * @since 12
  */
 typedef enum InputEvent_AxisAction {
     /**
-     * Cancel action for the axis input event.
-     *
+     * The axis event is canceled.
      * @since 12
      */
     AXIS_ACTION_CANCEL = 0,
     /**
-     * Start action for the axis input event.
-     *
+     * The axis event begins.
      * @since 12
      */
     AXIS_ACTION_BEGIN,
     /**
-     * Update action for the axis input event.
-     *
+     * The axis event is updated.
      * @since 12
      */
     AXIS_ACTION_UPDATE,
     /**
-     * End action for the axis input event.
-     *
+     * The axis event ends.
      * @since 12
      */
     AXIS_ACTION_END,

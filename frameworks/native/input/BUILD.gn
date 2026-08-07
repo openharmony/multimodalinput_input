@@ -164,6 +164,7 @@ ohos_unittest("OHInputManagerTest") {
     "image_framework:image_native",
     "image_framework:pixelmap",
     "napi:ace_napi",
+    "node:node_header_notice",
   ]
 
   if (enable_player_framework) {
@@ -222,6 +223,7 @@ ohos_unittest("OHInputManagerEXTest") {
     "image_framework:image_native",
     "image_framework:pixelmap",
     "napi:ace_napi",
+    "node:node_header_notice",
   ]
 
   if (enable_player_framework) {
@@ -289,6 +291,7 @@ ohos_unittest("GetPointerLocationTest") {
     "image_framework:image_native",
     "image_framework:pixelmap",
     "napi:ace_napi",
+    "node:node_header_notice",
   ]
 
   if (enable_player_framework) {
@@ -352,6 +355,7 @@ ohos_unittest("SetDisplayBindTest") {
     "image_framework:image_native",
     "image_framework:pixelmap",
     "napi:ace_napi",
+    "node:node_header_notice",
   ]
 
   if (enable_player_framework) {

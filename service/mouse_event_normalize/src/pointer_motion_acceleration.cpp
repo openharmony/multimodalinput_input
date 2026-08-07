@@ -54,6 +54,9 @@ constexpr int32_t AXIS_CURVE_M_TABLET_INDEX = 7;
 constexpr int32_t AXIS_CURVE_Q_TABLET_INDEX = 8;
 constexpr int32_t AXIS_CURVE_G_TABLET_INDEX = 9;
 constexpr int32_t AXIS_CURVE_M_PC_PRO_INDEX = 10;
+constexpr int32_t AXIS_CURVE_S_FOLD_PC_INDEX = 11;
+constexpr int32_t AXIS_CURVE_D_TABLET_INDEX = 12;
+constexpr int32_t AXIS_CURVE_SP_FOLD_PC_VIRT_INDEX = 13;
 } // namespace
 
 std::atomic_bool PointerMotionAcceleration::loading_ { false };
@@ -530,6 +533,7 @@ std::string PointerMotionAcceleration::GetTouchpadConfigName(DeviceType devType)
         { DeviceType::DEVICE_TABLET, std::string("TabletTouchpad") },
         { DeviceType::DEVICE_FOLD_PC, std::string("FoldPcTouchpad") },
         { DeviceType::DEVICE_FOLD_PC_VIRT, std::string("FoldPcVirtTouchpad") },
+        { DeviceType::DEVICE_SP_FOLD_PC_VIRT, std::string("SpFoldPcVirtTouchpad") },
     };
     if (auto iter = names.find(devType); iter != names.cend()) {
         return iter->second;
@@ -647,6 +651,13 @@ bool PointerMotionAcceleration::CalcAxisGainTouchpad(const AxisCurve &curve, dou
         return false;
     }
 
+    if ((curve.speeds.empty()) ||
+        (curve.slopes.size() < curve.speeds.size()) ||
+        (curve.diffNums.size() < curve.speeds.size())) {
+        MMI_HILOGE("Invalid axis-gain-touchpad curve");
+        return false;
+    }
+
     const auto absAxisSpeed = std::fabs(axisSpeed);
     const auto len = curve.speeds.size();
 
@@ -725,6 +736,15 @@ const PointerMotionAcceleration::AxisCurve* PointerMotionAcceleration::MatchAxis
             break;
         case DeviceType::DEVICE_M_PC_PRO:
             validDeviceType = AXIS_CURVE_M_PC_PRO_INDEX;
+            break;
+        case DeviceType::DEVICE_S_FOLD_PC:
+            validDeviceType = AXIS_CURVE_S_FOLD_PC_INDEX;
+            break;
+        case DeviceType::DEVICE_D_TABLET:
+            validDeviceType = AXIS_CURVE_D_TABLET_INDEX;
+            break;
+        case DeviceType::DEVICE_SP_FOLD_PC_VIRT:
+            validDeviceType = AXIS_CURVE_SP_FOLD_PC_VIRT_INDEX;
             break;
         default:
             validDeviceType = 1;

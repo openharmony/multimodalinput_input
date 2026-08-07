@@ -29,10 +29,9 @@ struct ScreenCaptureHandle {
     int32_t (*isWorking)(int32_t);
     void (*registerListener)(ScreenCaptureCallback);
     bool (*isMusicActivate)();
-    void (*cleanUpResources)();
 
     ScreenCaptureHandle(): handle(nullptr), isWorking(nullptr), registerListener(nullptr),
-        isMusicActivate(nullptr), cleanUpResources(nullptr) {}
+        isMusicActivate(nullptr) {}
 
     void Free()
     {
@@ -43,7 +42,6 @@ struct ScreenCaptureHandle {
         isWorking = nullptr;
         registerListener = nullptr;
         isMusicActivate = nullptr;
-        cleanUpResources = nullptr;
     }
 };
 
@@ -53,7 +51,6 @@ public:
     bool IsScreenCaptureWorking(int32_t capturePid);
     void RegisterListener(ScreenCaptureCallback callback);
     bool IsMusicActivate();
-    void UnloadLibrary();
 private:
     int32_t LoadLibrary();
     int32_t LoadAudioLibrary();

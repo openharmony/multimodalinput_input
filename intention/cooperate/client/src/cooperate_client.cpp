@@ -341,7 +341,7 @@ int32_t CooperateClient::GenerateRequestID()
 
 int32_t CooperateClient::OnCoordinationListener(const StreamClient &client, NetPacket &pkt)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     int32_t userData = 0;
     std::string networkId;
     int32_t nType = 0;
@@ -357,7 +357,7 @@ int32_t CooperateClient::OnCoordinationListener(const StreamClient &client, NetP
 
 void CooperateClient::OnDevCooperateListener(const std::string &networkId, CoordinationMessage msg)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(mtx_);
     for (const auto &item : devCooperateListener_) {
         item->OnCoordinationMessage(networkId, msg);
@@ -366,7 +366,7 @@ void CooperateClient::OnDevCooperateListener(const std::string &networkId, Coord
 
 int32_t CooperateClient::OnCoordinationMessage(const StreamClient &client, NetPacket &pkt)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     int32_t userData = 0;
     std::string networkId;
     int32_t nType = 0;
@@ -388,7 +388,7 @@ int32_t CooperateClient::OnCoordinationMessage(const StreamClient &client, NetPa
 void CooperateClient::OnCooperateMessageEvent(
     int32_t userData, const std::string &networkId, const CoordinationMsgInfo &msgInfo)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     CHK_PID_AND_TID();
     std::lock_guard<std::mutex> guard(mtx_);
     auto iter = devCooperateEvent_.find(userData);
@@ -403,7 +403,7 @@ void CooperateClient::OnCooperateMessageEvent(
 
 int32_t CooperateClient::OnCoordinationState(const StreamClient &client, NetPacket &pkt)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     int32_t userData = 0;
     bool state = false;
     int32_t errCode = -1;
@@ -419,7 +419,7 @@ int32_t CooperateClient::OnCoordinationState(const StreamClient &client, NetPack
 
 void CooperateClient::OnCooperateStateEvent(int32_t userData, bool state)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     CHK_PID_AND_TID();
     std::lock_guard<std::mutex> guard(mtx_);
     auto iter = devCooperateEvent_.find(userData);

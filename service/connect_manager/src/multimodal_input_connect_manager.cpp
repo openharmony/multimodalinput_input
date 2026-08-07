@@ -107,6 +107,17 @@ int32_t MultimodalInputConnectManager::SetDisplayBind(int32_t deviceId, int32_t 
     return ret;
 }
 
+int32_t MultimodalInputConnectManager::BindToDisplay(int32_t deviceId, int32_t displayId)
+{
+    std::lock_guard<std::mutex> guard(lock_);
+    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    int32_t ret = multimodalInputConnectService_->BindToDisplay(deviceId, displayId);
+    if (ret != RET_OK) {
+        MMI_HILOGE("BindToDisplay failed, ret:%{public}d", ret);
+    }
+    return ret;
+}
+
 int32_t MultimodalInputConnectManager::GetWindowPid(int32_t windowId)
 {
     std::lock_guard<std::mutex> guard(lock_);
@@ -1159,7 +1170,7 @@ int32_t MultimodalInputConnectManager::AncoRemoveChannel(sptr<IAncoChannel> chan
 
 int32_t MultimodalInputConnectManager::CheckKnuckleEvent(float pointX, float pointY, bool &touchType)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(lock_);
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
     return multimodalInputConnectService_->CheckKnuckleEvent(pointX, pointY, touchType);
@@ -1188,7 +1199,7 @@ int32_t MultimodalInputConnectManager::GetIntervalSinceLastInput(int64_t &timeIn
 
 int32_t MultimodalInputConnectManager::GetAllSystemHotkeys(std::vector<std::unique_ptr<KeyOption>> &keyOptions)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(lock_);
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
     std::vector<KeyOption> keyOptionsArray;
@@ -1209,7 +1220,7 @@ int32_t MultimodalInputConnectManager::SetInputDeviceEnabled(int32_t deviceId, b
 
 int32_t MultimodalInputConnectManager::DisableInputEventDispatch(bool disabled)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(lock_);
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
     return multimodalInputConnectService_->DisableInputEventDispatch(disabled);
@@ -1217,7 +1228,7 @@ int32_t MultimodalInputConnectManager::DisableInputEventDispatch(bool disabled)
 
 int32_t MultimodalInputConnectManager::EnableInputExtension(const std::string &uuid, bool enabled)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(lock_);
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
     return multimodalInputConnectService_->EnableInputExtension(uuid, enabled);
@@ -1225,7 +1236,7 @@ int32_t MultimodalInputConnectManager::EnableInputExtension(const std::string &u
 
 int32_t MultimodalInputConnectManager::ShiftAppPointerEvent(const ShiftWindowParam &param, bool autoGenDown)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(lock_);
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
     return multimodalInputConnectService_->ShiftAppPointerEvent(param, autoGenDown);

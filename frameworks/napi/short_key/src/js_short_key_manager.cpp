@@ -175,6 +175,7 @@ napi_value JsShortKeyManager::SetKeyDownDuration(napi_env env, const std::string
         CHKRP(napi_create_reference(env, handle, 1, &asyncContext->callback), CREATE_REFERENCE);
         if (napi_get_undefined(env, &promise) != napi_ok) {
             CHKRP(napi_delete_reference(env, asyncContext->callback), DELETE_REFERENCE);
+            asyncContext->callback = nullptr;
             return nullptr;
         }
     } else {

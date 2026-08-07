@@ -75,7 +75,7 @@ KeyboardControllerImpl::~KeyboardControllerImpl()
 
 int32_t KeyboardControllerImpl::PressKey(int32_t keyCode)
 {
-    MMI_HILOGD("PressKey: keyCode=%{public}d", keyCode);
+    MMI_HILOGD("PressKey: keyCode=%{private}d", keyCode);
 
     bool isNewKey = false;
     std::shared_ptr<KeyEvent> keyEvent;
@@ -93,7 +93,7 @@ int32_t KeyboardControllerImpl::PressKey(int32_t keyCode)
                 return ERROR_CODE_KEY_STATE_ERROR;
             }
             // Allow repeating the last pressed key (for recording/playback scenario)
-            MMI_HILOGD("Repeat press last key: %{public}d", keyCode);
+            MMI_HILOGD("Repeat press last key: %{private}d", keyCode);
         } else {
             // 2. New key, check if maximum number exceeded
             if (pressedKeys_.size() >= MAX_PRESSED_KEYS) {
@@ -137,7 +137,7 @@ int32_t KeyboardControllerImpl::PressKey(int32_t keyCode)
 
 int32_t KeyboardControllerImpl::ReleaseKey(int32_t keyCode)
 {
-    MMI_HILOGD("ReleaseKey: keyCode=%{public}d", keyCode);
+    MMI_HILOGD("ReleaseKey: keyCode=%{private}d", keyCode);
 
     std::shared_ptr<KeyEvent> keyEvent;
     std::vector<int32_t>::iterator it;
@@ -236,7 +236,7 @@ std::shared_ptr<KeyEvent> KeyboardControllerImpl::CreateKeyEvent(int32_t action,
         addedCount++;
     }
 
-    MMI_HILOGD("CreateKeyEvent: action=%{public}d, keyCode=%{public}d, added %{public}d other pressed keys",
+    MMI_HILOGD("CreateKeyEvent: action=%{public}d, keyCode=%{private}d, added %{public}d other pressed keys",
         action, keyCode, addedCount);
 
     return keyEvent;

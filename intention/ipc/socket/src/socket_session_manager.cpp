@@ -185,7 +185,7 @@ void SocketSessionManager::ReleaseSessionByPid(int32_t pid)
 
 sptr<AppExecFwk::IAppMgr> SocketSessionManager::GetAppMgr()
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     auto saMgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
     CHKPP(saMgr);
     auto appMgrObj = saMgr->GetSystemAbility(APP_MGR_SERVICE_ID);

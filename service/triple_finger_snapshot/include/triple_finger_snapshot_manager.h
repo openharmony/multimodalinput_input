@@ -43,7 +43,8 @@ public:
     virtual bool HandleTouchEvent(std::shared_ptr<PointerEvent> event) = 0;
     virtual void Enable() = 0;
     virtual void Disable() = 0;
-    virtual void UpdateDisplayInfo(int32_t displayWidth, int32_t displayHeight, int32_t direction) = 0;
+    virtual void UpdateDisplayInfo(int32_t displayWidth, int32_t displayHeight, int32_t direction,
+        int32_t screenRealDPI) = 0;
     virtual void Dump(int32_t fd) = 0;
     virtual void UpdateAppsEnable(bool enabled) = 0;
 };
@@ -99,7 +100,7 @@ public:
      * @param displayHeight 显示高度
      * @param direction 旋转角度
      */
-    void UpdateDisplayInfo(int32_t displayWidth, int32_t displayHeight, int32_t direction);
+    void UpdateDisplayInfo(int32_t displayWidth, int32_t displayHeight, int32_t direction, int32_t screenRealDPI);
 
     /**
      * 调试信息输出

@@ -33,7 +33,7 @@ AppObserverManager::~AppObserverManager() {}
 void ApplicationStateObserver::OnProcessStateChanged(const AppExecFwk::ProcessData &processData)
 {
     CALL_DEBUG_ENTER;
-    MMI_HILOGI("Process state change app name:%{public}s, uid:%{public}d, state:%{public}d",
+    MMI_HILOGD("Process state change app name:%{public}s, uid:%{public}d, state:%{public}d",
         processData.bundleName.c_str(),
         processData.uid,
         processData.state);
@@ -85,7 +85,7 @@ void AppObserverManager::SetForegroundAppData(const std::vector<AppExecFwk::AppS
     BytraceAdapter::StartForegroundAppData("SetForegroundAppData", list.size());
     std::lock_guard<std::mutex> guard(mutex_);
     foregroundAppData_ = list;
-    MMI_HILOGI("The foregroundAppData_.size():%{public}zu", foregroundAppData_.size());
+    MMI_HILOGD("The foregroundAppData_.size():%{public}zu", foregroundAppData_.size());
     BytraceAdapter::StopForegroundAppData();
 }
 

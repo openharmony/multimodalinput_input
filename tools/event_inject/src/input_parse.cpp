@@ -17,8 +17,8 @@
 
 #include <sstream>
 
-#include "json_parser.h"
 #include "define_multimodal.h"
+#include "json_parser.h"
 
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "GetDeviceNode"

@@ -19,7 +19,6 @@
 #include <cstring>
 
 #include "nocopyable.h"
-
 #include "util.h"
 
 namespace OHOS {

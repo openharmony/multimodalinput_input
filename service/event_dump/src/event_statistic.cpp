@@ -206,9 +206,11 @@ void EventStatistic::PushKeyEvent(std::shared_ptr<KeyEvent> eventPtr)
     eventStr += ",keyItems:[";
     for (size_t i = 0; i < keyItems.size(); i++) {
         std::string keyItemCode = "***";
+        std::string unicode = "***";
         int32_t pressed = keyItems[i].IsPressed() ? 1 : 0;
         if (!eventPtr->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE)) {
             keyItemCode = std::to_string(keyItems[i].GetKeyCode());
+            unicode = std::to_string(keyItems[i].GetUnicode());
         }
         eventStr += "{pressed:";
         eventStr += std::to_string(pressed);
@@ -219,7 +221,7 @@ void EventStatistic::PushKeyEvent(std::shared_ptr<KeyEvent> eventPtr)
         eventStr += ",downTime:";
         eventStr += std::to_string(keyItems[i].GetDownTime());
         eventStr += ",unicode:";
-        eventStr += std::to_string(keyItems[i].GetUnicode());
+        eventStr += unicode;
         eventStr += "}";
         if (i != keyItems.size() - 1) {
             eventStr += ",";
@@ -259,9 +261,15 @@ void EventStatistic::PushPointerRecord(std::shared_ptr<PointerEvent> eventPtr)
 {
     CHKPV(eventPtr);
     int32_t pointerAction = eventPtr->GetPointerAction();
-    if (pointerAction == PointerEvent::POINTER_ACTION_MOVE ||
-        pointerAction == PointerEvent::POINTER_ACTION_PULL_MOVE) {
-        return;
+    switch (pointerAction) {
+        case PointerEvent::POINTER_ACTION_CANCEL:
+        case PointerEvent::POINTER_ACTION_DOWN:
+        case PointerEvent::POINTER_ACTION_UP:
+        case PointerEvent::POINTER_ACTION_PULL_DOWN:
+        case PointerEvent::POINTER_ACTION_PULL_UP:
+            break;
+        default:
+            return;
     }
     std::list<PointerEvent::PointerItem> pointerItems = eventPtr->GetAllPointerItems();
     auto& record = pointerRecordRingBuffer_[ringTail_];

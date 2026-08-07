@@ -13,12 +13,12 @@
  * limitations under the License.
  */
 
+#include "input_enable_key_status_command.h"
 #include "input_manager_command.h"
 #ifdef OHOS_BUILD_ENABLE_EVENT_RECORDER
 #include "input_replay_command.h"
 #endif // OHOS_BUILD_ENABLE_EVENT_RECORDER
 #include "input_sendevent_command.h"
-#include "input_enable_key_status_command.h"
 
 int32_t main(int32_t argc, char** argv)
 {

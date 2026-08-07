@@ -218,11 +218,7 @@ Input_Result OH_Input_GetKeyState(struct Input_KeyState* keyState)
     MMI_HISTOGRAM_BOOLEAN("InputKit.OH_Input_GetKeyState.Call", true);
     CHKPR(keyState, INPUT_PARAMETER_ERROR);
     if (keyState->keyCode < 0 || keyState->keyCode > KEYCODE_NUMPAD_RIGHT_PAREN) {
-        if (!OHOS::MMI::EventLogHelper::IsBetaVersion()) {
-            MMI_HILOGE("Invaild");
-        } else {
-            MMI_HILOGE("Invaild");
-        }
+        MMI_HILOGE("Invaild");
         return INPUT_PARAMETER_ERROR;
     }
     if (g_keyCodeValueSet.find(keyState->keyCode) == g_keyCodeValueSet.end()) {
@@ -253,7 +249,6 @@ Input_Result OH_Input_GetKeyState(struct Input_KeyState* keyState)
 
 struct Input_KeyState* OH_Input_CreateKeyState()
 {
-    MMI_HISTOGRAM_BOOLEAN("InputKit.OH_Input_CreateKeyState.Call", true);
     Input_KeyState* keyState = new (std::nothrow) Input_KeyState();
     CHKPL(keyState);
     return keyState;
@@ -262,7 +257,6 @@ struct Input_KeyState* OH_Input_CreateKeyState()
 void OH_Input_DestroyKeyState(struct Input_KeyState** keyState)
 {
     CALL_DEBUG_ENTER;
-    MMI_HISTOGRAM_BOOLEAN("InputKit.OH_Input_DestroyKeyState.Call", true);
     CHKPV(keyState);
     CHKPV(*keyState);
     delete *keyState;
@@ -272,13 +266,8 @@ void OH_Input_DestroyKeyState(struct Input_KeyState** keyState)
 void OH_Input_SetKeyCode(struct Input_KeyState* keyState, int32_t keyCode)
 {
     CHKPV(keyState);
-    MMI_HISTOGRAM_BOOLEAN("InputKit.OH_Input_SetKeyCode.Call", true);
     if (keyCode < 0 || keyState->keyCode > KEYCODE_NUMPAD_RIGHT_PAREN) {
-        if (!OHOS::MMI::EventLogHelper::IsBetaVersion()) {
-            MMI_HILOGE("Invaild");
-        } else {
-            MMI_HILOGE("Invaild");
-        }
+        MMI_HILOGE("Invaild");
         return;
     }
     keyState->keyCode = keyCode;
@@ -286,35 +275,30 @@ void OH_Input_SetKeyCode(struct Input_KeyState* keyState, int32_t keyCode)
 
 int32_t OH_Input_GetKeyCode(const struct Input_KeyState* keyState)
 {
-    MMI_HISTOGRAM_BOOLEAN("InputKit.OH_Input_GetKeyCode.Call", true);
     CHKPR(keyState, KEYCODE_UNKNOWN);
     return keyState->keyCode;
 }
 
 void OH_Input_SetKeyPressed(struct Input_KeyState* keyState, int32_t keyAction)
 {
-    MMI_HISTOGRAM_BOOLEAN("InputKit.OH_Input_SetKeyPressed.Call", true);
     CHKPV(keyState);
     keyState->keyState = keyAction;
 }
 
 int32_t OH_Input_GetKeyPressed(const struct Input_KeyState* keyState)
 {
-    MMI_HISTOGRAM_BOOLEAN("InputKit.OH_Input_GetKeyPressed.Call", true);
     CHKPR(keyState, KEY_DEFAULT);
     return keyState->keyState;
 }
 
 void OH_Input_SetKeySwitch(struct Input_KeyState* keyState, int32_t keySwitch)
 {
-    MMI_HISTOGRAM_BOOLEAN("InputKit.OH_Input_SetKeySwitch.Call", true);
     CHKPV(keyState);
     keyState->keySwitch = keySwitch;
 }
 
 int32_t OH_Input_GetKeySwitch(const struct Input_KeyState* keyState)
 {
-    MMI_HISTOGRAM_BOOLEAN("InputKit.OH_Input_GetKeySwitch.Call", true);
     CHKPR(keyState, KEY_DEFAULT);
     return keyState->keySwitch;
 }
@@ -328,8 +312,6 @@ static void HandleKeyAction(const struct Input_KeyEvent* keyEvent, OHOS::MMI::Ke
         std::optional<OHOS::MMI::KeyEvent::KeyItem> pressedKeyItem = g_keyEvent->GetKeyItem(keyEvent->keyCode);
         if (pressedKeyItem) {
             item.SetDownTime(pressedKeyItem->GetDownTime());
-        } else if (!OHOS::MMI::EventLogHelper::IsBetaVersion()) {
-            MMI_HILOGW("Find pressed key failed");
         } else {
             MMI_HILOGW("Find pressed key failed");
         }
@@ -344,11 +326,7 @@ int32_t OH_Input_InjectKeyEvent(const struct Input_KeyEvent* keyEvent)
     MMI_HISTOGRAM_BOOLEAN("InputKit.OH_Input_InjectKeyEvent.Call", true);
     CHKPR(keyEvent, INPUT_PARAMETER_ERROR);
     if (keyEvent->keyCode < 0) {
-        if (!OHOS::MMI::EventLogHelper::IsBetaVersion()) {
-            MMI_HILOGE("code is less 0, can not process");
-        } else {
-            MMI_HILOGE("code is less 0, can not process");
-        }
+        MMI_HILOGE("code is less 0, can not process");
         MMI_HISTOGRAM_ERROR("InputKit.OH_Input_InjectKeyEvent.Error", INPUT_PARAMETER_ERROR);
         return INPUT_PARAMETER_ERROR;
     }
@@ -391,7 +369,6 @@ int32_t OH_Input_InjectKeyEvent(const struct Input_KeyEvent* keyEvent)
 
 struct Input_KeyEvent* OH_Input_CreateKeyEvent()
 {
-    MMI_HISTOGRAM_BOOLEAN("InputKit.OH_Input_CreateKeyEvent.Call", true);
     Input_KeyEvent* keyEvent = new (std::nothrow) Input_KeyEvent();
     CHKPL(keyEvent);
     return keyEvent;
@@ -400,7 +377,6 @@ struct Input_KeyEvent* OH_Input_CreateKeyEvent()
 void OH_Input_DestroyKeyEvent(struct Input_KeyEvent** keyEvent)
 {
     CALL_DEBUG_ENTER;
-    MMI_HISTOGRAM_BOOLEAN("InputKit.OH_Input_DestroyKeyEvent.Call", true);
     CHKPV(keyEvent);
     CHKPV(*keyEvent);
     delete *keyEvent;
@@ -409,70 +385,60 @@ void OH_Input_DestroyKeyEvent(struct Input_KeyEvent** keyEvent)
 
 void OH_Input_SetKeyEventAction(struct Input_KeyEvent* keyEvent, int32_t action)
 {
-    MMI_HISTOGRAM_BOOLEAN("InputKit.OH_Input_SetKeyEventAction.Call", true);
     CHKPV(keyEvent);
     keyEvent->action = action;
 }
 
 int32_t OH_Input_GetKeyEventAction(const struct Input_KeyEvent* keyEvent)
 {
-    MMI_HISTOGRAM_BOOLEAN("InputKit.OH_Input_GetKeyEventAction.Call", true);
     CHKPR(keyEvent, RET_ERR);
     return keyEvent->action;
 }
 
 void OH_Input_SetKeyEventKeyCode(struct Input_KeyEvent* keyEvent, int32_t keyCode)
 {
-    MMI_HISTOGRAM_BOOLEAN("InputKit.OH_Input_SetKeyEventKeyCode.Call", true);
     CHKPV(keyEvent);
     keyEvent->keyCode = keyCode;
 }
 
 int32_t OH_Input_GetKeyEventKeyCode(const struct Input_KeyEvent* keyEvent)
 {
-    MMI_HISTOGRAM_BOOLEAN("InputKit.OH_Input_GetKeyEventKeyCode.Call", true);
     CHKPR(keyEvent, KEYCODE_UNKNOWN);
     return keyEvent->keyCode;
 }
 
 void OH_Input_SetKeyEventActionTime(struct Input_KeyEvent* keyEvent, int64_t actionTime)
 {
-    MMI_HISTOGRAM_BOOLEAN("InputKit.OH_Input_SetKeyEventActionTime.Call", true);
     CHKPV(keyEvent);
     keyEvent->actionTime = actionTime;
 }
 
 int64_t OH_Input_GetKeyEventActionTime(const struct Input_KeyEvent* keyEvent)
 {
-    MMI_HISTOGRAM_BOOLEAN("InputKit.OH_Input_GetKeyEventActionTime.Call", true);
     CHKPR(keyEvent, RET_ERR);
     return keyEvent->actionTime;
 }
 
 void OH_Input_SetKeyEventWindowId(struct Input_KeyEvent* keyEvent, int32_t windowId)
 {
-    MMI_HISTOGRAM_BOOLEAN("InputKit.OH_Input_SetKeyEventWindowId.Call", true);
     CHKPV(keyEvent);
     keyEvent->windowId = windowId;
 }
 
 int32_t OH_Input_GetKeyEventWindowId(const struct Input_KeyEvent* keyEvent)
 {
-    MMI_HISTOGRAM_BOOLEAN("InputKit.OH_Input_GetKeyEventWindowId.Call", true);
     CHKPR(keyEvent, RET_ERR);
     return keyEvent->windowId;
 }
 
 void OH_Input_SetKeyEventDisplayId(struct Input_KeyEvent* keyEvent, int32_t displayId)
 {
-    MMI_HISTOGRAM_BOOLEAN("InputKit.OH_Input_SetKeyEventDisplayId.Call", true);
     CHKPV(keyEvent);
     keyEvent->displayId = displayId;
 }
 
 int32_t OH_Input_GetKeyEventDisplayId(const struct Input_KeyEvent* keyEvent)
 {
-    MMI_HISTOGRAM_BOOLEAN("InputKit.OH_Input_GetKeyEventDisplayId.Call", true);
     CHKPR(keyEvent, RET_ERR);
     return keyEvent->displayId;
 }
@@ -671,7 +637,6 @@ int32_t OH_Input_InjectMouseEventGlobal(const struct Input_MouseEvent* mouseEven
 struct Input_MouseEvent* OH_Input_CreateMouseEvent()
 {
     CALL_DEBUG_ENTER;
-    MMI_HISTOGRAM_BOOLEAN("InputKit.OH_Input_CreateMouseEvent.Call", true);
     Input_MouseEvent* mouseEvent = new (std::nothrow) Input_MouseEvent();
     CHKPL(mouseEvent);
     return mouseEvent;
@@ -680,7 +645,6 @@ struct Input_MouseEvent* OH_Input_CreateMouseEvent()
 void OH_Input_DestroyMouseEvent(struct Input_MouseEvent** mouseEvent)
 {
     CALL_DEBUG_ENTER;
-    MMI_HISTOGRAM_BOOLEAN("InputKit.OH_Input_DestroyMouseEvent.Call", true);
     CHKPV(mouseEvent);
     CHKPV(*mouseEvent);
     delete *mouseEvent;
@@ -690,7 +654,6 @@ void OH_Input_DestroyMouseEvent(struct Input_MouseEvent** mouseEvent)
 void OH_Input_SetMouseEventAction(struct Input_MouseEvent* mouseEvent, int32_t action)
 {
     CALL_DEBUG_ENTER;
-    MMI_HISTOGRAM_BOOLEAN("InputKit.OH_Input_SetMouseEventAction.Call", true);
     CHKPV(mouseEvent);
     mouseEvent->action = action;
 }
@@ -698,7 +661,6 @@ void OH_Input_SetMouseEventAction(struct Input_MouseEvent* mouseEvent, int32_t a
 int32_t OH_Input_GetMouseEventAction(const struct Input_MouseEvent* mouseEvent)
 {
     CALL_DEBUG_ENTER;
-    MMI_HISTOGRAM_BOOLEAN("InputKit.OH_Input_GetMouseEventAction.Call", true);
     CHKPR(mouseEvent, RET_ERR);
     return mouseEvent->action;
 }
@@ -706,7 +668,6 @@ int32_t OH_Input_GetMouseEventAction(const struct Input_MouseEvent* mouseEvent)
 void OH_Input_SetMouseEventDisplayX(struct Input_MouseEvent* mouseEvent, int32_t displayX)
 {
     CALL_DEBUG_ENTER;
-    MMI_HISTOGRAM_BOOLEAN("InputKit.OH_Input_SetMouseEventDisplayX.Call", true);
     CHKPV(mouseEvent);
     mouseEvent->displayX = displayX;
 }
@@ -714,7 +675,6 @@ void OH_Input_SetMouseEventDisplayX(struct Input_MouseEvent* mouseEvent, int32_t
 int32_t OH_Input_GetMouseEventDisplayX(const struct Input_MouseEvent* mouseEvent)
 {
     CALL_DEBUG_ENTER;
-    MMI_HISTOGRAM_BOOLEAN("InputKit.OH_Input_GetMouseEventDisplayX.Call", true);
     CHKPR(mouseEvent, RET_ERR);
     return mouseEvent->displayX;
 }
@@ -722,7 +682,6 @@ int32_t OH_Input_GetMouseEventDisplayX(const struct Input_MouseEvent* mouseEvent
 void OH_Input_SetMouseEventDisplayY(struct Input_MouseEvent* mouseEvent, int32_t displayY)
 {
     CALL_DEBUG_ENTER;
-    MMI_HISTOGRAM_BOOLEAN("InputKit.OH_Input_SetMouseEventDisplayY.Call", true);
     CHKPV(mouseEvent);
     mouseEvent->displayY = displayY;
 }
@@ -730,7 +689,6 @@ void OH_Input_SetMouseEventDisplayY(struct Input_MouseEvent* mouseEvent, int32_t
 int32_t OH_Input_GetMouseEventDisplayY(const struct Input_MouseEvent* mouseEvent)
 {
     CALL_DEBUG_ENTER;
-    MMI_HISTOGRAM_BOOLEAN("InputKit.OH_Input_GetMouseEventDisplayY.Call", true);
     CHKPR(mouseEvent, RET_ERR);
     return mouseEvent->displayY;
 }
@@ -738,7 +696,6 @@ int32_t OH_Input_GetMouseEventDisplayY(const struct Input_MouseEvent* mouseEvent
 void OH_Input_SetMouseEventButton(struct Input_MouseEvent* mouseEvent, int32_t button)
 {
     CALL_DEBUG_ENTER;
-    MMI_HISTOGRAM_BOOLEAN("InputKit.OH_Input_SetMouseEventButton.Call", true);
     CHKPV(mouseEvent);
     mouseEvent->button = button;
 }
@@ -746,7 +703,6 @@ void OH_Input_SetMouseEventButton(struct Input_MouseEvent* mouseEvent, int32_t b
 int32_t OH_Input_GetMouseEventButton(const struct Input_MouseEvent* mouseEvent)
 {
     CALL_DEBUG_ENTER;
-    MMI_HISTOGRAM_BOOLEAN("InputKit.OH_Input_GetMouseEventButton.Call", true);
     CHKPR(mouseEvent, RET_ERR);
     return mouseEvent->button;
 }
@@ -754,7 +710,6 @@ int32_t OH_Input_GetMouseEventButton(const struct Input_MouseEvent* mouseEvent)
 void OH_Input_SetMouseEventAxisType(struct Input_MouseEvent* mouseEvent, int32_t axisType)
 {
     CALL_DEBUG_ENTER;
-    MMI_HISTOGRAM_BOOLEAN("InputKit.OH_Input_SetMouseEventAxisType.Call", true);
     CHKPV(mouseEvent);
     mouseEvent->axisType = axisType;
 }
@@ -762,7 +717,6 @@ void OH_Input_SetMouseEventAxisType(struct Input_MouseEvent* mouseEvent, int32_t
 int32_t OH_Input_GetMouseEventAxisType(const struct Input_MouseEvent* mouseEvent)
 {
     CALL_DEBUG_ENTER;
-    MMI_HISTOGRAM_BOOLEAN("InputKit.OH_Input_GetMouseEventAxisType.Call", true);
     CHKPR(mouseEvent, RET_ERR);
     return mouseEvent->axisType;
 }
@@ -770,7 +724,6 @@ int32_t OH_Input_GetMouseEventAxisType(const struct Input_MouseEvent* mouseEvent
 void OH_Input_SetMouseEventAxisValue(struct Input_MouseEvent* mouseEvent, float axisValue)
 {
     CALL_DEBUG_ENTER;
-    MMI_HISTOGRAM_BOOLEAN("InputKit.OH_Input_SetMouseEventAxisValue.Call", true);
     CHKPV(mouseEvent);
     mouseEvent->axisValue = axisValue;
 }
@@ -778,7 +731,6 @@ void OH_Input_SetMouseEventAxisValue(struct Input_MouseEvent* mouseEvent, float 
 float OH_Input_GetMouseEventAxisValue(const struct Input_MouseEvent* mouseEvent)
 {
     CALL_DEBUG_ENTER;
-    MMI_HISTOGRAM_BOOLEAN("InputKit.OH_Input_GetMouseEventAxisValue.Call", true);
     CHKPR(mouseEvent, RET_ERR);
     return mouseEvent->axisValue;
 }
@@ -786,7 +738,6 @@ float OH_Input_GetMouseEventAxisValue(const struct Input_MouseEvent* mouseEvent)
 void OH_Input_SetMouseEventActionTime(struct Input_MouseEvent* mouseEvent, int64_t actionTime)
 {
     CALL_DEBUG_ENTER;
-    MMI_HISTOGRAM_BOOLEAN("InputKit.OH_Input_SetMouseEventActionTime.Call", true);
     CHKPV(mouseEvent);
     mouseEvent->actionTime = actionTime;
 }
@@ -794,7 +745,6 @@ void OH_Input_SetMouseEventActionTime(struct Input_MouseEvent* mouseEvent, int64
 int64_t OH_Input_GetMouseEventActionTime(const struct Input_MouseEvent* mouseEvent)
 {
     CALL_DEBUG_ENTER;
-    MMI_HISTOGRAM_BOOLEAN("InputKit.OH_Input_GetMouseEventActionTime.Call", true);
     CHKPR(mouseEvent, RET_ERR);
     return mouseEvent->actionTime;
 }
@@ -802,7 +752,6 @@ int64_t OH_Input_GetMouseEventActionTime(const struct Input_MouseEvent* mouseEve
 void OH_Input_SetMouseEventWindowId(struct Input_MouseEvent* mouseEvent, int32_t windowId)
 {
     CALL_DEBUG_ENTER;
-    MMI_HISTOGRAM_BOOLEAN("InputKit.OH_Input_SetMouseEventWindowId.Call", true);
     CHKPV(mouseEvent);
     mouseEvent->windowId = windowId;
 }
@@ -810,7 +759,6 @@ void OH_Input_SetMouseEventWindowId(struct Input_MouseEvent* mouseEvent, int32_t
 int32_t OH_Input_GetMouseEventWindowId(const struct Input_MouseEvent* mouseEvent)
 {
     CALL_DEBUG_ENTER;
-    MMI_HISTOGRAM_BOOLEAN("InputKit.OH_Input_GetMouseEventWindowId.Call", true);
     CHKPR(mouseEvent, RET_ERR);
     return mouseEvent->windowId;
 }
@@ -818,7 +766,6 @@ int32_t OH_Input_GetMouseEventWindowId(const struct Input_MouseEvent* mouseEvent
 void OH_Input_SetMouseEventDisplayId(struct Input_MouseEvent* mouseEvent, int32_t displayId)
 {
     CALL_DEBUG_ENTER;
-    MMI_HISTOGRAM_BOOLEAN("InputKit.OH_Input_SetMouseEventDisplayId.Call", true);
     CHKPV(mouseEvent);
     mouseEvent->displayId = displayId;
 }
@@ -826,7 +773,6 @@ void OH_Input_SetMouseEventDisplayId(struct Input_MouseEvent* mouseEvent, int32_
 int32_t OH_Input_GetMouseEventDisplayId(const struct Input_MouseEvent* mouseEvent)
 {
     CALL_DEBUG_ENTER;
-    MMI_HISTOGRAM_BOOLEAN("InputKit.OH_Input_GetMouseEventDisplayId.Call", true);
     CHKPR(mouseEvent, RET_ERR);
     return mouseEvent->displayId;
 }
@@ -834,7 +780,6 @@ int32_t OH_Input_GetMouseEventDisplayId(const struct Input_MouseEvent* mouseEven
 void OH_Input_SetMouseEventGlobalX(struct Input_MouseEvent* mouseEvent, int32_t globalX)
 {
     CALL_DEBUG_ENTER;
-    MMI_HISTOGRAM_BOOLEAN("InputKit.OH_Input_SetMouseEventGlobalX.Call", true);
     CHKPV(mouseEvent);
     mouseEvent->globalX = globalX;
 }
@@ -842,7 +787,6 @@ void OH_Input_SetMouseEventGlobalX(struct Input_MouseEvent* mouseEvent, int32_t 
 int32_t OH_Input_GetMouseEventGlobalX(const struct Input_MouseEvent* mouseEvent)
 {
     CALL_DEBUG_ENTER;
-    MMI_HISTOGRAM_BOOLEAN("InputKit.OH_Input_GetMouseEventGlobalX.Call", true);
     CHKPR(mouseEvent, INT32_MAX);
     return mouseEvent->globalX;
 }
@@ -850,7 +794,6 @@ int32_t OH_Input_GetMouseEventGlobalX(const struct Input_MouseEvent* mouseEvent)
 void OH_Input_SetMouseEventGlobalY(struct Input_MouseEvent* mouseEvent, int32_t globalY)
 {
     CALL_DEBUG_ENTER;
-    MMI_HISTOGRAM_BOOLEAN("InputKit.OH_Input_SetMouseEventGlobalY.Call", true);
     CHKPV(mouseEvent);
     mouseEvent->globalY = globalY;
 }
@@ -858,7 +801,6 @@ void OH_Input_SetMouseEventGlobalY(struct Input_MouseEvent* mouseEvent, int32_t 
 int32_t OH_Input_GetMouseEventGlobalY(const struct Input_MouseEvent* mouseEvent)
 {
     CALL_DEBUG_ENTER;
-    MMI_HISTOGRAM_BOOLEAN("InputKit.OH_Input_GetMouseEventGlobalY.Call", true);
     CHKPR(mouseEvent, INT32_MAX);
     return mouseEvent->globalY;
 }
@@ -1047,7 +989,6 @@ int32_t OH_Input_InjectTouchEventGlobal(const struct Input_TouchEvent* touchEven
 struct Input_TouchEvent* OH_Input_CreateTouchEvent()
 {
     CALL_DEBUG_ENTER;
-    MMI_HISTOGRAM_BOOLEAN("InputKit.OH_Input_CreateTouchEvent.Call", true);
     Input_TouchEvent* touchEvent = new (std::nothrow) Input_TouchEvent();
     CHKPL(touchEvent);
     return touchEvent;
@@ -1056,7 +997,6 @@ struct Input_TouchEvent* OH_Input_CreateTouchEvent()
 void OH_Input_DestroyTouchEvent(struct Input_TouchEvent** touchEvent)
 {
     CALL_DEBUG_ENTER;
-    MMI_HISTOGRAM_BOOLEAN("InputKit.OH_Input_DestroyTouchEvent.Call", true);
     CHKPV(touchEvent);
     CHKPV(*touchEvent);
     delete *touchEvent;
@@ -1066,7 +1006,6 @@ void OH_Input_DestroyTouchEvent(struct Input_TouchEvent** touchEvent)
 void OH_Input_SetTouchEventAction(struct Input_TouchEvent* touchEvent, int32_t action)
 {
     CALL_DEBUG_ENTER;
-    MMI_HISTOGRAM_BOOLEAN("InputKit.OH_Input_SetTouchEventAction.Call", true);
     CHKPV(touchEvent);
     touchEvent->action = action;
 }
@@ -1074,7 +1013,6 @@ void OH_Input_SetTouchEventAction(struct Input_TouchEvent* touchEvent, int32_t a
 int32_t OH_Input_GetTouchEventAction(const struct Input_TouchEvent* touchEvent)
 {
     CALL_DEBUG_ENTER;
-    MMI_HISTOGRAM_BOOLEAN("InputKit.OH_Input_GetTouchEventAction.Call", true);
     CHKPR(touchEvent, RET_ERR);
     return touchEvent->action;
 }
@@ -1082,7 +1020,6 @@ int32_t OH_Input_GetTouchEventAction(const struct Input_TouchEvent* touchEvent)
 void OH_Input_SetTouchEventFingerId(struct Input_TouchEvent* touchEvent, int32_t id)
 {
     CALL_DEBUG_ENTER;
-    MMI_HISTOGRAM_BOOLEAN("InputKit.OH_Input_SetTouchEventFingerId.Call", true);
     CHKPV(touchEvent);
     touchEvent->id = id;
 }
@@ -1090,7 +1027,6 @@ void OH_Input_SetTouchEventFingerId(struct Input_TouchEvent* touchEvent, int32_t
 int32_t OH_Input_GetTouchEventFingerId(const struct Input_TouchEvent* touchEvent)
 {
     CALL_DEBUG_ENTER;
-    MMI_HISTOGRAM_BOOLEAN("InputKit.OH_Input_GetTouchEventFingerId.Call", true);
     CHKPR(touchEvent, RET_ERR);
     return touchEvent->id;
 }
@@ -1098,7 +1034,6 @@ int32_t OH_Input_GetTouchEventFingerId(const struct Input_TouchEvent* touchEvent
 void OH_Input_SetTouchEventDisplayX(struct Input_TouchEvent* touchEvent, int32_t displayX)
 {
     CALL_DEBUG_ENTER;
-    MMI_HISTOGRAM_BOOLEAN("InputKit.OH_Input_SetTouchEventDisplayX.Call", true);
     CHKPV(touchEvent);
     touchEvent->displayX = displayX;
 }
@@ -1106,7 +1041,6 @@ void OH_Input_SetTouchEventDisplayX(struct Input_TouchEvent* touchEvent, int32_t
 int32_t OH_Input_GetTouchEventDisplayX(const struct Input_TouchEvent* touchEvent)
 {
     CALL_DEBUG_ENTER;
-    MMI_HISTOGRAM_BOOLEAN("InputKit.OH_Input_GetTouchEventDisplayX.Call", true);
     CHKPR(touchEvent, RET_ERR);
     return touchEvent->displayX;
 }
@@ -1114,7 +1048,6 @@ int32_t OH_Input_GetTouchEventDisplayX(const struct Input_TouchEvent* touchEvent
 void OH_Input_SetTouchEventDisplayY(struct Input_TouchEvent* touchEvent, int32_t displayY)
 {
     CALL_DEBUG_ENTER;
-    MMI_HISTOGRAM_BOOLEAN("InputKit.OH_Input_SetTouchEventDisplayY.Call", true);
     CHKPV(touchEvent);
     touchEvent->displayY = displayY;
 }
@@ -1122,7 +1055,6 @@ void OH_Input_SetTouchEventDisplayY(struct Input_TouchEvent* touchEvent, int32_t
 int32_t OH_Input_GetTouchEventDisplayY(const struct Input_TouchEvent* touchEvent)
 {
     CALL_DEBUG_ENTER;
-    MMI_HISTOGRAM_BOOLEAN("InputKit.OH_Input_GetTouchEventDisplayY.Call", true);
     CHKPR(touchEvent, RET_ERR);
     return touchEvent->displayY;
 }
@@ -1130,7 +1062,6 @@ int32_t OH_Input_GetTouchEventDisplayY(const struct Input_TouchEvent* touchEvent
 void OH_Input_SetTouchEventActionTime(struct Input_TouchEvent* touchEvent, int64_t actionTime)
 {
     CALL_DEBUG_ENTER;
-    MMI_HISTOGRAM_BOOLEAN("InputKit.OH_Input_SetTouchEventActionTime.Call", true);
     CHKPV(touchEvent);
     touchEvent->actionTime = actionTime;
 }
@@ -1138,7 +1069,6 @@ void OH_Input_SetTouchEventActionTime(struct Input_TouchEvent* touchEvent, int64
 int64_t OH_Input_GetTouchEventActionTime(const struct Input_TouchEvent* touchEvent)
 {
     CALL_DEBUG_ENTER;
-    MMI_HISTOGRAM_BOOLEAN("InputKit.OH_Input_GetTouchEventActionTime.Call", true);
     CHKPR(touchEvent, RET_ERR);
     return touchEvent->actionTime;
 }
@@ -1146,7 +1076,6 @@ int64_t OH_Input_GetTouchEventActionTime(const struct Input_TouchEvent* touchEve
 void OH_Input_SetTouchEventWindowId(struct Input_TouchEvent* touchEvent, int32_t windowId)
 {
     CALL_DEBUG_ENTER;
-    MMI_HISTOGRAM_BOOLEAN("InputKit.OH_Input_SetTouchEventWindowId.Call", true);
     CHKPV(touchEvent);
     touchEvent->windowId = windowId;
 }
@@ -1154,7 +1083,6 @@ void OH_Input_SetTouchEventWindowId(struct Input_TouchEvent* touchEvent, int32_t
 int32_t OH_Input_GetTouchEventWindowId(const struct Input_TouchEvent* touchEvent)
 {
     CALL_DEBUG_ENTER;
-    MMI_HISTOGRAM_BOOLEAN("InputKit.OH_Input_GetTouchEventWindowId.Call", true);
     CHKPR(touchEvent, RET_ERR);
     return touchEvent->windowId;
 }
@@ -1162,7 +1090,6 @@ int32_t OH_Input_GetTouchEventWindowId(const struct Input_TouchEvent* touchEvent
 void OH_Input_SetTouchEventDisplayId(struct Input_TouchEvent* touchEvent, int32_t displayId)
 {
     CALL_DEBUG_ENTER;
-    MMI_HISTOGRAM_BOOLEAN("InputKit.OH_Input_SetTouchEventDisplayId.Call", true);
     CHKPV(touchEvent);
     touchEvent->displayId = displayId;
 }
@@ -1170,7 +1097,6 @@ void OH_Input_SetTouchEventDisplayId(struct Input_TouchEvent* touchEvent, int32_
 int32_t OH_Input_GetTouchEventDisplayId(const struct Input_TouchEvent* touchEvent)
 {
     CALL_DEBUG_ENTER;
-    MMI_HISTOGRAM_BOOLEAN("InputKit.OH_Input_GetTouchEventDisplayId.Call", true);
     CHKPR(touchEvent, RET_ERR);
     return touchEvent->displayId;
 }
@@ -1178,7 +1104,6 @@ int32_t OH_Input_GetTouchEventDisplayId(const struct Input_TouchEvent* touchEven
 void OH_Input_SetTouchEventGlobalX(struct Input_TouchEvent* touchEvent, int32_t globalX)
 {
     CALL_DEBUG_ENTER;
-    MMI_HISTOGRAM_BOOLEAN("InputKit.OH_Input_SetTouchEventGlobalX.Call", true);
     CHKPV(touchEvent);
     touchEvent->globalX = globalX;
 }
@@ -1186,7 +1111,6 @@ void OH_Input_SetTouchEventGlobalX(struct Input_TouchEvent* touchEvent, int32_t 
 int32_t OH_Input_GetTouchEventGlobalX(const struct Input_TouchEvent* touchEvent)
 {
     CALL_DEBUG_ENTER;
-    MMI_HISTOGRAM_BOOLEAN("InputKit.OH_Input_GetTouchEventGlobalX.Call", true);
     CHKPR(touchEvent, INT32_MAX);
     return touchEvent->globalX;
 }
@@ -1194,7 +1118,6 @@ int32_t OH_Input_GetTouchEventGlobalX(const struct Input_TouchEvent* touchEvent)
 void OH_Input_SetTouchEventGlobalY(struct Input_TouchEvent* touchEvent, int32_t globalY)
 {
     CALL_DEBUG_ENTER;
-    MMI_HISTOGRAM_BOOLEAN("InputKit.OH_Input_SetTouchEventGlobalY.Call", true);
     CHKPV(touchEvent);
     touchEvent->globalY = globalY;
 }
@@ -1202,7 +1125,6 @@ void OH_Input_SetTouchEventGlobalY(struct Input_TouchEvent* touchEvent, int32_t 
 int32_t OH_Input_GetTouchEventGlobalY(const struct Input_TouchEvent* touchEvent)
 {
     CALL_DEBUG_ENTER;
-    MMI_HISTOGRAM_BOOLEAN("InputKit.OH_Input_GetTouchEventGlobalY.Call", true);
     CHKPR(touchEvent, INT32_MAX);
     return touchEvent->globalY;
 }
@@ -1344,7 +1266,6 @@ static bool IsAxisEvent(int32_t action)
 
 Input_AxisEvent* OH_Input_CreateAxisEvent(void)
 {
-    MMI_HISTOGRAM_BOOLEAN("InputKit.OH_Input_CreateAxisEvent.Call", true);
     Input_AxisEvent* axisEvent = new (std::nothrow) Input_AxisEvent();
     CHKPP(axisEvent);
     return axisEvent;
@@ -1353,7 +1274,6 @@ Input_AxisEvent* OH_Input_CreateAxisEvent(void)
 Input_Result OH_Input_DestroyAxisEvent(Input_AxisEvent** axisEvent)
 {
     CALL_DEBUG_ENTER;
-    MMI_HISTOGRAM_BOOLEAN("InputKit.OH_Input_DestroyAxisEvent.Call", true);
     if (axisEvent == nullptr || *axisEvent == nullptr) {
         return INPUT_PARAMETER_ERROR;
     }
@@ -1364,7 +1284,6 @@ Input_Result OH_Input_DestroyAxisEvent(Input_AxisEvent** axisEvent)
 
 Input_Result OH_Input_SetAxisEventAction(Input_AxisEvent* axisEvent, InputEvent_AxisAction action)
 {
-    MMI_HISTOGRAM_BOOLEAN("InputKit.OH_Input_SetAxisEventAction.Call", true);
     CHKPR(axisEvent, INPUT_PARAMETER_ERROR);
     axisEvent->axisAction = action;
     return INPUT_SUCCESS;
@@ -1372,7 +1291,6 @@ Input_Result OH_Input_SetAxisEventAction(Input_AxisEvent* axisEvent, InputEvent_
 
 Input_Result OH_Input_GetAxisEventAction(const Input_AxisEvent* axisEvent, InputEvent_AxisAction *action)
 {
-    MMI_HISTOGRAM_BOOLEAN("InputKit.OH_Input_GetAxisEventAction.Call", true);
     CHKPR(axisEvent, INPUT_PARAMETER_ERROR);
     CHKPR(action, INPUT_PARAMETER_ERROR);
     *action = InputEvent_AxisAction(axisEvent->axisAction);
@@ -1381,7 +1299,6 @@ Input_Result OH_Input_GetAxisEventAction(const Input_AxisEvent* axisEvent, Input
 
 Input_Result OH_Input_SetAxisEventDisplayX(Input_AxisEvent* axisEvent, float displayX)
 {
-    MMI_HISTOGRAM_BOOLEAN("InputKit.OH_Input_SetAxisEventDisplayX.Call", true);
     CHKPR(axisEvent, INPUT_PARAMETER_ERROR);
     axisEvent->displayX = displayX;
     return INPUT_SUCCESS;
@@ -1389,7 +1306,6 @@ Input_Result OH_Input_SetAxisEventDisplayX(Input_AxisEvent* axisEvent, float dis
 
 Input_Result OH_Input_GetAxisEventDisplayX(const Input_AxisEvent* axisEvent, float* displayX)
 {
-    MMI_HISTOGRAM_BOOLEAN("InputKit.OH_Input_GetAxisEventDisplayX.Call", true);
     CHKPR(axisEvent, INPUT_PARAMETER_ERROR);
     CHKPR(displayX, INPUT_PARAMETER_ERROR);
     *displayX = axisEvent->displayX;
@@ -1398,7 +1314,6 @@ Input_Result OH_Input_GetAxisEventDisplayX(const Input_AxisEvent* axisEvent, flo
 
 Input_Result OH_Input_SetAxisEventDisplayY(Input_AxisEvent* axisEvent, float displayY)
 {
-    MMI_HISTOGRAM_BOOLEAN("InputKit.OH_Input_SetAxisEventDisplayY.Call", true);
     CHKPR(axisEvent, INPUT_PARAMETER_ERROR);
     axisEvent->displayY = displayY;
     return INPUT_SUCCESS;
@@ -1406,7 +1321,6 @@ Input_Result OH_Input_SetAxisEventDisplayY(Input_AxisEvent* axisEvent, float dis
 
 Input_Result OH_Input_GetAxisEventDisplayY(const Input_AxisEvent* axisEvent, float* displayY)
 {
-    MMI_HISTOGRAM_BOOLEAN("InputKit.OH_Input_GetAxisEventDisplayY.Call", true);
     CHKPR(axisEvent, INPUT_PARAMETER_ERROR);
     CHKPR(displayY, INPUT_PARAMETER_ERROR);
     *displayY = axisEvent->displayY;
@@ -1416,7 +1330,6 @@ Input_Result OH_Input_GetAxisEventDisplayY(const Input_AxisEvent* axisEvent, flo
 Input_Result OH_Input_SetAxisEventAxisValue(Input_AxisEvent* axisEvent,
     InputEvent_AxisType axisType, double axisValue)
 {
-    MMI_HISTOGRAM_BOOLEAN("InputKit.OH_Input_SetAxisEventAxisValue.Call", true);
     CHKPR(axisEvent, INPUT_PARAMETER_ERROR);
     axisEvent->axisValues.emplace(axisType, axisValue);
     return INPUT_SUCCESS;
@@ -1425,7 +1338,6 @@ Input_Result OH_Input_SetAxisEventAxisValue(Input_AxisEvent* axisEvent,
 Input_Result OH_Input_GetAxisEventAxisValue(const Input_AxisEvent* axisEvent,
     InputEvent_AxisType axisType, double* axisValue)
 {
-    MMI_HISTOGRAM_BOOLEAN("InputKit.OH_Input_GetAxisEventAxisValue.Call", true);
     CHKPR(axisEvent, INPUT_PARAMETER_ERROR);
     CHKPR(axisValue, INPUT_PARAMETER_ERROR);
     auto it = axisEvent->axisValues.find(axisType);
@@ -1439,7 +1351,6 @@ Input_Result OH_Input_GetAxisEventAxisValue(const Input_AxisEvent* axisEvent,
 
 Input_Result OH_Input_SetAxisEventActionTime(Input_AxisEvent* axisEvent, int64_t actionTime)
 {
-    MMI_HISTOGRAM_BOOLEAN("InputKit.OH_Input_SetAxisEventActionTime.Call", true);
     CHKPR(axisEvent, INPUT_PARAMETER_ERROR);
     axisEvent->actionTime = actionTime;
     return INPUT_SUCCESS;
@@ -1447,7 +1358,6 @@ Input_Result OH_Input_SetAxisEventActionTime(Input_AxisEvent* axisEvent, int64_t
 
 Input_Result OH_Input_GetAxisEventActionTime(const Input_AxisEvent* axisEvent, int64_t* actionTime)
 {
-    MMI_HISTOGRAM_BOOLEAN("InputKit.OH_Input_GetAxisEventActionTime.Call", true);
     CHKPR(axisEvent, INPUT_PARAMETER_ERROR);
     CHKPR(actionTime, INPUT_PARAMETER_ERROR);
     *actionTime = axisEvent->actionTime;
@@ -1456,7 +1366,6 @@ Input_Result OH_Input_GetAxisEventActionTime(const Input_AxisEvent* axisEvent, i
 
 Input_Result OH_Input_SetAxisEventType(Input_AxisEvent* axisEvent, InputEvent_AxisEventType axisEventType)
 {
-    MMI_HISTOGRAM_BOOLEAN("InputKit.OH_Input_SetAxisEventType.Call", true);
     CHKPR(axisEvent, INPUT_PARAMETER_ERROR);
     axisEvent->axisEventType = axisEventType;
     return INPUT_SUCCESS;
@@ -1464,7 +1373,6 @@ Input_Result OH_Input_SetAxisEventType(Input_AxisEvent* axisEvent, InputEvent_Ax
 
 Input_Result OH_Input_GetAxisEventType(const Input_AxisEvent* axisEvent, InputEvent_AxisEventType* axisEventType)
 {
-    MMI_HISTOGRAM_BOOLEAN("InputKit.OH_Input_GetAxisEventType.Call", true);
     CHKPR(axisEvent, INPUT_PARAMETER_ERROR);
     CHKPR(axisEventType, INPUT_PARAMETER_ERROR);
     *axisEventType = InputEvent_AxisEventType(axisEvent->axisEventType);
@@ -1473,7 +1381,6 @@ Input_Result OH_Input_GetAxisEventType(const Input_AxisEvent* axisEvent, InputEv
 
 Input_Result OH_Input_SetAxisEventSourceType(Input_AxisEvent* axisEvent, InputEvent_SourceType sourceType)
 {
-    MMI_HISTOGRAM_BOOLEAN("InputKit.OH_Input_SetAxisEventSourceType.Call", true);
     CHKPR(axisEvent, INPUT_PARAMETER_ERROR);
     axisEvent->sourceType = sourceType;
     return INPUT_SUCCESS;
@@ -1481,7 +1388,6 @@ Input_Result OH_Input_SetAxisEventSourceType(Input_AxisEvent* axisEvent, InputEv
 
 Input_Result OH_Input_GetAxisEventSourceType(const Input_AxisEvent* axisEvent, InputEvent_SourceType* sourceType)
 {
-    MMI_HISTOGRAM_BOOLEAN("InputKit.OH_Input_GetAxisEventSourceType.Call", true);
     CHKPR(axisEvent, INPUT_PARAMETER_ERROR);
     CHKPR(sourceType, INPUT_PARAMETER_ERROR);
     *sourceType = InputEvent_SourceType(axisEvent->sourceType);
@@ -1490,7 +1396,6 @@ Input_Result OH_Input_GetAxisEventSourceType(const Input_AxisEvent* axisEvent, I
 
 Input_Result OH_Input_SetAxisEventWindowId(Input_AxisEvent* axisEvent, int32_t windowId)
 {
-    MMI_HISTOGRAM_BOOLEAN("InputKit.OH_Input_SetAxisEventWindowId.Call", true);
     CHKPR(axisEvent, INPUT_PARAMETER_ERROR);
     axisEvent->windowId = windowId;
     return INPUT_SUCCESS;
@@ -1498,7 +1403,6 @@ Input_Result OH_Input_SetAxisEventWindowId(Input_AxisEvent* axisEvent, int32_t w
 
 Input_Result OH_Input_GetAxisEventWindowId(const Input_AxisEvent* axisEvent, int32_t* windowId)
 {
-    MMI_HISTOGRAM_BOOLEAN("InputKit.OH_Input_GetAxisEventWindowId.Call", true);
     CHKPR(axisEvent, INPUT_PARAMETER_ERROR);
     CHKPR(windowId, INPUT_PARAMETER_ERROR);
     *windowId = axisEvent->windowId;
@@ -1507,7 +1411,6 @@ Input_Result OH_Input_GetAxisEventWindowId(const Input_AxisEvent* axisEvent, int
 
 Input_Result OH_Input_SetAxisEventDisplayId(Input_AxisEvent* axisEvent, int32_t displayId)
 {
-    MMI_HISTOGRAM_BOOLEAN("InputKit.OH_Input_SetAxisEventDisplayId.Call", true);
     CHKPR(axisEvent, INPUT_PARAMETER_ERROR);
     axisEvent->displayId = displayId;
     return INPUT_SUCCESS;
@@ -1515,7 +1418,6 @@ Input_Result OH_Input_SetAxisEventDisplayId(Input_AxisEvent* axisEvent, int32_t 
 
 Input_Result OH_Input_GetAxisEventDisplayId(const Input_AxisEvent* axisEvent, int32_t* displayId)
 {
-    MMI_HISTOGRAM_BOOLEAN("InputKit.OH_Input_GetAxisEventDisplayId.Call", true);
     CHKPR(axisEvent, INPUT_PARAMETER_ERROR);
     CHKPR(displayId, INPUT_PARAMETER_ERROR);
     *displayId = axisEvent->displayId;
@@ -1524,7 +1426,6 @@ Input_Result OH_Input_GetAxisEventDisplayId(const Input_AxisEvent* axisEvent, in
 
 Input_Result OH_Input_SetAxisEventGlobalX(struct Input_AxisEvent* axisEvent, int32_t globalX)
 {
-    MMI_HISTOGRAM_BOOLEAN("InputKit.OH_Input_SetAxisEventGlobalX.Call", true);
     CHKPR(axisEvent, INPUT_PARAMETER_ERROR);
     axisEvent->globalX = globalX;
     return INPUT_SUCCESS;
@@ -1532,7 +1433,6 @@ Input_Result OH_Input_SetAxisEventGlobalX(struct Input_AxisEvent* axisEvent, int
 
 Input_Result OH_Input_GetAxisEventGlobalX(const Input_AxisEvent* axisEvent, int32_t* globalX)
 {
-    MMI_HISTOGRAM_BOOLEAN("InputKit.OH_Input_GetAxisEventGlobalX.Call", true);
     CHKPR(axisEvent, INPUT_PARAMETER_ERROR);
     CHKPR(globalX, INPUT_PARAMETER_ERROR);
     *globalX = axisEvent->globalX;
@@ -1541,7 +1441,6 @@ Input_Result OH_Input_GetAxisEventGlobalX(const Input_AxisEvent* axisEvent, int3
 
 Input_Result OH_Input_SetAxisEventGlobalY(struct Input_AxisEvent* axisEvent, int32_t globalY)
 {
-    MMI_HISTOGRAM_BOOLEAN("InputKit.OH_Input_SetAxisEventGlobalY.Call", true);
     CHKPR(axisEvent, INPUT_PARAMETER_ERROR);
     axisEvent->globalY = globalY;
     return INPUT_SUCCESS;
@@ -1549,7 +1448,6 @@ Input_Result OH_Input_SetAxisEventGlobalY(struct Input_AxisEvent* axisEvent, int
 
 Input_Result OH_Input_GetAxisEventGlobalY(const Input_AxisEvent* axisEvent, int32_t* globalY)
 {
-    MMI_HISTOGRAM_BOOLEAN("InputKit.OH_Input_GetAxisEventGlobalY.Call", true);
     CHKPR(axisEvent, INPUT_PARAMETER_ERROR);
     CHKPR(globalY, INPUT_PARAMETER_ERROR);
     *globalY = axisEvent->globalY;
@@ -2362,7 +2260,7 @@ Input_Result OH_Input_RemoveInputEventInterceptor(void)
     return retCode;
 }
 
-int32_t OH_Input_GetIntervalSinceLastInput(int64_t *intervalSinceLastInput)
+Input_Result OH_Input_GetIntervalSinceLastInput(int64_t *intervalSinceLastInput)
 {
     CALL_DEBUG_ENTER;
     MMI_HISTOGRAM_BOOLEAN("InputKit.OH_Input_GetIntervalSinceLastInput.Call", true);
@@ -2422,7 +2320,6 @@ Input_Hotkey **OH_Input_CreateAllSystemHotkeys(int32_t count)
 
 void OH_Input_DestroyAllSystemHotkeys(Input_Hotkey **hotkeys, int32_t count)
 {
-    MMI_HISTOGRAM_BOOLEAN("InputKit.OH_Input_DestroyAllSystemHotkeys.Call", true);
     std::lock_guard<std::mutex> lock(g_hotkeyCountsMutex);
     auto iter = g_hotkeyCounts.find(hotkeys);
     if (iter != g_hotkeyCounts.end()) {
@@ -2478,7 +2375,6 @@ Input_Result OH_Input_GetAllSystemHotkeys(Input_Hotkey **hotkey, int32_t *count)
 Input_Hotkey* OH_Input_CreateHotkey(void)
 {
     CALL_DEBUG_ENTER;
-    MMI_HISTOGRAM_BOOLEAN("InputKit.OH_Input_CreateHotkey.Call", true);
     Input_Hotkey* hotkey = new (std::nothrow) Input_Hotkey();
     CHKPP(hotkey);
     return hotkey;
@@ -2487,7 +2383,6 @@ Input_Hotkey* OH_Input_CreateHotkey(void)
 void OH_Input_DestroyHotkey(Input_Hotkey **hotkey)
 {
     CALL_DEBUG_ENTER;
-    MMI_HISTOGRAM_BOOLEAN("InputKit.OH_Input_DestroyHotkey.Call", true);
     CHKPV(hotkey);
     CHKPV(*hotkey);
     delete *hotkey;
@@ -2497,7 +2392,6 @@ void OH_Input_DestroyHotkey(Input_Hotkey **hotkey)
 void OH_Input_SetPreKeys(Input_Hotkey *hotkey, int32_t *preKeys, int32_t size)
 {
     CALL_DEBUG_ENTER;
-    MMI_HISTOGRAM_BOOLEAN("InputKit.OH_Input_SetPreKeys.Call", true);
     CHKPV(hotkey);
     CHKPV(preKeys);
     if (size <= 0) {
@@ -2514,7 +2408,6 @@ void OH_Input_SetPreKeys(Input_Hotkey *hotkey, int32_t *preKeys, int32_t size)
 Input_Result OH_Input_GetPreKeys(const Input_Hotkey *hotkey, int32_t **preKeys, int32_t *preKeyCount)
 {
     CALL_DEBUG_ENTER;
-    MMI_HISTOGRAM_BOOLEAN("InputKit.OH_Input_GetPreKeys.Call", true);
     CHKPR(hotkey, INPUT_PARAMETER_ERROR);
     CHKPR(preKeys, INPUT_PARAMETER_ERROR);
     CHKPR(*preKeys, INPUT_PARAMETER_ERROR);
@@ -2535,7 +2428,6 @@ Input_Result OH_Input_GetPreKeys(const Input_Hotkey *hotkey, int32_t **preKeys, 
 void OH_Input_SetFinalKey(Input_Hotkey *hotkey, int32_t finalKey)
 {
     CALL_DEBUG_ENTER;
-    MMI_HISTOGRAM_BOOLEAN("InputKit.OH_Input_SetFinalKey.Call", true);
     CHKPV(hotkey);
     hotkey->finalKey = finalKey;
     return;
@@ -2544,7 +2436,6 @@ void OH_Input_SetFinalKey(Input_Hotkey *hotkey, int32_t finalKey)
 Input_Result OH_Input_GetFinalKey(const Input_Hotkey *hotkey, int32_t *finalKeyCode)
 {
     CALL_DEBUG_ENTER;
-    MMI_HISTOGRAM_BOOLEAN("InputKit.OH_Input_GetFinalKey.Call", true);
     CHKPR(hotkey, INPUT_PARAMETER_ERROR);
     CHKPR(finalKeyCode, INPUT_PARAMETER_ERROR);
     *finalKeyCode = hotkey->finalKey;
@@ -2554,7 +2445,6 @@ Input_Result OH_Input_GetFinalKey(const Input_Hotkey *hotkey, int32_t *finalKeyC
 void OH_Input_SetRepeat(Input_Hotkey* hotkey, bool isRepeat)
 {
     CALL_DEBUG_ENTER;
-    MMI_HISTOGRAM_BOOLEAN("InputKit.OH_Input_SetRepeat.Call", true);
     CHKPV(hotkey);
     hotkey->isRepeat = isRepeat;
 }
@@ -2562,7 +2452,6 @@ void OH_Input_SetRepeat(Input_Hotkey* hotkey, bool isRepeat)
 Input_Result OH_Input_GetRepeat(const Input_Hotkey* hotkey, bool *isRepeat)
 {
     CALL_DEBUG_ENTER;
-    MMI_HISTOGRAM_BOOLEAN("InputKit.OH_Input_GetRepeat.Call", true);
     CHKPR(hotkey, INPUT_PARAMETER_ERROR);
     CHKPR(isRepeat, INPUT_PARAMETER_ERROR);
     *isRepeat = hotkey->isRepeat;
@@ -2668,8 +2557,9 @@ static int32_t AddHotkeySubscribe(Input_HotkeyInfo* hotkeyInfo)
                 return INPUT_PARAMETER_ERROR;
             }
         }
+
+        it->second.push_back(hotkeyInfo);
     }
-    it->second.push_back(hotkeyInfo);
     return INPUT_SUCCESS;
 }
 
@@ -3022,12 +2912,7 @@ Input_Result OH_Input_GetDeviceIds(int32_t *deviceIds, int32_t inSize, int32_t *
     CHKPR(outSize, INPUT_PARAMETER_ERROR);
     auto nativeCallback = [&](std::vector<int32_t> &ids) {
         auto deviceIdslength = static_cast<int32_t>(ids.size());
-        if (inSize > deviceIdslength) {
-            *outSize = deviceIdslength;
-        }
-        if (inSize < deviceIdslength) {
-            *outSize = inSize;
-        }
+        *outSize = std::min(inSize, deviceIdslength);
         for (int32_t i = 0; i < *outSize; ++i) {
             *(deviceIds + i) = ids[i];
         }
@@ -3043,7 +2928,6 @@ Input_Result OH_Input_GetDeviceIds(int32_t *deviceIds, int32_t inSize, int32_t *
 Input_DeviceInfo* OH_Input_CreateDeviceInfo(void)
 {
     CALL_DEBUG_ENTER;
-    MMI_HISTOGRAM_BOOLEAN("InputKit.OH_Input_CreateDeviceInfo.Call", true);
     Input_DeviceInfo* deviceInfo = new (std::nothrow) Input_DeviceInfo();
     CHKPP(deviceInfo);
     return deviceInfo;
@@ -3052,7 +2936,6 @@ Input_DeviceInfo* OH_Input_CreateDeviceInfo(void)
 void OH_Input_DestroyDeviceInfo(Input_DeviceInfo **deviceInfo)
 {
     CALL_DEBUG_ENTER;
-    MMI_HISTOGRAM_BOOLEAN("InputKit.OH_Input_DestroyDeviceInfo.Call", true);
     CHKPV(deviceInfo);
     CHKPV(*deviceInfo);
     delete *deviceInfo;
@@ -3116,7 +2999,6 @@ Input_Result OH_Input_GetKeyboardType(int32_t deviceId, int32_t *KeyboardType)
 Input_Result OH_Input_GetDeviceName(Input_DeviceInfo *deviceInfo, char **name)
 {
     CALL_DEBUG_ENTER;
-    MMI_HISTOGRAM_BOOLEAN("InputKit.OH_Input_GetDeviceName.Call", true);
     CHKPR(deviceInfo, INPUT_PARAMETER_ERROR);
     CHKPR(name, INPUT_PARAMETER_ERROR);
     *name = deviceInfo->name;
@@ -3127,7 +3009,6 @@ Input_Result OH_Input_GetDeviceName(Input_DeviceInfo *deviceInfo, char **name)
 Input_Result OH_Input_GetDeviceAddress(Input_DeviceInfo *deviceInfo, char **address)
 {
     CALL_DEBUG_ENTER;
-    MMI_HISTOGRAM_BOOLEAN("InputKit.OH_Input_GetDeviceAddress.Call", true);
     CHKPR(deviceInfo, INPUT_PARAMETER_ERROR);
     CHKPR(address, INPUT_PARAMETER_ERROR);
     *address = deviceInfo->phys;
@@ -3137,7 +3018,6 @@ Input_Result OH_Input_GetDeviceAddress(Input_DeviceInfo *deviceInfo, char **addr
 Input_Result OH_Input_GetDeviceId(Input_DeviceInfo *deviceInfo, int32_t *id)
 {
     CALL_DEBUG_ENTER;
-    MMI_HISTOGRAM_BOOLEAN("InputKit.OH_Input_GetDeviceId.Call", true);
     CHKPR(deviceInfo, INPUT_PARAMETER_ERROR);
     CHKPR(id, INPUT_PARAMETER_ERROR);
     *id = deviceInfo->id;
@@ -3147,7 +3027,6 @@ Input_Result OH_Input_GetDeviceId(Input_DeviceInfo *deviceInfo, int32_t *id)
 Input_Result OH_Input_GetCapabilities(Input_DeviceInfo *deviceInfo, int32_t *capabilities)
 {
     CALL_DEBUG_ENTER;
-    MMI_HISTOGRAM_BOOLEAN("InputKit.OH_Input_GetCapabilities.Call", true);
     CHKPR(deviceInfo, INPUT_PARAMETER_ERROR);
     CHKPR(capabilities, INPUT_PARAMETER_ERROR);
     *capabilities = deviceInfo->ability;
@@ -3157,7 +3036,6 @@ Input_Result OH_Input_GetCapabilities(Input_DeviceInfo *deviceInfo, int32_t *cap
 Input_Result OH_Input_GetDeviceVersion(Input_DeviceInfo *deviceInfo, int32_t *version)
 {
     CALL_DEBUG_ENTER;
-    MMI_HISTOGRAM_BOOLEAN("InputKit.OH_Input_GetDeviceVersion.Call", true);
     CHKPR(deviceInfo, INPUT_PARAMETER_ERROR);
     CHKPR(version, INPUT_PARAMETER_ERROR);
     *version = deviceInfo->version;
@@ -3167,7 +3045,6 @@ Input_Result OH_Input_GetDeviceVersion(Input_DeviceInfo *deviceInfo, int32_t *ve
 Input_Result OH_Input_GetDeviceProduct(Input_DeviceInfo *deviceInfo, int32_t *product)
 {
     CALL_DEBUG_ENTER;
-    MMI_HISTOGRAM_BOOLEAN("InputKit.OH_Input_GetDeviceProduct.Call", true);
     CHKPR(deviceInfo, INPUT_PARAMETER_ERROR);
     CHKPR(product, INPUT_PARAMETER_ERROR);
     *product = deviceInfo->product;
@@ -3177,7 +3054,6 @@ Input_Result OH_Input_GetDeviceProduct(Input_DeviceInfo *deviceInfo, int32_t *pr
 Input_Result OH_Input_GetDeviceVendor(Input_DeviceInfo *deviceInfo, int32_t *vendor)
 {
     CALL_DEBUG_ENTER;
-    MMI_HISTOGRAM_BOOLEAN("InputKit.OH_Input_GetDeviceVendor.Call", true);
     CHKPR(deviceInfo, INPUT_PARAMETER_ERROR);
     CHKPR(vendor, INPUT_PARAMETER_ERROR);
     *vendor = deviceInfo->vendor;
@@ -3334,7 +3210,7 @@ Input_Result OH_Input_GetPointerLocation(int32_t *displayId, double *displayX, d
 static void TransformTouchActionDown(std::shared_ptr<OHOS::MMI::PointerEvent> pointerEvent,
     OHOS::MMI::PointerEvent::PointerItem &item, int64_t time)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     CHKPV(pointerEvent);
     auto pointIds = pointerEvent->GetPointerIds();
     if (pointIds.empty()) {
@@ -3350,7 +3226,7 @@ static void TransformTouchActionDown(std::shared_ptr<OHOS::MMI::PointerEvent> po
 static int32_t TransformTouchAction(const struct Input_TouchEvent *touchEvent,
     std::shared_ptr<OHOS::MMI::PointerEvent> pointerEvent, OHOS::MMI::PointerEvent::PointerItem &item)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     CHKPR(touchEvent, INPUT_PARAMETER_ERROR);
     CHKPR(pointerEvent, INPUT_PARAMETER_ERROR);
     int64_t time = touchEvent->actionTime;
@@ -3392,7 +3268,7 @@ static int32_t TransformTouchProperty(const struct Input_TouchEvent *touchEvent,
     std::shared_ptr<OHOS::MMI::PointerEvent> pointerEvent,
     OHOS::MMI::PointerEvent::PointerItem &item, int32_t windowX, int32_t windowY)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     CHKPR(touchEvent, INPUT_PARAMETER_ERROR);
     CHKPR(pointerEvent, INPUT_PARAMETER_ERROR);
     int32_t screenX = touchEvent->displayX;
@@ -3446,7 +3322,7 @@ static int32_t TransformTouchProperty(const struct Input_TouchEvent *touchEvent,
 std::shared_ptr<OHOS::MMI::PointerEvent> OH_Input_TouchEventToPointerEvent(Input_TouchEvent *touchEvent,
     int32_t windowX, int32_t windowY)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     if (touchEvent == nullptr) {
         MMI_HILOGE("touchEvent is null");
         return nullptr;
@@ -3474,9 +3350,41 @@ std::shared_ptr<OHOS::MMI::PointerEvent> OH_Input_TouchEventToPointerEvent(Input
     return pointerEvent;
 }
 
+Input_TouchEvent  *OH_Input_PointerEventToTouchEvent(const OHOS::MMI::PointerEvent &event)
+{
+    Input_TouchEvent* touchEvent = OH_Input_CreateTouchEvent();
+    if (touchEvent == nullptr) {
+        MMI_HILOGE("touchevent is null");
+        return nullptr;
+    }
+    OHOS::MMI::PointerEvent::PointerItem item;
+    if (!(event.GetPointerItem(event.GetPointerId(), item))) {
+        MMI_HILOGE("Can not get pointerItem for the pointer event");
+        OH_Input_DestroyTouchEvent(&touchEvent);
+        return nullptr;
+    }
+    if (!SetTouchEventAction(touchEvent, event.GetPointerAction())) {
+        OH_Input_DestroyTouchEvent(&touchEvent);
+        return nullptr;
+    }
+    touchEvent->id = event.GetPointerId();
+    touchEvent->displayX = item.GetDisplayX();
+    touchEvent->displayY = item.GetDisplayY();
+    touchEvent->actionTime = event.GetActionTime();
+    touchEvent->windowId = event.GetTargetWindowId();
+    touchEvent->displayId = event.GetTargetDisplayId();
+    touchEvent->globalX = item.GetGlobalX();
+    touchEvent->globalY = item.GetGlobalY();
+    touchEvent->pressure = item.GetPressure();
+    touchEvent->windowX = item.GetWindowX();
+    touchEvent->windowY = item.GetWindowY();
+    touchEvent->downTime = item.GetDownTime();
+    touchEvent->toolType = static_cast<Input_TouchEventToolType>(item.GetToolType());
+    return touchEvent;
+}
+
 Input_Result OH_Input_GetKeyEventId(const struct Input_KeyEvent* keyEvent, int32_t* eventId)
 {
-    MMI_HISTOGRAM_BOOLEAN("InputKit.OH_Input_GetKeyEventId.Call", true);
     CHKPR(keyEvent, INPUT_PARAMETER_ERROR);
     CHKPR(eventId, INPUT_PARAMETER_ERROR);
     *eventId = keyEvent->id;
@@ -3485,7 +3393,7 @@ Input_Result OH_Input_GetKeyEventId(const struct Input_KeyEvent* keyEvent, int32
 
 Input_Result OH_Input_AddKeyEventHook(Input_KeyEventCallback callback)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     MMI_HISTOGRAM_BOOLEAN("InputKit.OH_Input_AddKeyEventHook.Call", true);
     CHKPR(callback, INPUT_PARAMETER_ERROR);
     if (auto hookCallback = GetHookCallback(); callback == hookCallback) {
@@ -3528,7 +3436,7 @@ Input_Result OH_Input_AddKeyEventHook(Input_KeyEventCallback callback)
 
 Input_Result OH_Input_RemoveKeyEventHook(Input_KeyEventCallback callback)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     MMI_HISTOGRAM_BOOLEAN("InputKit.OH_Input_RemoveKeyEventHook.Call", true);
     CHKPR(callback, INPUT_PARAMETER_ERROR);
     if (auto hookCallback = GetHookCallback(); hookCallback != callback) {
@@ -3623,7 +3531,6 @@ Input_Result OH_Input_SetPointerStyle(int32_t windowId, int32_t pointerStyle)
 Input_CustomCursor* OH_Input_CustomCursor_Create(OH_PixelmapNative* pixelMap, int32_t anchorX, int32_t anchorY)
 {
     CALL_DEBUG_ENTER;
-    MMI_HISTOGRAM_BOOLEAN("InputKit.OH_Input_CustomCursor_Create.Call", true);
     CHKPP(pixelMap);
     OH_Pixelmap_ImageInfo* imageInfo = nullptr;
     if (OH_PixelmapImageInfo_Create(&imageInfo) != IMAGE_SUCCESS) {
@@ -3655,7 +3562,6 @@ Input_CustomCursor* OH_Input_CustomCursor_Create(OH_PixelmapNative* pixelMap, in
 void OH_Input_CustomCursor_Destroy(Input_CustomCursor** customCursor)
 {
     CALL_DEBUG_ENTER;
-    MMI_HISTOGRAM_BOOLEAN("InputKit.OH_Input_CustomCursor_Destroy.Call", true);
     CHKPV(customCursor);
     CHKPV(*customCursor);
     delete *customCursor;
@@ -3665,7 +3571,6 @@ void OH_Input_CustomCursor_Destroy(Input_CustomCursor** customCursor)
 Input_Result OH_Input_CustomCursor_GetPixelMap(Input_CustomCursor* customCursor, OH_PixelmapNative** pixelMap)
 {
     CALL_DEBUG_ENTER;
-    MMI_HISTOGRAM_BOOLEAN("InputKit.OH_Input_CustomCursor_GetPixelMap.Call", true);
     CHKPR(customCursor, INPUT_PARAMETER_ERROR);
     CHKPR(pixelMap, INPUT_PARAMETER_ERROR);
     *pixelMap = customCursor->pixelMap;
@@ -3675,7 +3580,6 @@ Input_Result OH_Input_CustomCursor_GetPixelMap(Input_CustomCursor* customCursor,
 Input_Result OH_Input_CustomCursor_GetAnchor(Input_CustomCursor* customCursor, int32_t* anchorX, int32_t* anchorY)
 {
     CALL_DEBUG_ENTER;
-    MMI_HISTOGRAM_BOOLEAN("InputKit.OH_Input_CustomCursor_GetAnchor.Call", true);
     CHKPR(customCursor, INPUT_PARAMETER_ERROR);
     CHKPR(anchorX, INPUT_PARAMETER_ERROR);
     CHKPR(anchorY, INPUT_PARAMETER_ERROR);
@@ -3687,7 +3591,6 @@ Input_Result OH_Input_CustomCursor_GetAnchor(Input_CustomCursor* customCursor, i
 Input_CursorConfig* OH_Input_CursorConfig_Create(bool followSystem)
 {
     CALL_DEBUG_ENTER;
-    MMI_HISTOGRAM_BOOLEAN("InputKit.OH_Input_CursorConfig_Create.Call", true);
     Input_CursorConfig* cursorConfig = new (std::nothrow) Input_CursorConfig();
     CHKPP(cursorConfig);
     cursorConfig->followSystem = followSystem;
@@ -3697,7 +3600,6 @@ Input_CursorConfig* OH_Input_CursorConfig_Create(bool followSystem)
 void OH_Input_CursorConfig_Destroy(Input_CursorConfig** cursorConfig)
 {
     CALL_DEBUG_ENTER;
-    MMI_HISTOGRAM_BOOLEAN("InputKit.OH_Input_CursorConfig_Destroy.Call", true);
     CHKPV(cursorConfig);
     CHKPV(*cursorConfig);
     delete *cursorConfig;
@@ -3707,7 +3609,6 @@ void OH_Input_CursorConfig_Destroy(Input_CursorConfig** cursorConfig)
 Input_Result OH_Input_CursorConfig_IsFollowSystem(Input_CursorConfig* cursorConfig, bool* followSystem)
 {
     CALL_DEBUG_ENTER;
-    MMI_HISTOGRAM_BOOLEAN("InputKit.OH_Input_CursorConfig_IsFollowSystem.Call", true);
     CHKPR(cursorConfig, INPUT_PARAMETER_ERROR);
     CHKPR(followSystem, INPUT_PARAMETER_ERROR);
     *followSystem = cursorConfig->followSystem;
@@ -3816,7 +3717,6 @@ Input_Result OH_Input_SetCustomCursor(int32_t windowId, Input_CustomCursor* cust
 struct Input_CursorInfo* OH_Input_CursorInfo_Create()
 {
     CALL_DEBUG_ENTER;
-    MMI_HISTOGRAM_BOOLEAN("InputKit.OH_Input_CursorInfo_Create.Call", true);
     Input_CursorInfo* cursorInfo = new (std::nothrow) Input_CursorInfo();
     CHKPL(cursorInfo);
     return cursorInfo;
@@ -3825,7 +3725,6 @@ struct Input_CursorInfo* OH_Input_CursorInfo_Create()
 void OH_Input_CursorInfo_Destroy(Input_CursorInfo** cursorInfo)
 {
     CALL_DEBUG_ENTER;
-    MMI_HISTOGRAM_BOOLEAN("InputKit.OH_Input_CursorInfo_Destroy.Call", true);
     CHKPV(cursorInfo);
     CHKPV(*cursorInfo);
     delete *cursorInfo;
@@ -3835,7 +3734,6 @@ void OH_Input_CursorInfo_Destroy(Input_CursorInfo** cursorInfo)
 Input_Result OH_Input_CursorInfo_IsVisible(Input_CursorInfo* cursorInfo, bool* visible)
 {
     CALL_DEBUG_ENTER;
-    MMI_HISTOGRAM_BOOLEAN("InputKit.OH_Input_CursorInfo_IsVisible.Call", true);
     CHKPR(cursorInfo, INPUT_PARAMETER_ERROR);
     CHKPR(visible, INPUT_PARAMETER_ERROR);
     *visible = cursorInfo->visible;
@@ -3845,7 +3743,6 @@ Input_Result OH_Input_CursorInfo_IsVisible(Input_CursorInfo* cursorInfo, bool* v
 Input_Result OH_Input_CursorInfo_GetStyle(Input_CursorInfo* cursorInfo, Input_PointerStyle* style)
 {
     CALL_DEBUG_ENTER;
-    MMI_HISTOGRAM_BOOLEAN("InputKit.OH_Input_CursorInfo_GetStyle.Call", true);
     CHKPR(cursorInfo, INPUT_PARAMETER_ERROR);
     CHKPR(style, INPUT_PARAMETER_ERROR);
     if (!cursorInfo->visible) {
@@ -3858,7 +3755,6 @@ Input_Result OH_Input_CursorInfo_GetStyle(Input_CursorInfo* cursorInfo, Input_Po
 Input_Result OH_Input_CursorInfo_GetSizeLevel(Input_CursorInfo* cursorInfo, int32_t* sizeLevel)
 {
     CALL_DEBUG_ENTER;
-    MMI_HISTOGRAM_BOOLEAN("InputKit.OH_Input_CursorInfo_GetSizeLevel.Call", true);
     CHKPR(cursorInfo, INPUT_PARAMETER_ERROR);
     CHKPR(sizeLevel, INPUT_PARAMETER_ERROR);
     if (!cursorInfo->visible) {
@@ -3871,7 +3767,6 @@ Input_Result OH_Input_CursorInfo_GetSizeLevel(Input_CursorInfo* cursorInfo, int3
 Input_Result OH_Input_CursorInfo_GetColor(Input_CursorInfo* cursorInfo, uint32_t* cursorColor)
 {
     CALL_DEBUG_ENTER;
-    MMI_HISTOGRAM_BOOLEAN("InputKit.OH_Input_CursorInfo_GetColor.Call", true);
     CHKPR(cursorInfo, INPUT_PARAMETER_ERROR);
     CHKPR(cursorColor, INPUT_PARAMETER_ERROR);
     if (!cursorInfo->visible) {
@@ -3884,7 +3779,6 @@ Input_Result OH_Input_CursorInfo_GetColor(Input_CursorInfo* cursorInfo, uint32_t
 Input_Result OH_Input_GetMouseEventCursorInfo(const struct Input_MouseEvent* mouseEvent, Input_CursorInfo* cursorInfo)
 {
     CALL_DEBUG_ENTER;
-    MMI_HISTOGRAM_BOOLEAN("InputKit.OH_Input_GetMouseEventCursorInfo.Call", true);
     CHKPR(mouseEvent, INPUT_PARAMETER_ERROR);
     CHKPR(cursorInfo, INPUT_PARAMETER_ERROR);
     *cursorInfo = mouseEvent->cursorInfo;

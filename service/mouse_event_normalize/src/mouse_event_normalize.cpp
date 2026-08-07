@@ -28,7 +28,7 @@ namespace MMI {
 
 void MouseEventNormalize::OnDeviceAdded(int32_t deviceId)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     CHKPV(env_);
     auto devMgr = env_->GetDeviceManager();
     if (devMgr == nullptr) {
@@ -51,26 +51,26 @@ void MouseEventNormalize::OnDeviceAdded(int32_t deviceId)
                 return;
             }
             processors_.emplace(deviceId, std::make_shared<MouseTransformProcessor>(env_, deviceId));
-            MMI_HILOGI("Emplace processor for device(%{public}d)", deviceId);
+            MMI_HILOGD("Emplace processor for device(%{public}d)", deviceId);
         });
 }
 
 void MouseEventNormalize::OnDeviceRemoved(int32_t deviceId)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     auto iter = std::find_if(processors_.cbegin(), processors_.cend(),
         [deviceId](const auto &item) {
             return ((item.first == deviceId));
         });
     if (iter != processors_.end()) {
-        MMI_HILOGI("Clear processor attached to device(%{public}d)", deviceId);
+        MMI_HILOGD("Clear processor attached to device(%{public}d)", deviceId);
         processors_.erase(iter);
     }
 }
 
 void MouseEventNormalize::OnDeviceEnabled(int32_t deviceId)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     auto processor = GetProcessor(deviceId);
     if (processor != nullptr) {
         processor->OnDeviceEnabled();
@@ -79,7 +79,7 @@ void MouseEventNormalize::OnDeviceEnabled(int32_t deviceId)
 
 void MouseEventNormalize::OnDeviceDisabled(int32_t deviceId)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     auto processor = GetProcessor(deviceId);
     if (processor != nullptr) {
         processor->OnDeviceDisabled();

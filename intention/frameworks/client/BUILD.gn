@@ -33,12 +33,12 @@ ohos_source_set("intention_manager") {
 
   sources = [ "src/intention_manager.cpp" ]
 
+  public_configs = [ ":intention_manager_public_config" ]
+
   deps = [
     "${device_status_root_path}/utils/common:devicestatus_util",
     "${device_status_root_path}/utils/ipc:devicestatus_ipc",
   ]
-
-  public_configs = [ ":intention_manager_public_config" ]
 
   external_deps = [ "hilog:libhilog" ]
 

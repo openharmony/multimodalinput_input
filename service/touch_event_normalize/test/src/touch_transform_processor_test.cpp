@@ -305,7 +305,8 @@ HWTEST_F(TouchTransformProcessorTest, NotifyFingersenseProcess_001, TestSize.Lev
     int32_t displayId = 0;
     PointerEvent::PointerItem item;
     int32_t toolType = 0;
-    EXPECT_NO_FATAL_FAILURE(processor.NotifyFingersenseProcess(displayId, item, toolType));
+    EventTouch touchInfo;
+    EXPECT_NO_FATAL_FAILURE(processor.NotifyFingersenseProcess(displayId, item, touchInfo, toolType));
 }
 #endif // OHOS_BUILD_KNUCKLE
 

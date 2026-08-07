@@ -16,6 +16,7 @@
 #ifndef JS_INPUT_MONITOR_H
 #define JS_INPUT_MONITOR_H
 
+#include <atomic>
 #include <map>
 #include <queue>
 #include <uv.h>
@@ -57,6 +58,7 @@ public:
 private:
     bool IsGestureEvent(std::shared_ptr<PointerEvent> pointerEvent) const;
     void SetConsumeState(std::shared_ptr<PointerEvent> pointerEvent) const;
+    bool ShouldSkipMouseMove() const;
 
 private:
     std::function<void(std::shared_ptr<PointerEvent>)> callback_;
@@ -70,7 +72,7 @@ private:
     mutable std::mutex mutex_;
     mutable std::mutex callbackMutex_;
     mutable std::mutex keyCallbackMutex_;
-    mutable int32_t flowCtrl_ { 0 };
+    mutable std::atomic<int32_t> flowCtrl_ { 0 };
     std::string typeName_;
     std::vector<int32_t> keys_;
 };

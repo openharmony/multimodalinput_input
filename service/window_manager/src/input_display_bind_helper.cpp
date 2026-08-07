@@ -17,6 +17,8 @@
 
 #include <fstream>
 
+#include "config_policy_utils.h"
+#include "error_multimodal.h"
 #include "input_device_manager.h"
 #include "parameters.h"
 #include "util.h"
@@ -30,19 +32,13 @@ namespace OHOS {
 namespace MMI {
 namespace {
 const std::string FOLD_SCREEN_FLAG = system::GetParameter("const.window.foldscreen.type", "");
-const char* INPUT_DEVICE_NAME_CONFIG { "/sys_prod/etc/input/input_device_name.cfg" };
+const char* INPUT_DEVICE_NAME_CONFIG { "/etc/input/input_device_name.cfg" };
 const std::string DIRECTORY { "/sys/devices/virtual/input" };
 const char* SEPARATOR { "/" };
 const char* SUFFIX { "0000:0000" };
 const std::string INPUT { "input" };
 const std::string EVENT { "event" };
 const char* NAME { "name" };
-
-// Product type constants
-const std::string PRODUCT_TYPE = system::GetParameter("const.product.devicetype", "unknown");
-const std::string PRODUCT_TYPE_CAR = "car";
-const bool PRODUCT_PC_OR_TABLET = (PRODUCT_TYPE == "2in1") || (PRODUCT_TYPE == "tablet");
-const std::string DEFAULT_TP_DEVICE = "input_mt_wrapper";
 }
 
 namespace fs = std::filesystem;
@@ -138,7 +134,7 @@ bool operator < (const BindInfo &l, const BindInfo &r)
 
 std::ostream &operator << (std::ostream &os, const BindInfo &r)
 {
-    os << r.inputDeviceName_ << "<=>" << r.displayName_ << std::endl;
+    os << r.inputDeviceName_ << "<=>" << r.inputNodeName_ << "<=>" << r.displayName_ << std::endl;
     return os;
 }
 
@@ -225,10 +221,7 @@ bool BindInfos::Add(const BindInfo &info)
             break;
         }
     }
-    auto it2 = infos_.emplace(it, std::move(info));
-    if (it2 == infos_.end()) {
-        MMI_HILOGE("Duplicate %{public}s", info.GetDesc().c_str());
-    }
+    infos_.emplace(it, info);
     return true;
 }
 
@@ -246,12 +239,22 @@ void BindInfos::UnbindInputDevice(int32_t deviceId)
 
 void BindInfos::UnbindDisplay(int32_t displayId)
 {
-    auto it = infos_.begin();
-    for (; it != infos_.end(); ++it) {
-        if (it->GetDisplayId() == displayId) {
-            it->RemoveDisplay();
-            infos_.erase(it);
-            return;
+    for (auto &info : infos_) {
+        if (info.GetDisplayId() == displayId) {
+            info.RemoveDisplay();
+        }
+    }
+}
+
+void BindInfos::BindDisplayByCfgNodes(int32_t displayId, const std::string &displayName,
+    const std::set<std::string> &cfgNodeNames)
+{
+    if (cfgNodeNames.empty()) {
+        return;
+    }
+    for (auto &info : infos_) {
+        if (info.DisplayNotBind() && cfgNodeNames.count(info.GetInputNodeName()) > 0) {
+            info.AddDisplay(displayId, displayName);
         }
     }
 }
@@ -272,20 +275,6 @@ BindInfo BindInfos::GetUnbindInputDevice(const std::string &displayName)
     return BindInfo();
 }
 
-BindInfo BindInfos::GetUnbindDisplay()
-{
-    auto it = infos_.begin();
-    while (it != infos_.end()) {
-        if (it->DisplayNotBind()) {
-            auto info = std::move(*it);
-            infos_.erase(it);
-            return info;
-        }
-        ++it;
-    }
-    return BindInfo();
-}
-
 BindInfo BindInfos::GetUnbindDisplay(const std::string &inputDeviceName)
 {
     auto it = infos_.begin();
@@ -299,7 +288,7 @@ BindInfo BindInfos::GetUnbindDisplay(const std::string &inputDeviceName)
         }
         ++it;
     }
-    return PRODUCT_PC_OR_TABLET ? BindInfo() : GetUnbindDisplay();
+    return BindInfo();
 }
 
 std::ostream &operator << (std::ostream &os, const BindInfos &r)
@@ -337,21 +326,30 @@ std::string InputDisplayBindHelper::GetBindDisplayNameByInputDevice(int32_t inpu
     return infos_->GetBindDisplayNameByInputDevice(inputDeviceId);
 }
 
+int32_t InputDisplayBindHelper::GetBindDisplayIdByInputDevice(int32_t inputDeviceId) const
+{
+    CALL_DEBUG_ENTER;
+    if (infos_ == nullptr) {
+        MMI_HILOGW("infos_ is nullptr");
+        return -1;
+    }
+    return infos_->GetBindDisplayIdByInputDevice(inputDeviceId);
+}
+
 void InputDisplayBindHelper::AddInputDevice(int32_t id, const std::string &nodeName, const std::string &sysUid)
 {
     CALL_DEBUG_ENTER;
     MMI_HILOGD("Param: id:%{public}d, nodeName:%{public}s, name:%{public}s", id, nodeName.c_str(), sysUid.c_str());
     CHKPV(configFileInfos_);
     auto displayName = configFileInfos_->GetDisplayNameByInputDevice(sysUid);
-    if (displayName.empty()) {
-        if (PRODUCT_TYPE == PRODUCT_TYPE_CAR) {
-            int32_t cfgRsId = -1;
-            if (GetRsIdByInputNodeNameCfg(nodeName, cfgRsId)) {
-                displayName = "default" + std::to_string(cfgRsId);
-            }
-        }
+    int32_t cfgRsId = -1;
+    if (displayName.empty() && GetRsIdByInputNodeNameCfg(nodeName, cfgRsId)) {
+        displayName = "default" + std::to_string(cfgRsId);
     }
     BindInfo info = infos_->GetUnbindInputDevice(displayName);
+    if (info.DisplayNotBind() && cfgRsId != -1) {
+        info.AddDisplay(cfgRsId, displayName);
+    }
     info.AddInputDevice(id, nodeName, sysUid);
     infos_->Add(info);
     Store();
@@ -395,7 +393,7 @@ void InputDisplayBindHelper::AddDisplay(int32_t id, const std::string &name)
 {
     CALL_DEBUG_ENTER;
     auto inputDeviceName = configFileInfos_->GetInputDeviceByDisplayName(name);
-    
+
     std::string deviceName = GetInputDeviceById(id);
     if (!deviceName.empty()) {
         inputDeviceName = deviceName;
@@ -403,6 +401,12 @@ void InputDisplayBindHelper::AddDisplay(int32_t id, const std::string &name)
     BindInfo info = infos_->GetUnbindDisplay(inputDeviceName);
     info.AddDisplay(id, name);
     infos_->Add(info);
+    std::vector<std::string> cfgNodeNames;
+    GetInputNodeNamesByCfg(id, cfgNodeNames);
+    if (!cfgNodeNames.empty()) {
+        std::set<std::string> nodeNameSet(cfgNodeNames.begin(), cfgNodeNames.end());
+        infos_->BindDisplayByCfgNodes(id, name, nodeNameSet);
+    }
     Store();
 }
 
@@ -445,12 +449,7 @@ std::string InputDisplayBindHelper::GetInputDeviceById(int32_t id)
     CALL_DEBUG_ENTER;
     std::string inputNodeName = GetInputNodeNameByCfg(id);
     if (inputNodeName.empty()) {
-        // make sure the default tp bind to screen 0
-        if (id == 0 && PRODUCT_PC_OR_TABLET) {
-            inputNodeName = DEFAULT_TP_DEVICE;
-        } else {
-            return "";
-        }
+        return "";
     }
 
     std::string inputNode = GetInputNode(inputNodeName);
@@ -490,10 +489,30 @@ std::string InputDisplayBindHelper::GetInputDeviceById(int32_t id)
     return inputDeviceName;
 }
 
+std::string InputDisplayBindHelper::GetInputDeviceNameCfgPath() const
+{
+    char buf[MAX_PATH_LEN] = {};
+    char *filePath = ::GetOneCfgFile(INPUT_DEVICE_NAME_CONFIG, buf, sizeof(buf));
+    if (filePath == nullptr || filePath[0] == '\0') {
+        MMI_HILOGW("Can not get input_device_name.cfg via GetOneCfgFile");
+        return "";
+    }
+    char realPath[PATH_MAX] = {};
+    if (realpath(filePath, realPath) == nullptr) {
+        MMI_HILOGW("Invalid file path for input_device_name.cfg, errno:%{public}d", errno);
+        return "";
+    }
+    return std::string(realPath);
+}
+
 std::string InputDisplayBindHelper::GetInputNodeNameByCfg(int32_t id)
 {
     CALL_DEBUG_ENTER;
-    std::ifstream file(INPUT_DEVICE_NAME_CONFIG);
+    std::string cfgPath = GetInputDeviceNameCfgPath();
+    if (cfgPath.empty()) {
+        return "";
+    }
+    std::ifstream file(cfgPath);
     std::string res;
     if (file.is_open()) {
         std::string line;
@@ -518,6 +537,43 @@ std::string InputDisplayBindHelper::GetInputNodeNameByCfg(int32_t id)
         res.pop_back();
     }
     return res;
+}
+
+void InputDisplayBindHelper::GetInputNodeNamesByCfg(int32_t id, std::vector<std::string> &nodeNames)
+{
+    CALL_DEBUG_ENTER;
+    nodeNames.clear();
+    std::string cfgPath = GetInputDeviceNameCfgPath();
+    if (cfgPath.empty()) {
+        return;
+    }
+    std::ifstream file(cfgPath);
+    if (!file.is_open()) {
+        MMI_HILOGW("Failed to open input_device_name.cfg for displayId:%{public}d", id);
+        return;
+    }
+    std::string line;
+    while (getline(file, line)) {
+        const std::string delim = "<=>";
+        size_t pos = line.find(delim);
+        if (pos == std::string::npos) {
+            continue;
+        }
+        std::string displayIdStr = line.substr(0, pos);
+        std::string cfgInputNodeName = line.substr(pos + delim.length());
+        if (!displayIdStr.empty() && (displayIdStr.back() == '\r' || displayIdStr.back() == '\n')) {
+            displayIdStr.pop_back();
+        }
+        if (!cfgInputNodeName.empty() && (cfgInputNodeName.back() == '\r' || cfgInputNodeName.back() == '\n')) {
+            cfgInputNodeName.pop_back();
+        }
+        if (!displayIdStr.empty() && !cfgInputNodeName.empty()
+            && std::all_of(displayIdStr.begin(), displayIdStr.end(), ::isdigit)
+            && std::atoi(displayIdStr.c_str()) == id) {
+            nodeNames.push_back(cfgInputNodeName);
+        }
+    }
+    file.close();
 }
 
 std::string InputDisplayBindHelper::GetContent(const std::string &fileName)
@@ -692,6 +748,57 @@ int32_t InputDisplayBindHelper::SetDisplayBind(int32_t deviceId, int32_t display
     return RET_ERR;
 }
 
+int32_t InputDisplayBindHelper::BindToDisplay(int32_t deviceId, int32_t displayId,
+    const std::string &displayName, std::string &msg)
+{
+    CALL_DEBUG_ENTER;
+    MMI_HILOGI("Param: deviceId:%{public}d, displayId:%{public}d", deviceId, displayId);
+    if ((deviceId == -1) || (displayId == -1)) {
+        msg = "The deviceId or displayId is invalid";
+        MMI_HILOGE("%{public}s", msg.c_str());
+        return RET_ERR;
+    }
+    if (infos_ == nullptr) {
+        msg = "Infos_ is nullptr";
+        MMI_HILOGE("%{public}s", msg.c_str());
+        return RET_ERR;
+    }
+
+    // A display can be bound to multiple devices; binding the same device-display pair again is a
+    // no-op and succeeds.
+    if (infos_->GetBindDisplayIdByInputDevice(deviceId) == displayId) {
+        msg = "The input device and display are already bound";
+        MMI_HILOGI("%{public}s", msg.c_str());
+        return RET_OK;
+    }
+
+    BindInfo bindByDevice;
+    for (const auto &item : infos_->GetInfos()) {
+        if (item.GetInputDeviceId() == deviceId) {
+            bindByDevice = item;
+        }
+    }
+    if (bindByDevice.GetInputDeviceId() == -1) {
+        auto device = INPUT_DEV_MGR->GetInputDevice(deviceId);
+        if (device == nullptr) {
+            msg = "The specified input device does not exist.";
+            MMI_HILOGE("%{public}s", msg.c_str());
+            return ERR_BIND_DEVICE_NOT_EXIST;
+        }
+        bindByDevice.AddInputDevice(deviceId, device->GetName(), INPUT_DEV_MGR->GetSysUid(deviceId));
+    }
+
+    // A device is bound to at most one display: drop its previous binding. Devices already bound to
+    // the target display are left untouched, so one display may hold multiple devices.
+    infos_->UnbindInputDevice(bindByDevice.GetInputDeviceId());
+    BindInfo info;
+    info.AddInputDevice(bindByDevice.GetInputDeviceId(), bindByDevice.GetInputNodeName(),
+        bindByDevice.GetInputDeviceName());
+    info.AddDisplay(displayId, displayName);
+    infos_->Add(info);
+    return RET_OK;
+}
+
 void InputDisplayBindHelper::Load()
 {
     CALL_DEBUG_ENTER;
@@ -714,13 +821,12 @@ void InputDisplayBindHelper::Load()
 bool InputDisplayBindHelper::GetRsIdByInputNodeNameCfg(const std::string &nodeName, int32_t &cfgRsId) const
 {
     CALL_DEBUG_ENTER;
-    char realPath[PATH_MAX] = {};
-    if (realpath(INPUT_DEVICE_NAME_CONFIG, realPath) == nullptr) {
-        MMI_HILOGW("Invalid file path for input_device_name.cfg, errno:%{public}d", errno);
+    std::string cfgPath = GetInputDeviceNameCfgPath();
+    if (cfgPath.empty()) {
         return false;
     }
 
-    std::ifstream file(realPath);
+    std::ifstream file(cfgPath);
     if (file.is_open()) {
         std::string line;
         while (getline(file, line)) {
@@ -731,6 +837,12 @@ bool InputDisplayBindHelper::GetRsIdByInputNodeNameCfg(const std::string &nodeNa
             }
             std::string displayIdStr = line.substr(0, pos);
             std::string cfgInputNodeName = line.substr(pos + delim.length());
+            if (!displayIdStr.empty() && (displayIdStr.back() == '\r' || displayIdStr.back() == '\n')) {
+                displayIdStr.pop_back();
+            }
+            if (!cfgInputNodeName.empty() && (cfgInputNodeName.back() == '\r' || cfgInputNodeName.back() == '\n')) {
+                cfgInputNodeName.pop_back();
+            }
             if (!displayIdStr.empty() && !cfgInputNodeName.empty()
                 && std::all_of(displayIdStr.begin(), displayIdStr.end(), ::isdigit)
                 && cfgInputNodeName == nodeName) {

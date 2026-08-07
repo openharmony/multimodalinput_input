@@ -50,12 +50,12 @@ public:
     MOCK_METHOD(std::shared_ptr<InputDevice>, GetInputDevice, (int32_t), (const));
     MOCK_METHOD(std::shared_ptr<InputDevice>, GetInputDevice, (int32_t, bool), (const));
     MOCK_METHOD(struct libinput_device*, GetLibinputDevice, (int32_t), (const));
+    std::string GetSysUid(int32_t deviceId) { return ""; }
     MOCK_METHOD(bool, IsRemoteInputDevice, (int32_t), (const));
     MOCK_METHOD(int32_t, FindInputDeviceId, (struct libinput_device*));
     MOCK_METHOD(void, Attach, (std::shared_ptr<IDeviceObserver>));
     MOCK_METHOD(void, Detach, (std::shared_ptr<IDeviceObserver>));
     MOCK_METHOD(void, GetMultiKeyboardDevice, (std::vector<struct libinput_device*>&));
-    MOCK_METHOD(bool, HasLocalMouseDevice, ());
     MOCK_METHOD(bool, HasPointerDevice, ());
     MOCK_METHOD(std::vector<libinput_device*>, GetTouchPadDeviceOrigins, ());
     MOCK_METHOD(bool, GetIsDeviceReportEvent, (int32_t));

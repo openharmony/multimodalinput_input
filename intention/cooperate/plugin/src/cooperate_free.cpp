@@ -49,7 +49,7 @@ void CooperateFree::OnEvent(Context &context, const CooperateEvent &event)
 
 void CooperateFree::OnEnterState(Context &context)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     bool hasLocalPointerDevice = HasLocalPointerDevice();
     FI_HILOGI("HasLocalPointerDevice:%{public}s", hasLocalPointerDevice ? "true" : "false");
     bool visible = !context.NeedHideCursor() && hasLocalPointerDevice;
@@ -58,7 +58,7 @@ void CooperateFree::OnEnterState(Context &context)
 
 void CooperateFree::OnLeaveState(Context &context)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     UpdateCooperateFlagEvent event {
         .mask = COOPERATE_FLAG_HIDE_CURSOR,
     };
@@ -85,7 +85,7 @@ bool CooperateFree::HasLocalKeyboardDevice() const
 
 void CooperateFree::UnchainConnections(Context &context, const StopCooperateEvent &event) const
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     if (event.isUnchained) {
         FI_HILOGI("Unchain all connections");
         context.dsoftbus_.CloseAllSessions();
@@ -119,7 +119,7 @@ void CooperateFree::Initial::RemoveChains(std::shared_ptr<Initial> initial) { }
 
 void CooperateFree::Initial::OnStart(Context &context, const CooperateEvent &event)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     StartCooperateEvent notice = std::get<StartCooperateEvent>(event.event);
     FI_HILOGI("[start cooperation] With \'%{public}s\'", Utility::Anonymize(notice.remoteNetworkId).c_str());
     context.StartCooperate(notice);
@@ -156,7 +156,7 @@ void CooperateFree::Initial::OnStart(Context &context, const CooperateEvent &eve
 
 void CooperateFree::Initial::OnStop(Context &context, const CooperateEvent &event)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     StopCooperateEvent notice = std::get<StopCooperateEvent>(event.event);
     parent_.UnchainConnections(context, notice);
 }
@@ -169,7 +169,7 @@ void CooperateFree::Initial::OnAppClosed(Context &context, const CooperateEvent 
 
 void CooperateFree::Initial::OnRemoteStart(Context &context, const CooperateEvent &event)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     DSoftbusStartCooperate notice = std::get<DSoftbusStartCooperate>(event.event);
     context.OnRemoteStartCooperate(notice.extra);
     context.eventMgr_.RemoteStart(notice);

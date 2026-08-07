@@ -73,7 +73,7 @@ int32_t EventLoopClosureChecker::RemovePendingDownKeys(int32_t hookId, int32_t k
 
 int32_t EventLoopClosureChecker::RemoveChecker(int32_t hookId)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     std::unique_lock<std::shared_mutex> lock(rwMutex_);
     if (pendingDownKeys_.find(hookId) == pendingDownKeys_.end()) {
         MMI_HILOGW("No checker of hook:%{public}d existed", hookId);

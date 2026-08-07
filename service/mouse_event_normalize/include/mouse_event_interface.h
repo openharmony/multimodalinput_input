@@ -77,25 +77,25 @@ public:
     int32_t GetPointerLocation(int32_t &displayId, double &displayX, double &displayY);
     int32_t SetMouseAccelerateMotionSwitch(int32_t deviceId, bool enable);
 
-    int32_t SetMouseScrollRows(int32_t userId, int32_t rows) ;
-    int32_t GetMouseScrollRows(int32_t userId) const ;
-    int32_t SetMousePrimaryButton(int32_t userId, int32_t primaryButton) ;
-    int32_t GetMousePrimaryButton(int32_t userId) const ;
-    int32_t SetPointerSpeed(int32_t userId, int32_t speed) ;
-    int32_t GetPointerSpeed(int32_t userId) const ;
-    int32_t GetTouchpadSpeed(int32_t userId) const ;
-    int32_t SetTouchpadScrollSwitch(int32_t userId, int32_t pid, bool switchFlag) const ;
-    void GetTouchpadScrollSwitch(int32_t userId, bool &switchFlag) const ;
-    int32_t SetTouchpadScrollDirection(int32_t userId, bool state) const ;
-    void GetTouchpadScrollDirection(int32_t userId, bool &state) const ;
-    int32_t SetTouchpadTapSwitch(int32_t userId, bool switchFlag) const ;
-    void GetTouchpadTapSwitch(int32_t userId, bool &switchFlag) const ;
-    int32_t SetTouchpadRightClickType(int32_t userId, int32_t type) const ;
-    void GetTouchpadRightClickType(int32_t userId, int32_t &type) const ;
-    int32_t SetTouchpadPointerSpeed(int32_t userId, int32_t speed) const ;
-    void GetTouchpadPointerSpeed(int32_t userId, int32_t &speed) const ;
-    int32_t SetMouseScrollDirection(int32_t userId, bool state) const ;
-    int32_t GetMouseScrollDirection(int32_t userId, bool &state) const ;
+    int32_t SetMouseScrollRows(int32_t userId, int32_t rows);
+    int32_t GetMouseScrollRows(int32_t userId) const;
+    int32_t SetMousePrimaryButton(int32_t userId, int32_t primaryButton);
+    int32_t GetMousePrimaryButton(int32_t userId) const;
+    int32_t SetPointerSpeed(int32_t userId, int32_t speed);
+    int32_t GetPointerSpeed(int32_t userId) const;
+    int32_t GetTouchpadSpeed(int32_t userId) const;
+    int32_t SetTouchpadScrollSwitch(int32_t userId, int32_t pid, bool switchFlag) const;
+    void GetTouchpadScrollSwitch(int32_t userId, bool &switchFlag) const;
+    int32_t SetTouchpadScrollDirection(int32_t userId, bool state) const;
+    void GetTouchpadScrollDirection(int32_t userId, bool &state) const;
+    int32_t SetTouchpadTapSwitch(int32_t userId, bool switchFlag) const;
+    void GetTouchpadTapSwitch(int32_t userId, bool &switchFlag) const;
+    int32_t SetTouchpadRightClickType(int32_t userId, int32_t type) const;
+    void GetTouchpadRightClickType(int32_t userId, int32_t &type) const;
+    int32_t SetTouchpadPointerSpeed(int32_t userId, int32_t speed) const;
+    void GetTouchpadPointerSpeed(int32_t userId, int32_t &speed) const;
+    int32_t SetMouseScrollDirection(int32_t userId, bool state) const;
+    int32_t GetMouseScrollDirection(int32_t userId, bool &state) const;
     void ReadTouchpadCDG(TouchpadCDG &touchpadCDG) const;
 
     // MouseDeviceState Interface

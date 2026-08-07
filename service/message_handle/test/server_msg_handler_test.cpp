@@ -24,6 +24,7 @@
 #include "sec_comp_enhance_kit.h"
 
 #include "authorize_helper.h"
+#include "config_multimodal.h"
 #include "define_multimodal.h"
 #include "event_log_helper.h"
 #include "image_source.h"
@@ -33,6 +34,7 @@
 #include "input_windows_manager.h"
 #include "mmi_log.h"
 #include "pointer_event.h"
+#include "resource_decompress.h"
 #include "running_process_info.h"
 #include "server_msg_handler.h"
 #include "stream_buffer.h"
@@ -94,7 +96,10 @@ public:
 
 class ServerMsgHandlerTest : public testing::Test {
 public:
-    static void SetUpTestCase(void) {}
+    static void SetUpTestCase(void)
+    {
+        DecompressToDisk(DEF_MOUSE_ICONS_DAT_PATH, "/data/service/el1/public/multimodalinput/mouse_icon/");
+    }
     static void TearDownTestCase(void) {}
     void SetUp() {}
     void TearDoen() {}
@@ -107,7 +112,8 @@ public:
 
     MOCK_METHOD(int32_t, AddSocketPairInfo,
         (const std::string &programName, const int32_t moduleType, const int32_t uid, const int32_t pid,
-            int32_t &serverFd, int32_t &toReturnClientFd, int32_t &tokenType, uint32_t tokenId, bool isRealProcessName),
+            int32_t &serverFd, int32_t &toReturnClientFd, int32_t &tokenType, uint32_t tokenId, bool isRealProcessName,
+            std::shared_ptr<SocketPairFlag> socketPairClosedFlag),
         (override));
 
     MOCK_METHOD(SessionPtr, GetSessionByPid, (int32_t pid), (const, override));
@@ -1601,7 +1607,7 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_SetWindowInfo_001, TestSize.
     ServerMsgHandler handler;
     int32_t infoId = 1;
     WindowInfo info;
-    const std::string iconPath = "/system/etc/multimodalinput/mouse_icon/North_South.svg";
+    const std::string iconPath = "/data/service/el1/public/multimodalinput/mouse_icon/North_South.svg";
     handler.transparentWins_.insert(std::make_pair(1, SetMouseIconTest(iconPath)));
     EXPECT_NO_FATAL_FAILURE(handler.SetWindowInfo(infoId, info));
     infoId = 2;

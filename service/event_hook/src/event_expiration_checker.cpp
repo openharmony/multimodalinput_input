@@ -107,7 +107,7 @@ void EventExpirationChecker::RemoveExpiredStashEventLocked(int32_t hookId)
 
 int32_t EventExpirationChecker::RemoveChecker(int32_t hookId)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     std::unique_lock<std::shared_mutex> lock(rwMutex_);
     if (stashEvents_.find(hookId) == stashEvents_.end()) {
         MMI_HILOGW("No checker of hook:%{public}d existed", hookId);

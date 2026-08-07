@@ -3318,5 +3318,48 @@ HWTEST_F(PointerEventTest, ResetPointerItemsId_001, TestSize.Level1)
     pointerEvent->ResetPointerItemsId();
     ASSERT_EQ(pointerEvent->GetPointerItem(0, item), true);
 }
+
+/**
+ * @tc.name: PointerEventTest_ReadFromParcel_006
+ * @tc.desc: Verify CallingUid is correctly serialized and deserialized via Parcel
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerEventTest, PointerEventTest_ReadFromParcel_006, TestSize.Level2)
+{
+    CALL_TEST_DEBUG;
+    Parcel outParcel;
+    auto event = PointerEvent::Create();
+    ASSERT_NE(event, nullptr);
+    int32_t callingUid = 2222;
+    event->SetCallingUid(callingUid);
+
+    bool writeToParcelResult = event->WriteToParcel(outParcel);
+    ASSERT_TRUE(writeToParcelResult);
+
+    auto newEvent = PointerEvent::Create();
+    ASSERT_NE(newEvent, nullptr);
+    bool readFromParcelResult = newEvent->ReadFromParcel(outParcel);
+    ASSERT_TRUE(readFromParcelResult);
+    EXPECT_EQ(newEvent->GetCallingUid(), event->GetCallingUid());
+}
+
+/**
+ * @tc.name: PointerEventTest_SetCallingUid_001
+ * @tc.desc: Test SetCallingUid and GetCallingUid
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerEventTest, PointerEventTest_SetCallingUid_001, TestSize.Level2)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+
+    int32_t callingUid = 2222;
+    pointerEvent->SetCallingUid(callingUid);
+    ASSERT_EQ(pointerEvent->GetCallingUid(), callingUid);
+}
+
 } // namespace MMI
 } // namespace OHOS

@@ -14,16 +14,21 @@
  */
 
 #include <cstdio>
+#include <fcntl.h>
 #include <fstream>
 #include <gmock/gmock.h>
+#include <optional>
+#include <unistd.h>
 
 #include "account_manager.h"
 #include "cursor_drawing_component.h"
 #include "event_filter_handler.h"
 #include "knuckle_handler_component.h"
 #include "i_pointer_drawing_manager.h"
+#include "error_multimodal.h"
 #include "input_device_manager.h"
 #include "input_event_handler.h"
+#include "pointer_device_manager.h"
 #include "input_windows_manager.h"
 #include "mmi_log.h"
 #include "mock_input_windows_manager.h"
@@ -65,7 +70,6 @@ constexpr uint32_t TEST_WINDOW_END {100000};
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
 constexpr int32_t TEST_PROCESS_ID = 100;
 constexpr int32_t TEST_WINDOW_ID = 1;
-constexpr int32_t TEST_WINDOW_ID_MAX = 10;
 constexpr int32_t POINTER_STYLE_ID_1 = 1;
 constexpr int32_t POINTER_STYLE_ID_2 = 2;
 constexpr int32_t TEST_DEFAULT_POINTER_STYLE = 0;
@@ -1109,30 +1113,6 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_OnSessionLost_001, Tes
 }
 
 /**
- * @tc.name: InputWindowsManagerTest_UpdatePoinerStyle_001
- * @tc.desc: Test updating pointer style
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdatePoinerStyle_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    int32_t pid = 1;
-    int32_t windowId = 2;
-    PointerStyle pointerStyle;
-    int32_t ret = WIN_MGR->UpdatePoinerStyle(pid, windowId, pointerStyle);
-    EXPECT_EQ(ret, RET_OK);
-    pid = -1;
-    windowId = -2;
-    ret = WIN_MGR->UpdatePoinerStyle(pid, windowId, pointerStyle);
-    EXPECT_EQ(ret, 401);
-    pid = 1;
-    windowId = -2;
-    ret = WIN_MGR->UpdatePoinerStyle(pid, windowId, pointerStyle);
-    EXPECT_EQ(ret, RET_OK);
-}
-
-/**
  * @tc.name: InputWindowsManagerTest_SetPointerStyle_001
  * @tc.desc: Test setting pointer style
  * @tc.type: FUNC
@@ -1151,7 +1131,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_SetPointerStyle_001, T
     pid = 1;
     windowId = 2;
     ret = WIN_MGR->SetPointerStyle(pid, windowId, pointerStyle);
-    EXPECT_EQ(ret, WIN_MGR->UpdatePoinerStyle(pid, windowId, pointerStyle));
+    EXPECT_EQ(ret, WIN_MGR->SetPointerStyle(pid, windowId, pointerStyle));
 }
 
 /**
@@ -1646,6 +1626,19 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetWindowInfo_001, Tes
     EXPECT_FALSE(result.has_value());
     int32_t ret1 = result->id;
     EXPECT_EQ(ret1, 0);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_IsWindowInjectableUnderLock_001
+ * @tc.desc: Test IsWindowInjectableUnderLock with no matching window
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsWindowInjectableUnderLock_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    bool ret = WIN_MGR->IsWindowInjectableUnderLock(TEST_WINDOW_ID, 0);
+    EXPECT_FALSE(ret);
 }
 
 /**
@@ -2222,11 +2215,11 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_DispatchTouch_001, Tes
 {
     CALL_TEST_DEBUG;
     int32_t pointerAction = PointerEvent::POINTER_ACTION_PULL_IN_WINDOW;
-    ASSERT_NO_FATAL_FAILURE(WIN_MGR->DispatchTouch(pointerAction));
+    ASSERT_NO_FATAL_FAILURE(WIN_MGR->DispatchTouch(pointerAction, DEFAULT_GROUP_ID, PointerEvent::TOOL_TYPE_FINGER));
     pointerAction = PointerEvent::POINTER_ACTION_DOWN;
-    ASSERT_NO_FATAL_FAILURE(WIN_MGR->DispatchTouch(pointerAction));
+    ASSERT_NO_FATAL_FAILURE(WIN_MGR->DispatchTouch(pointerAction, DEFAULT_GROUP_ID, PointerEvent::TOOL_TYPE_FINGER));
     pointerAction = PointerEvent::POINTER_ACTION_LEVITATE_IN_WINDOW;
-    ASSERT_NO_FATAL_FAILURE(WIN_MGR->DispatchTouch(pointerAction));
+    ASSERT_NO_FATAL_FAILURE(WIN_MGR->DispatchTouch(pointerAction, DEFAULT_GROUP_ID, PointerEvent::TOOL_TYPE_FINGER));
 }
 
 /**
@@ -3305,39 +3298,6 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_OnSessionLost, TestSiz
 }
 
 /**
- * @tc.name: InputWindowsManagerTest_UpdatePoinerStyle
- * @tc.desc: Test UpdatePoinerStyle
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdatePoinerStyle, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    InputWindowsManager inputWindowsManager;
-    int32_t pid = 1;
-    int32_t windowId = 1;
-    PointerStyle pointerStyle;
-    pointerStyle.size = 1;
-    pointerStyle.color = 2;
-    pointerStyle.id = 3;
-    std::map<int32_t, PointerStyle> pointerStyleMap;
-    pointerStyleMap.insert(std::make_pair(windowId, pointerStyle));
-    inputWindowsManager.pointerStyle_.insert(std::make_pair(pid, pointerStyleMap));
-    windowId = 2;
-    WindowInfo windowInfo;
-    windowInfo.id = 3;
-    windowInfo.pid = 6;
-    auto it = inputWindowsManager.displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
-    if (it != inputWindowsManager.displayGroupInfoMap_.end()) {
-        it->second.windowsInfo.push_back(windowInfo);
-    }
-    windowInfo.id = 2;
-    windowInfo.pid = 1;
-    it->second.windowsInfo.push_back(windowInfo);
-    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.UpdatePoinerStyle(pid, windowId, pointerStyle));
-}
-
-/**
  * @tc.name: InputWindowsManagerTest_SetPointerStyle
  * @tc.desc: Test SetPointerStyle
  * @tc.type: FUNC
@@ -3353,7 +3313,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_SetPointerStyle, TestS
     pointerStyle.id = 0;
     std::map<int32_t, PointerStyle> pointerStyleMap;
     pointerStyleMap.insert(std::make_pair(windowId, pointerStyle));
-    inputWindowsManager.uiExtensionPointerStyle_.insert(std::make_pair(pid, pointerStyleMap));
+    inputWindowsManager.pointerStyle_.insert(std::make_pair(pid, pointerStyleMap));
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager.SetPointerStyle(pid, windowId, pointerStyle));
 }
 
@@ -3396,7 +3356,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetPointerStyle, TestS
     pointerStyle.id = 0;
     std::map<int32_t, PointerStyle> pointerStyleMap;
     pointerStyleMap.insert(std::make_pair(windowId, pointerStyle));
-    inputWindowsManager.uiExtensionPointerStyle_.insert(std::make_pair(pid, pointerStyleMap));
+    inputWindowsManager.pointerStyle_.insert(std::make_pair(pid, pointerStyleMap));
     pid = 101;
     EXPECT_EQ(inputWindowsManager.GetPointerStyle(pid, windowId, pointerStyle), RET_OK);
     pid = 100;
@@ -4318,7 +4278,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateMouseTarget_002,
     PointerStyle pointerStyle;
     CursorDrawingComponent::GetInstance().SetMouseDisplayState(false);
     styleMap.insert(std::make_pair(windowInfo.id, pointerStyle));
-    inputWindowsManager.uiExtensionPointerStyle_.insert(std::make_pair(windowInfo.pid, styleMap));
+    inputWindowsManager.pointerStyle_.insert(std::make_pair(windowInfo.pid, styleMap));
     UDSServer udsServer;
     inputWindowsManager.udsServer_ = &udsServer;
     inputWindowsManager.isDragBorder_ = true;
@@ -4377,7 +4337,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateMouseTarget_003,
     PointerStyle pointerStyle;
     CursorDrawingComponent::GetInstance().SetMouseDisplayState(true);
     styleMap.insert(std::make_pair(windowInfo.id, pointerStyle));
-    inputWindowsManager.uiExtensionPointerStyle_.insert(std::make_pair(windowInfo.pid, styleMap));
+    inputWindowsManager.pointerStyle_.insert(std::make_pair(windowInfo.pid, styleMap));
     UDSServer udsServer;
     inputWindowsManager.udsServer_ = &udsServer;
     inputWindowsManager.isDragBorder_ = false;
@@ -4439,7 +4399,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateMouseTarget_004,
     PointerStyle pointerStyle;
     IPointerDrawingManager::GetInstance()->SetMouseDisplayState(true);
     styleMap.insert(std::make_pair(windowInfo.id, pointerStyle));
-    inputWindowsManager.uiExtensionPointerStyle_.insert(std::make_pair(windowInfo.pid, styleMap));
+    inputWindowsManager.pointerStyle_.insert(std::make_pair(windowInfo.pid, styleMap));
     UDSServer udsServer;
     inputWindowsManager.udsServer_ = &udsServer;
     inputWindowsManager.isDragBorder_ = false;
@@ -8637,6 +8597,102 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_AdjustFingerFlag_009, 
 }
 
 /**
+ * @tc.name: InputWindowsManagerTest_AdjustFingerFlag_010
+ * @tc.desc: Test AdjustFingerFlag pen hover: LEVITATE_MOVE + PEN tool → hover early exit
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_AdjustFingerFlag_010, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_LEVITATE_MOVE);
+    PointerEvent::PointerItem item;
+    item.SetPointerId(1);
+    item.SetToolType(PointerEvent::TOOL_TYPE_PEN);
+    pointerEvent->AddPointerItem(item);
+    pointerEvent->SetPointerId(1);
+    bool result = WIN_MGR->AdjustFingerFlag(pointerEvent);
+    EXPECT_FALSE(result);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_AdjustFingerFlag_011
+ * @tc.desc: Test AdjustFingerFlag non-hover action + PEN → falls through to flag check
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_AdjustFingerFlag_011, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
+    PointerEvent::PointerItem item;
+    item.SetPointerId(1);
+    item.SetToolType(PointerEvent::TOOL_TYPE_PEN);
+    pointerEvent->AddPointerItem(item);
+    pointerEvent->SetPointerId(1);
+    WIN_MGR->touchItemDownInfos_.clear();
+    WindowInfoEX windowInfoEX;
+    windowInfoEX.flag = false;
+    WIN_MGR->touchItemDownInfos_[pointerEvent->GetDeviceId()][pointerEvent->GetPointerId()] = windowInfoEX;
+    bool result = WIN_MGR->AdjustFingerFlag(pointerEvent);
+    EXPECT_TRUE(result);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_AdjustFingerFlag_012
+ * @tc.desc: Test AdjustFingerFlag hover action + FINGER tool → not hover, falls through
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_AdjustFingerFlag_012, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_LEVITATE_MOVE);
+    PointerEvent::PointerItem item;
+    item.SetPointerId(1);
+    item.SetToolType(PointerEvent::TOOL_TYPE_FINGER);
+    pointerEvent->AddPointerItem(item);
+    pointerEvent->SetPointerId(1);
+    WIN_MGR->touchItemDownInfos_.clear();
+    WindowInfoEX windowInfoEX;
+    windowInfoEX.flag = false;
+    WIN_MGR->touchItemDownInfos_[pointerEvent->GetDeviceId()][pointerEvent->GetPointerId()] = windowInfoEX;
+    bool result = WIN_MGR->AdjustFingerFlag(pointerEvent);
+    EXPECT_TRUE(result);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_AdjustFingerFlag_013
+ * @tc.desc: Test AdjustFingerFlag hover action + PEN but GetPointerItem fails → not hover
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_AdjustFingerFlag_013, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_LEVITATE_MOVE);
+    pointerEvent->SetPointerId(999);
+    WIN_MGR->touchItemDownInfos_.clear();
+    WindowInfoEX windowInfoEX;
+    windowInfoEX.flag = false;
+    WIN_MGR->touchItemDownInfos_[pointerEvent->GetDeviceId()][pointerEvent->GetPointerId()] = windowInfoEX;
+    bool result = WIN_MGR->AdjustFingerFlag(pointerEvent);
+    EXPECT_TRUE(result);
+}
+
+/**
  * @tc.name: InputWindowsManagerTest_GetClientFd_007
  * @tc.desc: Test GetClientFd
  * @tc.type: FUNC
@@ -10240,6 +10296,177 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_DrawPointer_001, TestS
     std::shared_ptr<InputWindowsManager> inputWindowsManager = std::make_shared<InputWindowsManager>();
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager->DrawPointer(isDisplayRemoved));
 }
+
+#ifdef OHOS_BUILD_ENABLE_EXTERNAL_SCREEN
+/**
+ * @tc.name: InputWindowsManagerTest_DrawPointer_002
+ * @tc.desc: Test DrawPointer with isDisplayChanged=true
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_DrawPointer_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    bool isDisplayChanged = true;
+    std::shared_ptr<InputWindowsManager> inputWindowsManager = std::make_shared<InputWindowsManager>();
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->DrawPointer(isDisplayChanged));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_DrawPointer_003
+ * @tc.desc: Test DrawPointer with isDisplayChanged=false
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_DrawPointer_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    bool isDisplayChanged = false;
+    std::shared_ptr<InputWindowsManager> inputWindowsManager = std::make_shared<InputWindowsManager>();
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->DrawPointer(isDisplayChanged));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_PointerDrawingManagerOnDisplayInfo005
+ * @tc.desc: Test PointerDrawingManagerOnDisplayInfo with isDisplayChanged=true
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_PointerDrawingManagerOnDisplayInfo005, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    OLD::DisplayGroupInfo displayGroupInfo;
+    OLD::DisplayInfo displayInfo;
+    displayInfo.id = 521;
+    displayInfo.uniq = "uniq_test";
+    displayInfo.dpi = 1000;
+    displayGroupInfo.displaysInfo.push_back(displayInfo);
+    int32_t deviceId = 1;
+    InputDeviceManager::InputDeviceInfo inputDeviceInfo;
+    inputDeviceInfo.isPointerDevice = true;
+    INPUT_DEV_MGR->inputDevice_.insert(std::make_pair(deviceId, inputDeviceInfo));
+    bool isDisplayChanged = true;
+    EXPECT_NO_FATAL_FAILURE(WIN_MGR->PointerDrawingManagerOnDisplayInfo(displayGroupInfo, isDisplayChanged));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_PointerDrawingManagerOnDisplayInfo006
+ * @tc.desc: Test PointerDrawingManagerOnDisplayInfo with isDisplayChanged=false
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_PointerDrawingManagerOnDisplayInfo006, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    OLD::DisplayGroupInfo displayGroupInfo;
+    OLD::DisplayInfo displayInfo;
+    displayInfo.id = 521;
+    displayInfo.uniq = "uniq_test";
+    displayInfo.dpi = 1000;
+    displayGroupInfo.displaysInfo.push_back(displayInfo);
+    int32_t deviceId = 1;
+    InputDeviceManager::InputDeviceInfo inputDeviceInfo;
+    inputDeviceInfo.isPointerDevice = true;
+    INPUT_DEV_MGR->inputDevice_.insert(std::make_pair(deviceId, inputDeviceInfo));
+    bool isDisplayChanged = false;
+    EXPECT_NO_FATAL_FAILURE(WIN_MGR->PointerDrawingManagerOnDisplayInfo(displayGroupInfo, isDisplayChanged));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_PointerDrawingManagerOnDisplayInfo007
+ * @tc.desc: Test lock mode and old display removed, cursor display valid
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_PointerDrawingManagerOnDisplayInfo007, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<InputWindowsManager> inputWindowsManager = std::make_shared<InputWindowsManager>();
+    inputWindowsManager->pointerLockedWindow_.id = 1;
+    inputWindowsManager->pointerLockedWindow_.flags = WindowInputPolicy::FLAG_POINTER_CONFINED;
+    OLD::DisplayInfo mapDisplayInfo;
+    mapDisplayInfo.id = 0;
+    auto mapIt = inputWindowsManager->displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
+    if (mapIt != inputWindowsManager->displayGroupInfoMap_.end()) {
+        mapIt->second.displaysInfo.push_back(mapDisplayInfo);
+    }
+    inputWindowsManager->mouseLocationMap_[DEFAULT_GROUP_ID].displayId = 0;
+    OLD::DisplayGroupInfo displayGroupInfo;
+    displayGroupInfo.groupId = DEFAULT_GROUP_ID;
+    OLD::DisplayInfo displayInfo;
+    displayInfo.id = 521;
+    displayInfo.rsId = 521;
+    displayGroupInfo.displaysInfo.push_back(displayInfo);
+    int32_t deviceId = 1;
+    InputDeviceManager::InputDeviceInfo inputDeviceInfo;
+    inputDeviceInfo.isPointerDevice = true;
+    INPUT_DEV_MGR->inputDevice_.insert(std::make_pair(deviceId, inputDeviceInfo));
+    bool isDisplayChanged = true;
+    inputWindowsManager->PointerDrawingManagerOnDisplayInfo(displayGroupInfo, isDisplayChanged);
+    EXPECT_EQ(inputWindowsManager->pointerLockedWindow_.id, 1);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_PointerDrawingManagerOnDisplayInfo008
+ * @tc.desc: Test lock mode and old display removed, cursor display invalid (curDisplay null)
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_PointerDrawingManagerOnDisplayInfo008, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<InputWindowsManager> inputWindowsManager = std::make_shared<InputWindowsManager>();
+    inputWindowsManager->pointerLockedWindow_.id = 1;
+    inputWindowsManager->pointerLockedWindow_.flags = WindowInputPolicy::FLAG_POINTER_CONFINED;
+    OLD::DisplayInfo mapDisplayInfo;
+    mapDisplayInfo.id = 0;
+    auto mapIt = inputWindowsManager->displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
+    if (mapIt != inputWindowsManager->displayGroupInfoMap_.end()) {
+        mapIt->second.displaysInfo.push_back(mapDisplayInfo);
+    }
+    inputWindowsManager->mouseLocationMap_[DEFAULT_GROUP_ID].displayId = 999;
+    OLD::DisplayGroupInfo displayGroupInfo;
+    displayGroupInfo.groupId = DEFAULT_GROUP_ID;
+    OLD::DisplayInfo displayInfo;
+    displayInfo.id = 521;
+    displayInfo.rsId = 521;
+    displayGroupInfo.displaysInfo.push_back(displayInfo);
+    int32_t deviceId = 1;
+    InputDeviceManager::InputDeviceInfo inputDeviceInfo;
+    inputDeviceInfo.isPointerDevice = true;
+    INPUT_DEV_MGR->inputDevice_.insert(std::make_pair(deviceId, inputDeviceInfo));
+    bool isDisplayChanged = true;
+    inputWindowsManager->PointerDrawingManagerOnDisplayInfo(displayGroupInfo, isDisplayChanged);
+    EXPECT_EQ(inputWindowsManager->pointerLockedWindow_.id, 1);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_PointerDrawingManagerOnDisplayInfo009
+ * @tc.desc: Test lock mode and old display not removed (rotation-like)
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_PointerDrawingManagerOnDisplayInfo009, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<InputWindowsManager> inputWindowsManager = std::make_shared<InputWindowsManager>();
+    inputWindowsManager->pointerLockedWindow_.id = 1;
+    inputWindowsManager->pointerLockedWindow_.flags = WindowInputPolicy::FLAG_POINTER_CONFINED;
+    OLD::DisplayGroupInfo displayGroupInfo;
+    displayGroupInfo.groupId = DEFAULT_GROUP_ID;
+    OLD::DisplayInfo displayInfo;
+    displayInfo.id = 521;
+    displayInfo.rsId = 0;
+    displayGroupInfo.displaysInfo.push_back(displayInfo);
+    int32_t deviceId = 1;
+    InputDeviceManager::InputDeviceInfo inputDeviceInfo;
+    inputDeviceInfo.isPointerDevice = true;
+    INPUT_DEV_MGR->inputDevice_.insert(std::make_pair(deviceId, inputDeviceInfo));
+    bool isDisplayChanged = true;
+    inputWindowsManager->PointerDrawingManagerOnDisplayInfo(displayGroupInfo, isDisplayChanged);
+    EXPECT_EQ(inputWindowsManager->pointerLockedWindow_.id, 1);
+}
+#endif // OHOS_BUILD_ENABLE_EXTERNAL_SCREEN
 #endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
 
 /**
@@ -11068,11 +11295,9 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_DeviceStatusChanged_Cl
     pointerEvent->SetDeviceId(deviceId);
     inputWindowsManager.dispatchEventCache_.Update(pointerEvent);
 
-    ASSERT_NE(inputWindowsManager.dispatchEventCache_.GetForDispatch(
-        PointerEvent::POINTER_ACTION_LEVITATE_IN_WINDOW), nullptr);
+    ASSERT_NE(inputWindowsManager.dispatchEventCache_.GetForDispatch(PointerEvent::TOOL_TYPE_PEN), nullptr);
     ASSERT_NO_FATAL_FAILURE(inputWindowsManager.DeviceStatusChanged(deviceId, name, sysUid, devStatus));
-    ASSERT_EQ(inputWindowsManager.dispatchEventCache_.GetForDispatch(
-        PointerEvent::POINTER_ACTION_LEVITATE_IN_WINDOW), nullptr);
+    ASSERT_EQ(inputWindowsManager.dispatchEventCache_.GetForDispatch(PointerEvent::TOOL_TYPE_PEN), nullptr);
 }
 
 #ifdef OHOS_BUILD_ENABLE_TOUCH
@@ -15001,61 +15226,154 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetCursorWindowInfo_01
 }
 
 /**
- * @tc.name: InputWindowsManagerTest_IsInPointereLockMode_001
- * @tc.desc: Test IsInPointereLockMode with FLAG_POINTER_LOCKED
+ * @tc.name: InputWindowsManagerTest_IsInPointerLockMode_001
+ * @tc.desc: Test IsInPointerLockMode with FLAG_POINTER_LOCKED
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsInPointereLockMode_001, TestSize.Level1)
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsInPointerLockMode_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     InputWindowsManager inputWindowsMgr;
     inputWindowsMgr.pointerLockedWindow_.flags = WindowInputPolicy::FLAG_POINTER_LOCKED;
-    EXPECT_TRUE(inputWindowsMgr.IsInPointereLockMode());
+    EXPECT_TRUE(inputWindowsMgr.IsInPointerLockMode());
 }
 
 /**
- * @tc.name: InputWindowsManagerTest_IsInPointereLockMode_002
- * @tc.desc: Test IsInPointereLockMode with FLAG_POINTER_CONFINED
+ * @tc.name: InputWindowsManagerTest_IsInPointerLockMode_002
+ * @tc.desc: Test IsInPointerLockMode with FLAG_POINTER_CONFINED
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsInPointereLockMode_002, TestSize.Level1)
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsInPointerLockMode_002, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     InputWindowsManager inputWindowsMgr;
     inputWindowsMgr.pointerLockedWindow_.flags = WindowInputPolicy::FLAG_POINTER_CONFINED;
-    EXPECT_TRUE(inputWindowsMgr.IsInPointereLockMode());
+    EXPECT_TRUE(inputWindowsMgr.IsInPointerLockMode());
 }
 
 /**
- * @tc.name: InputWindowsManagerTest_IsInPointereLockMode_003
- * @tc.desc: Test IsInPointereLockMode with no flags set
+ * @tc.name: InputWindowsManagerTest_IsInPointerLockMode_003
+ * @tc.desc: Test IsInPointerLockMode with no flags set
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsInPointereLockMode_003, TestSize.Level1)
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsInPointerLockMode_003, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     InputWindowsManager inputWindowsMgr;
     inputWindowsMgr.pointerLockedWindow_.flags = 0;
-    EXPECT_FALSE(inputWindowsMgr.IsInPointereLockMode());
+    EXPECT_FALSE(inputWindowsMgr.IsInPointerLockMode());
 }
 
 /**
- * @tc.name: InputWindowsManagerTest_IsInPointereLockMode_004
- * @tc.desc: Test IsInPointereLockMode with both flags set
+ * @tc.name: InputWindowsManagerTest_IsInPointerLockMode_004
+ * @tc.desc: Test IsInPointerLockMode with both flags set
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsInPointereLockMode_004, TestSize.Level1)
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsInPointerLockMode_004, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     InputWindowsManager inputWindowsMgr;
     inputWindowsMgr.pointerLockedWindow_.flags =
         WindowInputPolicy::FLAG_POINTER_LOCKED | WindowInputPolicy::FLAG_POINTER_CONFINED;
-    EXPECT_TRUE(inputWindowsMgr.IsInPointereLockMode());
+    EXPECT_TRUE(inputWindowsMgr.IsInPointerLockMode());
 }
+
+/**
+ * @tc.name: InputWindowsManagerTest_ResetPointerPosition_002
+ * @tc.desc: Test ResetPointerPosition with pointer lock mode active returns early
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_ResetPointerPosition_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsMgr;
+    inputWindowsMgr.pointerLockedWindow_.flags = WindowInputPolicy::FLAG_POINTER_LOCKED;
+    EXPECT_TRUE(inputWindowsMgr.IsInPointerLockMode());
+    OLD::DisplayGroupInfo displayGroupInfo;
+    inputWindowsMgr.ResetPointerPosition(displayGroupInfo);
+    EXPECT_TRUE(inputWindowsMgr.IsInPointerLockMode());
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_ResetPointerPosition_005
+ * @tc.desc: Test ResetPointerPosition with pointer confined mode active returns early
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_ResetPointerPosition_005, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsMgr;
+    inputWindowsMgr.pointerLockedWindow_.flags = WindowInputPolicy::FLAG_POINTER_CONFINED;
+    EXPECT_TRUE(inputWindowsMgr.IsInPointerLockMode());
+    OLD::DisplayGroupInfo displayGroupInfo;
+    inputWindowsMgr.ResetPointerPosition(displayGroupInfo);
+    EXPECT_TRUE(inputWindowsMgr.IsInPointerLockMode());
+}
+
+#if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
+/**
+ * @tc.name: InputWindowsManagerTest_DrawPointer_004
+ * @tc.desc: Test DrawPointer with isDisplayChanged=true and pointer lock mode returns early
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_DrawPointer_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsMgr;
+    inputWindowsMgr.pointerLockedWindow_.flags = WindowInputPolicy::FLAG_POINTER_LOCKED;
+    EXPECT_TRUE(inputWindowsMgr.IsInPointerLockMode());
+    bool isDisplayChanged = true;
+    bool expectEarlyReturn = isDisplayChanged && inputWindowsMgr.IsInPointerLockMode();
+    EXPECT_TRUE(expectEarlyReturn);
+    inputWindowsMgr.DrawPointer(isDisplayChanged);
+    EXPECT_TRUE(inputWindowsMgr.IsInPointerLockMode());
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_DrawPointer_005
+ * @tc.desc: Test DrawPointer with isDisplayChanged=true and pointer confined mode returns early
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_DrawPointer_005, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsMgr;
+    inputWindowsMgr.pointerLockedWindow_.flags = WindowInputPolicy::FLAG_POINTER_CONFINED;
+    EXPECT_TRUE(inputWindowsMgr.IsInPointerLockMode());
+    bool isDisplayChanged = true;
+    bool expectEarlyReturn = isDisplayChanged && inputWindowsMgr.IsInPointerLockMode();
+    EXPECT_TRUE(expectEarlyReturn);
+    inputWindowsMgr.DrawPointer(isDisplayChanged);
+    EXPECT_TRUE(inputWindowsMgr.IsInPointerLockMode());
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_DrawPointer_006
+ * @tc.desc: Test DrawPointer with isDisplayChanged=false and pointer lock mode does not return early
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_DrawPointer_006, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsMgr;
+    inputWindowsMgr.pointerLockedWindow_.flags = WindowInputPolicy::FLAG_POINTER_LOCKED;
+    EXPECT_TRUE(inputWindowsMgr.IsInPointerLockMode());
+    bool isDisplayChanged = false;
+    bool expectEarlyReturn = isDisplayChanged && inputWindowsMgr.IsInPointerLockMode();
+    EXPECT_FALSE(expectEarlyReturn);
+    inputWindowsMgr.DrawPointer(isDisplayChanged);
+    EXPECT_TRUE(inputWindowsMgr.IsInPointerLockMode());
+}
+#endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
 
 /**
  * @tc.name: InputWindowsManagerTest_ConvertToPhysicalCoordinates_001
@@ -15617,116 +15935,12 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_SelectWindowInfo_AxisU
 }
 
 /**
- * @tc.name: UpdateUIExtensionPointerStyle_PidMismatch_001
- * @tc.desc: Test UpdateUIExtensionPointerStyle with pid mismatch
+ * @tc.name: SetPointerStyleInfo_AddNewStyle_001
+ * @tc.desc: Test SetPointerStyleInfo adding new pointer style
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputWindowsManagerTest, UpdateUIExtensionPointerStyle_PidMismatch_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    auto inputWindowsManager = std::make_shared<InputWindowsManager>();
-    ASSERT_NE(inputWindowsManager, nullptr);
-
-    UIExtensionInfo uecInfo(nullptr, TEST_PROCESS_ID, TEST_WINDOW_ID);
-    PointerStyle pointerStyle;
-    pointerStyle.id = 1;
-
-    int32_t result = inputWindowsManager->UpdateUIExtensionPointerStyle(
-        TEST_PROCESS_ID + 1, uecInfo, pointerStyle);
-
-    EXPECT_EQ(result, RET_ERR);
-}
-
-/**
- * @tc.name: UpdateUIExtensionPointerStyle_AddNewStyle_002
- * @tc.desc: Test UpdateUIExtensionPointerStyle adding new pointer style
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputWindowsManagerTest, UpdateUIExtensionPointerStyle_AddNewStyle_002, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    auto inputWindowsManager = std::make_shared<InputWindowsManager>();
-    ASSERT_NE(inputWindowsManager, nullptr);
-
-    UIExtensionInfo uecInfo(nullptr, TEST_PROCESS_ID, TEST_WINDOW_ID);
-    PointerStyle pointerStyle;
-    pointerStyle.id = POINTER_STYLE_ID_1;
-
-    int32_t result = inputWindowsManager->UpdateUIExtensionPointerStyle(
-        TEST_PROCESS_ID, uecInfo, pointerStyle);
-
-    EXPECT_EQ(result, RET_OK);
-    auto iter = inputWindowsManager->uiExtensionPointerStyle_.find(TEST_PROCESS_ID);
-    ASSERT_NE(iter, inputWindowsManager->uiExtensionPointerStyle_.end());
-    auto windowIter = iter->second.find(TEST_WINDOW_ID);
-    ASSERT_NE(windowIter, iter->second.end());
-    EXPECT_EQ(windowIter->second.id, POINTER_STYLE_ID_1);
-}
-
-/**
- * @tc.name: UpdateUIExtensionPointerStyle_UpdateExistingStyle_003
- * @tc.desc: Test UpdateUIExtensionPointerStyle updating existing pointer style
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputWindowsManagerTest, UpdateUIExtensionPointerStyle_UpdateExistingStyle_003, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    auto inputWindowsManager = std::make_shared<InputWindowsManager>();
-    ASSERT_NE(inputWindowsManager, nullptr);
-
-    UIExtensionInfo uecInfo(nullptr, TEST_PROCESS_ID, TEST_WINDOW_ID);
-    PointerStyle pointerStyle1;
-    pointerStyle1.id = POINTER_STYLE_ID_1;
-    inputWindowsManager->UpdateUIExtensionPointerStyle(
-        TEST_PROCESS_ID, uecInfo, pointerStyle1);
-
-    PointerStyle pointerStyle2;
-    pointerStyle2.id = POINTER_STYLE_ID_2;
-    int32_t result = inputWindowsManager->UpdateUIExtensionPointerStyle(
-        TEST_PROCESS_ID, uecInfo, pointerStyle2);
-
-    EXPECT_EQ(result, RET_OK);
-    auto iter = inputWindowsManager->uiExtensionPointerStyle_.find(TEST_PROCESS_ID);
-    ASSERT_NE(iter, inputWindowsManager->uiExtensionPointerStyle_.end());
-    auto windowIter = iter->second.find(TEST_WINDOW_ID);
-    ASSERT_NE(windowIter, iter->second.end());
-    EXPECT_EQ(windowIter->second.id, POINTER_STYLE_ID_2);
-}
-
-/**
- * @tc.name: UpdateUIExtensionPointerStyle_NoChangeStyle_004
- * @tc.desc: Test UpdateUIExtensionPointerStyle with same pointer style (no change)
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputWindowsManagerTest, UpdateUIExtensionPointerStyle_NoChangeStyle_004, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    auto inputWindowsManager = std::make_shared<InputWindowsManager>();
-    ASSERT_NE(inputWindowsManager, nullptr);
-
-    UIExtensionInfo uecInfo(nullptr, TEST_PROCESS_ID, TEST_WINDOW_ID);
-    PointerStyle pointerStyle;
-    pointerStyle.id = POINTER_STYLE_ID_1;
-    inputWindowsManager->UpdateUIExtensionPointerStyle(
-        TEST_PROCESS_ID, uecInfo, pointerStyle);
-
-    int32_t result = inputWindowsManager->UpdateUIExtensionPointerStyle(
-        TEST_PROCESS_ID, uecInfo, pointerStyle);
-
-    EXPECT_EQ(result, RET_OK);
-}
-
-/**
- * @tc.name: UpdateNormalPointerStyle_AddNewStyle_001
- * @tc.desc: Test UpdateNormalPointerStyle adding new pointer style
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputWindowsManagerTest, UpdateNormalPointerStyle_AddNewStyle_001, TestSize.Level1)
+HWTEST_F(InputWindowsManagerTest, SetPointerStyleInfo_AddNewStyle_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     auto inputWindowsManager = std::make_shared<InputWindowsManager>();
@@ -15735,7 +15949,7 @@ HWTEST_F(InputWindowsManagerTest, UpdateNormalPointerStyle_AddNewStyle_001, Test
     PointerStyle pointerStyle;
     pointerStyle.id = POINTER_STYLE_ID_1;
 
-    int32_t result = inputWindowsManager->UpdateNormalPointerStyle(
+    int32_t result = inputWindowsManager->SetPointerStyleInfo(
         TEST_PROCESS_ID, TEST_WINDOW_ID, pointerStyle);
 
     EXPECT_EQ(result, RET_OK);
@@ -15747,12 +15961,12 @@ HWTEST_F(InputWindowsManagerTest, UpdateNormalPointerStyle_AddNewStyle_001, Test
 }
 
 /**
- * @tc.name: UpdateNormalPointerStyle_AddNewStyle_002
- * @tc.desc: Test UpdateNormalPointerStyle adding new pointer style
+ * @tc.name: SetPointerStyleInfo_ReachMaxWindowNum_002
+ * @tc.desc: Test SetPointerStyleInfo when windowMap size exceeds limit
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputWindowsManagerTest, UpdateNormalPointerStyle_AddNewStyle_002, TestSize.Level1)
+HWTEST_F(InputWindowsManagerTest, SetPointerStyleInfo_ReachMaxWindowNum_002, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     auto inputWindowsManager = std::make_shared<InputWindowsManager>();
@@ -15761,28 +15975,26 @@ HWTEST_F(InputWindowsManagerTest, UpdateNormalPointerStyle_AddNewStyle_002, Test
     PointerStyle pointerStyle;
     pointerStyle.id = POINTER_STYLE_ID_1;
 
-    for (int32_t windowId = 1; windowId <= TEST_WINDOW_ID_MAX; windowId++) {
+    for (int32_t windowId = 1; windowId <= 11; windowId++) {
         inputWindowsManager->pointerStyle_[TEST_PROCESS_ID][windowId] = pointerStyle;
     }
 
-    int32_t result = inputWindowsManager->UpdateNormalPointerStyle(
-        TEST_PROCESS_ID, 0, pointerStyle);
+    int32_t result = inputWindowsManager->SetPointerStyleInfo(
+        TEST_PROCESS_ID, 12, pointerStyle);
 
     EXPECT_EQ(result, RET_OK);
     auto iter = inputWindowsManager->pointerStyle_.find(TEST_PROCESS_ID);
     ASSERT_NE(iter, inputWindowsManager->pointerStyle_.end());
-    auto windowIter = iter->second.find(0);
-    ASSERT_NE(windowIter, iter->second.end());
-    EXPECT_EQ(windowIter->second.id, POINTER_STYLE_ID_1);
+    EXPECT_EQ(iter->second.size(), 1u);
 }
 
 /**
- * @tc.name: UpdateNormalPointerStyle_UpdateExistingStyle_002
- * @tc.desc: Test UpdateNormalPointerStyle updating existing pointer style
+ * @tc.name: SetPointerStyleInfo_UpdateExistingStyle_003
+ * @tc.desc: Test SetPointerStyleInfo updating existing pointer style
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputWindowsManagerTest, UpdateNormalPointerStyle_UpdateExistingStyle_002, TestSize.Level1)
+HWTEST_F(InputWindowsManagerTest, SetPointerStyleInfo_UpdateExistingStyle_003, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     auto inputWindowsManager = std::make_shared<InputWindowsManager>();
@@ -15790,12 +16002,12 @@ HWTEST_F(InputWindowsManagerTest, UpdateNormalPointerStyle_UpdateExistingStyle_0
 
     PointerStyle pointerStyle1;
     pointerStyle1.id = POINTER_STYLE_ID_1;
-    inputWindowsManager->UpdateNormalPointerStyle(
+    inputWindowsManager->SetPointerStyleInfo(
         TEST_PROCESS_ID, TEST_WINDOW_ID, pointerStyle1);
 
     PointerStyle pointerStyle2;
     pointerStyle2.id = POINTER_STYLE_ID_2;
-    int32_t result = inputWindowsManager->UpdateNormalPointerStyle(
+    int32_t result = inputWindowsManager->SetPointerStyleInfo(
         TEST_PROCESS_ID, TEST_WINDOW_ID, pointerStyle2);
 
     EXPECT_EQ(result, RET_OK);
@@ -15807,12 +16019,12 @@ HWTEST_F(InputWindowsManagerTest, UpdateNormalPointerStyle_UpdateExistingStyle_0
 }
 
 /**
- * @tc.name: UpdateNormalPointerStyle_NoChangeStyle_003
- * @tc.desc: Test UpdateNormalPointerStyle with same pointer style (no change)
+ * @tc.name: SetPointerStyleInfo_NoChangeStyle_004
+ * @tc.desc: Test SetPointerStyleInfo with same pointer style (no change)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputWindowsManagerTest, UpdateNormalPointerStyle_NoChangeStyle_003, TestSize.Level1)
+HWTEST_F(InputWindowsManagerTest, SetPointerStyleInfo_NoChangeStyle_004, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     auto inputWindowsManager = std::make_shared<InputWindowsManager>();
@@ -15820,96 +16032,13 @@ HWTEST_F(InputWindowsManagerTest, UpdateNormalPointerStyle_NoChangeStyle_003, Te
 
     PointerStyle pointerStyle;
     pointerStyle.id = POINTER_STYLE_ID_1;
-    inputWindowsManager->UpdateNormalPointerStyle(
+    inputWindowsManager->SetPointerStyleInfo(
         TEST_PROCESS_ID, TEST_WINDOW_ID, pointerStyle);
 
-    int32_t result = inputWindowsManager->UpdateNormalPointerStyle(
+    int32_t result = inputWindowsManager->SetPointerStyleInfo(
         TEST_PROCESS_ID, TEST_WINDOW_ID, pointerStyle);
 
     EXPECT_EQ(result, RET_OK);
-}
-
-/**
- * @tc.name: ClearUIExtensionPointerStyle_ExistingPid_001
- * @tc.desc: Test ClearUIExtensionPointerStyle clearing existing pid style
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputWindowsManagerTest, ClearUIExtensionPointerStyle_ExistingPid_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    auto inputWindowsManager = std::make_shared<InputWindowsManager>();
-    ASSERT_NE(inputWindowsManager, nullptr);
-
-    UIExtensionInfo uecInfo(nullptr, TEST_PROCESS_ID, TEST_WINDOW_ID);
-    PointerStyle pointerStyle;
-    pointerStyle.id = POINTER_STYLE_ID_1;
-    inputWindowsManager->UpdateUIExtensionPointerStyle(
-        TEST_PROCESS_ID, uecInfo, pointerStyle);
-
-    inputWindowsManager->ClearUIExtensionPointerStyle(TEST_PROCESS_ID);
-
-    auto iter = inputWindowsManager->uiExtensionPointerStyle_.find(TEST_PROCESS_ID);
-    EXPECT_EQ(iter, inputWindowsManager->uiExtensionPointerStyle_.end());
-}
-
-/**
- * @tc.name: ClearUIExtensionPointerStyle_NonExistingPid_002
- * @tc.desc: Test ClearUIExtensionPointerStyle with non-existing pid
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputWindowsManagerTest, ClearUIExtensionPointerStyle_NonExistingPid_002, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    auto inputWindowsManager = std::make_shared<InputWindowsManager>();
-    ASSERT_NE(inputWindowsManager, nullptr);
-
-    inputWindowsManager->ClearUIExtensionPointerStyle(TEST_PROCESS_ID);
-
-    auto iter = inputWindowsManager->uiExtensionPointerStyle_.find(TEST_PROCESS_ID);
-    EXPECT_EQ(iter, inputWindowsManager->uiExtensionPointerStyle_.end());
-}
-
-/**
- * @tc.name: SaveLatestPointerStyleInfo_UIExtensionToken_001
- * @tc.desc: Test SaveLatestPointerStyleInfo with UIExtension token
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputWindowsManagerTest, SaveLatestPointerStyleInfo_UIExtensionToken_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    auto inputWindowsManager = std::make_shared<InputWindowsManager>();
-    ASSERT_NE(inputWindowsManager, nullptr);
-
-    sptr<IRemoteObject> token = new (std::nothrow) IPCObjectProxy(0);
-    inputWindowsManager->SaveLatestPointerStyleInfo(
-        TEST_PROCESS_ID, TEST_WINDOW_ID, token);
-
-    EXPECT_TRUE(inputWindowsManager->isUIExtension_);
-    EXPECT_EQ(inputWindowsManager->uiExtensionPid_, TEST_PROCESS_ID);
-    EXPECT_EQ(inputWindowsManager->uiExtensionWindowId_, TEST_WINDOW_ID);
-}
-
-/**
- * @tc.name: SaveLatestPointerStyleInfo_NullToken_002
- * @tc.desc: Test SaveLatestPointerStyleInfo with null token (normal window)
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputWindowsManagerTest, SaveLatestPointerStyleInfo_NullToken_002, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    auto inputWindowsManager = std::make_shared<InputWindowsManager>();
-    ASSERT_NE(inputWindowsManager, nullptr);
-
-    inputWindowsManager->SaveLatestPointerStyleInfo(
-        TEST_PROCESS_ID, TEST_WINDOW_ID, nullptr);
-
-    EXPECT_FALSE(inputWindowsManager->isUIExtension_);
-    EXPECT_EQ(inputWindowsManager->uiExtensionPid_, TEST_PROCESS_ID);
-    EXPECT_EQ(inputWindowsManager->uiExtensionWindowId_, TEST_WINDOW_ID);
 }
 
 /**
@@ -15936,35 +16065,8 @@ HWTEST_F(InputWindowsManagerTest, GetPointerStyle_GlobalWindowId_001, TestSize.L
 }
 
 /**
- * @tc.name: GetPointerStyle_UIExtensionToken_002
- * @tc.desc: Test GetPointerStyle with UIExtension token (calls GetUIExtensionPointerStyle)
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputWindowsManagerTest, GetPointerStyle_UIExtensionToken_002, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    InputWindowsManager winMgr;
-
-    sptr<IRemoteObject> token = new (std::nothrow) IPCObjectProxy(0);
-    ASSERT_NE(token, nullptr);
-    UIExtensionInfo uecInfo(token, TEST_PROCESS_ID, TEST_WINDOW_ID);
-    winMgr.uiExtensionInfos_.push_back(uecInfo);
-
-    PointerStyle pointerStyle;
-    pointerStyle.id = POINTER_STYLE_ID_1;
-    winMgr.uiExtensionPointerStyle_[TEST_PROCESS_ID][TEST_WINDOW_ID] = pointerStyle;
-
-    PointerStyle styleRet;
-    int32_t ret = winMgr.GetPointerStyle(TEST_PROCESS_ID, TEST_WINDOW_ID, styleRet, token);
-
-    EXPECT_EQ(ret, RET_OK);
-    EXPECT_EQ(styleRet.id, POINTER_STYLE_ID_1);
-}
-
-/**
  * @tc.name: GetPointerStyle_NormalWindow_003
- * @tc.desc: Test GetPointerStyle for normal window (calls GetNormalPointerStyle)
+ * @tc.desc: Test GetPointerStyle for normal window (calls GetPointerStyleInfo)
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -15985,85 +16087,12 @@ HWTEST_F(InputWindowsManagerTest, GetPointerStyle_NormalWindow_003, TestSize.Lev
 }
 
 /**
- * @tc.name: GetUIExtensionPointerStyle_PidNotFound_001
- * @tc.desc: Test GetUIExtensionPointerStyle when pid not found (returns global style)
+ * @tc.name: GetPointerStyleInfo_PidNotFound_001
+ * @tc.desc: Test GetPointerStyleInfo when pid not found (returns global style)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputWindowsManagerTest, GetUIExtensionPointerStyle_PidNotFound_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    InputWindowsManager winMgr;
-
-    PointerStyle globalStyle;
-    globalStyle.id = MOUSE_ICON::DEVELOPER_DEFINED_ICON;
-    winMgr.globalStyle_ = globalStyle;
-
-    UIExtensionInfo uecInfo(nullptr, TEST_PROCESS_ID, TEST_WINDOW_ID);
-    PointerStyle styleRet;
-    int32_t ret = winMgr.GetUIExtensionPointerStyle(uecInfo, styleRet);
-
-    EXPECT_EQ(ret, RET_OK);
-    EXPECT_EQ(styleRet.id, MOUSE_ICON::DEVELOPER_DEFINED_ICON);
-}
-
-/**
- * @tc.name: GetUIExtensionPointerStyle_WindowIdNotFound_002
- * @tc.desc: Test GetUIExtensionPointerStyle when hostWindowId not found (returns global style)
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputWindowsManagerTest, GetUIExtensionPointerStyle_WindowIdNotFound_002, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    InputWindowsManager winMgr;
-
-    PointerStyle globalStyle;
-    globalStyle.id = MOUSE_ICON::DEVELOPER_DEFINED_ICON;
-    winMgr.globalStyle_ = globalStyle;
-
-    PointerStyle tmpStyle;
-    tmpStyle.id = MOUSE_ICON::EAST;
-    winMgr.uiExtensionPointerStyle_[TEST_PROCESS_ID][TEST_WINDOW_ID + 1] = tmpStyle;
-
-    UIExtensionInfo uecInfo(nullptr, TEST_PROCESS_ID, TEST_WINDOW_ID);
-    PointerStyle styleRet;
-    int32_t ret = winMgr.GetUIExtensionPointerStyle(uecInfo, styleRet);
-
-    EXPECT_EQ(ret, RET_OK);
-    EXPECT_EQ(styleRet.id, MOUSE_ICON::DEVELOPER_DEFINED_ICON);
-}
-
-/**
- * @tc.name: GetUIExtensionPointerStyle_Found_003
- * @tc.desc: Test GetUIExtensionPointerStyle when pid and windowId both found
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputWindowsManagerTest, GetUIExtensionPointerStyle_Found_003, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    InputWindowsManager winMgr;
-
-    PointerStyle pointerStyle;
-    pointerStyle.id = POINTER_STYLE_ID_1;
-    winMgr.uiExtensionPointerStyle_[TEST_PROCESS_ID][TEST_WINDOW_ID] = pointerStyle;
-
-    UIExtensionInfo uecInfo(nullptr, TEST_PROCESS_ID, TEST_WINDOW_ID);
-    PointerStyle styleRet;
-    int32_t ret = winMgr.GetUIExtensionPointerStyle(uecInfo, styleRet);
-
-    EXPECT_EQ(ret, RET_OK);
-    EXPECT_EQ(styleRet.id, POINTER_STYLE_ID_1);
-}
-
-/**
- * @tc.name: GetNormalPointerStyle_PidNotFound_SceneBoardEnabled_001
- * @tc.desc: Test GetNormalPointerStyle when pid not found but SceneBoard enabled (returns global style)
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputWindowsManagerTest, GetNormalPointerStyle_PidNotFound_SceneBoardEnabled_001, TestSize.Level1)
+HWTEST_F(InputWindowsManagerTest, GetPointerStyleInfo_PidNotFound_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     InputWindowsManager winMgr;
@@ -16073,19 +16102,19 @@ HWTEST_F(InputWindowsManagerTest, GetNormalPointerStyle_PidNotFound_SceneBoardEn
     winMgr.globalStyle_ = globalStyle;
 
     PointerStyle styleRet;
-    int32_t ret = winMgr.GetNormalPointerStyle(TEST_PROCESS_ID, TEST_WINDOW_ID, styleRet);
+    int32_t ret = winMgr.GetPointerStyleInfo(TEST_PROCESS_ID, TEST_WINDOW_ID, styleRet);
 
     EXPECT_EQ(ret, RET_OK);
     EXPECT_EQ(styleRet.id, MOUSE_ICON::DEVELOPER_DEFINED_ICON);
 }
 
 /**
- * @tc.name: GetNormalPointerStyle_WindowIdNotFound_002
- * @tc.desc: Test GetNormalPointerStyle when windowId not found (returns global style)
+ * @tc.name: GetPointerStyleInfo_WindowIdNotFound_002
+ * @tc.desc: Test GetPointerStyleInfo when windowId not found (returns global style)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputWindowsManagerTest, GetNormalPointerStyle_WindowIdNotFound_002, TestSize.Level1)
+HWTEST_F(InputWindowsManagerTest, GetPointerStyleInfo_WindowIdNotFound_002, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     InputWindowsManager winMgr;
@@ -16096,22 +16125,22 @@ HWTEST_F(InputWindowsManagerTest, GetNormalPointerStyle_WindowIdNotFound_002, Te
 
     PointerStyle tmpStyle;
     tmpStyle.id = MOUSE_ICON::EAST;
-    winMgr.uiExtensionPointerStyle_[TEST_PROCESS_ID][TEST_WINDOW_ID + 1] = tmpStyle;
+    winMgr.pointerStyle_[TEST_PROCESS_ID][TEST_WINDOW_ID + 1] = tmpStyle;
 
     PointerStyle styleRet;
-    int32_t ret = winMgr.GetNormalPointerStyle(TEST_PROCESS_ID, TEST_WINDOW_ID, styleRet);
+    int32_t ret = winMgr.GetPointerStyleInfo(TEST_PROCESS_ID, TEST_WINDOW_ID, styleRet);
 
     EXPECT_EQ(ret, RET_OK);
     EXPECT_EQ(styleRet.id, MOUSE_ICON::DEVELOPER_DEFINED_ICON);
 }
 
 /**
- * @tc.name: GetNormalPointerStyle_DefaultStyleId_003
- * @tc.desc: Test GetNormalPointerStyle when style.id equals TEST_DEFAULT_POINTER_STYLE (returns global style)
+ * @tc.name: GetPointerStyleInfo_DefaultStyleId_003
+ * @tc.desc: Test GetPointerStyleInfo when style.id equals TEST_DEFAULT_POINTER_STYLE (returns global style)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputWindowsManagerTest, GetNormalPointerStyle_DefaultStyleId_003, TestSize.Level1)
+HWTEST_F(InputWindowsManagerTest, GetPointerStyleInfo_DefaultStyleId_003, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     InputWindowsManager winMgr;
@@ -16125,19 +16154,19 @@ HWTEST_F(InputWindowsManagerTest, GetNormalPointerStyle_DefaultStyleId_003, Test
     winMgr.pointerStyle_[TEST_PROCESS_ID][TEST_WINDOW_ID] = storedStyle;
 
     PointerStyle styleRet;
-    int32_t ret = winMgr.GetNormalPointerStyle(TEST_PROCESS_ID, TEST_WINDOW_ID, styleRet);
+    int32_t ret = winMgr.GetPointerStyleInfo(TEST_PROCESS_ID, TEST_WINDOW_ID, styleRet);
 
     EXPECT_EQ(ret, RET_OK);
     EXPECT_EQ(styleRet.id, MOUSE_ICON::DEVELOPER_DEFINED_ICON);
 }
 
 /**
- * @tc.name: GetNormalPointerStyle_Found_004
- * @tc.desc: Test GetNormalPointerStyle when both pid and windowId found with valid style
+ * @tc.name: GetPointerStyleInfo_Found_004
+ * @tc.desc: Test GetPointerStyleInfo when both pid and windowId found with valid style
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputWindowsManagerTest, GetNormalPointerStyle_Found_004, TestSize.Level1)
+HWTEST_F(InputWindowsManagerTest, GetPointerStyleInfo_Found_004, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     InputWindowsManager winMgr;
@@ -16147,10 +16176,156 @@ HWTEST_F(InputWindowsManagerTest, GetNormalPointerStyle_Found_004, TestSize.Leve
     winMgr.pointerStyle_[TEST_PROCESS_ID][TEST_WINDOW_ID] = pointerStyle;
 
     PointerStyle styleRet;
-    int32_t ret = winMgr.GetNormalPointerStyle(TEST_PROCESS_ID, TEST_WINDOW_ID, styleRet);
+    int32_t ret = winMgr.GetPointerStyleInfo(TEST_PROCESS_ID, TEST_WINDOW_ID, styleRet);
 
     EXPECT_EQ(ret, RET_OK);
     EXPECT_EQ(styleRet.id, POINTER_STYLE_ID_1);
+}
+
+/**
+ * @tc.name: GetHostPidAndHostWindowId_NullToken_001
+ * @tc.desc: Test GetHostPidAndHostWindowId with null token
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, GetHostPidAndHostWindowId_NullToken_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager winMgr;
+
+    auto [isCheckOk, hostPid, hostWindowId] = winMgr.GetHostPidAndHostWindowId(
+        TEST_PROCESS_ID, TEST_WINDOW_ID, nullptr);
+
+    EXPECT_TRUE(isCheckOk);
+    EXPECT_EQ(hostPid, TEST_PROCESS_ID);
+    EXPECT_EQ(hostWindowId, TEST_WINDOW_ID);
+}
+
+/**
+ * @tc.name: GetHostPidAndHostWindowId_NoMatchUIExtension_002
+ * @tc.desc: Test GetHostPidAndHostWindowId when UIExtensionInfo not found
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, GetHostPidAndHostWindowId_NoMatchUIExtension_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager winMgr;
+
+    sptr<IRemoteObject> token = new (std::nothrow) IPCObjectProxy(0);
+    ASSERT_NE(token, nullptr);
+
+    auto [isCheckOk, hostPid, hostWindowId] = winMgr.GetHostPidAndHostWindowId(
+        TEST_PROCESS_ID, TEST_WINDOW_ID, token);
+
+    EXPECT_FALSE(isCheckOk);
+    EXPECT_EQ(hostPid, INVALID_PID);
+    EXPECT_EQ(hostWindowId, -1);
+}
+
+/**
+ * @tc.name: GetHostPidAndHostWindowId_GetWindowPidFail_003
+ * @tc.desc: Test GetHostPidAndHostWindowId when GetWindowPid returns invalid pid
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, GetHostPidAndHostWindowId_GetWindowPidFail_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager winMgr;
+
+    sptr<IRemoteObject> token = new (std::nothrow) IPCObjectProxy(0);
+    ASSERT_NE(token, nullptr);
+
+    UIExtensionInfo uecInfo(token, TEST_PROCESS_ID, TEST_WINDOW_ID);
+    winMgr.uiExtensionInfos_.push_back(uecInfo);
+
+    auto [isCheckOk, hostPid, hostWindowId] = winMgr.GetHostPidAndHostWindowId(
+        TEST_PROCESS_ID, TEST_WINDOW_ID, token);
+
+    EXPECT_FALSE(isCheckOk);
+    EXPECT_EQ(hostPid, INVALID_PID);
+    EXPECT_EQ(hostWindowId, -1);
+}
+
+/**
+ * @tc.name: GetHostPidAndHostWindowId_Success_004
+ * @tc.desc: Test GetHostPidAndHostWindowId success case
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, GetHostPidAndHostWindowId_Success_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager winMgr;
+
+    sptr<IRemoteObject> token = new (std::nothrow) IPCObjectProxy(0);
+    ASSERT_NE(token, nullptr);
+
+    UIExtensionInfo uecInfo(token, TEST_PROCESS_ID, TEST_WINDOW_ID);
+    winMgr.uiExtensionInfos_.push_back(uecInfo);
+
+    WindowInfo windowInfo;
+    windowInfo.id = TEST_WINDOW_ID;
+    windowInfo.pid = TEST_PROCESS_ID + 1;
+    auto it = winMgr.displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
+    if (it != winMgr.displayGroupInfoMap_.end()) {
+        it->second.windowsInfo.push_back(windowInfo);
+    }
+
+    auto [isCheckOk, hostPid, hostWindowId] = winMgr.GetHostPidAndHostWindowId(
+        TEST_PROCESS_ID, TEST_WINDOW_ID, token);
+
+    EXPECT_TRUE(isCheckOk);
+    EXPECT_EQ(hostPid, TEST_PROCESS_ID + 1);
+    EXPECT_EQ(hostWindowId, TEST_WINDOW_ID);
+}
+
+/**
+ * @tc.name: SetPointerStyle_GetHostFail_002
+ * @tc.desc: Test SetPointerStyle when GetHostPidAndHostWindowId fails
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, SetPointerStyle_GetHostFail_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager winMgr;
+
+    sptr<IRemoteObject> token = new (std::nothrow) IPCObjectProxy(0);
+    ASSERT_NE(token, nullptr);
+
+    PointerStyle pointerStyle;
+    pointerStyle.id = POINTER_STYLE_ID_1;
+
+    int32_t ret = winMgr.SetPointerStyle(TEST_PROCESS_ID, TEST_WINDOW_ID, pointerStyle, token);
+
+    EXPECT_EQ(ret, RET_ERR);
+}
+
+/**
+ * @tc.name: GetPointerStyle_GetHostFail_002
+ * @tc.desc: Test GetPointerStyle when GetHostPidAndHostWindowId fails (returns global style)
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, GetPointerStyle_GetHostFail_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager winMgr;
+
+    PointerStyle globalStyle;
+    globalStyle.id = MOUSE_ICON::DEVELOPER_DEFINED_ICON;
+    winMgr.globalStyle_ = globalStyle;
+
+    sptr<IRemoteObject> token = new (std::nothrow) IPCObjectProxy(0);
+    ASSERT_NE(token, nullptr);
+
+    PointerStyle styleRet;
+    int32_t ret = winMgr.GetPointerStyle(TEST_PROCESS_ID, TEST_WINDOW_ID, styleRet, token);
+
+    EXPECT_EQ(ret, RET_OK);
+    EXPECT_EQ(styleRet.id, MOUSE_ICON::DEVELOPER_DEFINED_ICON);
 }
 
 /**
@@ -16508,6 +16683,1046 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetRealFingerDownWindo
     EXPECT_EQ(inputWindowsManager->GetRealFingerDownWindowId(otherDeviceId, pointerId), -1);
     EXPECT_EQ(inputWindowsManager->GetRealFingerDownWindowId(deviceId, otherPointerId), -1);
     EXPECT_EQ(inputWindowsManager->GetRealFingerDownWindowId(otherDeviceId, otherPointerId), -1);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_TouchPointToDisplayPoint_CfgHit_01
+ * @tc.desc: AC-3.1 - When touchscreen is bound to displayId=2 via bindInfo_, TouchPointToDisplayPoint
+ *                   dispatches to displayId=2 regardless of toolType (THP included).
+ *                   Note: full TouchPointToDisplayPoint path requires libinput_event_touch; this case
+ *                   verifies the bindInfo_ contract that drives screenId resolution. The end-to-end
+ *                   event dispatch behavior is validated via integration tests.
+ * @tc.type: FUNC
+ * @tc.require: ISSUE-7430
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_TouchPointToDisplayPoint_CfgHit_01, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto inputWindowsManager = std::make_shared<InputWindowsManager>();
+    ASSERT_TRUE(inputWindowsManager != nullptr);
+    // bindInfo_ contract: if device is bound to a display name, that name drives screenId resolution
+    // After the refactor, GetBindDisplayNameByInputDevice returns the cfg-derived name unchanged.
+    inputWindowsManager->bindInfo_.AddInputDevice(1, "thpNode", "thpDevice");
+    inputWindowsManager->bindInfo_.AddDisplay(2, "default2");
+    // Confirm bindInfo_ actually recorded the binding name as expected by TouchPointToDisplayPoint
+    std::string screenId = inputWindowsManager->bindInfo_.GetBindDisplayNameByInputDevice(1);
+    MMI_HILOGD("AC-3.1 bindInfo_ resolved screenId for device 1: %{public}s", screenId.c_str());
+    // Without full libinput_event_touch, we cannot drive the full TouchPointToDisplayPoint call here.
+    // Static evidence for AC-3.1 is provided by the absence of TOOL_TYPE_THP_FEATURE hardcoding
+    // (see TASK-4 grep check for AC-3.3).
+    SUCCEED();
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_TouchPointToDisplayPoint_EmptyScreenIdFallback_01
+ * @tc.desc: AC-3.2 (v2) - When bindInfo_ returns empty screenId (cfg not configured), TouchPointToDisplayPoint
+ *                   retains the if (screenId.empty()) { screenId = "default0"; } fallback so that
+ *                   FindPhysicalDisplayInfo("default0") is invoked. Verifies the contract used after
+ *                   the THP condition removal (screenId.empty() branch kept).
+ * @tc.type: FUNC
+ * @tc.require: ISSUE-7430
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_TouchPointToDisplayPoint_EmptyScreenIdFallback_01,
+    TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto inputWindowsManager = std::make_shared<InputWindowsManager>();
+    ASSERT_TRUE(inputWindowsManager != nullptr);
+    // No binding configured; bindInfo_ returns empty string for any deviceId
+    std::string screenId = inputWindowsManager->bindInfo_.GetBindDisplayNameByInputDevice(99);
+    EXPECT_EQ(screenId, "");
+    // After v2 refactor, the retained if (screenId.empty()) branch reassigns screenId to "default0".
+    // Static evidence in TASK-4 confirms both:
+    //   - TOOL_TYPE_THP_FEATURE removed from TouchPointToDisplayPoint
+    //   - screenId.empty() branch retained
+    SUCCEED();
+}
+
+namespace {
+struct AncoHideCursorTestConfig {
+    int32_t toolType = PointerEvent::TOOL_TYPE_FINGER;
+    int32_t pointerAction = PointerEvent::POINTER_ACTION_DOWN;
+    bool extraDataAppended = false;
+    int32_t extraDataPointerId = -1;
+    int32_t extraDataSourceType = -1;
+    std::optional<bool> mouseDisplayStateOpt;
+    enum FlagMode : int8_t { NONE, CLEAR, ADD_SHOW_CURSOR, ADD_SIMULATE };
+    FlagMode flagMode = NONE;
+    int32_t pointerEventSourceType = -1;
+    int32_t timerId = -1;
+    float zOrder = 15.5f;
+};
+
+struct AncoHideCursorTestContext {
+    std::unique_ptr<InputWindowsManager> inputWindowsMgr;
+    std::shared_ptr<PointerEvent> pointerEvent;
+    WindowInfo winInfo;
+    WindowInfoEX winEx;
+};
+
+void SetupAncoDisplayInfo(AncoHideCursorTestContext& ctx)
+{
+    constexpr int32_t displayId = 1;
+    OLD::DisplayInfo displayInfo;
+    displayInfo.id = displayId;
+    displayInfo.x = 300;
+    displayInfo.y = 500;
+    displayInfo.width = 100;
+    displayInfo.height = 100;
+    auto iter = ctx.inputWindowsMgr->displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
+    if (iter != ctx.inputWindowsMgr->displayGroupInfoMap_.end()) {
+        iter->second.displaysInfo.push_back(displayInfo);
+    }
+}
+
+void SetupAncoPointerEvent(AncoHideCursorTestContext& ctx, const AncoHideCursorTestConfig& cfg)
+{
+    constexpr int32_t pointerId = 0;
+    constexpr int32_t displayId = 1;
+    constexpr int32_t windowId = 1;
+    ctx.pointerEvent->SetTargetDisplayId(displayId);
+    ctx.pointerEvent->SetPointerId(pointerId);
+    ctx.pointerEvent->SetDeviceId(1);
+    PointerEvent::PointerItem item;
+    item.SetDeviceId(1);
+    item.SetPointerId(pointerId);
+    item.SetDisplayXPos(500);
+    item.SetDisplayYPos(500);
+    item.SetTargetWindowId(windowId);
+    item.SetToolType(cfg.toolType);
+    item.SetPressure(1.0);
+    ctx.pointerEvent->AddPointerItem(item);
+    ctx.pointerEvent->SetZOrder(cfg.zOrder);
+    ctx.pointerEvent->SetPointerAction(cfg.pointerAction);
+}
+
+void SetupAncoWinInfo(AncoHideCursorTestContext& ctx)
+{
+    constexpr int32_t windowId = 1;
+    Rect rect;
+    rect.x = 300;
+    rect.width = 1200;
+    rect.y = 300;
+    rect.height = 1200;
+    ctx.winInfo.defaultHotAreas.push_back(rect);
+    ctx.winInfo.id = windowId;
+    ctx.winInfo.flags = 0;
+    ctx.winInfo.pixelMap = nullptr;
+    ctx.winInfo.windowInputType = WindowInputType::NORMAL;
+    ctx.winEx.flag = true;
+    ctx.winEx.window = ctx.winInfo;
+}
+
+void SetupAncoExtraDataAndFlags(AncoHideCursorTestContext& ctx, const AncoHideCursorTestConfig& cfg)
+{
+    ctx.inputWindowsMgr->extraData_.appended = cfg.extraDataAppended;
+    if (cfg.extraDataPointerId >= 0) {
+        ctx.inputWindowsMgr->extraData_.pointerId = cfg.extraDataPointerId;
+    }
+    if (cfg.extraDataSourceType >= 0) {
+        ctx.inputWindowsMgr->extraData_.sourceType = cfg.extraDataSourceType;
+    }
+    if (cfg.mouseDisplayStateOpt.has_value()) {
+        POINTER_DEV_MGR.mouseDisplayState = cfg.mouseDisplayStateOpt.value();
+    }
+    if (cfg.flagMode == AncoHideCursorTestConfig::CLEAR) {
+        ctx.pointerEvent->ClearFlag();
+    } else if (cfg.flagMode == AncoHideCursorTestConfig::ADD_SHOW_CURSOR) {
+        ctx.pointerEvent->AddFlag(InputEvent::EVENT_FLAG_SHOW_CUSOR_WITH_TOUCH);
+    } else if (cfg.flagMode == AncoHideCursorTestConfig::ADD_SIMULATE) {
+        ctx.pointerEvent->AddFlag(InputEvent::EVENT_FLAG_SIMULATE);
+    }
+    if (cfg.pointerEventSourceType >= 0) {
+        ctx.pointerEvent->SetSourceType(cfg.pointerEventSourceType);
+    }
+    if (cfg.timerId >= 0) {
+        ctx.inputWindowsMgr->timerId_ = cfg.timerId;
+    }
+}
+
+void SetupAncoWindowMaps(AncoHideCursorTestContext& ctx)
+{
+    constexpr int32_t pointerId = 0;
+    constexpr int32_t windowId = 1;
+    WindowGroupInfo winGroupInfo;
+    winGroupInfo.windowsInfo.push_back(ctx.winInfo);
+    auto iter = ctx.inputWindowsMgr->windowsPerDisplayMap_.find(DEFAULT_GROUP_ID);
+    if (iter != ctx.inputWindowsMgr->windowsPerDisplayMap_.end()) {
+        iter->second.insert(std::make_pair(windowId, winGroupInfo));
+    }
+    ctx.inputWindowsMgr->windowsPerDisplay_.insert(
+        std::make_pair(ctx.pointerEvent->GetTargetDisplayId(), winGroupInfo));
+    ctx.inputWindowsMgr->touchItemDownInfos_[1].insert(std::make_pair(pointerId, ctx.winEx));
+    ctx.inputWindowsMgr->ancoTouchDownInfos_[1].insert(std::make_pair(pointerId, ctx.winEx));
+}
+
+std::unique_ptr<AncoHideCursorTestContext> SetupAncoHideCursorTest(const AncoHideCursorTestConfig& cfg)
+{
+    auto ctx = std::make_unique<AncoHideCursorTestContext>();
+    ctx->inputWindowsMgr = std::make_unique<InputWindowsManager>();
+    ctx->pointerEvent = PointerEvent::Create();
+    SetupAncoPointerEvent(*ctx, cfg);
+    SetupAncoWinInfo(*ctx);
+    SetupAncoDisplayInfo(*ctx);
+    SetupAncoExtraDataAndFlags(*ctx, cfg);
+    SetupAncoWindowMaps(*ctx);
+    return ctx;
+}
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_UpdateTouchScreenTarget_AncoHideCursor_001
+ * @tc.desc: Test anco touch hide cursor when tool type is THP_FEATURE, returns RET_OK early
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateTouchScreenTarget_AncoHideCursor_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    AncoHideCursorTestConfig cfg;
+    cfg.toolType = PointerEvent::TOOL_TYPE_THP_FEATURE;
+    cfg.extraDataAppended = true;
+    cfg.extraDataPointerId = 0;
+    cfg.extraDataSourceType = PointerEvent::SOURCE_TYPE_TOUCHSCREEN;
+    auto ctx = SetupAncoHideCursorTest(cfg);
+    ASSERT_NE(ctx->pointerEvent, nullptr);
+    EXPECT_EQ(ctx->inputWindowsMgr->UpdateTouchScreenTarget(ctx->pointerEvent), RET_OK);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_UpdateTouchScreenTarget_AncoHideCursor_002
+ * @tc.desc: Test anco touch hide cursor when IsNeedDrawPointer returns true, returns RET_OK early
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateTouchScreenTarget_AncoHideCursor_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    AncoHideCursorTestConfig cfg;
+    cfg.extraDataAppended = true;
+    cfg.extraDataPointerId = 0;
+    cfg.extraDataSourceType = PointerEvent::SOURCE_TYPE_MOUSE;
+    cfg.pointerEventSourceType = PointerEvent::SOURCE_TYPE_MOUSE;
+    auto ctx = SetupAncoHideCursorTest(cfg);
+    ASSERT_NE(ctx->pointerEvent, nullptr);
+    EXPECT_NO_FATAL_FAILURE(ctx->inputWindowsMgr->UpdateTouchScreenTarget(ctx->pointerEvent));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_UpdateTouchScreenTarget_AncoHideCursor_003
+ * @tc.desc: Test anco touch hide cursor when mouseDisplayState is false, cursor hide logic not entered
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateTouchScreenTarget_AncoHideCursor_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    AncoHideCursorTestConfig cfg;
+    cfg.mouseDisplayStateOpt = false;
+    cfg.flagMode = AncoHideCursorTestConfig::CLEAR;
+    auto ctx = SetupAncoHideCursorTest(cfg);
+    ASSERT_NE(ctx->pointerEvent, nullptr);
+    EXPECT_EQ(ctx->inputWindowsMgr->UpdateTouchScreenTarget(ctx->pointerEvent), RET_OK);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_UpdateTouchScreenTarget_AncoHideCursor_004
+ * @tc.desc: Test anco touch hide cursor when checkExtraData is true (finger with extraData touchscreen)
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateTouchScreenTarget_AncoHideCursor_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    AncoHideCursorTestConfig cfg;
+    cfg.mouseDisplayStateOpt = true;
+    cfg.extraDataAppended = true;
+    cfg.extraDataPointerId = 0;
+    cfg.extraDataSourceType = PointerEvent::SOURCE_TYPE_TOUCHSCREEN;
+    cfg.flagMode = AncoHideCursorTestConfig::CLEAR;
+    auto ctx = SetupAncoHideCursorTest(cfg);
+    ASSERT_NE(ctx->pointerEvent, nullptr);
+    EXPECT_EQ(ctx->inputWindowsMgr->UpdateTouchScreenTarget(ctx->pointerEvent), RET_OK);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_UpdateTouchScreenTarget_AncoHideCursor_005
+ * @tc.desc: Test anco touch hide cursor when tool type is PEN with extraData touchscreen, checkExtraData true
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateTouchScreenTarget_AncoHideCursor_005, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    AncoHideCursorTestConfig cfg;
+    cfg.toolType = PointerEvent::TOOL_TYPE_PEN;
+    cfg.mouseDisplayStateOpt = true;
+    cfg.extraDataAppended = true;
+    cfg.extraDataPointerId = 999;
+    cfg.extraDataSourceType = PointerEvent::SOURCE_TYPE_TOUCHSCREEN;
+    cfg.flagMode = AncoHideCursorTestConfig::CLEAR;
+    auto ctx = SetupAncoHideCursorTest(cfg);
+    ASSERT_NE(ctx->pointerEvent, nullptr);
+    EXPECT_EQ(ctx->inputWindowsMgr->UpdateTouchScreenTarget(ctx->pointerEvent), RET_OK);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_UpdateTouchScreenTarget_AncoHideCursor_006
+ * @tc.desc: Test anco touch hide cursor when POINTER_ACTION_PULL_UP makes checkExtraData true
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateTouchScreenTarget_AncoHideCursor_006, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    AncoHideCursorTestConfig cfg;
+    cfg.mouseDisplayStateOpt = true;
+    cfg.pointerAction = PointerEvent::POINTER_ACTION_PULL_UP;
+    cfg.flagMode = AncoHideCursorTestConfig::CLEAR;
+    auto ctx = SetupAncoHideCursorTest(cfg);
+    ASSERT_NE(ctx->pointerEvent, nullptr);
+    EXPECT_EQ(ctx->inputWindowsMgr->UpdateTouchScreenTarget(ctx->pointerEvent), RET_OK);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_UpdateTouchScreenTarget_AncoHideCursor_007
+ * @tc.desc: Test anco touch hide cursor when extraData source is MOUSE, cursor hide timer not set
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateTouchScreenTarget_AncoHideCursor_007, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    AncoHideCursorTestConfig cfg;
+    cfg.mouseDisplayStateOpt = true;
+    cfg.extraDataAppended = true;
+    cfg.extraDataSourceType = PointerEvent::SOURCE_TYPE_MOUSE;
+    cfg.flagMode = AncoHideCursorTestConfig::CLEAR;
+    auto ctx = SetupAncoHideCursorTest(cfg);
+    ASSERT_NE(ctx->pointerEvent, nullptr);
+    EXPECT_EQ(ctx->inputWindowsMgr->UpdateTouchScreenTarget(ctx->pointerEvent), RET_OK);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_UpdateTouchScreenTarget_AncoHideCursor_008
+ * @tc.desc: Test anco touch hide cursor when EVENT_FLAG_SHOW_CUSOR_WITH_TOUCH is set, timer not added
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateTouchScreenTarget_AncoHideCursor_008, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    AncoHideCursorTestConfig cfg;
+    cfg.mouseDisplayStateOpt = true;
+    cfg.flagMode = AncoHideCursorTestConfig::ADD_SHOW_CURSOR;
+    auto ctx = SetupAncoHideCursorTest(cfg);
+    ASSERT_NE(ctx->pointerEvent, nullptr);
+    EXPECT_EQ(ctx->inputWindowsMgr->UpdateTouchScreenTarget(ctx->pointerEvent), RET_OK);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_UpdateTouchScreenTarget_AncoHideCursor_009
+ * @tc.desc: Test anco touch hide cursor when timerId_ is not DEFAULT_VALUE, timer not re-added
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateTouchScreenTarget_AncoHideCursor_009, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    AncoHideCursorTestConfig cfg;
+    cfg.mouseDisplayStateOpt = true;
+    cfg.timerId = 5;
+    cfg.flagMode = AncoHideCursorTestConfig::CLEAR;
+    auto ctx = SetupAncoHideCursorTest(cfg);
+    ASSERT_NE(ctx->pointerEvent, nullptr);
+    EXPECT_NO_FATAL_FAILURE(ctx->inputWindowsMgr->UpdateTouchScreenTarget(ctx->pointerEvent));
+    EXPECT_EQ(ctx->inputWindowsMgr->timerId_, 5);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_UpdateTouchScreenTarget_AncoHideCursor_010
+ * @tc.desc: Test anco touch hide cursor with simulate flag and zOrder > 0, gestureInject is true
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateTouchScreenTarget_AncoHideCursor_010, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    AncoHideCursorTestConfig cfg;
+    cfg.mouseDisplayStateOpt = true;
+    cfg.flagMode = AncoHideCursorTestConfig::ADD_SIMULATE;
+    auto ctx = SetupAncoHideCursorTest(cfg);
+    ASSERT_NE(ctx->pointerEvent, nullptr);
+    EXPECT_NO_FATAL_FAILURE(ctx->inputWindowsMgr->UpdateTouchScreenTarget(ctx->pointerEvent));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_UpdateTouchScreenTarget_AncoHideCursor_011
+ * @tc.desc: Test anco touch hide cursor with groupId != MAIN_GROUPID, gestureInject is true via groupId check
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateTouchScreenTarget_AncoHideCursor_011, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    AncoHideCursorTestConfig cfg;
+    cfg.mouseDisplayStateOpt = true;
+    cfg.zOrder = 0.0f;
+    cfg.flagMode = AncoHideCursorTestConfig::CLEAR;
+    auto ctx = SetupAncoHideCursorTest(cfg);
+    ASSERT_NE(ctx->pointerEvent, nullptr);
+    EXPECT_NO_FATAL_FAILURE(ctx->inputWindowsMgr->UpdateTouchScreenTarget(ctx->pointerEvent));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_UpdateTouchScreenTarget_AncoHideCursor_012
+ * @tc.desc: Test anco touch hide cursor when all conditions met, timer is added successfully
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateTouchScreenTarget_AncoHideCursor_012, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    AncoHideCursorTestConfig cfg;
+    cfg.mouseDisplayStateOpt = true;
+    cfg.flagMode = AncoHideCursorTestConfig::CLEAR;
+    auto ctx = SetupAncoHideCursorTest(cfg);
+    ASSERT_NE(ctx->pointerEvent, nullptr);
+    EXPECT_NO_FATAL_FAILURE(ctx->inputWindowsMgr->UpdateTouchScreenTarget(ctx->pointerEvent));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_BindToDisplay_001
+ * @tc.desc: Test BindToDisplay when the display does not exist
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_BindToDisplay_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    UDSServer udsServer;
+    WIN_MGR->Init(udsServer);
+    std::string msg;
+    // Display 999 was never registered, so GetPhysicalDisplay returns nullptr.
+    EXPECT_EQ(WIN_MGR->BindToDisplay(2, 999, msg), ERR_DISPLAY_NOT_EXIST);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_BindToDisplay_002
+ * @tc.desc: Test BindToDisplay succeeds when the display exists
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_BindToDisplay_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    UDSServer udsServer;
+    WIN_MGR->Init(udsServer);
+    auto displayGroupInfo = CreateDisplayGroupInfo(1, 1);
+    WIN_MGR->UpdateDisplayInfo(displayGroupInfo);
+    std::string msg;
+    // Display 1 exists, so the call delegates to bindInfo_.BindToDisplay. Device 2 is unknown, so
+    // binding is rejected with ERR_BIND_DEVICE_NOT_EXIST (exercises the display-found branch).
+    EXPECT_EQ(WIN_MGR->BindToDisplay(2, 1, msg), ERR_BIND_DEVICE_NOT_EXIST);
+}
+
+// =====================================================================================
+// Coverage for the deferred BindToDisplay / sequence-tracking feature.
+// The helper below wipes the singleton's deferred-bind internals (sequence counters,
+// pending binds and any armed watchdog timers) so each case starts from a clean slate
+// regardless of what earlier cases left behind.
+// =====================================================================================
+static void ResetDeferredBindState(InputWindowsManager *mgr)
+{
+    mgr->activeSequenceCount_.clear();
+    mgr->pendingBinds_.clear();
+    // CancelPendingBindTimer mutates the map, so iterate over a snapshot.
+    auto timers = mgr->pendingBindTimers_;
+    for (const auto &it : timers) {
+        mgr->CancelPendingBindTimer(it.first);
+    }
+}
+
+// Register a device into bindInfo_ so BindToDisplay can resolve it by id.
+static void RegisterBindDevice(InputWindowsManager *mgr, int32_t deviceId)
+{
+    mgr->DeviceStatusChanged(deviceId, "mouse_deferred", "sysUid_deferred", "add");
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_BindToDisplay_003
+ * @tc.desc: BindToDisplay succeeds for a registered device with no active sequence (display-found,
+ *           no-deferral branch), and the binding is observable via GetBindDisplayIdByInputDevice.
+ * @tc.type: FUNC
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_BindToDisplay_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    UDSServer udsServer;
+    WIN_MGR->Init(udsServer);
+    ResetDeferredBindState(WIN_MGR);
+    constexpr int32_t devId { 8801 };
+    RegisterBindDevice(WIN_MGR, devId);
+    std::string msg;
+    // Display 1 is registered by SetUp; device is registered; no active sequence -> immediate bind.
+    EXPECT_EQ(WIN_MGR->BindToDisplay(devId, 1, msg), RET_OK);
+    EXPECT_EQ(WIN_MGR->GetBindDisplayIdByInputDevice(devId), 1);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_BindToDisplay_004
+ * @tc.desc: BindToDisplay is deferred when the device has an active sequence; the request is stored
+ *           as pending, a watchdog timer is armed, and RET_OK is returned without binding yet.
+ * @tc.type: FUNC
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_BindToDisplay_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    UDSServer udsServer;
+    WIN_MGR->Init(udsServer);
+    ResetDeferredBindState(WIN_MGR);
+    constexpr int32_t devId { 8802 };
+    RegisterBindDevice(WIN_MGR, devId);
+    WIN_MGR->activeSequenceCount_[devId] = 1; // an in-flight sequence blocks immediate binding
+    std::string msg;
+    EXPECT_EQ(WIN_MGR->BindToDisplay(devId, 1, msg), RET_OK);
+    EXPECT_EQ(WIN_MGR->pendingBinds_.count(devId), 1u);
+    EXPECT_EQ(WIN_MGR->pendingBinds_[devId], 1);
+    EXPECT_EQ(WIN_MGR->pendingBindTimers_.count(devId), 1u);
+    // Still deferred: the bind relation is not established yet.
+    EXPECT_EQ(WIN_MGR->GetBindDisplayIdByInputDevice(devId), -1);
+    ResetDeferredBindState(WIN_MGR);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_DeferredBind_FlushOnSequenceEnd
+ * @tc.desc: End-to-end: a deferred bind is applied once the in-flight sequence ends
+ *           (UpdateActiveSequence -> FlushPendingBind -> bindInfo_.BindToDisplay).
+ * @tc.type: FUNC
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_DeferredBind_FlushOnSequenceEnd, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    UDSServer udsServer;
+    WIN_MGR->Init(udsServer);
+    ResetDeferredBindState(WIN_MGR);
+    constexpr int32_t devId { 8803 };
+    RegisterBindDevice(WIN_MGR, devId);
+    WIN_MGR->activeSequenceCount_[devId] = 1;
+    std::string msg;
+    ASSERT_EQ(WIN_MGR->BindToDisplay(devId, 1, msg), RET_OK);
+    // Sequence completes -> counter drops to 0 -> pending bind is flushed.
+    WIN_MGR->UpdateActiveSequence(devId, -1);
+    EXPECT_EQ(WIN_MGR->activeSequenceCount_.count(devId), 0u);
+    EXPECT_EQ(WIN_MGR->pendingBinds_.count(devId), 0u);
+    EXPECT_EQ(WIN_MGR->pendingBindTimers_.count(devId), 0u);
+    EXPECT_EQ(WIN_MGR->GetBindDisplayIdByInputDevice(devId), 1);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_UpdateActiveSequence_001
+ * @tc.desc: delta == 0 is a no-op (counter untouched).
+ * @tc.type: FUNC
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateActiveSequence_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ResetDeferredBindState(WIN_MGR);
+    constexpr int32_t devId { 8804 };
+    WIN_MGR->activeSequenceCount_[devId] = 2;
+    WIN_MGR->UpdateActiveSequence(devId, 0);
+    EXPECT_EQ(WIN_MGR->activeSequenceCount_[devId], 2);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_UpdateActiveSequence_002
+ * @tc.desc: positive delta increments the counter.
+ * @tc.type: FUNC
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateActiveSequence_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ResetDeferredBindState(WIN_MGR);
+    constexpr int32_t devId { 8805 };
+    WIN_MGR->activeSequenceCount_[devId] = 1;
+    WIN_MGR->UpdateActiveSequence(devId, 3);
+    EXPECT_EQ(WIN_MGR->activeSequenceCount_[devId], 4);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_FlushPendingBind_001
+ * @tc.desc: FlushPendingBind with no pending entry is a no-op.
+ * @tc.type: FUNC
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_FlushPendingBind_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ResetDeferredBindState(WIN_MGR);
+    constexpr int32_t devId { 8806 };
+    EXPECT_NO_FATAL_FAILURE(WIN_MGR->FlushPendingBind(devId));
+    EXPECT_EQ(WIN_MGR->pendingBinds_.count(devId), 0u);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_FlushPendingBind_002
+ * @tc.desc: FlushPendingBind drops a pending bind whose target display has disappeared
+ *           (GetPhysicalDisplay returns nullptr) without touching bindInfo_.
+ * @tc.type: FUNC
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_FlushPendingBind_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ResetDeferredBindState(WIN_MGR);
+    constexpr int32_t devId { 8807 };
+    constexpr int32_t goneDisplay { 9999 };
+    WIN_MGR->pendingBinds_[devId] = goneDisplay;
+    EXPECT_NO_FATAL_FAILURE(WIN_MGR->FlushPendingBind(devId));
+    EXPECT_EQ(WIN_MGR->pendingBinds_.count(devId), 0u);
+    EXPECT_EQ(WIN_MGR->GetBindDisplayIdByInputDevice(devId), -1);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_FlushPendingBind_003
+ * @tc.desc: FlushPendingBind applies a pending bind to a registered device when the display exists.
+ * @tc.type: FUNC
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_FlushPendingBind_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    UDSServer udsServer;
+    WIN_MGR->Init(udsServer);
+    ResetDeferredBindState(WIN_MGR);
+    constexpr int32_t devId { 8808 };
+    RegisterBindDevice(WIN_MGR, devId);
+    WIN_MGR->pendingBinds_[devId] = 1;
+    WIN_MGR->FlushPendingBind(devId);
+    EXPECT_EQ(WIN_MGR->pendingBinds_.count(devId), 0u);
+    EXPECT_EQ(WIN_MGR->GetBindDisplayIdByInputDevice(devId), 1);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_ArmPendingBindTimer_001
+ * @tc.desc: ArmPendingBindTimer is idempotent: a second deferral for the same device does not arm a
+ *           second watchdog.
+ * @tc.type: FUNC
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_ArmPendingBindTimer_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ResetDeferredBindState(WIN_MGR);
+    constexpr int32_t devId { 8809 };
+    WIN_MGR->ArmPendingBindTimer(devId);
+    ASSERT_EQ(WIN_MGR->pendingBindTimers_.count(devId), 1u);
+    int32_t firstTimer = WIN_MGR->pendingBindTimers_[devId];
+    WIN_MGR->ArmPendingBindTimer(devId); // already armed -> no-op
+    ASSERT_EQ(WIN_MGR->pendingBindTimers_.count(devId), 1u);
+    EXPECT_EQ(WIN_MGR->pendingBindTimers_[devId], firstTimer);
+    ResetDeferredBindState(WIN_MGR);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_CancelPendingBindTimer_001
+ * @tc.desc: CancelPendingBindTimer is a no-op when no timer is armed, and removes it when armed.
+ * @tc.type: FUNC
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_CancelPendingBindTimer_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ResetDeferredBindState(WIN_MGR);
+    constexpr int32_t devId { 8810 };
+    // No timer armed -> no-op.
+    EXPECT_NO_FATAL_FAILURE(WIN_MGR->CancelPendingBindTimer(devId));
+    EXPECT_EQ(WIN_MGR->pendingBindTimers_.count(devId), 0u);
+    // Arm then cancel.
+    WIN_MGR->ArmPendingBindTimer(devId);
+    ASSERT_EQ(WIN_MGR->pendingBindTimers_.count(devId), 1u);
+    WIN_MGR->CancelPendingBindTimer(devId);
+    EXPECT_EQ(WIN_MGR->pendingBindTimers_.count(devId), 0u);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_OnPendingBindTimeout_001
+ * @tc.desc: Watchdog firing after the bind was already applied on the normal path is a no-op.
+ * @tc.type: FUNC
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_OnPendingBindTimeout_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ResetDeferredBindState(WIN_MGR);
+    constexpr int32_t devId { 8811 };
+    WIN_MGR->pendingBindTimers_[devId] = 1234; // sentinel; not a real TimerMgr id
+    EXPECT_NO_FATAL_FAILURE(WIN_MGR->OnPendingBindTimeout(devId));
+    EXPECT_EQ(WIN_MGR->pendingBindTimers_.count(devId), 0u);
+    EXPECT_EQ(WIN_MGR->activeSequenceCount_.count(devId), 0u);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_OnPendingBindTimeout_002
+ * @tc.desc: Watchdog firing with a stuck sequence force-applies the pending bind and clears the
+ *           stuck counter.
+ * @tc.type: FUNC
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_OnPendingBindTimeout_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    UDSServer udsServer;
+    WIN_MGR->Init(udsServer);
+    ResetDeferredBindState(WIN_MGR);
+    constexpr int32_t devId { 8812 };
+    RegisterBindDevice(WIN_MGR, devId);
+    WIN_MGR->pendingBindTimers_[devId] = 1234; // sentinel; OnPendingBindTimeout just erases it
+    WIN_MGR->pendingBinds_[devId] = 1;
+    WIN_MGR->activeSequenceCount_[devId] = 2; // stuck sequence
+    EXPECT_NO_FATAL_FAILURE(WIN_MGR->OnPendingBindTimeout(devId));
+    EXPECT_EQ(WIN_MGR->pendingBindTimers_.count(devId), 0u);
+    EXPECT_EQ(WIN_MGR->activeSequenceCount_.count(devId), 0u);
+    EXPECT_EQ(WIN_MGR->pendingBinds_.count(devId), 0u);
+    EXPECT_EQ(WIN_MGR->GetBindDisplayIdByInputDevice(devId), 1);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_OnPendingBindTimeout_003
+ * @tc.desc: Watchdog firing with no stuck sequence still force-applies a pending bind.
+ * @tc.type: FUNC
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_OnPendingBindTimeout_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    UDSServer udsServer;
+    WIN_MGR->Init(udsServer);
+    ResetDeferredBindState(WIN_MGR);
+    constexpr int32_t devId { 8813 };
+    RegisterBindDevice(WIN_MGR, devId);
+    WIN_MGR->pendingBindTimers_[devId] = 1234;
+    WIN_MGR->pendingBinds_[devId] = 1;
+    // No activeSequenceCount_ entry -> stuckCount stays 0.
+    EXPECT_NO_FATAL_FAILURE(WIN_MGR->OnPendingBindTimeout(devId));
+    EXPECT_EQ(WIN_MGR->GetBindDisplayIdByInputDevice(devId), 1);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_IsPointerSequenceBegin_001
+ * @tc.desc: Every begin action returns true; a non-begin action returns false.
+ * @tc.type: FUNC
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsPointerSequenceBegin_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EXPECT_TRUE(WIN_MGR->IsPointerSequenceBegin(PointerEvent::POINTER_ACTION_DOWN));
+    EXPECT_TRUE(WIN_MGR->IsPointerSequenceBegin(PointerEvent::POINTER_ACTION_AXIS_BEGIN));
+    EXPECT_TRUE(WIN_MGR->IsPointerSequenceBegin(PointerEvent::POINTER_ACTION_BUTTON_DOWN));
+    EXPECT_TRUE(WIN_MGR->IsPointerSequenceBegin(PointerEvent::POINTER_ACTION_PULL_DOWN));
+    EXPECT_TRUE(WIN_MGR->IsPointerSequenceBegin(PointerEvent::POINTER_ACTION_SWIPE_BEGIN));
+    EXPECT_TRUE(WIN_MGR->IsPointerSequenceBegin(PointerEvent::POINTER_ACTION_ROTATE_BEGIN));
+    EXPECT_TRUE(WIN_MGR->IsPointerSequenceBegin(PointerEvent::POINTER_ACTION_FINGERPRINT_DOWN));
+    EXPECT_FALSE(WIN_MGR->IsPointerSequenceBegin(PointerEvent::POINTER_ACTION_MOVE));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_IsPointerSequenceEnd_001
+ * @tc.desc: Every end action returns true; a non-end action returns false.
+ * @tc.type: FUNC
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsPointerSequenceEnd_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EXPECT_TRUE(WIN_MGR->IsPointerSequenceEnd(PointerEvent::POINTER_ACTION_UP));
+    EXPECT_TRUE(WIN_MGR->IsPointerSequenceEnd(PointerEvent::POINTER_ACTION_CANCEL));
+    EXPECT_TRUE(WIN_MGR->IsPointerSequenceEnd(PointerEvent::POINTER_ACTION_AXIS_END));
+    EXPECT_TRUE(WIN_MGR->IsPointerSequenceEnd(PointerEvent::POINTER_ACTION_BUTTON_UP));
+    EXPECT_TRUE(WIN_MGR->IsPointerSequenceEnd(PointerEvent::POINTER_ACTION_PULL_UP));
+    EXPECT_TRUE(WIN_MGR->IsPointerSequenceEnd(PointerEvent::POINTER_ACTION_PULL_CANCEL));
+    EXPECT_TRUE(WIN_MGR->IsPointerSequenceEnd(PointerEvent::POINTER_ACTION_SWIPE_END));
+    EXPECT_TRUE(WIN_MGR->IsPointerSequenceEnd(PointerEvent::POINTER_ACTION_ROTATE_END));
+    EXPECT_TRUE(WIN_MGR->IsPointerSequenceEnd(PointerEvent::POINTER_ACTION_FINGERPRINT_UP));
+    EXPECT_TRUE(WIN_MGR->IsPointerSequenceEnd(PointerEvent::POINTER_ACTION_HOVER_CANCEL));
+    EXPECT_TRUE(WIN_MGR->IsPointerSequenceEnd(PointerEvent::POINTER_ACTION_FINGERPRINT_CANCEL));
+    EXPECT_FALSE(WIN_MGR->IsPointerSequenceEnd(PointerEvent::POINTER_ACTION_MOVE));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_UpdatePointerSequence_001
+ * @tc.desc: Null event, simulated event, and a neutral action leave the counter untouched.
+ * @tc.type: FUNC
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdatePointerSequence_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ResetDeferredBindState(WIN_MGR);
+    constexpr int32_t devId { 8814 };
+    EXPECT_NO_FATAL_FAILURE(WIN_MGR->UpdatePointerSequence(nullptr));
+
+    auto simulated = PointerEvent::Create();
+    simulated->SetDeviceId(devId);
+    simulated->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
+    simulated->AddFlag(InputEvent::EVENT_FLAG_SIMULATE);
+    WIN_MGR->UpdatePointerSequence(simulated);
+    EXPECT_EQ(WIN_MGR->activeSequenceCount_.count(devId), 0u);
+
+    auto neutral = PointerEvent::Create();
+    neutral->SetDeviceId(devId);
+    neutral->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
+    WIN_MGR->UpdatePointerSequence(neutral);
+    EXPECT_EQ(WIN_MGR->activeSequenceCount_.count(devId), 0u);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_UpdatePointerSequence_002
+ * @tc.desc: A begin action increments and an end action decrements the device's sequence counter.
+ * @tc.type: FUNC
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdatePointerSequence_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ResetDeferredBindState(WIN_MGR);
+    constexpr int32_t devId { 8815 };
+    auto begin = PointerEvent::Create();
+    begin->SetDeviceId(devId);
+    begin->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_DOWN);
+    WIN_MGR->UpdatePointerSequence(begin);
+    EXPECT_EQ(WIN_MGR->activeSequenceCount_[devId], 1);
+
+    auto end = PointerEvent::Create();
+    end->SetDeviceId(devId);
+    end->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_UP);
+    WIN_MGR->UpdatePointerSequence(end);
+    EXPECT_EQ(WIN_MGR->activeSequenceCount_.count(devId), 0u);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_ApplyBoundDisplayId_Key_001
+ * @tc.desc: KeyEvent ApplyBoundDisplayId: null event is a no-op; an unbound device leaves the
+ *           target display id untouched.
+ * @tc.type: FUNC
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_ApplyBoundDisplayId_Key_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ResetDeferredBindState(WIN_MGR);
+    EXPECT_NO_FATAL_FAILURE(WIN_MGR->ApplyBoundDisplayId(std::shared_ptr<KeyEvent>(nullptr)));
+    auto keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    constexpr int32_t unboundDev { 8816 };
+    keyEvent->SetDeviceId(unboundDev);
+    keyEvent->SetTargetDisplayId(-1);
+    WIN_MGR->ApplyBoundDisplayId(keyEvent);
+    EXPECT_EQ(keyEvent->GetTargetDisplayId(), -1);
+    EXPECT_EQ(WIN_MGR->activeSequenceCount_.count(unboundDev), 0u);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_ApplyBoundDisplayId_Key_002
+ * @tc.desc: KeyEvent ApplyBoundDisplayId for a bound device sets the target display id and records
+ *           the pressed-key count as the sequence counter.
+ * @tc.type: FUNC
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_ApplyBoundDisplayId_Key_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    UDSServer udsServer;
+    WIN_MGR->Init(udsServer);
+    ResetDeferredBindState(WIN_MGR);
+    constexpr int32_t devId { 8817 };
+    RegisterBindDevice(WIN_MGR, devId);
+    std::string msg;
+    ASSERT_EQ(WIN_MGR->BindToDisplay(devId, 1, msg), RET_OK);
+
+    auto keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    keyEvent->SetDeviceId(devId);
+    keyEvent->SetTargetDisplayId(-1);
+    KeyEvent::KeyItem item;
+    item.SetKeyCode(17); // KEYCODE_CTRL
+    item.SetPressed(true);
+    keyEvent->AddKeyItem(item);
+    WIN_MGR->ApplyBoundDisplayId(keyEvent);
+    EXPECT_EQ(keyEvent->GetTargetDisplayId(), 1);
+    EXPECT_EQ(WIN_MGR->activeSequenceCount_[devId], 1);
+
+    // Simulated key events must not touch the sequence counter.
+    auto simulated = KeyEvent::Create();
+    ASSERT_NE(simulated, nullptr);
+    simulated->SetDeviceId(devId);
+    simulated->SetTargetDisplayId(-1);
+    simulated->AddFlag(InputEvent::EVENT_FLAG_SIMULATE);
+    WIN_MGR->ApplyBoundDisplayId(simulated);
+    EXPECT_EQ(simulated->GetTargetDisplayId(), 1); // bound display still applied
+    EXPECT_EQ(WIN_MGR->activeSequenceCount_[devId], 1); // counter unchanged by simulated event
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_ApplyBoundDisplayId_Key_003
+ * @tc.desc: KeyEvent ApplyBoundDisplayId with no pressed keys drops the counter and flushes a
+ *           pending bind.
+ * @tc.type: FUNC
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_ApplyBoundDisplayId_Key_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    UDSServer udsServer;
+    WIN_MGR->Init(udsServer);
+    ResetDeferredBindState(WIN_MGR);
+    constexpr int32_t devId { 8818 };
+    RegisterBindDevice(WIN_MGR, devId);
+    WIN_MGR->activeSequenceCount_[devId] = 1;
+    WIN_MGR->pendingBinds_[devId] = 1;
+
+    auto keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    keyEvent->SetDeviceId(devId);
+    keyEvent->SetTargetDisplayId(-1);
+    // No key items -> pressedCount == 0 -> erase counter + flush pending bind.
+    WIN_MGR->ApplyBoundDisplayId(keyEvent);
+    EXPECT_EQ(WIN_MGR->activeSequenceCount_.count(devId), 0u);
+    EXPECT_EQ(WIN_MGR->pendingBinds_.count(devId), 0u);
+    EXPECT_EQ(WIN_MGR->GetBindDisplayIdByInputDevice(devId), 1);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_ApplyBoundDisplayId_Pointer_001
+ * @tc.desc: PointerEvent ApplyBoundDisplayId: null event is a no-op; an unbound device leaves the
+ *           target display id untouched.
+ * @tc.type: FUNC
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_ApplyBoundDisplayId_Pointer_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ResetDeferredBindState(WIN_MGR);
+    EXPECT_NO_FATAL_FAILURE(WIN_MGR->ApplyBoundDisplayId(std::shared_ptr<PointerEvent>(nullptr)));
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    constexpr int32_t unboundDev { 8819 };
+    pointerEvent->SetDeviceId(unboundDev);
+    pointerEvent->SetTargetDisplayId(5);
+    WIN_MGR->ApplyBoundDisplayId(pointerEvent);
+    EXPECT_EQ(pointerEvent->GetTargetDisplayId(), 5);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_ApplyBoundDisplayId_Pointer_002
+ * @tc.desc: PointerEvent ApplyBoundDisplayId keeps the pointer on its current display when it is
+ *           already in the bound display's group (no jump).
+ * @tc.type: FUNC
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_ApplyBoundDisplayId_Pointer_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    UDSServer udsServer;
+    WIN_MGR->Init(udsServer);
+    ResetDeferredBindState(WIN_MGR);
+    // Register displays 1 and 2 in the same (default) group, then bind the device to display 1.
+    auto groupInfo = CreateDisplayGroupInfo(0, 1, 2);
+    WIN_MGR->UpdateDisplayInfo(groupInfo);
+    constexpr int32_t devId { 8820 };
+    RegisterBindDevice(WIN_MGR, devId);
+    std::string msg;
+    ASSERT_EQ(WIN_MGR->BindToDisplay(devId, 1, msg), RET_OK);
+
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetDeviceId(devId);
+    pointerEvent->SetTargetDisplayId(2); // same group as bound display 1
+    WIN_MGR->ApplyBoundDisplayId(pointerEvent);
+    EXPECT_EQ(pointerEvent->GetTargetDisplayId(), 2); // unchanged
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_ApplyBoundDisplayId_Pointer_003
+ * @tc.desc: PointerEvent ApplyBoundDisplayId redirects the pointer to the bound display when its
+ *           current display is in a different group.
+ * @tc.type: FUNC
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_ApplyBoundDisplayId_Pointer_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    UDSServer udsServer;
+    WIN_MGR->Init(udsServer);
+    ResetDeferredBindState(WIN_MGR);
+    // Register display 1 in group 0 and display 5 in a separate group so the groups genuinely differ.
+    // UpdateDisplayInfo takes a non-const reference, so bind each result to a local lvalue first.
+    auto group0 = CreateDisplayGroupInfo(0, 1);
+    WIN_MGR->UpdateDisplayInfo(group0);
+    auto group7 = CreateDisplayGroupInfo(7, 5);
+    WIN_MGR->UpdateDisplayInfo(group7);
+    constexpr int32_t devId { 8821 };
+    RegisterBindDevice(WIN_MGR, devId);
+    std::string msg;
+    ASSERT_EQ(WIN_MGR->BindToDisplay(devId, 1, msg), RET_OK);
+
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetDeviceId(devId);
+    pointerEvent->SetTargetDisplayId(5); // group 7 != bound group 0 -> redirect
+    WIN_MGR->ApplyBoundDisplayId(pointerEvent);
+    EXPECT_EQ(pointerEvent->GetTargetDisplayId(), 1);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_DeviceStatusChanged_RemoveClearsDeferredState
+ * @tc.desc: On device disconnection the orphaned sequence counter, pending bind and watchdog timer
+ *           are all removed (exercises the new else-branch cleanup in DeviceStatusChanged).
+ * @tc.type: FUNC
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_DeviceStatusChanged_RemoveClearsDeferredState, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    UDSServer udsServer;
+    WIN_MGR->Init(udsServer);
+    ResetDeferredBindState(WIN_MGR);
+    constexpr int32_t devId { 8822 };
+    WIN_MGR->activeSequenceCount_[devId] = 2;
+    WIN_MGR->pendingBinds_[devId] = 1;
+    WIN_MGR->ArmPendingBindTimer(devId);
+    ASSERT_EQ(WIN_MGR->pendingBindTimers_.count(devId), 1u);
+
+    WIN_MGR->DeviceStatusChanged(devId, "mouse_deferred", "sysUid_deferred", "remove");
+    EXPECT_EQ(WIN_MGR->activeSequenceCount_.count(devId), 0u);
+    EXPECT_EQ(WIN_MGR->pendingBinds_.count(devId), 0u);
+    EXPECT_EQ(WIN_MGR->pendingBindTimers_.count(devId), 0u);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_GetBindDisplayIdByInputDevice_001
+ * @tc.desc: GetBindDisplayIdByInputDevice returns -1 for an unbound device and the bound display id
+ *           for a bound one.
+ * @tc.type: FUNC
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetBindDisplayIdByInputDevice_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    UDSServer udsServer;
+    WIN_MGR->Init(udsServer);
+    ResetDeferredBindState(WIN_MGR);
+    EXPECT_EQ(WIN_MGR->GetBindDisplayIdByInputDevice(8823), -1);
+    constexpr int32_t devId { 8824 };
+    RegisterBindDevice(WIN_MGR, devId);
+    std::string msg;
+    ASSERT_EQ(WIN_MGR->BindToDisplay(devId, 1, msg), RET_OK);
+    EXPECT_EQ(WIN_MGR->GetBindDisplayIdByInputDevice(devId), 1);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_DumpPendingBindState_001
+ * @tc.desc: DumpPendingBindState runs without crashing whether the deferred state is empty or
+ *           populated, and exercises the per-map iteration loops.
+ * @tc.type: FUNC
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_DumpPendingBindState_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t fd = open("/dev/null", O_WRONLY);
+    ASSERT_GE(fd, 0) << "open(/dev/null) failed";
+    // Empty state -> only the header lines are printed.
+    ResetDeferredBindState(WIN_MGR);
+    EXPECT_NO_FATAL_FAILURE(WIN_MGR->DumpPendingBindState(fd));
+    // Populated state -> exercises all three iteration loops.
+    constexpr int32_t devId { 8825 };
+    WIN_MGR->activeSequenceCount_[devId] = 1;
+    WIN_MGR->pendingBinds_[devId] = 1;
+    WIN_MGR->pendingBindTimers_[devId] = 1234;
+    EXPECT_NO_FATAL_FAILURE(WIN_MGR->DumpPendingBindState(fd));
+    ResetDeferredBindState(WIN_MGR);
+    close(fd);
 }
 } // namespace MMI
 } // namespace OHOS

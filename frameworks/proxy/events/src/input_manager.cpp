@@ -61,6 +61,11 @@ int32_t InputManager::SetDisplayBind(int32_t deviceId, int32_t displayId, std::s
     return InputMgrImpl.SetDisplayBind(deviceId, displayId, msg);
 }
 
+int32_t InputManager::BindToDisplay(int32_t deviceId, int32_t displayId, std::function<void(int32_t)> callback)
+{
+    return InputMgrImpl.BindToDisplay(deviceId, displayId, callback);
+}
+
 int32_t InputManager::GetWindowPid(int32_t windowId)
 {
     return InputMgrImpl.GetWindowPid(windowId);
@@ -1140,6 +1145,21 @@ int32_t InputManager::CheckTouchControllerPermission()
 int32_t InputManager::EnableInputExtension(const std::string &uuid, bool enabled)
 {
     return InputMgrImpl.EnableInputExtension(uuid, enabled);
+}
+
+int32_t InputManager::EnablePointerEventRecord(int32_t maxCount)
+{
+    return InputMgrImpl.EnablePointerEventRecord(maxCount);
+}
+
+int32_t InputManager::DisablePointerEventRecord()
+{
+    return InputMgrImpl.DisablePointerEventRecord();
+}
+
+int32_t InputManager::GetPointerEventRecord(std::vector<std::shared_ptr<PointerEvent>> &pointerList)
+{
+    return InputMgrImpl.GetPointerEventRecord(pointerList);
 }
 } // namespace MMI
 } // namespace OHOS

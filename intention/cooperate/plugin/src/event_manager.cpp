@@ -31,7 +31,7 @@ EventManager::EventManager(IContext *env) : env_(env) { }
 
 void EventManager::RegisterListener(const RegisterListenerEvent &event)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     std::shared_ptr<EventInfo> eventInfo = std::make_shared<EventInfo>();
     eventInfo->type = EventType::LISTENER;
     eventInfo->msgId = MessageId::COORDINATION_ADD_LISTENER;
@@ -59,7 +59,7 @@ void EventManager::UnregisterListener(const UnregisterListenerEvent &event)
 
 void EventManager::EnableCooperate(const EnableCooperateEvent &event)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     CooperateNotice notice { .pid = event.pid,
         .msgId = MessageId::COORDINATION_MESSAGE,
         .userData = event.userData,
@@ -69,7 +69,7 @@ void EventManager::EnableCooperate(const EnableCooperateEvent &event)
 
 void EventManager::DisableCooperate(const DisableCooperateEvent &event)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     CooperateNotice notice { .pid = event.pid,
         .msgId = MessageId::COORDINATION_MESSAGE,
         .userData = event.userData,
@@ -99,13 +99,13 @@ NotifyCooperateMessage(notice);
 
 void EventManager::RemoteStart(const DSoftbusStartCooperate &event)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     OnCooperateMessage(CoordinationMessage::ACTIVATE, event.networkId);
 }
 
 void EventManager::RemoteStartFinish(const DSoftbusStartCooperateFinished &event)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     CoordinationMessage msg { event.success ? CoordinationMessage::ACTIVATE_SUCCESS :
                                               CoordinationMessage::ACTIVATE_FAIL };
     OnCooperateMessage(msg, event.networkId);
@@ -118,7 +118,7 @@ void EventManager::RemoteStartFinish(const DSoftbusStartCooperateFinished &event
 
 void EventManager::OnUnchain(const StopCooperateEvent &event)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     OnCooperateMessage(CoordinationMessage::SESSION_CLOSED, std::string());
 }
 
@@ -153,7 +153,7 @@ void EventManager::RemoteStopFinish(const DSoftbusStopCooperateFinished &event)
 
 void EventManager::OnProfileChanged(const DDPCooperateSwitchChanged &event)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     FI_HILOGI("Switch status of \'%{public}s\' has changed to %{public}d", Utility::Anonymize(event.networkId).c_str(),
         event.normal);
     CoordinationMessage msg = (event.normal ? CoordinationMessage::PREPARE : CoordinationMessage::UNPREPARE);
@@ -168,13 +168,13 @@ void EventManager::OnSoftbusSessionClosed(const DSoftbusSessionClosed &event)
 
 void EventManager::GetCooperateState(const CooperateStateNotice &notice)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     NotifyCooperateState(notice);
 }
 
 void EventManager::OnCooperateMessage(CoordinationMessage msg, const std::string &networkId)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     for (auto iter = listeners_.begin(); iter != listeners_.end(); ++iter) {
         std::shared_ptr<EventInfo> listener = *iter;
         CHKPC(listener);
@@ -223,7 +223,7 @@ void EventManager::NotifyCooperateMessage(const CooperateNotice &notice)
 
 void EventManager::NotifyCooperateState(const CooperateStateNotice &notice)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     CHKPV(env_);
     auto session = env_->GetSocketSessionManager().FindSessionByPid(notice.pid);
     CHKPV(session);
