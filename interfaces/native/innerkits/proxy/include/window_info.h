@@ -299,6 +299,13 @@ enum WindowInputPolicy : uint32_t {
      * @since 26
      */
     FLAG_INJECTABLE_UNDER_LOCK = 1 << 12,
+    /**
+     * Skip monitor. If set, events sent to this window will not be forwarded to
+     * input monitor listeners.
+     *
+     * @since 26
+     */
+    FLAG_SKIP_MONITOR = 1 << 13,
 };
 
 struct WindowInfo {

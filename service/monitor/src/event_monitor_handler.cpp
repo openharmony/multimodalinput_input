@@ -17,6 +17,8 @@
 #include "input_event_data_transformation.h"
 #include "input_event_handler.h"
 #include "util_ex.h"
+#include "window_info.h"
+#include "i_input_windows_manager.h"
 
 #undef MMI_LOG_DOMAIN
 #define MMI_LOG_DOMAIN MMI_LOG_HANDLER
@@ -209,6 +211,8 @@ bool EventMonitorHandler::OnHandleEvent(std::shared_ptr<PointerEvent> pointerEve
     CHKPF(pointerEvent);
     if (pointerEvent->HasFlag(InputEvent::EVENT_FLAG_NO_MONITOR)) {
         MMI_HILOGD("This event has been tagged as not to be monitored");
+    } else if (CheckTargetWindowSkipMonitor(pointerEvent)) {
+        MMI_HILOGD("Target window has FLAG_SKIP_MONITOR, skip monitoring");
     } else {
         if (monitors_.HandleEvent(pointerEvent)) {
             MMI_HILOGD("Pointer event was monitor");
@@ -216,6 +220,22 @@ bool EventMonitorHandler::OnHandleEvent(std::shared_ptr<PointerEvent> pointerEve
         }
     }
     MMI_HILOGD("Interception and monitor failed");
+    return false;
+}
+#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
+
+#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
+bool EventMonitorHandler::CheckTargetWindowSkipMonitor(std::shared_ptr<PointerEvent> pointerEvent)
+{
+    CHKPF(pointerEvent);
+    int32_t targetWindowId = pointerEvent->GetTargetWindowId();
+    int32_t targetDisplayId = pointerEvent->GetTargetDisplayId();
+    if (targetWindowId >= 0 && targetDisplayId >= 0) {
+        auto windowInfo = WIN_MGR->GetWindowAndDisplayInfo(targetWindowId, targetDisplayId);
+        if (windowInfo.has_value() && (windowInfo->flags & WindowInputPolicy::FLAG_SKIP_MONITOR)) {
+            return true;
+        }
+    }
     return false;
 }
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH

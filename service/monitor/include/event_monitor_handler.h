@@ -69,6 +69,9 @@ public:
 private:
     void InitSessionLostCallback();
     void OnSessionLost(SessionPtr session);
+#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
+    bool CheckTargetWindowSkipMonitor(std::shared_ptr<PointerEvent> pointerEvent);
+#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 
 private:
     class SessionHandler : public ISessionHandler {
