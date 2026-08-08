@@ -1069,6 +1069,11 @@ int32_t InputWindowsManager::GetBindDisplayIdByInputDevice(int32_t inputDeviceId
     return bindInfo_.GetBindDisplayIdByInputDevice(inputDeviceId);
 }
 
+int32_t InputWindowsManager::GetBindToDisplayIdByInputDevice(int32_t inputDeviceId) const
+{
+    return bindInfo_.GetBindToDisplayIdByInputDevice(inputDeviceId);
+}
+
 int32_t InputWindowsManager::SetDisplayBind(int32_t deviceId, int32_t displayId, std::string &msg)
 {
     CALL_DEBUG_ENTER;

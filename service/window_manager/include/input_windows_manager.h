@@ -83,6 +83,7 @@ public:
     void DeviceStatusChanged(int32_t deviceId, const std::string &name, const std::string &sysUid,
         const std::string devStatus);
     int32_t GetBindDisplayIdByInputDevice(int32_t inputDeviceId) const;
+    int32_t GetBindToDisplayIdByInputDevice(int32_t inputDeviceId) const;
     void ApplyBoundDisplayId(std::shared_ptr<PointerEvent> pointerEvent);
     void ApplyBoundDisplayId(std::shared_ptr<KeyEvent> keyEvent);
     int32_t GetDisplayBindInfo(DisplayBindInfos &infos);

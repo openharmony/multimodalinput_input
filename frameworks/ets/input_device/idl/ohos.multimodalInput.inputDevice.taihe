@@ -97,6 +97,7 @@ struct InputDeviceData {
     uniq: String;
     isVirtual: Optional<bool>;
     isLocal: Optional<bool>;
+    displayId: Optional<i32>;
 }
 @gen_async("getDeviceList")
 @gen_promise("getDeviceList")

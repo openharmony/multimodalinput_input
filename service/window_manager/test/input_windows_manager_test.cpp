@@ -17724,5 +17724,26 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_DumpPendingBindState_0
     ResetDeferredBindState(WIN_MGR);
     close(fd);
 }
+
+/**
+ * @tc.name: InputWindowsManagerTest_GetBindToDisplayIdByInputDevice_001
+ * @tc.desc: GetBindToDisplayIdByInputDevice returns -1 for an unbound device and the bound display
+ *           id only when the binding was established via BindToDisplay.
+ * @tc.type: FUNC
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetBindToDisplayIdByInputDevice_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    UDSServer udsServer;
+    WIN_MGR->Init(udsServer);
+    ResetDeferredBindState(WIN_MGR);
+    EXPECT_EQ(WIN_MGR->GetBindToDisplayIdByInputDevice(8823), -1);
+    constexpr int32_t devId { 8824 };
+    RegisterBindDevice(WIN_MGR, devId);
+    std::string msg;
+    ASSERT_EQ(WIN_MGR->BindToDisplay(devId, 1, msg), RET_OK);
+    // BindToDisplay sets the runtime marker, so the application-facing accessor returns the id.
+    EXPECT_EQ(WIN_MGR->GetBindToDisplayIdByInputDevice(devId), 1);
+}
 } // namespace MMI
 } // namespace OHOS

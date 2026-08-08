@@ -57,6 +57,7 @@ public:
     MOCK_METHOD(int32_t, SetDisplayBind, (int32_t, int32_t, std::string&));
     MOCK_METHOD(int32_t, BindToDisplay, (int32_t, int32_t, std::string&));
     int32_t GetBindDisplayIdByInputDevice(int32_t inputDeviceId) const override { return -1; }
+    int32_t GetBindToDisplayIdByInputDevice(int32_t inputDeviceId) const override { return -1; }
     void ApplyBoundDisplayId(std::shared_ptr<PointerEvent> pointerEvent) override {}
     void ApplyBoundDisplayId(std::shared_ptr<KeyEvent> keyEvent) override {}
     MOCK_METHOD(int32_t, AppendExtraData, (const ExtraData&));

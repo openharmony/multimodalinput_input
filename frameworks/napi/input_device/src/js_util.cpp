@@ -128,6 +128,14 @@ napi_value JsUtil::GetDeviceInfo(sptr<CallbackInfo> cb)
         return nullptr;
     }
 
+    // Optional field: only present when the device is bound to a display (displayId >= 0).
+    int32_t displayId = cb->data.device->GetDisplayId();
+    if (displayId >= 0) {
+        napi_value displayIdValue = nullptr;
+        CHKRP(napi_create_int32(cb->env, displayId, &displayIdValue), CREATE_INT32);
+        CHKRP(napi_set_named_property(cb->env, object, "displayId", displayIdValue), SET_NAMED_PROPERTY);
+    }
+
     if (!GetDeviceSourceType(cb, object)) {
         MMI_HILOGE("Get device source type failed");
         return nullptr;

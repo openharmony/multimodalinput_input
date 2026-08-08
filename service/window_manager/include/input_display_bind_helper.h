@@ -34,6 +34,8 @@ public:
     bool IsUnbind() const;
     bool InputDeviceNotBind() const;
     bool DisplayNotBind() const;
+    bool IsBindToDisplay() const;
+    void SetBindToDisplayFlag(bool bindToDisplay);
     bool AddInputDevice(int32_t deviceId, const std::string &nodeName, const std::string &deviceName);
     void RemoveInputDevice();
     bool AddDisplay(int32_t id, const std::string &name);
@@ -49,6 +51,9 @@ private:
     std::string inputDeviceName_;
     int32_t displayId_ { -1 };
     std::string displayName_;
+    // Runtime-only marker: true when this binding was established via the bindToDisplay API.
+    // Not serialized (BindToDisplay does not persist), so config-loaded bindings stay false.
+    bool bindToDisplay_ { false };
 };
 class BindInfos {
 public:
@@ -61,6 +66,7 @@ public:
     BindInfo GetUnbindDisplay(const std::string &inputDeviceName);
     std::string GetDisplayNameByInputDevice(const std::string &name) const;
     int32_t GetBindDisplayIdByInputDevice(int32_t inputDeviceId) const;
+    int32_t GetBindToDisplayIdByInputDevice(int32_t inputDeviceId) const;
     std::string GetBindDisplayNameByInputDevice(int32_t inputDeviceId) const;
     std::string GetInputDeviceByDisplayName(const std::string &name) const;
     std::string GetDesc() const;
@@ -92,6 +98,7 @@ public:
         std::string &msg);
 
     int32_t GetBindDisplayIdByInputDevice(int32_t inputDeviceId) const;
+    int32_t GetBindToDisplayIdByInputDevice(int32_t inputDeviceId) const;
     std::string GetInputDeviceById(int32_t id);
     std::string GetInputNodeNameByCfg(int32_t id);
     void GetInputNodeNamesByCfg(int32_t id, std::vector<std::string> &nodeNames);

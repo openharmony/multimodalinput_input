@@ -2547,5 +2547,108 @@ HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_AddLocalDisplay_
     ASSERT_NO_FATAL_FAILURE(idh.AddLocalDisplay(0, "default0"));
     ASSERT_NO_FATAL_FAILURE(idh.AddDisplay(1, "default1"));
 }
+
+/**
+ * @tc.name: InputDisplayBindHelperTest_BindInfo_SetBindToDisplayFlag_01
+ * @tc.desc: Test BindInfo IsBindToDisplay/SetBindToDisplayFlag default and toggling
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_BindInfo_SetBindToDisplayFlag_01, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    BindInfo info;
+    // Runtime marker defaults to false (not serialized; config/SetDisplayBind paths leave it unset).
+    EXPECT_FALSE(info.IsBindToDisplay());
+    info.SetBindToDisplayFlag(true);
+    EXPECT_TRUE(info.IsBindToDisplay());
+    info.SetBindToDisplayFlag(false);
+    EXPECT_FALSE(info.IsBindToDisplay());
+}
+
+/**
+ * @tc.name: InputDisplayBindHelperTest_GetBindToDisplayIdByInputDevice_002
+ * @tc.desc: BindToDisplay sets the marker so InputDisplayBindHelper surfaces the displayId
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_GetBindToDisplayIdByInputDevice_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputDisplayBindHelperTest::WriteConfigFile("");
+    InputDisplayBindHelper idh(InputDisplayBindHelperTest::GetCfgFileName());
+    idh.Load();
+    idh.AddInputDevice(1, "input0", "mouse");
+    std::string msg;
+    ASSERT_EQ(idh.BindToDisplay(1, 5, "default5", msg), RET_OK);
+    // Only the bindToDisplay path surfaces displayId to applications.
+    EXPECT_EQ(idh.GetBindToDisplayIdByInputDevice(1), 5);
+    // The generic accessor still reports the binding (used for event routing).
+    EXPECT_EQ(idh.GetBindDisplayIdByInputDevice(1), 5);
+    // A device with no binding at all reports -1 on both accessors.
+    EXPECT_EQ(idh.GetBindToDisplayIdByInputDevice(999), -1);
+    EXPECT_EQ(idh.GetBindDisplayIdByInputDevice(999), -1);
+}
+
+/**
+ * @tc.name: InputDisplayBindHelperTest_GetBindToDisplayIdByInputDevice_003
+ * @tc.desc: Non-bindToDisplay bindings (config/SetDisplayBind) are not surfaced via GetBindToDisplayIdByInputDevice
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_GetBindToDisplayIdByInputDevice_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputDisplayBindHelperTest::WriteConfigFile("");
+    InputDisplayBindHelper idh(InputDisplayBindHelperTest::GetCfgFileName());
+    idh.Load();
+    // Simulate a binding established via the config/SetDisplayBind path: a bound device+display
+    // entry whose runtime bindToDisplay_ marker is left at its default (false).
+    BindInfo info;
+    info.inputDeviceId_ = 7;
+    info.inputDeviceName_ = "trackpad";
+    info.displayId_ = 3;
+    info.displayName_ = "default3";
+    info.bindToDisplay_ = false;
+    idh.infos_->infos_.push_back(info);
+    // Generic accessor returns the display (binding exists)...
+    EXPECT_EQ(idh.GetBindDisplayIdByInputDevice(7), 3);
+    // ...but the application-facing accessor returns -1 because the marker is unset.
+    EXPECT_EQ(idh.GetBindToDisplayIdByInputDevice(7), -1);
+}
+
+/**
+ * @tc.name: InputDisplayBindHelperTest_GetBindToDisplayIdByInputDevice_01
+ * @tc.desc: GetBindToDisplayIdByInputDevice returns displayId only for bindToDisplay bindings
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_GetBindToDisplayIdByInputDevice_01, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    BindInfos bindInfos;
+    // Binding established via bindToDisplay -> displayId is surfaced to applications.
+    BindInfo bindToDisplayInfo;
+    bindToDisplayInfo.inputDeviceId_ = 1;
+    bindToDisplayInfo.inputDeviceName_ = "mouse";
+    bindToDisplayInfo.displayId_ = 2;
+    bindToDisplayInfo.displayName_ = "hp 223";
+    bindToDisplayInfo.bindToDisplay_ = true;
+    bindInfos.infos_.push_back(bindToDisplayInfo);
+    EXPECT_EQ(bindInfos.GetBindToDisplayIdByInputDevice(1), 2);
+
+    // Binding NOT from bindToDisplay (e.g. SetDisplayBind / static config) -> not surfaced.
+    BindInfo otherBindInfo;
+    otherBindInfo.inputDeviceId_ = 3;
+    otherBindInfo.inputDeviceName_ = "keyboard";
+    otherBindInfo.displayId_ = 4;
+    otherBindInfo.displayName_ = "think 123";
+    otherBindInfo.bindToDisplay_ = false;
+    bindInfos.infos_.push_back(otherBindInfo);
+    EXPECT_EQ(bindInfos.GetBindToDisplayIdByInputDevice(3), -1);
+
+    // Device with no binding at all.
+    EXPECT_EQ(bindInfos.GetBindToDisplayIdByInputDevice(999), -1);
+}
 } // namespace MMI
 } // namespace OHOS

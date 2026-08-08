@@ -86,6 +86,8 @@ public:
     void SetLocal(bool isLocal);
     bool IsVirtual() const;
     bool IsLocal() const;
+    void SetDisplayId(int32_t displayId);
+    int32_t GetDisplayId() const;
 
     unsigned long GetCapabilities() const;
     void SetCapabilities(unsigned long caps);
@@ -191,7 +193,8 @@ public:
             in.ReadString(phys_) &&
             in.ReadString(uniq_) &&
             in.ReadBool(isVirtual_) &&
-            in.ReadBool(isLocal_)
+            in.ReadBool(isLocal_) &&
+            in.ReadInt32(displayId_)
         );
         uint64_t capabilities = 0;
         if (!result || !in.ReadUint64(capabilities)) {
@@ -235,6 +238,9 @@ public:
         if (!out.WriteBool(isLocal_)) {
             return false;
         }
+        if (!out.WriteInt32(displayId_)) {
+            return false;
+        }
         if (!out.WriteUint64(capabilities_.to_ulong())) {
             return false;
         }
@@ -272,6 +278,7 @@ private:
     std::bitset<INPUT_DEV_CAP_MAX> capabilities_;
     bool isVirtual_ { false };
     bool isLocal_ { false };
+    int32_t displayId_ { -1 };
 };
 
 inline unsigned long InputDevice::GetCapabilities() const
