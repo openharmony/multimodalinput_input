@@ -6670,8 +6670,8 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_AllReleasedStates_Mu
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(KeySubscriberHandlerTest,
-    KeySubscriberHandlerTest_HandleKeyForAllReleased_MultiProcessTabUp_001, TestSize.Level1)
+HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_HandleKeyForAllReleased_MultiProcessTabUp_001,
+    TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     KeySubscriberHandler handler;
