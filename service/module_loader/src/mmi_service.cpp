@@ -1674,9 +1674,9 @@ int32_t MMIService::OnGetDevice(int32_t deviceId, std::shared_ptr<InputDevice> i
     inputDevice->SetAxisInfo(tmpDevice->GetAxisInfo());
     inputDevice->SetVirtual(tmpDevice->IsVirtual());
     inputDevice->SetLocal(tmpDevice->IsLocal());
-    // Surface the device's bound display (if any) so applications can observe the bindToDisplay
-    // result through getDevice/getDeviceInfo/getDeviceInfoSync. -1 means unbound.
-    inputDevice->SetDisplayId(WIN_MGR->GetBindDisplayIdByInputDevice(deviceId));
+    // Only bindings established via bindToDisplay are surfaced to applications (displayId from
+    // SetDisplayBind or static config is not returned). -1 means no bindToDisplay binding.
+    inputDevice->SetDisplayId(WIN_MGR->GetBindToDisplayIdByInputDevice(deviceId));
 
     return RET_OK;
 }

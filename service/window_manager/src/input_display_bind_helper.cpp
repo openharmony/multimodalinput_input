@@ -83,6 +83,16 @@ bool BindInfo::DisplayNotBind() const
     return (displayId_ == -1);
 }
 
+bool BindInfo::IsBindToDisplay() const
+{
+    return bindToDisplay_;
+}
+
+void BindInfo::SetBindToDisplayFlag(bool bindToDisplay)
+{
+    bindToDisplay_ = bindToDisplay;
+}
+
 bool BindInfo::AddInputDevice(int32_t deviceId, const std::string &nodeName, const std::string &deviceName)
 {
     if ((inputDeviceId_ != -1) || !inputNodeName_.empty() || !inputDeviceName_.empty()) {
@@ -176,6 +186,18 @@ int32_t BindInfos::GetBindDisplayIdByInputDevice(int32_t inputDeviceId) const
             if (!item.IsUnbind()) {
                 return item.GetDisplayId();
             }
+        }
+    }
+    return -1;
+}
+
+int32_t BindInfos::GetBindToDisplayIdByInputDevice(int32_t inputDeviceId) const
+{
+    // Only bindings established via the bindToDisplay API are surfaced to applications; bindings
+    // from SetDisplayBind or static config return -1 here.
+    for (const auto &item : infos_) {
+        if ((item.GetInputDeviceId() == inputDeviceId) && item.IsBindToDisplay() && !item.IsUnbind()) {
+            return item.GetDisplayId();
         }
     }
     return -1;
@@ -334,6 +356,16 @@ int32_t InputDisplayBindHelper::GetBindDisplayIdByInputDevice(int32_t inputDevic
         return -1;
     }
     return infos_->GetBindDisplayIdByInputDevice(inputDeviceId);
+}
+
+int32_t InputDisplayBindHelper::GetBindToDisplayIdByInputDevice(int32_t inputDeviceId) const
+{
+    CALL_DEBUG_ENTER;
+    if (infos_ == nullptr) {
+        MMI_HILOGW("infos_ is nullptr");
+        return -1;
+    }
+    return infos_->GetBindToDisplayIdByInputDevice(inputDeviceId);
 }
 
 void InputDisplayBindHelper::AddInputDevice(int32_t id, const std::string &nodeName, const std::string &sysUid)
@@ -795,6 +827,7 @@ int32_t InputDisplayBindHelper::BindToDisplay(int32_t deviceId, int32_t displayI
     info.AddInputDevice(bindByDevice.GetInputDeviceId(), bindByDevice.GetInputNodeName(),
         bindByDevice.GetInputDeviceName());
     info.AddDisplay(displayId, displayName);
+    info.SetBindToDisplayFlag(true);
     infos_->Add(info);
     return RET_OK;
 }
