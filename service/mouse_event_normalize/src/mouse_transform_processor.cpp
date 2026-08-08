@@ -1449,6 +1449,19 @@ bool MouseTransformProcessor::NormalizeMoveMouse(int32_t offsetX, int32_t offset
     DumpInner();
     return bHasPointerDevice;
 }
+
+void MouseTransformProcessor::PrepareMoveToCenter()
+{
+    CALL_DEBUG_ENTER;
+    CHKPV(pointerEvent_);
+    if (!pointerEvent_->GetPressedButtons().empty()) {
+        MMI_HILOGD("Buttons are pressed, skip synthetic move dispatch");
+        return;
+    }
+    pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
+    PointerEvent::PointerItem pointerItem;
+    HandlePostMoveMouse(pointerItem);
+}
 #endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
 
 void MouseTransformProcessor::DumpInner()

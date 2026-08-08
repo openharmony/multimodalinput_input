@@ -1513,7 +1513,12 @@ void InputWindowsManager::ResetPointerPosition(const OLD::DisplayGroupInfo &disp
     auto lastPointerEventCopy = GetLastPointerEvent();
     if ((lastPointerEventCopy != nullptr) &&
         (!lastPointerEventCopy->IsButtonPressed(PointerEvent::MOUSE_BUTTON_LEFT))) {
-        MMI_HILOGD("Reset pointer position, left mouse button is not pressed");
+        if (!CursorDrawingComponent::GetInstance().GetMouseDisplayState() && !HasMouseHideFlag()) {
+            MMI_HILOGD("Mouse is hidden, skip synthetic move dispatch");
+            return;
+        }
+        MMI_HILOGD("Reset pointer position, left mouse button is not pressed, dispatching synthetic move");
+        MouseEventHdr->NormalizeMoveToCenter();
         return;
     }
     (void)SendBackCenterPointerEvent(cursorPos);

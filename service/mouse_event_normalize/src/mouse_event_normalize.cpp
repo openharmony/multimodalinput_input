@@ -199,6 +199,26 @@ bool MouseEventNormalize::NormalizeMoveMouse(int32_t offsetX, int32_t offsetY)
     CHKPF(processor);
     return processor->NormalizeMoveMouse(offsetX, offsetY);
 }
+
+void MouseEventNormalize::NormalizeMoveToCenter()
+{
+    if (env_ == nullptr) {
+        MMI_HILOGE("Env is nullptr");
+        return;
+    }
+    if (processors_.empty()) {
+        MMI_HILOGD("No mouse processor, skip");
+        return;
+    }
+    auto processor = processors_.begin()->second;
+    CHKPV(processor);
+    processor->PrepareMoveToCenter();
+    auto pointerEvent = processor->GetPointerEvent();
+    CHKPV(pointerEvent);
+    auto handler = env_->GetEventNormalizeHandler();
+    CHKPV(handler);
+    handler->HandlePointerEvent(pointerEvent);
+}
 #endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
 
 void MouseEventNormalize::Dump(int32_t fd, const std::vector<std::string> &args)

@@ -105,6 +105,7 @@ public:
     bool CheckAndPackageAxisEvent();
 #ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
     bool NormalizeMoveMouse(int32_t offsetX, int32_t offsetY);
+    void PrepareMoveToCenter();
 #endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
 #ifdef OHOS_BUILD_MOUSE_REPORTING_RATE
     void HandleFilterMouseEvent(Offset* offset);
