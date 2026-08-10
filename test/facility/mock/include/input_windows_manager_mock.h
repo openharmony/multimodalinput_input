@@ -61,7 +61,7 @@ public:
     void ApplyBoundDisplayId(std::shared_ptr<PointerEvent> pointerEvent) override {}
     void ApplyBoundDisplayId(std::shared_ptr<KeyEvent> keyEvent) override {}
     MOCK_METHOD(int32_t, AppendExtraData, (const ExtraData&));
-    MOCK_METHOD(bool, IsWindowVisible, (int32_t));
+    MOCK_METHOD(bool, IsWindowVisible, (int32_t, int32_t));
     MOCK_METHOD(ExtraData, GetExtraData, (), (const));
     MOCK_METHOD(const std::vector<WindowInfo>, GetWindowGroupInfoByDisplayIdCopy, (int32_t), (const));
     MOCK_METHOD((std::pair<double, double>), TransformWindowXY, (const WindowInfo&, double, double), (const));

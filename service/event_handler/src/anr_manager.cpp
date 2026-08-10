@@ -14,6 +14,7 @@
  */
 
 #include <charconv>
+#include "account_manager.h"
 #include "anr_manager.h"
 
 #include "dfx_hisysevent.h"
@@ -167,12 +168,13 @@ void ANRManager::AddTimer(int32_t type, int32_t id, int64_t currentTime, Session
     int32_t timerId = TimerMgr->AddTimer(INPUT_UI_TIMEOUT_TIME * getRatioValue() / TIME_CONVERT_RATIO, 1,
         [this, id, type, sess]() {
         CHKPV(sess);
-        if (type == ANR_MONITOR || WIN_MGR->IsWindowVisible(sess->GetPid())) {
+        int32_t userId = ACCOUNT_MGR->GetAccountIdFromUid(sess->GetUid());
+        if (type == ANR_MONITOR || WIN_MGR->IsWindowVisible(sess->GetPid(), userId)) {
             sess->SetAnrStatus(type, true);
             anrEventId_ = id;
             DfxHisysevent::ApplicationBlockInput(sess);
-            MMI_HILOG_FREEZEE("Application not responding. pid:%{public}d, anr type:%{public}d, eventId:%{public}d",
-                sess->GetPid(), type, id);
+            MMI_HILOG_FREEZEE("Application not responding. pid:%{public}d, anr type:%{public}d, eventId:%{public}d, "
+                "uid:%{private}d, userId:%{public}d", sess->GetPid(), type, id, sess->GetUid(), userId);
             CHK_INVALID_RV(anrNoticedPid_, "Add anr timer failed, timer count reached the maximum number");
             NetPacket pkt(MmiMessageId::NOTICE_ANR);
             pkt << sess->GetPid();
