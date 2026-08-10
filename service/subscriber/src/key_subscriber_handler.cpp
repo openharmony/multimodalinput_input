@@ -276,9 +276,6 @@ int32_t KeySubscriberHandler::RemoveKeyGestureSubscriber(SessionPtr sess, int32_
 int32_t KeySubscriberHandler::RegisterSystemKey(std::shared_ptr<KeyOption> option,
     int32_t session, std::function<void(std::shared_ptr<KeyEvent>)> callback)
 {
-    // onKey 路径（triggerType_ 已设置）：PRESSED/REPEAT_PRESSED/ALL_RELEASED 首次触发方向均为 DOWN，
-    // 映射为 SHORTCUT_TRIGGER_TYPE_DOWN 才能与 exceptional_system_keys_config.json 的 "down" 条目匹配。
-    // on('key') 路径（triggerType_==0）：沿用原 IsFinalKeyDown() 逻辑，行为不变。
     KeyShortcutManager::ShortcutTriggerType shortcutTriggerType = KeyShortcutManager::SHORTCUT_TRIGGER_TYPE_UP;
     if (option->GetTriggerType() != 0) {
         shortcutTriggerType = KeyShortcutManager::SHORTCUT_TRIGGER_TYPE_DOWN;
@@ -294,7 +291,7 @@ int32_t KeySubscriberHandler::RegisterSystemKey(std::shared_ptr<KeyOption> optio
         .session = session,
         .callback = callback,
     };
-    MMI_HILOGD("RegisterSystemKey: IsFinalKeyDown=%{public}d, GetTriggerType=%{public}d, "
+    MMI_HILOGI("RegisterSystemKey: IsFinalKeyDown=%{public}d, GetTriggerType=%{public}d, "
         "shortcutTriggerType=%{public}d, preKeys_size=%{public}zu, finalKey=%{private}d, longPressTime=%{public}d",
         option->IsFinalKeyDown(), option->GetTriggerType(), shortcutTriggerType,
         option->GetPreKeys().size(), option->GetFinalKey(), option->GetFinalKeyDownDuration());
@@ -1205,8 +1202,6 @@ void KeySubscriberHandler::HandleKeyUpForPressedType(const std::shared_ptr<KeyEv
     if (keyCode == finalKey || preKeys.find(keyCode) != preKeys.end()) {
         MMI_HILOGI("PRESSED/REPEAT_PRESSED: consuming UP event KC:%{private}d", keyCode);
         handled = true;
-        // finalKey UP 时通知客户端，使客户端 TriggerEventDispatcher 能重置 firstDownSent_，
-        // 否则 PRESSED 模式下后续独立按键按下会被误判为 auto-repeat 而不回调。
         if (keyCode == finalKey) {
             for (auto &subscriber : subscribers) {
                 CHKPC(subscriber);
@@ -1241,7 +1236,7 @@ void KeySubscriberHandler::NotifyPressedSubscriberOnKeyUp(const std::shared_ptr<
     std::lock_guard<std::mutex> lock(subscriberMapMutex_);
     for (auto &iter : subscriberMap_) {
         auto keyOption = iter.first;
-        auto subscribers = iter.second; // 值拷贝，隔离原始列表，避免遍历中被修改
+        auto subscribers = iter.second;
         if ((keyOption->GetTriggerType() == KeyCommandTriggerType::PRESSED ||
              keyOption->GetTriggerType() == KeyCommandTriggerType::REPEAT_PRESSED) &&
             keyCode == keyOption->GetFinalKey()) {
@@ -1257,9 +1252,6 @@ bool KeySubscriberHandler::HandleKeyUp(const std::shared_ptr<KeyEvent> &keyEvent
 {
 #ifdef SHORTCUT_KEY_RULES_ENABLED
     if (KEY_SHORTCUT_MGR->HaveShortcutConsumed(keyEvent) || !KEY_SHORTCUT_MGR->IsCheckUpShortcut(keyEvent)) {
-        // 宏守卫拦截 UP 事件后不会再执行到下方的 PRESSED/REPEAT_PRESSED 路由；
-        // 但 PRESSED/REPEAT_PRESSED 需要 finalKey UP 通知客户端以重置 firstDownSent_，
-        // 故在此兜底通知后再 return。
         if (keyEvent->GetKeyAction() == KeyEvent::KEY_ACTION_UP) {
             NotifyPressedSubscriberOnKeyUp(keyEvent);
         }
@@ -1501,13 +1493,10 @@ bool KeySubscriberHandler::IsKeyEventSubscribed(int32_t keyCode, int32_t trriger
             keyOption->GetFinalKeyDownDuration());
         int32_t keyAction = KeyEvent::KEY_ACTION_UP;
         if (keyOption->GetTriggerType() == KeyCommandTriggerType::ALL_RELEASED) {
-            // ALL_RELEASED：DOWN 和 UP 事件都需回调，两个方向都应匹配（令 keyAction=trrigerType 使条件恒成立）
             keyAction = trrigerType;
         } else if (keyOption->GetTriggerType() != 0) {
-            // onKey 路径（PRESSED/REPEAT_PRESSED）：仅在 DOWN 时触发
             keyAction = KeyEvent::KEY_ACTION_DOWN;
         } else if (keyOption->IsFinalKeyDown()) {
-            // on('key') 路径：沿用原逻辑
             MMI_HILOGD("keyOption is final key down");
             keyAction = KeyEvent::KEY_ACTION_DOWN;
         }

@@ -150,8 +150,6 @@ bool TriggerEventDispatcher::ShouldDispatchPRESSED(std::shared_ptr<KeyOption> ke
     if (keyCode != keyOption->GetFinalKey()) {
         return false;
     }
-    // finalKey UP 时重置 firstDownSent_，使下次独立按键按下能正常触发回调；
-    // UP 本身不分发（return false），仅用于重置内部状态。
     if (action == KeyEvent::KEY_ACTION_UP) {
         std::string subscribeKey = GenerateSubscribeKey(keyOption);
         firstDownSent_[subscribeKey] = false;
@@ -362,7 +360,6 @@ void TriggerEventDispatcher::StartDurationWindow(const std::string& subscribeKey
     hasOtherKey_[subscribeKey] = false;
 
     std::thread([this, subscribeKey, duration]() {
-        // duration 单位为毫秒，与 key_subscriber_handler.cpp(MS2US/AddTimer) 对齐
         std::this_thread::sleep_for(std::chrono::milliseconds(duration));
 
         std::lock_guard<std::mutex> lock(mutex_);
