@@ -6811,7 +6811,9 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_AllReleasedStates_Mu
     stateB.pressedComboKeys = { KeyEvent::KEYCODE_ALT_LEFT, KeyEvent::KEYCODE_TAB };
     // key assertion: two independent entries (old int-key impl kept only one shared entry)
     EXPECT_EQ(handler.allReleasedStates_.size(), 2u);
-    // subscriberA handles Tab UP -> only its own combo resets
+    // subscriberA handles Tab UP: ALT_LEFT is still held, so A's combo stays active (only Tab is
+    // removed from pressedComboKeys). The key point under test is that A's state change does not
+    // leak to B (per-subscriber isolation via Subscriber* key).
     std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
     ASSERT_NE(keyEvent, nullptr);
     keyEvent->SetKeyCode(KeyEvent::KEYCODE_TAB);
@@ -6820,8 +6822,9 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_AllReleasedStates_Mu
     bool handled = false;
     handler.ProcessAllReleasedComboActivated(keyEvent, keyOption, subscriberA, handled);
     EXPECT_TRUE(handled);
-    EXPECT_FALSE(stateA.comboActivated);
-    EXPECT_TRUE(stateA.pressedComboKeys.empty());
+    EXPECT_TRUE(stateA.comboActivated);
+    EXPECT_FALSE(stateA.pressedComboKeys.empty());
+    EXPECT_EQ(stateA.pressedComboKeys.size(), 1u);
     // B must be unaffected (old impl wrongly reset B here because A and B shared one state)
     EXPECT_TRUE(stateB.comboActivated);
     EXPECT_EQ(stateB.pressedComboKeys.size(), 2u);
