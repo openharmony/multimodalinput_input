@@ -437,9 +437,14 @@ napi_value GetEventInfoAPI26(napi_env env, napi_callback_info info, sptr<KeyEven
             "triggerType is required and must be one of KeyCommandTriggerType values");
         return nullptr;
     }
+    // onKey 路径按 triggerType 工作；同步置 isFinalKeyDown=true，供仍读取 IsFinalKeyDown() 的
+    // 共享逻辑（IsEqualKeyOption 去重、AddTimer 等）获得与 PRESSED/REPEAT_PRESSED/ALL_RELEASED
+    // 首次触发方向（均为 DOWN）一致的语义。
+    keyOption->SetFinalKeyDown(true);
     subKeyNames += std::to_string(triggerType);
     subKeyNames += ",false,";
-    MMI_HILOGI("Using triggerType mode, ignoring isFinalKeyDown and isRepeat");
+    MMI_HILOGI("Using triggerType mode, triggerType:%{public}d, isFinalKeyDown:%{public}d",
+        triggerType, keyOption->IsFinalKeyDown());
     event->eventType = subKeyNames;
     napi_value ret;
     CHKRP(napi_create_int32(env, RET_OK, &ret), CREATE_INT32);
