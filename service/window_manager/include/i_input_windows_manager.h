@@ -102,7 +102,7 @@ public:
     virtual void ApplyBoundDisplayId(std::shared_ptr<PointerEvent> pointerEvent) = 0;
     virtual void ApplyBoundDisplayId(std::shared_ptr<KeyEvent> keyEvent) = 0;
     virtual int32_t AppendExtraData(const ExtraData& extraData) = 0;
-    virtual bool IsWindowVisible(int32_t pid) = 0;
+    virtual bool IsWindowVisible(int32_t pid, int32_t userId = -1) = 0;
     virtual ExtraData GetExtraData() const = 0;
     virtual const std::vector<WindowInfo> GetWindowGroupInfoByDisplayIdCopy(int32_t displayId) const = 0;
     virtual std::pair<double, double> TransformWindowXY(const WindowInfo &, double, double) const = 0;

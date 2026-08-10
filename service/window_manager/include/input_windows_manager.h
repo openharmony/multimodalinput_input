@@ -90,7 +90,7 @@ public:
     int32_t SetDisplayBind(int32_t deviceId, int32_t displayId, std::string &msg);
     int32_t BindToDisplay(int32_t deviceId, int32_t displayId, std::string &msg);
     int32_t AppendExtraData(const ExtraData& extraData);
-    bool IsWindowVisible(int32_t pid);
+    bool IsWindowVisible(int32_t pid, int32_t userId = -1);
     void ClearExtraData();
     ExtraData GetExtraData() const;
     const std::vector<WindowInfo> GetWindowGroupInfoByDisplayIdCopy(int32_t displayId) const;

@@ -8000,7 +8000,7 @@ ExtraData InputWindowsManager::GetExtraData() const
     return extraData_;
 }
 
-bool InputWindowsManager::IsWindowVisible(int32_t pid)
+bool InputWindowsManager::IsWindowVisible(int32_t pid, int32_t userId)
 {
     CALL_DEBUG_ENTER;
     if (pid < 0) {
@@ -8009,7 +8009,14 @@ bool InputWindowsManager::IsWindowVisible(int32_t pid)
     }
     std::vector<sptr<Rosen::WindowVisibilityInfo>> infos;
     BytraceAdapter::StartWindowVisible(pid);
-    Rosen::WindowManagerLite::GetInstance().GetVisibilityWindowInfo(infos);
+    // In multi-foreground scenarios (e.g. cockpit) each foreground user owns a separate WMS.
+    // When userId is valid (>0), scope the query by the window owner's userId so the correct
+    // user's windows are returned; otherwise fall back to the shared instance (legacy behavior).
+    if (userId > 0) {
+        Rosen::WindowManagerLite::GetInstance(userId).GetVisibilityWindowInfo(infos);
+    } else {
+        Rosen::WindowManagerLite::GetInstance().GetVisibilityWindowInfo(infos);
+    }
     BytraceAdapter::StopWindowVisible();
     for (const auto &it: infos) {
         CHKPC(it);
