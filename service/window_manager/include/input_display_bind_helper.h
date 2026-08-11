@@ -20,6 +20,7 @@
 #include <set>
 #include <vector>
 
+#include "old_display_info.h"
 #include "window_info.h"
 
 namespace OHOS {
@@ -30,6 +31,7 @@ public:
     std::string GetInputNodeName() const;
     std::string GetInputDeviceName() const;
     int32_t GetDisplayId() const;
+    uint64_t GetRsId() const;
     std::string GetDisplayName() const;
     bool IsUnbind() const;
     bool InputDeviceNotBind() const;
@@ -38,7 +40,7 @@ public:
     void SetBindToDisplayFlag(bool bindToDisplay);
     bool AddInputDevice(int32_t deviceId, const std::string &nodeName, const std::string &deviceName);
     void RemoveInputDevice();
-    bool AddDisplay(int32_t id, const std::string &name);
+    bool AddDisplay(uint64_t rsId, int32_t displayId, const std::string &name);
     void RemoveDisplay();
     std::string GetDesc() const;
     friend bool operator < (const BindInfo &l, const BindInfo &r);
@@ -50,6 +52,7 @@ private:
     std::string inputNodeName_;
     std::string inputDeviceName_;
     int32_t displayId_ { -1 };
+    uint64_t rsId_ { ~uint64_t(0) };
     std::string displayName_;
     // Runtime-only marker: true when this binding was established via the bindToDisplay API.
     // Not serialized (BindToDisplay does not persist), so config-loaded bindings stay false.
@@ -60,7 +63,8 @@ public:
     bool Add(const BindInfo &info);
     void UnbindInputDevice(int32_t deviceId);
     void UnbindDisplay(int32_t displayId);
-    void BindDisplayByCfgNodes(int32_t displayId, const std::string &displayName,
+    void UnbindDisplayByRsId(uint64_t rsId);
+    void BindDisplayByCfgNodes(uint64_t rsId, int32_t displayId, const std::string &displayName,
         const std::set<std::string> &cfgNodeNames);
     BindInfo GetUnbindInputDevice(const std::string &displayName);
     BindInfo GetUnbindDisplay(const std::string &inputDeviceName);
@@ -82,19 +86,20 @@ class InputDisplayBindHelper {
 public:
     InputDisplayBindHelper(const std::string bindCfgFile);
     std::string GetBindDisplayNameByInputDevice(int32_t inputDeviceId) const;
-    void AddInputDevice(int32_t id, const std::string &name, const std::string &sysUid);
+    void AddInputDevice(int32_t id, const std::string &name, const std::string &sysUid,
+        const std::vector<OLD::DisplayInfo> &displays = {});
     void RemoveInputDevice(int32_t id);
-    bool IsDisplayAdd(int32_t id, const std::string &name);
+    bool IsDisplayAdd(uint64_t id, const std::string &name);
     std::set<std::pair<uint64_t, std::string>> GetDisplayIdNames() const;
-    void AddDisplay(int32_t id, const std::string &name);
-    void AddLocalDisplay(int32_t id, const std::string &name);
+    void AddDisplay(uint64_t rsId, int32_t displayId, const std::string &name);
     void RemoveDisplay(int32_t id);
+    void RemoveDisplayByRsId(uint64_t rsId);
     void Load();
     std::string Dumps() const;
     void Store();
     int32_t GetDisplayBindInfo(DisplayBindInfos &infos);
     int32_t SetDisplayBind(int32_t deviceId, int32_t displayId, std::string &msg);
-    int32_t BindToDisplay(int32_t deviceId, int32_t displayId, const std::string &displayName,
+    int32_t BindToDisplay(int32_t deviceId, int32_t displayId, uint64_t rsId, const std::string &displayName,
         std::string &msg);
 
     int32_t GetBindDisplayIdByInputDevice(int32_t inputDeviceId) const;

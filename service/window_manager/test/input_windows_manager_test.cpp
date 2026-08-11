@@ -4113,7 +4113,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateDisplayIdAndName
     if (it != inputWindowsManager.displayGroupInfoMap_.end()) {
         it->second.displaysInfo.push_back(displaysInfo);
     }
-    inputWindowsManager.bindInfo_.AddDisplay(2, "cde");
+    inputWindowsManager.bindInfo_.AddDisplay(2, 2, "cde");
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager.UpdateDisplayIdAndName());
 }
 
@@ -4134,7 +4134,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateDisplayIdAndName
     if (it != inputWindowsManager.displayGroupInfoMap_.end()) {
         it->second.displaysInfo.push_back(displaysInfo);
     }
-    inputWindowsManager.bindInfo_.AddDisplay(1, "abc");
+    inputWindowsManager.bindInfo_.AddDisplay(1, 1, "abc");
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager.UpdateDisplayIdAndName());
 }
 
@@ -10728,10 +10728,10 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateDisplayIdAndName
     }
     it->second.displaysInfo.push_back(displaysInfo);
 
-    inputWindowsManager->bindInfo_.AddDisplay(1, "abc");
-    inputWindowsManager->bindInfo_.AddDisplay(1, "abc");
-    inputWindowsManager->bindInfo_.AddDisplay(2, "abc");
-    inputWindowsManager->bindInfo_.AddDisplay(1, "aaa");
+    inputWindowsManager->bindInfo_.AddDisplay(1, 1, "abc");
+    inputWindowsManager->bindInfo_.AddDisplay(1, 1, "abc");
+    inputWindowsManager->bindInfo_.AddDisplay(2, 2, "abc");
+    inputWindowsManager->bindInfo_.AddDisplay(1, 1, "aaa");
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager->UpdateDisplayIdAndName());
 }
 
@@ -12229,7 +12229,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateDisplayIdAndName
     displaysInfo.id = 1;
     displaysInfo.uniq = "abc";
     inputWindowsManager.displayGroupInfo_.displaysInfo.push_back(displaysInfo);
-    inputWindowsManager.bindInfo_.AddDisplay(2, "cde");
+    inputWindowsManager.bindInfo_.AddDisplay(2, 2, "cde");
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager.UpdateDisplayIdAndName());
 }
 
@@ -12753,10 +12753,10 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateDisplayIdAndName
     }
     it->second.displaysInfo.push_back(displaysInfo);
 
-    inputWindowsManager->bindInfo_.AddDisplay(1, "abc");
-    inputWindowsManager->bindInfo_.AddDisplay(1, "abc");
-    inputWindowsManager->bindInfo_.AddDisplay(2, "abc");
-    inputWindowsManager->bindInfo_.AddDisplay(1, "aaa");
+    inputWindowsManager->bindInfo_.AddDisplay(1, 1, "abc");
+    inputWindowsManager->bindInfo_.AddDisplay(1, 1, "abc");
+    inputWindowsManager->bindInfo_.AddDisplay(2, 2, "abc");
+    inputWindowsManager->bindInfo_.AddDisplay(1, 1, "aaa");
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager->UpdateDisplayIdAndName());
 }
 
@@ -16703,7 +16703,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_TouchPointToDisplayPoi
     // bindInfo_ contract: if device is bound to a display name, that name drives screenId resolution
     // After the refactor, GetBindDisplayNameByInputDevice returns the cfg-derived name unchanged.
     inputWindowsManager->bindInfo_.AddInputDevice(1, "thpNode", "thpDevice");
-    inputWindowsManager->bindInfo_.AddDisplay(2, "default2");
+    inputWindowsManager->bindInfo_.AddDisplay(2, 2, "default2");
     // Confirm bindInfo_ actually recorded the binding name as expected by TouchPointToDisplayPoint
     std::string screenId = inputWindowsManager->bindInfo_.GetBindDisplayNameByInputDevice(1);
     MMI_HILOGD("AC-3.1 bindInfo_ resolved screenId for device 1: %{public}s", screenId.c_str());

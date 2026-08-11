@@ -230,7 +230,7 @@ void InputWindowsManager::DeviceStatusChanged(int32_t deviceId, const std::strin
 {
     CALL_DEBUG_ENTER;
     if (devStatus == "add") {
-        bindInfo_.AddInputDevice(deviceId, name, sysUid);
+        bindInfo_.AddInputDevice(deviceId, name, sysUid, GetAllUsersDisplays());
     } else {
         bindInfo_.RemoveInputDevice(deviceId);
         // A disconnected device can no longer complete an in-flight sequence; drop its sequence
@@ -1041,19 +1041,21 @@ void InputWindowsManager::UpdateDisplayIdAndName()
     }
     for (auto it = oldInfo.begin(); it != oldInfo.end();) {
         if (newInfo.find(*it) == newInfo.end()) {
-            bindInfo_.RemoveDisplay(it->first);
+            bindInfo_.RemoveDisplayByRsId(it->first);
             oldInfo.erase(it++);
         } else {
             ++it;
         }
     }
-    for (const auto &item : newInfo) {
-        if (item.first >= HICAR_MIN_DISPLAY_ID) {
-            MMI_HILOGD("Displayinfo id:%{public}" PRIu64 ", name:%{public}s", item.first, item.second.c_str());
+    // Iterate DisplaysInfo (not newInfo) so each new binding records the display's true logical id
+    // (item.id) alongside its rsId, instead of reusing rsId for both.
+    for (const auto &item : DisplaysInfo) {
+        if (item.rsId >= HICAR_MIN_DISPLAY_ID) {
+            MMI_HILOGD("Displayinfo id:%{public}" PRIu64 ", name:%{public}s", item.rsId, item.uniq.c_str());
             continue;
         }
-        if (!bindInfo_.IsDisplayAdd(item.first, item.second)) {
-            bindInfo_.AddDisplay(item.first, item.second);
+        if (!bindInfo_.IsDisplayAdd(item.rsId, item.uniq)) {
+            bindInfo_.AddDisplay(item.rsId, item.id, item.uniq);
         }
     }
 }
@@ -1103,7 +1105,7 @@ int32_t InputWindowsManager::BindToDisplay(int32_t deviceId, int32_t displayId, 
         ArmPendingBindTimer(deviceId);
         return RET_OK;
     }
-    return bindInfo_.BindToDisplay(deviceId, displayId, displayInfo->uniq, msg);
+    return bindInfo_.BindToDisplay(deviceId, displayId, displayInfo->rsId, displayInfo->uniq, msg);
 }
 
 void InputWindowsManager::UpdateActiveSequence(int32_t deviceId, int32_t delta)
@@ -1135,7 +1137,7 @@ void InputWindowsManager::FlushPendingBind(int32_t deviceId)
         return;
     }
     std::string bindMsg;
-    bindInfo_.BindToDisplay(deviceId, displayId, displayInfo->uniq, bindMsg);
+    bindInfo_.BindToDisplay(deviceId, displayId, displayInfo->rsId, displayInfo->uniq, bindMsg);
 }
 
 void InputWindowsManager::ArmPendingBindTimer(int32_t deviceId)

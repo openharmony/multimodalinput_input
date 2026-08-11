@@ -58,21 +58,19 @@ std::set<std::pair<uint64_t, std::string>> InputDisplayBindHelper::GetDisplayIdN
 void InputDisplayBindHelper::RemoveDisplay(int32_t id)
 {}
 
-void InputDisplayBindHelper::AddLocalDisplay(int32_t id, const std::string &name)
-{}
-
-bool InputDisplayBindHelper::IsDisplayAdd(int32_t id, const std::string &name)
+bool InputDisplayBindHelper::IsDisplayAdd(uint64_t id, const std::string &name)
 {
     return false;
 }
 
-void InputDisplayBindHelper::AddDisplay(int32_t id, const std::string &name)
+void InputDisplayBindHelper::AddDisplay(uint64_t rsId, int32_t displayId, const std::string &name)
 {}
 
 void InputDisplayBindHelper::RemoveInputDevice(int32_t id)
 {}
 
-void InputDisplayBindHelper::AddInputDevice(int32_t id, const std::string &nodeName, const std::string &sysUid)
+void InputDisplayBindHelper::AddInputDevice(int32_t id, const std::string &nodeName, const std::string &sysUid,
+    const std::vector<OLD::DisplayInfo> &displays)
 {}
 
 UDSServer::~UDSServer() {}

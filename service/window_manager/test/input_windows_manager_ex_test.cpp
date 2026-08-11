@@ -2760,7 +2760,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_TouchPointToDisplayPoi
     libinput_event_touch touch {};
     EventTouch touchInfo;
     int32_t physicalDisplayId;
-    inputWindowsManager->bindInfo_.AddDisplay(2, "abcdefg");
+    inputWindowsManager->bindInfo_.AddDisplay(2, 2, "abcdefg");
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager->TouchPointToDisplayPoint
         (deviceId, &touch, touchInfo, physicalDisplayId));
     deviceId = 2;
