@@ -155,8 +155,8 @@ HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_001, TestSize.Le
     bindInfo.AddInputDevice(1, "mouse", "mouse");
     bindInfo.AddInputDevice(2, "keyboard", "keyboard");
     // 窗口同步信息
-    bindInfo.AddDisplay(0, "default0");
-    bindInfo.AddDisplay(2, "default2");
+    bindInfo.AddDisplay(0, 0, "default0");
+    bindInfo.AddDisplay(2, 2, "default2");
     ASSERT_EQ(bindInfo.Dumps(), std::string("mouse<=>mouse<=>default0\nkeyboard<=>keyboard<=>default2\n"));
 }
 
@@ -177,8 +177,8 @@ HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_002, TestSize.Le
     bindInfo.AddInputDevice(1, "mouse", "mouse");
     bindInfo.AddInputDevice(2, "keyboard", "keyboard");
     // 窗口同步信息
-    bindInfo.AddDisplay(0, "hp 223");
-    bindInfo.AddDisplay(2, "think 123");
+    bindInfo.AddDisplay(0, 0, "hp 223");
+    bindInfo.AddDisplay(2, 2, "think 123");
     ASSERT_EQ(bindInfo.Dumps(), std::string("mouse<=>mouse<=>hp 223\nkeyboard<=>keyboard<=>think 123\n"));
 }
 
@@ -199,8 +199,8 @@ HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_003, TestSize.Le
     bindInfo.AddInputDevice(1, "mouse", "mouse");
     bindInfo.AddInputDevice(2, "keyboard", "keyboard");
     // 窗口同步信息
-    bindInfo.AddDisplay(0, "think 123");
-    bindInfo.AddDisplay(2, "hp 223");
+    bindInfo.AddDisplay(0, 0, "think 123");
+    bindInfo.AddDisplay(2, 2, "hp 223");
     ASSERT_EQ(bindInfo.Dumps(), std::string("mouse<=>mouse<=>think 123\nkeyboard<=>keyboard<=>hp 223\n"));
 }
 
@@ -221,8 +221,8 @@ HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_004, TestSize.Le
     bindInfo.AddInputDevice(1, "mouse", "mouse");
     bindInfo.AddInputDevice(2, "keyboard", "keyboard");
     // 窗口同步信息
-    bindInfo.AddDisplay(0, "hp 223");
-    bindInfo.AddDisplay(2, "think 123");
+    bindInfo.AddDisplay(0, 0, "hp 223");
+    bindInfo.AddDisplay(2, 2, "think 123");
     // 显示屏移除
     bindInfo.RemoveDisplay(2);
     bindInfo.RemoveDisplay(0);
@@ -231,8 +231,8 @@ HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_004, TestSize.Le
     bindInfo.RemoveInputDevice(2);
     bindInfo.RemoveInputDevice(3);
     // 窗口同步信息
-    bindInfo.AddDisplay(0, "hp 223");
-    bindInfo.AddDisplay(2, "think 123");
+    bindInfo.AddDisplay(0, 0, "hp 223");
+    bindInfo.AddDisplay(2, 2, "think 123");
     // 检测到触摸板设备
     bindInfo.AddInputDevice(1, "mouse", "mouse");
     bindInfo.AddInputDevice(2, "keyboard", "keyboard");
@@ -267,8 +267,8 @@ HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_GetBindDisplayNa
     bindInfo.AddInputDevice(1, "mouse", "mouse");
     bindInfo.AddInputDevice(2, "keyboard", "keyboard");
     // 窗口同步信息
-    bindInfo.AddDisplay(0, "think 123");
-    bindInfo.AddDisplay(2, "hp 223");
+    bindInfo.AddDisplay(0, 0, "think 123");
+    bindInfo.AddDisplay(2, 2, "hp 223");
     ASSERT_EQ(bindInfo.Dumps(), std::string("mouse<=>mouse<=>think 123\nkeyboard<=>keyboard<=>hp 223\n"));
     // 获取
     ASSERT_EQ(bindInfo.GetBindDisplayNameByInputDevice(1), std::string("think 123"));
@@ -304,8 +304,8 @@ HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_IsDisplayAdd_006
     bindInfo.AddInputDevice(1, "mouse", "mouse");
     bindInfo.AddInputDevice(2, "keyboard", "keyboard");
     // 窗口同步信息
-    bindInfo.AddDisplay(0, "think 123");
-    bindInfo.AddDisplay(2, "hp 223");
+    bindInfo.AddDisplay(0, 0, "think 123");
+    bindInfo.AddDisplay(2, 2, "hp 223");
     ASSERT_TRUE(bindInfo.IsDisplayAdd(0, "think 123"));
     ASSERT_TRUE(bindInfo.IsDisplayAdd(2, "hp 223"));
     ASSERT_FALSE(bindInfo.IsDisplayAdd(1, "think 123"));
@@ -329,7 +329,7 @@ HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_GetDisplayIdName
     bindInfo.Load();
     IdNames idNames;
     ASSERT_EQ(bindInfo.GetDisplayIdNames(), idNames);
-    bindInfo.AddDisplay(2, "hp 223");
+    bindInfo.AddDisplay(2, 2, "hp 223");
     idNames.insert(std::make_pair(2, "hp 223"));
     ASSERT_EQ(bindInfo.GetDisplayIdNames(), idNames);
 
@@ -338,10 +338,10 @@ HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_GetDisplayIdName
     bindInfo.AddInputDevice(2, "keyboard", "keyboard");
 
     // 窗口同步信息
-    bindInfo.AddDisplay(0, "think 123");
+    bindInfo.AddDisplay(0, 0, "think 123");
     idNames.insert(std::make_pair(0, "think 123"));
     ASSERT_EQ(bindInfo.GetDisplayIdNames(), idNames);
-    bindInfo.AddDisplay(2, "hp 223");
+    bindInfo.AddDisplay(2, 2, "hp 223");
     idNames.insert(std::make_pair(2, "hp 223"));
     ASSERT_EQ(bindInfo.GetDisplayIdNames(), idNames);
     ASSERT_EQ(bindInfo.Dumps(), std::string("mouse<=>mouse<=>think 123\nkeyboard<=>keyboard<=>hp 223\n"));
@@ -514,7 +514,7 @@ HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_AddDisplay_01, T
 {
     CALL_TEST_DEBUG;
     BindInfo bindInfo;
-    ASSERT_NO_FATAL_FAILURE(bindInfo.AddDisplay(0, "hp 223"));
+    ASSERT_NO_FATAL_FAILURE(bindInfo.AddDisplay(0, 0, "hp 223"));
 }
 
 /**
@@ -528,7 +528,7 @@ HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_AddDisplay_02, T
     CALL_TEST_DEBUG;
     BindInfo bindInfo;
     bindInfo.displayName_ = "hp 223";
-    ASSERT_NO_FATAL_FAILURE(bindInfo.AddDisplay(0, "hp 223"));
+    ASSERT_NO_FATAL_FAILURE(bindInfo.AddDisplay(0, 0, "hp 223"));
 }
 
 /**
@@ -542,7 +542,7 @@ HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_AddDisplay_03, T
     CALL_TEST_DEBUG;
     BindInfo bindInfo;
     bindInfo.displayId_ = 0;
-    ASSERT_NO_FATAL_FAILURE(bindInfo.AddDisplay(0, "hp 223"));
+    ASSERT_NO_FATAL_FAILURE(bindInfo.AddDisplay(0, 0, "hp 223"));
 }
 
 /**
@@ -557,7 +557,7 @@ HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_AddDisplay_04, T
     BindInfo bindInfo;
     bindInfo.displayId_ = 0;
     bindInfo.displayName_ = "hp 223";
-    ASSERT_NO_FATAL_FAILURE(bindInfo.AddDisplay(0, "hp 223"));
+    ASSERT_NO_FATAL_FAILURE(bindInfo.AddDisplay(0, 0, "hp 223"));
 }
 
 /**
@@ -572,7 +572,7 @@ HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_AddDisplay_05, T
     BindInfo bindInfo;
     bindInfo.displayId_ = -1;
     bindInfo.displayName_ = "";
-    bool ret = bindInfo.AddDisplay(1, "hp 223");
+    bool ret = bindInfo.AddDisplay(1, 1, "hp 223");
     EXPECT_TRUE(ret);
 }
 
@@ -592,7 +592,7 @@ HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_AddDisplay_06, T
     std::string name = "display";
     std::string deviceName = inputDisplayBindHelper.GetInputDeviceById(id);
     EXPECT_TRUE(deviceName.empty());
-    ASSERT_NO_FATAL_FAILURE(inputDisplayBindHelper.AddDisplay(id, name));
+    ASSERT_NO_FATAL_FAILURE(inputDisplayBindHelper.AddDisplay(id, id, name));
 }
 
 /**
@@ -725,46 +725,6 @@ HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_GetDisplayIdName
     bindInfo.displayName_ = "hp 223";
     inputDisplayBindHelper.infos_->infos_.push_back(bindInfo);
     ASSERT_NO_FATAL_FAILURE(inputDisplayBindHelper.GetDisplayIdNames());
-}
-
-/**
- * @tc.name: InputDisplayBindHelperTest_AddLocalDisplay_02
- * @tc.desc: Test AddLocalDisplay
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_AddLocalDisplay_02, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    InputDisplayBindHelperTest::WriteConfigFile("mouse<=>hp 223\nkeyboard<=>think 123\n");
-    InputDisplayBindHelper inputDisplayBindHelper(InputDisplayBindHelperTest::GetCfgFileName());
-    BindInfo bindInfo;
-    bindInfo.inputDeviceId_ = 1;
-    bindInfo.inputDeviceName_ = "mouse";
-    bindInfo.displayId_ = -1;
-    bindInfo.displayName_ = "hp 223";
-    inputDisplayBindHelper.infos_->infos_.push_back(bindInfo);
-    ASSERT_NO_FATAL_FAILURE(inputDisplayBindHelper.AddLocalDisplay(0, "hp 223"));
-}
-
-/**
- * @tc.name: InputDisplayBindHelperTest_AddLocalDisplay_03
- * @tc.desc: Test AddLocalDisplay
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_AddLocalDisplay_03, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    InputDisplayBindHelperTest::WriteConfigFile("mouse<=>hp 223\nkeyboard<=>think 123\n");
-    InputDisplayBindHelper inputDisplayBindHelper(InputDisplayBindHelperTest::GetCfgFileName());
-    BindInfo bindInfo;
-    bindInfo.inputDeviceId_ = 1;
-    bindInfo.inputDeviceName_ = "mouse";
-    bindInfo.displayId_ = 0;
-    bindInfo.displayName_ = "hp 223";
-    inputDisplayBindHelper.infos_->infos_.push_back(bindInfo);
-    ASSERT_NO_FATAL_FAILURE(inputDisplayBindHelper.AddLocalDisplay(0, "hp 223"));
 }
 
 /**
@@ -1250,23 +1210,6 @@ HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_SetDisplayBind_1
 }
 
 /**
- * @tc.name: InputDisplayBindHelperTest_AddLocalDisplay_01
- * @tc.desc: Test AddLocalDisplay
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_AddLocalDisplay_01, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    bool isStore;
-    int32_t id = 3;
-    std::string name = "localDisplay";
-    InputDisplayBindHelper idh("/data/service/el1/public/multimodalinput/0.txt");
-    isStore = false;
-    ASSERT_NO_FATAL_FAILURE(idh.AddLocalDisplay(id, name));
-}
-
-/**
  * @tc.name: InputDisplayBindHelperTest_GetDisplayBindInfo_02
  * @tc.desc: Test GetDisplayBindInfo
  * @tc.type: FUNC
@@ -1475,7 +1418,7 @@ HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_BindInfo_AddDisp
     BindInfo bindInfo;
     bindInfo.displayId_ = 0;
     
-    bool ret = bindInfo.AddDisplay(1, "hp 224");
+    bool ret = bindInfo.AddDisplay(1, 1, "hp 224");
     EXPECT_FALSE(ret);
 }
 
@@ -1491,7 +1434,7 @@ HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_BindInfo_AddDisp
     BindInfo bindInfo;
     bindInfo.displayName_ = "hp 223";
     
-    bool ret = bindInfo.AddDisplay(0, "hp 224");
+    bool ret = bindInfo.AddDisplay(0, 0, "hp 224");
     EXPECT_FALSE(ret);
 }
 
@@ -2099,28 +2042,6 @@ HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_GetInputNode_03,
 }
 
 /**
- * @tc.name: InputDisplayBindHelperTest_InputDisplayBindHelper_AddLocalDisplay_04
- * @tc.desc: Test InputDisplayBindHelper AddLocalDisplay with no unbind devices
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_AddLocalDisplay_04, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    InputDisplayBindHelperTest::WriteConfigFile("");
-    InputDisplayBindHelper idh(InputDisplayBindHelperTest::GetCfgFileName());
-    idh.Load();
-    
-    idh.AddInputDevice(1, "input0", "mouse");
-    idh.AddDisplay(0, "hp 223");
-    
-    idh.AddLocalDisplay(1, "localDisplay");
-    
-    std::string dumps = idh.Dumps();
-    EXPECT_NE(dumps.find("mouse<=>hp 223"), std::string::npos);
-}
-
-/**
  * @tc.name: InputDisplayBindHelperTest_InputDisplayBindHelper_SetDisplayBind_14
  * @tc.desc: Test InputDisplayBindHelper SetDisplayBind with same binding
  * @tc.type: FUNC
@@ -2134,7 +2055,7 @@ HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_SetDisplayBind_1
     idh.Load();
     
     idh.AddInputDevice(1, "input0", "mouse");
-    idh.AddDisplay(0, "hp 223");
+    idh.AddDisplay(0, 0, "hp 223");
     
     std::string msg;
     int32_t ret = idh.SetDisplayBind(1, 0, msg);
@@ -2155,7 +2076,7 @@ HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_BindToDisplay_00
     InputDisplayBindHelper idh(InputDisplayBindHelperTest::GetCfgFileName());
     idh.Load();
     std::string msg;
-    EXPECT_EQ(idh.BindToDisplay(-1, 0, "default0", msg), RET_ERR);
+    EXPECT_EQ(idh.BindToDisplay(-1, 0, 0, "default0", msg), RET_ERR);
     EXPECT_NE(msg.find("invalid"), std::string::npos);
 }
 
@@ -2172,7 +2093,7 @@ HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_BindToDisplay_00
     InputDisplayBindHelper idh(InputDisplayBindHelperTest::GetCfgFileName());
     idh.Load();
     std::string msg;
-    EXPECT_EQ(idh.BindToDisplay(1, -1, "default0", msg), RET_ERR);
+    EXPECT_EQ(idh.BindToDisplay(1, -1, -1, "default0", msg), RET_ERR);
     EXPECT_NE(msg.find("invalid"), std::string::npos);
 }
 
@@ -2190,7 +2111,7 @@ HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_BindToDisplay_00
     idh.Load();
     std::string msg;
     // Device 99 is neither in the bind relations nor reported by INPUT_DEV_MGR (mock returns null).
-    EXPECT_EQ(idh.BindToDisplay(99, 0, "default0", msg), ERR_BIND_DEVICE_NOT_EXIST);
+    EXPECT_EQ(idh.BindToDisplay(99, 0, 0, "default0", msg), ERR_BIND_DEVICE_NOT_EXIST);
 }
 
 /**
@@ -2207,8 +2128,33 @@ HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_BindToDisplay_00
     idh.Load();
     idh.AddInputDevice(1, "input0", "mouse");
     std::string msg;
-    EXPECT_EQ(idh.BindToDisplay(1, 5, "default5", msg), RET_OK);
+    EXPECT_EQ(idh.BindToDisplay(1, 5, 5, "default5", msg), RET_OK);
     EXPECT_EQ(idh.GetBindDisplayIdByInputDevice(1), 5);
+}
+
+/**
+ * @tc.name: InputDisplayBindHelperTest_BindToDisplay_CockpitRsId
+ * @tc.desc: BindToDisplay stores the logical displayId and the rsId separately. In a cockpit setup
+ *           (logical id != rsId) the logical id is exposed via GetBindDisplayIdByInputDevice, while
+ *           GetDisplayIdNames reports the entry in the rsId dimension the reconciler matches on.
+ * @tc.type: FUNC
+ */
+HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_BindToDisplay_CockpitRsId, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputDisplayBindHelperTest::WriteConfigFile("");
+    InputDisplayBindHelper idh(InputDisplayBindHelperTest::GetCfgFileName());
+    idh.Load();
+    idh.AddInputDevice(1, "input0", "mouse");
+    std::string msg;
+    // Cockpit: logical display id 5 != rsId 8.
+    EXPECT_EQ(idh.BindToDisplay(1, 5, 8, "default5", msg), RET_OK);
+    // Routing / app-facing id is the logical display id, not the rsId.
+    EXPECT_EQ(idh.GetBindDisplayIdByInputDevice(1), 5);
+    EXPECT_EQ(idh.GetBindToDisplayIdByInputDevice(1), 5);
+    // The reconciler presence set is keyed by rsId, so the entry surfaces as (8, "default5").
+    std::set<std::pair<uint64_t, std::string>> expected = { std::make_pair(8ull, "default5") };
+    EXPECT_EQ(idh.GetDisplayIdNames(), expected);
 }
 
 /**
@@ -2225,9 +2171,9 @@ HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_BindToDisplay_00
     idh.Load();
     idh.AddInputDevice(1, "input0", "mouse");
     std::string msg;
-    EXPECT_EQ(idh.BindToDisplay(1, 5, "default5", msg), RET_OK);
+    EXPECT_EQ(idh.BindToDisplay(1, 5, 5, "default5", msg), RET_OK);
     // Re-binding the same pair succeeds and is a no-op.
-    EXPECT_EQ(idh.BindToDisplay(1, 5, "default5", msg), RET_OK);
+    EXPECT_EQ(idh.BindToDisplay(1, 5, 5, "default5", msg), RET_OK);
     EXPECT_NE(msg.find("already bound"), std::string::npos);
 }
 
@@ -2246,9 +2192,9 @@ HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_BindToDisplay_00
     idh.AddInputDevice(1, "input0", "mouse");
     idh.AddInputDevice(2, "input1", "keyboard");
     std::string msg;
-    EXPECT_EQ(idh.BindToDisplay(1, 5, "default5", msg), RET_OK);
+    EXPECT_EQ(idh.BindToDisplay(1, 5, 5, "default5", msg), RET_OK);
     // Binding a second device to the same display must not evict the first one.
-    EXPECT_EQ(idh.BindToDisplay(2, 5, "default5", msg), RET_OK);
+    EXPECT_EQ(idh.BindToDisplay(2, 5, 5, "default5", msg), RET_OK);
     EXPECT_EQ(idh.GetBindDisplayIdByInputDevice(1), 5);
     EXPECT_EQ(idh.GetBindDisplayIdByInputDevice(2), 5);
 }
@@ -2267,9 +2213,9 @@ HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_BindToDisplay_00
     idh.Load();
     idh.AddInputDevice(1, "input0", "mouse");
     std::string msg;
-    EXPECT_EQ(idh.BindToDisplay(1, 5, "default5", msg), RET_OK);
+    EXPECT_EQ(idh.BindToDisplay(1, 5, 5, "default5", msg), RET_OK);
     // A device is bound to at most one display: moving it releases the previous binding.
-    EXPECT_EQ(idh.BindToDisplay(1, 6, "default6", msg), RET_OK);
+    EXPECT_EQ(idh.BindToDisplay(1, 6, 6, "default6", msg), RET_OK);
     EXPECT_EQ(idh.GetBindDisplayIdByInputDevice(1), 6);
 }
 
@@ -2287,7 +2233,7 @@ HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_GetBindDisplayId
     idh.Load();
     idh.AddInputDevice(1, "input0", "mouse");
     std::string msg;
-    ASSERT_EQ(idh.BindToDisplay(1, 2, "default2", msg), RET_OK);
+    ASSERT_EQ(idh.BindToDisplay(1, 2, 2, "default2", msg), RET_OK);
     EXPECT_EQ(idh.GetBindDisplayIdByInputDevice(1), 2);
     // An unbound device reports -1.
     EXPECT_EQ(idh.GetBindDisplayIdByInputDevice(999), -1);
@@ -2327,8 +2273,8 @@ HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_GetDisplayBindIn
     
     idh.AddInputDevice(1, "input0", "mouse");
     idh.AddInputDevice(2, "input1", "keyboard");
-    idh.AddDisplay(0, "hp 223");
-    idh.AddDisplay(1, "think 123");
+    idh.AddDisplay(0, 0, "hp 223");
+    idh.AddDisplay(1, 1, "think 123");
     
     DisplayBindInfos infos;
     int32_t ret = idh.GetDisplayBindInfo(infos);
@@ -2388,7 +2334,7 @@ HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_CfgBinding_Hit_0
     bindInfo.Load();
     // input_device_name.cfg contains "0<=>wrapper"; nodeName "wrapper" should map to displayId=0
     bindInfo.AddInputDevice(1, INPUT_NODE_NAME, "sysUid_test");
-    bindInfo.AddDisplay(0, "default0");
+    bindInfo.AddDisplay(0, 0, "default0");
     ASSERT_EQ(bindInfo.GetBindDisplayNameByInputDevice(1), std::string("default0"));
 }
 
@@ -2412,7 +2358,7 @@ HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_CfgBinding_AddDi
     bindInfo.Load();
     // cfg: "0<=>wrapper"; sysfs node /data/input0_test/name contains "wrapper"
     // AddDisplay(0) should resolve inputDevice via GetInputDeviceById(0) and bind
-    bindInfo.AddDisplay(0, "default0");
+    bindInfo.AddDisplay(0, 0, "default0");
     ASSERT_NO_FATAL_FAILURE(bindInfo.GetBindDisplayNameByInputDevice(0));
 }
 
@@ -2435,7 +2381,7 @@ HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_CfgBinding_FileM
     bindInfo.Load();
     // must not crash; falls back to default display path
     ASSERT_NO_FATAL_FAILURE(bindInfo.AddInputDevice(1, "orphan_node", "orphan_sysUid"));
-    ASSERT_NO_FATAL_FAILURE(bindInfo.AddDisplay(0, "default0"));
+    ASSERT_NO_FATAL_FAILURE(bindInfo.AddDisplay(0, 0, "default0"));
 }
 
 /**
@@ -2521,34 +2467,6 @@ HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_BindInfos_GetUnb
 }
 
 /**
- * @tc.name: InputDisplayBindHelperTest_AddLocalDisplay_ParallelWithAddDisplay_01
- * @tc.desc: AC-4.3 - AddLocalDisplay invokes GetInputDeviceById the same way as AddDisplay.
- *                   Smoke test: calling AddLocalDisplay must not crash and must not corrupt state.
- * @tc.type: FUNC
- * @tc.require: ISSUE-7430
- */
-HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_AddLocalDisplay_ParallelWithAddDisplay_01,
-    TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    InputDisplayBindHelperTest::WriteConfigFile("");
-    if (fs::exists(INPUT_DEVICE_NAME_CONFIG)) {
-        std::remove(INPUT_DEVICE_NAME_CONFIG.c_str());
-    }
-    InputDisplayBindHelper idh(InputDisplayBindHelperTest::GetCfgFileName());
-    idh.Load();
-    // Pre-populate an unbind input device entry
-    BindInfo unboundDevice;
-    unboundDevice.inputDeviceId_ = 1;
-    unboundDevice.inputDeviceName_ = "mouse";
-    unboundDevice.inputNodeName_ = "node1";
-    unboundDevice.displayId_ = -1;
-    idh.infos_->infos_.push_back(unboundDevice);
-    ASSERT_NO_FATAL_FAILURE(idh.AddLocalDisplay(0, "default0"));
-    ASSERT_NO_FATAL_FAILURE(idh.AddDisplay(1, "default1"));
-}
-
-/**
  * @tc.name: InputDisplayBindHelperTest_BindInfo_SetBindToDisplayFlag_01
  * @tc.desc: Test BindInfo IsBindToDisplay/SetBindToDisplayFlag default and toggling
  * @tc.type: FUNC
@@ -2580,7 +2498,7 @@ HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_GetBindToDisplay
     idh.Load();
     idh.AddInputDevice(1, "input0", "mouse");
     std::string msg;
-    ASSERT_EQ(idh.BindToDisplay(1, 5, "default5", msg), RET_OK);
+    ASSERT_EQ(idh.BindToDisplay(1, 5, 5, "default5", msg), RET_OK);
     // Only the bindToDisplay path surfaces displayId to applications.
     EXPECT_EQ(idh.GetBindToDisplayIdByInputDevice(1), 5);
     // The generic accessor still reports the binding (used for event routing).

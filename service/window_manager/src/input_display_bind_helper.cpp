@@ -63,6 +63,11 @@ int32_t BindInfo::GetDisplayId() const
     return displayId_;
 }
 
+uint64_t BindInfo::GetRsId() const
+{
+    return rsId_;
+}
+
 std::string BindInfo::GetDisplayName() const
 {
     return displayName_;
@@ -110,12 +115,16 @@ void BindInfo::RemoveInputDevice()
     inputDeviceName_.clear();
 }
 
-bool BindInfo::AddDisplay(int32_t id, const std::string &name)
+bool BindInfo::AddDisplay(uint64_t rsId, int32_t displayId, const std::string &name)
 {
     if ((displayId_ != -1) || !displayName_.empty()) {
         return false;
     }
-    displayId_ = id;
+    // Each binding stores all three ids it was established with: rsId_ drives the reconciler
+    // (presence tracked in the rsId dimension), displayId_ (logical id) drives input routing and the
+    // app-facing bind info. Callers pass both explicitly so the two are never conflated.
+    rsId_ = rsId;
+    displayId_ = displayId;
     displayName_ = name;
     return true;
 }
@@ -123,6 +132,7 @@ bool BindInfo::AddDisplay(int32_t id, const std::string &name)
 void BindInfo::RemoveDisplay()
 {
     displayId_ = -1;
+    rsId_ = ~uint64_t(0);
     displayName_.clear();
 }
 
@@ -268,7 +278,16 @@ void BindInfos::UnbindDisplay(int32_t displayId)
     }
 }
 
-void BindInfos::BindDisplayByCfgNodes(int32_t displayId, const std::string &displayName,
+void BindInfos::UnbindDisplayByRsId(uint64_t rsId)
+{
+    for (auto &info : infos_) {
+        if (info.GetRsId() == rsId) {
+            info.RemoveDisplay();
+        }
+    }
+}
+
+void BindInfos::BindDisplayByCfgNodes(uint64_t rsId, int32_t displayId, const std::string &displayName,
     const std::set<std::string> &cfgNodeNames)
 {
     if (cfgNodeNames.empty()) {
@@ -276,7 +295,7 @@ void BindInfos::BindDisplayByCfgNodes(int32_t displayId, const std::string &disp
     }
     for (auto &info : infos_) {
         if (info.DisplayNotBind() && cfgNodeNames.count(info.GetInputNodeName()) > 0) {
-            info.AddDisplay(displayId, displayName);
+            info.AddDisplay(rsId, displayId, displayName);
         }
     }
 }
@@ -368,7 +387,8 @@ int32_t InputDisplayBindHelper::GetBindToDisplayIdByInputDevice(int32_t inputDev
     return infos_->GetBindToDisplayIdByInputDevice(inputDeviceId);
 }
 
-void InputDisplayBindHelper::AddInputDevice(int32_t id, const std::string &nodeName, const std::string &sysUid)
+void InputDisplayBindHelper::AddInputDevice(int32_t id, const std::string &nodeName, const std::string &sysUid,
+    const std::vector<OLD::DisplayInfo> &displays)
 {
     CALL_DEBUG_ENTER;
     MMI_HILOGD("Param: id:%{public}d, nodeName:%{public}s, name:%{public}s", id, nodeName.c_str(), sysUid.c_str());
@@ -380,7 +400,19 @@ void InputDisplayBindHelper::AddInputDevice(int32_t id, const std::string &nodeN
     }
     BindInfo info = infos_->GetUnbindInputDevice(displayName);
     if (info.DisplayNotBind() && cfgRsId != -1) {
-        info.AddDisplay(cfgRsId, displayName);
+        // Resolve the real rsId and logical displayId from the live display list by uniq (== the
+        // displayName assigned above). Falls back to cfgRsId for both when no matching display is
+        // up yet (e.g. device added before its display); the reconciler refreshes ids on its run.
+        uint64_t rsId = static_cast<uint64_t>(cfgRsId);
+        int32_t displayId = cfgRsId;
+        for (const auto &disp : displays) {
+            if (disp.uniq == displayName) {
+                rsId = disp.rsId;
+                displayId = disp.id;
+                break;
+            }
+        }
+        info.AddDisplay(rsId, displayId, displayName);
     }
     info.AddInputDevice(id, nodeName, sysUid);
     infos_->Add(info);
@@ -395,12 +427,12 @@ void InputDisplayBindHelper::RemoveInputDevice(int32_t id)
     infos_->UnbindInputDevice(id);
 }
 
-bool InputDisplayBindHelper::IsDisplayAdd(int32_t id, const std::string &name)
+bool InputDisplayBindHelper::IsDisplayAdd(uint64_t id, const std::string &name)
 {
     CHKPF(infos_);
     const auto &infos = infos_->GetInfos();
     for (const auto &info : infos) {
-        if ((info.GetDisplayName() == name) && (info.GetDisplayId() == id)) {
+        if ((info.GetDisplayName() == name) && (info.GetRsId() == id)) {
             return true;
         }
     }
@@ -414,66 +446,33 @@ std::set<std::pair<uint64_t, std::string>> InputDisplayBindHelper::GetDisplayIdN
     CHKFR(infos_, idNames, "infos_ is null");
     const auto &infos = infos_->GetInfos();
     for (const auto &info : infos) {
-        if (info.GetDisplayId() != -1) {
-            idNames.insert(std::make_pair(info.GetDisplayId(), info.GetDisplayName()));
+        if (info.GetRsId() != ~uint64_t(0)) {
+            idNames.insert(std::make_pair(info.GetRsId(), info.GetDisplayName()));
         }
     }
     return idNames;
 }
 
-void InputDisplayBindHelper::AddDisplay(int32_t id, const std::string &name)
+void InputDisplayBindHelper::AddDisplay(uint64_t rsId, int32_t displayId, const std::string &name)
 {
     CALL_DEBUG_ENTER;
     auto inputDeviceName = configFileInfos_->GetInputDeviceByDisplayName(name);
 
-    std::string deviceName = GetInputDeviceById(id);
+    int32_t cfgId = static_cast<int32_t>(rsId);
+    std::string deviceName = GetInputDeviceById(cfgId);
     if (!deviceName.empty()) {
         inputDeviceName = deviceName;
     }
     BindInfo info = infos_->GetUnbindDisplay(inputDeviceName);
-    info.AddDisplay(id, name);
+    info.AddDisplay(rsId, displayId, name);
     infos_->Add(info);
     std::vector<std::string> cfgNodeNames;
-    GetInputNodeNamesByCfg(id, cfgNodeNames);
+    GetInputNodeNamesByCfg(cfgId, cfgNodeNames);
     if (!cfgNodeNames.empty()) {
         std::set<std::string> nodeNameSet(cfgNodeNames.begin(), cfgNodeNames.end());
-        infos_->BindDisplayByCfgNodes(id, name, nodeNameSet);
+        infos_->BindDisplayByCfgNodes(rsId, displayId, name, nodeNameSet);
     }
     Store();
-}
-
-void InputDisplayBindHelper::AddLocalDisplay(int32_t id, const std::string &name)
-{
-    CALL_DEBUG_ENTER;
-    MMI_HILOGD("Param: id:%{public}d, name:%{public}s", id, name.c_str());
-    CHKPV(infos_);
-
-    const auto &infos = infos_->GetInfos();
-    std::vector<std::string> unbindDevices;
-    for (const auto &info : infos) {
-        if (info.DisplayNotBind()) {
-            unbindDevices.push_back(info.GetInputDeviceName());
-            MMI_HILOGI("Unbind InputDevice, id:%{public}d, inputDevice:%{public}s",
-                info.GetInputDeviceId(), info.GetInputDeviceName().c_str());
-        }
-    }
-    
-    bool IsStore = false;
-    for (auto &item : unbindDevices) {
-        auto inputDeviceName = item;
-        std::string deviceName = GetInputDeviceById(id);
-        if (!deviceName.empty()) {
-            inputDeviceName = deviceName;
-        }
-        BindInfo info = infos_->GetUnbindDisplay(inputDeviceName);
-        info.AddDisplay(id, name);
-        infos_->Add(info);
-        IsStore = true;
-    }
-    if (IsStore) {
-        Store();
-    }
-    unbindDevices.clear();
 }
 
 std::string InputDisplayBindHelper::GetInputDeviceById(int32_t id)
@@ -656,6 +655,14 @@ void InputDisplayBindHelper::RemoveDisplay(int32_t id)
     infos_->UnbindDisplay(id);
 }
 
+void InputDisplayBindHelper::RemoveDisplayByRsId(uint64_t rsId)
+{
+    CALL_DEBUG_ENTER;
+    MMI_HILOGD("Param: rsId:%{public}llu", static_cast<unsigned long long>(rsId));
+    CHKPV(infos_);
+    infos_->UnbindDisplayByRsId(rsId);
+}
+
 void InputDisplayBindHelper::Store()
 {
     CALL_DEBUG_ENTER;
@@ -750,7 +757,7 @@ int32_t InputDisplayBindHelper::SetDisplayBind(int32_t deviceId, int32_t display
     BindInfo info1;
     info1.AddInputDevice(bindByDevice.GetInputDeviceId(), bindByDevice.GetInputNodeName(),
         bindByDevice.GetInputDeviceName());
-    info1.AddDisplay(bindByDisplay.GetDisplayId(), bindByDisplay.GetDisplayName());
+    info1.AddDisplay(bindByDisplay.GetRsId(), bindByDisplay.GetDisplayId(), bindByDisplay.GetDisplayName());
     infos_->Add(info1);
 
     if ((bindByDevice.GetDisplayId() != -1) && (bindByDisplay.GetInputDeviceId() != -1)) {
@@ -758,14 +765,14 @@ int32_t InputDisplayBindHelper::SetDisplayBind(int32_t deviceId, int32_t display
         BindInfo info2;
         info2.AddInputDevice(bindByDisplay.GetInputDeviceId(), bindByDisplay.GetInputNodeName(),
             bindByDisplay.GetInputDeviceName());
-        info2.AddDisplay(bindByDevice.GetDisplayId(), bindByDevice.GetDisplayName());
+        info2.AddDisplay(bindByDevice.GetRsId(), bindByDevice.GetDisplayId(), bindByDevice.GetDisplayName());
         infos_->Add(info2);
         return RET_OK;
     }
 
     if (bindByDevice.GetDisplayId() != -1) {
         MMI_HILOGD("The display id is invalid");
-        AddDisplay(bindByDevice.GetDisplayId(), bindByDevice.GetDisplayName());
+        AddDisplay(bindByDevice.GetRsId(), bindByDevice.GetDisplayId(), bindByDevice.GetDisplayName());
         return RET_OK;
     }
 
@@ -780,11 +787,12 @@ int32_t InputDisplayBindHelper::SetDisplayBind(int32_t deviceId, int32_t display
     return RET_ERR;
 }
 
-int32_t InputDisplayBindHelper::BindToDisplay(int32_t deviceId, int32_t displayId,
+int32_t InputDisplayBindHelper::BindToDisplay(int32_t deviceId, int32_t displayId, uint64_t rsId,
     const std::string &displayName, std::string &msg)
 {
     CALL_DEBUG_ENTER;
-    MMI_HILOGI("Param: deviceId:%{public}d, displayId:%{public}d", deviceId, displayId);
+    MMI_HILOGI("Param: deviceId:%{public}d, displayId:%{public}d, rsId:%{public}llu",
+        deviceId, displayId, static_cast<unsigned long long>(rsId));
     if ((deviceId == -1) || (displayId == -1)) {
         msg = "The deviceId or displayId is invalid";
         MMI_HILOGE("%{public}s", msg.c_str());
@@ -826,7 +834,10 @@ int32_t InputDisplayBindHelper::BindToDisplay(int32_t deviceId, int32_t displayI
     BindInfo info;
     info.AddInputDevice(bindByDevice.GetInputDeviceId(), bindByDevice.GetInputNodeName(),
         bindByDevice.GetInputDeviceName());
-    info.AddDisplay(displayId, displayName);
+    info.AddDisplay(rsId, displayId, displayName);
+    // BindToDisplay keys displayId_ by the logical id from the API; rsId_ carries the matching
+    // render id so the reconciler can match this entry in the rsId dimension (displayId != rsId in
+    // cockpit setups) instead of dropping it.
     info.SetBindToDisplayFlag(true);
     infos_->Add(info);
     return RET_OK;
