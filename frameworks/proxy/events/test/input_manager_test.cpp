@@ -6673,5 +6673,59 @@ HWTEST_F(InputManagerTest, InputManagerTest_BindToDisplay_001, TestSize.Level1)
     CALL_TEST_DEBUG;
     EXPECT_EQ(InputManager::GetInstance()->BindToDisplay(1, 0, nullptr), RET_ERR);
 }
+
+/**
+ * @tc.name: InputManagerTest_EnablePointerEventRecord_001
+ * @tc.desc: Test EnablePointerEventRecord with valid, clamped and invalid maxCount
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_EnablePointerEventRecord_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EXPECT_EQ(InputManager::GetInstance()->EnablePointerEventRecord(10), RET_OK);
+    EXPECT_EQ(InputManager::GetInstance()->DisablePointerEventRecord(), RET_OK);
+
+    EXPECT_EQ(InputManager::GetInstance()->EnablePointerEventRecord(101), RET_OK);
+    EXPECT_EQ(InputManager::GetInstance()->DisablePointerEventRecord(), RET_OK);
+
+    EXPECT_EQ(InputManager::GetInstance()->EnablePointerEventRecord(0), RET_ERR);
+    EXPECT_EQ(InputManager::GetInstance()->EnablePointerEventRecord(-1), RET_ERR);
+}
+
+/**
+ * @tc.name: InputManagerTest_DisablePointerEventRecord_001
+ * @tc.desc: Test DisablePointerEventRecord when enabled and when not enabled
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_DisablePointerEventRecord_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EXPECT_EQ(InputManager::GetInstance()->EnablePointerEventRecord(10), RET_OK);
+    EXPECT_EQ(InputManager::GetInstance()->DisablePointerEventRecord(), RET_OK);
+
+    EXPECT_EQ(InputManager::GetInstance()->DisablePointerEventRecord(), RET_OK);
+}
+
+/**
+ * @tc.name: InputManagerTest_GetPointerEventRecord_001
+ * @tc.desc: Test GetPointerEventRecord returns empty list when not recording
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_GetPointerEventRecord_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::vector<std::shared_ptr<PointerEvent>> records;
+    EXPECT_EQ(InputManager::GetInstance()->GetPointerEventRecord(records), RET_OK);
+    EXPECT_TRUE(records.empty());
+
+    EXPECT_EQ(InputManager::GetInstance()->EnablePointerEventRecord(10), RET_OK);
+    records.clear();
+    EXPECT_EQ(InputManager::GetInstance()->GetPointerEventRecord(records), RET_OK);
+    EXPECT_TRUE(records.empty());
+    EXPECT_EQ(InputManager::GetInstance()->DisablePointerEventRecord(), RET_OK);
+}
 } // namespace MMI
 } // namespace OHOS
