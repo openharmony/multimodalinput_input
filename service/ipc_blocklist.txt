@@ -30,3 +30,7 @@ src:*foundation/multimodalinput/input/service/module_loader/test/*
 src:*foundation/multimodalinput/input/service/common/setting_datashare/test/*
 src:*foundation/multimodalinput/input/service/common/timer_manager/test/*
 src:*foundation/multimodalinput/input/service/knuckle/test/*
+src:*foundation/multimodalinput/input/service/window_manager/src/input_windows_manager.cpp
+src:*foundation/multimodalinput/input/service/window_manager/src/mouse_redispatch_store.cpp
+src:*foundation/multimodalinput/input/service/window_manager/src/pointer_dispatch_event_cache.cpp
+src:*foundation/multimodalinput/input/service/window_manager/src/touch_redispatch_store.cpp

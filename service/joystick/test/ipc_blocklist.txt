@@ -12,4 +12,9 @@
 # limitations under the License.
 
 [cfi]
+src:*third_party/googletest/*
 src:*foundation/multimodalinput/input/service/joystick/test/*
+src:*foundation/multimodalinput/input/service/joystick/src/*
+src:*foundation/multimodalinput/input/service/common/timer_manager/src/*
+src:*foundation/multimodalinput/input/service/module_loader/src/*
+src:*foundation/multimodalinput/input/frameworks/proxy/event_handler/src/*
