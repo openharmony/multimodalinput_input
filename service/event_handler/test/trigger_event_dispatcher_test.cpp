@@ -13,6 +13,8 @@
  * limitations under the License.
  */
 
+#include <chrono>
+#include <thread>
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 

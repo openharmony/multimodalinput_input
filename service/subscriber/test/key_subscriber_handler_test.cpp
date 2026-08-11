@@ -21,6 +21,7 @@
 #include "key_option.h"
 #include "key_subscriber_handler.h"
 #include "key_shortcut_manager.h"
+#include "trigger_event_dispatcher.h"
 #ifdef OHOS_BUILD_ENABLE_CALL_MANAGER
 #include "call_manager_client.h"
 #endif // OHOS_BUILD_ENABLE_CALL_MANAGER
