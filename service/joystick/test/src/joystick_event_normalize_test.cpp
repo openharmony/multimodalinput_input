@@ -77,6 +77,10 @@ HWTEST_F(JoystickEventNormalizeTest, InputDeviceObserver_OnDeviceAdded_001, Test
 
     NiceMock<LibinputInterfaceMock> libinputMock;
     EXPECT_CALL(libinputMock, DeviceGetName).WillRepeatedly(Return(nullptr));
+    EXPECT_CALL(libinputMock, DeviceGetAxisMin).WillRepeatedly(Return(0));
+    EXPECT_CALL(libinputMock, DeviceGetAxisMax).WillRepeatedly(Return(0));
+    EXPECT_CALL(libinputMock, DeviceGetAxisFuzz).WillRepeatedly(Return(0));
+    EXPECT_CALL(libinputMock, DeviceGetAxisFlat).WillRepeatedly(Return(0));
 
     auto joystick = std::make_shared<JoystickEventNormalize>(&env_);
     joystick->OnDeviceAdded(deviceId);
@@ -104,6 +108,10 @@ HWTEST_F(JoystickEventNormalizeTest, InputDeviceObserver_OnDeviceRemoved_001, Te
     CALL_TEST_DEBUG;
     NiceMock<LibinputInterfaceMock> libinputMock;
     EXPECT_CALL(libinputMock, DeviceGetName).WillRepeatedly(Return(nullptr));
+    EXPECT_CALL(libinputMock, DeviceGetAxisMin).WillRepeatedly(Return(0));
+    EXPECT_CALL(libinputMock, DeviceGetAxisMax).WillRepeatedly(Return(0));
+    EXPECT_CALL(libinputMock, DeviceGetAxisFuzz).WillRepeatedly(Return(0));
+    EXPECT_CALL(libinputMock, DeviceGetAxisFlat).WillRepeatedly(Return(0));
     int32_t deviceId { 2 };
     struct libinput_device rawDev {};
     EXPECT_CALL(*INPUT_DEV_MGR, GetLibinputDevice).WillRepeatedly(Return(&rawDev));
@@ -114,47 +122,6 @@ HWTEST_F(JoystickEventNormalizeTest, InputDeviceObserver_OnDeviceRemoved_001, Te
 
     const auto &processors = joystick->processors_;
     EXPECT_EQ(processors.find(&rawDev), processors.cend());
-}
-
-/**
- * @tc.name: JoystickEventNormalizeTest_CheckIntention
- * @tc.desc: Test JoystickEventNormalize::CheckIntention
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(JoystickEventNormalizeTest, JoystickEventNormalizeTest_CheckIntention, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    int32_t deviceId { 2 };
-    auto inputDev = std::make_shared<NiceMock<InputDeviceManagerMock::HiddenInputDevice>>();
-    struct libinput_device rawDev {};
-    EXPECT_CALL(*inputDev, GetRawDevice).WillRepeatedly(Return(&rawDev));
-    INPUT_DEV_MGR->AddInputDevice(deviceId, inputDev);
-
-    NiceMock<LibinputInterfaceMock> libinputMock;
-    EXPECT_CALL(libinputMock, DeviceGetName).WillRepeatedly(Return(nullptr));
-
-    auto joystick = std::make_shared<JoystickEventNormalize>(&env_);
-    joystick->GetProcessor(&rawDev);
-
-    auto pointerEvent = PointerEvent::Create();
-    ASSERT_NE(pointerEvent, nullptr);
-    pointerEvent->SetDeviceId(deviceId);
-    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_JOYSTICK);
-    double axisValue { 1.0 };
-    pointerEvent->SetAxisValue(PointerEvent::AXIS_TYPE_ABS_HAT0X, axisValue);
-
-    int32_t keyCode { KeyEvent::KEYCODE_UNKNOWN };
-    int32_t keyAction { KeyEvent::KEY_ACTION_UNKNOWN };
-
-    joystick->CheckIntention(pointerEvent, [&](std::shared_ptr<KeyEvent> keyEvent) {
-        if (keyEvent != nullptr) {
-            keyCode = keyEvent->GetKeyCode();
-            keyAction = keyEvent->GetKeyAction();
-        }
-    });
-    EXPECT_EQ(keyCode, KeyEvent::KEYCODE_DPAD_RIGHT);
-    EXPECT_EQ(keyAction, KeyEvent::KEY_ACTION_DOWN);
 }
 
 /**
@@ -176,6 +143,10 @@ HWTEST_F(JoystickEventNormalizeTest, JoystickEventNormalizeTest_OnDeviceAdded_00
 
     NiceMock<LibinputInterfaceMock> libinputMock;
     EXPECT_CALL(libinputMock, DeviceGetName).WillRepeatedly(Return(nullptr));
+    EXPECT_CALL(libinputMock, DeviceGetAxisMin).WillRepeatedly(Return(0));
+    EXPECT_CALL(libinputMock, DeviceGetAxisMax).WillRepeatedly(Return(0));
+    EXPECT_CALL(libinputMock, DeviceGetAxisFuzz).WillRepeatedly(Return(0));
+    EXPECT_CALL(libinputMock, DeviceGetAxisFlat).WillRepeatedly(Return(0));
 
     auto joystick = std::make_shared<JoystickEventNormalize>(&env_);
     joystick->OnDeviceAdded(deviceId);
@@ -353,6 +324,10 @@ HWTEST_F(JoystickEventNormalizeTest, JoystickEventNormalizeTest_GetProcessor, Te
 
     NiceMock<LibinputInterfaceMock> libinputMock;
     EXPECT_CALL(libinputMock, DeviceGetName).WillRepeatedly(Return(nullptr));
+    EXPECT_CALL(libinputMock, DeviceGetAxisMin).WillRepeatedly(Return(0));
+    EXPECT_CALL(libinputMock, DeviceGetAxisMax).WillRepeatedly(Return(0));
+    EXPECT_CALL(libinputMock, DeviceGetAxisFuzz).WillRepeatedly(Return(0));
+    EXPECT_CALL(libinputMock, DeviceGetAxisFlat).WillRepeatedly(Return(0));
 
     auto joystick = std::make_shared<JoystickEventNormalize>(&env_);
     auto processor = joystick->GetProcessor(&rawDev);

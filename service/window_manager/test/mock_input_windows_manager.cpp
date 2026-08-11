@@ -13,9 +13,19 @@
  * limitations under the License.
  */
 
+#include "common_event_manager.h"
 #include "i_pointer_drawing_manager.h"
 #include "input_event_handler.h"
 #include "mock_input_windows_manager.h"
+
+namespace OHOS {
+namespace EventFwk {
+bool CommonEventManager::SubscribeCommonEvent(const std::shared_ptr<CommonEventSubscriber> &)
+{
+    return false;
+}
+} // namespace EventFwk
+} // namespace OHOS
 
 namespace OHOS {
 namespace MMI {
