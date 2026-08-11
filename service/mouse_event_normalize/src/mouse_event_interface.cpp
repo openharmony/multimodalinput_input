@@ -167,6 +167,16 @@ bool MouseEventInterface::NormalizeMoveMouse(int32_t offsetX, int32_t offsetY)
     return mouse->NormalizeMoveMouse(offsetX, offsetY);
 }
 
+void MouseEventInterface::NormalizeMoveToCenter()
+{
+    auto mouse = GetMouse();
+    if (mouse == nullptr) {
+        MMI_HILOGE("Mouse module not loaded");
+        return;
+    }
+    mouse->NormalizeMoveToCenter();
+}
+
 void MouseEventInterface::OnDisplayLost(int32_t displayId)
 {
     auto mouse = GetMouse();

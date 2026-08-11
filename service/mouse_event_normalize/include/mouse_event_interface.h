@@ -70,6 +70,7 @@ public:
 #endif // OHOS_BUILD_MOUSE_REPORTING_RATE
 #ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
     bool NormalizeMoveMouse(int32_t offsetX, int32_t offsetY);
+    void NormalizeMoveToCenter();
     void OnDisplayLost(int32_t displayId);
     int32_t GetDisplayId();
 #endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
