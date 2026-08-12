@@ -109,6 +109,7 @@ public:
     MOCK_METHOD(bool, UnregisterKeyMonitorCallback, (int32_t), (override, const));
     MOCK_METHOD(void, AddFlagForDevice, (libinput_event *event), (override));
     MOCK_METHOD(void, RemoveFlagForDevice, (libinput_event *event), (override));
+    MOCK_METHOD(double, ConvertVPToPX, (double vp), (override, const));
 #endif
 };
 

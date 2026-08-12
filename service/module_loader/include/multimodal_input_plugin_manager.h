@@ -115,6 +115,7 @@ public:
     bool UnregisterDisplayChangeCallback(int32_t callbackId) override;
     int32_t EnableInputDeviceForPlugin(int32_t deviceId) override;
     int32_t DisableInputDeviceForPlugin(int32_t deviceId) override;
+    double ConvertVPToPX(double vp) const override;
 
     int32_t prio_ = 200;
     std::function<void(PluginEventType, int64_t)> callback_;
