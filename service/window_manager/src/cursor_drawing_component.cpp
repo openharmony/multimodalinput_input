@@ -857,7 +857,7 @@ void CursorDrawingInformation::OnSessionLost(int32_t pid)
 
 bool CursorDrawingInformation::IsPointerVisible()
 {
-    auto delegateProxy =  POINTER_DEV_MGR.GetDelegateProxy();
+    auto delegateProxy = POINTER_DEV_MGR.GetDelegateProxy();
     CHKPF(delegateProxy);
     auto result = delegateProxy->OnPostSyncTask([] {
         auto isPointerVisible = CursorDrawingInformation::GetInstance().IsPointerVisibleInner();
