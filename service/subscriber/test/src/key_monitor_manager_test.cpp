@@ -363,9 +363,10 @@ HWTEST_F(KeyMonitorManagerTest, KeyMonitorManagerTest_Monitor_Dump, TestSize.Lev
         .key_ = KeyEvent::KEYCODE_VOLUME_DOWN,
         .action_ = KeyEvent::KEY_ACTION_DOWN,
         .isRepeat_ = false,
+        .userId_ = -1,
     };
     auto result = monitor.Dump();
-    EXPECT_EQ(result, "Session:1001,Key:17,Action:2,IsRepeat:false");
+    EXPECT_EQ(result, "Session:1001,Key:17,Action:2,IsRepeat:false,UserId:-1");
 }
 
 /**
@@ -382,9 +383,30 @@ HWTEST_F(KeyMonitorManagerTest, KeyMonitorManagerTest_Monitor_Dump_01, TestSize.
         .key_ = KeyEvent::KEYCODE_VOLUME_UP,
         .action_ = 999,
         .isRepeat_ = true,
+        .userId_ = -1,
     };
     auto result = monitor.Dump();
-    EXPECT_EQ(result, "Session:500,Key:16,Action:999,IsRepeat:true");
+    EXPECT_EQ(result, "Session:500,Key:16,Action:999,IsRepeat:true,UserId:-1");
+}
+
+/**
+ * @tc.name: KeyMonitorManagerTest_Monitor_Dump_02
+ * @tc.desc: Verify the Monitor Dump carries the owning userId when set
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyMonitorManagerTest, KeyMonitorManagerTest_Monitor_Dump_02, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyMonitorManager::Monitor monitor {
+        .session_ = 7,
+        .key_ = KeyEvent::KEYCODE_VOLUME_UP,
+        .action_ = KeyEvent::KEY_ACTION_DOWN,
+        .isRepeat_ = false,
+        .userId_ = 100,
+    };
+    auto result = monitor.Dump();
+    EXPECT_EQ(result, "Session:7,Key:16,Action:2,IsRepeat:false,UserId:100");
 }
 
 /**
@@ -1349,6 +1371,33 @@ HWTEST_F(KeyMonitorManagerTest, KeyMonitorManagerTest_GetSubscribedKeysByPid_05,
  
     std::vector<int32_t> result2 = keyMonitorManager->GetSubscribedKeysByPid(200);
     EXPECT_NE(std::find(result2.begin(), result2.end(), KeyEvent::KEYCODE_VOLUME_DOWN), result2.end());
+}
+
+/**
+ * @tc.name: KeyMonitorManagerTest_Intercept_UserIdFallback_001
+ * @tc.desc: When the event has no display (eventUserId < 0) the per-user filter is skipped, so a
+ *           monitor carrying a specific userId still participates like a global one.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyMonitorManagerTest, KeyMonitorManagerTest_Intercept_UserIdFallback_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<KeyMonitorManager> keyMonitorManager = std::make_shared<KeyMonitorManager>();
+    KeyMonitorManager::Monitor monitor {
+        .session_ = 0,
+        .key_ = KeyEvent::KEYCODE_VOLUME_UP,
+        .action_ = KeyEvent::KEY_ACTION_DOWN,
+        .isRepeat_ = true,
+        .userId_ = 100,
+    };
+    keyMonitorManager->monitors_.emplace(monitor);
+    EXPECT_EQ(keyMonitorManager->monitors_.size(), 1);
+
+    std::shared_ptr<KeyEvent> keyEvent = std::make_shared<KeyEvent>(monitor.key_);
+    keyEvent->SetKeyCode(monitor.key_);
+    keyEvent->SetKeyAction(monitor.action_);
+    EXPECT_FALSE(keyMonitorManager->Intercept(keyEvent));
 }
 } // namespace MMI
 } // namespace OHOS

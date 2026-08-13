@@ -93,7 +93,7 @@ public:
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 #ifdef OHOS_BUILD_ENABLE_KEY_PRESSED_HANDLER
     int32_t SubscribeKeyMonitor(int32_t session,
-        const KeyMonitorOption &keyOption, const std::string &bundleName);
+        const KeyMonitorOption &keyOption, const std::string &bundleName, int32_t userId);
     int32_t UnsubscribeKeyMonitor(int32_t session,
         const KeyMonitorOption &keyOption, const std::string &bundleName);
 #endif // OHOS_BUILD_ENABLE_KEY_PRESSED_HANDLER
