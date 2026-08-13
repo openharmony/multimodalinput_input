@@ -5545,7 +5545,7 @@ ErrCode MMIService::SetUIExtensionCustomCursor(int32_t windowId, const CustomCur
     const CursorOptionsParcel& cOptionParcel, const sptr<IRemoteObject> &token)
 {
     CALL_DEBUG_ENTER;
-    ret = SetCustomCursorInner(windowId, curParcel, cOptionParcel, token);
+    int32_t ret = SetCustomCursorInner(windowId, curParcel, cOptionParcel, token);
     if (ret != RET_OK) {
         if (ret != ERROR_PIXELMAP_MANAGED) {
             Media::PixelMap *pixelMap = static_cast<Media::PixelMap*>(curParcel.pixelMap);
