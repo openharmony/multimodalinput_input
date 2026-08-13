@@ -857,12 +857,15 @@ void CursorDrawingInformation::OnSessionLost(int32_t pid)
 
 bool CursorDrawingInformation::IsPointerVisible()
 {
-    auto delegateProxy =  CursorDrawingComponent::GetInstance().GetDelegateProxy();
+    auto delegateProxy =  POINTER_DEV_MGR.GetDelegateProxy();
     CHKPF(delegateProxy);
     auto result = delegateProxy->OnPostSyncTask([] {
         auto isPointerVisible = CursorDrawingInformation::GetInstance().IsPointerVisibleInner();
         return isPointerVisible ? 0 : -1;
     });
+    if (result == ETASKS_WAIT_TIMEOUT) {
+        MMI_HILOGW("IsPointerVisible task timeout");
+    }
     return (result == 0) ? true : false;
 }
 
