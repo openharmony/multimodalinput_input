@@ -51,6 +51,22 @@ void EventNormalizeHandlerTestWithMock::TearDown()
     JoystickEventInterface::ReleaseInstance();
 }
 
+#ifdef OHOS_BUILD_ENABLE_TOUCHPAD
+/**
+ * @tc.name: SwipeInwardValidAngle_001
+ * @tc.desc: Accept inward swipes within 30 degrees of the horizontal axis.
+ * @tc.type: FUNC
+ */
+HWTEST_F(EventNormalizeHandlerTestWithMock, SwipeInwardValidAngle_001, TestSize.Level1)
+{
+    EventNormalizeHandler handler;
+
+    EXPECT_TRUE(handler.SwipeInwardValidAngle(5.0, 2.0));
+    EXPECT_FALSE(handler.SwipeInwardValidAngle(5.0, 3.0));
+    EXPECT_FALSE(handler.SwipeInwardValidAngle(0.0, 5.0));
+}
+#endif // OHOS_BUILD_ENABLE_TOUCHPAD
+
 struct InputEventHandlerMock : public IInputEventHandler {
     InputEventHandlerMock() = default;
     virtual ~InputEventHandlerMock() = default;

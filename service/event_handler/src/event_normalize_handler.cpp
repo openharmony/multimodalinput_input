@@ -72,13 +72,15 @@ constexpr int32_t SWIPE_INWARD_FINGER_ONE { 1 };
 constexpr int32_t USELIB_ABS_MT_POSITION_X { 0x35 };
 constexpr int32_t USELIB_ABS_MT_POSITION_Y { 0x36 };
 constexpr double SWIPE_INWARD_EDGE_X_THRE { 5.0 };
-constexpr double SWIPE_INWARD_SPEED_THRE { 0.00005 };
+constexpr double SWIPE_INWARD_SPEED_THRE { 0.000080 }; // 80mm/s
+constexpr double SWIPE_INWARD_DISTANCE_THRE { 8.0 }; // 8mm
 constexpr int32_t SWIPE_INWARD_TIME_THRE { 60000 };
 constexpr int32_t TABLET_PRODUCT_DEVICE_ID { 4274 };
 constexpr int32_t BLE_PRODUCT_DEVICE_ID { 4307 };
 constexpr int32_t PHONE_PRODUCT_DEVICE_ID { 4261 };
 constexpr int64_t FREETOUCH_GES_BLOCK_THRETHOLD { MS2US(800) };
 constexpr uint32_t TOUCHPAD_FEATURE_SWIPEINWARD { 1 << 3 };
+constexpr double SWIPE_INWARD_MAX_TAN { 0.5774 }; // tan(30 degrees)
 #endif // OHOS_BUILD_ENABLE_TOUCHPAD
 constexpr int64_t PLUGIN_TIME_THRESHOLD { MS2US(3000) };
 const std::string TOUCHPAD_TYPE = OHOS::system::GetParameter("const.settings.clickpad_type", "0");
@@ -774,7 +776,8 @@ int32_t EventNormalizeHandler::HandleTouchPadEvent(libinput_event* event)
     }
     buttonIds_.insert(seatSlot);
     if (buttonIds_.size() >= FINGER_NUM && g_isSwipeInward) {
-        MMI_HILOGD("More than one finger, cancel swipeInward");
+        MMI_HILOGI("SwipeInward failed: multi-finger detected, fingerCount:%{public}zu, "
+            "cancel swipeInward", buttonIds_.size());
         pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_CANCEL);
         pointerEvent->SetFingerCount(SWIPE_INWARD_FINGER_ONE);
         nextHandler_->HandlePointerEvent(pointerEvent);
@@ -1254,8 +1257,7 @@ void EventNormalizeHandler::TerminateAxis(libinput_event* event)
 #endif // OHOS_BUILD_ENABLE_POINTER
 }
 #ifdef OHOS_BUILD_ENABLE_TOUCHPAD
-bool EventNormalizeHandler::JudgeIfSwipeInward(std::shared_ptr<PointerEvent> pointerEvent,
-    enum libinput_event_type type, libinput_event* event)
+void EventNormalizeHandler::HandleTpRegister(enum libinput_event_type type)
 {
     if (tpRegisterTryCount_ > 0 && type == LIBINPUT_EVENT_TOUCHPAD_DOWN) {
         tpRegisterTryCount_--;
@@ -1263,42 +1265,80 @@ bool EventNormalizeHandler::JudgeIfSwipeInward(std::shared_ptr<PointerEvent> poi
             TOUCHPAD_MGR->RegisterTpObserver(ACCOUNT_MGR->GetCurrentAccountSetting().GetAccountId());
         }
     }
+}
 
-    if (!TOUCHPAD_MGR->SupportSwipeInward()) {
+bool EventNormalizeHandler::IsGestureBlocked()
+{
+    int64_t curTime = GetSysClockTime();
+    if (curTime - g_lastKeyboardEventTime < FREETOUCH_GES_BLOCK_THRETHOLD && g_isSwipeInward == false) {
+        MMI_HILOGI("SwipeInward failed: blocked by recent keyboard event, timeDiff:%{public}lldus, "
+            "threshold:%{public}lldus",
+            static_cast<long long>(GetSysClockTime() - g_lastKeyboardEventTime),
+            static_cast<long long>(FREETOUCH_GES_BLOCK_THRETHOLD));
+        return true;
+    }
+    return false;
+}
+
+bool EventNormalizeHandler::InitSwipeInwardEdge(std::shared_ptr<PointerEvent> pointerEvent,
+    enum libinput_event_type type, libinput_event* event)
+{
+    if (g_isSwipeInward != false ||
+        type != LIBINPUT_EVENT_TOUCHPAD_DOWN ||
+        pointerEvent->GetAllPointerItems().size() != SWIPE_INWARD_FINGER_ONE) {
         return false;
     }
-    if (GetSysClockTime() - g_lastKeyboardEventTime < FREETOUCH_GES_BLOCK_THRETHOLD && g_isSwipeInward == false) {
+    auto touchPadDevice = libinput_event_get_device(event);
+    // product isolation
+    uint32_t touchPadDeviceId = libinput_device_get_id_product(touchPadDevice);
+    if (touchPadDeviceId != TABLET_PRODUCT_DEVICE_ID &&
+        touchPadDeviceId != BLE_PRODUCT_DEVICE_ID &&
+        touchPadDeviceId != PHONE_PRODUCT_DEVICE_ID &&
+        IsNumeric(TOUCHPAD_TYPE) &&
+        (std::stoul(TOUCHPAD_TYPE) & TOUCHPAD_FEATURE_SWIPEINWARD) != TOUCHPAD_FEATURE_SWIPEINWARD) {
+        MMI_HILOGI("SwipeInward failed: product isolated, productId:%{public}u, "
+            "touchpadType:%{public}s", touchPadDeviceId, TOUCHPAD_TYPE.c_str());
+        return true;
+    }
+    // get touchpad physic size
+    if (libinput_device_get_size(touchPadDevice, &g_touchPadDeviceWidth, &g_touchPadDeviceHeight)) {
+        MMI_HILOGW("SwipeInward failed: get touchpad physic size error");
+    }
+    // get touchpad max axis size
+    g_touchPadDeviceAxisX = libinput_device_get_axis_max(touchPadDevice, USELIB_ABS_MT_POSITION_X);
+    g_touchPadDeviceAxisY = libinput_device_get_axis_max(touchPadDevice, USELIB_ABS_MT_POSITION_Y);
+    double curPosX = pointerEvent->GetAllPointerItems().begin()->GetDisplayXPos();
+    currentPointDownPosY_ = pointerEvent->GetAllPointerItems().begin()->GetDisplayYPos();
+    // start postion in edge
+    if (curPosX > SWIPE_INWARD_EDGE_X_THRE && curPosX < g_touchPadDeviceWidth - SWIPE_INWARD_EDGE_X_THRE) {
+        MMI_HILOGI("SwipeInward failed: down position not in edge area, curPosX:%{public}f, "
+            "edgeThre:%{public}f, deviceWidth:%{public}f", curPosX, SWIPE_INWARD_EDGE_X_THRE,
+            g_touchPadDeviceWidth);
+        return true;
+    }
+    // update start down x postion
+    currentPointDownPosX_ = curPosX;
+    currentPointDownTime_ = GetSysClockTime();
+    return true;
+}
+
+bool EventNormalizeHandler::JudgeIfSwipeInward(std::shared_ptr<PointerEvent> pointerEvent,
+    enum libinput_event_type type, libinput_event* event)
+{
+    HandleTpRegister(type);
+
+    if (!TOUCHPAD_MGR->SupportSwipeInward()) {
+        MMI_HILOGI("SwipeInward failed: touchpad does not support swipeInward");
+        return false;
+    }
+    if (IsGestureBlocked()) {
         return false;
     }
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHPAD);
     pointerEvent->SetFingerCount(SWIPE_INWARD_FINGER_ONE);
-    if (g_isSwipeInward == false &&
-        type == LIBINPUT_EVENT_TOUCHPAD_DOWN &&
-        pointerEvent->GetAllPointerItems().size() == SWIPE_INWARD_FINGER_ONE) {
-        auto touchPadDevice = libinput_event_get_device(event);
-        // product isolation
-        uint32_t touchPadDeviceId = libinput_device_get_id_product(touchPadDevice);
-        if (IsSwipeInwardProductIsolated(touchPadDeviceId)) {
-            return g_isSwipeInward;
-        }
-        // get touchpad physic size
-        if (libinput_device_get_size(touchPadDevice, &g_touchPadDeviceWidth, &g_touchPadDeviceHeight)) {
-            MMI_HILOGD("JudgeIfSwipeInward, get touchPad physic size error");
-        }
-        // get touchpad max axis size
-        g_touchPadDeviceAxisX = libinput_device_get_axis_max(touchPadDevice, USELIB_ABS_MT_POSITION_X);
-        g_touchPadDeviceAxisY = libinput_device_get_axis_max(touchPadDevice, USELIB_ABS_MT_POSITION_Y);
-        double curPosX = pointerEvent->GetAllPointerItems().begin()->GetDisplayXPos();
-        // start postion in edge
-        if (curPosX > SWIPE_INWARD_EDGE_X_THRE && curPosX < g_touchPadDeviceWidth - SWIPE_INWARD_EDGE_X_THRE) {
-            return g_isSwipeInward;
-        }
-        // update start down x postion
-        currentPointDownPosX_ = curPosX;
-        currentPointDownTime_ = GetSysClockTime();
+    if (InitSwipeInwardEdge(pointerEvent, type, event)) {
         return g_isSwipeInward;
     }
-
     if (g_isSwipeInward == false && type == LIBINPUT_EVENT_TOUCHPAD_MOTION) {
         SwipeInwardSpeedJudge(pointerEvent);
     }
@@ -1310,43 +1350,60 @@ bool EventNormalizeHandler::JudgeIfSwipeInward(std::shared_ptr<PointerEvent> poi
     return g_isSwipeInward;
 }
 
-bool EventNormalizeHandler::IsSwipeInwardProductIsolated(uint32_t touchPadDeviceId)
-{
-    if (touchPadDeviceId == TABLET_PRODUCT_DEVICE_ID ||
-        touchPadDeviceId == BLE_PRODUCT_DEVICE_ID ||
-        touchPadDeviceId == PHONE_PRODUCT_DEVICE_ID) {
-        return false;
-    }
-    if (!IsNumeric(TOUCHPAD_TYPE)) {
-        return false;
-    }
-    return (std::stoul(TOUCHPAD_TYPE) & TOUCHPAD_FEATURE_SWIPEINWARD) != TOUCHPAD_FEATURE_SWIPEINWARD;
-}
-
 void EventNormalizeHandler::SwipeInwardButtonJudge(std::shared_ptr<PointerEvent> pointerEvent)
 {
     if (g_buttonPressed) {
-        MMI_HILOGD("Button pressed, response button, cancel swipeInward");
+        MMI_HILOGI("SwipeInward failed: button pressed during swipe, cancel swipeInward");
         pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_CANCEL);
         nextHandler_->HandlePointerEvent(pointerEvent);
         g_isSwipeInward = false;
     }
 }
 
+bool EventNormalizeHandler::SwipeInwardValidAngle(double dx, double dy)
+{
+    // Calculate the angle between the swipe direction and the horizontal axis.
+    double absDx = std::fabs(dx);
+    double absDy = std::fabs(dy);
+    if (absDx < std::numeric_limits<double>::epsilon()) {
+        MMI_HILOGI("SwipeInward failed: pure vertical swipe, dx:%{public}f, dy:%{public}f", dx, dy);
+        return false;
+    }
+    double tanAngle = absDy / absDx;
+    if (tanAngle > SWIPE_INWARD_MAX_TAN) {
+        MMI_HILOGI("SwipeInward failed: angle too steep, tan:%{public}f(maxTan:%{public}f), "
+            "dx:%{public}f, dy:%{public}f", tanAngle, SWIPE_INWARD_MAX_TAN, dx, dy);
+        return false;
+    }
+    return true;
+}
+
 void EventNormalizeHandler::SwipeInwardSpeedJudge(std::shared_ptr<PointerEvent> pointerEvent)
 {
     int64_t curTime = GetSysClockTime();
     double curMovePosX = pointerEvent->GetAllPointerItems().begin()->GetDisplayXPos();
+    double curMovePosY = pointerEvent->GetAllPointerItems().begin()->GetDisplayYPos();
     if (curTime - currentPointDownTime_ > SWIPE_INWARD_TIME_THRE || curTime - currentPointDownTime_ == 0) {
+        MMI_HILOGD("SwipeInward failed: time threshold not met, timeDiff:%{public}lldus, "
+            "threshold:%{public}dus",
+            static_cast<long long>(curTime - currentPointDownTime_),
+            SWIPE_INWARD_TIME_THRE);
         return;
     }
     double swipeSpeed = std::fabs(curMovePosX - currentPointDownPosX_)/(curTime - currentPointDownTime_);
-    if (swipeSpeed > SWIPE_INWARD_SPEED_THRE) {
+    double moveDistanceX = std::fabs(curMovePosX - currentPointDownPosX_);
+    double moveDistanceY = std::fabs(curMovePosY - currentPointDownPosY_);
+    if (swipeSpeed > SWIPE_INWARD_SPEED_THRE && moveDistanceX > SWIPE_INWARD_DISTANCE_THRE &&
+        SwipeInwardValidAngle(moveDistanceX, moveDistanceY)) {
         g_isSwipeInward = true;
 
         MMI_HILOGI("Touchpad swipeInward action");
         pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
         DfxHisysevent::ReportTouchpadSwipeInwardEvent();
+    } else {
+        MMI_HILOGI("SwipeInward failed: speed/distance/angle check failed, speed:%{public}f(speedThre:%{public}f), "
+            "distX:%{public}f(distThre:%{public}f), distY:%{public}f",
+            swipeSpeed, SWIPE_INWARD_SPEED_THRE, moveDistanceX, SWIPE_INWARD_DISTANCE_THRE, moveDistanceY);
     }
 }
 
@@ -1356,7 +1413,8 @@ void EventNormalizeHandler::SwipeInwardProcess(std::shared_ptr<PointerEvent> poi
     int32_t pointerId = pointerEvent->GetPointerId();
     PointerEvent::PointerItem pointerItem;
     if (!pointerEvent->GetPointerItem(pointerId, pointerItem)) {
-        MMI_HILOGD("judgeIfSwipeInward, Can't find pointerItem");
+        MMI_HILOGW("SwipeInward failed: can't find pointerItem, pointerId:%{public}d, "
+            "cancel swipeInward", pointerId);
         g_isSwipeInward = false;
         return;
     }
