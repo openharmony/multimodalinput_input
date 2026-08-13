@@ -5526,10 +5526,16 @@ ErrCode MMIService::SetCustomCursor(int32_t windowId, const CustomCursorParcel& 
     const CursorOptionsParcel& cOptionParcel)
 {
     CALL_DEBUG_ENTER;
-    if (auto ret = SetCustomCursorInner(windowId, curParcel, cOptionParcel, nullptr); ret != RET_OK) {
-        Media::PixelMap *pixelMap = static_cast<Media::PixelMap*>(curParcel.pixelMap);
-        delete pixelMap;
-        MMI_HILOGE("SetCustomCursor failed, release resource");
+    int32_t ret = SetCustomCursorInner(windowId, curParcel, cOptionParcel, nullptr);
+    if (ret != RET_OK) {
+        if (ret != ERROR_PIXELMAP_MANAGED) {
+            Media::PixelMap *pixelMap = static_cast<Media::PixelMap*>(curParcel.pixelMap);
+            delete pixelMap;
+            MMI_HILOGE("SetCustomCursor failed, release resource");
+        } else {
+            MMI_HILOGE("SetCustomCursor failed after pixelMap managed, no need to release");
+            ret = RET_ERR;  // Convert back to RET_ERR for client compatibility
+        }
         return ret;
     }
     return RET_OK;
@@ -5539,10 +5545,16 @@ ErrCode MMIService::SetUIExtensionCustomCursor(int32_t windowId, const CustomCur
     const CursorOptionsParcel& cOptionParcel, const sptr<IRemoteObject> &token)
 {
     CALL_DEBUG_ENTER;
-    if (auto ret = SetCustomCursorInner(windowId, curParcel, cOptionParcel, token); ret != RET_OK) {
-        Media::PixelMap *pixelMap = static_cast<Media::PixelMap*>(curParcel.pixelMap);
-        delete pixelMap;
-        MMI_HILOGE("SetCustomCursor failed, release resource");
+    ret = SetCustomCursorInner(windowId, curParcel, cOptionParcel, token);
+    if (ret != RET_OK) {
+        if (ret != ERROR_PIXELMAP_MANAGED) {
+            Media::PixelMap *pixelMap = static_cast<Media::PixelMap*>(curParcel.pixelMap);
+            delete pixelMap;
+            MMI_HILOGE("SetCustomCursorInner failed, release resource");
+        } else {
+            MMI_HILOGE("SetCustomCursorInner failed after pixelMap managed, no need to release");
+            ret = RET_ERR;  // Convert back to RET_ERR for client compatibility
+        }
         return ret;
     }
     return RET_OK;
