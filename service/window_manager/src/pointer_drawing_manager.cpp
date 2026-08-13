@@ -2143,7 +2143,7 @@ int32_t PointerDrawingManager::SetCustomCursor(CursorPixelMap curPixelMap,
 
     ret = CursorDrawingInformation::GetInstance().SetPointerStyle(GetCurrentUser(), pid, windowId, style);
     if (ret == RET_ERR) {
-        ret = ERROR_PIXELMAP_MANAGED
+        ret = ERROR_PIXELMAP_MANAGED;
         MMI_HILOGE("SetPointerStyle is failed");
     }
     MMI_HILOGD("style.id:%{public}d, userIconHotSpotX_:%{private}d, userIconHotSpotY_:%{private}d",
@@ -3922,7 +3922,7 @@ int32_t PointerDrawingManager::SetCustomCursor(int32_t pid, int32_t windowId, Cu
     lastMouseStyle_ = style;
     ret = CursorDrawingInformation::GetInstance().SetPointerStyle(GetCurrentUser(), pid, windowId, style, token);
     if (ret == RET_ERR) {
-        ret = ERROR_PIXELMAP_MANAGED
+        ret = ERROR_PIXELMAP_MANAGED;
         MMI_HILOGE("SetPointerStyle is failed");
     }
     MMI_HILOGD("style.id:%{public}d, userIconHotSpotX_:%{private}d, userIconHotSpotY_:%{private}d",
