@@ -8839,6 +8839,34 @@ bool InputWindowsManager::GetCachedDisplayGroupInfo(int32_t groupId, OLD::Displa
     return true;
 }
 
+bool InputWindowsManager::HasAddedCoordinationDisplay(const OLD::DisplayGroupInfo &oldGroupInfo,
+    const OLD::DisplayGroupInfo &newGroupInfo) const
+{
+    CALL_DEBUG_ENTER;
+    for (const auto &newDisplay : newGroupInfo.displaysInfo) {
+        const auto *oldDisplay = FindDisplayById(oldGroupInfo.displaysInfo, newDisplay.id);
+        if (oldDisplay == nullptr && newDisplay.displayMode == OHOS::MMI::DisplayMode::COORDINATION) {
+            MMI_HILOGI("Added display is in COORDINATION mode, displayId:%{public}d", newDisplay.id);
+            return true;
+        }
+    }
+    return false;
+}
+
+bool InputWindowsManager::HasRemovedCoordinationDisplay(const OLD::DisplayGroupInfo &oldGroupInfo,
+    const OLD::DisplayGroupInfo &newGroupInfo) const
+{
+    CALL_DEBUG_ENTER;
+    for (const auto &oldDisplay : oldGroupInfo.displaysInfo) {
+        const auto *newDisplay = FindDisplayById(newGroupInfo.displaysInfo, oldDisplay.id);
+        if (newDisplay == nullptr && oldDisplay.displayMode == OHOS::MMI::DisplayMode::COORDINATION) {
+            MMI_HILOGI("Removed display was in COORDINATION mode, displayId:%{public}d", oldDisplay.id);
+            return true;
+        }
+    }
+    return false;
+}
+
 bool InputWindowsManager::IsBackCenterDisplayChange(const OLD::DisplayGroupInfo &oldGroupInfo,
     const OLD::DisplayGroupInfo &newGroupInfo, bool hasOldGroupInfo) const
 {
@@ -8854,6 +8882,22 @@ bool InputWindowsManager::IsBackCenterDisplayChange(const OLD::DisplayGroupInfo 
     if (oldGroupInfo.displaysInfo.size() != newGroupInfo.displaysInfo.size()) {
         const char *reason = oldGroupInfo.displaysInfo.size() > newGroupInfo.displaysInfo.size() ?
             "DISPLAY_REMOVED" : "DISPLAY_ADDED";
+
+        // Check if the display change involves COORDINATION mode
+        bool skipBackCenter = false;
+        if (oldGroupInfo.displaysInfo.size() < newGroupInfo.displaysInfo.size()) {
+            // Display added scenario
+            skipBackCenter = HasAddedCoordinationDisplay(oldGroupInfo, newGroupInfo);
+        } else {
+            // Display removed scenario
+            skipBackCenter = HasRemovedCoordinationDisplay(oldGroupInfo, newGroupInfo);
+        }
+
+        if (skipBackCenter) {
+            MMI_HILOGI("Skip cursor center reset due to COORDINATION mode display change");
+            return false;
+        }
+
         MMI_HILOGD("Pointer back center triggered, reason:%{public}s, oldSize:%{public}zu, "
             "newSize:%{public}zu", reason, oldGroupInfo.displaysInfo.size(), newGroupInfo.displaysInfo.size());
         return true;

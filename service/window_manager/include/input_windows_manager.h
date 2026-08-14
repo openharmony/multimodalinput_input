@@ -499,6 +499,10 @@ void HandleOneHandMode(const OLD::DisplayInfo &displayInfo, std::shared_ptr<Poin
     bool IsValidDisplayChange(const OLD::DisplayInfo &displayInfo);
     void UpdateKeyEventDisplayId(std::shared_ptr<KeyEvent> keyEvent, int32_t focusWindowId, int32_t groupId = DEFAULT_GROUP_ID);
     bool OnDisplayRemovedOrCombinationChanged(const OLD::DisplayGroupInfo &displayGroupInfo);
+    bool HasAddedCoordinationDisplay(const OLD::DisplayGroupInfo &oldGroupInfo,
+        const OLD::DisplayGroupInfo &newGroupInfo) const;
+    bool HasRemovedCoordinationDisplay(const OLD::DisplayGroupInfo &oldGroupInfo,
+        const OLD::DisplayGroupInfo &newGroupInfo) const;
     bool IsBackCenterDisplayChange(const OLD::DisplayGroupInfo &oldGroupInfo,
         const OLD::DisplayGroupInfo &newGroupInfo, bool hasOldGroupInfo) const;
     bool HasDisplayGroupInfoChanged(const OLD::DisplayGroupInfo &oldGroupInfo,
