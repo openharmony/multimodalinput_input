@@ -31,6 +31,7 @@ namespace OHOS {
 namespace MMI {
 namespace {
 constexpr int32_t INVALID_DEVICE_ID { -1 };
+constexpr int32_t INVALID_KEY_CODE { -1 };
 constexpr int32_t OPEN_AUTO_REPEAT { 1 };
 constexpr int32_t DEFAULT_KEY_REPEAT_DELAY { 500 };
 constexpr int32_t MIN_KEY_REPEAT_DELAY { 300 };
@@ -112,18 +113,24 @@ void KeyAutoRepeat::SelectAutoRepeat(const std::shared_ptr<KeyEvent>& keyEvent)
             }
             TimerMgr->RemoveTimer(timerId_);
             keyEvent_->SetRepeatKey(false);
+            keyEvent_->SetRepeatCount(0);
             timerId_ = -1;
             repeatKeyCode_ = -1;
+            repeatCount_ = 0;
         }
         int32_t delayTime = GetDelayTime(WIN_MGR->FindDisplayUserId(keyEvent_->GetTargetDisplayId()));
         keyEvent_->SetRepeatKey(true);
+        keyEvent_->SetRepeatCount(0);
+        repeatCount_ = 0;
         AddHandleTimer(delayTime);
         repeatKeyCode_ = keyEvent_->GetKeyCode();
     }
     if (JudgeKeyEvent(keyEvent_) && TimerMgr->IsExist(timerId_)) {
         TimerMgr->RemoveTimer(timerId_);
         keyEvent_->SetRepeatKey(false);
+        keyEvent_->SetRepeatCount(0);
         timerId_ = -1;
+        repeatCount_ = 0;
         if (!JudgeLimitPrint(keyEvent_)) {
             MMI_HILOGI("Stop autorepeat, code:%{private}d, repeatKeyCode:%{private}d, keyAction:%{public}d",
                 keyEvent_->GetKeyCode(), repeatKeyCode_, keyEvent_->GetKeyAction());
@@ -147,6 +154,8 @@ void KeyAutoRepeat::SelectAutoRepeat(const std::shared_ptr<KeyEvent>& keyEvent)
             keyEvent_->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
             int32_t delayTime = GetDelayTime(WIN_MGR->FindDisplayUserId(keyEvent_->GetTargetDisplayId()));
             keyEvent_->SetRepeatKey(true);
+            keyEvent_->SetRepeatCount(0);
+            repeatCount_ = 0;
             AddHandleTimer(delayTime);
             if (!JudgeLimitPrint(keyEvent_)) {
                 MMI_HILOGD("The end keyboard autorepeat:%{private}d", keyEvent_->GetKeyCode());
@@ -155,6 +164,7 @@ void KeyAutoRepeat::SelectAutoRepeat(const std::shared_ptr<KeyEvent>& keyEvent)
             }
         } else {
             repeatKeyCode_ = -1;
+            repeatCount_ = 0;
         }
     }
 }
@@ -168,6 +178,7 @@ void KeyAutoRepeat::AddHandleTimer(int32_t timeout)
         auto inputEventNormalizeHandler = InputHandler->GetEventNormalizeHandler();
         CHKPV(inputEventNormalizeHandler);
         LogTracer lt(this->keyEvent_->GetId(), this->keyEvent_->GetEventType(), this->keyEvent_->GetKeyAction());
+        this->keyEvent_->SetRepeatCount(++repeatCount_);
         inputEventNormalizeHandler->HandleKeyEvent(this->keyEvent_);
         this->keyEvent_->UpdateId();
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
@@ -235,6 +246,10 @@ void KeyAutoRepeat::RemoveTimer()
     CALL_DEBUG_ENTER;
     TimerMgr->RemoveTimer(timerId_);
     timerId_ = -1;
+    repeatCount_ = 0;
+    if (keyEvent_ != nullptr) {
+        keyEvent_->SetRepeatCount(0);
+    }
 }
 
 int32_t KeyAutoRepeat::SetKeyboardRepeatDelay(int32_t userId, int32_t delay)
@@ -331,6 +346,12 @@ int32_t KeyAutoRepeat::GetConfigDataFromDatabase(int32_t userId, std::string &ke
 void KeyAutoRepeat::SetRepeatKeyCode(int32_t code)
 {
     repeatKeyCode_ = code;
+    if (code == INVALID_KEY_CODE) {
+        repeatCount_ = 0;
+        if (keyEvent_ != nullptr) {
+            keyEvent_->SetRepeatCount(0);
+        }
+    }
 }
 } // namespace MMI
 } // namespace OHOS

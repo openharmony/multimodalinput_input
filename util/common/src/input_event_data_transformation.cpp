@@ -49,11 +49,12 @@ int32_t InputEventDataTransformation::KeyEventToNetPacket(
     pkt << size;
     for (const auto &item : keys) {
         pkt << item.GetKeyCode() << item.GetDownTime()
-            << item.GetDeviceId() << item.IsPressed() << item.GetUnicode();
+            << item.GetDeviceId() << item.IsPressed() << item.GetUnicode() << item.GetRawCode();
     }
     pkt << key->GetFunctionKey(KeyEvent::NUM_LOCK_FUNCTION_KEY)
         << key->GetFunctionKey(KeyEvent::CAPS_LOCK_FUNCTION_KEY)
-        << key->GetFunctionKey(KeyEvent::SCROLL_LOCK_FUNCTION_KEY);
+        << key->GetFunctionKey(KeyEvent::SCROLL_LOCK_FUNCTION_KEY)
+        << key->GetRawCode() << key->GetRepeatCount();
     if (pkt.ChkRWError()) {
         MMI_HILOGE("Packet write key event failed");
         return RET_ERR;
@@ -67,26 +68,11 @@ int32_t InputEventDataTransformation::NetPacketToKeyEvent(NetPacket &pkt, std::s
         MMI_HILOGE("Deserialize input event failed");
         return RET_ERR;
     }
-    int32_t data = 0;
-    pkt >> data;
-    key->SetKeyCode(data);
-    pkt >> data;
-    key->SetKeyAction(data);
-    pkt >> data;
-    key->SetKeyIntention(data);
-    bool isRepeatKey { false };
-    pkt >> isRepeatKey;
-    key->SetRepeatKey(isRepeatKey);
     int32_t size = 0;
-    pkt >> size;
-    if (size > MAX_KEY_SIZE) {
-        MMI_HILOGE("Key exceeds the max range");
+    if (ReadKeyEventBaseInfo(pkt, key, size) != RET_OK) {
         return RET_ERR;
     }
-    if (pkt.ChkRWError()) {
-        MMI_HILOGE("Packet read size failed");
-        return RET_ERR;
-    }
+    int32_t data = 0;
     bool isPressed = false;
     for (int32_t i = 0; i < size; i++) {
         KeyEvent::KeyItem keyItem;
@@ -106,9 +92,40 @@ int32_t InputEventDataTransformation::NetPacketToKeyEvent(NetPacket &pkt, std::s
         uint32_t unicode;
         pkt >> unicode;
         keyItem.SetUnicode(unicode);
+        pkt >> data;
+        keyItem.SetRawCode(data);
         key->AddKeyItem(keyItem);
     }
     ReadFunctionKeys(pkt, key);
+    pkt >> data;
+    key->SetRawCode(data);
+    pkt >> data;
+    key->SetRepeatCount(data);
+    return RET_OK;
+}
+
+int32_t InputEventDataTransformation::ReadKeyEventBaseInfo(NetPacket &pkt, std::shared_ptr<KeyEvent> key, int32_t &size)
+{
+    CHKPR(key, RET_ERR);
+    int32_t data = 0;
+    pkt >> data;
+    key->SetKeyCode(data);
+    pkt >> data;
+    key->SetKeyAction(data);
+    pkt >> data;
+    key->SetKeyIntention(data);
+    bool isRepeatKey { false };
+    pkt >> isRepeatKey;
+    key->SetRepeatKey(isRepeatKey);
+    pkt >> size;
+    if (size > MAX_KEY_SIZE) {
+        MMI_HILOGE("Key exceeds the max range");
+        return RET_ERR;
+    }
+    if (pkt.ChkRWError()) {
+        MMI_HILOGE("Packet read size failed");
+        return RET_ERR;
+    }
     return RET_OK;
 }
 

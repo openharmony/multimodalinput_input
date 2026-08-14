@@ -937,6 +937,16 @@ void KeyEvent::KeyItem::SetKeyCode(int32_t keyCode)
     keyCode_ = keyCode;
 }
 
+int32_t KeyEvent::KeyItem::GetRawCode() const
+{
+    return rawCode_;
+}
+
+void KeyEvent::KeyItem::SetRawCode(int32_t rawCode)
+{
+    rawCode_ = rawCode;
+}
+
 int64_t KeyEvent::KeyItem::GetDownTime() const
 {
     // LCOV_EXCL_START
@@ -990,6 +1000,7 @@ bool KeyEvent::KeyItem::WriteToParcel(Parcel &out) const
     WRITEINT32(out, deviceId_);
     WRITEINT32(out, keyCode_);
     WRITEUINT32(out, unicode_);
+    WRITEINT32(out, rawCode_);
     return true;
 }
 
@@ -1000,6 +1011,7 @@ bool KeyEvent::KeyItem::ReadFromParcel(Parcel &in)
     READINT32(in, deviceId_);
     READINT32(in, keyCode_);
     READUINT32(in, unicode_);
+    READINT32(in, rawCode_);
     return true;
 }
 
@@ -1015,6 +1027,7 @@ KeyEvent::KeyEvent(int32_t eventType) : InputEvent(eventType) {}
 KeyEvent::KeyEvent(const KeyEvent& other)
     : InputEvent(other),
       keyCode_(other.keyCode_),
+      rawCode_(other.rawCode_),
       keys_(other.keys_),
       keyAction_(other.keyAction_),
       keyIntention_(other.keyIntention_),
@@ -1025,7 +1038,8 @@ KeyEvent::KeyEvent(const KeyEvent& other)
       enhanceData_(other.enhanceData_),
 #endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
       repeat_(other.repeat_),
-      repeatKey_(other.repeatKey_) {}
+      repeatKey_(other.repeatKey_),
+      repeatCount_(other.repeatCount_) {}
 
 KeyEvent::~KeyEvent() {}
 
@@ -1041,6 +1055,7 @@ void KeyEvent::Reset()
     // LCOV_EXCL_START
     InputEvent::Reset();
     keyCode_ = KeyEvent::UNKNOWN_FUNCTION_KEY;
+    rawCode_ = -1;
     keyAction_ = KeyEvent::KEY_ACTION_UNKNOWN;
     keyIntention_ = KeyEvent::INTENTION_UNKNOWN;
     numLock_ = false;
@@ -1048,6 +1063,7 @@ void KeyEvent::Reset()
     scrollLock_ = false;
     repeat_ = false;
     repeatKey_ = false;
+    repeatCount_ = 0;
     keys_.clear();
 #ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
     enhanceData_.clear();
@@ -1060,6 +1076,10 @@ std::string KeyEvent::ToString()
     std::string eventStr = InputEvent::ToString();
     eventStr += ",keyCode:";
     eventStr += std::to_string(keyCode_);
+    eventStr += ",rawCode:";
+    eventStr += std::to_string(rawCode_);
+    eventStr += ",repeatCount:";
+    eventStr += std::to_string(repeatCount_);
     eventStr += ",keyAction:";
     eventStr += std::to_string(keyAction_);
     eventStr += ",keyItems:[";
@@ -1071,6 +1091,8 @@ std::string KeyEvent::ToString()
         eventStr += std::to_string(keys_[i].GetDeviceId());
         eventStr += ",keyCode:";
         eventStr += std::to_string(keys_[i].GetKeyCode());
+        eventStr += ",rawCode:";
+        eventStr += std::to_string(keys_[i].GetRawCode());
         eventStr += ",downTime:";
         eventStr += std::to_string(keys_[i].GetDownTime());
         eventStr += ",unicode:";
@@ -1098,6 +1120,26 @@ int32_t KeyEvent::GetKeyCode() const
 void KeyEvent::SetKeyCode(int32_t keyCode)
 {
     keyCode_ = keyCode;
+}
+
+int32_t KeyEvent::GetRawCode() const
+{
+    return rawCode_;
+}
+
+void KeyEvent::SetRawCode(int32_t rawCode)
+{
+    rawCode_ = rawCode;
+}
+
+int32_t KeyEvent::GetRepeatCount() const
+{
+    return repeatCount_;
+}
+
+void KeyEvent::SetRepeatCount(int32_t repeatCount)
+{
+    repeatCount_ = repeatCount < 0 ? 0 : repeatCount;
 }
 
 int32_t KeyEvent::GetKeyAction() const
@@ -1355,6 +1397,8 @@ bool KeyEvent::WriteToParcel(Parcel &out) const
         WRITEUINT32(out, enhanceData_[i]);
     }
 #endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
+    WRITEINT32(out, rawCode_);
+    WRITEINT32(out, repeatCount_);
     return true;
 }
 
@@ -1392,6 +1436,8 @@ bool KeyEvent::ReadFromParcel(Parcel &in)
         return false;
     }
 #endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
+    READINT32(in, rawCode_);
+    READINT32(in, repeatCount_);
     return true;
 }
 

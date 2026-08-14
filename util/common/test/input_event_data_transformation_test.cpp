@@ -22,6 +22,7 @@ namespace MMI {
 namespace {
 using namespace testing::ext;
 using namespace OHOS;
+constexpr int64_t TEST_KEY_DOWN_TIME { 100 };
 } // namespace
 
 class InputEventDataTransformationTest : public testing::Test {
@@ -160,6 +161,42 @@ HWTEST_F(InputEventDataTransformationTest, LongPressEventToNetPacket, TestSize.L
     NetPacket pkt(MmiMessageId::ON_SUBSCRIBE_SWITCH);
     auto ret = InputEventDataTransformation::LongPressEventToNetPacket(longPressEvent, pkt);
     ASSERT_EQ(ret, RET_OK);
+}
+
+/**
+ * @tc.name: KeyEventToNetPacket
+ * @tc.desc: Test key event serialization
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputEventDataTransformationTest, KeyEventToNetPacket, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_A);
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+    keyEvent->SetRawCode(30);
+    keyEvent->SetRepeatCount(2);
+
+    KeyEvent::KeyItem item;
+    item.SetKeyCode(KeyEvent::KEYCODE_A);
+    item.SetDownTime(TEST_KEY_DOWN_TIME);
+    item.SetPressed(true);
+    item.SetRawCode(30);
+    keyEvent->AddKeyItem(item);
+
+    NetPacket pkt(MmiMessageId::ON_KEY_EVENT);
+    ASSERT_EQ(InputEventDataTransformation::KeyEventToNetPacket(keyEvent, pkt), RET_OK);
+
+    auto outEvent = KeyEvent::Create();
+    ASSERT_NE(outEvent, nullptr);
+    ASSERT_EQ(InputEventDataTransformation::NetPacketToKeyEvent(pkt, outEvent), RET_OK);
+    EXPECT_EQ(outEvent->GetRawCode(), 30);
+    EXPECT_EQ(outEvent->GetRepeatCount(), 2);
+    auto outItem = outEvent->GetKeyItem(KeyEvent::KEYCODE_A);
+    ASSERT_TRUE(outItem.has_value());
+    EXPECT_EQ(outItem->GetRawCode(), 30);
 }
 
 /**

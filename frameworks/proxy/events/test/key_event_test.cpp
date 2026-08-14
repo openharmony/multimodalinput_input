@@ -29,6 +29,7 @@ namespace OHOS {
 namespace MMI {
 namespace {
 using namespace testing::ext;
+constexpr int64_t TEST_KEY_DOWN_TIME { 100 };
 } // namespace
 
 class KeyEventTest : public testing::Test {
@@ -229,6 +230,87 @@ HWTEST_F(KeyEventTest, KeyEventTest_OnCheckKeyEvent_006, TestSize.Level1)
     ASSERT_TRUE(keyEvent->IsValid());
     std::vector<KeyEvent::KeyItem> items = keyEvent->GetKeyItems();
     TestUtil->DumpInputEvent(keyEvent);
+}
+
+/**
+ * @tc.name: KeyEventTest_GetRawCode_001
+ * @tc.desc: Verify default rawCode and repeatCount
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyEventTest, KeyEventTest_GetRawCode_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    EXPECT_EQ(keyEvent->GetRawCode(), -1);
+    EXPECT_EQ(keyEvent->GetRepeatCount(), 0);
+    keyEvent->SetRepeatCount(3);
+    EXPECT_EQ(keyEvent->GetRepeatCount(), 3);
+    keyEvent->SetRepeatCount(-1);
+    EXPECT_EQ(keyEvent->GetRepeatCount(), 0);
+
+    KeyEvent::KeyItem item;
+    EXPECT_EQ(item.GetRawCode(), -1);
+}
+
+/**
+ * @tc.name: KeyEventTest_GetRawCode_002
+ * @tc.desc: Verify rawCode and repeatCount parcel
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyEventTest, KeyEventTest_GetRawCode_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_A);
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+    keyEvent->SetRawCode(30);
+    keyEvent->SetRepeatCount(2);
+
+    KeyEvent::KeyItem item;
+    item.SetKeyCode(KeyEvent::KEYCODE_A);
+    item.SetDownTime(TEST_KEY_DOWN_TIME);
+    item.SetPressed(true);
+    item.SetRawCode(30);
+    keyEvent->AddKeyItem(item);
+
+    MessageParcel data;
+    ASSERT_TRUE(keyEvent->WriteToParcel(data));
+    auto outEvent = KeyEvent::Create();
+    ASSERT_NE(outEvent, nullptr);
+    ASSERT_TRUE(outEvent->ReadFromParcel(data));
+    EXPECT_EQ(outEvent->GetRawCode(), 30);
+    EXPECT_EQ(outEvent->GetRepeatCount(), 2);
+    auto outItem = outEvent->GetKeyItem(KeyEvent::KEYCODE_A);
+    ASSERT_TRUE(outItem.has_value());
+    EXPECT_EQ(outItem->GetRawCode(), 30);
+}
+
+/**
+ * @tc.name: KeyEventTest_GetRawCode_003
+ * @tc.desc: Verify cloned and reset key event preserve rawCode and repeatCount rules
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyEventTest, KeyEventTest_GetRawCode_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    keyEvent->SetRawCode(31);
+    keyEvent->SetRepeatCount(4);
+
+    auto clonedEvent = KeyEvent::Clone(keyEvent);
+    ASSERT_NE(clonedEvent, nullptr);
+    EXPECT_EQ(clonedEvent->GetRawCode(), 31);
+    EXPECT_EQ(clonedEvent->GetRepeatCount(), 4);
+
+    keyEvent->Reset();
+    EXPECT_EQ(keyEvent->GetRawCode(), -1);
+    EXPECT_EQ(keyEvent->GetRepeatCount(), 0);
 }
 
 /**

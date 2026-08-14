@@ -3349,6 +3349,21 @@ public:
         void SetKeyCode(int32_t keyCode);
 
         /**
+         * @brief Obtains the raw key code of the key.
+         * @return Returns the raw key code.
+         * @since 26.0.0
+         */
+        int32_t GetRawCode() const;
+
+        /**
+         * @brief Sets a raw key code for the key.
+         * @param rawCode Indicates the raw key code to set.
+         * @return void
+         * @since 26.0.0
+         */
+        void SetRawCode(int32_t rawCode);
+
+        /**
          * @brief Obtains the time when the key is pressed.
          * @return Returns the time.
          * @since 9
@@ -3431,6 +3446,7 @@ public:
         bool pressed_ = false;
         int32_t deviceId_ = -1;
         int32_t keyCode_ = -1;
+        int32_t rawCode_ = -1;
         int64_t downTime_ = 0;
         uint32_t unicode_ { 0 };
     };
@@ -3503,6 +3519,21 @@ public:
      * @since 9
      */
     void SetKeyCode(int32_t keyCode);
+
+    /**
+     * @brief Obtains the raw key code of this key event.
+     * @return Returns the raw key code.
+     * @since 26.0.0
+     */
+    int32_t GetRawCode() const;
+
+    /**
+     * @brief Sets a raw key code for this key event.
+     * @param rawCode Indicates the raw key code to set.
+     * @return void
+     * @since 26.0.0
+     */
+    void SetRawCode(int32_t rawCode);
 
     /**
      * @brief Obtains the key action of this key event.
@@ -3658,6 +3689,21 @@ public:
      */
     void SetRepeatKey(bool repeatKey);
 
+    /**
+     * @brief Gets the repeat count of the current key event.
+     * @return Returns the repeat count.
+     * @since 26.0.0
+     */
+    int32_t GetRepeatCount() const;
+
+    /**
+     * @brief Sets the repeat count of the current key event.
+     * @param repeatCount Indicates the repeat count to set.
+     * @return void
+     * @since 26.0.0
+     */
+    void SetRepeatCount(int32_t repeatCount);
+
     bool IsKeyPressed(int32_t keyCode) const;
 
     bool HasKeyItem(int32_t keyCode) const;
@@ -3739,6 +3785,7 @@ private:
 
 private:
     int32_t keyCode_ { -1 };
+    int32_t rawCode_ { -1 };
     std::vector<KeyItem> keys_;
     int32_t keyAction_ { 0 };
     int32_t keyIntention_ { -1 };
@@ -3750,6 +3797,7 @@ private:
 #endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
     bool repeat_ { false };
     bool repeatKey_ { false };
+    int32_t repeatCount_ { 0 };
     bool fourceMonitorFlag_ { false };
 };
 } // namespace MMI
