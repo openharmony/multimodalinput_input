@@ -211,6 +211,7 @@ struct IPluginContext {
     virtual bool UnregisterDisplayChangeCallback(int32_t callbackId) = 0;
     virtual int32_t EnableInputDeviceForPlugin(int32_t deviceId) = 0;
     virtual int32_t DisableInputDeviceForPlugin(int32_t deviceId) = 0;
+    virtual double ConvertVPToPX(double vp) const = 0;
 };
 
 inline bool checkPluginEventNull(PluginEventType &event)

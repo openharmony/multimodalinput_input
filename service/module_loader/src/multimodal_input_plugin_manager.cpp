@@ -1485,5 +1485,27 @@ void InputPluginManager::NotifyDisplayChange()
     }
     MMI_HILOGI("Notified %{public}zu display change callbacks", allCallbacks.size());
 }
+
+double InputPlugin::ConvertVPToPX(double vp) const
+{
+    if (vp <= 0) {
+        return 0.0;
+    }
+    if (WIN_MGR == nullptr) {
+        MMI_HILOGE("Window manager is null");
+        return 0.0;
+    }
+    auto displayInfo = WIN_MGR->GetDefaultDisplayInfo();
+    if (displayInfo == nullptr) {
+        MMI_HILOGE("displayInfo is null");
+        return 0.0;
+    }
+    int32_t dpi = displayInfo->dpi;
+    if (dpi <= 0) {
+        return 0.0;
+    }
+    const double base = 160.0;
+    return vp * (dpi / base);
+}
 } // namespace MMI
 } // namespace OHOS
