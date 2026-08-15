@@ -2133,13 +2133,13 @@ HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_BindToDisplay_00
 }
 
 /**
- * @tc.name: InputDisplayBindHelperTest_BindToDisplay_CockpitRsId
- * @tc.desc: BindToDisplay stores the logical displayId and the rsId separately. In a cockpit setup
- *           (logical id != rsId) the logical id is exposed via GetBindDisplayIdByInputDevice, while
+ * @tc.name: InputDisplayBindHelperTest_BindToDisplay_DistinctRsId
+ * @tc.desc: BindToDisplay stores the logical displayId and the rsId separately. When logical id !=
+ *           rsId, the logical id is exposed via GetBindDisplayIdByInputDevice, while
  *           GetDisplayIdNames reports the entry in the rsId dimension the reconciler matches on.
  * @tc.type: FUNC
  */
-HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_BindToDisplay_CockpitRsId, TestSize.Level1)
+HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_BindToDisplay_DistinctRsId, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     InputDisplayBindHelperTest::WriteConfigFile("");
@@ -2147,7 +2147,7 @@ HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_BindToDisplay_Co
     idh.Load();
     idh.AddInputDevice(1, "input0", "mouse");
     std::string msg;
-    // Cockpit: logical display id 5 != rsId 8.
+    // logical display id 5 != rsId 8.
     EXPECT_EQ(idh.BindToDisplay(1, 5, 8, "default5", msg), RET_OK);
     // Routing / app-facing id is the logical display id, not the rsId.
     EXPECT_EQ(idh.GetBindDisplayIdByInputDevice(1), 5);

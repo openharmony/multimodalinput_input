@@ -17,6 +17,7 @@
 #define POINTER_DRAWING_MANAGER_H
 
 #include <unordered_set>
+#include <unordered_map>
 #include "transaction/rs_transaction.h"
 #include "transaction/rs_interfaces.h"
 
@@ -41,6 +42,16 @@ constexpr float HARDWARE_CANVAS_SIZE { 512.0f };
 } // namespace
 
 using ScreenPointersIter = std::unordered_map<uint64_t, std::shared_ptr<ScreenPointer>>::iterator;
+
+struct GroupCursorContext {
+    std::shared_ptr<Rosen::RSUIDirector> rsUIDirector;
+    std::shared_ptr<Rosen::RSUIContext> rsUIContext;
+    std::shared_ptr<Rosen::RSSurfaceNode> surfaceNode;
+    std::shared_ptr<Rosen::RSCanvasNode> canvasNode;
+    int32_t lastPhysicalX { -1 };
+    int32_t lastPhysicalY { -1 };
+    bool visible { false };
+};
 
 struct PixelMapReleaseContext {
     explicit PixelMapReleaseContext(std::shared_ptr<Media::PixelMap> pixelMap) : pixelMap_(pixelMap) {}
@@ -147,7 +158,8 @@ public:
     bool HasMagicCursor();
     int32_t DrawCursor(const MOUSE_ICON mouseStyle);
     int32_t SwitchPointerStyle() override;
-    void DrawMovePointer(uint64_t rsId, int32_t physicalX, int32_t physicalY) override;
+    void DrawMovePointer(uint64_t rsId, int32_t physicalX, int32_t physicalY,
+        int32_t groupId = 0, bool multiDefaultGroup = false) override;
     void OnSwitchUser(int32_t userId) override;
     std::vector<std::vector<std::string>> GetDisplayInfo(OLD::DisplayInfo &di);
     void Dump(int32_t fd, const std::vector<std::string> &args) override;
@@ -157,6 +169,7 @@ public:
     void SubscribeScreenModeChange(uint64_t tid = 0) override;
     void RegisterDisplayStatusReceiver() override;
     OLD::DisplayInfo GetCurrentDisplayInfo() override;
+    int32_t GetCursorGroupId() override;
 #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
     int32_t GetPointerSnapshot(void *pixelMapPtr) override;
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
@@ -239,6 +252,10 @@ private:
     void ForceClearPointerVisibleStatus() override;
     int32_t UpdateSurfaceNodeBounds(int32_t physicalX, int32_t physicalY);
     void CreateCanvasNode();
+    void SaveActiveGroupToMap();
+    void RestoreGroupFromMap(int32_t groupId);
+    bool CreateGroupContext(int32_t groupId, uint64_t rsId);
+    void ClearGroupCursorCtxMap();
     bool SetCursorLocation(int32_t physicalX, int32_t physicalY);
     std::shared_ptr<OHOS::Media::PixelMap> GetUserIconCopy(bool setSurfaceNode = true);
     void SetSurfaceNodeBounds();
@@ -255,7 +272,8 @@ private:
     void PostMoveRetryTask(std::function<void()> task);
     int32_t FlushBuffer();
     int32_t GetSurfaceInformation();
-    void UpdateBindDisplayId(uint64_t rsId) override;
+    void UpdateBindDisplayId(uint64_t rsId, int32_t groupId = 0, bool multiDefaultGroup = false) override;
+    void UpdateBindDisplayIdForMultiGroup(uint64_t rsId, int32_t groupId);
     bool ShouldSkipScreen(const sptr<OHOS::Rosen::ScreenInfo> &screen);
     sptr<OHOS::Rosen::ScreenInfo> UpdateScreenPointerAndFindMainScreenInfo(
         const std::vector<sptr<OHOS::Rosen::ScreenInfo>> &screens);
@@ -355,6 +373,8 @@ private:
     std::shared_ptr<Rosen::RSUIContext> rsUIContext_;
     std::shared_ptr<Rosen::RSSurfaceNode> surfaceNode_;
     std::shared_ptr<Rosen::RSCanvasNode> canvasNode_;
+    std::unordered_map<int32_t, GroupCursorContext> groupCursorCtxMap_;
+    int32_t activeGroupId_ { -1 };
     int32_t userIconHotSpotX_ { 0 };
     int32_t userIconHotSpotY_ { 0 };
     int32_t tempPointerColor_ { -1 };

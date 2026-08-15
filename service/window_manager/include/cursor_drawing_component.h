@@ -48,7 +48,7 @@ public:
     void DrawPointer(uint64_t displayId, int32_t physicalX, int32_t physicalY,
         const PointerStyle pointerStyle, Direction direction);
     void UpdateDisplayInfo(const OLD::DisplayInfo &displayInfo);
-    void UpdateBindDisplayId(uint64_t rsId);
+    void UpdateBindDisplayId(uint64_t rsId, int32_t groupId = 0, bool multiDefaultGroup = false);
     void OnDisplayInfo(const OLD::DisplayGroupInfo &displayGroupInfo, bool isDisplayChanged = false);
     void OnWindowInfo(const WinInfo &info);
     bool Init();
@@ -79,13 +79,15 @@ public:
     IconStyle GetIconStyle(const MOUSE_ICON mouseStyle);
     const std::map<MOUSE_ICON, IconStyle>& GetMouseIconPath();
     int32_t SwitchPointerStyle();
-    void DrawMovePointer(uint64_t displayId, int32_t physicalX, int32_t physicalY);
+    void DrawMovePointer(uint64_t displayId, int32_t physicalX, int32_t physicalY,
+        int32_t groupId = 0, bool multiDefaultGroup = false);
     void Dump(int32_t fd, const std::vector<std::string> &args);
     void InitPointerCallback();
     void InitScreenInfo();
     int32_t EnableHardwareCursorStats(int32_t pid, bool enable);
     int32_t GetHardwareCursorStats(int32_t pid, uint32_t &frameCount, uint32_t &vsyncCount);
     OLD::DisplayInfo GetCurrentDisplayInfo();
+    int32_t GetCursorGroupId();
     void ForceClearPointerVisibleStatus();
     void InitPointerObserver();
     void OnSessionLost(int32_t pid);

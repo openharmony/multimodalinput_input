@@ -201,6 +201,9 @@ public:
 #endif // OHOS_BUILD_ENABLE_ANCO_GAME_EVENT_MAPPING
     MOCK_METHOD(OLD::DisplayGroupInfo&, GetDefaultDisplayGroupInfo, ());
     MOCK_METHOD(std::vector<PluginDisplayGroupInfo>, GetDisplayGroupInfos, ());
+    MOCK_METHOD(bool, HasPointerDeviceBoundToRsId, (uint64_t), (const));
+    MOCK_METHOD(int32_t, FindGroupIdByRsId, (uint64_t), (const));
+    MOCK_METHOD(bool, HasMultipleActiveUsers, (), (const));
     static std::shared_ptr<InputWindowsManagerMock> GetInstance();
     static void ReleaseInstance();
 

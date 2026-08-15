@@ -192,6 +192,9 @@ public:
         int32_t deviceId) = 0;
     virtual int32_t SetCurrentUser(int32_t userId) = 0;
     virtual DisplayMode GetDisplayMode() const = 0;
+    virtual bool HasPointerDeviceBoundToRsId(uint64_t rsId) const = 0;
+    virtual int32_t FindGroupIdByRsId(uint64_t rsId) const = 0;
+    virtual bool HasMultipleActiveUsers() const = 0;
     virtual void SetWindowStateNotifyPid(int32_t userId, int32_t pid) = 0;
     virtual int32_t GetWindowStateNotifyPid(int32_t userId) = 0;
     virtual int32_t GetPidByDisplayIdAndWindowId(int32_t displayId, int32_t windowId) = 0;

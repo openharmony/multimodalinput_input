@@ -453,6 +453,22 @@ std::set<std::pair<uint64_t, std::string>> InputDisplayBindHelper::GetDisplayIdN
     return idNames;
 }
 
+std::vector<int32_t> InputDisplayBindHelper::GetInputDeviceIdsByRsId(uint64_t rsId) const
+{
+    std::vector<int32_t> deviceIds;
+    if (infos_ == nullptr) {
+        MMI_HILOGE("infos_ is null");
+        return deviceIds;
+    }
+    const auto &infos = infos_->GetInfos();
+    for (const auto &info : infos) {
+        if ((info.GetRsId() == rsId) && !info.InputDeviceNotBind()) {
+            deviceIds.push_back(info.GetInputDeviceId());
+        }
+    }
+    return deviceIds;
+}
+
 void InputDisplayBindHelper::AddDisplay(uint64_t rsId, int32_t displayId, const std::string &name)
 {
     CALL_DEBUG_ENTER;
@@ -836,8 +852,8 @@ int32_t InputDisplayBindHelper::BindToDisplay(int32_t deviceId, int32_t displayI
         bindByDevice.GetInputDeviceName());
     info.AddDisplay(rsId, displayId, displayName);
     // BindToDisplay keys displayId_ by the logical id from the API; rsId_ carries the matching
-    // render id so the reconciler can match this entry in the rsId dimension (displayId != rsId in
-    // cockpit setups) instead of dropping it.
+    // render id so the reconciler can match this entry in the rsId dimension (displayId != rsId)
+    // instead of dropping it.
     info.SetBindToDisplayFlag(true);
     infos_->Add(info);
     return RET_OK;

@@ -5183,5 +5183,58 @@ HWTEST_F(PointerDrawingManagerTest, PointerDrawingManagerTest_CalculateRenderDir
     result = pointerDrawingManager.CalculateRenderDirection(false, sp);
     EXPECT_EQ(result, Direction::DIRECTION270);
 }
+
+/**
+ * @tc.name: PointerDrawingManagerTest_UpdateBindDisplayId_MultiGroup_LegacyGate_001
+ * @tc.desc: multiDefaultGroup=false must keep the per-group cache empty (single-group legacy path).
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerTest, PointerDrawingManagerTest_UpdateBindDisplayId_MultiGroup_LegacyGate_001,
+    TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerDrawingManager pointerDrawingManager;
+    pointerDrawingManager.lastDisplayId_ = 0;
+    pointerDrawingManager.surfaceNode_ = nullptr;
+    pointerDrawingManager.activeGroupId_ = -1;
+    // single-group path: cache must stay empty, lastDisplayId_ advances via the legacy tail.
+    pointerDrawingManager.UpdateBindDisplayId(1, 0, false);
+    EXPECT_TRUE(pointerDrawingManager.groupCursorCtxMap_.empty());
+    EXPECT_EQ(pointerDrawingManager.lastDisplayId_, static_cast<uint64_t>(1));
+}
+
+/**
+ * @tc.name: PointerDrawingManagerTest_UpdateBindDisplayId_MultiGroup_Smoke_001
+ * @tc.desc: multiDefaultGroup=true cross-rsId switch must not crash even without a real RS
+ *           (CreateGroupContext fails and rolls back; full node creation needs a live RS).
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerTest, PointerDrawingManagerTest_UpdateBindDisplayId_MultiGroup_Smoke_001,
+    TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerDrawingManager pointerDrawingManager;
+    pointerDrawingManager.lastDisplayId_ = 10;
+    pointerDrawingManager.surfaceNode_ = nullptr;
+    pointerDrawingManager.activeGroupId_ = -1;
+    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.UpdateBindDisplayId(20, 5, true));
+}
+
+/**
+ * @tc.name: PointerDrawingManagerTest_GetCursorGroupId_001
+ * @tc.desc: GetCursorGroupId reflects the active multi-group cursor state (-1 when unset)
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerTest, PointerDrawingManagerTest_GetCursorGroupId_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerDrawingManager pointerDrawingManager;
+    EXPECT_EQ(pointerDrawingManager.GetCursorGroupId(), -1);
+    pointerDrawingManager.activeGroupId_ = 5;
+    EXPECT_EQ(pointerDrawingManager.GetCursorGroupId(), 5);
+}
 } // namespace MMI
 } // namespace OHOS

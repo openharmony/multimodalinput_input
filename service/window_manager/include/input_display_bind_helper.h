@@ -91,6 +91,7 @@ public:
     void RemoveInputDevice(int32_t id);
     bool IsDisplayAdd(uint64_t id, const std::string &name);
     std::set<std::pair<uint64_t, std::string>> GetDisplayIdNames() const;
+    std::vector<int32_t> GetInputDeviceIdsByRsId(uint64_t rsId) const;
     void AddDisplay(uint64_t rsId, int32_t displayId, const std::string &name);
     void RemoveDisplay(int32_t id);
     void RemoveDisplayByRsId(uint64_t rsId);
