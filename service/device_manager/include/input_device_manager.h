@@ -223,7 +223,6 @@ private:
     void NotifyDevCallbackExt(int32_t deviceId, struct libinput_device *inputDevice);
     void NotifyDevRemoveCallbackExt(int32_t deviceId);
 #endif // OHOS_BUILD_ENABLE_KEYBOARD_EXT_FLAG
-    int32_t GetTouchscreenKeyboardType(const InputDeviceInfo &deviceInfo, int32_t &keyboardType);
     int32_t GetVirtualKeyboardType(int32_t deviceId, int32_t &keyboardType);
     void PointerDeviceInit();
     void NotifyDeviceAdded(int32_t deviceId) const;
