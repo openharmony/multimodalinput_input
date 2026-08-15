@@ -15,7 +15,9 @@
 
 #include "key_subscriber_handler.h"
 
+#include "account_manager.h"
 #include "app_state_observer.h"
+#include "i_input_windows_manager.h"
 #include "bytrace_adapter.h"
 #include "trigger_event_dispatcher.h"
 #ifdef OHOS_BUILD_ENABLE_CALL_MANAGER
@@ -274,7 +276,7 @@ int32_t KeySubscriberHandler::RemoveKeyGestureSubscriber(SessionPtr sess, int32_
 
 #ifdef SHORTCUT_KEY_MANAGER_ENABLED
 int32_t KeySubscriberHandler::RegisterSystemKey(std::shared_ptr<KeyOption> option,
-    int32_t session, std::function<void(std::shared_ptr<KeyEvent>)> callback)
+    int32_t session, std::function<void(std::shared_ptr<KeyEvent>)> callback, int32_t userId)
 {
     KeyShortcutManager::SystemShortcutKey sysKey {
         .modifiers = option->GetPreKeys(),
@@ -284,6 +286,7 @@ int32_t KeySubscriberHandler::RegisterSystemKey(std::shared_ptr<KeyOption> optio
                                                    KeyShortcutManager::SHORTCUT_TRIGGER_TYPE_UP),
         .session = session,
         .callback = callback,
+        .userId = userId,
     };
     if (KeyShortcutManager::IsModifier(sysKey.finalKey) &&
         !sysKey.modifiers.empty() &&
@@ -298,7 +301,7 @@ int32_t KeySubscriberHandler::RegisterSystemKey(std::shared_ptr<KeyOption> optio
 }
 
 int32_t KeySubscriberHandler::RegisterHotKey(std::shared_ptr<KeyOption> option,
-    int32_t session, std::function<void(std::shared_ptr<KeyEvent>)> callback)
+    int32_t session, std::function<void(std::shared_ptr<KeyEvent>)> callback, int32_t userId)
 {
     KeyShortcutManager::HotKey hotKey {
         .modifiers = option->GetPreKeys(),
@@ -306,6 +309,7 @@ int32_t KeySubscriberHandler::RegisterHotKey(std::shared_ptr<KeyOption> option,
         .longPressTime = option->GetFinalKeyDownDuration(),
         .session = session,
         .callback = callback,
+        .userId = userId,
     };
     return KEY_SHORTCUT_MGR->RegisterHotKey(hotKey);
 }
@@ -380,20 +384,21 @@ int32_t KeySubscriberHandler::AddSubscriber(std::shared_ptr<Subscriber> subscrib
     CHKPR(subscriber, RET_ERR);
     CHKPR(option, RET_ERR);
     PrintKeyOption(option);
-#ifdef SHORTCUT_KEY_MANAGER_ENABLED
     CHKPR(subscriber->sess_, RET_ERR);
+    subscriber->userId_ = ResolveCallerUserId(subscriber->sess_);
+#ifdef SHORTCUT_KEY_MANAGER_ENABLED
     if (isSystem) {
         subscriber->isSystem = true;
         subscriber->shortcutId_ = RegisterSystemKey(option, subscriber->sess_->GetPid(),
             [this, subscriber](std::shared_ptr<KeyEvent> keyEvent) {
                 NotifySubscriber(keyEvent, subscriber);
-            });
+            }, subscriber->userId_);
     } else {
         subscriber->isSystem = false;
         subscriber->shortcutId_ = RegisterHotKey(option, subscriber->sess_->GetPid(),
             [this, subscriber](std::shared_ptr<KeyEvent> keyEvent) {
                 NotifySubscriber(keyEvent, subscriber);
-            });
+            }, subscriber->userId_);
     }
     if (subscriber->shortcutId_ < 0) {
         MMI_HILOGE("Register shortcut fail, error:%{public}d", subscriber->shortcutId_);
@@ -830,6 +835,12 @@ bool KeySubscriberHandler::IsMatchForegroundPid(std::list<std::shared_ptr<Subscr
     foregroundPids_.clear();
     for (const auto &item : subs) {
         CHKPF(item);
+        // Skip shortcuts that do not belong to the user owning this key event (unless the
+        // shortcut is global, e.g. registered by SA/Shell). This keeps per-user isolation
+        // independent of the foreground-PID logic below.
+        if (!IsMatchEventUser(item, lastEventUserId_)) {
+            continue;
+        }
         auto sess = item->sess_;
         CHKPF(sess);
         if (foregroundPids.find(sess->GetPid()) != foregroundPids.end()) {
@@ -840,6 +851,17 @@ bool KeySubscriberHandler::IsMatchForegroundPid(std::list<std::shared_ptr<Subscr
     MMI_HILOGD("The isForegroundExits_:%{public}d, foregroundPids:%{public}zu",
         isForegroundExits_, foregroundPids_.size());
     return isForegroundExits_;
+}
+
+bool KeySubscriberHandler::IsMatchEventUser(const std::shared_ptr<Subscriber> &subscriber,
+    int32_t eventUserId) const
+{
+    CHKPF(subscriber);
+    // Global shortcuts (SA/Shell) and the no-display fallback always participate.
+    if (subscriber->userId_ == USER_ID_ALL || eventUserId < 0) {
+        return true;
+    }
+    return subscriber->userId_ == eventUserId;
 }
 
 void KeySubscriberHandler::NotifyKeyDownSubscriber(const std::shared_ptr<KeyEvent> &keyEvent,
@@ -878,6 +900,9 @@ void KeySubscriberHandler::NotifyKeyDownRightNow(const std::shared_ptr<KeyEvent>
         CHKPC(sess);
         MMI_HILOGD("Notify subscribe conditions, isForegroundExits:%{public}d, code()%{private}d, pid:%{public}d",
             isForegroundExits_, keyEvent->GetKeyCode(), sess->GetPid());
+        if (!IsMatchEventUser(subscriber, lastEventUserId_)) {
+            continue;
+        }
         if (!isForegroundExits_ || keyEvent->GetKeyCode() == KeyEvent::KEYCODE_POWER ||
             foregroundPids_.find(sess->GetPid()) != foregroundPids_.end()) {
             if (!isRepeat && keyEvent->GetKeyCode() == KeyRepeat->GetRepeatKeyCode()) {
@@ -908,6 +933,9 @@ void KeySubscriberHandler::NotifyKeyDownDelay(const std::shared_ptr<KeyEvent> &k
         CHKPC(subscriber);
         auto sess = subscriber->sess_;
         CHKPC(sess);
+        if (!IsMatchEventUser(subscriber, lastEventUserId_)) {
+            continue;
+        }
         if (!isForegroundExits_ || keyEvent->GetKeyCode() == KeyEvent::KEYCODE_POWER ||
             foregroundPids_.find(sess->GetPid()) != foregroundPids_.end()) {
             interestedSubscribers.push_back(subscriber);
@@ -937,6 +965,9 @@ void KeySubscriberHandler::NotifyKeyUpSubscriber(const std::shared_ptr<KeyEvent>
         CHKPC(sess);
         MMI_HILOGD("Notify subscribe conditions, isForegroundExits:%{public}d, code()%{private}d, pid:%{public}d",
             isForegroundExits_, keyEvent->GetKeyCode(), sess->GetPid());
+        if (!IsMatchEventUser(subscriber, lastEventUserId_)) {
+            continue;
+        }
         if (!isForegroundExits_ || foregroundPids_.find(sess->GetPid()) != foregroundPids_.end()) {
             interestedSubscribers.push_back(subscriber);
             handled = true;
@@ -1108,6 +1139,9 @@ void KeySubscriberHandler::HandleKeyDownForPressedType(const std::shared_ptr<Key
         CHKPC(subscriber);
         auto sess = subscriber->sess_;
         CHKPC(sess);
+        if (!IsMatchEventUser(subscriber, lastEventUserId_)) {
+            continue;
+        }
         if (isForegroundExits_ || keyCode == KeyEvent::KEYCODE_POWER ||
             foregroundPids_.find(sess->GetPid()) != foregroundPids_.end()) {
             NotifySubscriber(keyEvent, subscriber);
@@ -1123,6 +1157,8 @@ bool KeySubscriberHandler::HandleKeyDown(const std::shared_ptr<KeyEvent> &keyEve
 #ifdef SHORTCUT_KEY_RULES_ENABLED
     KEY_SHORTCUT_MGR->ResetCheckState();
 #endif // SHORTCUT_KEY_RULES_ENABLED
+    lastEventDisplayId_ = keyEvent->GetTargetDisplayId();
+    lastEventUserId_ = WIN_MGR->FindDisplayUserId(lastEventDisplayId_);
     bool handled = false;
     auto keyCode = keyEvent->GetKeyCode();
     std::vector<int32_t> pressedKeys = keyEvent->GetPressedKeys();
@@ -1228,6 +1264,8 @@ bool KeySubscriberHandler::HandleKeyUp(const std::shared_ptr<KeyEvent> &keyEvent
     std::set<int32_t> pids;
     GetForegroundPids(pids);
     std::lock_guard<std::mutex> lock(subscriberMapMutex_);
+    lastEventDisplayId_ = keyEvent->GetTargetDisplayId();
+    lastEventUserId_ = WIN_MGR->FindDisplayUserId(lastEventDisplayId_);
     for (auto &iter : subscriberMap_) {
         auto keyOption = iter.first;
         auto subscribers = iter.second;
@@ -1348,6 +1386,9 @@ bool KeySubscriberHandler::HandleKeyForAllReleased(const std::shared_ptr<KeyEven
 
     for (auto &subscriber : subscribers) {
         CHKPC(subscriber);
+        if (!IsMatchEventUser(subscriber, lastEventUserId_)) {
+            continue;
+        }
         auto &state = allReleasedStates_[subscriber.get()];
         if (state.comboActivated) {
             ProcessAllReleasedComboActivated(keyEvent, keyOption, subscriber, handled);
@@ -1671,9 +1712,10 @@ void KeySubscriberHandler::DumpSubscriber(int32_t fd, std::shared_ptr<Subscriber
         }
     }
     mprintf(fd,
-            "Subscriber ID:%d | Pid:%d | Uid:%d | Fd:%d | Prekeys:[%s] | FinalKey:%d | "
+            "Subscriber ID:%d | Pid:%d | Uid:%d | UserId:%d | Fd:%d | Prekeys:[%s] | FinalKey:%d | "
             "FinalKeyDownDuration:%d | IsFinalKeyDown:%s | IsRepeat:%s | ProgramName:%s",
-            subscriber->id_, session->GetPid(), session->GetUid(), session->GetFd(),
+            subscriber->id_, session->GetPid(), session->GetUid(), subscriber->userId_,
+            session->GetFd(),
             sPrekeys.str().c_str(), keyOption->GetFinalKey(), keyOption->GetFinalKeyDownDuration(),
             keyOption->IsFinalKeyDown() ? "true" : "false", keyOption->IsRepeat() ? "true" : "false",
             session->GetProgramName().c_str());

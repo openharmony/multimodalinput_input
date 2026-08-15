@@ -24,6 +24,7 @@
 
 #include "key_event.h"
 #include "key_option.h"
+#include "shortcut_user_resolver.h"
 
 namespace OHOS {
 namespace MMI {
@@ -39,6 +40,10 @@ public:
         int32_t key_ { KeyEvent::KEYCODE_UNKNOWN };
         int32_t action_ { KeyEvent::KEY_ACTION_UNKNOWN };
         bool isRepeat_ { false };
+        // Owning user of the registering app, or USER_ID_ALL for SA/Shell monitors.
+        // Used only for per-user filtering in Intercept; intentionally excluded from
+        // operator< (a session belongs to exactly one user, so it does not affect dedup).
+        int32_t userId_ { USER_ID_ALL };
 
         bool operator<(const Monitor &other) const;
         std::string Dump() const;

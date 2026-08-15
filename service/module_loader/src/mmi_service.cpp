@@ -69,6 +69,9 @@
 #ifdef SHORTCUT_KEY_MANAGER_ENABLED
 #include "key_shortcut_manager.h"
 #endif // SHORTCUT_KEY_MANAGER_ENABLED
+#ifdef OHOS_BUILD_ENABLE_KEY_PRESSED_HANDLER
+#include "shortcut_user_resolver.h"
+#endif // OHOS_BUILD_ENABLE_KEY_PRESSED_HANDLER
 #include "permission_helper.h"
 #include "pointer_device_manager.h"
 #include "product_name_definition.h"
@@ -2932,9 +2935,12 @@ ErrCode MMIService::SubscribeKeyMonitor(const KeyMonitorOption &keyOption)
     auto sess = GetSessionByPid(pid);
     CHKPR(sess, ERROR_NULL_POINTER);
     std::string bundleName = sess->GetProgramName();
+    // Resolve the owning user on the IPC thread (sess is valid here). It must be computed
+    // before PostSyncTask, since the delegate thread no longer has the calling session.
+    int32_t userId = ResolveCallerUserId(sess);
     int32_t ret = delegateTasks_.PostSyncTask(
-        [this, pid, keyOption, bundleName] {
-            return sMsgHandler_.SubscribeKeyMonitor(pid, keyOption, bundleName);
+        [this, pid, keyOption, bundleName, userId] {
+            return sMsgHandler_.SubscribeKeyMonitor(pid, keyOption, bundleName, userId);
         });
     if (ret != RET_OK) {
         MMI_HILOGE("ServerMsgHandler::SubscribeKeyMonitor fail, error:%{public}d", ret);
