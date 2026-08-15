@@ -243,10 +243,10 @@ void CursorDrawingComponent::UpdateDisplayInfo(const OLD::DisplayInfo &displayIn
     pointerInstance_->UpdateDisplayInfo(displayInfo);
 }
 
-void CursorDrawingComponent::UpdateBindDisplayId(uint64_t rsId)
+void CursorDrawingComponent::UpdateBindDisplayId(uint64_t rsId, int32_t groupId, bool multiDefaultGroup)
 {
     CHK_IS_LOADV(isLoaded_, pointerInstance_)
-    pointerInstance_->UpdateBindDisplayId(rsId);
+    pointerInstance_->UpdateBindDisplayId(rsId, groupId, multiDefaultGroup);
 }
 
 void CursorDrawingComponent::OnDisplayInfo(const OLD::DisplayGroupInfo &displayGroupInfo, bool isDisplayChanged)
@@ -456,10 +456,11 @@ int32_t CursorDrawingComponent::SwitchPointerStyle()
     return pointerInstance_->SwitchPointerStyle();
 }
 
-void CursorDrawingComponent::DrawMovePointer(uint64_t displayId, int32_t physicalX, int32_t physicalY)
+void CursorDrawingComponent::DrawMovePointer(uint64_t displayId, int32_t physicalX, int32_t physicalY,
+    int32_t groupId, bool multiDefaultGroup)
 {
     CHK_IS_LOADV(isLoaded_, pointerInstance_)
-    pointerInstance_->DrawMovePointer(displayId, physicalX, physicalY);
+    pointerInstance_->DrawMovePointer(displayId, physicalX, physicalY, groupId, multiDefaultGroup);
 }
 
 void CursorDrawingComponent::Dump(int32_t fd, const std::vector<std::string> &args)
@@ -499,6 +500,14 @@ OLD::DisplayInfo CursorDrawingComponent::GetCurrentDisplayInfo()
         return OLD::DisplayInfo();
     }
     return pointerInstance_->GetCurrentDisplayInfo();
+}
+
+int32_t CursorDrawingComponent::GetCursorGroupId()
+{
+    if ((isLoaded_) == 0 || (pointerInstance_ == nullptr)) {
+        return -1;
+    }
+    return pointerInstance_->GetCursorGroupId();
 }
 
 void CursorDrawingComponent::ForceClearPointerVisibleStatus()

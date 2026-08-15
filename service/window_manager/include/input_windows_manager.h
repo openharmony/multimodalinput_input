@@ -283,6 +283,9 @@ public:
     void CleanMouseEventCycle(std::shared_ptr<PointerEvent> event);
 #endif // OHOS_BUILD_ENABLE_POINTER
     const OLD::DisplayGroupInfo& GetDefaultDisplayGroupInfo();
+    bool HasPointerDeviceBoundToRsId(uint64_t rsId) const;
+    int32_t FindGroupIdByRsId(uint64_t rsId) const;
+    bool HasMultipleActiveUsers() const;
 private:
     bool NeedTouchTracking(PointerEvent &event) const;
     void ProcessTouchTracking(std::shared_ptr<PointerEvent> event, const WindowInfo &targetWindow);

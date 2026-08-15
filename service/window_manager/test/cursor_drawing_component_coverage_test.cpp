@@ -899,5 +899,20 @@ HWTEST_F(CursorDrawingComponentCoverageTest, GetUserDefinedCursorPixelMap_NotLoa
     auto ret = instance->GetUserDefinedCursorPixelMap(pixelMapPtr);
     EXPECT_EQ(ret, RET_ERR);
 }
+
+/**
+ * @tc.name: GetCursorGroupId_NotLoaded_001
+ * @tc.desc: Test GetCursorGroupId when library not loaded
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(CursorDrawingComponentCoverageTest, GetCursorGroupId_NotLoaded_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    CursorDrawingComponent component;
+    auto *instance = &component;
+    auto ret = instance->GetCursorGroupId();
+    EXPECT_EQ(ret, -1);
+}
 } // namespace MMI
 } // namespace OHOS

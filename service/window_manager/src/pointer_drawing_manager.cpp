@@ -298,6 +298,81 @@ void PointerDrawingManager::DestroyPointerWindowOfSoftCursor()
     // The RSUIDirector and RSUIContext is invalid after the render_service dies.
     rsUIDirector_ = nullptr;
     rsUIContext_ = nullptr;
+    ClearGroupCursorCtxMap();
+}
+
+void PointerDrawingManager::SaveActiveGroupToMap()
+{
+    std::unique_lock<std::mutex> lockGuard(surfaceNodeMutex_);
+    if (activeGroupId_ < 0) {
+        return;
+    }
+    GroupCursorContext &ctx = groupCursorCtxMap_[activeGroupId_];
+    ctx.rsUIDirector = rsUIDirector_;
+    ctx.rsUIContext = rsUIContext_;
+    ctx.surfaceNode = surfaceNode_;
+    ctx.canvasNode = canvasNode_;
+    ctx.lastPhysicalX = lastPhysicalX_;
+    ctx.lastPhysicalY = lastPhysicalY_;
+}
+
+void PointerDrawingManager::RestoreGroupFromMap(int32_t groupId)
+{
+    std::unique_lock<std::mutex> lockGuard(surfaceNodeMutex_);
+    auto it = groupCursorCtxMap_.find(groupId);
+    if (it == groupCursorCtxMap_.end()) {
+        MMI_HILOGW("RestoreGroupFromMap miss, groupId:%{public}d", groupId);
+        return;
+    }
+    rsUIDirector_ = it->second.rsUIDirector;
+    rsUIContext_ = it->second.rsUIContext;
+    surfaceNode_ = it->second.surfaceNode;
+    canvasNode_ = it->second.canvasNode;
+    lastPhysicalX_ = it->second.lastPhysicalX;
+    lastPhysicalY_ = it->second.lastPhysicalY;
+    activeGroupId_ = groupId;
+    MMI_HILOGI("RestoreGroupFromMap groupId:%{public}d", groupId);
+}
+
+bool PointerDrawingManager::CreateGroupContext(int32_t groupId, uint64_t rsId)
+{
+    if (CreatePointerWindowForNoScreenPointer(rsId, lastPhysicalX_, lastPhysicalY_) != RET_OK) {
+        MMI_HILOGE("CreatePointerWindowForNoScreenPointer fail, groupId:%{public}d rsId:%{public}" PRIu64,
+            groupId, rsId);
+        return false;
+    }
+    screenId_ = rsId;
+    AttachToDisplay();
+    CreateCanvasNode();
+    RsFlushImplicitTransaction();
+    std::unique_lock<std::mutex> lockGuard(surfaceNodeMutex_);
+    activeGroupId_ = groupId;
+    GroupCursorContext &ctx = groupCursorCtxMap_[groupId];
+    ctx.rsUIDirector = rsUIDirector_;
+    ctx.rsUIContext = rsUIContext_;
+    ctx.surfaceNode = surfaceNode_;
+    ctx.canvasNode = canvasNode_;
+    ctx.lastPhysicalX = lastPhysicalX_;
+    ctx.lastPhysicalY = lastPhysicalY_;
+    ctx.visible = false;
+    MMI_HILOGI("CreateGroupContext groupId:%{public}d rsId:%{public}" PRIu64, groupId, rsId);
+    return true;
+}
+
+void PointerDrawingManager::ClearGroupCursorCtxMap()
+{
+    std::unique_lock<std::mutex> lockGuard(surfaceNodeMutex_);
+    for (auto &kv : groupCursorCtxMap_) {
+        kv.second.canvasNode.reset();
+        kv.second.surfaceNode.reset();
+        if (kv.second.rsUIDirector != nullptr) {
+            kv.second.rsUIDirector->SendMessages();
+        }
+        kv.second.rsUIDirector.reset();
+        kv.second.rsUIContext.reset();
+    }
+    groupCursorCtxMap_.clear();
+    activeGroupId_ = -1;
 }
 
 static inline bool IsNum(const std::string &str)
@@ -497,7 +572,7 @@ int32_t PointerDrawingManager::DrawMovePointer(uint64_t rsId, int32_t physicalX,
     }
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
 #ifdef OHOS_BUILD_ENABLE_EXTERNAL_SCREEN
-    UpdateBindDisplayId(rsId);
+    UpdateBindDisplayId(rsId, WIN_MGR->FindGroupIdByRsId(rsId), WIN_MGR->HasMultipleActiveUsers());
 #endif // OHOS_BUILD_ENABLE_EXTERNAL_SCREEN
     bool mouseIconUpdate = CursorDrawingInformation::GetInstance().GetMouseIconUpdate();
     if (lastMouseStyle_ == pointerStyle && !mouseIconUpdate &&
@@ -556,12 +631,13 @@ int32_t PointerDrawingManager::UpdateSurfaceNodeBounds(int32_t physicalX, int32_
     return RET_ERR;
 }
 
-void PointerDrawingManager::DrawMovePointer(uint64_t rsId, int32_t physicalX, int32_t physicalY)
+void PointerDrawingManager::DrawMovePointer(uint64_t rsId, int32_t physicalX, int32_t physicalY,
+    int32_t groupId, bool multiDefaultGroup)
 {
     CALL_DEBUG_ENTER;
     displayId_ = rsId;
 #ifdef OHOS_BUILD_ENABLE_EXTERNAL_SCREEN
-    UpdateBindDisplayId(rsId);
+    UpdateBindDisplayId(rsId, groupId, multiDefaultGroup);
 #endif // OHOS_BUILD_ENABLE_EXTERNAL_SCREEN
     Direction direction = static_cast<Direction>((
         ((displayInfo_.direction - displayInfo_.displayDirection) * ANGLE_90 + ANGLE_360) % ANGLE_360) / ANGLE_90);
@@ -2568,6 +2644,14 @@ void PointerDrawingManager::OnDisplayInfo(const OLD::DisplayGroupInfo &displayGr
         MMI_HILOGD("groupId:%{public}d", displayGroupInfo.groupId);
         return;
     }
+    if (WIN_MGR->HasMultipleActiveUsers()) {
+        int32_t cursorGroupId = WIN_MGR->FindGroupIdByRsId(displayInfo_.rsId);
+        if (cursorGroupId != DEFAULT_GROUP_ID && displayGroupInfo.groupId != cursorGroupId) {
+            MMI_HILOGI("Skip non-cursor group update, groupId:%{public}d cursorGroupId:%{public}d"
+                " cursorRsId:%{public}" PRIu64, displayGroupInfo.groupId, cursorGroupId, displayInfo_.rsId);
+            return;
+        }
+    }
     // When the screen changes, the cursor needs to be displayed in the center of the main screen by calling
     // 'DrawScreenCenterPointer', so it is necessary to replace the information of the current cursor on the screen
     // with the main screen information. Otherwise, only the information on the screen where the cursor is located
@@ -3127,7 +3211,7 @@ void PointerDrawingManager::Dump(int32_t fd, const std::vector<std::string> &arg
     dprintf(fd, dumpInfo.c_str());
 }
 
-void PointerDrawingManager::UpdateBindDisplayId(uint64_t rsId)
+void PointerDrawingManager::UpdateBindDisplayId(uint64_t rsId, int32_t groupId, bool multiDefaultGroup)
 {
     if (lastDisplayId_ == rsId) {
         return;
@@ -3153,9 +3237,12 @@ void PointerDrawingManager::UpdateBindDisplayId(uint64_t rsId)
         }
         // 新屏幕上重新绘制软硬光标
         UpdatePointerVisible();
+    } else if (multiDefaultGroup && !HasMagicCursor()) {
+        UpdateBindDisplayIdForMultiGroup(rsId, groupId);
+        return;
     }
 
-    // 绑定新屏幕 SurfaceNode 到全局 surfaceNode_
+    // 绑定新屏幕 SurfaceNode 到全局 surfaceNode_(硬光标 + 单 group 软光标共享)
     MMI_HILOGI("UpdateBindDisplayId The screenId_:%{public}" PRIu64, screenId_);
     screenId_ = rsId;
     MMI_HILOGI("The screenId_:%{public}" PRIu64, screenId_);
@@ -3166,6 +3253,41 @@ void PointerDrawingManager::UpdateBindDisplayId(uint64_t rsId)
         MMI_HILOGE("SetCursorLocation fail");
     }
 
+    lastDisplayId_ = rsId;
+}
+
+void PointerDrawingManager::UpdateBindDisplayIdForMultiGroup(uint64_t rsId, int32_t groupId)
+{
+    const uint64_t leavingRsId = lastDisplayId_;
+    if (activeGroupId_ < 0) {
+        activeGroupId_ = WIN_MGR->FindGroupIdByRsId(leavingRsId);
+    }
+    const int32_t leavingGroup = activeGroupId_;
+    SaveActiveGroupToMap();
+    if (leavingGroup >= 0) {
+        const bool kept = WIN_MGR->HasPointerDeviceBoundToRsId(leavingRsId);
+        auto &leavingCtx = groupCursorCtxMap_[leavingGroup];
+        if (leavingCtx.surfaceNode != nullptr) {
+            leavingCtx.surfaceNode->SetVisible(kept);
+        }
+        leavingCtx.visible = kept;
+        if (leavingCtx.rsUIDirector != nullptr) {
+            leavingCtx.rsUIDirector->SendMessages();
+        }
+    }
+    if (groupCursorCtxMap_.count(groupId) > 0) {
+        RestoreGroupFromMap(groupId);
+        screenId_ = rsId;
+        AttachToDisplay();
+        RsFlushImplicitTransaction();
+    } else if (!CreateGroupContext(groupId, rsId)) {
+        MMI_HILOGE("CreateGroupContext fail, rollback. groupId:%{public}d rsId:%{public}" PRIu64, groupId, rsId);
+        if (leavingGroup >= 0) {
+            RestoreGroupFromMap(leavingGroup);
+        }
+        return;
+    }
+    UpdatePointerVisible();
     lastDisplayId_ = rsId;
 }
 
@@ -3983,6 +4105,11 @@ void PointerDrawingManager::SetSurfaceNode(std::shared_ptr<Rosen::RSSurfaceNode>
 OLD::DisplayInfo PointerDrawingManager::GetCurrentDisplayInfo()
 {
     return displayInfo_;
+}
+
+int32_t PointerDrawingManager::GetCursorGroupId()
+{
+    return activeGroupId_;
 }
 
 void PointerDrawingManager::AdjustMouseFocusToSoftRenderOrigin(Direction direction, const MOUSE_ICON pointerStyle,

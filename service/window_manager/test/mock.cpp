@@ -255,7 +255,8 @@ int32_t PointerDrawingManager::SwitchPointerStyle()
 {
     return 0;
 }
-void PointerDrawingManager::DrawMovePointer(uint64_t rsId, int32_t physicalX, int32_t physicalY) {}
+void PointerDrawingManager::DrawMovePointer(uint64_t rsId, int32_t physicalX, int32_t physicalY,
+    int32_t groupId, bool multiDefaultGroup) {}
 void PointerDrawingManager::Dump(int32_t fd, const std::vector<std::string> &args) {}
 int32_t PointerDrawingManager::EnableHardwareCursorStats(int32_t pid, bool enable)
 {

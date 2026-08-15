@@ -711,6 +711,48 @@ int32_t InputWindowsManager::FindDisplayUserId(int32_t displayId) const
     return RET_ERR;
 }
 
+int32_t InputWindowsManager::FindGroupIdByRsId(uint64_t rsId) const
+{
+    for (const auto& it : displayGroupInfoMap_) {
+        for (const auto& item : it.second.displaysInfo) {
+            if (item.rsId == rsId) {
+                return it.second.groupId;
+            }
+        }
+    }
+    return DEFAULT_GROUP_ID;
+}
+
+bool InputWindowsManager::HasMultipleActiveUsers() const
+{
+    std::set<int32_t> activeUserIds;
+    for (const auto& it : displayGroupInfoMap_) {
+        if (it.second.userState != UserState::USER_ACTIVE) {
+            continue;
+        }
+        if (it.second.currentUserId <= 0) {
+            continue;
+        }
+        activeUserIds.insert(it.second.currentUserId);
+        if (activeUserIds.size() > 1) {
+            return true;
+        }
+    }
+    return false;
+}
+
+bool InputWindowsManager::HasPointerDeviceBoundToRsId(uint64_t rsId) const
+{
+    for (int32_t deviceId : bindInfo_.GetInputDeviceIdsByRsId(rsId)) {
+        auto device = INPUT_DEV_MGR->GetInputDevice(deviceId);
+        if (device != nullptr &&
+            device->HasCapability(InputDeviceCapability::INPUT_DEV_CAP_POINTER)) {
+            return true;
+        }
+    }
+    return false;
+}
+
 const OLD::DisplayGroupInfo& InputWindowsManager::GetDefaultDisplayGroupInfo()
 {
     for (auto &item : displayGroupInfoMap_) {
@@ -5086,8 +5128,10 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
             if (!pointerEvent->HasFlag(InputEvent::EVENT_FLAG_ACCESSIBILITY)) {
                 std::vector<int32_t> cursorPos = HandleHardwareCursor(physicalDisplayInfo, physicalX, physicalY);
                 CHKFR((cursorPos.size() >= CURSOR_POSITION_EXPECTED_SIZE), RET_ERR, "cursorPos is invalid");
+                const int32_t groupId = FindDisplayGroupId(physicalDisplayInfo->id);
+                const bool multiActiveUser = HasMultipleActiveUsers();
                 CursorDrawingComponent::GetInstance().DrawMovePointer(physicalDisplayInfo->rsId,
-                    cursorPos[0], cursorPos[1]);
+                    cursorPos[0], cursorPos[1], groupId, multiActiveUser);
             }
             CursorDrawingComponent::GetInstance().UpdatePointerItemCursorInfo(pointerItem);
             pointerEvent->UpdatePointerItem(pointerId, pointerItem);
@@ -5165,7 +5209,8 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
             pointerItem.GetMoveFlag() != POINTER_MOVEFLAG) {
             MMI_HILOGD("Turn the mouseDisplay from false to true");
             CursorDrawingComponent::GetInstance().UpdateDisplayInfo(*physicalDisplayInfo);
-            CursorDrawingComponent::GetInstance().UpdateBindDisplayId(physicalDisplayInfo->rsId);
+            CursorDrawingComponent::GetInstance().UpdateBindDisplayId(physicalDisplayInfo->rsId,
+                FindDisplayGroupId(physicalDisplayInfo->id), HasMultipleActiveUsers());
             CursorDrawingComponent::GetInstance().SetMouseDisplayState(true);
             DispatchPointer(PointerEvent::POINTER_ACTION_ENTER_WINDOW);
         }
@@ -6357,7 +6402,9 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
             if (IsNeedDrawPointer(pointerItem)) {
                 return RET_OK;
             }
-            if (POINTER_DEV_MGR.mouseDisplayState) {
+            int32_t cursorGroupId = CursorDrawingComponent::GetInstance().GetCursorGroupId();
+            if (POINTER_DEV_MGR.mouseDisplayState &&
+                (cursorGroupId < 0 || cursorGroupId == groupId)) {
                 bool checkExtraData = extraData_.appended &&
                     extraData_.sourceType == PointerEvent::SOURCE_TYPE_TOUCHSCREEN &&
                     ((pointerItem.GetToolType() == PointerEvent::TOOL_TYPE_FINGER &&
@@ -6373,8 +6420,8 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
                     if ((pointerEvent->HasFlag(InputEvent::EVENT_FLAG_SIMULATE)) &&
                         MMI_GNE(pointerEvent->GetZOrder(), 0.0f)) {
                         gestureInject = true;
-                    } else {
-                        gestureInject = groupId != MAIN_GROUPID ? true : gestureInject;
+                    } else if (!HasMultipleActiveUsers() && groupId != MAIN_GROUPID) {
+                        gestureInject = true;
                     }
                     timerId_ = TimerMgr->AddTimer(REPEAT_COOLING_TIME, REPEAT_ONCE, [this, gestureInject]() {
                         MMI_HILOGI("anco touch hide cursor, gestureInject=%{public}d", gestureInject);
@@ -6504,6 +6551,7 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
         gestureInject = true;
     }
 #if defined(OHOS_BUILD_ENABLE_POINTER) && (defined(OHOS_BUILD_ENABLE_POINTER_DRAWING) || defined(OHOS_BUILD_EMULATOR))
+    int32_t cursorGroupId = CursorDrawingComponent::GetInstance().GetCursorGroupId();
     if (IsNeedDrawPointer(pointerItem)) {
         if (!CursorDrawingComponent::GetInstance().GetMouseDisplayState()) {
             CursorDrawingComponent::GetInstance().SetMouseDisplayState(true);
@@ -6545,7 +6593,8 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
             CursorDrawingComponent::GetInstance().DrawPointer(physicDisplayInfo->rsId,
                 static_cast<int32_t>(cursorPos.x), static_cast<int32_t>(cursorPos.y), dragPointerStyle_, displayDir);
         }
-    } else if (POINTER_DEV_MGR.mouseDisplayState) {
+    } else if (POINTER_DEV_MGR.mouseDisplayState &&
+        (cursorGroupId < 0 || cursorGroupId == groupId)) {
         if ((!checkExtraData) && (!(extraData_.appended &&
             extraData_.sourceType == PointerEvent::SOURCE_TYPE_MOUSE))) {
             MMI_HILOG_DISPATCHD("PointerAction is to leave the window");
@@ -8016,9 +8065,6 @@ bool InputWindowsManager::IsWindowVisible(int32_t pid, int32_t userId)
     }
     std::vector<sptr<Rosen::WindowVisibilityInfo>> infos;
     BytraceAdapter::StartWindowVisible(pid);
-    // In multi-foreground scenarios (e.g. cockpit) each foreground user owns a separate WMS.
-    // When userId is valid (>0), scope the query by the window owner's userId so the correct
-    // user's windows are returned; otherwise fall back to the shared instance (legacy behavior).
     if (userId > 0) {
         Rosen::WindowManagerLite::GetInstance(userId).GetVisibilityWindowInfo(infos);
     } else {

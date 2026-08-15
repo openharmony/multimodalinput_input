@@ -31,7 +31,7 @@ public:
     virtual void DrawPointer(uint64_t rsId, int32_t physicalX, int32_t physicalY,
         const PointerStyle pointerStyle, Direction direction) {}
     virtual void UpdateDisplayInfo(const OLD::DisplayInfo& displayInfo) {}
-    virtual void UpdateBindDisplayId(uint64_t rsId) {}
+    virtual void UpdateBindDisplayId(uint64_t rsId, int32_t groupId = 0, bool multiDefaultGroup = false) {}
     virtual void OnDisplayInfo(const OLD::DisplayGroupInfo& displayGroupInfo, bool isDisplayChanged = false) {}
     virtual void OnWindowInfo(const WinInfo &info) {}
     virtual bool Init()
@@ -103,7 +103,8 @@ public:
     {
         return 0;
     }
-    virtual void DrawMovePointer(uint64_t rsId, int32_t physicalX, int32_t physicalY) {}
+    virtual void DrawMovePointer(uint64_t rsId, int32_t physicalX, int32_t physicalY,
+        int32_t groupId = 0, bool multiDefaultGroup = false) {}
     virtual void Dump(int32_t fd, const std::vector<std::string> &args) {}
     virtual void InitPointerCallback() {}
     virtual void InitScreenInfo() {}
@@ -118,6 +119,10 @@ public:
     virtual OLD::DisplayInfo GetCurrentDisplayInfo()
     {
         return {};
+    }
+    virtual int32_t GetCursorGroupId()
+    {
+        return -1;
     }
 #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
     virtual int32_t GetPointerSnapshot(void *pixelMapPtr)
