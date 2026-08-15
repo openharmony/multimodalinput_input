@@ -65,8 +65,6 @@ const std::string SECURE_SETTING_URI_PROXY {
 constexpr int32_t INVALID_USER_ID { -1 };
 const std::string EDM_ADMIN_ENABLED_EVENT { "com.ohos.edm.edmadminenabled" };
 const std::string EDM_ADMIN_DISABLED_EVENT { "com.ohos.edm.edmadmindisabled" };
-const std::string EDM_ADMIN_PLUGIN_UUID { "A1B2C3D4-E5F6-7890-ABCD-EF1234567890" };
-const std::string PARAM_EDM_ENABLE { "persist.edm.edm_enable" };
 }
 
 std::shared_ptr<AccountManager> AccountManager::instance_;
@@ -408,13 +406,6 @@ void AccountManager::Initialize()
 #ifdef SCREENLOCK_MANAGER_ENABLED
     InitializeScreenLockStatus();
 #endif // SCREENLOCK_MANAGER_ENABLED
-    if (OHOS::system::GetBoolParameter(PARAM_EDM_ENABLE, false)) {
-        MMI_HILOGI("EDM Admin is enabled at startup, loading libedm_customize plugin");
-        auto pluginMgr = InputPluginManager::GetInstance();
-        if (pluginMgr != nullptr) {
-            pluginMgr->LoadDynamicPlugin(0, EDM_ADMIN_PLUGIN_UUID);
-        }
-    }
 }
 
 AccountManager::AccountSetting AccountManager::GetCurrentAccountSetting()
@@ -493,18 +484,18 @@ void AccountManager::UnsubscribeCommonEvent()
 void AccountManager::OnEdmCommonEvent(const EventFwk::CommonEventData &data)
 {
     const auto &action = data.GetWant().GetAction();
+    auto pluginMgr = InputPluginManager::GetInstance();
+    if (pluginMgr == nullptr) {
+        MMI_HILOGE("InputPluginManager is null");
+        return;
+    }
+
     if (action == EDM_ADMIN_ENABLED_EVENT) {
-        MMI_HILOGI("EDM Admin enabled, loading libedm_customize plugin");
-        auto pluginMgr = InputPluginManager::GetInstance();
-        if (pluginMgr != nullptr) {
-            pluginMgr->LoadDynamicPlugin(0, EDM_ADMIN_PLUGIN_UUID);
-        }
+        MMI_HILOGI("EDM Admin enabled event received");
+        pluginMgr->EnableEdmPlugin();
     } else if (action == EDM_ADMIN_DISABLED_EVENT) {
-        MMI_HILOGI("EDM Admin disabled, unloading libedm_customize plugin");
-        auto pluginMgr = InputPluginManager::GetInstance();
-        if (pluginMgr != nullptr) {
-            pluginMgr->UnloadDynamicPlugin(0, EDM_ADMIN_PLUGIN_UUID);
-        }
+        MMI_HILOGI("EDM Admin disabled event received");
+        pluginMgr->DisableEdmPlugin();
     }
 }
  
