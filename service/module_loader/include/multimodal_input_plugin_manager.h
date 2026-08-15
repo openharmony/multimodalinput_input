@@ -178,6 +178,8 @@ public:
 
     int32_t LoadDynamicPlugin(int32_t uid, const std::string &uuid);
     int32_t UnloadDynamicPlugin(int32_t uid, const std::string &uuid);
+    void EnableEdmPlugin();
+    void DisableEdmPlugin();
 
 private:
     explicit InputPluginManager(const std::string& directory) : directory_(directory) {};
@@ -198,6 +200,7 @@ private:
         const std::string &uuid, const std::string &pluginPath);
     void OnPluginLoaded(const std::string &uuid, std::shared_ptr<InputPlugin> plugin);
     void AddCallbackToPlugin(const std::shared_ptr<IPluginContext> &cPin);
+    void CheckAndLoadEdmPluginAtStartup();
 
     std::weak_ptr<IDelegateInterface> delegate_;
     UDSServer* udsServer_ {nullptr};

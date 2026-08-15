@@ -39,6 +39,7 @@
 #include "setting_datashare.h"
 #include "system_ability_definition.h"
 #include "cursor_drawing_component.h"
+#include "parameters.h"
 
 #undef MMI_LOG_DOMAIN
 #define MMI_LOG_DOMAIN MMI_LOG_SERVER
@@ -56,6 +57,8 @@ const int32_t TIMEOUT_US = 300;
 const int32_t TIMEOUT_USE_EVENT_US = 2500;
 const int32_t MAX_TIMER = 3;
 const std::string EDM_ADMIN_PLUGIN_NAME { "libedm_customize.z.so" };
+const std::string EDM_ADMIN_PLUGIN_UUID { "A1B2C3D4-E5F6-7890-ABCD-EF1234567890" };
+const std::string PARAM_EDM_ENABLE { "persist.edm.edm_enable" };
 } // namespace
 
 bool InputPluginManager::PluginConfig::IsValid() const
@@ -145,7 +148,33 @@ int32_t InputPluginManager::Init(UDSServer& udsServer)
     }
     closedir(dir);
     PrintPlugins();
+    CheckAndLoadEdmPluginAtStartup();
     return RET_OK;
+}
+
+void InputPluginManager::CheckAndLoadEdmPluginAtStartup()
+{
+    CALL_DEBUG_ENTER;
+    if (OHOS::system::GetBoolParameter(PARAM_EDM_ENABLE, false)) {
+        MMI_HILOGI("EDM Admin is enabled at startup");
+        EnableEdmPlugin();
+    } else {
+        MMI_HILOGD("EDM Admin is not enabled at startup");
+    }
+}
+
+void InputPluginManager::EnableEdmPlugin()
+{
+    CALL_DEBUG_ENTER;
+    MMI_HILOGI("Enabling EDM Admin plugin");
+    LoadDynamicPlugin(0, EDM_ADMIN_PLUGIN_UUID);
+}
+
+void InputPluginManager::DisableEdmPlugin()
+{
+    CALL_DEBUG_ENTER;
+    MMI_HILOGI("Disabling EDM Admin plugin");
+    UnloadDynamicPlugin(0, EDM_ADMIN_PLUGIN_UUID);
 }
 
 std::shared_ptr<InputPlugin> InputPluginManager::LoadPlugin(const std::string &path)
