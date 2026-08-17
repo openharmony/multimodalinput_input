@@ -504,8 +504,12 @@ OLD::DisplayInfo CursorDrawingComponent::GetCurrentDisplayInfo()
 
 int32_t CursorDrawingComponent::GetCursorGroupId()
 {
-    if ((isLoaded_) == 0 || (pointerInstance_ == nullptr)) {
-        return -1;
+    {
+        std::lock_guard<ffrt::mutex> lockGuard(g_loadSoMutex);
+        if (isLoaded_ != 1 || (pointerInstance_ == nullptr)) {
+            return -1;
+        }
+        lastCallTime_ = std::chrono::steady_clock::now();
     }
     return pointerInstance_->GetCursorGroupId();
 }
