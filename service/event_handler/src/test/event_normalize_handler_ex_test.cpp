@@ -252,5 +252,39 @@ HWTEST_F(EventNormalizeHandlerEXTest, EventNormalizeHandlerEXTest_HandlePointerE
     handler.HandlePointerEvent(pointerEvent);
     EXPECT_EQ(pointerEvent->GetPointerId(), 0);
 }
+
+/**
+* @tc.name: EventNormalizeHandlerEXTest_HandleTpRegister_001
+* @tc.desc: Test HandleTpRegister with non-DOWN event type (should be no-op)
+* @tc.type: FUNC
+* @tc.require:
+*/
+HWTEST_F(EventNormalizeHandlerEXTest, EventNormalizeHandlerEXTest_HandleTpRegister_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EventNormalizeHandler handler;
+    int32_t beforeCount = hanlder.tpRegisterTryCount_;
+    handler.HandleTpRegister(LIBINPUT_EVENT_TOUCHPAD_MOTION);
+    EXPECT_EQ(handler.tpRegisterTryCount_, beforeCount);
+}
+
+/**
+* @tc.name: EventNormalizeHandlerEXTest_HandleTpRegister_002
+* @tc.desc: Test HandleTpRegister with DOWN event type and positive tpRegisterTryCount_
+* @tc.type: FUNC
+* @tc.require:
+*/
+HWTEST_F(EventNormalizeHandlerEXTest, EventNormalizeHandlerEXTest_HandleTpRegister_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EventNormalizeHandler handler;
+    int32_t savedCount = handler.tpRegisterTryCount_;
+    handler.tpRegisterTryCount_ = 2;
+    handler.HandleTpRegister(LIBINPUT_EVENT_TOUCHPAD_DOWN);
+    EXPECT_EQ(handler.tpRegisterTryCount_, 1);
+    handler.HandleTpRegister(LIBINPUT_EVENT_TOUCHPAD_DOWN);
+    EXPECT_EQ(handler.tpRegisterTryCount_, 0);
+    handler.tpRegisterTryCount_ = savedCount;
+}
 } // namespace MMI
 } // namespace OHOS
