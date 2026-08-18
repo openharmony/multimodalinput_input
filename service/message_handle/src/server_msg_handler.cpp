@@ -646,6 +646,7 @@ void ServerMsgHandler::UpdateMouseLocation(std::shared_ptr<PointerEvent> pointer
 {
     CHKPV(pointerEvent);
     if (pointerEvent->HasFlag(InputEvent::EVENT_FLAG_RAW_POINTER_MOVEMENT) ||
+        pointerEvent->HasFlag(InputEvent::EVENT_FLAG_ACCESSIBILITY) ||
         pointerEvent->GetSourceType() != PointerEvent::SOURCE_TYPE_MOUSE ||
         pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_MOVE) {
         return;
