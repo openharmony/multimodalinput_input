@@ -7596,5 +7596,28 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_UpdateMouseLocation_011, Tes
     pointerEvent->SetPointerId(0);
     ASSERT_NO_FATAL_FAILURE(handler.UpdateMouseLocation(pointerEvent));
 }
+
+/**
+ * @tc.name: ServerMsgHandlerTest_UpdateMouseLocation_012
+ * @tc.desc: Test the function UpdateMouseLocation with EVENT_FLAG_ACCESSIBILITY flag
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_UpdateMouseLocation_012, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ServerMsgHandler handler;
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->AddFlag(InputEvent::EVENT_FLAG_ACCESSIBILITY);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
+    int32_t pointerId = 0;
+    PointerEvent::PointerItem item;
+    item.SetPointerId(pointerId);
+    pointerEvent->AddPointerItem(item);
+    pointerEvent->SetPointerId(0);
+    ASSERT_NO_FATAL_FAILURE(handler.UpdateMouseLocation(pointerEvent));
+}
 } // namespace MMI
 } // namespace OHOS
