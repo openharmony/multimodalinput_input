@@ -656,11 +656,6 @@ int32_t InputDeviceManager::GetKeyboardType(int32_t deviceId, int32_t &keyboardT
         keyboardType = tempKeyboardType;
         return RET_OK;
     }
-#ifdef OHOS_BUILD_ENABLE_VKEYBOARD
-    if (GetTouchscreenKeyboardType(iter->second, keyboardType) == RET_OK) {
-        return RET_OK;
-    }
-#endif // OHOS_BUILD_ENABLE_VKEYBOARD
     return GetDeviceSupportKey(deviceId, keyboardType);
 }
 
@@ -2024,32 +2019,6 @@ void InputDeviceManager::FillInputDeviceWithVirtualCapability(
         }
     }
     // LCOV_EXCL_STOP
-}
-
-int32_t InputDeviceManager::GetTouchscreenKeyboardType(const InputDeviceInfo &deviceInfo, int32_t &keyboardType)
-{
-    if (!deviceInfo.isTouchableDevice) {
-        return RET_ERR;
-    }
-    bool hasVirtualKeyboard = false;
-    bool hasVirtualTrackpad = false;
-    for (auto it = virtualInputDevices_.begin(); it != virtualInputDevices_.end(); ++it) {
-        if (IsKeyboardDevice(it->second)) {
-            hasVirtualKeyboard = true;
-        } else if (IsPointerDevice(it->second)) {
-            hasVirtualTrackpad = true;
-        }
-    }
-    if (hasVirtualKeyboard) {
-        if (hasVirtualTrackpad) {
-            keyboardType = KEYBOARD_TYPE_ALPHABETICKEYBOARD;
-        } else {
-            keyboardType = KEYBOARD_TYPE_DIGITALKEYBOARD;
-        }
-        MMI_HILOGI("Touchscreen used as virtual keyboard, type=%{public}d", keyboardType);
-        return RET_OK;
-    }
-    return RET_ERR;
 }
 
 int32_t InputDeviceManager::GetVirtualKeyboardType(int32_t deviceId, int32_t &keyboardType)
