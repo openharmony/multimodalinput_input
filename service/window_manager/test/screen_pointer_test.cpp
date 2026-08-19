@@ -18,6 +18,7 @@
 
 #include "config_multimodal.h"
 #include "mmi_log.h"
+#include "display_manager_lite.h"
 #include "resource_decompress.h"
 #include "screen_pointer.h"
 #include "product_name_definition.h"
@@ -2291,6 +2292,180 @@ HWTEST_F(ScreenPointerTest, ScreenPointerTest_GetDisplayDirection_002, TestSize.
 
     Direction result = screenpointer->GetDisplayDirection();
     EXPECT_EQ(result, Direction::DIRECTION0);
+}
+
+/**
+ * @tc.name: ScreenPointerTest_IsROGEnable_001
+ * @tc.desc: Test IsROGEnable
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(ScreenPointerTest, ScreenPointerTest_IsROGEnable_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    // ratio != 1
+    EXPECT_TRUE(ScreenPointer::IsROGEnable(2880, 1920, 1440, 960));
+    // ratio == 1
+    EXPECT_FALSE(ScreenPointer::IsROGEnable(2880, 1920, 2880, 1920));
+    // non-proportional scaling
+    EXPECT_FALSE(ScreenPointer::IsROGEnable(2880, 1920, 2880, 1620));
+    EXPECT_FALSE(ScreenPointer::IsROGEnable(2880, 1920, 2000, 1080));
+    // zero value
+    EXPECT_FALSE(ScreenPointer::IsROGEnable(0, 1920, 1440, 960));
+    EXPECT_FALSE(ScreenPointer::IsROGEnable(2880, 0, 1440, 960));
+    EXPECT_FALSE(ScreenPointer::IsROGEnable(2880, 1920, 0, 960));
+    EXPECT_FALSE(ScreenPointer::IsROGEnable(2880, 1920, 1440, 0));
+    EXPECT_FALSE(ScreenPointer::IsROGEnable(0, 0, 0, 0));
+}
+
+/**
+ * @tc.name: ScreenPointerTest_ResolveScreenLiteInfo_001
+ * @tc.desc: Test ResolveScreenLiteInfo with nullptr and BUILT_IN displayLite nullptr
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(ScreenPointerTest, ScreenPointerTest_ResolveScreenLiteInfo_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto result = ScreenPointer::ResolveScreenLiteInfo(nullptr);
+    EXPECT_EQ(result.width, 0);
+    EXPECT_EQ(result.height, 0);
+    EXPECT_EQ(result.rotation, OHOS::Rosen::Rotation::ROTATION_0);
+
+    sptr<OHOS::Rosen::ScreenInfo> screenInfo = new OHOS::Rosen::ScreenInfo();
+    ASSERT_NE(screenInfo, nullptr);
+    OHOS::Rosen::DisplayLite::mockValid = false;
+    EXPECT_EQ(screenInfo->GetScreenTypeInfo(), OHOS::Rosen::ScreenTypeInfo::BUILT_IN);
+    result = ScreenPointer::ResolveScreenLiteInfo(screenInfo);
+    EXPECT_EQ(result.width, 0);
+    EXPECT_EQ(result.height, 0);
+    EXPECT_EQ(result.rotation, OHOS::Rosen::Rotation::ROTATION_0);
+}
+
+/**
+ * @tc.name: ScreenPointerTest_ResolveScreenLiteInfo_002
+ * @tc.desc: Test ResolveScreenLiteInfo with EXTERNAL and VIRTUAL screen
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(ScreenPointerTest, ScreenPointerTest_ResolveScreenLiteInfo_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    sptr<OHOS::Rosen::ScreenInfo> externalInfo = new OHOS::Rosen::ScreenInfo();
+    ASSERT_NE(externalInfo, nullptr);
+    externalInfo->SetScreenTypeInfo(OHOS::Rosen::ScreenTypeInfo::EXTERNAL);
+    auto result = ScreenPointer::ResolveScreenLiteInfo(externalInfo);
+    EXPECT_EQ(result.width, 0);
+    EXPECT_EQ(result.height, 0);
+    EXPECT_EQ(result.rotation, OHOS::Rosen::Rotation::ROTATION_0);
+
+    sptr<OHOS::Rosen::ScreenInfo> virtualInfo = new OHOS::Rosen::ScreenInfo();
+    ASSERT_NE(virtualInfo, nullptr);
+    virtualInfo->SetScreenTypeInfo(OHOS::Rosen::ScreenTypeInfo::VIRTUAL);
+    result = ScreenPointer::ResolveScreenLiteInfo(virtualInfo);
+    EXPECT_EQ(result.width, 0);
+    EXPECT_EQ(result.height, 0);
+    EXPECT_EQ(result.rotation, OHOS::Rosen::Rotation::ROTATION_0);
+}
+
+/**
+ * @tc.name: ScreenPointerTest_ResolveScreenLiteInfo_003
+ * @tc.desc: Test ResolveScreenLiteInfo  BUILT_IN with ROG, rotation=0
+ * @tc.require:
+ */
+HWTEST_F(ScreenPointerTest, ScreenPointerTest_ResolveScreenLiteInfo_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    sptr<OHOS::Rosen::ScreenInfo> screenInfo = new OHOS::Rosen::ScreenInfo();
+    sptr<OHOS::Rosen::SupportedScreenModes> mode = new OHOS::Rosen::SupportedScreenModes();
+    ASSERT_NE(screenInfo, nullptr);
+    ASSERT_NE(mode, nullptr);
+    mode->width = 2880;
+    mode->height = 1920;
+    screeInfo->SetModeId(0);
+    screenInfo->modes_ = { { mode } };
+    screenInfo->SetScreenTypeInfo(OHOS::Rosen::ScreenTypeInfo::BUILT_IN);
+
+    OHOS::Rosen::DisplayLite::mockValid = true;
+    OHOS::Rosen::DisplayLite::mockWidth = 1440;
+    OHOS::Rosen::DisplayLite::mockHeight = 960;
+    OHOS::Rosen::DisplayLite::mockRotation = OHOS::Rosen::Rotation::ROTATION_0;
+
+    auto result = ScreenPointer::ResolveScreenLiteInfo(screenInfo);
+    EXPECT_EQ(result.width, 1440);
+    EXPECT_EQ(result.height, 960);
+    EXPECT_EQ(result.rotation, OHOS::Rosen::Rotation::ROTATION_0);
+}
+
+/**
+ * @tc.name: ScreenPointerTest_ResolveScreenLiteInfo_004
+ * @tc.desc: Test ResolveScreenLiteInfo  BUILT_IN with ROG, rotation=90/270
+ * @tc.require:
+ */
+HWTEST_F(ScreenPointerTest, ScreenPointerTest_ResolveScreenLiteInfo_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    
+    sptr<OHOS::Rosen::SupportedScreenModes> mode = new OHOS::Rosen::SupportedScreenModes();
+    ASSERT_NE(mode, nullptr);
+    mode->width = 2880;
+    mode->height = 1920;
+    OHOS::Rosen::DisplayLite::mockValid = true;
+    
+    sptr<OHOS::Rosen::ScreenInfo> screenInfo90 = new OHOS::Rosen::ScreenInfo();
+    ASSERT_NE(screenInfo90, nullptr);
+    screenInfo90->SetModeId(0);
+    screenInfo90->modes_ = { { mode } };
+    screenInfo90->SetScreenTypeInfo(OHOS::Rosen::ScreenTypeInfo::BUILT_IN);
+    OHOS::Rosen::DisplayLite::mockWidth = 960;
+    OHOS::Rosen::DisplayLite::mockHeight = 1440;
+    OHOS::Rosen::DisplayLite::mockRotation = OHOS::Rosen::Rotation::ROTATION_90;
+    auto result = ScreenPointer::ResolveScreenLiteInfo(screenInfo90);
+    EXPECT_EQ(result.width, 1440);
+    EXPECT_EQ(result.height, 960);
+    EXPECT_EQ(result.rotation, OHOS::Rosen::Rotation::ROTATION_90);
+
+    sptr<OHOS::Rosen::ScreenInfo> screenInfo270 = new OHOS::Rosen::ScreenInfo();
+    ASSERT_NE(screenInfo270, nullptr);
+    screenInfo270->SetModeId(0);
+    screenInfo270->modes_ = { { mode } };
+    screenInfo270->SetScreenTypeInfo(OHOS::Rosen::ScreenTypeInfo::BUILT_IN);
+    OHOS::Rosen::DisplayLite::mockWidth = 960;
+    OHOS::Rosen::DisplayLite::mockHeight = 1440;
+    OHOS::Rosen::DisplayLite::mockRotation = OHOS::Rosen::Rotation::ROTATION_270;
+    auto result = ScreenPointer::ResolveScreenLiteInfo(screenInfo270);
+    EXPECT_EQ(result.width, 1440);
+    EXPECT_EQ(result.height, 960);
+    EXPECT_EQ(result.rotation, OHOS::Rosen::Rotation::ROTATION_270);
+}
+
+/**
+ * @tc.name: ScreenPointerTest_ResolveScreenLiteInfo_005
+ * @tc.desc: Test ResolveScreenLiteInfo  BUILT_IN without ROG
+ * @tc.require:
+ */
+HWTEST_F(ScreenPointerTest, ScreenPointerTest_ResolveScreenLiteInfo_005, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    sptr<OHOS::Rosen::ScreenInfo> screenInfo = new OHOS::Rosen::ScreenInfo();
+    sptr<OHOS::Rosen::SupportedScreenModes> mode = new OHOS::Rosen::SupportedScreenModes();
+    ASSERT_NE(screenInfo, nullptr);
+    ASSERT_NE(mode, nullptr);
+    mode->width = 2880;
+    mode->height = 1920;
+    screeInfo->SetModeId(0);
+    screenInfo->modes_ = { { mode } };
+    screenInfo->SetScreenTypeInfo(OHOS::Rosen::ScreenTypeInfo::BUILT_IN);
+
+    OHOS::Rosen::DisplayLite::mockValid = true;
+    OHOS::Rosen::DisplayLite::mockWidth = 2000;
+    OHOS::Rosen::DisplayLite::mockHeight = 1080;
+    OHOS::Rosen::DisplayLite::mockRotation = OHOS::Rosen::Rotation::ROTATION_0;
+
+    auto result = ScreenPointer::ResolveScreenLiteInfo(screenInfo);
+    EXPECT_EQ(result.width, 2880);
+    EXPECT_EQ(result.height, 1920);
+    EXPECT_EQ(result.rotation, OHOS::Rosen::Rotation::ROTATION_0);
 }
 } // namespace MMI
 } // namespace OHOS

@@ -40,6 +40,15 @@ uint32_t GetScreenInfoHeight(const screen_info_ptr_t);
 
 class ScreenPointer final {
 public:
+    static bool IsROGEnable(uint32_t physicalWidth, uint32_t physicalHeight,
+        uint32_t logicalWidth, uint32_t logicalHeight);
+    struct ScreenLiteInfo {
+        uint32_t width { 0 };
+        uint32_t height { 0 };
+        rotation_t rotation { rotation_t::ROTATION_0 };
+    };
+    static ScreenLiteInfo ResolveScreenLiteInfo(const screen_info_ptr_t &si);
+public:
     DISALLOW_COPY_AND_MOVE(ScreenPointer);
     ScreenPointer(hwcmgr_ptr_t hwcmgr, handler_ptr_t handler, const OLD::DisplayInfo &di);
     ScreenPointer(hwcmgr_ptr_t hwcmgr, handler_ptr_t handler, screen_info_ptr_t si);

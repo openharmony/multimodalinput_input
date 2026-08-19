@@ -1295,6 +1295,11 @@ ohos_unittest("TouchDrawingManagerTest") {
     "-Dprotected=public",
   ]
 
+  cflags_cc = [
+    "-Wno-unused-variable",
+    "-Wno-unused-function",
+  ]
+
   branch_protector_ret = "pac_ret"
   sanitize = {
     cfi = true
@@ -1304,6 +1309,7 @@ ohos_unittest("TouchDrawingManagerTest") {
   }
 
   include_dirs = [
+    "${mmi_path}/test/facility/window_manager_mock/include",
     "${mmi_path}/service/delegate_task/include",
     "${mmi_path}/service/hardware_cursor_pointer_manager/include",
     "${mmi_path}/util/json_parser/include",
@@ -1314,6 +1320,7 @@ ohos_unittest("TouchDrawingManagerTest") {
 
   if (input_feature_pointer_drawing) {
     sources += [
+      "window_manager/src/screen_pointer.cpp",
       "window_manager/test/pointer_renderer_test.cpp",
       "window_manager/test/screen_pointer_test.cpp",
     ]
@@ -1324,7 +1331,9 @@ ohos_unittest("TouchDrawingManagerTest") {
     "${mmi_path}/intention/scheduler/component_manager:mmi_component_manager",
     "${mmi_path}/service:libcursor_drawing_adapter",
     "${mmi_path}/service:libmmi-server",
+    "${mmi_path}/service:libmmi-server-common",
     "${mmi_path}/test/facility/mock:mmi_mock_sources",
+    "${mmi_path}/test/facility/window_manager_mock:window_manager_mock",
     "${mmi_path}/util:libmmi-util",
     "${mmi_path}/frameworks/proxy:libmmi-common",
   ]
