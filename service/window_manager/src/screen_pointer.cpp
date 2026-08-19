@@ -78,8 +78,8 @@ uint32_t GetScreenInfoHeight(screen_info_ptr_t si)
     return modes[modeId]->height_;
 }
 
-bool ScreenPointer::IsROGEnable(uint32_t physicalWidth, uint32_t physicalHeight,
-        uint32_t logicalWidth, uint32_t logicalHeight)
+bool ScreenPointer::IsROGEnable(uint32_t physicalWidth, uint32_t physicalHeight, uint32_t logicalWidth,
+    uint32_t logicalHeight)
 {
     if (physicalWidth == 0 || physicalHeight == 0 || logicalWidth == 0 || logicalHeight == 0) {
         return false;
@@ -89,7 +89,7 @@ bool ScreenPointer::IsROGEnable(uint32_t physicalWidth, uint32_t physicalHeight,
     }
     uint32_t gcdP = std::gcd(physicalWidth, physicalHeight);
     uint32_t gcdL = std::gcd(logicalWidth, logicalHeight);
-    return (physicalWidth / gcdP == logicalWidth / gcdL) && (physicalHeight / gcdP == logicalHeight / gcdL);
+    return (physicalWidth * gcdL ==  logicalWidth * gcdP) && (physicalHeight * gcdL == logicalHeight * gcdP);
 }
 
 ScreenPointer::ScreenLiteInfo ScreenPointer::ResolveScreenLiteInfo(const screen_info_ptr_t &si)
@@ -115,7 +115,7 @@ ScreenPointer::ScreenLiteInfo ScreenPointer::ResolveScreenLiteInfo(const screen_
     }
     uint32_t logicalWidth = static_cast<uint32_t>(displayLite->GetWidth());
     uint32_t logicalHeight = static_cast<uint32_t>(displayLite->GetHeight());
-    rotation_t logicalRotaion = displayLie->GetRotation();
+    rotation_t logicalRotaion = displayLite->GetRotation();
     if (logicalRotaion == rotation_t::ROTATION_90 || logicalRotaion == rotation_t::ROTATION_270) {
         std::swap(logicalWidth, logicalHeight);
     }
