@@ -1509,12 +1509,12 @@ bool InputDeviceManager::HasEnabledNoEventReportedPhysicalPointerDevice()
 {
     // LCOV_EXCL_START
     for (const auto &item : inputDevice_) {
-        if (!item.second.isPointerDevice || !item.second.enable) {
-            continue;
+        if ((!item.second.isRemote && item.second.isPointerDevice) ||
+            (item.second.isRemote && item.second.isPointerDevice && item.second.enable)) {
+            MMI_HILOGI("DeviceId:%{public}d, isRemote:%{public}d, sys uid:%{public}s", item.first,
+                item.second.isRemote, item.second.sysUid.c_str());
+            return true;
         }
-        MMI_HILOGI("DeviceId:%{public}d, isRemote:%{public}d, sys uid:%{public}s", item.first,
-            item.second.isRemote, item.second.sysUid.c_str());
-        return true;
     }
     return false;
     // LCOV_EXCL_STOP
