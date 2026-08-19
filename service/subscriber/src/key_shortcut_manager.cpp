@@ -16,7 +16,6 @@
 #include "key_shortcut_manager.h"
 
 #include "app_state_observer.h"
-#include "i_input_windows_manager.h"
 #include "json_parser.h"
 #include "key_command_handler_util.h"
 #include "timer_manager.h"
@@ -133,10 +132,9 @@ int32_t KeyShortcutManager::RegisterSystemKey(const SystemShortcutKey &key)
         return KEY_SHORTCUT_ERROR_COMBINATION_KEY;
     }
     auto [iter, _] = shortcuts_.emplace(GenerateId(), shortcut);
-    MMI_HILOGI("Register system key [No.%{public}d](0x%{private}x,%{private}d,%{public}d,%{public}d,%{public}d,"
-        "USER:%{public}d)",
+    MMI_HILOGI("Register system key [No.%{public}d](0x%{private}x,%{private}d,%{public}d,%{public}d,%{public}d)",
         iter->first, shortcut.modifiers, shortcut.finalKey, shortcut.longPressTime,
-        shortcut.triggerType, shortcut.session, shortcut.userId);
+        shortcut.triggerType, shortcut.session);
     return iter->first;
 }
 
@@ -148,9 +146,8 @@ void KeyShortcutManager::UnregisterSystemKey(int32_t shortcutId)
         return;
     }
     const KeyShortcut &key = iter->second;
-    MMI_HILOGI("Unregister system key(0x%{private}x,%{private}d,%{public}d,%{public}d,SESSION:%{public}d,"
-        "USER:%{public}d)",
-        key.modifiers, key.finalKey, key.longPressTime, key.triggerType, key.session, key.userId);
+    MMI_HILOGI("Unregister system key(0x%{private}x,%{private}d,%{public}d,%{public}d,SESSION:%{public}d)",
+        key.modifiers, key.finalKey, key.longPressTime, key.triggerType, key.session);
     ResetTriggering(shortcutId);
     shortcuts_.erase(iter);
 }
@@ -173,8 +170,8 @@ int32_t KeyShortcutManager::RegisterHotKey(const HotKey &key)
         return KEY_SHORTCUT_ERROR_COMBINATION_KEY;
     }
     auto [iter, _] = shortcuts_.emplace(GenerateId(), globalKey);
-    MMI_HILOGI("Register global key [No.%{public}d](0x%{private}x,%{private}d,SESSION:%{public}d,USER:%{public}d)",
-        iter->first, globalKey.modifiers, globalKey.finalKey, globalKey.session, globalKey.userId);
+    MMI_HILOGI("Register global key [No.%{public}d](0x%{private}x,%{private}d,SESSION:%{public}d)",
+        iter->first, globalKey.modifiers, globalKey.finalKey, globalKey.session);
     return iter->first;
 }
 
@@ -186,8 +183,8 @@ void KeyShortcutManager::UnregisterHotKey(int32_t shortcutId)
         return;
     }
     const KeyShortcut &key = iter->second;
-    MMI_HILOGI("Unregister global key(0x%{private}x,%{private}d,SESSION:%{public}d,USER:%{public}d)",
-        key.modifiers, key.finalKey, key.session, key.userId);
+    MMI_HILOGI("Unregister global key(0x%{private}x,%{private}d,SESSION:%{public}d)",
+        key.modifiers, key.finalKey, key.session);
     shortcuts_.erase(iter);
 }
 
@@ -489,7 +486,6 @@ bool KeyShortcutManager::CheckSystemKey(const SystemShortcutKey &key, KeyShortcu
         .triggerType = key.triggerType,
         .session = key.session,
         .callback = key.callback,
-        .userId = key.userId,
     };
     return true;
 }
@@ -532,7 +528,6 @@ bool KeyShortcutManager::CheckGlobalKey(const HotKey &key, KeyShortcut &shortcut
         .triggerType = SHORTCUT_TRIGGER_TYPE_DOWN,
         .session = key.session,
         .callback = key.callback,
-        .userId = key.userId,
     };
     return true;
 }
@@ -606,16 +601,10 @@ bool KeyShortcutManager::HandleKeyDown(std::shared_ptr<KeyEvent> keyEvent)
 {
     bool handled = false;
     std::set<int32_t> foregroundPids = GetForegroundPids();
-    int32_t eventUserId = WIN_MGR->FindDisplayUserId(keyEvent->GetTargetDisplayId());
 
     for (auto &item : shortcuts_) {
         KeyShortcut &shortcut = item.second;
         if (shortcut.triggerType != SHORTCUT_TRIGGER_TYPE_DOWN) {
-            continue;
-        }
-        // Per-user isolation: skip app shortcuts whose owner differs from the event's user.
-        // USER_ID_ALL (SA/Shell) and the no-display fallback (eventUserId < 0) always pass.
-        if (shortcut.userId != USER_ID_ALL && eventUserId >= 0 && shortcut.userId != eventUserId) {
             continue;
         }
         if (!foregroundPids.empty() &&
@@ -626,9 +615,9 @@ bool KeyShortcutManager::HandleKeyDown(std::shared_ptr<KeyEvent> keyEvent)
             continue;
         }
         MMI_HILOGI("Matched shortcut[No.%{public}d]"
-            "(0x%{private}x,%{private}d,%{public}d,%{public}d,SESSION:%{public}d,USER:%{public}d)",
+            "(0x%{private}x,%{private}d,%{public}d,%{public}d,SESSION:%{public}d)",
             item.first, shortcut.modifiers, shortcut.finalKey, shortcut.longPressTime,
-            shortcut.triggerType, shortcut.session, shortcut.userId);
+            shortcut.triggerType, shortcut.session);
         TriggerDown(keyEvent, item.first, shortcut);
         handled = true;
     }
@@ -639,15 +628,10 @@ bool KeyShortcutManager::HandleKeyUp(std::shared_ptr<KeyEvent> keyEvent)
 {
     bool handled = false;
     std::set<int32_t> foregroundPids = GetForegroundPids();
-    int32_t eventUserId = WIN_MGR->FindDisplayUserId(keyEvent->GetTargetDisplayId());
 
     for (auto &item : shortcuts_) {
         KeyShortcut &shortcut = item.second;
         if (shortcut.triggerType != SHORTCUT_TRIGGER_TYPE_UP) {
-            continue;
-        }
-        // Per-user isolation: skip app shortcuts whose owner differs from the event's user.
-        if (shortcut.userId != USER_ID_ALL && eventUserId >= 0 && shortcut.userId != eventUserId) {
             continue;
         }
         if (!foregroundPids.empty() &&
@@ -657,10 +641,8 @@ bool KeyShortcutManager::HandleKeyUp(std::shared_ptr<KeyEvent> keyEvent)
         if (!CheckCombination(keyEvent, shortcut)) {
             continue;
         }
-        MMI_HILOGI("Matched shortcut(0x%{private}x,%{private}d,%{public}d,%{public}d,SESSION:%{public}d,"
-            "USER:%{public}d)",
-            shortcut.modifiers, shortcut.finalKey, shortcut.longPressTime, shortcut.triggerType,
-            shortcut.session, shortcut.userId);
+        MMI_HILOGI("Matched shortcut(0x%{private}x,%{private}d,%{public}d,%{public}d,SESSION:%{public}d)",
+            shortcut.modifiers, shortcut.finalKey, shortcut.longPressTime, shortcut.triggerType, shortcut.session);
         TriggerUp(keyEvent, item.first, shortcut);
         handled = true;
     }

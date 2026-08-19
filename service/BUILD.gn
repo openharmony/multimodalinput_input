@@ -370,7 +370,6 @@ ohos_shared_library("libmmi-server") {
     "setting_manager/src/setting_data.cpp",
     "setting_manager/src/setting_manager.cpp",
     "setting_manager/src/setting_storage.cpp",
-    "subscriber/src/shortcut_user_resolver.cpp",
   ]
   if (input_feature_pen) {
     sources +=

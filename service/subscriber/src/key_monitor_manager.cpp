@@ -18,7 +18,6 @@
 #include "bundle_name_parser.h"
 #include "define_multimodal.h"
 #include "event_log_helper.h"
-#include "i_input_windows_manager.h"
 #include "input_event_data_transformation.h"
 #include "input_event_handler.h"
 #include "key_auto_repeat.h"
@@ -76,7 +75,7 @@ std::string KeyMonitorManager::Monitor::Dump() const
 {
     std::ostringstream sMonitor;
     sMonitor << "Session:" << session_ << ",Key:" << key_ << ",Action:" << action_
-        << ",IsRepeat:" << std::boolalpha << isRepeat_ << ",UserId:" << userId_;
+        << ",IsRepeat:" << std::boolalpha << isRepeat_;
     return std::move(sMonitor).str();
 }
 
@@ -233,17 +232,10 @@ void KeyMonitorManager::NotifyMeeTimeMonitor(std::shared_ptr<KeyEvent> keyEvent)
 bool KeyMonitorManager::Intercept(std::shared_ptr<KeyEvent> keyEvent)
 {
     CHKPF(keyEvent);
-    int32_t eventUserId = WIN_MGR->FindDisplayUserId(keyEvent->GetTargetDisplayId());
     std::set<int32_t> sessions;
     auto nTriggered = std::count_if(monitors_.cbegin(), monitors_.cend(),
-        [this, keyEvent, &sessions, eventUserId](const auto &monitor) {
+        [this, keyEvent, &sessions](const auto &monitor) {
             if (monitor.Want(keyEvent)) {
-                // Per-user isolation: skip monitors whose owner differs from the event's user.
-                // USER_ID_ALL (SA/Shell) and the no-display fallback (eventUserId < 0) pass.
-                if (monitor.userId_ != USER_ID_ALL && eventUserId >= 0 &&
-                    monitor.userId_ != eventUserId) {
-                    return false;
-                }
                 if (CheckMeeTimeMonitor(keyEvent)) {
                     NotifyMeeTimeMonitor(keyEvent);
                     return true;

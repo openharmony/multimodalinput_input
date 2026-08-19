@@ -3551,41 +3551,5 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_PrintCriticalKeySubs
     keyOption->SetFinalKey(KeyEvent::KEYCODE_A);
     ASSERT_NO_FATAL_FAILURE(handler.PrintCriticalKeySubscribeInfo(3, sess, keyOption));
 }
-
-/**
- * @tc.name: KeySubscriberHandlerTest_IsMatchEventUser_001
- * @tc.desc: Global subscriber (USER_ID_ALL) always participates regardless of eventUserId
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_IsMatchEventUser_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    KeySubscriberHandler handler;
-    auto keyOption = std::make_shared<KeyOption>();
-    auto subscriber = std::make_shared<KeySubscriberHandler::Subscriber>(1, nullptr, keyOption);
-    subscriber->userId_ = USER_ID_ALL;
-    EXPECT_TRUE(handler.IsMatchEventUser(subscriber, 100));
-    EXPECT_TRUE(handler.IsMatchEventUser(subscriber, 0));
-    EXPECT_TRUE(handler.IsMatchEventUser(subscriber, -1));
-}
-
-/**
- * @tc.name: KeySubscriberHandlerTest_IsMatchEventUser_002
- * @tc.desc: App subscriber participates only when eventUserId matches; negative eventUserId falls back
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_IsMatchEventUser_002, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    KeySubscriberHandler handler;
-    auto keyOption = std::make_shared<KeyOption>();
-    auto subscriber = std::make_shared<KeySubscriberHandler::Subscriber>(1, nullptr, keyOption);
-    subscriber->userId_ = 100;
-    EXPECT_TRUE(handler.IsMatchEventUser(subscriber, 100));
-    EXPECT_FALSE(handler.IsMatchEventUser(subscriber, 101));
-    EXPECT_TRUE(handler.IsMatchEventUser(subscriber, -1));
-}
 } // namespace MMI
 } // namespace OHOS

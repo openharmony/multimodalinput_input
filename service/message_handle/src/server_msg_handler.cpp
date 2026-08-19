@@ -1425,14 +1425,13 @@ int32_t ServerMsgHandler::OnUnsubscribeHotkey(IUdsServer *server, int32_t pid, i
 
 #ifdef OHOS_BUILD_ENABLE_KEY_PRESSED_HANDLER
 int32_t ServerMsgHandler::SubscribeKeyMonitor(int32_t session,
-    const KeyMonitorOption &keyOption, const std::string &bundleName, int32_t userId)
+    const KeyMonitorOption &keyOption, const std::string &bundleName)
 {
     KeyMonitorManager::Monitor monitor {
         .session_ = session,
         .key_ = keyOption.GetKey(),
         .action_ = keyOption.GetAction(),
         .isRepeat_ = keyOption.IsRepeat(),
-        .userId_ = userId,
     };
     return KEY_MONITOR_MGR->AddMonitor(monitor, bundleName);
 }

@@ -48,10 +48,6 @@ public:
         SHORTCUT_TRIGGER_TYPE_UP,
     };
 
-    // Marks a shortcut registered by a non-app caller (SA / Shell). Such shortcuts are global
-    // and not filtered by the key event's owning user. Mirrors KeySubscriberHandler::USER_ID_ALL.
-    static inline constexpr int32_t USER_ID_ALL { -1 };
-
     struct SystemShortcutKey {
         std::set<int32_t> modifiers;
         int32_t finalKey;
@@ -59,7 +55,6 @@ public:
         ShortcutTriggerType triggerType;
         int32_t session;
         std::function<void(std::shared_ptr<KeyEvent>)> callback;
-        int32_t userId { USER_ID_ALL };
     };
 
     struct HotKey {
@@ -68,7 +63,6 @@ public:
         int32_t longPressTime; // ms
         int32_t session;
         std::function<void(std::shared_ptr<KeyEvent>)> callback;
-        int32_t userId { USER_ID_ALL };
     };
 
     KeyShortcutManager();
@@ -118,7 +112,6 @@ private:
         ShortcutTriggerType triggerType;
         int32_t session;
         std::function<void(std::shared_ptr<KeyEvent>)> callback;
-        int32_t userId { USER_ID_ALL };
     };
 
     struct SystemHotkey {

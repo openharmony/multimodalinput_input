@@ -19,7 +19,6 @@
 #include "i_input_event_handler.h"
 #include "key_gesture_manager.h"
 #include "nap_process.h"
-#include "shortcut_user_resolver.h"
 
 namespace OHOS {
 namespace MMI {
@@ -61,8 +60,6 @@ private:
         bool isSystem { true };
 #endif // SHORTCUT_KEY_MANAGER_ENABLED
         std::shared_ptr<KeyEvent> keyEvent_ { nullptr };
-        // Owning user of the registering app, or USER_ID_ALL for SA/Shell shortcuts.
-        int32_t userId_ { USER_ID_ALL };
     };
     using SubscriberCollection = std::map<std::shared_ptr<KeyOption>, std::list<std::shared_ptr<Subscriber>>>;
 
@@ -103,9 +100,9 @@ private:
     int32_t RemoveKeyGestureSubscriber(SessionPtr sess, int32_t subscribeId);
 #ifdef SHORTCUT_KEY_MANAGER_ENABLED
     int32_t RegisterSystemKey(std::shared_ptr<KeyOption> option, int32_t session,
-        std::function<void(std::shared_ptr<KeyEvent>)> callback, int32_t userId);
+        std::function<void(std::shared_ptr<KeyEvent>)> callback);
     int32_t RegisterHotKey(std::shared_ptr<KeyOption> option, int32_t session,
-        std::function<void(std::shared_ptr<KeyEvent>)> callback, int32_t userId);
+        std::function<void(std::shared_ptr<KeyEvent>)> callback);
     void UnregisterSystemKey(int32_t shortcutId);
     void UnregisterHotKey(int32_t shortcutId);
     void DeleteShortcutId(std::shared_ptr<Subscriber> subscriber);
@@ -113,9 +110,6 @@ private:
     int32_t AddSubscriber(std::shared_ptr<Subscriber> subscriber, std::shared_ptr<KeyOption> option, bool isSystem);
     int32_t RemoveSubscriber(SessionPtr sess, int32_t subscribeId, bool isSystem);
     bool IsMatchForegroundPid(std::list<std::shared_ptr<Subscriber>> subs, std::set<int32_t> foregroundPids);
-    // Returns true if `subscriber` should participate for an event whose owning user is
-    // `eventUserId`. Global subscribers (USER_ID_ALL) and the fallback (eventUserId < 0) pass.
-    bool IsMatchEventUser(const std::shared_ptr<Subscriber> &subscriber, int32_t eventUserId) const;
     int32_t GetHighestPrioritySubscriber(const std::list<std::shared_ptr<Subscriber>> &subscribers);
     void NotifyKeyDownSubscriber(const std::shared_ptr<KeyEvent> &keyEvent, std::shared_ptr<KeyOption> keyOption,
         std::list<std::shared_ptr<Subscriber>> &subscribers, bool &handled);
@@ -183,11 +177,6 @@ private:
     bool enableCombineKey_ { true };
     std::set<int32_t> foregroundPids_ {};
     bool isForegroundExits_ { false };
-    // Owning displayId / user of the key event currently being dispatched. Set at the entry of
-    // HandleKeyDown/HandleKeyUp and read by the per-user filter (IsMatchEventUser). -1 means
-    // "no display context" → fallback to legacy global matching (no user isolation).
-    int32_t lastEventDisplayId_ { -1 };
-    int32_t lastEventUserId_ { -1 };
     std::atomic_bool needSkipPowerKeyUp_ { false };
     bool callBahaviorState_ { false };
     std::atomic_bool callEndKeyUp_ { false };
