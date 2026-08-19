@@ -128,6 +128,9 @@ int32_t MouseControllerImpl::MoveTo(int32_t displayId, int32_t x, int32_t y)
                 pointerEvent->SetButtonPressed(button);
             }
         }
+        if (lastButtonId_ == PointerEvent::BUTTON_NONE) {
+            pointerEvent->SetButtonId(lastButtonId_);
+        }
         PointerEvent::PointerItem item = CreatePointerItem();
         int64_t downTime = !buttonDownTimes_.empty() ? buttonDownTimes_.begin()->second : -1;
         item.SetDownTime(downTime);
@@ -156,12 +159,13 @@ int32_t MouseControllerImpl::PressButton(int32_t button)
 
         buttonStates_[button] = true;
         buttonDownTimes_[button] = GetSysClockTime();
-
+        lastButtonId_ = button;
         pointerEvent = CreatePointerEvent(PointerEvent::POINTER_ACTION_BUTTON_DOWN);
         if (pointerEvent == nullptr) {
             MMI_HILOGE("Failed to create pointer event");
             buttonStates_[button] = false;
             buttonDownTimes_.erase(button);
+            lastButtonId_ = PointerEvent::BUTTON_NONE;
             return RET_ERR;
         }
 
@@ -184,6 +188,7 @@ int32_t MouseControllerImpl::PressButton(int32_t button)
         std::lock_guard<std::mutex> lock(mutex_);
         buttonStates_[button] = false;
         buttonDownTimes_.erase(button);
+        lastButtonId_ = PointerEvent::BUTTON_NONE;
     }
 
     return ret;
@@ -231,6 +236,7 @@ int32_t MouseControllerImpl::ReleaseButton(int32_t button)
         std::lock_guard<std::mutex> lock(mutex_);
         buttonStates_[button] = false;
         buttonDownTimes_.erase(button);
+        lastButtonId_ = PointerEvent::BUTTON_NONE;
     }
 
     return ret;
