@@ -48,7 +48,7 @@ public:
 
 class DisplayManagerLite {
 public:
-    static DisplayManagerLite& GetInstan()
+    static DisplayManagerLite& GetInstance()
     {
         static DisplayManagerLite instance;
         return instance;

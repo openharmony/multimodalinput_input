@@ -2380,9 +2380,9 @@ HWTEST_F(ScreenPointerTest, ScreenPointerTest_ResolveScreenLiteInfo_003, TestSiz
     sptr<OHOS::Rosen::SupportedScreenModes> mode = new OHOS::Rosen::SupportedScreenModes();
     ASSERT_NE(screenInfo, nullptr);
     ASSERT_NE(mode, nullptr);
-    mode->width = 2880;
-    mode->height = 1920;
-    screeInfo->SetModeId(0);
+    mode->width_ = 2880;
+    mode->height_ = 1920;
+    screenInfo->SetModeId(0);
     screenInfo->modes_ = { { mode } };
     screenInfo->SetScreenTypeInfo(OHOS::Rosen::ScreenTypeInfo::BUILT_IN);
 
@@ -2408,8 +2408,8 @@ HWTEST_F(ScreenPointerTest, ScreenPointerTest_ResolveScreenLiteInfo_004, TestSiz
     
     sptr<OHOS::Rosen::SupportedScreenModes> mode = new OHOS::Rosen::SupportedScreenModes();
     ASSERT_NE(mode, nullptr);
-    mode->width = 2880;
-    mode->height = 1920;
+    mode->width_ = 2880;
+    mode->height_ = 1920;
     OHOS::Rosen::DisplayLite::mockValid = true;
     
     sptr<OHOS::Rosen::ScreenInfo> screenInfo90 = new OHOS::Rosen::ScreenInfo();
@@ -2433,7 +2433,7 @@ HWTEST_F(ScreenPointerTest, ScreenPointerTest_ResolveScreenLiteInfo_004, TestSiz
     OHOS::Rosen::DisplayLite::mockWidth = 960;
     OHOS::Rosen::DisplayLite::mockHeight = 1440;
     OHOS::Rosen::DisplayLite::mockRotation = OHOS::Rosen::Rotation::ROTATION_270;
-    auto result = ScreenPointer::ResolveScreenLiteInfo(screenInfo270);
+    result = ScreenPointer::ResolveScreenLiteInfo(screenInfo270);
     EXPECT_EQ(result.width, 1440);
     EXPECT_EQ(result.height, 960);
     EXPECT_EQ(result.rotation, OHOS::Rosen::Rotation::ROTATION_270);
@@ -2451,9 +2451,9 @@ HWTEST_F(ScreenPointerTest, ScreenPointerTest_ResolveScreenLiteInfo_005, TestSiz
     sptr<OHOS::Rosen::SupportedScreenModes> mode = new OHOS::Rosen::SupportedScreenModes();
     ASSERT_NE(screenInfo, nullptr);
     ASSERT_NE(mode, nullptr);
-    mode->width = 2880;
-    mode->height = 1920;
-    screeInfo->SetModeId(0);
+    mode->width_ = 2880;
+    mode->height_ = 1920;
+    screenInfo->SetModeId(0);
     screenInfo->modes_ = { { mode } };
     screenInfo->SetScreenTypeInfo(OHOS::Rosen::ScreenTypeInfo::BUILT_IN);
 
