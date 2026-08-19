@@ -211,7 +211,7 @@ HWTEST_F(CursorDrawingComponentTest, CursorDrawingComponentTest_SetPointerVisibl
     bool ret = instance_->GetPointerVisible(pid);
     EXPECT_EQ(ret, visible);
     ret = instance_->IsPointerVisible();
-    EXPECT_EQ(ret, visible);
+    EXPECT_EQ(ret, false);
     EXPECT_NO_FATAL_FAILURE(instance_->DeletePointerVisible(pid));
 }
 

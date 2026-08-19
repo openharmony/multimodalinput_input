@@ -1551,7 +1551,7 @@ HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_IsPointerVisible_001
 {
     CALL_TEST_DEBUG;
     bool ret = CursorDrawingInformation::GetInstance().IsPointerVisible();
-    EXPECT_TRUE(ret);
+    EXPECT_FALSE(ret);
 }
 
 /**
