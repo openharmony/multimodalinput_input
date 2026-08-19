@@ -868,8 +868,7 @@ int32_t MMIService::SetCustomCursorPixelMapInner(int32_t windowId, int32_t focus
     }
 #if defined OHOS_BUILD_ENABLE_POINTER
     auto type = PER_HELPER->GetTokenType();
-    if (windowId < 0 && (type == OHOS::Security::AccessToken::TOKEN_HAP ||
-        type == OHOS::Security::AccessToken::TOKEN_NATIVE)) {
+    if (windowId < 0 && (type != OHOS::Security::AccessToken::TOKEN_NATIVE)) {
         // The windowID of the application must be greater than 0
         MMI_HILOGE("Set the custom cursor failed, ret:%{public}d", RET_ERR);
         return RET_ERR;
@@ -1477,6 +1476,10 @@ int32_t MMIService::SetPointerStyleInner(int32_t windowId, PointerStyle pointerS
 ErrCode MMIService::ClearWindowPointerStyle(int32_t pid, int32_t windowId)
 {
     CALL_DEBUG_ENTER;
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
     if (windowId <= 0) {
         MMI_HILOGE("Invalid windowId:%{public}d", windowId);
         return RET_ERR;
@@ -2291,6 +2294,7 @@ ErrCode MMIService::MoveMouseEvent(int32_t offsetX, int32_t offsetY)
         return MMISERVICE_NOT_RUNNING;
     }
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
+    MouseEventHdr->LoadMouseExplicitly();
     int32_t ret =
         delegateTasks_.PostSyncTask(
             [this, offsetX, offsetY] {
@@ -3390,6 +3394,7 @@ ErrCode MMIService::SetPointerLocation(int32_t x, int32_t y, int32_t displayId)
         return MMISERVICE_NOT_RUNNING;
     }
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
+    MouseEventHdr->LoadMouseExplicitly();
     int32_t ret = delegateTasks_.PostSyncTask(
         [x, y, displayId] {
             return MouseEventHdr->SetPointerLocation(x, y, displayId);
@@ -5586,6 +5591,18 @@ ErrCode MMIService::ShiftAppPointerEvent(const ShiftWindowParam &param, bool aut
         MMI_HILOGE("Service is not running");
         return MMISERVICE_NOT_RUNNING;
     }
+    std::string callingTokenName;
+    Security::AccessToken::HapTokenInfo callingTokenInfo;
+    auto tokenId = IPCSkeleton::GetCallingTokenID();
+    if (Security::AccessToken::AccessTokenKit::GetHapTokenInfo(tokenId, callingTokenInfo) != 0) {
+        MMI_HILOGE("GetHapTokenInfo failed");
+        return RET_ERR;
+    }
+    callingTokenName = callingTokenInfo.bundleName;
+    if (callingTokenName != SCENEBOARD_NAME) {
+        MMI_HILOGE("Invalid Caller");
+        return RET_ERR;
+    }
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     int32_t ret = delegateTasks_.PostSyncTask(
         [param, autoGenDown]() {
@@ -6018,6 +6035,7 @@ ErrCode MMIService::SetMouseAccelerateMotionSwitch(int32_t deviceId, bool enable
         MMI_HILOGE("Verify Request From Shell failed");
         return ERROR_NO_PERMISSION;
     }
+    MouseEventHdr->LoadMouseExplicitly();
     int32_t ret = delegateTasks_.PostSyncTask(
         [deviceId, enable] {
             return MouseEventHdr->SetMouseAccelerateMotionSwitch(deviceId, enable);
