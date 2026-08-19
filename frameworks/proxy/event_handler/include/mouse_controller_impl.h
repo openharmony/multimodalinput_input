@@ -44,6 +44,7 @@ private:
 
     std::map<int32_t, bool> buttonStates_;
     std::map<int32_t, int64_t> buttonDownTimes_;
+    int32_t lastButtonId_ { PointerEvent::BUTTON_NONE };
 
     struct {
         bool inProgress = false;
