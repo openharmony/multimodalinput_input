@@ -2346,11 +2346,13 @@ HWTEST_F(ScreenPointerTest, ScreenPointerTest_ResolveScreenLiteInfo_001, TestSiz
     sptr<OHOS::Rosen::ScreenInfo> screenInfo = new OHOS::Rosen::ScreenInfo();
     ASSERT_NE(screenInfo, nullptr);
     OHOS::Rosen::DisplayLite::mockValid = false;
+    OHOS::system::g_mockProductType = "AST";
     EXPECT_EQ(screenInfo->GetScreenTypeInfo(), OHOS::Rosen::ScreenTypeInfo::BUILT_IN);
     result = ScreenPointer::ResolveScreenLiteInfo(screenInfo);
     EXPECT_EQ(result.width, 0);
     EXPECT_EQ(result.height, 0);
     EXPECT_EQ(result.rotation, OHOS::Rosen::Rotation::ROTATION_0);
+    OHOS::system::g_mockProductType.clear();
 }
 
 /**
@@ -2364,7 +2366,7 @@ HWTEST_F(ScreenPointerTest, ScreenPointerTest_ResolveScreenLiteInfo_002, TestSiz
     CALL_TEST_DEBUG;
     sptr<OHOS::Rosen::ScreenInfo> externalInfo = new OHOS::Rosen::ScreenInfo();
     ASSERT_NE(externalInfo, nullptr);
-    OHOS::system::g_mockProductType = DEVICE_TYPE_TABLET_A1;
+    OHOS::system::g_mockProductType = "AST";
     externalInfo->SetScreenTypeInfo(OHOS::Rosen::ScreenTypeInfo::EXTERNAL);
     auto result = ScreenPointer::ResolveScreenLiteInfo(externalInfo);
     EXPECT_EQ(result.width, 0);
@@ -2410,7 +2412,7 @@ HWTEST_F(ScreenPointerTest, ScreenPointerTest_ResolveScreenLiteInfo_003, TestSiz
     EXPECT_EQ(result.height, 1920);
     EXPECT_EQ(result.rotation, OHOS::Rosen::Rotation::ROTATION_0);
 
-    OHOS::system::g_mockProductType = DEVICE_TYPE_TABLET_A1;
+    OHOS::system::g_mockProductType = "AST";
     result = ScreenPointer::ResolveScreenLiteInfo(screenInfo);
     EXPECT_EQ(result.width, 1440);
     EXPECT_EQ(result.height, 960);
@@ -2432,7 +2434,7 @@ HWTEST_F(ScreenPointerTest, ScreenPointerTest_ResolveScreenLiteInfo_004, TestSiz
     mode->width_ = 2880;
     mode->height_ = 1920;
     OHOS::Rosen::DisplayLite::mockValid = true;
-    OHOS::system::g_mockProductType = DEVICE_TYPE_TABLET_A1;
+    OHOS::system::g_mockProductType = "AST";
     
     sptr<OHOS::Rosen::ScreenInfo> screenInfo90 = new OHOS::Rosen::ScreenInfo();
     ASSERT_NE(screenInfo90, nullptr);
@@ -2479,7 +2481,7 @@ HWTEST_F(ScreenPointerTest, ScreenPointerTest_ResolveScreenLiteInfo_005, TestSiz
     screenInfo->SetModeId(0);
     screenInfo->modes_ = { { mode } };
     screenInfo->SetScreenTypeInfo(OHOS::Rosen::ScreenTypeInfo::BUILT_IN);
-    OHOS::system::g_mockProductType = DEVICE_TYPE_TABLET_A1;
+    OHOS::system::g_mockProductType = "AST";
 
     OHOS::Rosen::DisplayLite::mockValid = true;
     OHOS::Rosen::DisplayLite::mockWidth = 2000;

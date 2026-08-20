@@ -104,7 +104,9 @@ ScreenPointer::ScreenLiteInfo ScreenPointer::ResolveScreenLiteInfo(const screen_
     result.width = physicalWidth;
     result.height = physicalHeight;
     result.rotation = si->GetRotation();
-    if (OHOS::system::GetParameter("const.build.product", SYS_GET_DEVICE_TYPE_PARAM) != DEVICE_TYPE_TABLET_A1) {
+    const std::string product = OHOS::system::GetParameter("const.build.product", SYS_GET_DEVICE_TYPE_PARAM);
+    if (std::find(DEVICE_TYPE_TABLET_A1_VECTOR.begin(), DEVICE_TYPE_TABLET_A1_VECTOR.end(), product) ==
+        DEVICE_TYPE_TABLET_A1_VECTOR.end()) {
         return result;
     }
     if (si->GetScreenTypeInfo() != OHOS::Rosen::ScreenTypeInfo::BUILT_IN) {
