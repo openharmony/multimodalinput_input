@@ -115,15 +115,15 @@ ScreenPointer::ScreenLiteInfo ScreenPointer::ResolveScreenLiteInfo(const screen_
     }
     uint32_t logicalWidth = static_cast<uint32_t>(displayLite->GetWidth());
     uint32_t logicalHeight = static_cast<uint32_t>(displayLite->GetHeight());
-    rotation_t logicalRotaion = displayLite->GetRotation();
-    if (logicalRotaion == rotation_t::ROTATION_90 || logicalRotaion == rotation_t::ROTATION_270) {
+    rotation_t logicalRotation = displayLite->GetRotation();
+    if (logicalRotation == rotation_t::ROTATION_90 || logicalRotation == rotation_t::ROTATION_270) {
         std::swap(logicalWidth, logicalHeight);
     }
     bool isROG = IsROGEnable(physicalWidth, physicalHeight, logicalWidth, logicalHeight);
     if (isROG) {
         result.width = logicalWidth;
         result.height = logicalHeight;
-        result.rotation = logicalRotaion;
+        result.rotation = logicalRotation;
     }
     MMI_HILOGI("ResolveScreenLiteInfo, rsId=%{public}" PRIu64 ", BUILT_IN, physical=(%{public}u, %{public}u),"
         "logical=(%{public}u, %{public}u), result=(%{public}u, %{public}u), rotation=%{public}u, ROG=%{public}d",
