@@ -119,9 +119,10 @@ void EventDump::ParseCommand(int32_t fd, const std::vector<std::string> &args)
         MMI_HILOGE("size of args can't be zero");
         return;
     }
-    char **argv = new (std::nothrow) char *[args.size()];
+    std::vector<int32_t> getoptResults;
+    char **argv = new (std::nothrow) char *[args.size() + 1];
     CHKPV(argv);
-    if (memset_s(argv, args.size() * sizeof(char*), 0, args.size() * sizeof(char*)) != EOK) {
+    if (memset_s(argv, (args.size() + 1) * sizeof(char*), 0, (args.size() + 1) * sizeof(char*)) != EOK) {
         MMI_HILOGE("Call memset_s failed");
         delete[] argv;
         argv = nullptr;
@@ -138,9 +139,16 @@ void EventDump::ParseCommand(int32_t fd, const std::vector<std::string> &args)
             goto RELEASE_RES;
         }
     }
-    optind = 1;
-    int32_t c;
-    while ((c = getopt_long (args.size(), argv, "hdlwusoifmckKetbnpB", dumpOptions, &optionIndex)) != -1) {
+    argv[args.size()] = nullptr;
+    {
+        std::lock_guard<std::mutex> lock(getoptMtx_);
+        optind = 1;
+        int32_t c;
+        while ((c = getopt_long (args.size(), argv, "hdlwusoifmckKetbnpB", dumpOptions, &optionIndex)) != -1) {
+            getoptResults.push_back(c);
+        }
+    }
+    for (int32_t c : getoptResults) {
         switch (c) {
             case 'h': {
                 DumpEventHelp(fd, args);
