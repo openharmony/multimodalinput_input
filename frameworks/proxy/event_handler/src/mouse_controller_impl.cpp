@@ -128,7 +128,7 @@ int32_t MouseControllerImpl::MoveTo(int32_t displayId, int32_t x, int32_t y)
                 pointerEvent->SetButtonPressed(button);
             }
         }
-        if (lastButtonId_ == PointerEvent::BUTTON_NONE) {
+        if (lastButtonId_ != PointerEvent::BUTTON_NONE) {
             pointerEvent->SetButtonId(lastButtonId_);
         }
         PointerEvent::PointerItem item = CreatePointerItem();
