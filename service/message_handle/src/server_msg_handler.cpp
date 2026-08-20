@@ -662,7 +662,7 @@ void ServerMsgHandler::UpdateMouseLocation(std::shared_ptr<PointerEvent> pointer
     double displayY = item.GetDisplayYPos();
     CursorPosition cursorPos = WIN_MGR->GetCursorPos();
     int32_t displayId = cursorPos.displayId;
-    WIN_MGR->UpdateAndAdjustMouseLocation(displayId, displayX, displayY);
+    WIN_MGR->UpdateAndAdjustMouseLocation(displayId, displayX, displayY, false);
 }
 
 void ServerMsgHandler::UpdatePointerEvent(std::shared_ptr<PointerEvent> pointerEvent)
