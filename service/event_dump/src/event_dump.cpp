@@ -147,7 +147,6 @@ void EventDump::ParseCommand(int32_t fd, const std::vector<std::string> &args)
         while ((c = getopt_long (args.size(), argv, "hdlwusoifmckKetbnpB", dumpOptions, &optionIndex)) != -1) {
             getoptResults.push_back(c);
         }
-
     }
     for (int32_t c : getoptResults) {
         switch (c) {
