@@ -35,6 +35,7 @@ public:
 
 private:
     std::weak_ptr<ITouchGestureManager> touchGestureMgr_;
+    std::mutex getoptMtx_;
 };
 
 #define MMIEventDump ::OHOS::DelayedSingleton<EventDump>::GetInstance()
