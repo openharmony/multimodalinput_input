@@ -615,7 +615,9 @@ bool KeyShortcutManager::HandleKeyDown(std::shared_ptr<KeyEvent> keyEvent)
         }
         // Per-user isolation: skip app shortcuts whose owner differs from the event's user.
         // USER_ID_ALL (SA/Shell) and the no-display fallback (eventUserId < 0) always pass.
-        if (shortcut.userId != USER_ID_ALL && eventUserId >= 0 && shortcut.userId != eventUserId) {
+        // userId 0 is not a valid active user (HasMultipleActiveUsers ignores userId <= 0);
+        // treat it as unknown so app shortcuts still match.
+        if (shortcut.userId != USER_ID_ALL && eventUserId > 0 && shortcut.userId != eventUserId) {
             continue;
         }
         if (!foregroundPids.empty() &&
@@ -647,7 +649,8 @@ bool KeyShortcutManager::HandleKeyUp(std::shared_ptr<KeyEvent> keyEvent)
             continue;
         }
         // Per-user isolation: skip app shortcuts whose owner differs from the event's user.
-        if (shortcut.userId != USER_ID_ALL && eventUserId >= 0 && shortcut.userId != eventUserId) {
+        // userId 0 is not a valid active user; treat it as unknown so app shortcuts still match.
+        if (shortcut.userId != USER_ID_ALL && eventUserId > 0 && shortcut.userId != eventUserId) {
             continue;
         }
         if (!foregroundPids.empty() &&

@@ -240,7 +240,8 @@ bool KeyMonitorManager::Intercept(std::shared_ptr<KeyEvent> keyEvent)
             if (monitor.Want(keyEvent)) {
                 // Per-user isolation: skip monitors whose owner differs from the event's user.
                 // USER_ID_ALL (SA/Shell) and the no-display fallback (eventUserId < 0) pass.
-                if (monitor.userId_ != USER_ID_ALL && eventUserId >= 0 &&
+                // userId 0 is not a valid active user; treat it as unknown so app monitors still match.
+                if (monitor.userId_ != USER_ID_ALL && eventUserId > 0 &&
                     monitor.userId_ != eventUserId) {
                     return false;
                 }

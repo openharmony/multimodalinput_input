@@ -858,7 +858,9 @@ bool KeySubscriberHandler::IsMatchEventUser(const std::shared_ptr<Subscriber> &s
 {
     CHKPF(subscriber);
     // Global shortcuts (SA/Shell) and the no-display fallback always participate.
-    if (subscriber->userId_ == USER_ID_ALL || eventUserId < 0) {
+    // userId 0 is not a valid active user (HasMultipleActiveUsers ignores userId <= 0);
+    // treat it as unknown so app subscriptions still match.
+    if (subscriber->userId_ == USER_ID_ALL || eventUserId <= 0) {
         return true;
     }
     return subscriber->userId_ == eventUserId;
