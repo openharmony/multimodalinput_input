@@ -2181,7 +2181,7 @@ void InputDeviceManager::RemoveFlag(int32_t deviceId)
 {
     auto iter = inputDeviceFlags_.find(deviceId);
     if (iter == inputDeviceFlags_.end()) {
-        MMI_HILOGE("Failed to search for the device");
+        MMI_HILOGD("Failed to search for the device");
         return;
     }
     inputDeviceFlags_.erase(iter);
@@ -2191,7 +2191,7 @@ uint32_t InputDeviceManager::GetFlag(int32_t deviceId)
 {
     auto iter = inputDeviceFlags_.find(deviceId);
     if (iter == inputDeviceFlags_.end()) {
-        MMI_HILOGE("Failed to search for the device");
+        MMI_HILOGD("Failed to search for the device");
         return 0;
     }
     return iter->second;
