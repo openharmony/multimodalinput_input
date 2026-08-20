@@ -2316,6 +2316,10 @@ HWTEST_F(ScreenPointerTest, ScreenPointerTest_IsROGEnable_001, TestSize.Level1)
     EXPECT_FALSE(ScreenPointer::IsROGEnable(2880, 1920, 0, 960));
     EXPECT_FALSE(ScreenPointer::IsROGEnable(2880, 1920, 1440, 0));
     EXPECT_FALSE(ScreenPointer::IsROGEnable(0, 0, 0, 0));
+    // only physicalWidth == logicalWidth, physicalHeight != logicalHeight
+    EXPECT_FALSE(ScreenPointer::IsROGEnable(2880, 1920, 2880, 1280));
+    // only physicalHeight == logicalHeight, physicalWidth != logicalWidth
+    EXPECT_FALSE(ScreenPointer::IsROGEnable(2880, 1920, 1920, 1920));
 }
 
 /**

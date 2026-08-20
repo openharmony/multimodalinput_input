@@ -100,7 +100,7 @@ ScreenPointer::ScreenLiteInfo ScreenPointer::ResolveScreenLiteInfo(const screen_
         return result;
     }
     uint32_t physicalWidth = GetScreenInfoWidth(si);
-    uint32_t physicalHeight = GetScreenInfoWidth(si);
+    uint32_t physicalHeight = GetScreenInfoHeight(si);
     result.width = physicalWidth;
     result.height = physicalHeight;
     result.rotation = si->GetRotation();
