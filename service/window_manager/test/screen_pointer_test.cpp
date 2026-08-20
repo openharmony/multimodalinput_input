@@ -31,6 +31,13 @@
 #define MMI_LOG_TAG "ScreenPointerTest"
 
 namespace OHOS {
+namespace system {
+std::string g_mockProductType;
+std::string GetParameter(const std::string& key, const std::string& def)
+{
+    return g_mockProductType.empty() ? def : g_mockProductType;
+}
+} // namespace system
 namespace MMI {
 namespace {
 using namespace testing::ext;
@@ -2357,6 +2364,7 @@ HWTEST_F(ScreenPointerTest, ScreenPointerTest_ResolveScreenLiteInfo_002, TestSiz
     CALL_TEST_DEBUG;
     sptr<OHOS::Rosen::ScreenInfo> externalInfo = new OHOS::Rosen::ScreenInfo();
     ASSERT_NE(externalInfo, nullptr);
+    OHOS::system::g_mockProductType = DEVICE_TYPE_TABLET_A1;
     externalInfo->SetScreenTypeInfo(OHOS::Rosen::ScreenTypeInfo::EXTERNAL);
     auto result = ScreenPointer::ResolveScreenLiteInfo(externalInfo);
     EXPECT_EQ(result.width, 0);
@@ -2370,6 +2378,7 @@ HWTEST_F(ScreenPointerTest, ScreenPointerTest_ResolveScreenLiteInfo_002, TestSiz
     EXPECT_EQ(result.width, 0);
     EXPECT_EQ(result.height, 0);
     EXPECT_EQ(result.rotation, OHOS::Rosen::Rotation::ROTATION_0);
+    OHOS::system::g_mockProductType.clear();
 }
 
 /**
@@ -2395,10 +2404,18 @@ HWTEST_F(ScreenPointerTest, ScreenPointerTest_ResolveScreenLiteInfo_003, TestSiz
     OHOS::Rosen::DisplayLite::mockHeight = 960;
     OHOS::Rosen::DisplayLite::mockRotation = OHOS::Rosen::Rotation::ROTATION_0;
 
+    OHOS::system::g_mockProductType = "NULL";
     auto result = ScreenPointer::ResolveScreenLiteInfo(screenInfo);
+    EXPECT_EQ(result.width, 2880);
+    EXPECT_EQ(result.height, 1920);
+    EXPECT_EQ(result.rotation, OHOS::Rosen::Rotation::ROTATION_0);
+
+    OHOS::system::g_mockProductType = DEVICE_TYPE_TABLET_A1;
+    result = ScreenPointer::ResolveScreenLiteInfo(screenInfo);
     EXPECT_EQ(result.width, 1440);
     EXPECT_EQ(result.height, 960);
     EXPECT_EQ(result.rotation, OHOS::Rosen::Rotation::ROTATION_0);
+    OHOS::system::g_mockProductType.clear();
 }
 
 /**
@@ -2415,6 +2432,7 @@ HWTEST_F(ScreenPointerTest, ScreenPointerTest_ResolveScreenLiteInfo_004, TestSiz
     mode->width_ = 2880;
     mode->height_ = 1920;
     OHOS::Rosen::DisplayLite::mockValid = true;
+    OHOS::system::g_mockProductType = DEVICE_TYPE_TABLET_A1;
     
     sptr<OHOS::Rosen::ScreenInfo> screenInfo90 = new OHOS::Rosen::ScreenInfo();
     ASSERT_NE(screenInfo90, nullptr);
@@ -2441,6 +2459,7 @@ HWTEST_F(ScreenPointerTest, ScreenPointerTest_ResolveScreenLiteInfo_004, TestSiz
     EXPECT_EQ(result.width, 1440);
     EXPECT_EQ(result.height, 960);
     EXPECT_EQ(result.rotation, OHOS::Rosen::Rotation::ROTATION_270);
+    OHOS::system::g_mockProductType.clear();
 }
 
 /**
@@ -2460,6 +2479,7 @@ HWTEST_F(ScreenPointerTest, ScreenPointerTest_ResolveScreenLiteInfo_005, TestSiz
     screenInfo->SetModeId(0);
     screenInfo->modes_ = { { mode } };
     screenInfo->SetScreenTypeInfo(OHOS::Rosen::ScreenTypeInfo::BUILT_IN);
+    OHOS::system::g_mockProductType = DEVICE_TYPE_TABLET_A1;
 
     OHOS::Rosen::DisplayLite::mockValid = true;
     OHOS::Rosen::DisplayLite::mockWidth = 2000;
@@ -2470,6 +2490,7 @@ HWTEST_F(ScreenPointerTest, ScreenPointerTest_ResolveScreenLiteInfo_005, TestSiz
     EXPECT_EQ(result.width, 2880);
     EXPECT_EQ(result.height, 1920);
     EXPECT_EQ(result.rotation, OHOS::Rosen::Rotation::ROTATION_0);
+    OHOS::system::g_mockProductType.clear();
 }
 } // namespace MMI
 } // namespace OHOS

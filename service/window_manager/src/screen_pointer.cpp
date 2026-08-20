@@ -104,6 +104,9 @@ ScreenPointer::ScreenLiteInfo ScreenPointer::ResolveScreenLiteInfo(const screen_
     result.width = physicalWidth;
     result.height = physicalHeight;
     result.rotation = si->GetRotation();
+    if (OHOS::system::GetParameter("const.build.product", SYS_GET_DEVICE_TYPE_PARAM) != DEVICE_TYPE_TABLET_A1) {
+        return result;
+    }
     if (si->GetScreenTypeInfo() != OHOS::Rosen::ScreenTypeInfo::BUILT_IN) {
         MMI_HILOGI("screenId=%{public}" PRIu64 ", not BUILT_IN, use physical", si->GetRsId());
         return result;
