@@ -1910,7 +1910,7 @@ int32_t InputManagerCommand::SavePixelMapToFile(const char *filePath)
         std::cerr << "PixelMap is null" << std::endl;
         return RET_ERR;
     }
-    uint64_t g_bufferSize = static_cast<uint64_t>(g_pixelMap->GetAllocationByteCount());
+    uint64_t g_bufferSize = static_cast<uint64_t>(g_pixelMap->GetByteCount());
     uint8_t* g_mappedAddr = static_cast<uint8_t*>(malloc(g_bufferSize));
     if (g_mappedAddr == nullptr) {
         std::cerr << "Malloc failed" << std::endl;
