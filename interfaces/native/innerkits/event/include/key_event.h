@@ -2833,7 +2833,7 @@ public:
     /**
      * Detect Peeling Key
      *
-     * @since 9
+     * @since 26.0.0
      */
     static const int32_t KEYCODE_PEELING;
 
