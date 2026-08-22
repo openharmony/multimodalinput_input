@@ -150,6 +150,12 @@ bool TriggerEventDispatcher::ShouldDispatchPRESSED(std::shared_ptr<KeyOption> ke
     if (keyCode != keyOption->GetFinalKey()) {
         return false;
     }
+    if (action == KeyEvent::KEY_ACTION_UP) {
+        std::string subscribeKey = GenerateSubscribeKey(keyOption);
+        firstDownSent_[subscribeKey] = false;
+        MMI_HILOGD("PRESSED mode: finalKey UP, reset firstDownSent");
+        return false;
+    }
     if (action != KeyEvent::KEY_ACTION_DOWN) {
         return false;
     }

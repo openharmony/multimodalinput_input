@@ -151,7 +151,9 @@ private:
         const std::shared_ptr<KeyOption> &keyOption,
         std::list<std::shared_ptr<Subscriber>> &subscribers, bool &handled);
     void HandleKeyUpForPressedType(const std::shared_ptr<KeyEvent> &keyEvent,
-        int32_t keyCode, const std::shared_ptr<KeyOption> &keyOption, bool &handled);
+        int32_t keyCode, const std::shared_ptr<KeyOption> &keyOption,
+        std::list<std::shared_ptr<Subscriber>> &subscribers, bool &handled);
+    void NotifyPressedSubscriberOnKeyUp(const std::shared_ptr<KeyEvent> &keyEvent);
     bool HandleKeyUpWithDurationCheck(const std::shared_ptr<KeyEvent> &keyEvent,
         const std::shared_ptr<KeyOption> &keyOption,
         std::list<std::shared_ptr<Subscriber>> &subscribers, bool &handled);

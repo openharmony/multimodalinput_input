@@ -21,6 +21,7 @@
 #include "key_option.h"
 #include "key_subscriber_handler.h"
 #include "key_shortcut_manager.h"
+#include "trigger_event_dispatcher.h"
 #ifdef OHOS_BUILD_ENABLE_CALL_MANAGER
 #include "call_manager_client.h"
 #endif // OHOS_BUILD_ENABLE_CALL_MANAGER
@@ -6086,7 +6087,11 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_HandleKeyUpForPresse
     keyOption->SetFinalKey(KeyEvent::KEYCODE_A);
     int32_t keyCode = KeyEvent::KEYCODE_A;
     bool handled = false;
-    handler.HandleKeyUpForPressedType(keyEvent, keyCode, keyOption, handled);
+    SessionPtr sess = std::make_shared<UDSSession>(PROGRAM_NAME, MODULE_TYPE, UDS_FD, UDS_UID, UDS_PID);
+    ASSERT_NE(sess, nullptr);
+    auto subscriber = std::make_shared<OHOS::MMI::KeySubscriberHandler::Subscriber>(1, sess, keyOption);
+    std::list<std::shared_ptr<OHOS::MMI::KeySubscriberHandler::Subscriber>> subscribers = { subscriber };
+    handler.HandleKeyUpForPressedType(keyEvent, keyCode, keyOption, subscribers, handled);
     EXPECT_TRUE(handled);
 }
 
@@ -6108,7 +6113,11 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_HandleKeyUpForPresse
     keyOption->SetPreKeys(preKeys);
     int32_t keyCode = KeyEvent::KEYCODE_CTRL_LEFT;
     bool handled = false;
-    handler.HandleKeyUpForPressedType(keyEvent, keyCode, keyOption, handled);
+    SessionPtr sess = std::make_shared<UDSSession>(PROGRAM_NAME, MODULE_TYPE, UDS_FD, UDS_UID, UDS_PID);
+    ASSERT_NE(sess, nullptr);
+    auto subscriber = std::make_shared<OHOS::MMI::KeySubscriberHandler::Subscriber>(1, sess, keyOption);
+    std::list<std::shared_ptr<OHOS::MMI::KeySubscriberHandler::Subscriber>> subscribers = { subscriber };
+    handler.HandleKeyUpForPressedType(keyEvent, keyCode, keyOption, subscribers, handled);
     EXPECT_TRUE(handled);
 }
 
@@ -6130,8 +6139,164 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_HandleKeyUpForPresse
     keyOption->SetPreKeys(preKeys);
     int32_t keyCode = KeyEvent::KEYCODE_B;
     bool handled = false;
-    handler.HandleKeyUpForPressedType(keyEvent, keyCode, keyOption, handled);
+    SessionPtr sess = std::make_shared<UDSSession>(PROGRAM_NAME, MODULE_TYPE, UDS_FD, UDS_UID, UDS_PID);
+    ASSERT_NE(sess, nullptr);
+    auto subscriber = std::make_shared<OHOS::MMI::KeySubscriberHandler::Subscriber>(1, sess, keyOption);
+    std::list<std::shared_ptr<OHOS::MMI::KeySubscriberHandler::Subscriber>> subscribers = { subscriber };
+    handler.HandleKeyUpForPressedType(keyEvent, keyCode, keyOption, subscribers, handled);
     EXPECT_FALSE(handled);
+}
+
+/**
+ * @tc.name: KeySubscriberHandlerTest_HandleKeyUpForPressedType_004
+ * @tc.desc: Test HandleKeyUpForPressedType consumes finalKey UP and notifies subscribers
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_HandleKeyUpForPressedType_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeySubscriberHandler handler;
+    handler.isForegroundExits_ = true;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_A);
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP);
+    auto keyOption = std::make_shared<KeyOption>();
+    keyOption->SetFinalKey(KeyEvent::KEYCODE_A);
+    SessionPtr sess = std::make_shared<UDSSession>(PROGRAM_NAME, MODULE_TYPE, UDS_FD, UDS_UID, UDS_PID);
+    ASSERT_NE(sess, nullptr);
+    auto subscriber = std::make_shared<OHOS::MMI::KeySubscriberHandler::Subscriber>(1, sess, keyOption);
+    std::list<std::shared_ptr<OHOS::MMI::KeySubscriberHandler::Subscriber>> subscribers = { subscriber };
+    bool handled = false;
+    handler.HandleKeyUpForPressedType(keyEvent, KeyEvent::KEYCODE_A, keyOption, subscribers, handled);
+    EXPECT_TRUE(handled);
+}
+
+/**
+ * @tc.name: KeySubscriberHandlerTest_HandleKeyUpForPressedType_005
+ * @tc.desc: Test HandleKeyUpForPressedType consumes preKey UP but skips notify (keyCode != finalKey)
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_HandleKeyUpForPressedType_005, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeySubscriberHandler handler;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    auto keyOption = std::make_shared<KeyOption>();
+    keyOption->SetFinalKey(KeyEvent::KEYCODE_A);
+    std::set<int32_t> preKeys = { KeyEvent::KEYCODE_CTRL_LEFT };
+    keyOption->SetPreKeys(preKeys);
+    SessionPtr sess = std::make_shared<UDSSession>(PROGRAM_NAME, MODULE_TYPE, UDS_FD, UDS_UID, UDS_PID);
+    ASSERT_NE(sess, nullptr);
+    auto subscriber = std::make_shared<OHOS::MMI::KeySubscriberHandler::Subscriber>(1, sess, keyOption);
+    std::list<std::shared_ptr<OHOS::MMI::KeySubscriberHandler::Subscriber>> subscribers = { subscriber };
+    bool handled = false;
+    handler.HandleKeyUpForPressedType(keyEvent, KeyEvent::KEYCODE_CTRL_LEFT, keyOption, subscribers, handled);
+    EXPECT_TRUE(handled);
+}
+
+/**
+ * @tc.name: KeySubscriberHandlerTest_IsKeyEventSubscribed_GetTriggerType_001
+ * @tc.desc: Test IsKeyEventSubscribed maps PRESSED(triggerType=1) to DOWN action only
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_IsKeyEventSubscribed_GetTriggerType_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeySubscriberHandler handler;
+    auto keyOption = std::make_shared<KeyOption>();
+    keyOption->SetFinalKey(KeyEvent::KEYCODE_BACK);
+    keyOption->SetTriggerType(KeyCommandTriggerType::PRESSED);
+    SessionPtr sess = std::make_shared<UDSSession>(PROGRAM_NAME, MODULE_TYPE, UDS_FD, UDS_UID, UDS_PID);
+    ASSERT_NE(sess, nullptr);
+    auto subscriber = std::make_shared<OHOS::MMI::KeySubscriberHandler::Subscriber>(1, sess, keyOption);
+    std::list<std::shared_ptr<OHOS::MMI::KeySubscriberHandler::Subscriber>> subs = { subscriber };
+    handler.subscriberMap_[keyOption] = subs;
+    EXPECT_TRUE(handler.IsKeyEventSubscribed(KeyEvent::KEYCODE_BACK, KeyEvent::KEY_ACTION_DOWN));
+    EXPECT_FALSE(handler.IsKeyEventSubscribed(KeyEvent::KEYCODE_BACK, KeyEvent::KEY_ACTION_UP));
+    handler.subscriberMap_.clear();
+}
+
+/**
+ * @tc.name: KeySubscriberHandlerTest_IsKeyEventSubscribed_GetTriggerType_002
+ * @tc.desc: Test IsKeyEventSubscribed treats ALL_RELEASED(triggerType=3) as matching both DOWN and UP
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_IsKeyEventSubscribed_GetTriggerType_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeySubscriberHandler handler;
+    auto keyOption = std::make_shared<KeyOption>();
+    keyOption->SetFinalKey(KeyEvent::KEYCODE_BACK);
+    keyOption->SetTriggerType(KeyCommandTriggerType::ALL_RELEASED);
+    SessionPtr sess = std::make_shared<UDSSession>(PROGRAM_NAME, MODULE_TYPE, UDS_FD, UDS_UID, UDS_PID);
+    ASSERT_NE(sess, nullptr);
+    auto subscriber = std::make_shared<OHOS::MMI::KeySubscriberHandler::Subscriber>(1, sess, keyOption);
+    std::list<std::shared_ptr<OHOS::MMI::KeySubscriberHandler::Subscriber>> subs = { subscriber };
+    handler.subscriberMap_[keyOption] = subs;
+    EXPECT_TRUE(handler.IsKeyEventSubscribed(KeyEvent::KEYCODE_BACK, KeyEvent::KEY_ACTION_DOWN));
+    EXPECT_TRUE(handler.IsKeyEventSubscribed(KeyEvent::KEYCODE_BACK, KeyEvent::KEY_ACTION_UP));
+    handler.subscriberMap_.clear();
+}
+
+/**
+ * @tc.name: KeySubscriberHandlerTest_IsKeyEventSubscribed_GetTriggerType_003
+ * @tc.desc: Test IsKeyEventSubscribed preserves on('key') fallback when triggerType==0 (isFinalKeyDown path)
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_IsKeyEventSubscribed_GetTriggerType_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeySubscriberHandler handler;
+    auto keyOption = std::make_shared<KeyOption>();
+    keyOption->SetFinalKey(KeyEvent::KEYCODE_BACK);
+    keyOption->SetFinalKeyDown(true);
+    SessionPtr sess = std::make_shared<UDSSession>(PROGRAM_NAME, MODULE_TYPE, UDS_FD, UDS_UID, UDS_PID);
+    ASSERT_NE(sess, nullptr);
+    auto subscriber = std::make_shared<OHOS::MMI::KeySubscriberHandler::Subscriber>(1, sess, keyOption);
+    std::list<std::shared_ptr<OHOS::MMI::KeySubscriberHandler::Subscriber>> subs = { subscriber };
+    handler.subscriberMap_[keyOption] = subs;
+    EXPECT_TRUE(handler.IsKeyEventSubscribed(KeyEvent::KEYCODE_BACK, KeyEvent::KEY_ACTION_DOWN));
+    EXPECT_FALSE(handler.IsKeyEventSubscribed(KeyEvent::KEYCODE_BACK, KeyEvent::KEY_ACTION_UP));
+    handler.subscriberMap_.clear();
+}
+
+/**
+ * @tc.name: KeySubscriberHandlerTest_NotifyPressedSubscriberOnKeyUp_001
+ * @tc.desc: Test NotifyPressedSubscriberOnKeyUp dispatches finalKey UP to PRESSED subscribers only
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_NotifyPressedSubscriberOnKeyUp_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeySubscriberHandler handler;
+    handler.isForegroundExits_ = true;
+    auto keyOptionP = std::make_shared<KeyOption>();
+    keyOptionP->SetFinalKey(KeyEvent::KEYCODE_BACK);
+    keyOptionP->SetTriggerType(KeyCommandTriggerType::PRESSED);
+    auto keyOptionA = std::make_shared<KeyOption>();
+    keyOptionA->SetFinalKey(KeyEvent::KEYCODE_BACK);
+    keyOptionA->SetTriggerType(KeyCommandTriggerType::ALL_RELEASED);
+    SessionPtr sess = std::make_shared<UDSSession>(PROGRAM_NAME, MODULE_TYPE, UDS_FD, UDS_UID, UDS_PID);
+    ASSERT_NE(sess, nullptr);
+    auto subscriber = std::make_shared<OHOS::MMI::KeySubscriberHandler::Subscriber>(1, sess, keyOptionP);
+    std::list<std::shared_ptr<OHOS::MMI::KeySubscriberHandler::Subscriber>> subs = { subscriber };
+    handler.subscriberMap_[keyOptionP] = subs;
+    handler.subscriberMap_[keyOptionA] = subs;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_BACK);
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP);
+    handler.NotifyPressedSubscriberOnKeyUp(keyEvent);
+    SUCCEED();
+    handler.subscriberMap_.clear();
 }
 
 /**
@@ -6647,7 +6812,9 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_AllReleasedStates_Mu
     stateB.pressedComboKeys = { KeyEvent::KEYCODE_ALT_LEFT, KeyEvent::KEYCODE_TAB };
     // key assertion: two independent entries (old int-key impl kept only one shared entry)
     EXPECT_EQ(handler.allReleasedStates_.size(), 2u);
-    // subscriberA handles Tab UP -> only its own combo resets
+    // subscriberA handles Tab UP: ALT_LEFT is still held, so A's combo stays active (only Tab is
+    // removed from pressedComboKeys). The key point under test is that A's state change does not
+    // leak to B (per-subscriber isolation via Subscriber* key).
     std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
     ASSERT_NE(keyEvent, nullptr);
     keyEvent->SetKeyCode(KeyEvent::KEYCODE_TAB);
@@ -6656,8 +6823,9 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_AllReleasedStates_Mu
     bool handled = false;
     handler.ProcessAllReleasedComboActivated(keyEvent, keyOption, subscriberA, handled);
     EXPECT_TRUE(handled);
-    EXPECT_FALSE(stateA.comboActivated);
-    EXPECT_TRUE(stateA.pressedComboKeys.empty());
+    EXPECT_TRUE(stateA.comboActivated);
+    EXPECT_FALSE(stateA.pressedComboKeys.empty());
+    EXPECT_EQ(stateA.pressedComboKeys.size(), 1u);
     // B must be unaffected (old impl wrongly reset B here because A and B shared one state)
     EXPECT_TRUE(stateB.comboActivated);
     EXPECT_EQ(stateB.pressedComboKeys.size(), 2u);

@@ -437,9 +437,15 @@ napi_value GetEventInfoAPI26(napi_env env, napi_callback_info info, sptr<KeyEven
             "triggerType is required and must be one of KeyCommandTriggerType values");
         return nullptr;
     }
+    if (triggerType == KeyCommandTriggerType::PRESSED ||
+        triggerType == KeyCommandTriggerType::REPEAT_PRESSED ||
+        triggerType == KeyCommandTriggerType::ALL_RELEASED) {
+        keyOption->SetFinalKeyDown(true);
+    }
     subKeyNames += std::to_string(triggerType);
     subKeyNames += ",false,";
-    MMI_HILOGI("Using triggerType mode, ignoring isFinalKeyDown and isRepeat");
+    MMI_HILOGI("Using triggerType mode, triggerType:%{public}d, isFinalKeyDown:%{public}d",
+        triggerType, keyOption->IsFinalKeyDown());
     event->eventType = subKeyNames;
     napi_value ret;
     CHKRP(napi_create_int32(env, RET_OK, &ret), CREATE_INT32);

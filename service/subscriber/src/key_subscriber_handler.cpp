@@ -278,16 +278,26 @@ int32_t KeySubscriberHandler::RemoveKeyGestureSubscriber(SessionPtr sess, int32_
 int32_t KeySubscriberHandler::RegisterSystemKey(std::shared_ptr<KeyOption> option,
     int32_t session, std::function<void(std::shared_ptr<KeyEvent>)> callback, int32_t userId)
 {
+    KeyShortcutManager::ShortcutTriggerType shortcutTriggerType = KeyShortcutManager::SHORTCUT_TRIGGER_TYPE_UP;
+    if (option->GetTriggerType() != 0) {
+        shortcutTriggerType = KeyShortcutManager::SHORTCUT_TRIGGER_TYPE_DOWN;
+    } else {
+        shortcutTriggerType = option->IsFinalKeyDown() ? KeyShortcutManager::SHORTCUT_TRIGGER_TYPE_DOWN :
+                                                         KeyShortcutManager::SHORTCUT_TRIGGER_TYPE_UP;
+    }
     KeyShortcutManager::SystemShortcutKey sysKey {
         .modifiers = option->GetPreKeys(),
         .finalKey = option->GetFinalKey(),
         .longPressTime = option->GetFinalKeyDownDuration(),
-        .triggerType = (option->IsFinalKeyDown() ? KeyShortcutManager::SHORTCUT_TRIGGER_TYPE_DOWN :
-                                                   KeyShortcutManager::SHORTCUT_TRIGGER_TYPE_UP),
+        .triggerType = shortcutTriggerType,
         .session = session,
         .callback = callback,
         .userId = userId,
     };
+    MMI_HILOGI("RegisterSystemKey: IsFinalKeyDown=%{public}d, GetTriggerType=%{public}d, "
+        "shortcutTriggerType=%{public}d, preKeys_size=%{public}zu, finalKey=%{private}d, longPressTime=%{public}d",
+        option->IsFinalKeyDown(), option->GetTriggerType(), shortcutTriggerType,
+        option->GetPreKeys().size(), option->GetFinalKey(), option->GetFinalKeyDownDuration());
     if (KeyShortcutManager::IsModifier(sysKey.finalKey) &&
         !sysKey.modifiers.empty() &&
         std::all_of(sysKey.modifiers.cbegin(), sysKey.modifiers.cend(),
@@ -1222,13 +1232,20 @@ void KeySubscriberHandler::SubscriberNotifyNap(const std::shared_ptr<Subscriber>
 }
 
 void KeySubscriberHandler::HandleKeyUpForPressedType(const std::shared_ptr<KeyEvent> &keyEvent,
-    int32_t keyCode, const std::shared_ptr<KeyOption> &keyOption, bool &handled)
+    int32_t keyCode, const std::shared_ptr<KeyOption> &keyOption,
+    std::list<std::shared_ptr<Subscriber>> &subscribers, bool &handled)
 {
     int32_t finalKey = keyOption->GetFinalKey();
     const auto &preKeys = keyOption->GetPreKeys();
     if (keyCode == finalKey || preKeys.find(keyCode) != preKeys.end()) {
         MMI_HILOGI("PRESSED/REPEAT_PRESSED: consuming UP event KC:%{private}d", keyCode);
         handled = true;
+        if (keyCode == finalKey) {
+            for (auto &subscriber : subscribers) {
+                CHKPC(subscriber);
+                NotifySubscriber(keyEvent, subscriber);
+            }
+        }
     }
 }
 
@@ -1251,10 +1268,31 @@ bool KeySubscriberHandler::HandleKeyUpWithDurationCheck(const std::shared_ptr<Ke
     return true;
 }
 
+void KeySubscriberHandler::NotifyPressedSubscriberOnKeyUp(const std::shared_ptr<KeyEvent> &keyEvent)
+{
+    auto keyCode = keyEvent->GetKeyCode();
+    std::lock_guard<std::mutex> lock(subscriberMapMutex_);
+    for (auto &iter : subscriberMap_) {
+        auto keyOption = iter.first;
+        auto subscribers = iter.second;
+        if ((keyOption->GetTriggerType() == KeyCommandTriggerType::PRESSED ||
+             keyOption->GetTriggerType() == KeyCommandTriggerType::REPEAT_PRESSED) &&
+            keyCode == keyOption->GetFinalKey()) {
+            for (auto &subscriber : subscribers) {
+                CHKPC(subscriber);
+                NotifySubscriber(keyEvent, subscriber);
+            }
+        }
+    }
+}
+
 bool KeySubscriberHandler::HandleKeyUp(const std::shared_ptr<KeyEvent> &keyEvent)
 {
 #ifdef SHORTCUT_KEY_RULES_ENABLED
     if (KEY_SHORTCUT_MGR->HaveShortcutConsumed(keyEvent) || !KEY_SHORTCUT_MGR->IsCheckUpShortcut(keyEvent)) {
+        if (keyEvent->GetKeyAction() == KeyEvent::KEY_ACTION_UP) {
+            NotifyPressedSubscriberOnKeyUp(keyEvent);
+        }
         MMI_HILOGI("Subscribe are not notify of key upevent!");
         return false;
     }
@@ -1278,7 +1316,7 @@ bool KeySubscriberHandler::HandleKeyUp(const std::shared_ptr<KeyEvent> &keyEvent
         }
         if (keyOption->GetTriggerType() == KeyCommandTriggerType::PRESSED ||
             keyOption->GetTriggerType() == KeyCommandTriggerType::REPEAT_PRESSED) {
-            HandleKeyUpForPressedType(keyEvent, keyCode, keyOption, handled);
+            HandleKeyUpForPressedType(keyEvent, keyCode, keyOption, subscribers, handled);
             continue;
         }
         if (keyOption->IsFinalKeyDown()) {
@@ -1497,7 +1535,11 @@ bool KeySubscriberHandler::IsKeyEventSubscribed(int32_t keyCode, int32_t trriger
             keyOption->GetFinalKey(), keyOption->IsFinalKeyDown() ? "true" : "false",
             keyOption->GetFinalKeyDownDuration());
         int32_t keyAction = KeyEvent::KEY_ACTION_UP;
-        if (keyOption->IsFinalKeyDown()) {
+        if (keyOption->GetTriggerType() == KeyCommandTriggerType::ALL_RELEASED) {
+            keyAction = trrigerType;
+        } else if (keyOption->GetTriggerType() != 0) {
+            keyAction = KeyEvent::KEY_ACTION_DOWN;
+        } else if (keyOption->IsFinalKeyDown()) {
             MMI_HILOGD("keyOption is final key down");
             keyAction = KeyEvent::KEY_ACTION_DOWN;
         }

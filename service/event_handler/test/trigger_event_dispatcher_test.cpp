@@ -13,6 +13,8 @@
  * limitations under the License.
  */
 
+#include <chrono>
+#include <thread>
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
@@ -265,6 +267,58 @@ HWTEST_F(TriggerEventDispatcherTest, TriggerEventDispatcher_ClearSubscribeState_
     // After clear, dispatch should succeed again
     result = dispatcher_->ShouldDispatch(keyOption, keyEvent);
     EXPECT_TRUE(result);
+}
+
+/**
+ * @tc.name: TriggerEventDispatcher_ShouldDispatch_PRESSED_UpReset_001
+ * @tc.desc: Test PRESSED finalKey UP resets firstDownSent_ so a later independent DOWN dispatches
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(TriggerEventDispatcherTest, TriggerEventDispatcher_ShouldDispatch_PRESSED_UpReset_001, TestSize.Level1)
+{
+    auto keyOption = std::make_shared<KeyOption>();
+    keyOption->SetFinalKey(KeyEvent::KEYCODE_E);
+    keyOption->SetTriggerType(PRESSED);
+    keyOption->SetFinalKeyDownDuration(0);
+    auto keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_E);
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+    EXPECT_TRUE(dispatcher_->ShouldDispatch(keyOption, keyEvent));
+    EXPECT_FALSE(dispatcher_->ShouldDispatch(keyOption, keyEvent)); // auto-repeat blocked
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP);
+    EXPECT_FALSE(dispatcher_->ShouldDispatch(keyOption, keyEvent)); // UP not dispatched, resets state
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+    EXPECT_TRUE(dispatcher_->ShouldDispatch(keyOption, keyEvent)); // independent press dispatches
+    std::string subscribeKey = std::to_string(KeyEvent::KEYCODE_E) + "," +
+        std::to_string(PRESSED) + "," + "0";
+    dispatcher_->ClearSubscribeState(subscribeKey);
+}
+
+/**
+ * @tc.name: TriggerEventDispatcher_CheckDuration_MillisecondsUnit_001
+ * @tc.desc: Regression for StartDurationWindow unit: finalKeyDownDuration is milliseconds,
+ *           sleep_for must use std::chrono::milliseconds (was microseconds, 1000x too short).
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(TriggerEventDispatcherTest, TriggerEventDispatcher_CheckDuration_MillisecondsUnit_001, TestSize.Level1)
+{
+    auto keyOption = std::make_shared<KeyOption>();
+    keyOption->SetFinalKey(KeyEvent::KEYCODE_F);
+    keyOption->SetTriggerType(REPEAT_PRESSED); // isolate CheckDuration (no firstDownSent_ dedup)
+    keyOption->SetFinalKeyDownDuration(100);   // 100ms window after fix; was 100us before fix
+    auto keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_F);
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+    EXPECT_FALSE(dispatcher_->ShouldDispatch(keyOption, keyEvent)); // start 100ms window
+    std::this_thread::sleep_for(std::chrono::milliseconds(10)); // 10ms < 100ms (fixed), >> 100us (buggy)
+    EXPECT_FALSE(dispatcher_->ShouldDispatch(keyOption, keyEvent)); // window not yet passed
+    std::string subscribeKey = std::to_string(KeyEvent::KEYCODE_F) + "," +
+        std::to_string(REPEAT_PRESSED) + "," + "100";
+    dispatcher_->ClearSubscribeState(subscribeKey);
 }
 } // namespace MMI
 } // namespace OHOS
