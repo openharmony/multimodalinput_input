@@ -1318,11 +1318,12 @@ int32_t InputManagerImpl::SimulateInputEvent(std::shared_ptr<KeyEvent> keyEvent,
         BytraceAdapter::MMIClientTraceStop();
         return RET_ERR;
     }
-    MMI_HILOGI("Key action:%{public}d, NL:%{public}d, CL:%{public}d, SL:%{public}d",
+    MMI_HILOGI("Key action:%{public}d, NL:%{public}d, CL:%{public}d,SL:%{public}d, TDID:%{public}d",
         keyEvent->GetKeyAction(),
         keyEvent->GetFunctionKey(KeyEvent::NUM_LOCK_FUNCTION_KEY),
         keyEvent->GetFunctionKey(KeyEvent::CAPS_LOCK_FUNCTION_KEY),
-        keyEvent->GetFunctionKey(KeyEvent::SCROLL_LOCK_FUNCTION_KEY));
+        keyEvent->GetFunctionKey(KeyEvent::SCROLL_LOCK_FUNCTION_KEY),
+        keyEvent->GetTargetDisplayId());
     int32_t ret = MMIEventHdl.InjectEvent(keyEvent, isNativeInject);
     if (ret != RET_OK) {
         MMI_HILOGE("Failed to inject keyEvent, ret=%{public}d", ret);
