@@ -416,6 +416,12 @@ void EventNormalizeHandler::HandleKeyEvent(const std::shared_ptr<KeyEvent> keyEv
     DfxHisysevent::GetDispStartTime();
     CHKPV(keyEvent);
     KeyEventHdr->SimulatedModifierKeyEventNormalize(keyEvent);
+    MMI_HILOGI("[KC,KA,NL,CL,SL,TDID]:[%{private}d,%{public}d,%{public}d,%{public}d,%{public}d,%{public}d]",
+        keyEvent->GetKeyCode(), keyEvent->GetKeyAction(),
+        keyEvent->GetFunctionKey(KeyEvent::NUM_LOCK_FUNCTION_KEY),
+        keyEvent->GetFunctionKey(KeyEvent::CAPS_LOCK_FUNCTION_KEY),
+        keyEvent->GetFunctionKey(KeyEvent::SCROLL_LOCK_FUNCTION_KEY),
+        keyEvent->GetTargetDisplayId());
     UpdateKeyEventHandlerChain(keyEvent);
     if (keyEvent->HasFlag(InputEvent::EVENT_FLAG_ACCESSIBILITY)) {
         KeyRepeat->SetRepeatKeyCode(keyEvent->GetKeyCode());
