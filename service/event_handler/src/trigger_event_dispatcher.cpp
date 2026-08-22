@@ -336,7 +336,7 @@ bool TriggerEventDispatcher::CheckDuration(std::shared_ptr<KeyOption> keyOption,
     std::string subscribeKey = GenerateSubscribeKey(keyOption);
     if (downStartTime_.find(subscribeKey) == downStartTime_.end()) {
         StartDurationWindow(subscribeKey, duration);
-        MMI_HILOGD("Duration window started, will wait %{public}d milliseconds", duration);
+        MMI_HILOGD("Duration window started, will wait %{public}d microseconds", duration);
         return false;
     }
     if (CheckDurationWindowPassed(subscribeKey)) {
@@ -360,7 +360,7 @@ void TriggerEventDispatcher::StartDurationWindow(const std::string& subscribeKey
     hasOtherKey_[subscribeKey] = false;
 
     std::thread([this, subscribeKey, duration]() {
-        std::this_thread::sleep_for(std::chrono::milliseconds(duration));
+        std::this_thread::sleep_for(std::chrono::microseconds(duration));
 
         std::lock_guard<std::mutex> lock(mutex_);
 
