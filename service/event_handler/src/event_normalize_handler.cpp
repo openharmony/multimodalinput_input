@@ -20,6 +20,7 @@
 #include "bytrace_adapter.h"
 #include "crown_transform_processor.h"
 #include "device_state_manager.h"
+#include "display_event_monitor.h"
 #include "dfx_hisysevent.h"
 #include "event_log_helper.h"
 #ifdef OHOS_BUILD_ENABLE_TOUCH
@@ -906,6 +907,7 @@ int32_t EventNormalizeHandler::HandleTouchEvent(libinput_event* event, int64_t f
         lt = LogTracer(pointerEvent->GetId(), pointerEvent->GetEventType(), pointerEvent->GetPointerAction());
     }
     BytraceAdapter::StopPackageEvent();
+    
     EventStatistic::PushPointerEvent(pointerEvent);
     PointerEventSetPressedKeys(pointerEvent);
 
