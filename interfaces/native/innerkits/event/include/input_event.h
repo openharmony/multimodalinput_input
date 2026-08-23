@@ -176,6 +176,18 @@ public:
     static constexpr uint32_t EVENT_FLAG_STYLUS_MOUSE_MODE = 0x00400000;
 
     /**
+     * Flag indicating the event was generated while the screen was locked.
+     * @since 26
+     */
+    static constexpr uint32_t EVENT_FLAG_SCREEN_LOCKED = 0x01000000;
+ 
+    /**
+     * Flag indicating the event was generated while the screen was unlocked.
+     * @since 26
+     */
+    static constexpr uint32_t EVENT_FLAG_SCREEN_UNLOCKED = 0x02000000;
+
+    /**
      * Flag indicating an injected event permitted to dispatch while the screen is locked.
      * The event is allowed to enter the dispatch pipeline, but it is dropped unless it
      * hits a window marked with FLAG_INJECTABLE_UNDER_LOCK.

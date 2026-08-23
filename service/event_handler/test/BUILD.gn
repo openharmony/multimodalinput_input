@@ -59,6 +59,7 @@ ohos_unittest("EventNormalizeHandlerTestWithMock") {
     "${mmi_path}/service/common/timer_manager/include",
     "${mmi_path}/service/device_config/include",
     "${mmi_path}/service/delegate_task/include",
+    "${mmi_path}/service/display_state_manager/include"
   ]
 
   sources = [
