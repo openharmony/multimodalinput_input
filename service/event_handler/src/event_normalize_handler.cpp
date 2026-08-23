@@ -907,6 +907,8 @@ int32_t EventNormalizeHandler::HandleTouchEvent(libinput_event* event, int64_t f
         lt = LogTracer(pointerEvent->GetId(), pointerEvent->GetEventType(), pointerEvent->GetPointerAction());
     }
     BytraceAdapter::StopPackageEvent();
+    pointerEvent->ClearFlag(InputEvent::EVENT_FLAG_SCREEN_LOCKED);
+    pointerEvent->ClearFlag(InputEvent::EVENT_FLAG_SCREEN_UNLOCKED);
     if (DISPLAY_MONITOR->GetScreenLocked()) {
         MMI_HILOGD("TouchEvent screen is locked, add EVENT_FLAG_SCREEN_LOCKED");
         pointerEvent->AddFlag(InputEvent::EVENT_FLAG_SCREEN_LOCKED);
