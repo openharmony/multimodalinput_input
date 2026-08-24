@@ -321,9 +321,7 @@ protected:
     bool InitDelegateTasks();
     int32_t Init();
     void InitPreferences();
-#ifdef OHOS_BUILD_PC_PRIORITY
     void SetMmiServicePriority(int32_t tid);
-#endif // OHOS_BUILD_PC_PRIORITY
     void OnThread();
     void PreEventLoop();
     void OnSignalEvent(int32_t signalFd);

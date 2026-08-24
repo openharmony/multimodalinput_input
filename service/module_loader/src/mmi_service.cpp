@@ -15,9 +15,7 @@
 
 #include "mmi_service.h"
 
-#ifdef OHOS_BUILD_PC_PRIORITY
 #include <sched.h>
-#endif // OHOS_BUILD_PC_PRIORITY
 #include <sys/signalfd.h>
 #include <csignal>
 #ifdef OHOS_RSS_CLIENT
@@ -2646,9 +2644,7 @@ void MMIService::OnAddResSchedSystemAbility(int32_t systemAbilityId, const std::
     DfxHisysevent::ReportApiCallTimes(ApiDurationStatistics::Api::RESOURCE_SCHEDULE_REPORT_DATA, durationMS);
 #endif // OHOS_BUILD_ENABLE_DFX_RADAR
     sleep(sleepSeconds);
-#ifdef OHOS_BUILD_PC_PRIORITY
     SetMmiServicePriority(tid);
-#endif // OHOS_BUILD_PC_PRIORITY
 }
 #endif // OHOS_RSS_CLIENT
 
@@ -3459,9 +3455,7 @@ void MMIService::OnThread()
     delegateTasks_.SetWorkerThreadId(tid);
     CursorDrawingComponent::GetInstance().SetWorkerThreadId(tid);
     MMI_HILOGI("Main worker thread start. tid:%{public}" PRId64 "", tid);
-#ifdef OHOS_BUILD_PC_PRIORITY
     SetMmiServicePriority(0);
-#endif // OHOS_BUILD_PC_PRIORITY
 #ifdef OHOS_RSS_CLIENT
     tid_.store(tid);
 #endif // OHOS_RSS_CLIENT
@@ -3509,7 +3503,6 @@ void MMIService::OnThread()
     // LCOV_EXCL_STOP
 }
 
-#ifdef OHOS_BUILD_PC_PRIORITY
 void MMIService::SetMmiServicePriority(int32_t tid)
 {
     struct sched_param param = {0};
@@ -3521,7 +3514,6 @@ void MMIService::SetMmiServicePriority(int32_t tid)
         MMI_HILOGI("The mmi_service set SCHED_FIFO succeed, schRet:%{public}d", schRet);
     }
 }
-#endif // OHOS_BUILD_PC_PRIORITY
 
 void MMIService::PreEventLoop()
 {
