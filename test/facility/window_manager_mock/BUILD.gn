@@ -39,6 +39,7 @@ ohos_source_set("window_manager_mock") {
 
   sources = [
     "src/cursor_drawing_component.cpp",
+    "src/display_manager_lite.cpp",
   ]
 
   public_configs = [ ":window_manager_mock_public_config" ]
@@ -51,6 +52,8 @@ ohos_source_set("window_manager_mock") {
     "c_utils:utils",
     "googletest:gmock_main",
     "hilog:libhilog",
+    "ipc:ipc_core",
+    "window_manager:libwmutil",
   ]
 
   part_name = "${mmi_part_name}"

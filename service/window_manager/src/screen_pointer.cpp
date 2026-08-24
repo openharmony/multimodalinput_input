@@ -13,13 +13,14 @@
  * limitations under the License.
  */
 #include "screen_pointer.h"
-
+#include <numeric>
 #include "bytrace_adapter.h"
 #include "define_multimodal.h"
 #include "transaction/rs_transaction.h"
 #include "transaction/rs_interfaces.h"
 #include "product_type_parser.h"
 #include "product_name_definition.h"
+#include "display_manager_lite.h"
 
 #undef MMI_LOG_DOMAIN
 #define MMI_LOG_DOMAIN MMI_LOG_CURSOR
@@ -77,6 +78,65 @@ uint32_t GetScreenInfoHeight(screen_info_ptr_t si)
     return modes[modeId]->height_;
 }
 
+bool ScreenPointer::IsROGEnable(uint32_t physicalWidth, uint32_t physicalHeight, uint32_t logicalWidth,
+    uint32_t logicalHeight)
+{
+    if (physicalWidth == 0 || physicalHeight == 0 || logicalWidth == 0 || logicalHeight == 0) {
+        return false;
+    }
+    if (physicalWidth == logicalWidth || physicalHeight == logicalHeight) {
+        return false;
+    }
+    uint32_t gcdP = std::gcd(physicalWidth, physicalHeight);
+    uint32_t gcdL = std::gcd(logicalWidth, logicalHeight);
+    return (physicalWidth * gcdL ==  logicalWidth * gcdP) && (physicalHeight * gcdL == logicalHeight * gcdP);
+}
+
+ScreenPointer::ScreenLiteInfo ScreenPointer::ResolveScreenLiteInfo(const screen_info_ptr_t &si)
+{
+    ScreenLiteInfo result;
+    if (si == nullptr) {
+        MMI_HILOGE("si is nullptr");
+        return result;
+    }
+    uint32_t physicalWidth = GetScreenInfoWidth(si);
+    uint32_t physicalHeight = GetScreenInfoHeight(si);
+    result.width = physicalWidth;
+    result.height = physicalHeight;
+    result.rotation = si->GetRotation();
+    const std::string product = OHOS::system::GetParameter("const.build.product", SYS_GET_DEVICE_TYPE_PARAM);
+    if (std::find(DEVICE_TYPE_TABLET_A1_VECTOR.begin(), DEVICE_TYPE_TABLET_A1_VECTOR.end(), product) ==
+        DEVICE_TYPE_TABLET_A1_VECTOR.end()) {
+        return result;
+    }
+    if (si->GetScreenTypeInfo() != OHOS::Rosen::ScreenTypeInfo::BUILT_IN) {
+        MMI_HILOGI("screenId=%{public}" PRIu64 ", not BUILT_IN, use physical", si->GetRsId());
+        return result;
+    }
+    auto displayLite = OHOS::Rosen::DisplayManagerLite::GetInstance().GetDisplayById(si->GetScreenId());
+    if (displayLite == nullptr) {
+        MMI_HILOGI("screenId=%{public}" PRIu64 ", BUILT_IN but displayLite is nullptr", si->GetRsId());
+        return result;
+    }
+    uint32_t logicalWidth = static_cast<uint32_t>(displayLite->GetWidth());
+    uint32_t logicalHeight = static_cast<uint32_t>(displayLite->GetHeight());
+    rotation_t logicalRotation = displayLite->GetRotation();
+    if (logicalRotation == rotation_t::ROTATION_90 || logicalRotation == rotation_t::ROTATION_270) {
+        std::swap(logicalWidth, logicalHeight);
+    }
+    bool isROG = IsROGEnable(physicalWidth, physicalHeight, logicalWidth, logicalHeight);
+    if (isROG) {
+        result.width = logicalWidth;
+        result.height = logicalHeight;
+        result.rotation = logicalRotation;
+    }
+    MMI_HILOGI("ResolveScreenLiteInfo, rsId=%{public}" PRIu64 ", BUILT_IN, physical=(%{public}u, %{public}u),"
+        "logical=(%{public}u, %{public}u), result=(%{public}u, %{public}u), rotation=%{public}u, ROG=%{public}d",
+        si->GetRsId(), physicalWidth, physicalHeight, logicalWidth, logicalHeight, result.width, result.height,
+        static_cast<uint32_t>(result.rotation), isROG);
+    return result;
+}
+
 ScreenPointer::ScreenPointer(hwcmgr_ptr_t hwcMgr, handler_ptr_t handler, const OLD::DisplayInfo &di)
     : hwcMgr_(hwcMgr), handler_(handler)
 {
@@ -97,15 +157,16 @@ ScreenPointer::ScreenPointer(hwcmgr_ptr_t hwcMgr, handler_ptr_t handler, screen_
     : hwcMgr_(hwcMgr), handler_(handler)
 {
     screenId_ = si->GetRsId();
-    width_ = GetScreenInfoWidth(si);
-    height_ = GetScreenInfoHeight(si);
     mode_ = si->GetSourceMode();
-    rotation_ = si->GetRotation();
     dpi_ = si->GetVirtualPixelRatio();
 #ifdef OHOS_BUILD_EXTERNAL_SCREEN
     mirrorWidth_ = si->GetMirrorWidth();
     mirrorHeight_ = si->GetMirrorHeight();
 #endif // OHOS_BUILD_EXTERNAL_SCREEN
+    auto result = ResolveScreenLiteInfo(si);
+    width_ = result.width;
+    height_ = result.height;
+    rotation_ = result.rotation;
     MMI_HILOGI("Construct with ScreenInfo, id=%{public}" PRIu64 ", shape=(%{public}u, %{public}u), mode=%{public}u, "
         "rotation=%{public}u, dpi=%{public}f", screenId_, width_, height_, mode_, rotation_.load(), dpi_);
 }
@@ -345,15 +406,16 @@ void ScreenPointer::UpdateScreenInfo(sptr<OHOS::Rosen::ScreenInfo> si, bool need
     CHKPV(si);
     CHKPV(surfaceNode_);
     screenId_ = si->GetRsId();
-    width_ = GetScreenInfoWidth(si);
-    height_ = GetScreenInfoHeight(si);
     mode_ = si->GetSourceMode();
-    rotation_ = si->GetRotation();
     dpi_ = si->GetVirtualPixelRatio();
 #ifdef OHOS_BUILD_EXTERNAL_SCREEN
     mirrorWidth_ = si->GetMirrorWidth();
     mirrorHeight_ = si->GetMirrorHeight();
 #endif // OHOS_BUILD_EXTERNAL_SCREEN
+    auto result = ResolveScreenLiteInfo(si);
+    width_ = result.width;
+    height_ = result.height;
+    rotation_ = result.rotation;
     if (needDrawPointer) {
         surfaceNode_->RemoveFromTree();
         surfaceNode_->AttachToDisplay(screenId_);
