@@ -17745,5 +17745,50 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetBindToDisplayIdByIn
     // BindToDisplay sets the runtime marker, so the application-facing accessor returns the id.
     EXPECT_EQ(WIN_MGR->GetBindToDisplayIdByInputDevice(devId), 1);
 }
+
+/**
+ * @tc.name: InputWindowsManagerTest_HandleKeyEventWindowId_BackfillDisplayId
+ * @tc.desc: Test HandleKeyEventWindowId backfills TargetDisplayId from the focus window
+ *           when the key event carries no display id (-1), and keeps a valid id unchanged.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_HandleKeyEventWindowId_BackfillDisplayId, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsMgr;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    auto it = inputWindowsMgr.displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
+    ASSERT_NE(it, inputWindowsMgr.displayGroupInfoMap_.end());
+
+    OLD::DisplayInfo displayInfo;
+    displayInfo.id = 2;
+    it->second.displaysInfo.push_back(displayInfo);
+    it->second.focusWindowId = 50;
+    WindowGroupInfo windowGroupInfo;
+    WindowInfo winInfo;
+    winInfo.id = 50;
+    winInfo.agentWindowId = 100;
+    windowGroupInfo.focusWindowId = 50;
+    windowGroupInfo.displayId = 2;
+    windowGroupInfo.windowsInfo.push_back(winInfo);
+    inputWindowsMgr.windowsPerDisplayMap_[DEFAULT_GROUP_ID].insert(std::make_pair(2, windowGroupInfo));
+
+    keyEvent->SetTargetDisplayId(-1);
+    EXPECT_NO_FATAL_FAILURE(inputWindowsMgr.HandleKeyEventWindowId(keyEvent));
+    EXPECT_EQ(keyEvent->GetTargetDisplayId(), 2);
+    EXPECT_EQ(keyEvent->GetTargetWindowId(), 50);
+
+    keyEvent->SetTargetDisplayId(2);
+    EXPECT_NO_FATAL_FAILURE(inputWindowsMgr.HandleKeyEventWindowId(keyEvent));
+    EXPECT_EQ(keyEvent->GetTargetDisplayId(), 2);
+    EXPECT_EQ(keyEvent->GetTargetWindowId(), 50);
+
+    it->second.focusWindowId = 80;
+    keyEvent->SetTargetDisplayId(-1);
+    EXPECT_NO_FATAL_FAILURE(inputWindowsMgr.HandleKeyEventWindowId(keyEvent));
+    EXPECT_EQ(keyEvent->GetTargetDisplayId(), 2);
+}
 } // namespace MMI
 } // namespace OHOS

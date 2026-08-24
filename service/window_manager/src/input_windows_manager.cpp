@@ -818,6 +818,10 @@ void InputWindowsManager::HandleKeyEventWindowId(std::shared_ptr<KeyEvent> keyEv
 {
     CALL_DEBUG_ENTER;
     CHKPV(keyEvent);
+    if (keyEvent->GetTargetDisplayId() < 0) {
+        int32_t pendingGroupId = FindDisplayGroupId(keyEvent->GetTargetDisplayId());
+        UpdateKeyEventDisplayId(keyEvent, GetFocusWindowId(pendingGroupId), pendingGroupId);
+    }
     int32_t groupId = FindDisplayGroupId(keyEvent->GetTargetDisplayId());
     int32_t focusWindowId = GetFocusWindowId(groupId);
     std::vector<WindowInfo> windowsInfo = GetWindowGroupInfoByDisplayId(keyEvent->GetTargetDisplayId());
