@@ -5010,7 +5010,7 @@ std::vector<int32_t> InputWindowsManager::HandleHardwareCursor(const OLD::Displa
 }
 
 #ifdef OHOS_BUILD_ENABLE_ANCO
-bool MouseTargetIsInAnco(int32_t logicalX, int32_t logicalY, const std::shared_ptr<PointerEvent>& pointerEvent,
+bool MouseTargetIsInAnco(int32_t windowX, int32_t windowY, const std::shared_ptr<PointerEvent>& pointerEvent,
     const std::optional<WindowInfo> &touchWindow, const InputWindowsManager &inputWindowsManager)
 {
     static bool isInAnco = false;
@@ -5026,14 +5026,14 @@ bool MouseTargetIsInAnco(int32_t logicalX, int32_t logicalY, const std::shared_p
     }
 
     if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_BUTTON_DOWN) {
-        isInAnco = inputWindowsManager.IsInAncoWindow(*touchWindow, logicalX, logicalY, pointerEvent->GetSourceType());
+        isInAnco = inputWindowsManager.IsInAncoWindow(*touchWindow, windowX, windowY, pointerEvent->GetSourceType());
     }
 
     if (pointerItem.IsPressed() || pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_BUTTON_UP) {
         return isInAnco;
     }
 
-    return inputWindowsManager.IsInAncoWindow(*touchWindow, logicalX, logicalY, pointerEvent->GetSourceType());
+    return inputWindowsManager.IsInAncoWindow(*touchWindow, windowX, windowY, pointerEvent->GetSourceType());
 }
 #endif // OHOS_BUILD_ENABLE_ANCO
 
@@ -5362,7 +5362,7 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
     }
 #endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
 #ifdef OHOS_BUILD_ENABLE_ANCO
-    if (MouseTargetIsInAnco(logicalX, logicalY, pointerEvent, touchWindow, *this)) {
+    if (MouseTargetIsInAnco(windowX, windowY, pointerEvent, touchWindow, *this)) {
         MMI_HILOGD("Process mouse event in Anco window, targetWindowId:%{public}d", touchWindow->id);
         pointerEvent->SetAncoDeal(true);
         return RET_OK;
@@ -6320,6 +6320,13 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
             }
         }
     }
+    double windowX = logicalX - touchWindow->area.x;
+    double windowY = logicalY - touchWindow->area.y;
+    if (!(touchWindow->transform.empty())) {
+        auto windowXY = TransformWindowXY(*touchWindow, logicalX, logicalY);
+        windowX = windowXY.first;
+        windowY = windowXY.second;
+    }
 #ifdef OHOS_BUILD_ENABLE_ANCO
     bool isHoverEvent = IsAccessibilityFocusEvent(pointerEvent);
     bool isInAnco = false;
@@ -6327,13 +6334,13 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
     if (isHoverEvent) {
         static bool hoverIsInAnco = false;
         if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_HOVER_ENTER || NeedTouchTracking()) {
-            hoverIsInAnco = touchWindow && IsInAncoWindow(*touchWindow, logicalX, logicalY);
+            hoverIsInAnco = touchWindow && IsInAncoWindow(*touchWindow, windowX, windowY);
         }
         isInAnco = hoverIsInAnco;
     } else {
         static bool touchIsInAnco = false;
         if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_DOWN || isExtraData) {
-            touchIsInAnco = touchWindow && IsInAncoWindow(*touchWindow, logicalX, logicalY);
+            touchIsInAnco = touchWindow && IsInAncoWindow(*touchWindow, windowX, windowY);
         }
         isInAnco = touchIsInAnco;
     }
@@ -6445,13 +6452,6 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
             TouchLastTouchEventOnBackGesture()->GetPointerAction() != PointerEvent::POINTER_ACTION_CANCEL) {
             TouchLastTouchEventOnBackGesture() = std::make_shared<PointerEvent>(*pointerEvent);
         }
-    }
-    double windowX = logicalX - touchWindow->area.x;
-    double windowY = logicalY - touchWindow->area.y;
-    if (!(touchWindow->transform.empty())) {
-        auto windowXY = TransformWindowXY(*touchWindow, logicalX, logicalY);
-        windowX = windowXY.first;
-        windowY = windowXY.second;
     }
     SetPrivacyModeFlag(touchWindow->privacyMode, pointerEvent);
     pointerEvent->SetAgentWindowId(touchWindow->agentWindowId);
