@@ -153,6 +153,7 @@ int32_t ServerMsgHandler::OnInjectKeyEvent(const std::shared_ptr<KeyEvent> keyEv
     CHKPR(keyEvent, ERROR_NULL_POINTER);
     keyEvent->UpdateId();
     LogTracer lt(keyEvent->GetId(), keyEvent->GetEventType(), keyEvent->GetKeyAction());
+    keyEvent->ClearFlag(InputEvent::EVENT_FLAG_INJECT_UNDER_LOCK);
     if (isNativeInject) {
         int32_t checkReturn = NativeInjectCheck(pid);
         if (checkReturn != RET_OK) {
@@ -263,6 +264,7 @@ int32_t ServerMsgHandler::OnInjectPointerEvent(int32_t userId, const std::shared
     CALL_DEBUG_ENTER;
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
     LogTracer lt(pointerEvent->GetId(), pointerEvent->GetEventType(), pointerEvent->GetPointerAction());
+    pointerEvent->ClearFlag(InputEvent::EVENT_FLAG_INJECT_UNDER_LOCK);
     if (isNativeInject) {
         int32_t checkReturn = NativeInjectCheck(pid);
         if (checkReturn != RET_OK) {
@@ -281,6 +283,7 @@ int32_t ServerMsgHandler::OnInjectTouchPadEvent(int32_t userId, const std::share
     CALL_DEBUG_ENTER;
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
     LogTracer lt(pointerEvent->GetId(), pointerEvent->GetEventType(), pointerEvent->GetPointerAction());
+    pointerEvent->ClearFlag(InputEvent::EVENT_FLAG_INJECT_UNDER_LOCK);
     if (isNativeInject) {
         int32_t checkReturn = NativeInjectCheck(pid);
         if (checkReturn != RET_OK) {
