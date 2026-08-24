@@ -2831,6 +2831,13 @@ public:
     static const int32_t KEYCODE_MMX_TOUCH;
 
     /**
+     * Detect Peeling Key
+     *
+     * @since 26.0.0
+     */
+    static const int32_t KEYCODE_PEELING;
+
+    /**
      * Left Knob roll-up
      * <p>In contrast to {@link #static const int32_t KEYCODE_LEFT_KNOB_ROLL_DOWN},
      * this key is used to roll the left knob upwards. The knob function is scenario-specific,
