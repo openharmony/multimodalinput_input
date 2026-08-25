@@ -1490,19 +1490,15 @@ bool InputDeviceManager::HasEnabledPhysicalPointerDevice()
 {
     // LCOV_EXCL_START
     for (const auto &item : inputDevice_) {
-        if (!item.second.isPointerDevice || !item.second.enable) {
-            continue;
+        if ((!item.second.isRemote && item.second.isPointerDevice && item.second.isDeviceReportEvent) ||
+            (item.second.isRemote && item.second.isPointerDevice && item.second.enable)) {
+            MMI_HILOGI("DeviceId:%{public}d, isRemote:%{public}d, sys uid:%{public}s", item.first,
+                item.second.isRemote, item.second.sysUid.c_str());
+            return true;
         }
-        // 本地设备：需要额外检查 isDeviceReportEvent
-        if (!item.second.isRemote && !item.second.isDeviceReportEvent) {
-            continue;
-        }
-        MMI_HILOGI("DeviceId:%{public}d, isRemote:%{public}d, sys uid:%{public}s", item.first,
-            item.second.isRemote, item.second.sysUid.c_str());
-        return true;
     }
     return false;
-    // LOCV_EXCL_STOP
+    // LCOV_EXCL_STOP
 }
 
 bool InputDeviceManager::HasEnabledNoEventReportedPhysicalPointerDevice()
