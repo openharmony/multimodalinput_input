@@ -5236,5 +5236,22 @@ HWTEST_F(PointerDrawingManagerTest, PointerDrawingManagerTest_GetCursorGroupId_0
     pointerDrawingManager.activeGroupId_ = 5;
     EXPECT_EQ(pointerDrawingManager.GetCursorGroupId(), 5);
 }
+
+/**
+ * @tc.name: PointerDrawingManagerTest_CreatePointerWindow_InitializeActiveGroupId_001
+ * @tc.desc: CreatePointerWindow must initialize activeGroupId_ so the per-group touch filter
+ *           does not treat the cursor group as unknown (-1) when no cross-group move happened.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerTest, PointerDrawingManagerTest_CreatePointerWindow_InitializeActiveGroupId_001,
+    TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerDrawingManager pointerDrawingManager;
+    pointerDrawingManager.activeGroupId_ = 7;
+    EXPECT_NO_FATAL_FAILURE(pointerDrawingManager.CreatePointerWindow(86, 100, 100, Direction::DIRECTION0));
+    EXPECT_EQ(pointerDrawingManager.activeGroupId_, 7);
+}
 } // namespace MMI
 } // namespace OHOS
