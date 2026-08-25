@@ -998,8 +998,11 @@ void MouseTransformProcessor::OnAxisScrollTimer()
     CHKPV(pointerEvent);
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_AXIS_END);
     pointerEvent->SetAxisEventType(PointerEvent::AXIS_EVENT_TYPE_SCROLL);
-    pointerEvent->SetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_VERTICAL, 0);
-    pointerEvent->SetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_HORIZONTAL, 0);
+    if (pointerEvent->HasAxis(PointerEvent::AXIS_TYPE_SCROLL_VERTICAL)) {
+        pointerEvent->SetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_VERTICAL, 0);
+    } else if (pointerEvent->HasAxis(PointerEvent::AXIS_TYPE_SCROLL_HORIZONTAL)) {
+        pointerEvent->SetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_HORIZONTAL, 0);
+    }
     pointerEvent->UpdateId();
     MMI_HILOGI("Axis end");
     LogTracer lt(pointerEvent->GetId(), pointerEvent->GetEventType(), pointerEvent->GetPointerAction());
@@ -2078,8 +2081,11 @@ void MouseTransformProcessor::SendAxisEndEvent()
     MMI_HILOGI("Mouse[%{public}d] has active axis scroll, sending AXIS_END", deviceId_);
     pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_AXIS_END);
     pointerEvent_->SetAxisEventType(PointerEvent::AXIS_EVENT_TYPE_SCROLL);
-    pointerEvent_->SetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_VERTICAL, 0.0);
-    pointerEvent_->SetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_HORIZONTAL, 0.0);
+    if (pointerEvent_->HasAxis(PointerEvent::AXIS_TYPE_SCROLL_VERTICAL)) {
+        pointerEvent_->SetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_VERTICAL, 0.0);
+    } else if (pointerEvent_->HasAxis(PointerEvent::AXIS_TYPE_SCROLL_HORIZONTAL)) {
+        pointerEvent_->SetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_HORIZONTAL, 0.0);
+    }
     pointerEvent_->UpdateId();
 
     auto inputChannel = GetEventNormalizeHandler();
