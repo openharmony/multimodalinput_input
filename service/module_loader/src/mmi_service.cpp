@@ -233,9 +233,7 @@ STOP_VTRACKPAD_TIMER stopVTrackpadTimer_ = nullptr;
 typedef bool (*VKEYBOARD_ISINSIDEFULLKBD_TYPE)(double x, double y);
 VKEYBOARD_ISINSIDEFULLKBD_TYPE vkeyboard_isInsideFullKbd_ = nullptr;
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
-#ifdef OHOS_BUILD_PC_PRIORITY
-constexpr int32_t PC_PRIORITY { 2 };
-#endif // OHOS_BUILD_PC_PRIORITY
+constexpr int32_t MMI_PRIORITY { 2 };
 } // namespace
 
 const bool REGISTER_RESULT = SystemAbility::MakeAndRegisterAbility(MMIService::GetInstance());
@@ -3506,7 +3504,7 @@ void MMIService::OnThread()
 void MMIService::SetMmiServicePriority(int32_t tid)
 {
     struct sched_param param = {0};
-    param.sched_priority = PC_PRIORITY;
+    param.sched_priority = MMI_PRIORITY;
     int32_t schRet = sched_setscheduler(tid, SCHED_FIFO, &param);
     if (schRet != 0) {
         MMI_HILOGE("mmi_service Couldn't set SCHED_FIFO, schRet:%{public}d", schRet);
