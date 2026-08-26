@@ -3065,6 +3065,7 @@ void InputWindowsManager::DispatchPointer(int32_t pointerAction, int32_t windowI
         pointerEvent->SetTargetDisplayId(lastPointerEventCopy->GetTargetDisplayId());
     }
     currentPointerItem.SetPointerId(0);
+    currentPointerItem.SetToolType(lastPointerItem.GetToolType());
 
     SetPrivacyModeFlag(lastWindowInfo_.privacyMode, pointerEvent);
     currentPointerItem.SetPressed(lastPointerItem.IsPressed());
@@ -7206,9 +7207,9 @@ void InputWindowsManager::DispatchTouch(int32_t pointerAction, int32_t groupId, 
     currentPointerItem.SetDisplayYPos(lastPointerItem.GetDisplayYPos());
     currentPointerItem.SetPressed(lastPointerItem.IsPressed());
     currentPointerItem.SetPointerId(lastPointerId);
+    currentPointerItem.SetToolType(lastPointerItem.GetToolType());
     if (pointerAction == PointerEvent::POINTER_ACTION_LEVITATE_IN_WINDOW ||
         pointerAction == PointerEvent::POINTER_ACTION_LEVITATE_OUT_WINDOW) {
-        currentPointerItem.SetToolType(PointerEvent::TOOL_TYPE_PEN);
         currentPointerItem.SetTiltX(lastPointerItem.GetTiltX());
         currentPointerItem.SetTiltY(lastPointerItem.GetTiltY());
     }
