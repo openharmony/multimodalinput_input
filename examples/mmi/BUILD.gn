@@ -27,6 +27,7 @@ ohos_executable("mmi-server") {
     debug = false
   }
   external_deps = [
+    "ability_runtime:ability_connect_callback_stub",
     "c_utils:utils",
     "data_share:datashare_consumer",
     "hilog:libhilog",
