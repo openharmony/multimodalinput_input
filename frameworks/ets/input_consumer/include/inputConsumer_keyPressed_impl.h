@@ -46,6 +46,15 @@ static const std::set<int32_t> allowedKeys_ {
     KeyEvent::KEYCODE_MEDIA_PREVIOUS,
     KeyEvent::KEYCODE_FINGERPRINT_SLIDE_UP,
     KeyEvent::KEYCODE_FINGERPRINT_SLIDE_DOWN,
+    KeyEvent::KEYCODE_PTZ_CLICK,
+    KeyEvent::KEYCODE_PTZ_FOCUS_LEFT,
+    KeyEvent::KEYCODE_PTZ_FOCUS_RIGHT,
+    KeyEvent::KEYCODE_PTZ_EXPOSE_LEFT,
+    KeyEvent::KEYCODE_PTZ_EXPOSE_RIGHT,
+    KeyEvent::KEYCODE_PTZ_SHUTTER_LEFT,
+    KeyEvent::KEYCODE_PTZ_SHUTTER_RIGHT,
+    KeyEvent::KEYCODE_PTZ_APERTURE_LEFT,
+    KeyEvent::KEYCODE_PTZ_APERTURE_RIGHT,
 };
 
 int32_t EtsKeyActionToKeyAction(int32_t action);

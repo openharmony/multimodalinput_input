@@ -892,6 +892,168 @@ HWTEST_F(KeyEventValueTransformationTest, KeyEventValueTransformationTest_Transf
 }
 
 /**
+ * @tc.name: KeyEventValueTransformationTest_TransferKeyValue_027
+ * @tc.desc: Transfer PTZ click key value
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyEventValueTransformationTest, KeyEventValueTransformationTest_TransferKeyValue_027, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    auto KeyEvent = KeyEvent::Create();
+    ASSERT_NE(KeyEvent, nullptr);
+    int32_t keyValue = 768;
+    KeyEventValueTransformation result = TransferKeyValue(keyValue);
+    EXPECT_EQ(result.sysKeyValue, KeyEvent::KEYCODE_PTZ_CLICK);
+    EXPECT_EQ(result.nativeKeyValue, keyValue);
+    EXPECT_EQ(result.keyEvent, "KEY_PTZ_CLICK");
+}
+
+/**
+ * @tc.name: KeyEventValueTransformationTest_TransferKeyValue_028
+ * @tc.desc: Transfer PTZ focus left key value
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyEventValueTransformationTest, KeyEventValueTransformationTest_TransferKeyValue_028, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    auto KeyEvent = KeyEvent::Create();
+    ASSERT_NE(KeyEvent, nullptr);
+    int32_t keyValue = 769;
+    KeyEventValueTransformation result = TransferKeyValue(keyValue);
+    EXPECT_EQ(result.sysKeyValue, KeyEvent::KEYCODE_PTZ_FOCUS_LEFT);
+    EXPECT_EQ(result.nativeKeyValue, keyValue);
+    EXPECT_EQ(result.keyEvent, "KEY_PTZ_FOCUS_LEFT");
+}
+
+/**
+ * @tc.name: KeyEventValueTransformationTest_TransferKeyValue_029
+ * @tc.desc: Transfer PTZ focus right key value
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyEventValueTransformationTest, KeyEventValueTransformationTest_TransferKeyValue_029, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    auto KeyEvent = KeyEvent::Create();
+    ASSERT_NE(KeyEvent, nullptr);
+    int32_t keyValue = 770;
+    KeyEventValueTransformation result = TransferKeyValue(keyValue);
+    EXPECT_EQ(result.sysKeyValue, KeyEvent::KEYCODE_PTZ_FOCUS_RIGHT);
+    EXPECT_EQ(result.nativeKeyValue, keyValue);
+    EXPECT_EQ(result.keyEvent, "KEY_PTZ_FOCUS_RIGHT");
+}
+
+/**
+ * @tc.name: KeyEventValueTransformationTest_TransferKeyValue_030
+ * @tc.desc: Transfer PTZ expose left key value
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyEventValueTransformationTest, KeyEventValueTransformationTest_TransferKeyValue_030, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    auto KeyEvent = KeyEvent::Create();
+    ASSERT_NE(KeyEvent, nullptr);
+    int32_t keyValue = 771;
+    KeyEventValueTransformation result = TransferKeyValue(keyValue);
+    EXPECT_EQ(result.sysKeyValue, KeyEvent::KEYCODE_PTZ_EXPOSE_LEFT);
+    EXPECT_EQ(result.nativeKeyValue, keyValue);
+    EXPECT_EQ(result.keyEvent, "KEY_PTZ_EXPOSE_LEFT");
+}
+
+/**
+ * @tc.name: KeyEventValueTransformationTest_TransferKeyValue_031
+ * @tc.desc: Transfer PTZ expose right key value
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyEventValueTransformationTest, KeyEventValueTransformationTest_TransferKeyValue_031, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    auto KeyEvent = KeyEvent::Create();
+    ASSERT_NE(KeyEvent, nullptr);
+    int32_t keyValue = 772;
+    KeyEventValueTransformation result = TransferKeyValue(keyValue);
+    EXPECT_EQ(result.sysKeyValue, KeyEvent::KEYCODE_PTZ_EXPOSE_RIGHT);
+    EXPECT_EQ(result.nativeKeyValue, keyValue);
+    EXPECT_EQ(result.keyEvent, "KEY_PTZ_EXPOSE_RIGHT");
+}
+
+/**
+ * @tc.name: KeyEventValueTransformationTest_TransferKeyValue_032
+ * @tc.desc: Transfer PTZ shutter left key value
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyEventValueTransformationTest, KeyEventValueTransformationTest_TransferKeyValue_032, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    auto KeyEvent = KeyEvent::Create();
+    ASSERT_NE(KeyEvent, nullptr);
+    int32_t keyValue = 773;
+    KeyEventValueTransformation result = TransferKeyValue(keyValue);
+    EXPECT_EQ(result.sysKeyValue, KeyEvent::KEYCODE_PTZ_SHUTTER_LEFT);
+    EXPECT_EQ(result.nativeKeyValue, keyValue);
+    EXPECT_EQ(result.keyEvent, "KEY_PTZ_SHUTTER_LEFT");
+}
+
+/**
+ * @tc.name: KeyEventValueTransformationTest_TransferKeyValue_033
+ * @tc.desc: Transfer PTZ shutter right key value
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyEventValueTransformationTest, KeyEventValueTransformationTest_TransferKeyValue_033, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    auto KeyEvent = KeyEvent::Create();
+    ASSERT_NE(KeyEvent, nullptr);
+    int32_t keyValue = 774;
+    KeyEventValueTransformation result = TransferKeyValue(keyValue);
+    EXPECT_EQ(result.sysKeyValue, KeyEvent::KEYCODE_PTZ_SHUTTER_RIGHT);
+    EXPECT_EQ(result.nativeKeyValue, keyValue);
+    EXPECT_EQ(result.keyEvent, "KEY_PTZ_SHUTTER_RIGHT");
+}
+
+/**
+ * @tc.name: KeyEventValueTransformationTest_TransferKeyValue_034
+ * @tc.desc: Transfer PTZ aperture left key value
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyEventValueTransformationTest, KeyEventValueTransformationTest_TransferKeyValue_034, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    auto KeyEvent = KeyEvent::Create();
+    ASSERT_NE(KeyEvent, nullptr);
+    int32_t keyValue = 775;
+    KeyEventValueTransformation result = TransferKeyValue(keyValue);
+    EXPECT_EQ(result.sysKeyValue, KeyEvent::KEYCODE_PTZ_APERTURE_LEFT);
+    EXPECT_EQ(result.nativeKeyValue, keyValue);
+    EXPECT_EQ(result.keyEvent, "KEY_PTZ_APERTURE_LEFT");
+}
+
+/**
+ * @tc.name: KeyEventValueTransformationTest_TransferKeyValue_035
+ * @tc.desc: Transfer PTZ aperture right key value
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyEventValueTransformationTest, KeyEventValueTransformationTest_TransferKeyValue_035, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    auto KeyEvent = KeyEvent::Create();
+    ASSERT_NE(KeyEvent, nullptr);
+    int32_t keyValue = 776;
+    KeyEventValueTransformation result = TransferKeyValue(keyValue);
+    EXPECT_EQ(result.sysKeyValue, KeyEvent::KEYCODE_PTZ_APERTURE_RIGHT);
+    EXPECT_EQ(result.nativeKeyValue, keyValue);
+    EXPECT_EQ(result.keyEvent, "KEY_PTZ_APERTURE_RIGHT");
+}
+
+/**
  * @tc.name: KeyEventValueTransformationTest_InputTransformationKeyValue_001
  * @tc.desc: Input transformationKey value
  * @tc.type: FUNC
@@ -905,6 +1067,27 @@ HWTEST_F(KeyEventValueTransformationTest, KeyEventValueTransformationTest_InputT
     ASSERT_NE(KeyEvent, nullptr);
     int32_t result = InputTransformationKeyValue(0);
     ASSERT_EQ(result, -1);
+}
+
+/**
+ * @tc.name: KeyEventValueTransformationTest_InputTransformationKeyValue_002
+ * @tc.desc: Input transformation PTZ key value
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyEventValueTransformationTest, KeyEventValueTransformationTest_InputTransformationKeyValue_002,
+     TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    auto KeyEvent = KeyEvent::Create();
+    ASSERT_NE(KeyEvent, nullptr);
+    constexpr int32_t ptzKeySize { 9 };
+    constexpr int32_t firstLinuxCode { 768 };
+    constexpr int32_t firstOhosCode { 3235 };
+    for (int32_t i = 0; i < ptzKeySize; ++i) {
+        int32_t result = InputTransformationKeyValue(firstOhosCode + i);
+        EXPECT_EQ(result, firstLinuxCode + i);
+    }
 }
 } // namespace MMI
 } // namespace OHOS

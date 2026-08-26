@@ -376,6 +376,15 @@ const static std::map<int32_t, keyCode::KeyCode> KEY_CODE_TRANSFORMATION = {
     { KEYCODE_XKEY_ETS,                      keyCode::KeyCode::key_t::KEYCODE_XKEY },
     { KEYCODE_FINGERPRINT_SLIDE_UP_ETS,      keyCode::KeyCode::key_t::KEYCODE_FINGERPRINT_SLIDE_UP },
     { KEYCODE_FINGERPRINT_SLIDE_DOWN_ETS,    keyCode::KeyCode::key_t::KEYCODE_FINGERPRINT_SLIDE_DOWN },
+    { KEYCODE_PTZ_CLICK_ETS,                 keyCode::KeyCode::key_t::KEYCODE_PTZ_CLICK },
+    { KEYCODE_PTZ_FOCUS_LEFT_ETS,            keyCode::KeyCode::key_t::KEYCODE_PTZ_FOCUS_LEFT },
+    { KEYCODE_PTZ_FOCUS_RIGHT_ETS,           keyCode::KeyCode::key_t::KEYCODE_PTZ_FOCUS_RIGHT },
+    { KEYCODE_PTZ_EXPOSE_LEFT_ETS,           keyCode::KeyCode::key_t::KEYCODE_PTZ_EXPOSE_LEFT },
+    { KEYCODE_PTZ_EXPOSE_RIGHT_ETS,          keyCode::KeyCode::key_t::KEYCODE_PTZ_EXPOSE_RIGHT },
+    { KEYCODE_PTZ_SHUTTER_LEFT_ETS,          keyCode::KeyCode::key_t::KEYCODE_PTZ_SHUTTER_LEFT },
+    { KEYCODE_PTZ_SHUTTER_RIGHT_ETS,         keyCode::KeyCode::key_t::KEYCODE_PTZ_SHUTTER_RIGHT },
+    { KEYCODE_PTZ_APERTURE_LEFT_ETS,         keyCode::KeyCode::key_t::KEYCODE_PTZ_APERTURE_LEFT },
+    { KEYCODE_PTZ_APERTURE_RIGHT_ETS,        keyCode::KeyCode::key_t::KEYCODE_PTZ_APERTURE_RIGHT },
     { KEYCODE_WRIST_TURN_ETS,                keyCode::KeyCode::key_t::KEYCODE_WRIST_TURN },
     { KEYCODE_BACK_PANEL_DOUBLE_TAP_ETS,     keyCode::KeyCode::key_t::KEYCODE_BACK_PANEL_DOUBLE_TAP }
 };
