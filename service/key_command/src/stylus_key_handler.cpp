@@ -37,16 +37,30 @@ const char* SHORTHAND_TARGET { "shorthand_target" };
 StylusKeyHandler::StylusKeyHandler() {}
 StylusKeyHandler::~StylusKeyHandler() {}
 
+void StylusKeyHandler::InitKeyObserver()
+{
+    CALL_DEBUG_ENTER;
+    if (isShortHandConfig_) {
+        MMI_HILOGD("Stylus key observer already initialized");
+        return;
+    }
+
+    stylusKey_.statusConfig = SHORTHAND_SWITCH;
+    CreateStatusConfigObserver(stylusKey_);
+    shortHandTarget_.statusConfig = SHORTHAND_TARGET;
+    CreateStatusConfigObserver(shortHandTarget_);
+    isShortHandConfig_ = true;
+    MMI_HILOGI("Stylus key observer initialized successfully");
+}
+
 bool StylusKeyHandler::HandleStylusKey(std::shared_ptr<KeyEvent> keyEvent)
 {
     CHKPF(keyEvent);
     if (!isShortHandConfig_) {
-        stylusKey_.statusConfig = SHORTHAND_SWITCH;
-        CreateStatusConfigObserver(stylusKey_);
-        shortHandTarget_.statusConfig = SHORTHAND_TARGET;
-        CreateStatusConfigObserver(shortHandTarget_);
-        isShortHandConfig_ = true;
+        MMI_HILOGW("Stylus key observer not initialized yet, cannot handle stylus event");
+        return false;
     }
+
     if (keyEvent->GetKeyCode() != KeyEvent::KEYCODE_STYLUS_SCREEN) {
         stylusKey_.lastEventIsStylus = false;
 #ifdef OHOS_BUILD_ENABLE_DFX_RADAR

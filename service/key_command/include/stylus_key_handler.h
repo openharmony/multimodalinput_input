@@ -41,6 +41,7 @@ public:
     bool HandleStylusKey(std::shared_ptr<KeyEvent> keyEvent);
     void IsLaunchAbility();
     void SetLastEventState(bool state);
+    void InitKeyObserver();
 private:
     template <class T>
     void CreateStatusConfigObserver(T& item);
