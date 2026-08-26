@@ -120,6 +120,9 @@ public:
                 if (keyHandler != nullptr) {
                     keyHandler->InitKeyObserver();
                 }
+#ifdef OHOS_BUILD_ENABLE_COMBINATION_KEY
+                STYLUS_HANDLER->InitKeyObserver();
+#endif // OHOS_BUILD_ENABLE_COMBINATION_KEY
 #ifdef OHOS_BUILD_KNUCKLE
                 KnuckleHandlerComponent::GetInstance().RegisterSwitchObserver();
 #endif // OHOS_BUILD_KNUCKLE
