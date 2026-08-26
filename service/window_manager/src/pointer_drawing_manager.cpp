@@ -1979,6 +1979,9 @@ void PointerDrawingManager::CreatePointerWindow(uint64_t rsId, int32_t physicalX
     }
     AttachToDisplay();
     lastDisplayId_ = rsId;
+    if (activeGroupId_ < 0) {
+        activeGroupId_ = WIN_MGR->FindGroupIdByRsId(rsId);
+    }
     MMI_HILOGI("CreatePointerWindow The screenId_:%{public}" PRIu64, screenId_);
     RotateDegree(direction);
     lastDirection_ = direction;
