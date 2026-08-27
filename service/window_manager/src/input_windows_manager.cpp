@@ -6332,24 +6332,28 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
         windowX = windowXY.first;
         windowY = windowXY.second;
     }
+    int32_t deviceId = pointerEvent->GetDeviceId();
+    int32_t pointerAction = pointerEvent->GetPointerAction();
 #ifdef OHOS_BUILD_ENABLE_ANCO
     bool isHoverEvent = IsAccessibilityFocusEvent(pointerEvent);
-    bool isInAnco = false;
-
-    if (isHoverEvent) {
-        static bool hoverIsInAnco = false;
-        if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_HOVER_ENTER || NeedTouchTracking()) {
-            hoverIsInAnco = touchWindow && IsInAncoWindow(*touchWindow, windowX, windowY);
-        }
-        isInAnco = hoverIsInAnco;
-    } else {
-        static bool touchIsInAnco = false;
-        if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_DOWN || isExtraData) {
-            touchIsInAnco = touchWindow && IsInAncoWindow(*touchWindow, windowX, windowY);
-        }
-        isInAnco = touchIsInAnco;
+    auto& ancoStates = isHoverEvent ? hoverAncoStates_ : touchAncoStates_;
+    if ((isHoverEvent && (pointerAction == PointerEvent::POINTER_ACTION_HOVER_ENTER ||
+            NeedTouchTracking(*pointerEvent))) ||
+        (!isHoverEvent && (pointerAction == PointerEvent::POINTER_ACTION_DOWN || isExtraData))) {
+        ancoStates[deviceId][pointerId] =
+            touchWindow && IsInAncoWindow(*touchWindow, windowX, windowY);
     }
-
+    bool isInAnco = GetAncoState(ancoStates, deviceId, pointerId);
+    if ((isHoverEvent && pointerAction == PointerEvent::POINTER_ACTION_HOVER_EXIT) ||
+        (!isHoverEvent && (pointerAction == PointerEvent::POINTER_ACTION_UP ||
+        pointerAction == PointerEvent::POINTER_ACTION_CANCEL ||
+        pointerAction == PointerEvent::POINTER_ACTION_PULL_CANCEL ||
+        pointerAction == PointerEvent::POINTER_ACTION_PULL_UP))) {
+        auto devIter = ancoStates.find(deviceId);
+        if (devIter != ancoStates.end()) {
+            devIter->second.erase(pointerId);
+        }
+    }
     if (isInAnco) {
         MMI_HILOG_DISPATCHD("Process touch screen event in Anco window, targetWindowId:%{public}d", touchWindow->id);
         std::set<int32_t> windowIds;
@@ -6490,7 +6494,7 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
         ((pointerItem.GetToolType() == PointerEvent::TOOL_TYPE_FINGER && extraData_.pointerId == pointerId) ||
         pointerItem.GetToolType() == PointerEvent::TOOL_TYPE_PEN);
     checkExtraData = checkExtraData || (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_PULL_UP);
-    int32_t pointerAction = pointerEvent->GetPointerAction();
+    pointerAction = pointerEvent->GetPointerAction();
     if ((pointerAction == PointerEvent::POINTER_ACTION_DOWN) && !checkExtraData) {
         UpdateStashTouchEventInfo(logicalX, logicalY, pointerEvent, touchWindow);
     }
@@ -6616,7 +6620,7 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
     int32_t curGroupId = FindDisplayGroupId(pointerEvent->GetTargetDisplayId());
     TouchLastPointerEventForWindowChangeMap()[curGroupId] = pointerEvent;
     TouchLastPointerEventForGesture() = pointerEvent;
-    int32_t deviceId = TouchLastPointerEventForGesture()->GetDeviceId();
+    deviceId = TouchLastPointerEventForGesture()->GetDeviceId();
     pointerAction = pointerEvent->GetPointerAction();
     if (pointerAction == PointerEvent::POINTER_ACTION_DOWN ||
         pointerAction == PointerEvent::POINTER_ACTION_HOVER_ENTER) {
@@ -6825,6 +6829,10 @@ void InputWindowsManager::ClearFirstTouchWindowInfos(int32_t deviceId)
         return;
     }
     firstTouchInfos.erase(deviceId);
+#ifdef OHOS_BUILD_ENABLE_ANCO
+    touchAncoStates_.erase(deviceId);
+    hoverAncoStates_.erase(deviceId);
+#endif // OHOS_BUILD_ENABLE_ANCO
 }
 
 void InputWindowsManager::UpdateTargetTouchWinIds(const WindowInfo &item, PointerEvent::PointerItem &pointerItem,
@@ -8847,6 +8855,17 @@ bool InputWindowsManager::IsKnuckleOnAncoWindow(std::shared_ptr<PointerEvent> po
     }
 
     return IsAncoWindowFocus(*windowInfo);
+}
+
+bool InputWindowsManager::GetAncoState(const std::map<int32_t, std::map<int32_t, bool>>& states,
+    int32_t deviceId, int32_t pointerId) const
+{
+    auto devIter = states.find(deviceId);
+    if (devIter == states.end()) {
+        return false;
+    }
+    auto ptrIter = devIter->second.find(pointerId);
+    return (ptrIter != devIter->second.end()) && (ptrIter->second);
 }
 #endif // OHOS_BUILD_ENABLE_ANCO
 

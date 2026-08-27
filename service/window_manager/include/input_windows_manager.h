@@ -192,6 +192,8 @@ public:
     void UpdateOneHandDataExt(const OLD::DisplayInfo &displayInfo);
     void UpdateShellWindow(const WindowInfo &window);
     void UpdateDisplayInfoExt(const OLD::DisplayGroupInfo &displayGroupInfo);
+    bool GetAncoState(const std::map<int32_t, std::map<int32_t, bool>>& states,
+          int32_t deviceId, int32_t pointerId) const;
     bool IsInAncoWindow(const WindowInfo &window, int32_t x, int32_t y,
         int32_t sourceType = PointerEvent::SOURCE_TYPE_UNKNOWN) const;
     bool IsAncoWindow(const WindowInfo &window) const;
@@ -723,6 +725,10 @@ private:
     Coordinate2D pointerLockedCursorPos_ = { 0.0, 0.0 };
     MouseRedispatchStore mouseRedispatchStore_;
     TouchRedispatchStore touchRedispatchStore_;
+#ifdef OHOS_BUILD_ENABLE_ANCO
+    std::map<int32_t, std::map<int32_t, bool>> touchAncoStates_;
+    std::map<int32_t, std::map<int32_t, bool>> hoverAncoStates_;
+#endif // OHOS_BUILD_ENABLE_ANCO
     int32_t activeDragToolType_ { -1 };
 };
 } // namespace MMI
