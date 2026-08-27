@@ -14,6 +14,7 @@
  */
 
 #include "device_config_file_parser.h"
+#include "parse_config_int.h"
 
 #include <fstream>
 #include <regex>
@@ -115,7 +116,11 @@ std::map<ConfigFileItem, int32_t> DeviceConfigManagement::ReadConfigFile(const s
         if (!isNumber) {
             continue;
         }
-        configList[ConfigItemName2Id(key)] = std::stoi(match[0]);
+        int32_t parsed = 0;
+        if (!ParseConfigInt32(match[0].str(), parsed)) {
+            continue;
+        }
+        configList[ConfigItemName2Id(key)] = parsed;
     }
     cfgFile.close();
     return configList;
