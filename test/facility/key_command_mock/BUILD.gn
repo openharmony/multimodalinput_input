@@ -32,7 +32,7 @@ ohos_source_set("key_command_mock") {
 
   include_dirs = [ "include" ]
 
-  sources = [ "src/key_command_handler_util.cpp" ]
+  sources = []
 
   public_configs = [ ":key_command_mock_public_config" ]
 

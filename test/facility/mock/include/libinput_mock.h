@@ -80,7 +80,6 @@ public:
     MOCK_METHOD(uint32_t, LibinputEventKeyboardGetKey, (struct libinput_event_keyboard *));
     MOCK_METHOD(enum libinput_key_state, LibinputEventKeyboardGetKeyState, (struct libinput_event_keyboard *));
     MOCK_METHOD(int, HasEventLedType, (struct libinput_device *));
-    MOCK_METHOD(int, SetLedState, (struct libinput_device *, unsigned int, unsigned int));
     MOCK_METHOD(int, GetFuncKeyState, (struct libinput_device *, unsigned int));
     MOCK_METHOD(uint32_t, PointerGetButtonArea, (struct libinput_event_pointer *));
     MOCK_METHOD(double, TouchpadDeviceGetPpi, (struct libinput_device *));

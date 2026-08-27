@@ -26,7 +26,6 @@
 namespace OHOS {
 namespace MMI {
 class KeyEventNormalize final {
-private:
     enum class VolumeSwapConfig {
         NO_CONFIG,
         NO_VOLUME_SWAP,

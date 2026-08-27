@@ -15,9 +15,6 @@
 
 #include "key_unicode_transformation.h"
 
-#include <map>
-
-#include "define_multimodal.h"
 #include "hos_key_event.h"
 
 #undef MMI_LOG_DOMAIN

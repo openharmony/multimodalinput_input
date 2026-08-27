@@ -163,7 +163,6 @@ public:
     virtual uint32_t LibinputEventKeyboardGetKey (struct libinput_event_keyboard *event) = 0;
     virtual enum libinput_key_state LibinputEventKeyboardGetKeyState (struct libinput_event_keyboard *event) = 0;
     virtual int HasEventLedType (struct libinput_device *device) = 0;
-    virtual int SetLedState(struct libinput_device *device, unsigned int code, unsigned int state) = 0;
     virtual int GetFuncKeyState (struct libinput_device *device, unsigned int code) = 0;
     virtual uint32_t PointerGetButtonArea(struct libinput_event_pointer *event) = 0;
     virtual double TouchpadDeviceGetPpi(struct libinput_device *device) = 0;

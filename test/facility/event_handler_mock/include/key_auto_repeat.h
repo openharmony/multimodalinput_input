@@ -31,9 +31,6 @@ public:
     virtual ~IKeyAutoRepeat() = default;
 
     virtual std::map<int32_t, DeviceConfig> GetDeviceConfig() const = 0;
-    virtual void RemoveTimer() = 0;
-    virtual int32_t GetRepeatKeyCode() const = 0;
-    virtual void SetRepeatKeyCode(int32_t code) = 0;
 };
 
 class KeyAutoRepeat final : public IKeyAutoRepeat {
@@ -46,9 +43,6 @@ public:
     DISALLOW_COPY_AND_MOVE(KeyAutoRepeat);
 
     MOCK_METHOD((std::map<int32_t, DeviceConfig>), GetDeviceConfig, (), (const));
-    void RemoveTimer() override {}
-    MOCK_METHOD(int32_t, GetRepeatKeyCode, (), (const));
-    void SetRepeatKeyCode(int32_t code) override {}
 
 private:
     static std::shared_ptr<KeyAutoRepeat> instance_;

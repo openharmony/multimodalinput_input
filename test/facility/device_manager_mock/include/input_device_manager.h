@@ -41,8 +41,6 @@ public:
 
     void AddInputDevice(int32_t deviceId, std::shared_ptr<IInputDevice> dev);
     void RemoveInputDevice(int32_t deviceId);
-    MOCK_METHOD(int32_t, AddVirtualInputDevice, (std::shared_ptr<InputDevice>, int32_t&));
-    MOCK_METHOD(int32_t, RemoveVirtualInputDevice, (int32_t));
     bool CheckDevice(int32_t deviceId, std::function<bool(const IInputDevice&)> pred) const;
     void ForEachDevice(std::function<void(int32_t, const IInputDevice&)> callback) const;
     void ForDevice(int32_t deviceId, std::function<void(const IInputDevice&)> callback) const;
@@ -63,9 +61,6 @@ public:
     MOCK_METHOD(bool, GetIsDeviceReportEvent, (int32_t));
     MOCK_METHOD(std::vector<int32_t>, GetTouchPadIds, ());
     MOCK_METHOD(bool, IsInputDeviceEnable, (int32_t));
-    MOCK_METHOD(bool, IsKeyboardDevice, (struct libinput_device*), (const));
-    MOCK_METHOD(bool, IsPointerDevice, (struct libinput_device*), (const));
-    MOCK_METHOD(bool, IsTouchDevice, (struct libinput_device*), (const));
     MOCK_METHOD(bool, IsTouchPadDevice, (struct libinput_device*), (const));
     MOCK_METHOD(void, OnInputDeviceAdded, (struct libinput_device*));
     MOCK_METHOD(void, OnInputDeviceRemoved, (struct libinput_device*));

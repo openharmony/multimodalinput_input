@@ -362,7 +362,7 @@ int libinput_has_event_led_type(struct libinput_device *device)
 
 int libinput_set_led_state(struct libinput_device *device, unsigned int code, unsigned int state)
 {
-    return g_instance->SetLedState(device, code, state);
+    return 1;
 }
 
 const char* libinput_device_get_name(struct libinput_device *device)
