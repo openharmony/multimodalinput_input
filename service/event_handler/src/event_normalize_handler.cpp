@@ -563,7 +563,15 @@ int32_t EventNormalizeHandler::HandleKeyboardEvent(libinput_event* event)
     }
     BytraceAdapter::StopPackageEvent();
     BytraceAdapter::StartBytrace(keyEvent);
-    EventLogHelper::PrintEventData(keyEvent, MMI_LOG_HEADER);
+    EventLogHelper::PrintEventData(keyEvent, MMI_LOG_HEADER, [](int32_t deviceId) {
+        EventSourceInfo source;
+        std::shared_ptr<InputDevice> device = INPUT_DEV_MGR->GetInputDevice(deviceId, false);
+        if (device != nullptr) {
+            source.name = device->GetName();
+            source.phys = device->GetPhys();
+        }
+        return source;
+    });
     auto device = INPUT_DEV_MGR->GetInputDevice(keyEvent->GetDeviceId());
     CHKPR(device, RET_ERR);
     MMI_HILOGI("InputTracking id:%{public}d event created by:%{public}s", keyEvent->GetId(), device->GetName().c_str());
