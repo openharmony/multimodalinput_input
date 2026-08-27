@@ -144,10 +144,9 @@ private:
         return ", ES:" + source.name + ", PH:" + source.phys;
     }
 
-    static void PrintInfoLog(const std::shared_ptr<KeyEvent> event, const LogHeader &lh,
-        const EventSourceResolver &resolver = nullptr)
+    static void PrintKeyEventInfoHead(const std::shared_ptr<KeyEvent> event,
+        const std::vector<KeyEvent::KeyItem> &eventItems, const LogHeader &lh)
     {
-        std::vector<KeyEvent::KeyItem> eventItems{ event->GetKeyItems() };
         std::string isSimulate = event->HasFlag(InputEvent::EVENT_FLAG_SIMULATE) ? "true" : "false";
         std::string isRepeat = event->IsRepeat() ? "true" : "false";
         if (event->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE) || IsEnterableKey(event->GetKeyCode())) {
@@ -174,7 +173,12 @@ private:
                 event->GetFunctionKey(KeyEvent::SCROLL_LOCK_FUNCTION_KEY), eventItems.size(),
                 event->GetTargetDisplayId(), isRepeat.c_str(), isSimulate.c_str());
         }
+    }
 
+    static void PrintKeyItemsInfoLog(const std::shared_ptr<KeyEvent> event,
+        const std::vector<KeyEvent::KeyItem> &eventItems, const EventSourceResolver &resolver,
+        const LogHeader &lh)
+    {
         for (const auto &item : eventItems) {
             std::string sourceSuffix = GetEventSourceSuffix(resolver, item.GetDeviceId());
             if (!IsBetaVersion()) {
@@ -192,6 +196,14 @@ private:
                 }
             }
         }
+    }
+
+    static void PrintInfoLog(const std::shared_ptr<KeyEvent> event, const LogHeader &lh,
+        const EventSourceResolver &resolver = nullptr)
+    {
+        std::vector<KeyEvent::KeyItem> eventItems{ event->GetKeyItems() };
+        PrintKeyEventInfoHead(event, eventItems, lh);
+        PrintKeyItemsInfoLog(event, eventItems, resolver, lh);
         std::vector<int32_t> pressedKeys = event->GetPressedKeys();
         std::vector<int32_t>::const_iterator cItr = pressedKeys.cbegin();
         if (cItr != pressedKeys.cend()) {
@@ -207,15 +219,9 @@ private:
         }
     }
 
-    static void Print(const std::shared_ptr<KeyEvent> event, const LogHeader &lh,
-        const EventSourceResolver &resolver = nullptr)
+    static void PrintKeyEventDebugHead(const std::shared_ptr<KeyEvent> event,
+        const std::vector<KeyEvent::KeyItem> &eventItems, bool isJudgeMode, const LogHeader &lh)
     {
-        if (!HiLogIsLoggable(lh.domain, lh.func, LOG_DEBUG) && event->GetKeyCode() != KeyEvent::KEYCODE_POWER) {
-            return;
-        }
-        PrintDebugDict();
-        std::vector<KeyEvent::KeyItem> eventItems{ event->GetKeyItems() };
-        bool isJudgeMode = IsEnterableKey(event->GetKeyCode());
         if (event->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE) || isJudgeMode) {
             MMI_HILOG_HEADER(LOG_DEBUG, lh, "KC:%{private}d, KI:%{public}d,"
                 "AT:%{public}" PRId64 ", AST:%{public}" PRId64
@@ -238,6 +244,12 @@ private:
                 event->GetFunctionKey(KeyEvent::CAPS_LOCK_FUNCTION_KEY),
                 event->GetFunctionKey(KeyEvent::SCROLL_LOCK_FUNCTION_KEY), event->GetId(), eventItems.size());
         }
+    }
+
+    static void PrintKeyItemsDebugLog(const std::shared_ptr<KeyEvent> event,
+        const std::vector<KeyEvent::KeyItem> &eventItems, const EventSourceResolver &resolver,
+        const LogHeader &lh)
+    {
         for (const auto &item : eventItems) {
             std::string sourceSuffix = GetEventSourceSuffix(resolver, item.GetDeviceId());
             if (!IsBetaVersion()) {
@@ -254,6 +266,19 @@ private:
                 }
             }
         }
+    }
+
+    static void Print(const std::shared_ptr<KeyEvent> event, const LogHeader &lh,
+        const EventSourceResolver &resolver = nullptr)
+    {
+        if (!HiLogIsLoggable(lh.domain, lh.func, LOG_DEBUG) && event->GetKeyCode() != KeyEvent::KEYCODE_POWER) {
+            return;
+        }
+        PrintDebugDict();
+        std::vector<KeyEvent::KeyItem> eventItems{ event->GetKeyItems() };
+        bool isJudgeMode = IsEnterableKey(event->GetKeyCode());
+        PrintKeyEventDebugHead(event, eventItems, isJudgeMode, lh);
+        PrintKeyItemsDebugLog(event, eventItems, resolver, lh);
         std::vector<int32_t> pressedKeys = event->GetPressedKeys();
         std::vector<int32_t>::const_iterator cItr = pressedKeys.cbegin();
         if (cItr != pressedKeys.cend()) {
