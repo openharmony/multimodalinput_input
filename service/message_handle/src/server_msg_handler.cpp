@@ -1039,13 +1039,17 @@ int32_t ServerMsgHandler::OnWindowGroupInfo(SessionPtr sess, NetPacket &pkt)
     CHKUPPER(num, MAX_WINDOW_GROUP_INFO_SIZE, RET_ERR);
     for (uint32_t i = 0; i < num; i++) {
         WindowInfo info;
+        int32_t pixelMapByteCount = 0;
         pkt >> info.id >> info.pid >> info.uid >> info.area >> info.defaultHotAreas
             >> info.pointerHotAreas >> info.agentWindowId >> info.flags >> info.action
             >> info.displayId >> info.groupId >> info.zOrder >> info.pointerChangeAreas >> info.transform
             >> info.windowInputType >> info.privacyMode >> info.windowType
             >> info.isSkipSelfWhenShowOnVirtualScreen >> info.windowNameType
-            >> info.agentPid >> info.dragDisabledAreas;
+            >> info.agentPid >> info.dragDisabledAreas >> pixelMapByteCount;
         CHKRWER(pkt, RET_ERR);
+        if (pixelMapByteCount == 0) {
+            WIN_MGR->RemovePixelMapData(info.id);
+        }
         OnUiExtentionWindowInfo(pkt, info);
         pkt >> info.rectChangeBySystem;
         CHKRWER(pkt, RET_ERR);
