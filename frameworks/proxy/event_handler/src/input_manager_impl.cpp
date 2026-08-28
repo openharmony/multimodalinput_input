@@ -788,6 +788,7 @@ int32_t InputManagerImpl::PackWindowGroupInfo(NetPacket &pkt)
     pkt << num;
     for (const auto &item : windowGroupInfo_.windowsInfo) {
         uint32_t resultFlags = WindowInputTypeToFlag(item);
+        int32_t pixelMapByteCount = 0;
         pkt << item.id << item.pid << item.uid << item.area
             << item.defaultHotAreas << item.pointerHotAreas
             << item.agentWindowId << resultFlags << item.action
@@ -795,6 +796,17 @@ int32_t InputManagerImpl::PackWindowGroupInfo(NetPacket &pkt)
             << item.transform << item.windowInputType << item.privacyMode
             << item.windowType << item.isSkipSelfWhenShowOnVirtualScreen << item.windowNameType << item.agentPid
             << item.dragDisabledAreas;
+
+        if (item.pixelMap != nullptr) {
+            OHOS::Media::PixelMap* pixelMapPtr = static_cast<OHOS::Media::PixelMap*>(item.pixelMap);
+            pixelMapByteCount = pixelMapPtr->GetByteCount();
+            int32_t ret = SetPixelMapData(item.id, item.pixelMap);
+            if (ret != RET_OK) {
+                pixelMapByteCount = 0;
+                MMI_HILOGE("Failed to set pixel map");
+            }
+        }
+        pkt << pixelMapByteCount;
         uint32_t uiExtentionWindowInfoNum = static_cast<uint32_t>(item.uiExtentionWindowInfo.size());
         pkt << uiExtentionWindowInfoNum;
         MMI_HILOGD("uiExtentionWindowInfoNum:%{public}u", uiExtentionWindowInfoNum);
