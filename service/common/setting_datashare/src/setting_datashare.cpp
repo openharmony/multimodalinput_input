@@ -136,6 +136,7 @@ void SettingDataShare::ExecRegisterCb(const sptr<SettingObserver>& observer)
 ErrCode SettingDataShare::RegisterObserver(const sptr<SettingObserver>& observer, const std::string &strUri)
 {
     if (observer == nullptr) {
+        MMI_HILOGE("Observer is nullptr");
         BytraceAdapter::StopDataShare();
         return RET_ERR;
     }
@@ -161,6 +162,7 @@ ErrCode SettingDataShare::RegisterObserver(const sptr<SettingObserver>& observer
 ErrCode SettingDataShare::UnregisterObserver(const sptr<SettingObserver>& observer, const std::string &strUri)
 {
     if (observer == nullptr) {
+        MMI_HILOGE("Observer is nullptr");
         BytraceAdapter::StopDataShare();
         return RET_ERR;
     }
@@ -197,6 +199,7 @@ ErrCode SettingDataShare::GetStringValue(const std::string& key, std::string& va
     auto resultSet = helper->Query(uri, predicates, columns);
     ReleaseDataShareHelper(helper);
     if (resultSet == nullptr) {
+        MMI_HILOGE("Query result set is nullptr, key:%{public}s", key.c_str());
         IPCSkeleton::SetCallingIdentity(callingIdentity);
         BytraceAdapter::StopDataShare();
         return ERR_INVALID_OPERATION;
@@ -204,6 +207,7 @@ ErrCode SettingDataShare::GetStringValue(const std::string& key, std::string& va
     int32_t count = 0;
     resultSet->GetRowCount(count);
     if (count == 0) {
+        MMI_HILOGW("Setting item not found, key:%{public}s", key.c_str());
         IPCSkeleton::SetCallingIdentity(callingIdentity);
         BytraceAdapter::StopDataShare();
         return ERR_NAME_NOT_FOUND;
@@ -212,6 +216,7 @@ ErrCode SettingDataShare::GetStringValue(const std::string& key, std::string& va
     resultSet->GoToRow(tmpRow);
     int32_t ret = resultSet->GetString(tmpRow, value);
     if (ret != RET_OK) {
+        MMI_HILOGE("Get string failed, ret:%{public}d, key:%{public}s", ret, key.c_str());
         IPCSkeleton::SetCallingIdentity(callingIdentity);
         BytraceAdapter::StopDataShare();
         return ERR_INVALID_VALUE;
@@ -274,6 +279,9 @@ std::shared_ptr<DataShare::DataShareHelper> SettingDataShare::CreateDataShareHel
         }
     }
     BytraceAdapter::StopDataShare();
+    if (ret.second == nullptr) {
+        MMI_HILOGE("Create data share helper failed");
+    }
     return ret.second;
 }
 

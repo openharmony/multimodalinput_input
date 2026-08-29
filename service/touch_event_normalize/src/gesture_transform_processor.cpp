@@ -151,7 +151,7 @@ std::shared_ptr<PointerEvent> GestureTransformProcessor::OnEvent(struct libinput
             return nullptr;
         }
         default: {
-            MMI_HILOGE("Unknown event_type of pointer class has been reported!\n");
+            MMI_HILOGE("Unknown event_type of pointer class has been reported!");
             return nullptr;
         }
     }

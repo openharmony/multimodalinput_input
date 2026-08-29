@@ -222,6 +222,7 @@ int32_t TwoFingerGestureHandler::CheckTwoFingerGesture(int32_t pid)
 int32_t TwoFingerGestureHandler::LaunchAiScreenAbility(int32_t pid)
 {
     if (CheckTwoFingerGesture(pid) != RET_OK) {
+        MMI_HILOGE("Check two finger gesture failed, pid:%{public}d", pid);
         context_.twoFingerGesture_.startTime = 0;
         context_.twoFingerGesture_.longPressFlag = false;
         context_.twoFingerGesture_.windowId = -1;

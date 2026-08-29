@@ -455,7 +455,7 @@ void ScreenPointer::OnDisplayInfo(const OLD::DisplayInfo &di)
         }
 
         offRenderScale_ = float(realWidth) / di.width;
-        MMI_HILOGD("Update with DisplayInfo, screenRealDPI=%{public}d, offRenderScale_=(%{public}f ",
+        MMI_HILOGD("Update with DisplayInfo, screenRealDPI:%{public}d, offRenderScale_:(%{public}f)",
             di.screenRealDPI, offRenderScale_);
     }
 }

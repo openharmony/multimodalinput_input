@@ -130,7 +130,7 @@ private:
         if (event->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE) || IsEnterableKey(event->GetKeyCode())) {
             MMI_HILOG_HEADER(LOG_INFO, lh, "See InputTracking-Dict, I:%{public}d,"
                 "KC:%{private}d, AT:%{public}" PRId64
-                ", ET:%{public}s, KA:%{public}s, NL:%{public}d, CL:%{public}d, SL:%{public}d, KIC:%zu, "
+                ", ET:%{public}s, KA:%{public}s, NL:%{public}d, CL:%{public}d, SL:%{public}d, KIC:%{public}zu, "
                 "DI:%{public}d, IR:%{public}s, SI:%{public}s",
                 event->GetId(), event->GetKeyCode(), event->GetActionTime(),
                 InputEvent::EventTypeToString(event->GetEventType()),
@@ -344,11 +344,11 @@ private:
                     item.GetTwist());
             } else {
                 if (event->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE)) {
-                    MMI_HILOG_HEADER(LOG_DEBUG, lh,"PI:%{public}d, DT:%{public}" PRId64 ", IP:%{public}d, DX:%d, DY:%d"
-                        ", WX:%d, WY:%d, W:%{public}d, H:%{public}d, TX:%.2f, TY:%.2f, TDX:%d, TDY:%d, ToolWX:%d, "
-                        "ToolWY:%d, ToolW:%{public}d, ToolH:%{public}d, P:%{public}.2f, MF:%{public}d, "
-                        "ToolType:%{public}d, LA:%{public}d, SA:%{public}d, RawDx:%d, RawDy:%d, RawDisplayX:%d, "
-                        "RawDisplayY:%d, T:%{public}d, DXP:%f, DYP:%f, FXP:%f, FYP:%f, WXP:%f, WYP:%f",
+                    MMI_HILOG_HEADER(LOG_DEBUG, lh,"PI:%{public}d, DT:%{public}" PRId64 ", IP:%{public}d, DX:%{public}d, DY:%{public}d"
+                        ", WX:%{public}d, WY:%{public}d, W:%{public}d, H:%{public}d, TX:%{public}.2f, TY:%{public}.2f, TDX:%{public}d, TDY:%{public}d, ToolWX:%{public}d, "
+                        "ToolWY:%{public}d, ToolW:%{public}d, ToolH:%{public}d, P:%{public}.2f, MF:%{public}d, "
+                        "ToolType:%{public}d, LA:%{public}d, SA:%{public}d, RawDx:%{public}d, RawDy:%{public}d, RawDisplayX:%{public}d, "
+                        "RawDisplayY:%{public}d, T:%{public}d, DXP:%{public}f, DYP:%{public}f, FXP:%{public}f, FYP:%{public}f, WXP:%{public}f, WYP:%{public}f",
                         item.GetPointerId(), item.GetDownTime(), item.IsPressed(), item.GetDisplayX(),
                         item.GetDisplayY(), item.GetWindowX(), item.GetWindowY(), item.GetWidth(), item.GetHeight(),
                         item.GetTiltX(), item.GetTiltY(), item.GetToolDisplayX(), item.GetToolDisplayY(),
@@ -386,11 +386,11 @@ private:
             } else {
                 if (event->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE)) {
                     MMI_HILOG_HEADER(LOG_DEBUG, lh,
-                        "PI:%{public}d, DT:%{public}" PRId64 ", IP:%{public}d, DX:%d, DY:%d, WX:%d, WY:%d, "
-                        "W:%{public}d, H:%{public}d, TX:%.2f, TY:%.2f, TDX:%d, TDY:%d, ToolWX:%d, ToolWY:%d, "
+                        "PI:%{public}d, DT:%{public}" PRId64 ", IP:%{public}d, DX:%{public}d, DY:%{public}d, WX:%{public}d, WY:%{public}d, "
+                        "W:%{public}d, H:%{public}d, TX:%{public}.2f, TY:%{public}.2f, TDX:%{public}d, TDY:%{public}d, ToolWX:%{public}d, ToolWY:%{public}d, "
                         "ToolW:%{public}d, ToolH:%{public}d, P:%{public}.2f, MF:%{public}d, "
-                        "ToolType:%{public}d, LA:%{public}d, SA:%{public}d, RawDx:%d, RawDy:%d, RawDisplayX:%d, "
-                        "RawDisplayY:%d, T:%{public}d, DXP:%f, DYP:%f, FXP:%f, FYP:%f, WXP:%f, WYP:%f",
+                        "ToolType:%{public}d, LA:%{public}d, SA:%{public}d, RawDx:%{public}d, RawDy:%{public}d, RawDisplayX:%{public}d, "
+                        "RawDisplayY:%{public}d, T:%{public}d, DXP:%{public}f, DYP:%{public}f, FXP:%{public}f, FYP:%{public}f, WXP:%{public}f, WYP:%{public}f",
                         item.GetPointerId(), item.GetDownTime(), item.IsPressed(), item.GetDisplayX(),
                         item.GetDisplayY(), item.GetWindowX(), item.GetWindowY(), item.GetWidth(), item.GetHeight(),
                         item.GetTiltX(), item.GetTiltY(), item.GetToolDisplayX(), item.GetToolDisplayY(),

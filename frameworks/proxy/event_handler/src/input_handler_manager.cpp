@@ -254,6 +254,7 @@ int32_t InputHandlerManager::RemoveHandler(int32_t handlerId, InputHandlerType h
         }
         return ret;
     }
+    MMI_HILOGW("Handler not found, handlerId:%{public}d, handlerType:%{public}d", handlerId, handlerType);
     return RET_ERR;
 }
 
@@ -275,7 +276,7 @@ int32_t InputHandlerManager::AddGestureToLocal(int32_t handlerId, HandleEventTyp
             ((handler.gestureHandler_.gestureType & gestureType) == gestureType) &&
             ((handler.gestureHandler_.fingers == ALL_FINGER_COUNT) || (handler.gestureHandler_.fingers == fingers)) &&
             (handler.consumer_ == consumer)) {
-            MMI_HILOGW("Duplicate monitor of TouchGesture(%{public}u, %{puglic}d)", gestureType, fingers);
+            MMI_HILOGW("Duplicate monitor of TouchGesture(%{public}u, %{public}d)", gestureType, fingers);
             return RET_ERR;
         }
     }

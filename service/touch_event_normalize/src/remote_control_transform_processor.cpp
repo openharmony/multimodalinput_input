@@ -116,11 +116,11 @@ bool Remote_ControlTransformProcessor::OnEventTouchMotion(struct libinput_event*
     }
     double x = touchInfo.point.x;
     double y = touchInfo.point.y;
-    MMI_HILOGD("Change coordinate: x:%.2f, y:%.2f, currentDisplayId:%d",
+    MMI_HILOGD("Change coordinate: x:%{public}.2f, y:%{public}.2f, currentDisplayId:%{public}d",
         x, y, logicalDisplayId);
     WIN_MGR->UpdateAndAdjustMouseLocation(logicalDisplayId, x, y);
     pointerEvent_->SetTargetDisplayId(logicalDisplayId);
-    MMI_HILOGD("Change coordinate: x:%.2f, y:%.2f, currentDisplayId:%d",
+    MMI_HILOGD("Change coordinate: x:%{public}.2f, y:%{public}.2f, currentDisplayId:%{public}d",
         x, y, logicalDisplayId);
 #endif // OHOS_BUILD_ENABLE_WATCH
     return true;

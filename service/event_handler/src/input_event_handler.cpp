@@ -68,6 +68,7 @@ InputEventHandler::~InputEventHandler() {}
 
 void InputEventHandler::Init(UDSServer& udsServer)
 {
+    CALL_INFO_TRACE;
     udsServer_ = &udsServer;
     BuildInputHandlerChain();
 }

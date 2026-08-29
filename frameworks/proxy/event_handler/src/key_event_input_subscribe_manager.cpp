@@ -225,6 +225,7 @@ int32_t KeyEventInputSubscribeManager::UnsubscribeKeyEvent(int32_t subscribeId)
             return RET_OK;
         }
     }
+    MMI_HILOGW("SubscribeId not found, subscribeId:%{public}d", subscribeId);
     return RET_ERR;
 }
 
@@ -297,6 +298,7 @@ int32_t KeyEventInputSubscribeManager::UnsubscribeHotkey(int32_t subscribeId)
             return RET_OK;
         }
     }
+    MMI_HILOGW("SubscribeId not found, subscribeId:%{public}d", subscribeId);
     return RET_ERR;
 }
 

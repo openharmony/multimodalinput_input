@@ -2533,7 +2533,7 @@ static int32_t GetSubscribeId(Input_HotkeyInfo* hotkeyInfo)
 
     auto it = g_callbacks.find(hotkeyInfo->hotkeyId);
     if (it == g_callbacks.end() || it->second.empty()) {
-        MMI_HILOGD("The callbacks is empty");
+        MMI_HILOGW("The callbacks is empty");
         return INPUT_PARAMETER_ERROR;
     }
 

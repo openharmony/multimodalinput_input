@@ -578,6 +578,8 @@ int32_t InputEventDataTransformation::MarshallingEnhanceData(std::shared_ptr<Poi
     int32_t result = Security::SecurityComponent::SecCompEnhanceKit::GetPointerEventEnhanceData(secCompPointEvent,
         dataLen, enHanceData, enHanceDataLen);
     if (result != 0 || enHanceDataLen > MAX_HMAC_SIZE) {
+        MMI_HILOGE("Get pointer event enhance data failed, result:%{public}d, enHanceDataLen:%{public}u",
+            result, enHanceDataLen);
         pkt << uint32_t(0U);
         free(secCompPointEvent);
         secCompPointEvent = nullptr;
@@ -635,6 +637,8 @@ int32_t InputEventDataTransformation::MarshallingEnhanceData(std::shared_ptr<Key
     int32_t result = Security::SecurityComponent::SecCompEnhanceKit::GetPointerEventEnhanceData(&secCompKeyEvent,
         dataLen, enHanceData, enHanceDataLen);
     if (result != 0 || enHanceDataLen > MAX_HMAC_SIZE) {
+        MMI_HILOGE("Get key event enhance data failed, result:%{public}d, enHanceDataLen:%{public}u",
+            result, enHanceDataLen);
         pkt << 0;
         return RET_ERR;
     }

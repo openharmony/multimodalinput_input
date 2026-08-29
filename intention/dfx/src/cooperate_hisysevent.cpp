@@ -150,6 +150,7 @@ int32_t CooperateDFX::WriteStop(OHOS::HiviewDFX::HiSysEvent::EventType type)
 int32_t CooperateDFX::WriteCooperateState(CooperateState curState)
 {
     if (curState == CooperateState::N_COOPERATE_STATES) {
+        FI_HILOGE("Invalid cooperate state, curState:%{public}d", static_cast<int32_t>(curState));
         return RET_ERR;
     }
     if (CooperateState_.find(curState) == CooperateState_.end()) {

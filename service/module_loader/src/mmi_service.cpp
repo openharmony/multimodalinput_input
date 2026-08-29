@@ -1015,7 +1015,7 @@ ErrCode MMIService::SetNapStatus(int32_t pid, int32_t uid, const std::string& bu
     }
     int32_t ret = CheckPidPermission(pid);
     if (ret != RET_OK) {
-        MMI_HILOGD("Check pid permission failed");
+        MMI_HILOGE("Check pid permission failed");
         return ret;
     }
     NapProcess::GetInstance()->SetNapStatus(pid, uid, bundleName, napStatus);
@@ -1921,6 +1921,7 @@ int32_t MMIService::CheckInputHandlerVaild(InputHandlerType handlerType)
                 return ERROR_NO_PERMISSION;
             }
 #else
+            MMI_HILOGE("Verify system APP failed");
             return ERROR_NOT_SYSAPI;
 #endif
         } else if (handlerType != InputHandlerType::INTERCEPTOR) {
@@ -1989,6 +1990,7 @@ ErrCode MMIService::AddPreInputHandler(int32_t handlerId, uint32_t eventType, co
 {
     CALL_DEBUG_ENTER;
     if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
         return ERROR_NOT_SYSAPI;
     }
     if (!IsRunning()) {
@@ -2021,6 +2023,7 @@ ErrCode MMIService::RemovePreInputHandler(int32_t handlerId)
 {
     CALL_DEBUG_ENTER;
     if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
         return ERROR_NOT_SYSAPI;
     }
     if (!IsRunning()) {
@@ -2068,7 +2071,7 @@ int32_t MMIService::ObserverAddInputHandler(int32_t pid)
         CHKPR(sess, ERROR_NULL_POINTER);
         napData.bundleName = sess->GetProgramName();
         int32_t syncState = SUBSCRIBED;
-        MMI_HILOGD("AddInputHandler info to observer : pid:%{public}d, uid:%d, bundleName:%{public}s",
+        MMI_HILOGD("AddInputHandler info to observer : pid:%{public}d, uid:%{public}d, bundleName:%{public}s",
             napData.pid, napData.uid, napData.bundleName.c_str());
         NapProcess::GetInstance()->AddMmiSubscribedEventData(napData, syncState);
         if (NapProcess::GetInstance()->GetNapClientPid() != UNOBSERVED) {
@@ -4440,9 +4443,11 @@ ErrCode MMIService::GetTouchpadDoubleTapAndDragState(bool &switchFlag)
 {
     CALL_DEBUG_ENTER;
     if (!IsRunning()) {
+        MMI_HILOGE("Service is not running");
         return MMISERVICE_NOT_RUNNING;
     }
     if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
         return ERROR_NOT_SYSAPI;
     }
     switchFlag = true;

@@ -220,6 +220,7 @@ int32_t KeySubscriberHandler::RemoveSubscriber(SessionPtr sess, int32_t subscrib
             }
         }
     }
+    MMI_HILOGW("Subscriber not found, subscribeId:%{public}d, pid:%{public}d", subscribeId, sess->GetPid());
     return RET_ERR;
 }
 
@@ -271,6 +272,8 @@ int32_t KeySubscriberHandler::RemoveKeyGestureSubscriber(SessionPtr sess, int32_
             return RET_OK;
         }
     }
+    MMI_HILOGW("Key gesture subscriber not found, subscribeId:%{public}d, pid:%{public}d",
+        subscribeId, sess->GetPid());
     return RET_ERR;
 }
 

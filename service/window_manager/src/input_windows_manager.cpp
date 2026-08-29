@@ -244,6 +244,7 @@ void InputWindowsManager::DeviceStatusChanged(int32_t deviceId, const std::strin
 
 void InputWindowsManager::Init(UDSServer& udsServer)
 {
+    CALL_INFO_TRACE;
     udsServer_ = &udsServer;
     CHKPV(udsServer_);
     bindInfo_.Load();
@@ -1138,7 +1139,7 @@ int32_t InputWindowsManager::BindToDisplay(int32_t deviceId, int32_t displayId, 
     const auto *displayInfo = GetPhysicalDisplay(displayId);
     if (displayInfo == nullptr) {
         msg = "The specified display does not exist.";
-        MMI_HILOGE("%s", msg.c_str());
+        MMI_HILOGE("%{public}s", msg.c_str());
         return ERR_DISPLAY_NOT_EXIST;
     }
     // Defer the binding change until the device's current event sequence completes, so an in-flight
@@ -3340,7 +3341,7 @@ void InputWindowsManager::PrintWindowInfo(const std::vector<WindowInfo> &windows
     window += StringPrintf("windowId:[");
     for (const auto &item : windowsInfo) {
         MMI_HILOGD("windowsInfos, id:%{public}d, pid:%{public}d, agentPid:%{public}d, uid:%{public}d, "
-            "area.x:%d, area.y:%d, area.width:%{public}d, area.height:%{public}d, "
+            "area.x:%{public}d, area.y:%{public}d, area.width:%{public}d, area.height:%{public}d, "
             "defaultHotAreas.size:%{public}zu, pointerHotAreas.size:%{public}zu, "
             "agentWindowId:%{public}d, flags:%{public}d, action:%{public}d, displayId:%{public}d, groupId:%{public}d"
             "zOrder:%{public}f, privacyMode:%{public}d, privacyProtect:%{public}d, windowType:%{public}d",
@@ -3349,11 +3350,11 @@ void InputWindowsManager::PrintWindowInfo(const std::vector<WindowInfo> &windows
             item.agentWindowId, item.flags, item.action, item.displayId, item.groupId, item.zOrder, item.privacyMode,
             item.isSkipSelfWhenShowOnVirtualScreen, static_cast<int32_t>(item.windowInputType));
         for (const auto &win : item.defaultHotAreas) {
-            MMI_HILOGD("defaultHotAreas:x:%d, y:%d, width:%{public}d, height:%{public}d",
+            MMI_HILOGD("defaultHotAreas:x:%{public}d, y:%{public}d, width:%{public}d, height:%{public}d",
                 win.x, win.y, win.width, win.height);
         }
         for (const auto &pointer : item.pointerHotAreas) {
-            MMI_HILOGD("pointerHotAreas:x:%d, y:%d, width:%{public}d, height:%{public}d",
+            MMI_HILOGD("pointerHotAreas:x:%{public}d, y:%{public}d, width:%{public}d, height:%{public}d",
                 pointer.x, pointer.y, pointer.width, pointer.height);
         }
 
@@ -3526,7 +3527,7 @@ void InputWindowsManager::RotateScreen90(const OLD::DisplayInfo& info, PhysicalC
         coord.x = info.validWidth - 1 - coord.y;
     }
     coord.y = temp;
-    MMI_HILOGD("DIRECTION90, physicalXY:{%f %f}->{%f %f}", oldX, oldY, coord.x, coord.y);
+    MMI_HILOGD("DIRECTION90, physicalXY:{%{public}f %{public}f}->{%{public}f %{public}f}", oldX, oldY, coord.x, coord.y);
     return;
 }
 
@@ -3537,7 +3538,7 @@ void InputWindowsManager::RotateScreen(const OLD::DisplayInfo& info, PhysicalCoo
     const Direction direction = info.direction;
     int32_t groupId = FindDisplayGroupId(info.id);
     if (direction == DIRECTION0) {
-        MMI_HILOGD("DIRECTION0, physicalXY:{%f %f}->{%f %f}", oldX, oldY, coord.x, coord.y);
+        MMI_HILOGD("DIRECTION0, physicalXY:{%{public}f %{public}f}->{%{public}f %{public}f}", oldX, oldY, coord.x, coord.y);
         return;
     }
     if (direction == DIRECTION90) {
@@ -3547,7 +3548,7 @@ void InputWindowsManager::RotateScreen(const OLD::DisplayInfo& info, PhysicalCoo
     if (direction == DIRECTION180) {
         coord.x = info.validWidth - 1 - coord.x;
         coord.y = info.validHeight - 1 - coord.y;
-        MMI_HILOGD("DIRECTION180, physicalXY:{%f %f}->{%f %f}", oldX, oldY, coord.x, coord.y);
+        MMI_HILOGD("DIRECTION180, physicalXY:{%{public}f %{public}f}->{%{public}f %{public}f}", oldX, oldY, coord.x, coord.y);
         return;
     }
     if (direction == DIRECTION270) {
@@ -3558,7 +3559,7 @@ void InputWindowsManager::RotateScreen(const OLD::DisplayInfo& info, PhysicalCoo
             coord.y = info.validHeight - 1 - coord.x;
         }
         coord.x = temp;
-        MMI_HILOGD("DIRECTION270, physicalXY:{%f %f}->{%f %f}", oldX, oldY, coord.x, coord.y);
+        MMI_HILOGD("DIRECTION270, physicalXY:{%{public}f %{public}f}->{%{public}f %{public}f}", oldX, oldY, coord.x, coord.y);
     }
 }
 
@@ -3569,7 +3570,7 @@ void InputWindowsManager::RotateDisplayScreen(const OLD::DisplayInfo& info, Phys
     double oldX = coord.x;
     double oldY = coord.y;
     if (displayDirection == DIRECTION0) {
-        MMI_HILOGD("DIRECTION0, IsSceneBoardEnabled:%d physicalXY:{%f,%f}", isEnable, oldX, oldY);
+        MMI_HILOGD("DIRECTION0, IsSceneBoardEnabled:%{public}d physicalXY:{%{public}f,%{public}f}", isEnable, oldX, oldY);
         return;
     }
     if (displayDirection == DIRECTION90) {
@@ -3581,14 +3582,14 @@ void InputWindowsManager::RotateDisplayScreen(const OLD::DisplayInfo& info, Phys
         }
         coord.y = temp;
         MMI_HILOGD(
-            "DIRECTION90, IsSceneBoardEnabled:%d physicalXY:{%f,%f}->{%f,%f}", isEnable, oldX, oldY, coord.x, coord.y);
+            "DIRECTION90, IsSceneBoardEnabled:%{public}d physicalXY:{%{public}f,%{public}f}->{%{public}f,%{public}f}", isEnable, oldX, oldY, coord.x, coord.y);
         return;
     }
     if (displayDirection == DIRECTION180) {
         coord.x = info.validWidth - 1 - coord.x;
         coord.y = info.validHeight - 1 - coord.y;
         MMI_HILOGD(
-            "DIRECTION180, IsSceneBoardEnabled:%d physicalXY:{%f,%f}->{%f,%f}", isEnable, oldX, oldY, coord.x, coord.y);
+            "DIRECTION180, IsSceneBoardEnabled:%{public}d physicalXY:{%{public}f,%{public}f}->{%{public}f,%{public}f}", isEnable, oldX, oldY, coord.x, coord.y);
         return;
     }
     if (displayDirection == DIRECTION270) {
@@ -3600,7 +3601,7 @@ void InputWindowsManager::RotateDisplayScreen(const OLD::DisplayInfo& info, Phys
         }
         coord.x = temp;
         MMI_HILOGD(
-            "DIRECTION270, IsSceneBoardEnabled:%d physicalXY:{%f,%f}->{%f,%f}", isEnable, oldX, oldY, coord.x, coord.y);
+            "DIRECTION270, IsSceneBoardEnabled:%{public}d physicalXY:{%{public}f,%{public}f}->{%{public}f,%{public}f}", isEnable, oldX, oldY, coord.x, coord.y);
     }
 }
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH

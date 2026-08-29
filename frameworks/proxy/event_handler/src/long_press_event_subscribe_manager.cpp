@@ -66,6 +66,7 @@ int32_t LongPressEventSubscribeManager::SubscribeLongPressEvent(
     subscribeInfos_.emplace(std::make_pair(subscribeId, SubscribeLongPressEventInfo(longPressRequest, callback)));
     int32_t ret = MMIEventHdl.SubscribeLongPressEvent(subscribeId, longPressRequest);
     if (ret != RET_OK) {
+        MMI_HILOGE("Subscribe long press event failed, ret:%{public}d", ret);
         subscribeInfos_.erase(subscribeId);
         return INVALID_SUBSCRIBE_ID;
     }

@@ -654,7 +654,7 @@ void PointerDrawingManager::DrawMovePointer(uint64_t rsId, int32_t physicalX, in
             MMI_HILOGE("SetCursorLocation failed");
             return;
         }
-        MMI_HILOGD("Move pointer, physicalX:%d, physicalY:%d", physicalX, physicalY);
+        MMI_HILOGD("Move pointer, physicalX:%{public}d, physicalY:%{public}d", physicalX, physicalY);
     }
 }
 

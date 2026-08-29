@@ -52,7 +52,7 @@ bool ShortKeyHandler::HandleShortKeys(const std::shared_ptr<KeyEvent> keyEvent)
         return false;
     }
     if (currentLaunchAbilityKey_.timerId >= 0 && IsKeyMatch(currentLaunchAbilityKey_, keyEvent)) {
-        MMI_HILOGD("repeat, current key %d has launched ability", currentLaunchAbilityKey_.finalKey);
+        MMI_HILOGD("repeat, current key %{public}d has launched ability", currentLaunchAbilityKey_.finalKey);
         return true;
     }
     DfxHisysevent::GetComboStartTime();
@@ -197,7 +197,7 @@ bool ShortKeyHandler::HandleKeyDown(ShortcutKey &shortcutKey)
     auto handler = InputHandler->GetSubscriberHandler();
     CHKPF(handler);
     if (handler->IsKeyEventSubscribed(shortcutKey.finalKey, shortcutKey.triggerType)) {
-        MMI_HILOGI("Current shortcutKey %d is subSubcribed", shortcutKey.finalKey);
+        MMI_HILOGI("Current shortcutKey %{public}d is subSubcribed", shortcutKey.finalKey);
         return false;
     }
     return true;

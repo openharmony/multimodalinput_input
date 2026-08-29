@@ -168,7 +168,7 @@ void KeyCommandHandler::HandlePointerEvent(const std::shared_ptr<PointerEvent> p
             MMI_HILOGD("The pointerEvent start launch an ability, pointAction:%{public}s",
                 pointerEvent->DumpPointerAction());
         } else {
-            MMI_HILOGD("The pointerEvent start launch an ability, pointAction:%s", pointerEvent->DumpPointerAction());
+            MMI_HILOGD("The pointerEvent start launch an ability, pointAction:%{public}s", pointerEvent->DumpPointerAction());
         }
     }
     CHKPV(nextHandler_);
@@ -552,7 +552,7 @@ void KeyCommandHandler::CreateStatusConfigObserver(T& item)
             MMI_HILOGE("Get value from setting date fail");
             return;
         }
-        MMI_HILOGD("Config changed key:%s, value:%{public}d", key.c_str(), statusValue);
+        MMI_HILOGD("Config changed key:%{public}s, value:%{public}d", key.c_str(), statusValue);
         item.statusConfigValue = statusValue;
     };
     sptr<SettingObserver> statusObserver = SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID)
@@ -569,7 +569,7 @@ void KeyCommandHandler::CreateStatusConfigObserver(T& item)
         MMI_HILOGE("Get value from setting date fail");
         return;
     }
-    MMI_HILOGD("Get value success key:%s, value:%{public}d", item.statusConfig.c_str(), configVlaue);
+    MMI_HILOGD("Get value success key:%{public}s, value:%{public}d", item.statusConfig.c_str(), configVlaue);
     item.statusConfigValue = configVlaue;
 }
 
@@ -1105,7 +1105,7 @@ void KeyCommandHandler::CallMistouchPrevention()
     if (mistouchLibHandle_ == nullptr) {
         mistouchLibHandle_ = dlopen(LOADMISTOUCH_LIBPATH, RTLD_LAZY);
         if (!mistouchLibHandle_) {
-            MMI_HILOGE("Failed to load library: %s", dlerror());
+            MMI_HILOGE("Failed to load library: %{public}s", dlerror());
             return;
         }
         typedef IMistouchPrevention* (*funCreate_ptr) (void);

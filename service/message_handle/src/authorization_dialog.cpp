@@ -133,7 +133,7 @@ void AuthorizationDialog::DialogAbilityConnection::CloseDialog()
         success = reply.ReadInt32(replyCode);
     }
     isDialogShow_ = false;
-    MMI_HILOGI("CloseDialog: ret=%d, %d, %d", ret, success, replyCode);
+    MMI_HILOGI("CloseDialog: ret=%{public}d, %{public}d, %{public}d", ret, success, replyCode);
 }
 
 void AuthorizationDialog::DialogAbilityConnection::OpenDialog()

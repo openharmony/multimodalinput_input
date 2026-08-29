@@ -900,7 +900,7 @@ void InputDeviceManager::NotifyDevCallback(int32_t deviceId, struct InputDeviceI
         CHKPV(devCallbacks_);
         devCallbacks_(deviceId, name, inDevice.sysUid, "add");
         MMI_HILOGI("Send device info to window manager, device id:%{public}d, name:%{private}s,"
-            "system uid:%s, status:add", deviceId, name.c_str(), inDevice.sysUid.c_str());
+            "system uid:%{public}s, status:add", deviceId, name.c_str(), inDevice.sysUid.c_str());
     } else {
         MMI_HILOGE("Get device system uid id is empty, deviceId:%{public}d", deviceId);
     }
@@ -1059,7 +1059,7 @@ void InputDeviceManager::OnInputDeviceRemoved(struct libinput_device *inputDevic
         std::string name = libinput_device_get_name(inputDevice);
         CHKPV(devCallbacks_);
         devCallbacks_(deviceId, name, sysUid, "remove");
-        MMI_HILOGI("Send device info to window manager, device id:%{public}d, name:%{private}s, system uid:%s, "
+        MMI_HILOGI("Send device info to window manager, device id:%{public}d, name:%{private}s, system uid:%{public}s, "
             "status:remove", deviceId, name.c_str(), sysUid.c_str());
     }
 
@@ -1351,6 +1351,7 @@ int32_t InputDeviceManager::AddVirtualInputDevice(std::shared_ptr<InputDevice> d
     CALL_DEBUG_ENTER;
     CHKPR(device, RET_ERR);
     if (CheckDuplicateInputDevice(device)) {
+        MMI_HILOGE("Duplicate input device, name:%{private}s", device->GetName().c_str());
         return RET_ERR;
     }
     // if we have enabled physical/virtual pointer before adding this one.

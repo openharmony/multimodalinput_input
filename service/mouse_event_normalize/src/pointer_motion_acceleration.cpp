@@ -644,7 +644,7 @@ bool PointerMotionAcceleration::AxisCurve::IsValid() const
 
 bool PointerMotionAcceleration::CalcAxisGainTouchpad(const AxisCurve &curve, double axisSpeed, double &gain)
 {
-    MMI_HILOGD("CalcAxisGainTouchpad, axisSpeed:%f", axisSpeed);
+    MMI_HILOGD("CalcAxisGainTouchpad, axisSpeed:%{public}f", axisSpeed);
 
     if (!curve.IsValid()) {
         MMI_HILOGE("Invalid acceleration curve");
