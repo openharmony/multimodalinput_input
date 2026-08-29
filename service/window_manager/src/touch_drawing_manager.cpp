@@ -270,7 +270,7 @@ void TouchDrawingManager::CreateBubbleObserverByApp(T &item)
         auto ret = SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID)
             .GetBoolValue(key, item.isShow);
         if (ret != RET_OK) {
-            MMI_HILOGI("Get value from setting date fail");
+            MMI_HILOGW("Get value from setting date fail");
             screenRecondingBubbleStatus_ = "";
             return;
         }

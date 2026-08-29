@@ -999,7 +999,7 @@ void AniInputMonitorConsumer::OnPerPointerEvent(std::shared_ptr<PointerEvent> po
     bool retValue = false;
     auto itFind = funcTypeInfo_.find(funType_);
     if (itFind == funcTypeInfo_.end()) {
-        MMI_HILOGI("This event is invalid");
+        MMI_HILOGW("This event is invalid");
         pointerEvent->MarkProcessed();
         return;
     }

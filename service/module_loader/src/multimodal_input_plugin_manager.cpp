@@ -965,7 +965,7 @@ PluginResult InputPlugin::HandleEvent(std::shared_ptr<AxisEvent> axisEvent, std:
 int32_t InputPlugin::AddTimer(std::function<void()> func, int32_t intervalMs, int32_t repeatCount)
 {
     if (timerCnt_ >= MAX_TIMER) {
-        MMI_HILOGW("Timer count reached the maximum number:%{public}d", MAX_TIMER);
+        MMI_HILOGE("Timer count reached the maximum number:%{public}d", MAX_TIMER);
         return RET_ERR;
     }
     int32_t timerId = TimerMgr->AddTimerInternal(intervalMs, repeatCount, func, name_);

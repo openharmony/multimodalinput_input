@@ -254,7 +254,7 @@ int32_t InputHandlerManager::RemoveHandler(int32_t handlerId, InputHandlerType h
         }
         return ret;
     }
-    MMI_HILOGW("Handler not found, handlerId:%{public}d, handlerType:%{public}d", handlerId, handlerType);
+    MMI_HILOGD("Handler not found, handlerId:%{public}d, handlerType:%{public}d", handlerId, handlerType);
     return RET_ERR;
 }
 
@@ -567,7 +567,7 @@ void InputHandlerManager::GetConsumerInfos(std::shared_ptr<PointerEvent> pointer
             CHKPV(consumer);
             auto ret = consumerInfos.emplace(handlerId, consumer);
             if (!ret.second) {
-                MMI_HILOGI("Duplicate handler:%{public}d", handlerId);
+                MMI_HILOGW("Duplicate handler:%{public}d", handlerId);
                 continue;
             }
             consumerCount++;
@@ -734,7 +734,7 @@ int32_t InputHandlerManager::GetMonitorConsumerInfos(std::shared_ptr<PointerEven
         CHKPR(consumer, INVALID_HANDLER_ID);
         auto ret = consumerInfos.emplace(handlerId, consumer);
         if (!ret.second) {
-            MMI_HILOGI("Duplicate handler:%{public}d", handlerId);
+            MMI_HILOGW("Duplicate handler:%{public}d", handlerId);
             continue;
         }
         consumerCount++;
@@ -749,7 +749,7 @@ int32_t InputHandlerManager::GetMonitorConsumerInfos(std::shared_ptr<PointerEven
             CHKPR(consumer, INVALID_HANDLER_ID);
             auto ret = consumerInfos.emplace(handlerId, consumer);
             if (!ret.second) {
-                MMI_HILOGI("Duplicate handler:%{public}d", handlerId);
+                MMI_HILOGW("Duplicate handler:%{public}d", handlerId);
                 continue;
             }
             consumerCount++;

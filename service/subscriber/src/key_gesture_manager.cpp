@@ -70,7 +70,7 @@ void KeyGestureManager::Handler::Trigger(std::shared_ptr<KeyEvent> keyEvent)
             timerId_ = INVALID_ENTITY_ID;
         }, "KeyGestureManager");
     if (timerId_ < 0) {
-        MMI_HILOGI("[Handler] AddTimer fail");
+        MMI_HILOGE("[Handler] AddTimer fail");
     }
 }
 
@@ -334,19 +334,19 @@ bool KeyGestureManager::LongPressCombinationKey::Intercept(std::shared_ptr<KeyEv
         if (IsActive()) {
             std::ostringstream output;
             Dump(output);
-            MMI_HILOGI("[LongPressCombinationKey] %{public}s is active now", output.str().c_str());
+            MMI_HILOGI("[LongPressCombinationKey] %{private}s is active now", output.str().c_str());
             return true;
         }
         if (!IsWorking()) {
             std::ostringstream output;
             Dump(output);
-            MMI_HILOGI("[LongPressCombinationKey] Switch off %{public}s", output.str().c_str());
+            MMI_HILOGI("[LongPressCombinationKey] Switch off %{private}s", output.str().c_str());
             return false;
         }
         if (handlers_.empty()) {
             std::ostringstream output;
             Dump(output);
-            MMI_HILOGI("[LongPressCombinationKey] No handler for %{public}s", output.str().c_str());
+            MMI_HILOGI("[LongPressCombinationKey] No handler for %{private}s", output.str().c_str());
             return false;
         }
         if (RecognizeGesture(keyEvent)) {
@@ -409,7 +409,7 @@ void KeyGestureManager::LongPressCombinationKey::TriggerAll(std::shared_ptr<KeyE
     MarkActive(true);
     std::ostringstream output;
     Dump(output);
-    MMI_HILOGI("[LongPressCombinationKey] trigger %{public}s", output.str().c_str());
+    MMI_HILOGI("[LongPressCombinationKey] trigger %{private}s", output.str().c_str());
     OnTriggerAll(keyEvent);
     TriggerHandlers(keyEvent);
 }
@@ -479,7 +479,7 @@ int32_t KeyGestureManager::AddKeyGesture(int32_t pid, std::shared_ptr<KeyOption>
             return keyGesture->AddHandler(pid, downDuration, callback);
         }
     }
-    MMI_HILOGW("No key gesture matched, pid:%{public}d, finalKey:%{private}d",
+    MMI_HILOGD("No key gesture matched, pid:%{public}d, finalKey:%{private}d",
         pid, keyOption->GetFinalKey());
     return INVALID_ENTITY_ID;
 }
@@ -501,7 +501,7 @@ bool KeyGestureManager::Intercept(std::shared_ptr<KeyEvent> keyEvent)
         if ((*iter)->Intercept(keyEvent)) {
             std::ostringstream output;
             (*iter)->Dump(output);
-            MMI_HILOGI("Intercepted by %{public}s", output.str().c_str());
+            MMI_HILOGI("Intercepted by %{private}s", output.str().c_str());
             for (++iter; iter != keyGestures_.end(); ++iter) {
                 (*iter)->Reset();
             }

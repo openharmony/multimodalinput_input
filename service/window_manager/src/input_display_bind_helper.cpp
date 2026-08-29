@@ -800,7 +800,7 @@ int32_t InputDisplayBindHelper::SetDisplayBind(int32_t deviceId, int32_t display
     }
 
     msg = "Can not reach here";
-    MMI_HILOGE("InputDisplayBindHelper::%{public}s", msg.c_str());
+    MMI_HILOGD("InputDisplayBindHelper::%{public}s", msg.c_str());
     return RET_ERR;
 }
 

@@ -1370,7 +1370,7 @@ int32_t JsInputMonitor::TransformMousePointerEvent(std::shared_ptr<PointerEvent>
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
     int32_t actionValue = TransformTsActionValue(pointerEvent->GetPointerAction());
     if (actionValue == RET_ERR) {
-        MMI_HILOGW("Transform action value failed");
+        MMI_HILOGD("Transform action value failed");
         return RET_ERR;
     }
     if (SetNameProperty(jsEnv_, result, "action", actionValue) != napi_ok) {

@@ -556,7 +556,7 @@ void MMIService::OnStart()
             MMI_HILOGI("Set thread status flag to false");
             threadStatusFlag_ = false;
         } else {
-            MMI_HILOGI("Mmi-server Timeout");
+            MMI_HILOGW("Mmi-server Timeout");
         }
     };
     MMI_HILOGI("Run periodical task success");
@@ -1015,7 +1015,7 @@ ErrCode MMIService::SetNapStatus(int32_t pid, int32_t uid, const std::string& bu
     }
     int32_t ret = CheckPidPermission(pid);
     if (ret != RET_OK) {
-        MMI_HILOGE("Check pid permission failed");
+        MMI_HILOGD("Check pid permission failed");
         return ret;
     }
     NapProcess::GetInstance()->SetNapStatus(pid, uid, bundleName, napStatus);
@@ -2071,7 +2071,7 @@ int32_t MMIService::ObserverAddInputHandler(int32_t pid)
         CHKPR(sess, ERROR_NULL_POINTER);
         napData.bundleName = sess->GetProgramName();
         int32_t syncState = SUBSCRIBED;
-        MMI_HILOGD("AddInputHandler info to observer : pid:%{public}d, uid:%{public}d, bundleName:%{public}s",
+        MMI_HILOGD("AddInputHandler info to observer : pid:%{public}d, uid:%{private}d, bundleName:%{public}s",
             napData.pid, napData.uid, napData.bundleName.c_str());
         NapProcess::GetInstance()->AddMmiSubscribedEventData(napData, syncState);
         if (NapProcess::GetInstance()->GetNapClientPid() != UNOBSERVED) {
@@ -2135,7 +2135,7 @@ ErrCode MMIService::RemoveInputHandler(int32_t handlerType, uint32_t eventType, 
         CHKPR(sess, ERROR_NULL_POINTER);
         napData.bundleName = sess->GetProgramName();
         int32_t syncState = UNSUBSCRIBED;
-        MMI_HILOGD("RemoveInputHandler info to observer : pid:%{public}d, uid:%{public}d, bundleName:%{public}s",
+        MMI_HILOGD("RemoveInputHandler info to observer : pid:%{public}d, uid:%{private}d, bundleName:%{public}s",
             napData.pid, napData.uid, napData.bundleName.c_str());
         NapProcess::GetInstance()->AddMmiSubscribedEventData(napData, syncState);
         if (NapProcess::GetInstance()->GetNapClientPid() != UNOBSERVED) {
@@ -2787,7 +2787,7 @@ ErrCode MMIService::SubscribeKeyEvent(int32_t subscribeId, const KeyOption& keyO
         CHKPR(sess, ERROR_NULL_POINTER);
         napData.bundleName = sess->GetProgramName();
         int32_t syncState = SUBSCRIBED;
-        MMI_HILOGD("SubscribeKeyEvent info to observer : pid:%{public}d, uid:%{public}d, bundleName:%{public}s",
+        MMI_HILOGD("SubscribeKeyEvent info to observer : pid:%{public}d, uid:%{private}d, bundleName:%{public}s",
             napData.pid, napData.uid, napData.bundleName.c_str());
         NapProcess::GetInstance()->AddMmiSubscribedEventData(napData, syncState);
         if (NapProcess::GetInstance()->GetNapClientPid() != UNOBSERVED) {
@@ -2831,7 +2831,7 @@ ErrCode MMIService::UnsubscribeKeyEvent(int32_t subscribeId)
         CHKPR(sess, ERROR_NULL_POINTER);
         napData.bundleName = sess->GetProgramName();
         int32_t syncState = UNSUBSCRIBED;
-        MMI_HILOGD("UnsubscribeKeyEvent info to observer : pid:%{public}d, uid:%{public}d, bundleName:%{public}s",
+        MMI_HILOGD("UnsubscribeKeyEvent info to observer : pid:%{public}d, uid:%{private}d, bundleName:%{public}s",
             napData.pid, napData.uid, napData.bundleName.c_str());
         NapProcess::GetInstance()->AddMmiSubscribedEventData(napData, syncState);
         if (NapProcess::GetInstance()->GetNapClientPid() != UNOBSERVED) {
@@ -6517,7 +6517,7 @@ int32_t MMIService::RedispatchInputEventInner(std::shared_ptr<PointerEvent> poin
                 int32_t realWindowId = WIN_MGR->GetRealFingerDownWindowId(
                     pointerEvent->GetDeviceId(), pointerEvent->GetPointerId());
                 if (realWindowId >= 0 && realWindowId == pointerEvent->GetTargetWindowId()) {
-                    MMI_HILOGI("Redispatch DOWN conflicts with real finger in same window, "
+                    MMI_HILOGW("Redispatch DOWN conflicts with real finger in same window, "
                         "deviceId:%{public}d pointerId:%{public}d windowId:%{public}d",
                         pointerEvent->GetDeviceId(), pointerEvent->GetPointerId(), realWindowId);
                     auto& store = WIN_MGR->GetTouchRedispatchStore();
@@ -6545,7 +6545,7 @@ int32_t MMIService::RedispatchInputEventInner(std::shared_ptr<PointerEvent> poin
         }
 #endif // OHOS_BUILD_ENABLE_POINTER
         default:
-            MMI_HILOGE("Unsupported sourceType:%{public}d", pointerEvent->GetSourceType());
+            MMI_HILOGE("Unsupported sourceType:%{private}d", pointerEvent->GetSourceType());
             return RET_ERR;
     }
     MMI_HILOGD("Redispatch, id:%{public}d, source:%{public}d",

@@ -279,7 +279,7 @@ int32_t CooperateClient::AddHotAreaListener(ITunnelClient &tunnel, HotAreaListen
     CALL_DEBUG_ENTER;
     CHKPR(listener, RET_ERR);
     if (std::find(devHotAreaListener_.begin(), devHotAreaListener_.end(), listener) != devHotAreaListener_.end()) {
-        FI_HILOGW("Current listener is registered already");
+        FI_HILOGD("Current listener is registered already");
         return RET_ERR;
     }
     RegisterHotAreaListenerParam param { GenerateRequestID(), false };
@@ -299,7 +299,7 @@ int32_t CooperateClient::RemoveHotAreaListener(ITunnelClient &tunnel, HotAreaLis
     CALL_DEBUG_ENTER;
     if (listener != nullptr &&
         std::find(devHotAreaListener_.begin(), devHotAreaListener_.end(), listener) == devHotAreaListener_.end()) {
-        FI_HILOGW("Current listener is not registered");
+        FI_HILOGD("Current listener is not registered");
         return RET_ERR;
     }
     if (listener == nullptr) {

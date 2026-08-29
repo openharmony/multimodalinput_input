@@ -64,12 +64,14 @@ void EventMonitorHandler::HandlePointerEvent(const std::shared_ptr<PointerEvent>
     CHKPV(pointerEvent);
     if (OnHandleEvent(pointerEvent)) {
         BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_STOP);
-        MMI_HILOGD("Monitor is succeeded");
+        MMI_HILOGD("Monitor is succeeded, pointerAction:%{private}d, id:%{public}d",
+            pointerEvent->GetPointerAction(), pointerEvent->GetId());
         return;
     }
     // This filter touch-gesture events being dispatched to applications.
     // This is a quick win solution, should be optimized later.
     if (TOUCH_GESTURE_ACTIONS.find(pointerEvent->GetPointerAction()) != TOUCH_GESTURE_ACTIONS.cend()) {
+        MMI_HILOGD("Touch gesture action:%{private}d filtered", pointerEvent->GetPointerAction());
         return;
     }
     CHKPV(nextHandler_);
@@ -83,7 +85,8 @@ void EventMonitorHandler::HandleTouchEvent(const std::shared_ptr<PointerEvent> p
     CHKPV(pointerEvent);
     if (OnHandleEvent(pointerEvent)) {
         BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_STOP);
-        MMI_HILOGD("Monitor is succeeded");
+        MMI_HILOGD("Monitor is succeeded, pointerAction:%{private}d, id:%{public}d",
+            pointerEvent->GetPointerAction(), pointerEvent->GetId());
         return;
     }
     int32_t pointerId = pointerEvent->GetPointerId();
@@ -97,6 +100,7 @@ void EventMonitorHandler::HandleTouchEvent(const std::shared_ptr<PointerEvent> p
     // This filter touch-gesture events being dispatched to applications.
     // This is a quick win solution, should be optimized later.
     if (TOUCH_GESTURE_ACTIONS.find(pointerEvent->GetPointerAction()) != TOUCH_GESTURE_ACTIONS.cend()) {
+        MMI_HILOGD("Touch gesture action:%{private}d filtered", pointerEvent->GetPointerAction());
         return;
     }
     CHKPV(nextHandler_);
@@ -197,7 +201,8 @@ bool EventMonitorHandler::OnHandleEvent(std::shared_ptr<KeyEvent> keyEvent)
         MMI_HILOGD("This event has been tagged as not to be monitored");
     } else {
         if (monitors_.HandleEvent(keyEvent)) {
-            MMI_HILOGD("Key event was consumed");
+            MMI_HILOGD("Key event was consumed, keyCode:%{private}d, id:%{public}d",
+                keyEvent->GetKeyCode(), keyEvent->GetId());
             return true;
         }
     }
@@ -215,7 +220,8 @@ bool EventMonitorHandler::OnHandleEvent(std::shared_ptr<PointerEvent> pointerEve
         MMI_HILOGD("Target window has FLAG_SKIP_MONITOR, skip monitoring");
     } else {
         if (monitors_.HandleEvent(pointerEvent)) {
-            MMI_HILOGD("Pointer event was monitor");
+            MMI_HILOGD("Pointer event was monitor, pointerAction:%{private}d, id:%{public}d",
+                pointerEvent->GetPointerAction(), pointerEvent->GetId());
             return true;
         }
     }

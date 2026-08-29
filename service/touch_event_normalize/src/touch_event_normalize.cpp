@@ -67,6 +67,8 @@ std::shared_ptr<PointerEvent> TouchEventNormalize::OnLibInput(struct libinput_ev
     CHKPP(device);
     std::shared_ptr<TransformProcessor> processor{ nullptr };
     auto deviceId = INPUT_DEV_MGR->FindInputDeviceId(device);
+    MMI_HILOGD("Transform event by device, deviceType:%{public}d, deviceId:%{private}d",
+        static_cast<int32_t>(deviceType), deviceId);
     if (deviceType == TouchEventNormalize::DeviceType::TOUCH_PAD) {
         if (auto it = touchpad_processors_.find(deviceId); it != touchpad_processors_.end()) {
             processor = it->second;

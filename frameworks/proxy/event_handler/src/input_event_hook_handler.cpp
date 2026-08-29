@@ -134,7 +134,7 @@ int32_t InputEventHookHandler::DispatchToNextHandler(int32_t eventId, HookEventT
         CHKPR(event, ERROR_INVALID_PARAMETER);
         return DispatchToNextHandler(event);
     } else {
-        MMI_HILOGW("Invalid hook event state, hookEventType:%{public}d", hookEventType);
+        MMI_HILOGE("Invalid hook event state, hookEventType:%{public}d", hookEventType);
         return RET_ERR;
     }
 }

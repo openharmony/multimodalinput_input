@@ -102,7 +102,7 @@ int32_t SwitchEventInputSubscribeManager::UnsubscribeSwitchEvent(int32_t subscri
         return RET_OK;
     }
 
-    MMI_HILOGW("SubscribeId not found, subscribeId:%{public}d", subscribeId);
+    MMI_HILOGD("SubscribeId not found, subscribeId:%{public}d", subscribeId);
     return RET_ERR;
 }
 

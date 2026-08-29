@@ -115,7 +115,7 @@ ScreenPointer::ScreenLiteInfo ScreenPointer::ResolveScreenLiteInfo(const screen_
     }
     auto displayLite = OHOS::Rosen::DisplayManagerLite::GetInstance().GetDisplayById(si->GetScreenId());
     if (displayLite == nullptr) {
-        MMI_HILOGI("screenId=%{public}" PRIu64 ", BUILT_IN but displayLite is nullptr", si->GetRsId());
+        MMI_HILOGW("screenId=%{public}" PRIu64 ", BUILT_IN but displayLite is nullptr", si->GetRsId());
         return result;
     }
     uint32_t logicalWidth = static_cast<uint32_t>(displayLite->GetWidth());
@@ -686,7 +686,7 @@ bool ScreenPointer::SetInvisible()
     int32_t width = buffer->GetWidth();
     int32_t height = buffer->GetHeight();
     if ((width < 0) || (height < 0)) {
-        MMI_HILOGI("The input data is incorrect, width:%{public}d, height:%{public}d.", width, height);
+        MMI_HILOGW("The input data is incorrect, width:%{public}d, height:%{public}d.", width, height);
         return false;
     }
     auto sret = buffer->FlushCache();

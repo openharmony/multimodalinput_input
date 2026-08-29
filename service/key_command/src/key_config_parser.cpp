@@ -304,9 +304,9 @@ void KeyConfigParser::Print()
         MMI_HILOGI("The row:%{public}d", row++);
         auto &shortcutKey = item.second;
         for (const auto &prekey : shortcutKey.preKeys) {
-            MMI_HILOGI("The preKey:%{public}d", prekey);
+            MMI_HILOGI("The preKey:%{private}d", prekey);
         }
-        MMI_HILOGI("The finalKey:%{public}d, keyDownDuration:%{public}d, triggerType:%{public}d,"
+        MMI_HILOGI("The finalKey:%{private}d, keyDownDuration:%{private}d, triggerType:%{public}d,"
                    " bundleName:%{public}s, abilityName:%{public}s", shortcutKey.finalKey,
                    shortcutKey.keyDownDuration, shortcutKey.triggerType,
                    shortcutKey.ability.bundleName.c_str(), shortcutKey.ability.abilityName.c_str());

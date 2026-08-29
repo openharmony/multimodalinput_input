@@ -132,10 +132,10 @@ void KeyAutoRepeat::SelectAutoRepeat(const std::shared_ptr<KeyEvent>& keyEvent)
         timerId_ = -1;
         repeatCount_ = 0;
         if (!JudgeLimitPrint(keyEvent_)) {
-            MMI_HILOGI("Stop autorepeat, code:%{private}d, repeatKeyCode:%{private}d, keyAction:%{public}d",
+            MMI_HILOGI("Stop autorepeat, code:%{private}d, repeatKeyCode:%{private}d, keyAction:%{private}d",
                 keyEvent_->GetKeyCode(), repeatKeyCode_, keyEvent_->GetKeyAction());
         } else {
-            MMI_HILOGI("Stop autorepeat, code:%{private}d, repeatKeyCode:%{private}d, keyAction:%{public}d",
+            MMI_HILOGI("Stop autorepeat, code:%{private}d, repeatKeyCode:%{private}d, keyAction:%{private}d",
                 keyEvent_->GetKeyCode(), repeatKeyCode_, keyEvent_->GetKeyAction());
         }
         if (keyEvent_->GetKeyAction() == KeyEvent::KEY_ACTION_UP && repeatKeyCode_ != keyEvent_->GetKeyCode()) {

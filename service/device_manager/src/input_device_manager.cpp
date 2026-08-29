@@ -870,10 +870,13 @@ void InputDeviceManager::CheckInputDeviceCaps(int32_t deviceId)
         }
         enum evdev_device_udev_tags udevTags = libinput_device_get_tags(rawDev);
         if ((udevTags & EVDEV_UDEV_TAG_TABLET) != EVDEV_UDEV_TAG_TABLET) {
+            MMI_HILOGD("Device is not tagged tablet, deviceId:%{private}d, udevTags:%{public}d",
+                deviceId, static_cast<int32_t>(udevTags));
             return;
         }
         if (libinput_device_has_property(rawDev, INPUT_PROP_POINTER)) {
             devInfo.isPointerDevice = true;
+            MMI_HILOGD("Tablet device has pointer property, deviceId:%{private}d", deviceId);
             return;
         }
         if (auto physIter = physicalInputDevices_.find(devInfo.physicalId);
@@ -889,7 +892,8 @@ void InputDeviceManager::NotifyDevCallback(int32_t deviceId, struct InputDeviceI
     NotifyDevCallbackExt(deviceId, inDevice.inputDeviceOrigin);
 #endif // OHOS_BUILD_ENABLE_KEYBOARD_EXT_FLAG
     if (!inDevice.isTouchableDevice || (deviceId < 0)) {
-        MMI_HILOGD("The device is not touchable device already existent");
+        MMI_HILOGD("The device is not touchable device already existent, deviceId:%{private}d, "
+            "isTouchableDevice:%{public}d", deviceId, inDevice.isTouchableDevice);
         return;
     }
     std::string name = "null";
@@ -899,8 +903,8 @@ void InputDeviceManager::NotifyDevCallback(int32_t deviceId, struct InputDeviceI
     if (!inDevice.sysUid.empty()) {
         CHKPV(devCallbacks_);
         devCallbacks_(deviceId, name, inDevice.sysUid, "add");
-        MMI_HILOGI("Send device info to window manager, device id:%{public}d, name:%{private}s,"
-            "system uid:%{public}s, status:add", deviceId, name.c_str(), inDevice.sysUid.c_str());
+        MMI_HILOGI("Send device info to window manager, device id:%{private}d, name:%{private}s,"
+            "system uid:%{private}s, status:add", deviceId, name.c_str(), inDevice.sysUid.c_str());
     } else {
         MMI_HILOGE("Get device system uid id is empty, deviceId:%{public}d", deviceId);
     }
@@ -1059,7 +1063,8 @@ void InputDeviceManager::OnInputDeviceRemoved(struct libinput_device *inputDevic
         std::string name = libinput_device_get_name(inputDevice);
         CHKPV(devCallbacks_);
         devCallbacks_(deviceId, name, sysUid, "remove");
-        MMI_HILOGI("Send device info to window manager, device id:%{public}d, name:%{private}s, system uid:%{public}s, "
+        MMI_HILOGI("Send device info to window manager, device id:%{private}d, name:%{private}s, "
+            "system uid:%{private}s, "
             "status:remove", deviceId, name.c_str(), sysUid.c_str());
     }
 
@@ -1351,7 +1356,7 @@ int32_t InputDeviceManager::AddVirtualInputDevice(std::shared_ptr<InputDevice> d
     CALL_DEBUG_ENTER;
     CHKPR(device, RET_ERR);
     if (CheckDuplicateInputDevice(device)) {
-        MMI_HILOGE("Duplicate input device, name:%{private}s", device->GetName().c_str());
+        MMI_HILOGD("Duplicate input device, name:%{private}s", device->GetName().c_str());
         return RET_ERR;
     }
     // if we have enabled physical/virtual pointer before adding this one.

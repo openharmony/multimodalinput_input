@@ -28,7 +28,8 @@ int32_t main(int32_t argc, char* argv[])
         SetThreadName("main");
         InjectionToolsHelpFunc helpFunc;
         if (!helpFunc.CheckInjectionCommand(argc, argv)) {
-            MMI_HILOGE("Invalid Input Para, Please Check the validity of the para! errCode:%{public}d", PARAM_INPUT_FAIL);
+            MMI_HILOGE("Invalid Input Para, Please Check the validity of the para! errCode:%{public}d",
+                PARAM_INPUT_FAIL);
             std::cout << "Try './mmi-event-injection --help' for more information" << std::endl;
             return RET_ERR;
         }

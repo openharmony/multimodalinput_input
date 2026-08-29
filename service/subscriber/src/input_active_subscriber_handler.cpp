@@ -157,6 +157,8 @@ bool InputActiveSubscriberHandler::IsImmediateNotifySubscriber(
 void InputActiveSubscriberHandler::StartIntervalTimer(std::shared_ptr<Subscriber> subscriber, int64_t eventTime)
 {
     if (subscriber->timerId_ >= 0) {
+        MMI_HILOGD("Interval timer is already running, timerId:%{public}d, interval:%{public}" PRId64,
+            subscriber->timerId_, subscriber->interval_);
         return;
     }
     auto timerIntervalMs = subscriber->interval_ - (eventTime - subscriber->sendEventLastTime_);

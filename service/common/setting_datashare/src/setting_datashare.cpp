@@ -207,7 +207,7 @@ ErrCode SettingDataShare::GetStringValue(const std::string& key, std::string& va
     int32_t count = 0;
     resultSet->GetRowCount(count);
     if (count == 0) {
-        MMI_HILOGW("Setting item not found, key:%{public}s", key.c_str());
+        MMI_HILOGD("Setting item not found, key:%{public}s", key.c_str());
         IPCSkeleton::SetCallingIdentity(callingIdentity);
         BytraceAdapter::StopDataShare();
         return ERR_NAME_NOT_FOUND;
