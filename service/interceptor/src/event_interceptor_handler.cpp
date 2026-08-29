@@ -68,7 +68,8 @@ void EventInterceptorHandler::HandlePointerEvent(const std::shared_ptr<PointerEv
     CHKPV(pointerEvent);
     if (OnHandleEvent(pointerEvent)) {
         BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_STOP);
-        MMI_HILOGD("Interception is succeeded");
+        MMI_HILOGD("Interception is succeeded, pointerAction:%{private}d, id:%{public}d",
+            pointerEvent->GetPointerAction(), pointerEvent->GetId());
         return;
     }
     CHKPV(nextHandler_);
@@ -82,7 +83,8 @@ void EventInterceptorHandler::HandleTouchEvent(const std::shared_ptr<PointerEven
     CHKPV(pointerEvent);
     if (OnHandleEvent(pointerEvent)) {
         BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_STOP);
-        MMI_HILOGD("Interception is succeeded");
+        MMI_HILOGD("Interception is succeeded, pointerAction:%{private}d, id:%{public}d",
+            pointerEvent->GetPointerAction(), pointerEvent->GetId());
         return;
     }
     CHKPV(nextHandler_);
@@ -123,6 +125,7 @@ bool EventInterceptorHandler::OnHandleEvent(std::shared_ptr<KeyEvent> keyEvent)
 {
     CHKPF(keyEvent);
     if (keyEvent->HasFlag(InputEvent::EVENT_FLAG_NO_INTERCEPT)) {
+        MMI_HILOGD("Key event:%{private}d has been tagged as not to be intercepted", keyEvent->GetKeyCode());
         return false;
     }
     return interceptors_.HandleEvent(keyEvent);

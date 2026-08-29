@@ -220,6 +220,7 @@ int32_t KeySubscriberHandler::RemoveSubscriber(SessionPtr sess, int32_t subscrib
             }
         }
     }
+    MMI_HILOGD("Subscriber not found, subscribeId:%{public}d, pid:%{public}d", subscribeId, sess->GetPid());
     return RET_ERR;
 }
 
@@ -271,6 +272,8 @@ int32_t KeySubscriberHandler::RemoveKeyGestureSubscriber(SessionPtr sess, int32_
             return RET_OK;
         }
     }
+    MMI_HILOGD("Key gesture subscriber not found, subscribeId:%{public}d, pid:%{public}d",
+        subscribeId, sess->GetPid());
     return RET_ERR;
 }
 
@@ -440,19 +443,23 @@ bool KeySubscriberHandler::IsEqualKeyOption(std::shared_ptr<KeyOption> newOption
         return false;
     }
     if (newOption->GetFinalKey() != oldOption->GetFinalKey()) {
-        MMI_HILOGD("Final key not match");
+        MMI_HILOGD("Final key not match, newFinalKey:%{private}d, oldFinalKey:%{private}d",
+            newOption->GetFinalKey(), oldOption->GetFinalKey());
         return false;
     }
     if (newOption->IsFinalKeyDown() != oldOption->IsFinalKeyDown()) {
-        MMI_HILOGD("Is final key down not match");
+        MMI_HILOGD("Is final key down not match, newIsDown:%{public}d, oldIsDown:%{public}d",
+            newOption->IsFinalKeyDown(), oldOption->IsFinalKeyDown());
         return false;
     }
     if (newOption->GetFinalKeyDownDuration() != oldOption->GetFinalKeyDownDuration()) {
-        MMI_HILOGD("Final key down duration not match");
+        MMI_HILOGD("Final key down duration not match, newDuration:%{public}d, oldDuration:%{public}d",
+            newOption->GetFinalKeyDownDuration(), oldOption->GetFinalKeyDownDuration());
         return false;
     }
     if (newOption->GetFinalKeyUpDelay() != oldOption->GetFinalKeyUpDelay()) {
-        MMI_HILOGD("Is final key up delay not match");
+        MMI_HILOGD("Is final key up delay not match, newDelay:%{private}d, oldDelay:%{private}d",
+            newOption->GetFinalKeyUpDelay(), oldOption->GetFinalKeyUpDelay());
         return false;
     }
     MMI_HILOGD("Key option match");
@@ -694,7 +701,8 @@ bool KeySubscriberHandler::OnSubscribeKeyEvent(std::shared_ptr<KeyEvent> keyEven
         return false;
     }
     if (keyGestureMgr_.Intercept(keyEvent)) {
-        MMI_HILOGD("Key gesture recognized");
+        MMI_HILOGD("Key gesture recognized, keyCode:%{private}d, keyAction:%{private}d",
+            keyEvent->GetKeyCode(), keyEvent->GetKeyAction());
         powerKeyLogger("keyGestureMgr::Intercept");
         return true;
     }
@@ -711,7 +719,8 @@ bool KeySubscriberHandler::OnSubscribeKeyEvent(std::shared_ptr<KeyEvent> keyEven
             MMI_HILOGI("Repeat KeyEvent but new triggerType needs processing,(KC:%{private}d, KA:%{public}d)",
                 keyEvent->GetKeyCode(), keyEvent->GetKeyAction());
         } else {
-            MMI_HILOGD("Repeat KeyEvent, skip");
+            MMI_HILOGD("Repeat KeyEvent, skip, keyCode:%{private}d, keyAction:%{private}d",
+                keyEvent->GetKeyCode(), keyEvent->GetKeyAction());
             powerKeyLogger("IsRepeatedKeyEvent");
             return true;
         }

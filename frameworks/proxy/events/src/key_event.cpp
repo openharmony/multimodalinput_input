@@ -1273,6 +1273,7 @@ const char* KeyEvent::KeyCodeToString(int32_t keyCode)
 std::shared_ptr<KeyEvent> KeyEvent::Clone(std::shared_ptr<KeyEvent> keyEvent)
 {
     if (!keyEvent) {
+        MMI_HILOGE("Clone key event failed, keyEvent is nullptr");
         return nullptr;
     }
     auto event = std::shared_ptr<KeyEvent>(new (std::nothrow) KeyEvent(*keyEvent.get()));

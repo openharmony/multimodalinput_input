@@ -34,7 +34,8 @@ void EventFilterHandler::HandleKeyEvent(const std::shared_ptr<KeyEvent> keyEvent
     }
     if (HandleKeyEventFilter(keyEvent)) {
         DfxHisysevent::ReportKeyEvent("filter");
-        MMI_HILOGD("Key event is filtered");
+        MMI_HILOGD("Key event is filtered, keyCode:%{private}d, deviceId:%{private}d",
+            keyEvent->GetKeyCode(), keyEvent->GetDeviceId());
         return;
     }
     CHKPV(nextHandler_);
@@ -59,7 +60,8 @@ void EventFilterHandler::HandleTouchEvent(const std::shared_ptr<PointerEvent> po
 {
     CHKPV(pointerEvent);
     if (HandlePointerEventFilter(pointerEvent)) {
-        MMI_HILOGD("Touch event is filtered");
+        MMI_HILOGD("Touch event is filtered, pointerAction:%{private}d, deviceId:%{private}d",
+            pointerEvent->GetPointerAction(), pointerEvent->GetDeviceId());
         return;
     }
     CHKPV(nextHandler_);
@@ -179,7 +181,8 @@ bool EventFilterHandler::HandleKeyEventFilter(std::shared_ptr<KeyEvent> event)
         CHKPF(i.filter);
         i.filter->HandleKeyEvent(event, resultValue);
         if (resultValue) {
-            MMI_HILOGD("Call HandleKeyEventFilter return true");
+            MMI_HILOGD("Call HandleKeyEventFilter return true, filterId:%{public}d, clientPid:%{public}d, "
+                "keyCode:%{private}d", i.filterId, i.clientPid, event->GetKeyCode());
             return true;
         }
     }
@@ -213,9 +216,11 @@ bool EventFilterHandler::HandlePointerEventFilter(std::shared_ptr<PointerEvent> 
                 action == PointerEvent::POINTER_ACTION_PULL_MOVE ||
                 action == PointerEvent::POINTER_ACTION_HOVER_MOVE ||
                 action == PointerEvent::POINTER_ACTION_SWIPE_UPDATE) {
-                MMI_HILOGD("Call HandlePointerEvent return true");
+                MMI_HILOGD("Call HandlePointerEvent return true, filterId:%{public}d, clientPid:%{public}d, "
+                    "action:%{private}d", i.filterId, i.clientPid, action);
             } else {
-                MMI_HILOGW("Call HandlePointerEvent return true");
+                MMI_HILOGW("Call HandlePointerEvent return true, filterId:%{public}d, clientPid:%{public}d, "
+                    "action:%{private}d", i.filterId, i.clientPid, action);
             }
             return true;
         }

@@ -129,6 +129,9 @@ void TwoFingerGestureHandler::StartTwoFingerGesture()
         DfxHisysevent::ReportPointerEventExitTimes(PointerEventStatistics::AIBASE_GESTURE);
 #endif // OHOS_BUILD_ENABLE_DFX_RADAR
     }, "TwoFingerGestureHandler-StartTwoFingerGesture");
+    MMI_HILOGD("Two-finger gesture timer is started, timerId:%{public}d, "
+        "abilityStartDelay:%{public}" PRId64, context_.twoFingerGesture_.timerId,
+        context_.twoFingerGesture_.abilityStartDelay);
 }
 
 void TwoFingerGestureHandler::StopTwoFingerGesture()
@@ -222,6 +225,7 @@ int32_t TwoFingerGestureHandler::CheckTwoFingerGesture(int32_t pid)
 int32_t TwoFingerGestureHandler::LaunchAiScreenAbility(int32_t pid)
 {
     if (CheckTwoFingerGesture(pid) != RET_OK) {
+        MMI_HILOGD("Check two finger gesture failed, pid:%{public}d", pid);
         context_.twoFingerGesture_.startTime = 0;
         context_.twoFingerGesture_.longPressFlag = false;
         context_.twoFingerGesture_.windowId = -1;

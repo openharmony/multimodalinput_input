@@ -85,6 +85,7 @@ int32_t TabletEventInputSubscribeManager::UnsubscribetabletProximity(int32_t sub
         subscribeInfos_.erase(it);
         return RET_OK;
     }
+    MMI_HILOGD("SubscribeId not found, subscribeId:%{public}d", subscribeId);
     return RET_ERR;
 }
 

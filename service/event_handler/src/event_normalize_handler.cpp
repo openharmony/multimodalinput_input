@@ -327,7 +327,7 @@ void EventNormalizeHandler::HandleEvent(libinput_event* event, int64_t frameTime
             break;
         }
         default: {
-            MMI_HILOGD("This device does not support :%d", type);
+            MMI_HILOGD("This device does not support :%{public}d", type);
             break;
         }
     }
@@ -1244,7 +1244,7 @@ void EventNormalizeHandler::CancelTwoFingerAxis(libinput_event* event)
     }
     bool result = MouseEventHdr->CheckAndPackageAxisEvent(event);
     if (!result) {
-        MMI_HILOGI("Check or packet axis event failed");
+        MMI_HILOGW("Check or packet axis event failed");
         return;
     }
     auto pointerEvent = MouseEventHdr->GetPointerEvent();
@@ -1576,12 +1576,12 @@ bool EventNormalizeHandler::HandleTouchPadEdgeSwipe(libinput_event* event)
 bool EventNormalizeHandler::HandleTouchpadSyncEvent(libinput_event *event)
 {
     if (event == nullptr) {
-        MMI_HILOGI("Event is null");
+        MMI_HILOGE("Event is null");
         return false;
     }
     auto manager = InputPluginManager::GetInstance();
     if (manager == nullptr) {
-        MMI_HILOGI("InputPluginManager is null");
+        MMI_HILOGE("InputPluginManager is null");
         return false;
     }
     auto pData = std::make_shared<IPluginData>();

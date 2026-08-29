@@ -843,7 +843,7 @@ bool TabletToolTransformProcessor::CalculateScreenCoordinateWithCalibration(
     }
     double rawX = libinput_event_tablet_tool_get_x_transformed(tabletEvent, static_cast<uint32_t>(tabletWidth));
     double rawY = libinput_event_tablet_tool_get_y_transformed(tabletEvent, static_cast<uint32_t>(tabletHeight));
-    MMI_HILOGD("Raw hardware coordinates: (%.1f, %.1f)", rawX, rawY);
+    MMI_HILOGD("Raw hardware coordinates: (%{private}.1f, %{private}.1f)", rawX, rawY);
     rawX = std::clamp(rawX, calibration_->calibratedMinX, calibration_->calibratedMaxX);
     rawY = std::clamp(rawY, calibration_->calibratedMinY, calibration_->calibratedMaxY);
 
@@ -865,7 +865,7 @@ bool TabletToolTransformProcessor::CalculateScreenCoordinateWithCalibration(
         coord.x = normalizedX * screenWidth;
         coord.y = normalizedY * screenHeight;
     }
-    MMI_HILOGD("Calibrated screen coordinates: (%.1f, %.1f)", coord.x, coord.y);
+    MMI_HILOGD("Calibrated screen coordinates: (%{private}.1f, %{private}.1f)", coord.x, coord.y);
     return true;
 }
 

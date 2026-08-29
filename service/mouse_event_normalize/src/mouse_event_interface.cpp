@@ -606,7 +606,7 @@ void MouseEventInterface::OnDeviceRemoved(std::shared_ptr<MouseEventInterface> s
     CALL_DEBUG_ENTER;
     auto mouse = GetMouse();
     if (mouse == nullptr) {
-        MMI_HILOGI("Mouse is nullptr");
+        MMI_HILOGE("Mouse is nullptr");
         return;
     }
     mouse->OnDeviceRemoved(deviceId);
@@ -622,7 +622,7 @@ void MouseEventInterface::OnDeviceEnabled(std::shared_ptr<MouseEventInterface> s
     CALL_DEBUG_ENTER;
     auto mouse = GetMouse();
     if (mouse == nullptr) {
-        MMI_HILOGI("Mouse is nullptr");
+        MMI_HILOGE("Mouse is nullptr");
         return;
     }
     mouse->OnDeviceEnabled(deviceId);
@@ -633,7 +633,7 @@ void MouseEventInterface::OnDeviceDisabled(std::shared_ptr<MouseEventInterface> 
     CALL_DEBUG_ENTER;
     auto mouse = GetMouse();
     if (mouse == nullptr) {
-        MMI_HILOGI("Mouse is nullptr");
+        MMI_HILOGE("Mouse is nullptr");
         return;
     }
     mouse->OnDeviceDisabled(deviceId);
@@ -765,6 +765,7 @@ void MouseEventInterface::RemoveUnloadingTimer()
         unloadTimerId_ = -1;
     }
     if (timerId >= 0) {
+        MMI_HILOGD("Remove unloading timer, timerId:%{public}d", timerId);
         TimerMgr->RemoveTimer(timerId);
     }
 }

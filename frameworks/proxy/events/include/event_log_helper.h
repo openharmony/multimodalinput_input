@@ -130,7 +130,7 @@ private:
         if (event->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE) || IsEnterableKey(event->GetKeyCode())) {
             MMI_HILOG_HEADER(LOG_INFO, lh, "See InputTracking-Dict, I:%{public}d,"
                 "KC:%{private}d, AT:%{public}" PRId64
-                ", ET:%{public}s, KA:%{public}s, NL:%{public}d, CL:%{public}d, SL:%{public}d, KIC:%zu, "
+                ", ET:%{public}s, KA:%{private}s, NL:%{private}d, CL:%{private}d, SL:%{private}d, KIC:%{private}zu, "
                 "DI:%{public}d, IR:%{public}s, SI:%{public}s",
                 event->GetId(), event->GetKeyCode(), event->GetActionTime(),
                 InputEvent::EventTypeToString(event->GetEventType()),
@@ -175,7 +175,7 @@ private:
             }
             if (IsBetaVersion()) {
                 if (!event->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE)) {
-                    MMI_HILOG_HEADER(LOG_INFO, lh, "%{public}s]", tmpStr.c_str());
+                    MMI_HILOG_HEADER(LOG_INFO, lh, "%{private}s]", tmpStr.c_str());
                 }
             }
         }
@@ -344,11 +344,15 @@ private:
                     item.GetTwist());
             } else {
                 if (event->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE)) {
-                    MMI_HILOG_HEADER(LOG_DEBUG, lh,"PI:%{public}d, DT:%{public}" PRId64 ", IP:%{public}d, DX:%d, DY:%d"
-                        ", WX:%d, WY:%d, W:%{public}d, H:%{public}d, TX:%.2f, TY:%.2f, TDX:%d, TDY:%d, ToolWX:%d, "
-                        "ToolWY:%d, ToolW:%{public}d, ToolH:%{public}d, P:%{public}.2f, MF:%{public}d, "
-                        "ToolType:%{public}d, LA:%{public}d, SA:%{public}d, RawDx:%d, RawDy:%d, RawDisplayX:%d, "
-                        "RawDisplayY:%d, T:%{public}d, DXP:%f, DYP:%f, FXP:%f, FYP:%f, WXP:%f, WYP:%f",
+                    MMI_HILOG_HEADER(LOG_DEBUG, lh,
+                        "PI:%{public}d, DT:%{public}" PRId64 ", IP:%{public}d, DX:%{private}d, DY:%{private}d, "
+                        "WX:%{private}d, WY:%{private}d, W:%{public}d, H:%{public}d, TX:%{private}.2f, "
+                        "TY:%{private}.2f, TDX:%{private}d, TDY:%{private}d, ToolWX:%{private}d, "
+                        "ToolWY:%{private}d, ToolW:%{public}d, ToolH:%{public}d, P:%{public}.2f, MF:%{public}d, "
+                        "ToolType:%{public}d, LA:%{public}d, SA:%{public}d, "
+                        "RawDx:%{private}d, RawDy:%{private}d, RawDisplayX:%{private}d, "
+                        "RawDisplayY:%{private}d, T:%{public}d, DXP:%{private}f, DYP:%{private}f, "
+                        "FXP:%{private}f, FYP:%{private}f, WXP:%{private}f, WYP:%{private}f",
                         item.GetPointerId(), item.GetDownTime(), item.IsPressed(), item.GetDisplayX(),
                         item.GetDisplayY(), item.GetWindowX(), item.GetWindowY(), item.GetWidth(), item.GetHeight(),
                         item.GetTiltX(), item.GetTiltY(), item.GetToolDisplayX(), item.GetToolDisplayY(),
@@ -386,11 +390,14 @@ private:
             } else {
                 if (event->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE)) {
                     MMI_HILOG_HEADER(LOG_DEBUG, lh,
-                        "PI:%{public}d, DT:%{public}" PRId64 ", IP:%{public}d, DX:%d, DY:%d, WX:%d, WY:%d, "
-                        "W:%{public}d, H:%{public}d, TX:%.2f, TY:%.2f, TDX:%d, TDY:%d, ToolWX:%d, ToolWY:%d, "
-                        "ToolW:%{public}d, ToolH:%{public}d, P:%{public}.2f, MF:%{public}d, "
-                        "ToolType:%{public}d, LA:%{public}d, SA:%{public}d, RawDx:%d, RawDy:%d, RawDisplayX:%d, "
-                        "RawDisplayY:%d, T:%{public}d, DXP:%f, DYP:%f, FXP:%f, FYP:%f, WXP:%f, WYP:%f",
+                        "PI:%{public}d, DT:%{public}" PRId64 ", IP:%{public}d, DX:%{private}d, DY:%{private}d, "
+                        "WX:%{private}d, WY:%{private}d, W:%{public}d, H:%{public}d, TX:%{private}.2f, "
+                        "TY:%{private}.2f, TDX:%{private}d, TDY:%{private}d, ToolWX:%{private}d, "
+                        "ToolWY:%{private}d, ToolW:%{public}d, ToolH:%{public}d, P:%{public}.2f, MF:%{public}d, "
+                        "ToolType:%{public}d, LA:%{public}d, SA:%{public}d, "
+                        "RawDx:%{private}d, RawDy:%{private}d, RawDisplayX:%{private}d, "
+                        "RawDisplayY:%{private}d, T:%{public}d, DXP:%{private}f, DYP:%{private}f, "
+                        "FXP:%{private}f, FYP:%{private}f, WXP:%{private}f, WYP:%{private}f",
                         item.GetPointerId(), item.GetDownTime(), item.IsPressed(), item.GetDisplayX(),
                         item.GetDisplayY(), item.GetWindowX(), item.GetWindowY(), item.GetWidth(), item.GetHeight(),
                         item.GetTiltX(), item.GetTiltY(), item.GetToolDisplayX(), item.GetToolDisplayY(),

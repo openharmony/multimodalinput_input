@@ -139,7 +139,7 @@ void AccountManager::AccountSetting::AccShortcutTimeout(int32_t accountId, const
     if (auto iter = accountMgr->accounts_.find(accountId); iter != accountMgr->accounts_.end()) {
         iter->second->OnAccShortcutTimeoutChanged(key);
     } else {
-        MMI_HILOGW("No account(%d)", accountId);
+        MMI_HILOGW("No account(%{private}d)", accountId);
     }
 }
 
@@ -150,7 +150,7 @@ void AccountManager::AccountSetting::AccShortcutEnabled(int32_t accountId, const
     if (auto iter = accountMgr->accounts_.find(accountId); iter != accountMgr->accounts_.end()) {
         iter->second->OnAccShortcutEnabled(key);
     } else {
-        MMI_HILOGW("No account(%{public}d)", accountId);
+        MMI_HILOGW("No account(%{private}d)", accountId);
     }
 }
 
@@ -161,7 +161,7 @@ void AccountManager::AccountSetting::AccShortcutEnabledOnScreenLocked(int32_t ac
     if (auto iter = accountMgr->accounts_.find(accountId); iter != accountMgr->accounts_.end()) {
         iter->second->OnAccShortcutEnabledOnScreenLocked(key);
     } else {
-        MMI_HILOGW("No account(%{public}d)", accountId);
+        MMI_HILOGW("No account(%{private}d)", accountId);
     }
 }
 
@@ -221,19 +221,19 @@ void AccountManager::AccountSetting::InitializeSetting()
 
 void AccountManager::AccountSetting::OnAccShortcutTimeoutChanged(const std::string &key)
 {
-    MMI_HILOGD("[AccountSetting][%d] Setting '%s' has changed", GetAccountId(), key.c_str());
+    MMI_HILOGD("[AccountSetting][%{private}d] Setting '%{public}s' has changed", GetAccountId(), key.c_str());
     ReadLongPressTime();
 }
 
 void AccountManager::AccountSetting::OnAccShortcutEnabled(const std::string &key)
 {
-    MMI_HILOGD("[AccountSetting][%d] Setting '%s' has changed", GetAccountId(), key.c_str());
+    MMI_HILOGD("[AccountSetting][%{private}d] Setting '%{public}s' has changed", GetAccountId(), key.c_str());
     accShortcutEnabled_ = ReadSwitchStatus(key, accShortcutEnabled_);
 }
 
 void AccountManager::AccountSetting::OnAccShortcutEnabledOnScreenLocked(const std::string &key)
 {
-    MMI_HILOGD("[AccountSetting][%d] Setting '%{public}s' has changed", GetAccountId(), key.c_str());
+    MMI_HILOGD("[AccountSetting][%{private}d] Setting '%{public}s' has changed", GetAccountId(), key.c_str());
     accShortcutEnabledOnScreenLocked_ = ReadSwitchStatus(key, accShortcutEnabledOnScreenLocked_);
 }
 
@@ -350,7 +350,7 @@ int32_t AccountManager::GetAccountIdFromUid(int32_t uid)
     int32_t userId = INVALID_USER_ID;
     auto errCode = AccountSA::OsAccountManager::GetOsAccountLocalIdFromUid(uid, userId);
     if (errCode != RET_OK) {
-        MMI_HILOGI("GetOsAccountLocalIdFromUid failed, errCode:%{public}d", errCode);
+        MMI_HILOGW("GetOsAccountLocalIdFromUid failed, errCode:%{public}d", errCode);
     }
     return userId;
 }
@@ -457,7 +457,7 @@ void AccountManager::SubscribeCommonEvent()
         return;
     }
     subscriber_ = nullptr;
-    MMI_HILOGI("SubscribeCommonEvent fail, retry later");
+    MMI_HILOGW("SubscribeCommonEvent fail, retry later");
     timerId_ = TimerMgr->AddTimer(REPEAT_COOLING_TIME, REPEAT_ONCE, [this]() {
         SubscribeCommonEvent();
         timerId_ = -1;
@@ -540,7 +540,7 @@ void AccountManager::SetupMainAccount()
     currentAccountId_ = MAIN_ACCOUNT_ID;
     auto [_, isNew] = accounts_.emplace(MAIN_ACCOUNT_ID, std::make_unique<AccountSetting>(MAIN_ACCOUNT_ID));
     if (!isNew) {
-        MMI_HILOGW("Account(%{public}d) has existed", MAIN_ACCOUNT_ID);
+        MMI_HILOGW("Account(%{private}d) has existed", MAIN_ACCOUNT_ID);
     }
     // LCOV_EXCL_STOP
 }
@@ -560,10 +560,10 @@ void AccountManager::OnCommonEvent(const EventFwk::CommonEventData &data)
 void AccountManager::OnAddUser(const EventFwk::CommonEventData &data)
 {
     int32_t accountId = data.GetCode();
-    MMI_HILOGD("Add account(%d)", accountId);
+    MMI_HILOGD("Add account(%{private}d)", accountId);
     auto [_, isNew] = accounts_.emplace(accountId, std::make_unique<AccountSetting>(accountId));
     if (!isNew) {
-        MMI_HILOGW("Account(%d) has existed", accountId);
+        MMI_HILOGW("Account(%{private}d) has existed", accountId);
     }
     INPUT_SETTING_MANAGER->OnAddUser(accountId);
 }
@@ -571,12 +571,12 @@ void AccountManager::OnAddUser(const EventFwk::CommonEventData &data)
 void AccountManager::OnRemoveUser(const EventFwk::CommonEventData &data)
 {
     int32_t accountId = data.GetCode();
-    MMI_HILOGD("Remove account(%d)", accountId);
+    MMI_HILOGD("Remove account(%{private}d)", accountId);
     if (auto iter = accounts_.find(accountId); iter != accounts_.end()) {
         accounts_.erase(iter);
-        MMI_HILOGD("Account(%d) has been removed", accountId);
+        MMI_HILOGD("Account(%{private}d) has been removed", accountId);
     } else {
-        MMI_HILOGW("No account(%d)", accountId);
+        MMI_HILOGW("No account(%{private}d)", accountId);
     }
     INPUT_SETTING_MANAGER->OnRemoveUser(accountId);
 }
@@ -591,7 +591,7 @@ void AccountManager::OnSwitchUser(const EventFwk::CommonEventData &data)
         auto [ptr, ec] = std::from_chars(displayId.data(), displayId.data() + displayId.size(), num);
     if (ec == std::errc() && num <= UINT64_MAX) {
         currentDisplayId = num;
-        MMI_HILOGD("Switch to {%{public}" PRIu64 ":%d}", currentDisplayId, accountId);
+        MMI_HILOGD("Switch to {%{public}" PRIu64 ":%{private}d}", currentDisplayId, accountId);
     } else {
         MMI_HILOGE("Failed to convert or invalid displayId value");
     }
@@ -601,7 +601,7 @@ void AccountManager::OnSwitchUser(const EventFwk::CommonEventData &data)
             accounts_.emplace(accountId, std::make_unique<AccountSetting>(accountId));
         }
         currentAccountId_ = accountId;
-        MMI_HILOGD("Switched to account(%d)", currentAccountId_);
+        MMI_HILOGD("Switched to account(%{private}d)", currentAccountId_);
     }
     INPUT_SETTING_MANAGER->OnSwitchUser(currentAccountId_);
 #ifdef OHOS_BUILD_ENABLE_TRIPLE_FINGER_SNAPSHOT

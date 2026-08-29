@@ -654,7 +654,7 @@ void PointerDrawingManager::DrawMovePointer(uint64_t rsId, int32_t physicalX, in
             MMI_HILOGE("SetCursorLocation failed");
             return;
         }
-        MMI_HILOGD("Move pointer, physicalX:%d, physicalY:%d", physicalX, physicalY);
+        MMI_HILOGD("Move pointer, physicalX:%{private}d, physicalY:%{private}d", physicalX, physicalY);
     }
 }
 
@@ -3910,7 +3910,7 @@ void PointerDrawingManager::MoveRetryAsync(uint64_t displayId, int32_t x, int32_
             MMI_HILOGE("Move retry failed, stillFailedScreens size:%{public}zu, TimerId:%{public}d",
                 stillFailedScreens.size(), moveRetryTimerId_.load());
             if (moveRetryCount_.load() == MAX_MOVE_RETRY_COUNT) {
-                MMI_HILOGI("Move retry exceed max count, stop retry");
+                MMI_HILOGW("Move retry exceed max count, stop retry");
                 moveRetryActive_ = false;
                 moveRetryTimerId_ = DEFAULT_VALUE;
                 moveRetryCount_ = 0;

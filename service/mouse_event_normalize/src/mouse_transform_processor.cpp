@@ -283,7 +283,7 @@ int32_t MouseTransformProcessor::UpdateMotionEventState(MotionDataContext& ctx)
     pointerEvent_->SetButtonId(buttonId_);
     pointerEvent_->SetTargetDisplayId(ctx.displayId);
     WIN_MGR->ApplyBoundDisplayId(pointerEvent_);
-    MMI_HILOGD("Change coordinate: x:%.2f, y:%.2f, currentDisplayId:%d",
+    MMI_HILOGD("Change coordinate: x:%{private}.2f, y:%{private}.2f, currentDisplayId:%{public}d",
                 ctx.cursorX, ctx.cursorY, ctx.displayId);
     return RET_OK;
 }
@@ -303,7 +303,8 @@ int32_t MouseTransformProcessor::UpdateMouseMoveLocation(const OLD::DisplayInfo*
         abs_x += offset.dx;
         abs_y += offset.dy;
         ret = RET_OK;
-        MMI_HILOGD("Skip mouse acceleration motion");
+        MMI_HILOGD("Skip mouse acceleration motion, dx:%{private}.2f, dy:%{private}.2f, "
+            "filterDeltaTime:%{public}" PRIu64, offset.dx, offset.dy, dalta_time);
         return ret;
     }
     auto winMgr = GetInputWindowsManager();
@@ -422,6 +423,8 @@ int32_t MouseTransformProcessor::UpdateTouchpadMoveLocation(const OLD::DisplayIn
         double touchpadSize = libinput_touchpad_device_get_hypot_size(device) * touchpadPPi;
         int32_t frequency = libinput_touchpad_device_get_frequency(device);
         if (touchpadPPi < CONST_DOUBLE_ONE || touchpadSize < CONST_DOUBLE_ONE || frequency < CONST_DOUBLE_ONE) {
+            MMI_HILOGE("Invalid touchpad parameters, ppi:%{public}.2f, size:%{public}.2f, frequency:%{public}d",
+                touchpadPPi, touchpadSize, frequency);
             return RET_ERR;
         }
         ret = PointerMotionAcceleration::DynamicAccelerateTouchpad(offset,
@@ -678,7 +681,8 @@ bool MouseTransformProcessor::IsTouchpadTapEnabled(int32_t type)
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
 
     if (type == LIBINPUT_EVENT_POINTER_TAP && !tpTapSwitch) {
-        MMI_HILOGD("Touch pad is disabled");
+        MMI_HILOGD("Touch pad is disabled, type:%{public}d, tpTapSwitch:%{public}d, userId:%{private}d",
+            type, tpTapSwitch, userId);
         return false;
     }
     return true;
@@ -848,7 +852,8 @@ int32_t MouseTransformProcessor::HandleButtonValueInner(struct libinput_event_po
             buttonId = PointerEvent::MOUSE_BUTTON_LEFT;
             button = MouseDeviceState::LIBINPUT_BUTTON_CODE::LIBINPUT_LEFT_BUTTON_CODE;
         } else {
-            MMI_HILOGD("The buttonId does not switch");
+            MMI_HILOGD("The buttonId does not switch, buttonId:%{private}d, primaryButton:%{private}d",
+                buttonId, primaryButton);
         }
     }
 
@@ -1534,7 +1539,7 @@ void MouseTransformProcessor::Dump(int32_t fd, const std::vector<std::string> &a
 
 int32_t MouseTransformProcessor::SetPointerLocation(IInputServiceContext &env, int32_t x, int32_t y, int32_t displayId)
 {
-    MMI_HILOGI("SetPointerLocation x:%d, y:%d, displayId:%d", x, y, displayId);
+    MMI_HILOGI("SetPointerLocation x:%{private}d, y:%{private}d, displayId:%{public}d", x, y, displayId);
     CursorPosition cursorPos = env.GetInputWindowsManager()->GetCursorPos();
     if (cursorPos.displayId < 0) {
         MMI_HILOGE("No display");
@@ -1551,7 +1556,7 @@ int32_t MouseTransformProcessor::SetPointerLocation(IInputServiceContext &env, i
     env.GetCursorDrawingComponent().SetPointerLocation(cursorPos.cursorPos.x, cursorPos.cursorPos.y,
         cursorPos.displayId);
 
-    MMI_HILOGI("CursorPosX:%f, cursorPosY:%f", cursorPos.cursorPos.x, cursorPos.cursorPos.y);
+    MMI_HILOGI("CursorPosX:%{private}f, cursorPosY:%{private}f", cursorPos.cursorPos.x, cursorPos.cursorPos.y);
     return RET_OK;
 }
 
@@ -1771,7 +1776,8 @@ void MouseTransformProcessor::TransTouchpadRightButton(struct libinput_event_poi
         MMI_HILOGD("Event not from touchpad");
         return;
     }
-    MMI_HILOGD("Transform right button event, evenType:%d, switchType:%d, button:%d", evenType, switchType, button);
+    MMI_HILOGD("Transform right button event, evenType:%{public}d, switchType:%{public}d, button:%{private}d",
+        evenType, switchType, button);
     uint32_t btn = button;
     auto state = libinput_event_pointer_get_button_state(data);
     if (state == LIBINPUT_BUTTON_STATE_RELEASED) {
@@ -1832,7 +1838,7 @@ void MouseTransformProcessor::HandleFilterMouseEvent(Offset* offset)
         filterInsertionPoint_.filterX = 0.0;
         filterInsertionPoint_.filterY = 0.0;
         filterInsertionPoint_.filterFlag = false;
-        MMI_HILOGD("x:%.2f, y:%.2f", offset->dx, offset->dy);
+        MMI_HILOGD("x:%{private}.2f, y:%{private}.2f", offset->dx, offset->dy);
     }
 }
 
@@ -1864,7 +1870,8 @@ bool MouseTransformProcessor::CheckFilterMouseEvent(struct libinput_event *event
     CHKPF(device);
     if (filterInsertionPoint_.filterDeltaTime < FilterInsertionPoint::FILTER_THRESHOLD_US &&
         libinput_device_get_id_bustype(device) == BUS_USB) {
-        MMI_HILOGD("Mouse motion event delta time is too short");
+        MMI_HILOGD("Mouse motion event delta time is too short, filterDeltaTime:%{public}" PRIu64
+            ", currentTime:%{public}" PRIu64, filterInsertionPoint_.filterDeltaTime, currentTime);
         return true;
     }
 

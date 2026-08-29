@@ -644,7 +644,7 @@ bool PointerMotionAcceleration::AxisCurve::IsValid() const
 
 bool PointerMotionAcceleration::CalcAxisGainTouchpad(const AxisCurve &curve, double axisSpeed, double &gain)
 {
-    MMI_HILOGD("CalcAxisGainTouchpad, axisSpeed:%f", axisSpeed);
+    MMI_HILOGD("CalcAxisGainTouchpad, axisSpeed:%{private}f", axisSpeed);
 
     if (!curve.IsValid()) {
         MMI_HILOGE("Invalid acceleration curve");
@@ -676,7 +676,7 @@ bool PointerMotionAcceleration::CalcAxisGainTouchpad(const AxisCurve &curve, dou
 
 int32_t PointerMotionAcceleration::DynamicAccelerateTouchpadAxis(double &axisSpeed, bool mode, DeviceType deviceType)
 {
-    MMI_HILOGD("Accelerate touchpad axis, mode:%{public}d, deviceType:%{public}d, axisSpeed:%{public}f",
+    MMI_HILOGD("Accelerate touchpad axis, mode:%{public}d, deviceType:%{public}d, axisSpeed:%{private}f",
         mode, static_cast<int32_t>(deviceType), axisSpeed);
     if (!axisCurves_) {
         PointerMotionAcceleration::LoadAccelerationConfig(&PointerMotionAcceleration::LoadAxisCurve);

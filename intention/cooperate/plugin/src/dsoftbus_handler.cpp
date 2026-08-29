@@ -251,7 +251,7 @@ void DSoftbusHandler::SendEvent(const CooperateEvent &event)
 void DSoftbusHandler::OnCommunicationFailure(const std::string &networkId)
 {
     env_->GetDSoftbus().CloseSession(networkId);
-    FI_HILOGI("Notify communication failure with peer(%{public}s)", Utility::Anonymize(networkId).c_str());
+    FI_HILOGW("Notify communication failure with peer(%{public}s)", Utility::Anonymize(networkId).c_str());
     SendEvent(CooperateEvent(
         CooperateEventType::DSOFTBUS_SESSION_CLOSED,
         DSoftbusSessionClosed {

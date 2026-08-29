@@ -110,19 +110,19 @@ int32_t AuthorizeHelper::AddAuthorizeProcess(int32_t pid, AuthorizeExitCallback 
 {
     CALL_DEBUG_ENTER;
     if (!isInit_) {
-        MMI_HILOGI("Not init");
+        MMI_HILOGW("Not init");
         return RET_ERR;
     }
 
     if (pid <= 0) {
-        MMI_HILOGI("Invalid process id, pid:%{public}d", pid);
+        MMI_HILOGW("Invalid process id, pid:%{public}d", pid);
         return RET_ERR;
     }
 
     std::lock_guard<std::mutex> lock(mutex_);
     if (state_ == AuthorizeState::STATE_UNAUTHORIZE) {
         if (pid_ != INVALID_AUTHORIZE_PID) {
-            MMI_HILOGI("Failed to authorize helper state.state:%{public}d,pid_:%{public}d,pid:%{public}d",
+            MMI_HILOGW("Failed to authorize helper state.state:%{public}d,pid_:%{public}d,pid:%{public}d",
                 state_, pid_, pid);
             return RET_ERR;
         }
@@ -153,7 +153,7 @@ void AuthorizeHelper::CancelAuthorize(int32_t pid)
 {
     CALL_DEBUG_ENTER;
     if (pid <= 0) {
-        MMI_HILOGI("Invalid process id, pid:%{public}d", pid);
+        MMI_HILOGW("Invalid process id, pid:%{public}d", pid);
         return;
     }
     std::lock_guard<std::mutex> lock(mutex_);

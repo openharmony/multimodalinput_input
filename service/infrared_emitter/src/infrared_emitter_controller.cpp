@@ -138,6 +138,7 @@ int32_t InfraredEmitterController::GetFrequencies(std::vector<InfraredFrequencyI
     std::lock_guard<std::mutex> guard(mutex_);
     InitInfraredEmitter();
     if (!irInterface_) {
+        MMI_HILOGE("Infrared emitter interface is null");
         return ERROR_UNSUPPORTED_IR_EMITTER;
     }
     bool outRet = false;

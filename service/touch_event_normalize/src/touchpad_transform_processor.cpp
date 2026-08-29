@@ -346,7 +346,7 @@ int32_t TouchPadTransformProcessor::SetTouchPadSwipeData(struct libinput_event *
     GetTouchpadSwipeSwitch(userId, tpSwipeSwitch);
 
     if (!tpSwipeSwitch) {
-        MMI_HILOGD("Touchpad swipe switch is false");
+        MMI_HILOGD("Touchpad swipe switch is false, userId:%{private}d, action:%{private}d", userId, action);
         return RET_ERR;
     }
 
@@ -596,7 +596,8 @@ int32_t TouchPadTransformProcessor::OnEventTouchPadPinchGesture(libinput_event *
         (action == PointerEvent::POINTER_ACTION_AXIS_BEGIN ||
         action == PointerEvent::POINTER_ACTION_AXIS_UPDATE ||
         action == PointerEvent::POINTER_ACTION_AXIS_END)) {
-        MMI_HILOGD("Touchpad pinch switch is false");
+        MMI_HILOGD("Touchpad pinch switch is false, userId:%{private}d, fingerCount:%{private}d, "
+            "action:%{private}d", userId, fingerCount, action);
         return RET_ERR;
     }
     bool tpRotateSwitch = false;
@@ -605,7 +606,8 @@ int32_t TouchPadTransformProcessor::OnEventTouchPadPinchGesture(libinput_event *
         (action == PointerEvent::POINTER_ACTION_ROTATE_BEGIN ||
         action == PointerEvent::POINTER_ACTION_ROTATE_UPDATE ||
         action == PointerEvent::POINTER_ACTION_ROTATE_END)) {
-        MMI_HILOGD("Touchpad rotate switch is false");
+        MMI_HILOGD("Touchpad rotate switch is false, userId:%{private}d, fingerCount:%{private}d, "
+            "action:%{private}d", userId, fingerCount, action);
         return RET_ERR;
     }
     int64_t time = static_cast<int64_t>(libinput_event_gesture_get_time(gesture));

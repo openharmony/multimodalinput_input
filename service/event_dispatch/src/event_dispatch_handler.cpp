@@ -62,7 +62,8 @@ void EventDispatchHandler::HandleKeyEvent(const std::shared_ptr<KeyEvent> keyEve
     CHKPV(keyEvent);
 #ifdef OHOS_BUILD_ENABLE_KEY_HOOK
     if (KEY_EVENT_HOOK_MGR.IsHooksExisted() && KEY_EVENT_HOOK_MGR.OnKeyEvent(keyEvent)) {
-        MMI_HILOGD("Keyevent is hooked");
+        MMI_HILOGD("Keyevent is hooked, keyCode:%{private}d, keyAction:%{private}d",
+            keyEvent->GetKeyCode(), keyEvent->GetKeyAction());
         return;
     }
 #endif // OHOS_BUILD_ENABLE_KEY_HOOK

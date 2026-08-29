@@ -48,6 +48,7 @@ std::shared_ptr<SocketConnection> SocketConnection::Connect(std::function<int32_
     CHKPP(socket);
     int32_t sockFd = socket();
     if (sockFd < 0) {
+        FI_HILOGE("Create socket failed, sockFd:%{public}d", sockFd);
         return nullptr;
     }
     return std::make_shared<SocketConnection>(sockFd, recv, onDisconnected);

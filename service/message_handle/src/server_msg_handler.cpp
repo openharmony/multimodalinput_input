@@ -413,6 +413,8 @@ int32_t ServerMsgHandler::OnInjectPointerEventExt(int32_t userId,
             }
             WIN_MGR->ProcessInjectEventGlobalXY(pointerEvent, useCoordinate);
             if (!FixTargetWindowId(pointerEvent, pointerEvent->GetPointerAction(), isShell, useCoordinate)) {
+                MMI_HILOGD("Fix target window id failed, pointerAction:%{private}d, deviceId:%{private}d",
+                    pointerEvent->GetPointerAction(), pointerEvent->GetDeviceId());
                 return RET_ERR;
             }
             DealGesturePointers(pointerEvent);
@@ -553,7 +555,7 @@ int32_t ServerMsgHandler::AccelerateMotion(int32_t userId, std::shared_ptr<Point
         return ret;
     }
     WIN_MGR->UpdateAndAdjustMouseLocation(cursorPos.displayId, cursorPos.cursorPos.x, cursorPos.cursorPos.y);
-    MMI_HILOGD("Cursor move to (x:%.2f, y:%.2f, DisplayId:%d)",
+    MMI_HILOGD("Cursor move to (x:%{private}.2f, y:%{private}.2f, DisplayId:%{public}d)",
         cursorPos.cursorPos.x, cursorPos.cursorPos.y, cursorPos.displayId);
     return RET_OK;
 }
@@ -621,7 +623,7 @@ int32_t ServerMsgHandler::AccelerateMotionTouchpad(int32_t userId, std::shared_p
         return ret;
     }
     WIN_MGR->UpdateAndAdjustMouseLocation(cursorPos.displayId, cursorPos.cursorPos.x, cursorPos.cursorPos.y);
-    MMI_HILOGD("Cursor move to (x:%.2f, y:%.2f, DisplayId:%d)",
+    MMI_HILOGD("Cursor move to (x:%{private}.2f, y:%{private}.2f, DisplayId:%{public}d)",
         cursorPos.cursorPos.x, cursorPos.cursorPos.y, cursorPos.displayId);
     return RET_OK;
 }
@@ -783,6 +785,8 @@ int32_t ServerMsgHandler::FixTargetWindowId(std::shared_ptr<PointerEvent> pointe
     if (iter != targetWindowIdMap.end()) {
         return iter->second;
     }
+    MMI_HILOGD("Target window not found, displayId:%{public}d, pointerId:%{public}d",
+        displayId, pointerEvent->GetPointerId());
     return RET_ERR;
 }
 
@@ -949,12 +953,15 @@ int32_t ServerMsgHandler::OnDisplayInfo(SessionPtr sess, NetPacket &pkt)
     oldDisplayGroupInfos_.clear();
     pkt >> userScreenInfo.userId >> userScreenInfo.userState;
     if (ReadScreensInfo(pkt, userScreenInfo) != RET_OK) {
+        MMI_HILOGD("Read screens info failed");
         return RET_ERR;
     }
     if (ReadDisplayGroupsInfo(pkt, userScreenInfo) != RET_OK) {
+        MMI_HILOGD("Read display groups info failed");
         return RET_ERR;
     }
     if (!ChangeToOld(userScreenInfo)) {
+        MMI_HILOGD("Change to old display info failed");
         return RET_ERR;
     }
     Printf(userScreenInfo);
@@ -991,9 +998,11 @@ int32_t ServerMsgHandler::ReadDisplayGroupsInfo(NetPacket &pkt, UserScreenInfo &
         pkt >> info.id >> info.name >> info.type >> info.mainDisplayId >> info.focusWindowId;
         CHKRWER(pkt, RET_ERR);
         if (ReadDisplaysInfo(pkt, info) != RET_OK) {
+            MMI_HILOGD("Read displays info failed, displayGroupId:%{public}d", info.id);
             return RET_ERR;
         }
         if (ReadWindowsInfo(pkt, info, oldInfo) != RET_OK) {
+            MMI_HILOGE("Read windows info failed, displayGroupId:%{public}d", info.id);
             return RET_ERR;
         }
         userScreenInfo.displayGroups.push_back(info);
@@ -1094,6 +1103,7 @@ int32_t ServerMsgHandler::OnEnhanceConfig(SessionPtr sess, NetPacket &pkt)
     }
     int32_t result = Security::SecurityComponent::SecCompEnhanceKit::SetEnhanceCfg(cfg, num);
     if (result != 0) {
+        MMI_HILOGE("SetEnhanceCfg failed, result:%{public}d", result);
         return RET_ERR;
     }
     return RET_OK;
@@ -1570,7 +1580,7 @@ int32_t ServerMsgHandler::OnAuthorize(bool isAuthorize)
                 CloseInjectNotice(pid);
         });
         if (result != RET_OK) {
-            MMI_HILOGI("Authorize process failed, pid:%{public}d", authorPid);
+            MMI_HILOGW("Authorize process failed, pid:%{public}d", authorPid);
         }
         MMI_HILOGD("Agree to apply injection,pid:%{public}d", authorPid);
         return ERR_OK;

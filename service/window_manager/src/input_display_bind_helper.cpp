@@ -719,12 +719,12 @@ int32_t InputDisplayBindHelper::SetDisplayBind(int32_t deviceId, int32_t display
     MMI_HILOGI("Param: deviceId:%{public}d, displayId:%{public}d", deviceId, displayId);
     if ((deviceId == -1) || (displayId == -1)) {
         msg = "The deviceId or displayId is invalid";
-        MMI_HILOGE("%s", msg.c_str());
+        MMI_HILOGE("%{public}s", msg.c_str());
         return RET_ERR;
     }
     if (infos_ == nullptr) {
         msg = "Infos_ is nullptr";
-        MMI_HILOGE("%s", msg.c_str());
+        MMI_HILOGE("%{public}s", msg.c_str());
         return RET_ERR;
     }
 
@@ -749,19 +749,19 @@ int32_t InputDisplayBindHelper::SetDisplayBind(int32_t deviceId, int32_t display
             MMI_HILOGI("bindByDevice:%{public}d", bindByDevice.GetInputDeviceId());
         } else {
             msg = "The deviceId is invalid";
-            MMI_HILOGE("%s", msg.c_str());
+            MMI_HILOGE("%{public}s", msg.c_str());
             return RET_ERR;
         }
     }
     if (bindByDisplay.GetDisplayId() == -1) {
         msg = "The displayId is invalid";
-        MMI_HILOGE("%s", msg.c_str());
+        MMI_HILOGE("%{public}s", msg.c_str());
         return RET_ERR;
     }
 
     if (infos_->GetBindDisplayIdByInputDevice(deviceId) == displayId) {
         msg = "The input device and display has alread bind";
-        MMI_HILOGE("%s", msg.c_str());
+        MMI_HILOGE("%{public}s", msg.c_str());
         return RET_ERR;
     }
 
@@ -800,6 +800,7 @@ int32_t InputDisplayBindHelper::SetDisplayBind(int32_t deviceId, int32_t display
     }
 
     msg = "Can not reach here";
+    MMI_HILOGD("InputDisplayBindHelper::%{public}s", msg.c_str());
     return RET_ERR;
 }
 

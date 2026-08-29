@@ -141,10 +141,10 @@ void MouseLocation::OnReplySubscribeMouseLocation(const DSoftbusReplySubscribeMo
     CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(mutex_);
     if (notice.result) {
-        FI_HILOGI("SubscribeMouseLocation of networkId:%{public}s successfully, localNetworkId:%{public}s",
+        FI_HILOGW("SubscribeMouseLocation of networkId:%{public}s successfully, localNetworkId:%{public}s",
             Utility::Anonymize(notice.networkId).c_str(), Utility::Anonymize(notice.remoteNetworkId).c_str());
     } else {
-        FI_HILOGI("SubscribeMouseLocation of networkId:%{public}s failed, localNetworkId:%{public}s",
+        FI_HILOGW("SubscribeMouseLocation of networkId:%{public}s failed, localNetworkId:%{public}s",
             Utility::Anonymize(notice.networkId).c_str(), Utility::Anonymize(notice.remoteNetworkId).c_str());
     }
 }
@@ -154,10 +154,10 @@ void MouseLocation::OnReplyUnSubscribeMouseLocation(const DSoftbusReplyUnSubscri
     CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(mutex_);
     if (notice.result) {
-        FI_HILOGI("UnSubscribeMouseLocation of networkId:%{public}s successfully, localNetworkId:%{public}s",
+        FI_HILOGW("UnSubscribeMouseLocation of networkId:%{public}s successfully, localNetworkId:%{public}s",
             Utility::Anonymize(notice.networkId).c_str(), Utility::Anonymize(notice.remoteNetworkId).c_str());
     } else {
-        FI_HILOGI("UnSubscribeMouseLocation of networkId:%{public}s failed, localNetworkId:%{public}s",
+        FI_HILOGW("UnSubscribeMouseLocation of networkId:%{public}s failed, localNetworkId:%{public}s",
             Utility::Anonymize(notice.networkId).c_str(), Utility::Anonymize(notice.remoteNetworkId).c_str());
     }
 }

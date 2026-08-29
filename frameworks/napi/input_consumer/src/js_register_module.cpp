@@ -967,7 +967,7 @@ napi_value SubscribeKeyCommand(napi_env env, napi_callback_info info, sptr<KeyEv
         MMI_HILOGE("AddEventCallback failed");
         if (event->subscribeId >= 0) {
             InputManager::GetInstance()->UnsubscribeKeyEvent(event->subscribeId);
-            MMI_HILOGI("UnsubscribeKeyEvent due to failure of AddEventCallback");
+            MMI_HILOGW("UnsubscribeKeyEvent due to failure of AddEventCallback");
         }
         return nullptr;
     }

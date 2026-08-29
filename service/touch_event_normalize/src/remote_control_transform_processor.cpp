@@ -64,11 +64,11 @@ std::shared_ptr<PointerEvent> Remote_ControlTransformProcessor::OnEvent(struct l
     pointerEvent_->ClearAxisValue();
     switch (type) {
         case LIBINPUT_EVENT_TOUCH_DOWN: {
-            MMI_HILOGD("Tv Touch event is not Motion");
+            MMI_HILOGD("Tv Touch down event is not Motion, deviceId:%{private}d", deviceId_);
             return pointerEvent_;
         }
         case LIBINPUT_EVENT_TOUCH_UP: {
-            MMI_HILOGD("Tv Touch event is not Motion");
+            MMI_HILOGD("Tv Touch up event is not Motion, deviceId:%{private}d", deviceId_);
             return pointerEvent_;
         }
         case LIBINPUT_EVENT_TOUCH_MOTION: {
@@ -116,11 +116,11 @@ bool Remote_ControlTransformProcessor::OnEventTouchMotion(struct libinput_event*
     }
     double x = touchInfo.point.x;
     double y = touchInfo.point.y;
-    MMI_HILOGD("Change coordinate: x:%.2f, y:%.2f, currentDisplayId:%d",
+    MMI_HILOGD("Change coordinate: x:%{private}.2f, y:%{private}.2f, currentDisplayId:%{public}d",
         x, y, logicalDisplayId);
     WIN_MGR->UpdateAndAdjustMouseLocation(logicalDisplayId, x, y);
     pointerEvent_->SetTargetDisplayId(logicalDisplayId);
-    MMI_HILOGD("Change coordinate: x:%.2f, y:%.2f, currentDisplayId:%d",
+    MMI_HILOGD("Change coordinate: x:%{private}.2f, y:%{private}.2f, currentDisplayId:%{public}d",
         x, y, logicalDisplayId);
 #endif // OHOS_BUILD_ENABLE_WATCH
     return true;
