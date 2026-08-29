@@ -523,7 +523,7 @@ template <class T> void EventLogHelper::PrintEventData(std::shared_ptr<T> event,
     }
 }
 
-void EventLogHelper::PrintEventData(std::shared_ptr<KeyEvent> event, const LogHeader &lh,
+inline void EventLogHelper::PrintEventData(std::shared_ptr<KeyEvent> event, const LogHeader &lh,
     const EventSourceResolver &resolver)
 {
     CHKPV(event);
