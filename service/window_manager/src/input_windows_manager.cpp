@@ -304,7 +304,8 @@ void InputWindowsManager::ReissueCancelTouchEvent(std::shared_ptr<PointerEvent> 
         auto tPointerEvent = std::make_shared<PointerEvent>(*pointerEvent);
         tPointerEvent->SetPointerId(pointerId);
         bool isDragging = extraData_.appended && extraData_.sourceType == PointerEvent::SOURCE_TYPE_TOUCHSCREEN &&
-            (item.GetToolType() == PointerEvent::TOOL_TYPE_FINGER && extraData_.pointerId == pointerId);
+            (item.GetToolType() == PointerEvent::TOOL_TYPE_FINGER && extraData_.pointerId == pointerId) &&
+            IsSameDragUser(pointerEvent->GetTargetDisplayId());
         if (isDragging) {
             tPointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_PULL_CANCEL);
         } else {
@@ -2038,7 +2039,7 @@ void InputWindowsManager::EnsureMouseEventCycle(std::shared_ptr<PointerEvent> ev
     if (event->GetSourceType() != PointerEvent::SOURCE_TYPE_MOUSE) {
         return;
     }
-    if (IsMouseDragging()) {
+    if (IsMouseDragging() && IsSameDragUser(event->GetTargetDisplayId())) {
         return;
     }
     if (!event->HasFlag(InputEvent::EVENT_FLAG_ACCESSIBILITY)) {
@@ -2099,7 +2100,8 @@ void InputWindowsManager::CancelMouseEvent()
         return;
     }
     int32_t action = PointerEvent::POINTER_ACTION_CANCEL;
-    if (extraData_.appended && extraData_.sourceType == PointerEvent::SOURCE_TYPE_MOUSE) {
+    if (extraData_.appended && extraData_.sourceType == PointerEvent::SOURCE_TYPE_MOUSE &&
+        IsSameDragUser(lastPointerEventCopy->GetTargetDisplayId())) {
         action = PointerEvent::POINTER_ACTION_PULL_CANCEL;
     }
     if (lastPointerEventCopy->GetSourceType() == PointerEvent::SOURCE_TYPE_MOUSE &&
@@ -2454,7 +2456,8 @@ void InputWindowsManager::AdjustDisplayRotation(int32_t groupId)
         } else {
             UpdateAndAdjustMouseLocation(cursorPosCur.displayId, coord.x, coord.y);
         }
-        if (extraData_.appended && (extraData_.sourceType == PointerEvent::SOURCE_TYPE_MOUSE)) {
+        if (extraData_.appended && (extraData_.sourceType == PointerEvent::SOURCE_TYPE_MOUSE) &&
+            IsSameDragUser(cursorPosCur.displayId)) {
             AdjustDragPosition(groupId);
         }
         CursorDrawingComponent::GetInstance().UpdateDisplayInfo(*displayInfo);
@@ -2727,7 +2730,8 @@ void InputWindowsManager::PointerDrawingManagerOnDisplayInfo(const OLD::DisplayG
 
 void InputWindowsManager::DispatchPointerCancel(int32_t displayId)
 {
-    if (mouseDownInfo_.id < 0 || (extraData_.appended && (extraData_.sourceType == PointerEvent::SOURCE_TYPE_MOUSE))) {
+    if (mouseDownInfo_.id < 0 || (extraData_.appended &&
+        (extraData_.sourceType == PointerEvent::SOURCE_TYPE_MOUSE) && IsSameDragUser(displayId))) {
         return;
     }
     auto lastPointerEventCopy = GetLastPointerEvent();
@@ -2947,7 +2951,8 @@ void InputWindowsManager::SendPointerEvent(int32_t pointerAction)
     pointerEvent->UpdateId();
     UpdateWindowInfoFlag(lastWindowInfo_.flags, pointerEvent);
     LogTracer lt1(pointerEvent->GetId(), pointerEvent->GetEventType(), pointerEvent->GetPointerAction());
-    if (extraData_.appended && extraData_.sourceType == PointerEvent::SOURCE_TYPE_MOUSE) {
+    if (extraData_.appended && extraData_.sourceType == PointerEvent::SOURCE_TYPE_MOUSE &&
+        IsSameDragUser(pointerEvent->GetTargetDisplayId())) {
         pointerEvent->SetBuffer(extraData_.buffer);
         pointerEvent->SetPullId(extraData_.pullId);
         UpdatePointerAction(pointerEvent);
@@ -3080,7 +3085,8 @@ void InputWindowsManager::DispatchPointer(int32_t pointerAction, int32_t windowI
     pointerEvent->SetActionStartTime(time);
     pointerEvent->SetDeviceId(lastPointerEventCopy->GetDeviceId());
     UpdateWindowInfoFlag(lastWindowInfo_.flags, pointerEvent);
-    if (extraData_.appended && extraData_.sourceType == PointerEvent::SOURCE_TYPE_MOUSE) {
+    if (extraData_.appended && extraData_.sourceType == PointerEvent::SOURCE_TYPE_MOUSE &&
+        IsSameDragUser(pointerEvent->GetTargetDisplayId())) {
         pointerEvent->SetBuffer(extraData_.buffer);
         pointerEvent->SetPullId(extraData_.pullId);
         UpdatePointerAction(pointerEvent);
@@ -3676,7 +3682,8 @@ void InputWindowsManager::TriggerTouchUpOnInvalidAreaEntry(int32_t pointerId)
         pointerEvent->SetOriginPointerAction(originAction);
         int32_t action = PointerEvent::POINTER_ACTION_UP;
         bool isDragging = extraData_.appended && extraData_.sourceType == PointerEvent::SOURCE_TYPE_TOUCHSCREEN &&
-                          (item.GetToolType() == PointerEvent::TOOL_TYPE_FINGER && extraData_.pointerId == pointerId);
+                          (item.GetToolType() == PointerEvent::TOOL_TYPE_FINGER && extraData_.pointerId == pointerId) &&
+                          IsSameDragUser(pointerEvent->GetTargetDisplayId());
         if (isDragging) {
             action = PointerEvent::POINTER_ACTION_PULL_UP;
         }
@@ -4441,7 +4448,8 @@ std::optional<WindowInfo> InputWindowsManager::SelectWindowInfo(int32_t logicalX
         : (firstBtnDownWindowInfo.first == -1) ||
         ((action == PointerEvent::POINTER_ACTION_BUTTON_DOWN) && (pointerEvent->GetPressedButtons().size() <= 1)) ||
         ((action == PointerEvent::POINTER_ACTION_MOVE) && (pointerEvent->GetPressedButtons().empty())) ||
-        (extraData_.appended && extraData_.sourceType == PointerEvent::SOURCE_TYPE_MOUSE) ||
+        (extraData_.appended && extraData_.sourceType == PointerEvent::SOURCE_TYPE_MOUSE &&
+            IsSameDragUser(pointerEvent->GetTargetDisplayId())) ||
         (action == PointerEvent::POINTER_ACTION_PULL_UP) ||
         ((action == PointerEvent::POINTER_ACTION_AXIS_BEGIN || action == PointerEvent::POINTER_ACTION_ROTATE_BEGIN) &&
         (pointerEvent->GetPressedButtons().empty())) || (action == PointerEvent::POINTER_ACTION_TOUCHPAD_ACTIVE);
@@ -4482,7 +4490,8 @@ std::optional<WindowInfo> InputWindowsManager::SelectWindowInfo(int32_t logicalX
             if (IsAccessibilityEventWithZorderInjected(pointerEvent) && pointerEvent->GetZOrder() <= item.zOrder) {
                 winId2ZorderMap.insert({item.id, item.zOrder});
                 continue;
-            } else if ((extraData_.appended && extraData_.sourceType == PointerEvent::SOURCE_TYPE_MOUSE) ||
+            } else if ((extraData_.appended && extraData_.sourceType == PointerEvent::SOURCE_TYPE_MOUSE &&
+                IsSameDragUser(pointerEvent->GetTargetDisplayId())) ||
                 (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_PULL_UP)) {
                 if (IsInHotArea(logicalX, logicalY, item.pointerHotAreas, item)) {
                     if ((item.flags & WindowInputPolicy::FLAG_DRAG_DISABLED) == WindowInputPolicy::FLAG_DRAG_DISABLED) {
@@ -5346,7 +5355,8 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
     pointerItem.SetGlobalX(logicalX);
     pointerItem.SetGlobalY(logicalY);
     pointerEvent->UpdatePointerItem(pointerId, pointerItem);
-    if ((extraData_.appended && (extraData_.sourceType == PointerEvent::SOURCE_TYPE_MOUSE)) ||
+    if ((extraData_.appended && (extraData_.sourceType == PointerEvent::SOURCE_TYPE_MOUSE) &&
+        IsSameDragUser(pointerEvent->GetTargetDisplayId())) ||
         (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_PULL_UP)) {
         pointerEvent->SetBuffer(extraData_.buffer);
         pointerEvent->SetPullId(extraData_.pullId);
@@ -6084,7 +6094,7 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
     bool isFollowFirstTouch = IsFollowFirstTouchWindow(pointerEvent, pointerItem);
     bool isExtraData = extraData_.appended && extraData_.sourceType == PointerEvent::SOURCE_TYPE_TOUCHSCREEN &&
         ((pointerItem.GetToolType() == PointerEvent::TOOL_TYPE_FINGER && extraData_.pointerId == pointerId) ||
-        pointerItem.GetToolType() == PointerEvent::TOOL_TYPE_PEN);
+        pointerItem.GetToolType() == PointerEvent::TOOL_TYPE_PEN) && IsSameDragUser(pointerEvent->GetTargetDisplayId());
     for (auto &item : windowsInfo) {
         if (isFollowFirstTouch) {
             if (IsFindFirstTouchFlagWindow(item, pointerEvent)) {
@@ -6419,7 +6429,8 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
                     extraData_.sourceType == PointerEvent::SOURCE_TYPE_TOUCHSCREEN &&
                     ((pointerItem.GetToolType() == PointerEvent::TOOL_TYPE_FINGER &&
                     extraData_.pointerId == pointerId) ||
-                    pointerItem.GetToolType() == PointerEvent::TOOL_TYPE_PEN);
+                    pointerItem.GetToolType() == PointerEvent::TOOL_TYPE_PEN) &&
+                    IsSameDragUser(pointerEvent->GetTargetDisplayId());
                 checkExtraData = checkExtraData ||
                     (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_PULL_UP);
                 if ((!checkExtraData) && (!(extraData_.appended &&
@@ -6487,7 +6498,7 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
     }
     bool checkExtraData = extraData_.appended && extraData_.sourceType == PointerEvent::SOURCE_TYPE_TOUCHSCREEN &&
         ((pointerItem.GetToolType() == PointerEvent::TOOL_TYPE_FINGER && extraData_.pointerId == pointerId) ||
-        pointerItem.GetToolType() == PointerEvent::TOOL_TYPE_PEN);
+        pointerItem.GetToolType() == PointerEvent::TOOL_TYPE_PEN) && IsSameDragUser(pointerEvent->GetTargetDisplayId());
     checkExtraData = checkExtraData || (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_PULL_UP);
     int32_t pointerAction = pointerEvent->GetPointerAction();
     if ((pointerAction == PointerEvent::POINTER_ACTION_DOWN) && !checkExtraData) {
@@ -6599,7 +6610,8 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
     } else if (POINTER_DEV_MGR.mouseDisplayState &&
         (cursorGroupId < 0 || cursorGroupId == groupId)) {
         if ((!checkExtraData) && (!(extraData_.appended &&
-            extraData_.sourceType == PointerEvent::SOURCE_TYPE_MOUSE))) {
+            extraData_.sourceType == PointerEvent::SOURCE_TYPE_MOUSE &&
+            IsSameDragUser(pointerEvent->GetTargetDisplayId())))) {
             MMI_HILOG_DISPATCHD("PointerAction is to leave the window");
             if (!pointerEvent->HasFlag(InputEvent::EVENT_FLAG_SHOW_CUSOR_WITH_TOUCH) && timerId_ == DEFAULT_VALUE) {
                 timerId_ = TimerMgr->AddTimer(REPEAT_COOLING_TIME, REPEAT_ONCE, [this, gestureInject]() {
@@ -8027,6 +8039,7 @@ int32_t InputWindowsManager::AppendExtraData(const ExtraData& extraData)
     extraData_.pullId = extraData.pullId;
     extraData_.eventId = extraData.eventId;
     extraData_.drawCursor = extraData.drawCursor;
+    extraData_.userId = extraData.userId;
     if (!extraData_.appended) {
         activeDragToolType_ = -1;
     }
@@ -8050,6 +8063,7 @@ void InputWindowsManager::ClearExtraData()
     extraData_.pullId = -1;
     extraData_.eventId = -1;
     extraData_.drawCursor = false;
+    extraData_.userId = -1;
     activeDragToolType_ = -1;
 }
 
@@ -8094,6 +8108,18 @@ bool InputWindowsManager::ShouldTransformAction(int32_t sourceType, int32_t tool
         return false;
     }
     return true;
+}
+
+bool InputWindowsManager::IsSameDragUser(int32_t displayId) const
+{
+    if (extraData_.userId < 0) {
+        return true;
+    }
+    int32_t eventUserId = FindDisplayUserId(displayId);
+    if (eventUserId < 0) {
+        return true;
+    }
+    return extraData_.userId == eventUserId;
 }
 
 void InputWindowsManager::UpdatePointerAction(std::shared_ptr<PointerEvent> pointerEvent)
@@ -9402,7 +9428,8 @@ void InputWindowsManager::CancelAllTouches(std::shared_ptr<PointerEvent> event, 
         int32_t pointerId = item.GetPointerId();
         int32_t action = PointerEvent::POINTER_ACTION_CANCEL;
         bool isDragging = extraData_.appended && extraData_.sourceType == PointerEvent::SOURCE_TYPE_TOUCHSCREEN &&
-                          (item.GetToolType() == PointerEvent::TOOL_TYPE_FINGER && extraData_.pointerId == pointerId);
+                          (item.GetToolType() == PointerEvent::TOOL_TYPE_FINGER && extraData_.pointerId == pointerId) &&
+                          IsSameDragUser(event->GetTargetDisplayId());
         if (isDragging) {
             action = PointerEvent::POINTER_ACTION_PULL_CANCEL;
         }
