@@ -15,6 +15,7 @@
 
 #include "input_device_manager.h"
 
+#include <charconv>
 #include <linux/input.h>
 #include <filesystem>
 #include <iomanip>
@@ -921,7 +922,14 @@ int32_t InputDeviceManager::ParseDeviceId(struct libinput_device *inputDevice)
     std::string strName(sysName);
     if (std::regex_match(strName, mr, pattern)) {
         if (mr.ready() && mr.size() == EXPECTED_N_SUBMATCHES) {
-            return std::stoi(mr[EXPECTED_SUBMATCH].str());
+            const std::string deviceIdText = mr[EXPECTED_SUBMATCH].str();
+            int32_t deviceId = RET_ERR;
+            const char *begin = deviceIdText.data();
+            const char *end = begin + deviceIdText.size();
+            auto parsed = std::from_chars(begin, end, deviceId);
+            if (parsed.ec == std::errc{} && parsed.ptr == end) {
+                return deviceId;
+            }
         }
     }
     std::string errStr = "Parsing strName failed: \'" + strName + "\'";
