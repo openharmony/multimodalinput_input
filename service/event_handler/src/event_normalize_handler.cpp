@@ -15,6 +15,7 @@
 
 #include "event_normalize_handler.h"
 
+#include <charconv>
 #include <unordered_set>
 
 #include "bytrace_adapter.h"
@@ -1307,11 +1308,16 @@ bool EventNormalizeHandler::InitSwipeInwardEdge(std::shared_ptr<PointerEvent> po
     auto touchPadDevice = libinput_event_get_device(event);
     // product isolation
     uint32_t touchPadDeviceId = libinput_device_get_id_product(touchPadDevice);
+    uint32_t touchPadType = 0;
+    const char *begin = TOUCHPAD_TYPE.data();
+    const char *end = begin + TOUCHPAD_TYPE.size();
+    auto parsed = std::from_chars(begin, end, touchPadType);
+    bool touchPadTypeEnabled = parsed.ec == std::errc{} && parsed.ptr == end &&
+        (touchPadType & TOUCHPAD_FEATURE_SWIPEINWARD) == TOUCHPAD_FEATURE_SWIPEINWARD;
     if (touchPadDeviceId != TABLET_PRODUCT_DEVICE_ID &&
         touchPadDeviceId != BLE_PRODUCT_DEVICE_ID &&
         touchPadDeviceId != PHONE_PRODUCT_DEVICE_ID &&
-        IsNumeric(TOUCHPAD_TYPE) &&
-        (std::stoul(TOUCHPAD_TYPE) & TOUCHPAD_FEATURE_SWIPEINWARD) != TOUCHPAD_FEATURE_SWIPEINWARD) {
+        IsNumeric(TOUCHPAD_TYPE) && !touchPadTypeEnabled) {
         MMI_HILOGI("SwipeInward failed: product isolated, productId:%{public}u, "
             "touchpadType:%{public}s", touchPadDeviceId, TOUCHPAD_TYPE.c_str());
         return true;
