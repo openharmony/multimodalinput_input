@@ -179,26 +179,20 @@ private:
         const std::vector<KeyEvent::KeyItem> &eventItems, const EventSourceResolver &resolver,
         const LogHeader &lh)
     {
-        std::string publicItems;
-        std::string privateItems;
+        std::string items;
         for (const auto &item : eventItems) {
+            bool isPrivacyKey = event->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE) ||
+                IsEnterableKey(item.GetKeyCode());
+            std::string keyStr = isPrivacyKey ? "<private>" : std::to_string(item.GetKeyCode());
             std::string itemStr = "DN:" + std::to_string(item.GetDeviceId()) +
-                ", KC:" + std::to_string(item.GetKeyCode()) +
+                ", KC:" + keyStr +
                 ", DT:" + std::to_string(item.GetDownTime()) +
                 ", IP:" + std::to_string(item.IsPressed() ? 1 : 0) +
                 GetEventSourceSuffix(resolver, item.GetDeviceId());
-            if (!event->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE) &&
-                !IsEnterableKey(item.GetKeyCode())) {
-                publicItems += (publicItems.empty() ? "" : "; ") + itemStr;
-            } else {
-                privateItems += (privateItems.empty() ? "" : "; ") + itemStr;
-            }
+            items += (items.empty() ? "" : "; ") + itemStr;
         }
-        if (!publicItems.empty()) {
-            MMI_HILOG_HEADER(LOG_INFO, lh, "%{public}s", publicItems.c_str());
-        }
-        if (!privateItems.empty()) {
-            MMI_HILOG_HEADER(LOG_INFO, lh, "%{private}s", privateItems.c_str());
+        if (!items.empty()) {
+            MMI_HILOG_HEADER(LOG_INFO, lh, "%{public}s", items.c_str());
         }
     }
 
@@ -241,27 +235,22 @@ private:
         const std::vector<KeyEvent::KeyItem> &eventItems, const EventSourceResolver &resolver,
         const LogHeader &lh)
     {
-        std::string publicItems;
-        std::string privateItems;
+        std::string items;
         for (const auto &item : eventItems) {
+            bool isPrivacyKey = event->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE) ||
+                IsEnterableKey(item.GetKeyCode());
+            std::string keyStr = isPrivacyKey ? "<private>" : std::to_string(item.GetKeyCode());
+            std::string guStr = isPrivacyKey ? "<private>" : std::to_string(item.GetUnicode());
             std::string itemStr = "DN:" + std::to_string(item.GetDeviceId()) +
-                ", KC:" + std::to_string(item.GetKeyCode()) +
+                ", KC:" + keyStr +
                 ", DT:" + std::to_string(item.GetDownTime()) +
                 ", IP:" + std::to_string(item.IsPressed() ? 1 : 0) +
-                ", GU:" + std::to_string(item.GetUnicode()) +
+                ", GU:" + guStr +
                 GetEventSourceSuffix(resolver, item.GetDeviceId());
-            if (!event->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE) &&
-                !IsEnterableKey(item.GetKeyCode())) {
-                publicItems += (publicItems.empty() ? "" : "; ") + itemStr;
-            } else {
-                privateItems += (privateItems.empty() ? "" : "; ") + itemStr;
-            }
+            items += (items.empty() ? "" : "; ") + itemStr;
         }
-        if (!publicItems.empty()) {
-            MMI_HILOG_HEADER(LOG_INFO, lh, "%{public}s", publicItems.c_str());
-        }
-        if (!privateItems.empty()) {
-            MMI_HILOG_HEADER(LOG_INFO, lh, "%{private}s", privateItems.c_str());
+        if (!items.empty()) {
+            MMI_HILOG_HEADER(LOG_INFO, lh, "%{public}s", items.c_str());
         }
     }
 
