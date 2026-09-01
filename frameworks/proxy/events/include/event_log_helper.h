@@ -179,22 +179,26 @@ private:
         const std::vector<KeyEvent::KeyItem> &eventItems, const EventSourceResolver &resolver,
         const LogHeader &lh)
     {
+        std::string publicItems;
+        std::string privateItems;
         for (const auto &item : eventItems) {
-            std::string sourceSuffix = GetEventSourceSuffix(resolver, item.GetDeviceId());
-            if (!IsBetaVersion()) {
-                MMI_HILOG_HEADER(LOG_INFO, lh, "DN:%{public}d" PRId64
-                ", IP:%{public}d,%{public}s", item.GetDeviceId(), item.IsPressed(), sourceSuffix.c_str());
+            std::string itemStr = "DN:" + std::to_string(item.GetDeviceId()) +
+                ", KC:" + std::to_string(item.GetKeyCode()) +
+                ", DT:" + std::to_string(item.GetDownTime()) +
+                ", IP:" + std::to_string(item.IsPressed() ? 1 : 0) +
+                GetEventSourceSuffix(resolver, item.GetDeviceId());
+            if (!event->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE) &&
+                !IsEnterableKey(item.GetKeyCode())) {
+                publicItems += (publicItems.empty() ? "" : "; ") + itemStr;
             } else {
-                if (event->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE)) {
-                    MMI_HILOG_HEADER(LOG_INFO, lh, "DN:%{public}d, KC:%{private}d, DT:%{public}" PRId64
-                    ", IP:%{public}d,%{public}s", item.GetDeviceId(), item.GetKeyCode(), item.GetDownTime(),
-                    item.IsPressed(), sourceSuffix.c_str());
-                } else {
-                    MMI_HILOG_HEADER(LOG_INFO, lh, "DN:%{public}d, KC:%{private}d, DT:%{public}" PRId64
-                    ", IP:%{public}d,%{public}s", item.GetDeviceId(), item.GetKeyCode(), item.GetDownTime(),
-                    item.IsPressed(), sourceSuffix.c_str());
-                }
+                privateItems += (privateItems.empty() ? "" : "; ") + itemStr;
             }
+        }
+        if (!publicItems.empty()) {
+            MMI_HILOG_HEADER(LOG_INFO, lh, "%{public}s", publicItems.c_str());
+        }
+        if (!privateItems.empty()) {
+            MMI_HILOG_HEADER(LOG_INFO, lh, "%{private}s", privateItems.c_str());
         }
     }
 
@@ -204,19 +208,6 @@ private:
         std::vector<KeyEvent::KeyItem> eventItems{ event->GetKeyItems() };
         PrintKeyEventInfoHead(event, eventItems, lh);
         PrintKeyItemsInfoLog(event, eventItems, resolver, lh);
-        std::vector<int32_t> pressedKeys = event->GetPressedKeys();
-        std::vector<int32_t>::const_iterator cItr = pressedKeys.cbegin();
-        if (cItr != pressedKeys.cend()) {
-            std::string tmpStr = "Pressed KC: [" + std::to_string(*(cItr++));
-            for (; cItr != pressedKeys.cend(); ++cItr) {
-                tmpStr += ("," + std::to_string(*cItr));
-            }
-            if (IsBetaVersion()) {
-                if (!event->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE)) {
-                    MMI_HILOG_HEADER(LOG_INFO, lh, "%{public}s]", tmpStr.c_str());
-                }
-            }
-        }
     }
 
     static void PrintKeyEventDebugHead(const std::shared_ptr<KeyEvent> event,
@@ -250,21 +241,27 @@ private:
         const std::vector<KeyEvent::KeyItem> &eventItems, const EventSourceResolver &resolver,
         const LogHeader &lh)
     {
+        std::string publicItems;
+        std::string privateItems;
         for (const auto &item : eventItems) {
-            std::string sourceSuffix = GetEventSourceSuffix(resolver, item.GetDeviceId());
-            if (!IsBetaVersion()) {
-                MMI_HILOG_HEADER(LOG_INFO, lh, "DN:%{public}d, IP:%{public}d%{public}s",
-                    item.GetDeviceId(), item.IsPressed(), sourceSuffix.c_str());
+            std::string itemStr = "DN:" + std::to_string(item.GetDeviceId()) +
+                ", KC:" + std::to_string(item.GetKeyCode()) +
+                ", DT:" + std::to_string(item.GetDownTime()) +
+                ", IP:" + std::to_string(item.IsPressed() ? 1 : 0) +
+                ", GU:" + std::to_string(item.GetUnicode()) +
+                GetEventSourceSuffix(resolver, item.GetDeviceId());
+            if (!event->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE) &&
+                !IsEnterableKey(item.GetKeyCode())) {
+                publicItems += (publicItems.empty() ? "" : "; ") + itemStr;
             } else {
-                if (event->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE)) {
-                    MMI_HILOG_HEADER(LOG_INFO, lh, "DN:%{public}d, IP:%{public}d%{public}s",
-                        item.GetDeviceId(), item.IsPressed(), sourceSuffix.c_str());
-                } else {
-                    MMI_HILOG_HEADER(LOG_INFO, lh, "DN:%{public}d, KC:%{private}d, DT:%{public}" PRId64 ","
-                        "IP:%{public}d, GU:%{public}d%{public}s", item.GetDeviceId(), item.GetKeyCode(),
-                        item.GetDownTime(), item.IsPressed(), item.GetUnicode(), sourceSuffix.c_str());
-                }
+                privateItems += (privateItems.empty() ? "" : "; ") + itemStr;
             }
+        }
+        if (!publicItems.empty()) {
+            MMI_HILOG_HEADER(LOG_INFO, lh, "%{public}s", publicItems.c_str());
+        }
+        if (!privateItems.empty()) {
+            MMI_HILOG_HEADER(LOG_INFO, lh, "%{private}s", privateItems.c_str());
         }
     }
 
@@ -279,19 +276,6 @@ private:
         bool isJudgeMode = IsEnterableKey(event->GetKeyCode());
         PrintKeyEventDebugHead(event, eventItems, isJudgeMode, lh);
         PrintKeyItemsDebugLog(event, eventItems, resolver, lh);
-        std::vector<int32_t> pressedKeys = event->GetPressedKeys();
-        std::vector<int32_t>::const_iterator cItr = pressedKeys.cbegin();
-        if (cItr != pressedKeys.cend()) {
-            std::string tmpStr = "Pressed keyCode: [" + std::to_string(*(cItr++));
-            for (; cItr != pressedKeys.cend(); ++cItr) {
-                tmpStr += ("," + std::to_string(*cItr));
-            }
-            if (IsBetaVersion()) {
-                if (!isJudgeMode || !event->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE)) {
-                        MMI_HILOG_HEADER(LOG_INFO, lh, "%{private}s]", tmpStr.c_str());
-                }
-            }
-        }
     }
 
     __attribute__((no_sanitize("cfi")))
