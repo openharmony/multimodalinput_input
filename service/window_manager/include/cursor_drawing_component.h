@@ -180,7 +180,6 @@ public:
 
 private:
     int32_t GetCurrentUser();
-    bool IsPointerVisibleInner();
 
     std::map<MOUSE_ICON, IconStyle> mouseIcons_;
     std::list<PidInfo> pidInfos_;
