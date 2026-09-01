@@ -17790,5 +17790,61 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_HandleKeyEventWindowId
     EXPECT_NO_FATAL_FAILURE(inputWindowsMgr.HandleKeyEventWindowId(keyEvent));
     EXPECT_EQ(keyEvent->GetTargetDisplayId(), 2);
 }
+
+/**
+ * @tc.name: InputWindowsManagerTest_AppendExtraData_UserId
+ * @tc.desc: AppendExtraData stores userId; ClearExtraData resets it to -1.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_AppendExtraData_UserId, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager manager;
+    ExtraData extraData;
+    extraData.appended = true;
+    extraData.sourceType = PointerEvent::SOURCE_TYPE_TOUCHSCREEN;
+    extraData.pointerId = 1;
+    extraData.pullId = 1;
+    extraData.userId = 100;
+    ASSERT_EQ(manager.AppendExtraData(extraData), RET_OK);
+    EXPECT_EQ(manager.GetExtraData().userId, 100);
+    manager.ClearExtraData();
+    EXPECT_EQ(manager.GetExtraData().userId, -1);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_IsSameDragUser_001
+ * @tc.desc: IsSameDragUser matches display user against drag user; unknown ids fall back to true.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsSameDragUser_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager manager;
+
+    // No drag user registered (-1) → always true.
+    manager.extraData_.userId = -1;
+    EXPECT_TRUE(manager.IsSameDragUser(77));
+
+    // Drag user set, display unknown to WIN_MGR → FindDisplayUserId fails → fallback true.
+    manager.extraData_.userId = 100;
+    EXPECT_TRUE(manager.IsSameDragUser(999));
+
+    // Drag user set, display resolves to another user → false.
+    OLD::DisplayGroupInfo groupInfo;
+    groupInfo.groupId = 3;
+    groupInfo.currentUserId = 101;
+    OLD::DisplayInfo displayInfo;
+    displayInfo.id = 77;
+    groupInfo.displaysInfo.push_back(displayInfo);
+    manager.displayGroupInfoMap_[3] = groupInfo;
+    EXPECT_FALSE(manager.IsSameDragUser(77));
+
+    // Display resolves to the same user → true.
+    manager.displayGroupInfoMap_[3].currentUserId = 100;
+    EXPECT_TRUE(manager.IsSameDragUser(77));
+}
 } // namespace MMI
 } // namespace OHOS

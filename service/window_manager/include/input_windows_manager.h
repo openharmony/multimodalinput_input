@@ -309,6 +309,7 @@ private:
     void UpdateDisplayIdAndName();
     void UpdateCustomStyle(int32_t windowId, PointerStyle pointerStyle);
     bool ShouldTransformAction(int32_t sourceType, int32_t toolType);
+    bool IsSameDragUser(int32_t displayId) const;
     void UpdatePointerAction(std::shared_ptr<PointerEvent> pointerEvent);
     bool IsNeedDrawPointer(PointerEvent::PointerItem &pointerItem) const;
     bool IsWritePen(PointerEvent::PointerItem &pointerItem) const;

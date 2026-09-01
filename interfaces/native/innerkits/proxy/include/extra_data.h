@@ -70,6 +70,12 @@ struct ExtraData : public Parcelable {
      * @since 13
      */
     bool drawCursor { false };
+    /*
+     * 拖拽发起方所属用户id，用于多用户多屏场景区分拖拽归属
+     *
+     * @since 26
+     */
+    int32_t userId { -1 };
 
     static bool UnmarshalVector(Parcel &parcel, std::vector<uint8_t> &buffer)
     {
@@ -100,7 +106,8 @@ struct ExtraData : public Parcelable {
             parcel.ReadInt32(pointerId) &&
             parcel.ReadInt32(pullId) &&
             parcel.ReadInt32(eventId) &&
-            parcel.ReadBool(drawCursor)
+            parcel.ReadBool(drawCursor) &&
+            parcel.ReadInt32(userId)
         );
     }
 
@@ -130,6 +137,9 @@ struct ExtraData : public Parcelable {
             return false;
         }
         if (!parcel.WriteBool(drawCursor)) {
+            return false;
+        }
+        if (!parcel.WriteInt32(userId)) {
             return false;
         }
         return true;
