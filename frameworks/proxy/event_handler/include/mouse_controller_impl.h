@@ -49,7 +49,6 @@ private:
     struct {
         bool inProgress = false;
         int32_t axisType = -1;
-        int32_t lastValue = 0;
     } axisState_;
 
     struct {
