@@ -471,7 +471,8 @@ HWTEST_F(TriggerEventDispatcherTest, TriggerEventDispatcher_ShouldDispatch_REPEA
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(TriggerEventDispatcherTest, TriggerEventDispatcher_ShouldConsume_ALL_RELEASED_NotActivated_001, TestSize.Level1)
+HWTEST_F(TriggerEventDispatcherTest,
+    TriggerEventDispatcher_ShouldConsume_ALL_RELEASED_NotActivated_001, TestSize.Level1)
 {
     auto keyOption = std::make_shared<KeyOption>();
     keyOption->SetFinalKey(KeyEvent::KEYCODE_L);
