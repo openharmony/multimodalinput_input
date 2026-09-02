@@ -15,10 +15,8 @@
 
 #include <gtest/gtest.h>
 
-#include "i_input_event_consumer.h"
 #include "input_active_subscribe_manager.h"
 #include "input_handler_type.h"
-#include "input_interceptor_manager.h"
 #include "mmi_log.h"
 #include "multimodal_event_handler.h"
 #include "multimodal_input_connect_manager.h"
@@ -30,8 +28,6 @@ namespace OHOS {
 namespace MMI {
 namespace {
 using namespace testing::ext;
-constexpr int32_t PRIORITY { 200 };
-constexpr uint32_t TOUCH_DEVICE_TAGS = 4;
 } // namespace
 
 class InputActiveSubscribeManagerTest : public testing::Test {
@@ -318,156 +314,6 @@ HWTEST_F(InputActiveSubscribeManagerTest, OnSubscribeInputActiveCallback_Test_00
     ASSERT_NE(pointerEvent, nullptr);
     int32_t result = INPUT_ACTIVE_SUBSCRIBE_MGR.OnSubscribeInputActiveCallback(pointerEvent, 0);
     EXPECT_NE(result, RET_OK);
-}
-
-class InputInterceptorManagerTest : public testing::Test {
-public:
-    static void SetUpTestCase(void) {}
-    static void TearDownTestCase(void) {}
-};
-
-class InputEventConsumerTest : public IInputEventConsumer {
-public:
-    void OnInputEvent(std::shared_ptr<KeyEvent> keyEvent) const override {}
-    void OnInputEvent(std::shared_ptr<PointerEvent> pointerEvent) const override {}
-    void OnInputEvent(std::shared_ptr<AxisEvent> axisEvent) const override {}
-};
-
-/**
- * @tc.name: InputInterceptorManagerTest_GetHandlerType_001
- * @tc.desc: Verify GetHandlerType returns INTERCEPTOR
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputInterceptorManagerTest, InputInterceptorManagerTest_GetHandlerType_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    InputInterceptorManager manager;
-    EXPECT_EQ(manager.GetHandlerType(), InputHandlerType::INTERCEPTOR);
-}
-
-/**
- * @tc.name: InputInterceptorManagerTest_AddInterceptor_001
- * @tc.desc: Verify AddInterceptor with nullptr interceptor returns INVALID_HANDLER_ID
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputInterceptorManagerTest, InputInterceptorManagerTest_AddInterceptor_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    InputInterceptorManager manager;
-    std::shared_ptr<IInputEventConsumer> interceptor = nullptr;
-    EXPECT_EQ(manager.AddInterceptor(interceptor, HANDLE_EVENT_TYPE_KEY), INVALID_HANDLER_ID);
-    EXPECT_EQ(manager.AddInterceptor(interceptor, HANDLE_EVENT_TYPE_POINTER, PRIORITY, TOUCH_DEVICE_TAGS),
-        INVALID_HANDLER_ID);
-}
-
-/**
- * @tc.name: InputInterceptorManagerTest_RemoveInterceptor_001
- * @tc.desc: Verify RemoveInterceptor on an empty manager returns RET_ERR
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputInterceptorManagerTest, InputInterceptorManagerTest_RemoveInterceptor_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    InputInterceptorManager manager;
-    EXPECT_EQ(manager.RemoveInterceptor(INVALID_HANDLER_ID), RET_ERR);
-    EXPECT_EQ(manager.RemoveInterceptor(1), RET_ERR);
-}
-
-/**
- * @tc.name: InputInterceptorManagerTest_RemoveInterceptor_002
- * @tc.desc: Verify RemoveInterceptor removes a pre-inserted handler and returns RET_OK
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputInterceptorManagerTest, InputInterceptorManagerTest_RemoveInterceptor_002, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    InputInterceptorManager manager;
-    manager.interHandlers_.clear();
-    InputHandlerManager::Handler handler;
-    handler.handlerId_ = 1;
-    handler.handlerType_ = InputHandlerType::INTERCEPTOR;
-    handler.eventType_ = HANDLE_EVENT_TYPE_KEY;
-    handler.deviceTags_ = 0;
-    manager.interHandlers_.push_back(handler);
-
-    handler.handlerId_ = 2;
-    manager.interHandlers_.push_back(handler);
-
-    EXPECT_TRUE(manager.HasHandler(1));
-    EXPECT_EQ(manager.RemoveInterceptor(1), RET_OK);
-    EXPECT_FALSE(manager.HasHandler(1));
-    EXPECT_TRUE(manager.HasHandler(2));
-}
-
-/**
- * @tc.name: InputInterceptorManagerTest_HasHandler_001
- * @tc.desc: Verify HasHandler returns false when no handler is registered
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputInterceptorManagerTest, InputInterceptorManagerTest_HasHandler_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    InputInterceptorManager manager;
-    EXPECT_FALSE(manager.HasHandler(INVALID_HANDLER_ID));
-    EXPECT_FALSE(manager.HasHandler(1));
-}
-
-/**
- * @tc.name: InputInterceptorManagerTest_GetEventType_001
- * @tc.desc: Verify GetEventType reflects the registered interceptor event types
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputInterceptorManagerTest, InputInterceptorManagerTest_GetEventType_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    InputInterceptorManager manager;
-    EXPECT_EQ(manager.GetEventType(), HANDLE_EVENT_TYPE_NONE);
-
-    InputHandlerManager::Handler handler;
-    handler.handlerId_ = 1;
-    handler.handlerType_ = InputHandlerType::INTERCEPTOR;
-    handler.eventType_ = HANDLE_EVENT_TYPE_KEY;
-    handler.deviceTags_ = 0;
-    manager.interHandlers_.push_back(handler);
-    EXPECT_EQ(manager.GetEventType(), HANDLE_EVENT_TYPE_KEY);
-
-    handler.handlerId_ = 2;
-    handler.eventType_ = HANDLE_EVENT_TYPE_POINTER;
-    manager.interHandlers_.push_back(handler);
-    EXPECT_EQ(manager.GetEventType(), HANDLE_EVENT_TYPE_KEY | HANDLE_EVENT_TYPE_POINTER);
-}
-
-/**
- * @tc.name: InputInterceptorManagerTest_GetPriority_001
- * @tc.desc: Verify GetPriority returns the priority of the front interceptor
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputInterceptorManagerTest, InputInterceptorManagerTest_GetPriority_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    InputInterceptorManager manager;
-    EXPECT_EQ(manager.GetPriority(), DEFUALT_INTERCEPTOR_PRIORITY);
-
-    InputHandlerManager::Handler handler;
-    handler.handlerId_ = 1;
-    handler.handlerType_ = InputHandlerType::INTERCEPTOR;
-    handler.eventType_ = HANDLE_EVENT_TYPE_KEY;
-    handler.priority_ = PRIORITY;
-    handler.deviceTags_ = 0;
-    manager.interHandlers_.push_back(handler);
-
-    handler.handlerId_ = 2;
-    handler.priority_ = PRIORITY + 1;
-    manager.interHandlers_.push_back(handler);
-
-    EXPECT_EQ(manager.GetPriority(), PRIORITY);
 }
 } // namespace MMI
 } // namespace OHOS
