@@ -262,6 +262,7 @@ int32_t MouseControllerImpl::BeginAxis(int32_t axis, int32_t value)
         if (pointerEvent == nullptr) {
             MMI_HILOGE("Failed to create pointer event");
             axisState_.inProgress = false;
+            axisState_.axisType = -1;
             return RET_ERR;
         }
 
