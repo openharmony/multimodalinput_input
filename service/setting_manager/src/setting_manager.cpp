@@ -108,8 +108,6 @@ void SettingManager::Initialize()
             {FIELD_KEYBOARD_REPEAT_RATE_DELAY, KEYBOARD_REPEATDELAY_DEFAULT}}};
 
     defaultSettingData_ = SettingData({mouseItem, touchpadItem, keyboardItem});
-
-    GetFfrtHandler();
 }
 
 void SettingManager::OnDataShareReady()
@@ -120,6 +118,10 @@ void SettingManager::OnDataShareReady()
         return;
     }
     auto ffrtHandler = GetFfrtHandler();
+    if (ffrtHandler == nullptr) {
+        MMI_HILOGI("OnDataShareReady process failed, ffrtHandler is null");
+        return;
+    }
     ffrtHandler->submit([this] {
         flushFlag_.store(true);
         int32_t userId = ACCOUNT_MGR->QueryCurrentAccountId();
@@ -152,6 +154,10 @@ void SettingManager::OnSwitchUser(int32_t userId)
         return;
     }
     auto ffrtHandler = GetFfrtHandler();
+    if (ffrtHandler == nullptr) {
+        MMI_HILOGI("OnSwitchUser process failed, ffrtHandler is null, id:%{private}d", userId);
+        return;
+    }
     ffrtHandler->submit([this, userId] {
         MMI_HILOGI("Run task on switch, id:%{private}d", userId);
         MarkUserConfigLoading(userId);
@@ -183,14 +189,15 @@ void SettingManager::OnSwitchUser(int32_t userId)
 
 bool SettingManager::CheckAddUser(int32_t userId)
 {
-    if (cacheSettingMap_.find(userId) == cacheSettingMap_.end()) {
-        MMI_HILOGI("Can not find id:%{private}d in cache", userId);
-        return false;
-    }
     SettingData data;
     {
-        std::lock_guard<std::mutex> cacheGuard(cacheMapMutex_);
-        data = cacheSettingMap_[userId];
+        std::lock_guard<std::mutex> guard(cacheMapMutex_);
+        auto iter = cacheSettingMap_.find(userId);
+        if (iter == cacheSettingMap_.end()) {
+            MMI_HILOGI("Can not find id:%{private}d in cache", userId);
+            return false;
+        }
+        data = iter->second;
     }
     if (!data.GetAddFlag()) {
         MMI_HILOGI("Not new id:%{private}d", userId);
@@ -214,6 +221,10 @@ void SettingManager::OnAddUser(int32_t userId)
     MMI_HILOGI("In add, id:%{private}d", userId);
     if (databaseReadyFlag_.load()) {
         auto ffrtHandler = GetFfrtHandler();
+        if (ffrtHandler == nullptr) {
+            MMI_HILOGI("OnAddUser process failed, ffrtHandler is null, id:%{private}d", userId);
+            return;
+        }
         ffrtHandler->submit([this, userId] {
             MMI_HILOGI("Run task on add, id:%{private}d", userId);
             std::vector<SettingItem> items;
