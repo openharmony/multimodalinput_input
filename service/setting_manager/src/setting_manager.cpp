@@ -109,9 +109,7 @@ void SettingManager::Initialize()
 
     defaultSettingData_ = SettingData({mouseItem, touchpadItem, keyboardItem});
 
-    if (ffrtHandler_ == nullptr) {
-        ffrtHandler_ = std::make_shared<ffrt::queue>("InputSettingManager");
-    }
+    GetFfrtHandler();
 }
 
 void SettingManager::OnDataShareReady()
@@ -121,10 +119,8 @@ void SettingManager::OnDataShareReady()
         MMI_HILOGI("The database ready event has been received");
         return;
     }
-    if (ffrtHandler_ == nullptr) {
-        ffrtHandler_ = std::make_shared<ffrt::queue>("InputSettingManager");
-    }
-    ffrtHandler_->submit([this] {
+    auto ffrtHandler = GetFfrtHandler();
+    ffrtHandler->submit([this] {
         flushFlag_.store(true);
         int32_t userId = ACCOUNT_MGR->QueryCurrentAccountId();
         MMI_HILOGI("Run task in data share ready, current id:%{private}d", userId);
@@ -155,10 +151,8 @@ void SettingManager::OnSwitchUser(int32_t userId)
         MMI_HILOGW("Data share not ready, id:%{private}d", userId);
         return;
     }
-    if (ffrtHandler_ == nullptr) {
-        ffrtHandler_ = std::make_shared<ffrt::queue>("InputSettingManager");
-    }
-    ffrtHandler_->submit([this, userId] {
+    auto ffrtHandler = GetFfrtHandler();
+    ffrtHandler->submit([this, userId] {
         MMI_HILOGI("Run task on switch, id:%{private}d", userId);
         MarkUserConfigLoading(userId);
         flushFlag_.store(true);
@@ -219,10 +213,8 @@ void SettingManager::OnAddUser(int32_t userId)
 {
     MMI_HILOGI("In add, id:%{private}d", userId);
     if (databaseReadyFlag_.load()) {
-        if (ffrtHandler_ == nullptr) {
-            ffrtHandler_ = std::make_shared<ffrt::queue>("InputSettingManager");
-        }
-        ffrtHandler_->submit([this, userId] {
+        auto ffrtHandler = GetFfrtHandler();
+        ffrtHandler->submit([this, userId] {
             MMI_HILOGI("Run task on add, id:%{private}d", userId);
             std::vector<SettingItem> items;
             for (auto &key : SETTING_KEYS) {
@@ -256,6 +248,15 @@ void SettingManager::OnRemoveUser(int32_t userId)
 bool SettingManager::IsDatabaseReady() const
 {
     return databaseReadyFlag_.load();
+}
+
+std::shared_ptr<ffrt::queue> SettingManager::GetFfrtHandler()
+{
+    std::lock_guard<std::mutex> guard(ffrtHandlerMutex_);
+    if (ffrtHandler_ == nullptr) {
+        ffrtHandler_ = std::make_shared<ffrt::queue>("InputSettingManager");
+    }
+    return ffrtHandler_;
 }
 
 void SettingManager::CommitStagedChanges()
