@@ -3480,10 +3480,13 @@ const OLD::DisplayInfo *InputWindowsManager::FindPhysicalDisplayInfo(const std::
     }
     MMI_HILOGD("Failed to search for Physical,uniq:%{public}s", uniq.c_str());
 
-    auto iter = displayGroupInfoMap_.find(MAIN_GROUPID);
-    if (iter != displayGroupInfoMap_.end()) {
-        if (iter->second.displaysInfo.size() > 0) {
-            return &iter->second.displaysInfo[0];
+    for (const auto &item : displayGroupInfoMap_) {
+        MMI_HILOGD("Group type:%{public}d, groupId:%{public}d, mainDisplayId:%{public}d",
+            item.second.type, item.second.groupId, item.second.mainDisplayId);
+        if (item.second.type == GroupType::GROUP_DEFAULT) {
+            if (!item.second.displaysInfo.empty()) {
+                return &item.second.displaysInfo[0];
+            }
         }
     }
     return nullptr;
@@ -9038,7 +9041,7 @@ bool InputWindowsManager::HasDisplayGroupInfoChanged(const OLD::DisplayGroupInfo
 {
     if (!hasOldGroupInfo) {
         MMI_HILOGD("No old display group info, skip plugin display change detection");
-        return false;
+        return true;
     }
 
     if (oldGroupInfo.mainDisplayId != newGroupInfo.mainDisplayId) {
