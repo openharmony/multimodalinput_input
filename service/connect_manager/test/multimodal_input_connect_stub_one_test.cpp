@@ -1371,6 +1371,26 @@ HWTEST_F(MultimodalInputConnectStubOneTest, MultimodalInputConnectStubOneTest_St
 }
 
 /* *
+ * @tc.name: MultimodalInputConnectStubOneTest_StubGetLastInputEventTimeByDisplay_001
+ * @tc.desc: Test the function StubGetLastInputEventTimeByDisplay
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubOneTest,
+    MultimodalInputConnectStubOneTest_StubGetLastInputEventTimeByDisplay_001, TestSize.Level1)
+{
+    std::shared_ptr<MockMultimodalInputConnectStub> mock = std::make_shared<MockMultimodalInputConnectStub>();
+    std::shared_ptr<MultimodalInputConnectStub> stub = mock;
+    EXPECT_CALL(*mock, GetLastInputEventTimeByDisplay).WillOnce(Return(-2));
+    MessageParcel data;
+    MessageParcel reply;
+    int32_t displayId = 0;
+    data.WriteInt32(displayId);
+    int32_t ret = stub->StubGetLastInputEventTimeByDisplay(data, reply);
+    EXPECT_EQ(ret, -2);
+}
+
+/* *
  * @tc.name: MultimodalInputConnectStubOneTest_StubGetAllSystemHotkeys_001
  * @tc.desc: Test the function StubGetAllSystemHotkeys
  * @tc.type: FUNC

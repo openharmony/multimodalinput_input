@@ -1164,6 +1164,16 @@ public:
      */
     int32_t GetIntervalSinceLastInput(int64_t &timeInterval);
 
+    /**
+     * @brief Get the time of the last input event on the display group of the given display.
+     *        The statistic covers both hardware-reported events and injected events.
+     * @param displayId the id of the display whose display group will be queried.
+     * @param lastInputEventTime the time (microseconds since boot, CLOCK_MONOTONIC) of the
+     *        last input event on the display group.
+     * @return Returns <b>0</b> if success; returns a non-0 value otherwise.
+     */
+    int32_t GetLastInputEventTimeByDisplay(int32_t displayId, int64_t &lastInputEventTime);
+
     int32_t GetAllSystemHotkeys(std::vector<std::unique_ptr<KeyOption>> &keyOptions, int32_t &count);
 
     /**

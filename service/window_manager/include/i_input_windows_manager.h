@@ -247,6 +247,8 @@ public:
 #endif // OHOS_BUILD_ENABLE_ANCO_GAME_EVENT_MAPPING
     virtual const OLD::DisplayGroupInfo& GetDefaultDisplayGroupInfo() = 0;
     virtual std::vector<PluginDisplayGroupInfo> GetDisplayGroupInfos() = 0;
+    virtual int32_t GetDisplayId(std::shared_ptr<InputEvent> inputEvent) const = 0;
+    virtual int32_t FindDisplayGroupId(int32_t displayId) const = 0;
 private:
     static std::mutex mutex_;
     static std::shared_ptr<IInputWindowsManager> instance_;

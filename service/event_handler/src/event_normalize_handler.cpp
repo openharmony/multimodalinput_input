@@ -1622,6 +1622,7 @@ void EventNormalizeHandler::BypassChainAndDispatchDirectly(std::shared_ptr<Point
     CHKPV(pointerEvent);
     auto eventDispatchHandler = InputHandler->GetEventDispatchHandler();
     CHKPV(eventDispatchHandler);
+    InputHandler->UpdateLastInputEventTime(WIN_MGR->GetDisplayId(pointerEvent));
     int32_t sourceType = pointerEvent->GetSourceType();
     if (sourceType == PointerEvent::SOURCE_TYPE_TOUCHSCREEN) {
         eventDispatchHandler->HandleTouchEvent(pointerEvent);

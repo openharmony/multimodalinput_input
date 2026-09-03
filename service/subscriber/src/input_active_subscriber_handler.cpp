@@ -18,6 +18,7 @@
 #include <future>
 #include <parameters.h>
 #include "dfx_hisysevent.h"
+#include "i_input_windows_manager.h"
 #include "input_event_data_transformation.h"
 #include "input_event_handler.h"
 #include "timer_manager.h"
@@ -38,6 +39,7 @@ void InputActiveSubscriberHandler::HandleKeyEvent(const std::shared_ptr<KeyEvent
 {
     CHKPV(keyEvent);
     CHKPV(nextHandler_);
+    InputHandler->UpdateLastInputEventTime(WIN_MGR->GetDisplayId(keyEvent));
     OnSubscribeInputActive(keyEvent);
     nextHandler_->HandleKeyEvent(keyEvent);
 }
@@ -48,6 +50,7 @@ void InputActiveSubscriberHandler::HandlePointerEvent(const std::shared_ptr<Poin
 {
     CHKPV(pointerEvent);
     CHKPV(nextHandler_);
+    InputHandler->UpdateLastInputEventTime(WIN_MGR->GetDisplayId(pointerEvent));
     OnSubscribeInputActive(pointerEvent);
     nextHandler_->HandlePointerEvent(pointerEvent);
 }
@@ -58,6 +61,7 @@ void InputActiveSubscriberHandler::HandleTouchEvent(const std::shared_ptr<Pointe
 {
     CHKPV(pointerEvent);
     CHKPV(nextHandler_);
+    InputHandler->UpdateLastInputEventTime(WIN_MGR->GetDisplayId(pointerEvent));
     OnSubscribeInputActive(pointerEvent);
     bool isFiltered = false;
 #ifdef OHOS_BUILD_ENABLE_TRIPLE_FINGER_SNAPSHOT

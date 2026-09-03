@@ -171,6 +171,7 @@ interface OHOS.MMI.IMultimodalInputConnect {
     void GetMouseScrollDirection([out] boolean state);
     void SetClientInfo([in] int pid, [in] unsigned long readThreadId);
     void GetIntervalSinceLastInput([out] long timeInterval);
+    void GetLastInputEventTimeByDisplay([in] int displayId, [out] long lastInputEventTime);
     [macrodef OHOS_BUILD_ENABLE_MAGICCURSOR] void GetPointerSnapshot([out] CursorPixelMap pixelMap);
     void TransferBinderClientSrv([in] IRemoteObject binderClientObject);
     void SkipPointerLayer([in] boolean isSkip);
