@@ -1197,6 +1197,18 @@ int32_t MultimodalInputConnectManager::GetIntervalSinceLastInput(int64_t &timeIn
     return multimodalInputConnectService_->GetIntervalSinceLastInput(timeInterval);
 }
 
+int32_t MultimodalInputConnectManager::GetLastInputEventTimeByDisplay(int32_t displayId,
+    int64_t &lastInputEventTime)
+{
+    sptr<IMultimodalInputConnect> multimodalInputConnectService = nullptr;
+    {
+        std::lock_guard<std::mutex> guard(lock_);
+        CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+        multimodalInputConnectService = multimodalInputConnectService_;
+    }
+    return multimodalInputConnectService->GetLastInputEventTimeByDisplay(displayId, lastInputEventTime);
+}
+
 int32_t MultimodalInputConnectManager::GetAllSystemHotkeys(std::vector<std::unique_ptr<KeyOption>> &keyOptions)
 {
     CALL_DEBUG_ENTER;

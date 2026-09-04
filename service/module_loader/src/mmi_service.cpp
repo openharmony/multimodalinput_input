@@ -5404,6 +5404,19 @@ ErrCode MMIService::GetIntervalSinceLastInput(int64_t &timeInterval)
     return ret;
 }
 
+ErrCode MMIService::GetLastInputEventTimeByDisplay(int32_t displayId, int64_t &lastInputEventTime)
+{
+    CALL_DEBUG_ENTER;
+    lastInputEventTime = 0;
+    int32_t ret = delegateTasks_.PostSyncTask(std::bind(&InputEventHandler::GetLastInputEventTimeByDisplay,
+        InputHandler, displayId, std::ref(lastInputEventTime)));
+    MMI_HILOGI("displayId:%{public}d, lastInputEventTime:%{public}" PRId64, displayId, lastInputEventTime);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Failed to GetLastInputEventTimeByDisplay, ret:%{public}d", ret);
+    }
+    return ret;
+}
+
 ErrCode MMIService::GetAllSystemHotkeys(std::vector<KeyOption>& keyOptions)
 {
     CALL_DEBUG_ENTER;

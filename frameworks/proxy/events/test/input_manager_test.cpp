@@ -4841,6 +4841,39 @@ HWTEST_F(InputManagerTest, InputManagerTest_GetIntervalSinceLastInput002, TestSi
 }
 
 /**
+ * @tc.name: InputManagerTest_GetLastInputEventTimeByDisplay001
+ * @tc.desc: GetLastInputEventTimeByDisplay interface detection
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_GetLastInputEventTimeByDisplay001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int64_t lastInputEventTime = -1;
+    ASSERT_NO_FATAL_FAILURE(InputManager::GetInstance()->GetLastInputEventTimeByDisplay(0, lastInputEventTime));
+}
+
+/**
+ * @tc.name: InputManagerTest_GetLastInputEventTimeByDisplay002
+ * @tc.desc: GetLastInputEventTimeByDisplay interface detection with injected event
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_GetLastInputEventTimeByDisplay002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHPAD);
+    InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
+    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
+    int64_t lastInputEventTime = 0;
+    int32_t result = InputManager::GetInstance()->GetLastInputEventTimeByDisplay(0, lastInputEventTime);
+    ASSERT_EQ(result, RET_OK);
+    EXPECT_GE(lastInputEventTime, 0);
+}
+
+/**
  * @tc.name: InputManagerTest_GetIntervalSinceLastInput003
  * @tc.desc: GetIntervalSinceLastInput interface detection
  * @tc.type: FUNC

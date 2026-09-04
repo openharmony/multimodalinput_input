@@ -260,6 +260,7 @@ public:
     void OnWindowStateError(int32_t pid, int32_t windowId);
     int32_t GetAllSystemHotkeys(std::vector<std::unique_ptr<KeyOption>> &keyOptions, int32_t &count);
     int32_t GetIntervalSinceLastInput(int64_t &timeInterval);
+    int32_t GetLastInputEventTimeByDisplay(int32_t displayId, int64_t &lastInputEventTime);
     int32_t ConvertToCapiKeyAction(int32_t keyAction);
     int32_t SetInputDeviceEnabled(int32_t deviceId, bool enable, std::function<void(int32_t)> callback);
     int32_t DisableInputEventDispatch(bool disabled);

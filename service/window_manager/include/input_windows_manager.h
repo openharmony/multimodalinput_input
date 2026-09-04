@@ -288,13 +288,14 @@ public:
     bool HasPointerDeviceBoundToRsId(uint64_t rsId) const;
     int32_t FindGroupIdByRsId(uint64_t rsId) const;
     bool HasMultipleActiveUsers() const;
+    int32_t GetDisplayId(std::shared_ptr<InputEvent> inputEvent) const;
+    int32_t FindDisplayGroupId(int32_t displayId) const;
 private:
     bool NeedTouchTracking(PointerEvent &event) const;
     void ProcessTouchTracking(std::shared_ptr<PointerEvent> event, const WindowInfo &targetWindow);
     bool IgnoreTouchEvent(std::shared_ptr<PointerEvent> pointerEvent);
     bool IsPenHoverEvent(std::shared_ptr<PointerEvent> pointerEvent) const;
     void ReissueCancelTouchEvent(std::shared_ptr<PointerEvent> pointerEvent);
-    int32_t GetDisplayId(std::shared_ptr<InputEvent> inputEvent) const;
     void PrintHighZorder(const std::vector<WindowInfo> &windowsInfo, int32_t pointerAction,
         int32_t targetWindowId, int32_t logicalX, int32_t logicalY);
     void PrintZorderInfo(const WindowInfo &windowInfo, std::string &window);
@@ -561,7 +562,6 @@ void HandleOneHandMode(const OLD::DisplayInfo &displayInfo, std::shared_ptr<Poin
     void UpdateWindowInfoFlag(uint32_t flag, std::shared_ptr<InputEvent> event);
     bool IsTouchPadScrollAxis(const WindowInfo &window, const std::shared_ptr<PointerEvent> pointerEvent);
 private:
-    int32_t FindDisplayGroupId(int32_t displayId) const;
     const OLD::DisplayGroupInfo& FindDisplayGroupInfo(int32_t displayId) const;
     const OLD::DisplayGroupInfo& GetConstMainDisplayGroupInfo() const;
     void RotateScreen90(const OLD::DisplayInfo& info, PhysicalCoordinate& coord) const;

@@ -25,9 +25,11 @@
 #include <unistd.h>
 
 #include "libinput.h"
+#include "i_input_windows_manager.h"
 #include "key_command_handler.h"
 #include "timer_manager.h"
 #include "util.h"
+#include "util_ex.h"
 
 #undef MMI_LOG_DOMAIN
 #define MMI_LOG_DOMAIN MMI_LOG_HANDLER
@@ -38,6 +40,10 @@ namespace OHOS {
 namespace MMI {
 namespace {
 constexpr int32_t TIMEOUT_MS { 1500 };
+constexpr int64_t MICRO_SECONDS { 1000000 };
+constexpr int64_t MILLI_TO_MICRO { 1000 };
+constexpr int64_t SECONDS_PER_MINUTE { 60 };
+constexpr int64_t SECONDS_PER_HOUR { 3600 };
 #ifdef OHOS_BUILD_ENABLE_TOUCHPAD
 constexpr int32_t MT_TOOL_PALM { 2 };
 constexpr uint32_t KEY_ESC { 1 };
@@ -61,6 +67,7 @@ constexpr uint32_t KEY_LEFTMETA { 125 };
 InputEventHandler::InputEventHandler()
 {
     lastEventBeginTime_ = GetSysClockTime();
+    lastInputEventTimeInit_ = lastEventBeginTime_;
     udsServer_ = nullptr;
 }
 
@@ -455,6 +462,68 @@ int32_t InputEventHandler::GetIntervalSinceLastInput(int64_t &timeInterval)
     int64_t currentSystemTime = GetSysClockTime();
     timeInterval = currentSystemTime - lastEventBeginTime_;
     return RET_OK;
+}
+
+void InputEventHandler::UpdateLastInputEventTime(int32_t displayId)
+{
+    if (displayId < 0) {
+        MMI_HILOGD("Invalid displayId:%{public}d", displayId);
+        return;
+    }
+    int32_t groupId = WIN_MGR->FindDisplayGroupId(displayId);
+    lastInputEventTimes_[groupId][displayId] = GetSysClockTime();
+}
+
+int32_t InputEventHandler::GetLastInputEventTimeByDisplay(int32_t displayId, int64_t &lastInputEventTime)
+{
+    if (displayId < 0) {
+        MMI_HILOGE("Invalid displayId:%{public}d", displayId);
+        return RET_ERR;
+    }
+    int32_t groupId = WIN_MGR->FindDisplayGroupId(displayId);
+    const auto groupIter = lastInputEventTimes_.find(groupId);
+    if (groupIter == lastInputEventTimes_.end()) {
+        lastInputEventTime = lastInputEventTimeInit_;
+    } else {
+        lastInputEventTime = QueryGroupLastInputTime(groupIter->second);
+    }
+    MMI_HILOGD("displayId:%{public}d, groupId:%{public}d, lastInputEventTime:%{public}" PRId64,
+        displayId, groupId, lastInputEventTime);
+    return RET_OK;
+}
+
+int64_t InputEventHandler::QueryGroupLastInputTime(const std::map<int32_t, int64_t> &displayTimes) const
+{
+    int64_t lastInputTime = lastInputEventTimeInit_;
+    for (const auto &[displayId, eventTime] : displayTimes) {
+        if (eventTime > lastInputTime) {
+            lastInputTime = eventTime;
+        }
+    }
+    return lastInputTime;
+}
+
+void InputEventHandler::DumpLastInputTime(int32_t fd)
+{
+    mprintf(fd, "Last input event time information:\n");
+    if (lastInputEventTimes_.empty()) {
+        mprintf(fd, "No input event recorded\n");
+        return;
+    }
+    for (const auto &[groupId, displayTimes] : lastInputEventTimes_) {
+        mprintf(fd, "Group %d\n", groupId);
+        for (const auto &[displayId, eventTime] : displayTimes) {
+            int64_t totalSec = eventTime / MICRO_SECONDS;
+            mprintf(fd, "  Display %d, lastInputTime:%" PRId64
+                "(us), [hour:%02d][minute:%02d][second:%02d][millisecond:%03d][microsecond:%03d]\n",
+                displayId, eventTime,
+                static_cast<int32_t>(totalSec / SECONDS_PER_HOUR),
+                static_cast<int32_t>(totalSec % SECONDS_PER_HOUR / SECONDS_PER_MINUTE),
+                static_cast<int32_t>(totalSec % SECONDS_PER_MINUTE),
+                static_cast<int32_t>(eventTime % MICRO_SECONDS / MILLI_TO_MICRO),
+                static_cast<int32_t>(eventTime % MILLI_TO_MICRO));
+        }
+    }
 }
 
 UDSServer* InputEventHandler::GetUDSServer() const

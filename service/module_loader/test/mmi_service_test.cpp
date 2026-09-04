@@ -4176,6 +4176,22 @@ HWTEST_F(MMIServerTest, MMIService_GetIntervalSinceLastInput_001, TestSize.Level
 }
 
 /**
+ * @tc.name: MMIService_GetLastInputEventTimeByDisplay_001
+ * @tc.desc: Verify that the input interval time returned under normal conditions is greater than or equal to 0
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIServerTest, MMIService_GetLastInputEventTimeByDisplay_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MMIService mmiService;
+    int64_t timeInterval = -1;
+    ErrCode ret = mmiService.GetLastInputEventTimeByDisplay(0, timeInterval);
+    EXPECT_NE(ret, RET_OK);
+    EXPECT_GE(timeInterval, 0);
+}
+
+/**
  * @tc.name: MMIService_GetAllSystemHotkeys_001
  * @tc.desc: The verification call was successful
  * @tc.type: FUNC

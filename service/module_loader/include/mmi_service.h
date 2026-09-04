@@ -214,6 +214,7 @@ public:
     void CalculateFuntionRunningTime(std::function<void()> func, const std::string &flag);
     ErrCode SetClientInfo(int32_t pid, uint64_t readThreadId) override;
     ErrCode GetIntervalSinceLastInput(int64_t &timeInterval) override;
+    ErrCode GetLastInputEventTimeByDisplay(int32_t displayId, int64_t &lastInputEventTime) override;
 #ifdef OHOS_BUILD_ENABLE_ANCO
     void InitAncoUds();
     void StopAncoUds();

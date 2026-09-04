@@ -17,10 +17,13 @@
 
 #include <cinttypes>
 #include <climits>
+#include <chrono>
 #include <cstdio>
 #include <cstring>
+#include <fstream>
 #include <functional>
 #include <sys/stat.h>
+#include <thread>
 #include <unistd.h>
 #include <vector>
 
@@ -870,6 +873,186 @@ HWTEST_F(InputEventHandlerTest, InputEventHandler_GetIntervalSinceLastInput_001,
     int32_t result = inputEventHandler->GetIntervalSinceLastInput(timeInterval);
     EXPECT_EQ(result, RET_OK);
     EXPECT_GE(timeInterval, 0);
+}
+
+/**
+ * @tc.name: InputEventHandler_UpdateLastInputEventTime_001
+ * @tc.desc: Test UpdateLastInputEventTime with invalid displayId
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputEventHandlerTest, InputEventHandler_UpdateLastInputEventTime_001, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    std::shared_ptr<InputEventHandler> inputEventHandler = std::make_shared<InputEventHandler>();
+    inputEventHandler->UpdateLastInputEventTime(-1);
+    EXPECT_TRUE(inputEventHandler->lastInputEventTimes_.empty());
+}
+
+/**
+ * @tc.name: InputEventHandler_UpdateLastInputEventTime_002
+ * @tc.desc: Test UpdateLastInputEventTime records time under the resolved group
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputEventHandlerTest, InputEventHandler_UpdateLastInputEventTime_002, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    std::shared_ptr<InputEventHandler> inputEventHandler = std::make_shared<InputEventHandler>();
+    int64_t before = GetSysClockTime();
+    inputEventHandler->UpdateLastInputEventTime(3);
+    int64_t after = GetSysClockTime();
+    ASSERT_EQ(inputEventHandler->lastInputEventTimes_.size(), 1u);
+    ASSERT_EQ(inputEventHandler->lastInputEventTimes_[0].count(3), 1u);
+    EXPECT_GE(inputEventHandler->lastInputEventTimes_[0][3], before);
+    EXPECT_LE(inputEventHandler->lastInputEventTimes_[0][3], after);
+}
+
+/**
+ * @tc.name: InputEventHandler_UpdateLastInputEventTime_003
+ * @tc.desc: Test UpdateLastInputEventTime overwrites the same display without duplicating entries
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputEventHandlerTest, InputEventHandler_UpdateLastInputEventTime_003, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    std::shared_ptr<InputEventHandler> inputEventHandler = std::make_shared<InputEventHandler>();
+    inputEventHandler->UpdateLastInputEventTime(3);
+    int64_t firstTime = inputEventHandler->lastInputEventTimes_[0][3];
+    std::this_thread::sleep_for(std::chrono::milliseconds(10));
+    inputEventHandler->UpdateLastInputEventTime(3);
+    EXPECT_GT(inputEventHandler->lastInputEventTimes_[0][3], firstTime);
+    EXPECT_EQ(inputEventHandler->lastInputEventTimes_.size(), 1u);
+    EXPECT_EQ(inputEventHandler->lastInputEventTimes_[0].size(), 1u);
+}
+
+/**
+ * @tc.name: InputEventHandler_GetLastInputEventTimeByDisplay_001
+ * @tc.desc: Test GetLastInputEventTimeByDisplay with invalid displayId
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputEventHandlerTest, InputEventHandler_GetLastInputEventTimeByDisplay_001, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    std::shared_ptr<InputEventHandler> inputEventHandler = std::make_shared<InputEventHandler>();
+    int64_t lastInputEventTime = 0;
+    int32_t result = inputEventHandler->GetLastInputEventTimeByDisplay(-1, lastInputEventTime);
+    EXPECT_NE(result, RET_OK);
+    EXPECT_EQ(lastInputEventTime, 0);
+}
+
+/**
+ * @tc.name: InputEventHandler_GetLastInputEventTimeByDisplay_002
+ * @tc.desc: Test GetLastInputEventTimeByDisplay falls back to init baseline when nothing recorded
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputEventHandlerTest, InputEventHandler_GetLastInputEventTimeByDisplay_002, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    std::shared_ptr<InputEventHandler> inputEventHandler = std::make_shared<InputEventHandler>();
+    int64_t lastInputEventTime = -1;
+    int32_t result = inputEventHandler->GetLastInputEventTimeByDisplay(7, lastInputEventTime);
+    EXPECT_EQ(result, RET_OK);
+    EXPECT_EQ(lastInputEventTime, inputEventHandler->lastInputEventTimeInit_);
+    EXPECT_GE(lastInputEventTime, 0);
+}
+
+/**
+ * @tc.name: InputEventHandler_GetLastInputEventTimeByDisplay_003
+ * @tc.desc: Test GetLastInputEventTimeByDisplay returns the recorded event time
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputEventHandlerTest, InputEventHandler_GetLastInputEventTimeByDisplay_003, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    std::shared_ptr<InputEventHandler> inputEventHandler = std::make_shared<InputEventHandler>();
+    inputEventHandler->UpdateLastInputEventTime(3);
+    int64_t recorded = inputEventHandler->lastInputEventTimes_[0][3];
+    int64_t lastInputEventTime = -1;
+    int32_t result = inputEventHandler->GetLastInputEventTimeByDisplay(3, lastInputEventTime);
+    EXPECT_EQ(result, RET_OK);
+    EXPECT_EQ(lastInputEventTime, recorded);
+}
+
+/**
+ * @tc.name: InputEventHandler_GetLastInputEventTimeByDisplay_004
+ * @tc.desc: Test GetLastInputEventTimeByDisplay returns the max time of displays in the same group
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputEventHandlerTest, InputEventHandler_GetLastInputEventTimeByDisplay_004, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    std::shared_ptr<InputEventHandler> inputEventHandler = std::make_shared<InputEventHandler>();
+    inputEventHandler->UpdateLastInputEventTime(3);
+    int64_t display3Time = inputEventHandler->lastInputEventTimes_[0][3];
+    std::this_thread::sleep_for(std::chrono::milliseconds(10));
+    inputEventHandler->UpdateLastInputEventTime(4);
+    int64_t display4Time = inputEventHandler->lastInputEventTimes_[0][4];
+    ASSERT_GT(display4Time, display3Time);
+    int64_t lastInputEventTime = -1;
+    int32_t result = inputEventHandler->GetLastInputEventTimeByDisplay(3, lastInputEventTime);
+    EXPECT_EQ(result, RET_OK);
+    EXPECT_EQ(lastInputEventTime, display4Time);
+    result = inputEventHandler->GetLastInputEventTimeByDisplay(4, lastInputEventTime);
+    EXPECT_EQ(result, RET_OK);
+    EXPECT_EQ(lastInputEventTime, display4Time);
+}
+
+/**
+ * @tc.name: InputEventHandler_DumpLastInputTime_001
+ * @tc.desc: Test DumpLastInputTime with no record
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputEventHandlerTest, InputEventHandler_DumpLastInputTime_001, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    std::shared_ptr<InputEventHandler> inputEventHandler = std::make_shared<InputEventHandler>();
+    char path[] = "/data/local/tmp/dump_last_input_time_001";
+    int32_t fd = open(path, O_CREAT | O_WRONLY | O_TRUNC, 0644);
+    ASSERT_GE(fd, 0);
+    inputEventHandler->DumpLastInputTime(fd);
+    close(fd);
+    std::ifstream inFile(path);
+    ASSERT_TRUE(inFile.is_open());
+    std::string content((std::istreambuf_iterator<char>(inFile)), std::istreambuf_iterator<char>());
+    inFile.close();
+    remove(path);
+    EXPECT_NE(content.find("No input event recorded"), std::string::npos);
+}
+
+/**
+ * @tc.name: InputEventHandler_DumpLastInputTime_002
+ * @tc.desc: Test DumpLastInputTime with recorded entries
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputEventHandlerTest, InputEventHandler_DumpLastInputTime_002, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    std::shared_ptr<InputEventHandler> inputEventHandler = std::make_shared<InputEventHandler>();
+    inputEventHandler->UpdateLastInputEventTime(3);
+    inputEventHandler->UpdateLastInputEventTime(4);
+    char path[] = "/data/local/tmp/dump_last_input_time_002";
+    int32_t fd = open(path, O_CREAT | O_WRONLY | O_TRUNC, 0644);
+    ASSERT_GE(fd, 0);
+    inputEventHandler->DumpLastInputTime(fd);
+    close(fd);
+    std::ifstream inFile(path);
+    ASSERT_TRUE(inFile.is_open());
+    std::string content((std::istreambuf_iterator<char>(inFile)), std::istreambuf_iterator<char>());
+    inFile.close();
+    remove(path);
+    EXPECT_NE(content.find("Group 0"), std::string::npos);
+    EXPECT_NE(content.find("Display 3"), std::string::npos);
+    EXPECT_NE(content.find("Display 4"), std::string::npos);
+    EXPECT_NE(content.find("[hour:"), std::string::npos);
+    EXPECT_NE(content.find("[microsecond:"), std::string::npos);
 }
 
 /**

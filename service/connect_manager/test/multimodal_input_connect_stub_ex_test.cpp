@@ -327,6 +327,10 @@ public:
     {
         return retGetIntervalSinceLastInput_;
     }
+    int32_t GetLastInputEventTimeByDisplay(int32_t displayId, int64_t &timeInterval) override
+    {
+        return retGetLastInputEventTimeByDisplay_;
+    }
 #ifdef OHOS_BUILD_ENABLE_ANCO
     int32_t AncoAddChannel(sptr<IAncoChannel> channel) override { return retChannel_; }
     int32_t AncoRemoveChannel(sptr<IAncoChannel> channel) override { return retChannel_; }
@@ -463,6 +467,7 @@ public:
     int32_t getAllSystemHotkeys_ = 0;
     int32_t retSetClientInfo_ = 0;
     int32_t retGetIntervalSinceLastInput_ = 0;
+    int32_t retGetLastInputEventTimeByDisplay_ = 0;
     int32_t retCreateVKeyboardDevice_ = 0;
     bool doubleTapAndDragState_ = false;
     int32_t retSetInputDeviceEnable_ = 0;
@@ -8010,6 +8015,43 @@ HWTEST_F(MultimodalInputConnectStubTest, StubGetIntervalSinceLastInput_002, Test
     MessageParcel data;
     MessageParcel reply;
     EXPECT_NO_FATAL_FAILURE(stub->StubGetIntervalSinceLastInput(data, reply));
+}
+
+/**
+ * @tc.name: StubGetLastInputEventTimeByDisplay_001
+ * @tc.desc: Test the function StubGetLastInputEventTimeByDisplay
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubTest, StubGetLastInputEventTimeByDisplay_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto stub = std::make_shared<MMIServiceTest>();
+    ASSERT_NE(stub, nullptr);
+    std::shared_ptr<MMIServiceTest> service = std::static_pointer_cast<MMIServiceTest>(stub);
+    service->retGetLastInputEventTimeByDisplay_ = -1;
+    MessageParcel data;
+    MessageParcel reply;
+    EXPECT_NO_FATAL_FAILURE(stub->StubGetLastInputEventTimeByDisplay(data, reply));
+}
+
+/**
+ * @tc.name: StubGetLastInputEventTimeByDisplay_002
+ * @tc.desc: Test the function StubGetLastInputEventTimeByDisplay
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubTest, StubGetLastInputEventTimeByDisplay_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EXPECT_CALL(*messageParcelMock_, WriteInt64(_)).WillOnce(Return(true));
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIServiceTest>();
+    ASSERT_NE(stub, nullptr);
+    std::shared_ptr<MMIServiceTest> service = std::static_pointer_cast<MMIServiceTest>(stub);
+    service->retGetLastInputEventTimeByDisplay_ = 0;
+    MessageParcel data;
+    MessageParcel reply;
+    EXPECT_NO_FATAL_FAILURE(stub->StubGetLastInputEventTimeByDisplay(data, reply));
 }
 
 /**

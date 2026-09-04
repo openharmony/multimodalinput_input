@@ -3153,6 +3153,20 @@ int32_t InputManagerImpl::GetIntervalSinceLastInput(int64_t &timeInterval)
     return RET_OK;
 }
 
+int32_t InputManagerImpl::GetLastInputEventTimeByDisplay(int32_t displayId, int64_t &lastInputEventTime)
+{
+    CALL_DEBUG_ENTER;
+    if (displayId < 0) {
+        MMI_HILOGE("Invalid displayId:%{public}d", displayId);
+        return RET_ERR;
+    }
+    if (MULTIMODAL_INPUT_CONNECT_MGR->GetLastInputEventTimeByDisplay(displayId, lastInputEventTime) != RET_OK) {
+        MMI_HILOGE("GetLastInputEventTimeByDisplay failed");
+        return RET_ERR;
+    }
+    return RET_OK;
+}
+
 int32_t InputManagerImpl::GetAllSystemHotkeys(std::vector<std::unique_ptr<KeyOption>> &keyOptions, int32_t &count)
 {
     CALL_DEBUG_ENTER;

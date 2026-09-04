@@ -182,6 +182,7 @@ public:
     MOCK_METHOD(int32_t, EnableHardwareCursorStats, (bool enable), (override));
     MOCK_METHOD(int32_t, GetHardwareCursorStats, (uint32_t & frameCount, uint32_t &vsyncCount), (override));
     MOCK_METHOD(int32_t, GetIntervalSinceLastInput, (int64_t & timeInterval), (override));
+    MOCK_METHOD(int32_t, GetLastInputEventTimeByDisplay, (int32_t displayId, int64_t & lastInputEventTime), (override));
 #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
     MOCK_METHOD(int32_t, GetPointerSnapshot, (void *pixelMapPtr), (override));
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR

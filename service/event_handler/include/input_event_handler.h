@@ -16,6 +16,8 @@
 #ifndef INPUT_EVENT_HANDLER_H
 #define INPUT_EVENT_HANDLER_H
 
+#include <map>
+
 #include "singleton.h"
 
 #include "event_dispatch_handler.h"
@@ -51,6 +53,9 @@ public:
     UDSServer *GetUDSServer() const;
     int32_t SetMoveEventFilters(bool flag);
     int32_t GetIntervalSinceLastInput(int64_t &timeInterval);
+    int32_t GetLastInputEventTimeByDisplay(int32_t displayId, int64_t &lastInputEventTime);
+    void UpdateLastInputEventTime(int32_t displayId);
+    void DumpLastInputTime(int32_t fd);
 
     std::shared_ptr<EventNormalizeHandler> GetEventNormalizeHandler() const;
     std::shared_ptr<EventInterceptorHandler> GetInterceptorHandler() const;
@@ -68,6 +73,7 @@ public:
 
 private:
     int32_t BuildInputHandlerChain();
+    int64_t QueryGroupLastInputTime(const std::map<int32_t, int64_t> &displayTimes) const;
 #ifdef OHOS_BUILD_ENABLE_TOUCHPAD
     // disable-while-typing
     void UpdateDwtRecord(libinput_event *event);
@@ -117,6 +123,9 @@ private:
     std::vector<bool> isKeyPressedWithAnyModifiers_ = std::vector<bool>(TOUCHPAD_KEY_CNT, false); // keycode as index
 
     int64_t lastEventBeginTime_ { 0 };
+
+    std::map<int32_t, std::map<int32_t, int64_t>> lastInputEventTimes_;
+    int64_t lastInputEventTimeInit_ { 0 };
 
     static constexpr double TOUCHPAD_EDGE_WIDTH = 15.0;
     static constexpr double TOUCHPAD_EDGE_WIDTH_RELEASE = 20.0;
