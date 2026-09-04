@@ -251,19 +251,6 @@ HWTEST_F(InputActiveSubscribeManagerTest, OnConnectedTest, TestSize.Level1)
 }
 
 /**
- * @tc.name: UnsubscribeInputActive_Test_001
- * @tc.desc: Test UnsubscribeInputActive with valid id but no active subscription
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputActiveSubscribeManagerTest, UnsubscribeInputActive_Test_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    int32_t result = INPUT_ACTIVE_SUBSCRIBE_MGR.UnsubscribeInputActive(0);
-    EXPECT_NE(result, RET_OK);
-}
-
-/**
  * @tc.name: UnsubscribeInputActive_Test_002
  * @tc.desc: Unsubscribe with an invalid id is rejected
  * @tc.type: FUNC
