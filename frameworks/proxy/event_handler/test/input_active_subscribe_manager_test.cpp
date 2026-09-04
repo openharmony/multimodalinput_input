@@ -29,7 +29,6 @@ namespace OHOS {
 namespace MMI {
 namespace {
 using namespace testing::ext;
-constexpr int64_t DEFAULT_INTERVAL { 500 }; // ms
 constexpr int32_t VALID_SUBSCRIBE_ID { 0 };
 constexpr int32_t INVALID_SUBSCRIBE_ID { -1 };
 } // namespace
