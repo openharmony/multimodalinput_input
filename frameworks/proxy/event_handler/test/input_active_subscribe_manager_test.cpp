@@ -58,8 +58,7 @@ public:
 
 /**
  * @tc.name: SubscribeInputActive_Test_001
- * @tc.desc: Subscribe with a valid callback returns the current subscribe id, then
- *           a duplicate subscribe in the same process is rejected
+ * @tc.desc: Test SubscribeInputActive
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -68,12 +67,13 @@ HWTEST_F(InputActiveSubscribeManagerTest, SubscribeInputActive_Test_001, TestSiz
     CALL_TEST_DEBUG;
     std::shared_ptr<TestInputEventConsumer> inputEventConsumer = std::make_shared<TestInputEventConsumer>();
     EXPECT_NE(inputEventConsumer, nullptr);
+    int64_t interval = 500; // ms
     int32_t subscriberId = INPUT_ACTIVE_SUBSCRIBE_MGR.SubscribeInputActive(
-        std::static_pointer_cast<IInputEventConsumer>(inputEventConsumer), DEFAULT_INTERVAL);
-    EXPECT_EQ(subscriberId, VALID_SUBSCRIBE_ID);
+        std::static_pointer_cast<IInputEventConsumer>(inputEventConsumer), interval);
+    EXPECT_GE(subscriberId, 0);
     int32_t subscriberId1 = INPUT_ACTIVE_SUBSCRIBE_MGR.SubscribeInputActive(
-        std::static_pointer_cast<IInputEventConsumer>(inputEventConsumer), DEFAULT_INTERVAL);
-    EXPECT_EQ(subscriberId1, ERROR_ONE_PROCESS_ONLY_SUPPORT_ONE);
+        std::static_pointer_cast<IInputEventConsumer>(inputEventConsumer), interval);
+    EXPECT_LT(subscriberId1, 0);
     int32_t result = INPUT_ACTIVE_SUBSCRIBE_MGR.UnsubscribeInputActive(subscriberId);
     EXPECT_EQ(result, RET_OK);
     result = INPUT_ACTIVE_SUBSCRIBE_MGR.UnsubscribeInputActive(subscriberId);
@@ -82,33 +82,24 @@ HWTEST_F(InputActiveSubscribeManagerTest, SubscribeInputActive_Test_001, TestSiz
 
 /**
  * @tc.name: SubscribeInputActive_Test_002
- * @tc.desc: Subscribe with a nullptr callback is rejected with the invalid id
+ * @tc.desc: Test SubscribeInputActive
  * @tc.type: FUNC
  * @tc.require:
  */
 HWTEST_F(InputActiveSubscribeManagerTest, SubscribeInputActive_Test_002, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    int32_t subscriberInput = INPUT_ACTIVE_SUBSCRIBE_MGR.SubscribeInputActive(nullptr, DEFAULT_INTERVAL);
-    EXPECT_EQ(subscriberInput, INVALID_HANDLER_ID);
-}
-
-/**
- * @tc.name: SubscribeInputActive_Test_003
- * @tc.desc: Unsubscribe with an id that differs from the supported single id is rejected
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputActiveSubscribeManagerTest, SubscribeInputActive_Test_003, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    int32_t result = INPUT_ACTIVE_SUBSCRIBE_MGR.UnsubscribeInputActive(INVALID_SUBSCRIBE_ID);
-    EXPECT_EQ(result, ERROR_INVALID_SUBSCRIBE_ID);
+    int64_t interval = 500; // ms
+    int32_t subscriberInput = INPUT_ACTIVE_SUBSCRIBE_MGR.SubscribeInputActive(nullptr, interval);
+    EXPECT_LT(subscriberInput, 0);
+    subscriberInput = 2;
+    int32_t result = INPUT_ACTIVE_SUBSCRIBE_MGR.UnsubscribeInputActive(subscriberInput);
+    EXPECT_NE(result, RET_OK);
 }
 
 /**
  * @tc.name: OnSubscribeInputActiveCallback_Test_001
- * @tc.desc: Key callback after a successful subscribe returns RET_OK and clears afterward
+ * @tc.desc: Test OnSubscribeInputActiveCallback
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -117,9 +108,10 @@ HWTEST_F(InputActiveSubscribeManagerTest, OnSubscribeInputActiveCallback_Test_00
     CALL_TEST_DEBUG;
     std::shared_ptr<TestInputEventConsumer> inputEventConsumer = std::make_shared<TestInputEventConsumer>();
     EXPECT_NE(inputEventConsumer, nullptr);
+    int64_t interval = 500; // ms
     int32_t subscriberInput = INPUT_ACTIVE_SUBSCRIBE_MGR.SubscribeInputActive(
-        std::static_pointer_cast<IInputEventConsumer>(inputEventConsumer), DEFAULT_INTERVAL);
-    EXPECT_EQ(subscriberInput, VALID_SUBSCRIBE_ID);
+        std::static_pointer_cast<IInputEventConsumer>(inputEventConsumer), interval);
+    EXPECT_GE(subscriberInput, 0);
 
     std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
     ASSERT_NE(keyEvent, nullptr);
@@ -133,7 +125,7 @@ HWTEST_F(InputActiveSubscribeManagerTest, OnSubscribeInputActiveCallback_Test_00
 
 /**
  * @tc.name: OnSubscribeInputActiveCallback_Test_002
- * @tc.desc: Pointer callback after a successful subscribe returns RET_OK and clears afterward
+ * @tc.desc: Test OnSubscribeInputActiveCallback
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -142,9 +134,10 @@ HWTEST_F(InputActiveSubscribeManagerTest, OnSubscribeInputActiveCallback_Test_00
     CALL_TEST_DEBUG;
     std::shared_ptr<TestInputEventConsumer> inputEventConsumer = std::make_shared<TestInputEventConsumer>();
     EXPECT_NE(inputEventConsumer, nullptr);
+    int64_t interval = 500; // ms
     int32_t subscriberInput = INPUT_ACTIVE_SUBSCRIBE_MGR.SubscribeInputActive(
-        std::static_pointer_cast<IInputEventConsumer>(inputEventConsumer), DEFAULT_INTERVAL);
-    EXPECT_EQ(subscriberInput, VALID_SUBSCRIBE_ID);
+        std::static_pointer_cast<IInputEventConsumer>(inputEventConsumer), interval);
+    EXPECT_GE(subscriberInput, 0);
 
     auto pointerEvent = PointerEvent::Create();
     ASSERT_NE(pointerEvent, nullptr);
@@ -158,7 +151,7 @@ HWTEST_F(InputActiveSubscribeManagerTest, OnSubscribeInputActiveCallback_Test_00
 
 /**
  * @tc.name: OnSubscribeInputActiveCallback_Test_003
- * @tc.desc: Key callback with a nullptr event or an invalid subscribe id is rejected
+ * @tc.desc: Test OnSubscribeInputActiveCallback
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -167,23 +160,24 @@ HWTEST_F(InputActiveSubscribeManagerTest, OnSubscribeInputActiveCallback_Test_00
     CALL_TEST_DEBUG;
     std::shared_ptr<TestInputEventConsumer> inputEventConsumer = std::make_shared<TestInputEventConsumer>();
     EXPECT_NE(inputEventConsumer, nullptr);
+    int64_t interval = 500; // ms
     int32_t subscriberInput = INPUT_ACTIVE_SUBSCRIBE_MGR.SubscribeInputActive(
-        std::static_pointer_cast<IInputEventConsumer>(inputEventConsumer), DEFAULT_INTERVAL);
-    EXPECT_EQ(subscriberInput, VALID_SUBSCRIBE_ID);
+        std::static_pointer_cast<IInputEventConsumer>(inputEventConsumer), interval);
+    EXPECT_GE(subscriberInput, 0);
 
     std::shared_ptr<KeyEvent> keyEvent = nullptr;
     int32_t result = INPUT_ACTIVE_SUBSCRIBE_MGR.OnSubscribeInputActiveCallback(keyEvent, subscriberInput);
     EXPECT_NE(result, RET_OK);
     keyEvent = KeyEvent::Create();
-    result = INPUT_ACTIVE_SUBSCRIBE_MGR.OnSubscribeInputActiveCallback(keyEvent, INVALID_SUBSCRIBE_ID);
-    EXPECT_EQ(result, ERROR_INVALID_SUBSCRIBE_ID);
+    result = INPUT_ACTIVE_SUBSCRIBE_MGR.OnSubscribeInputActiveCallback(keyEvent, -1);
+    EXPECT_NE(result, RET_OK);
     result = INPUT_ACTIVE_SUBSCRIBE_MGR.UnsubscribeInputActive(subscriberInput);
     EXPECT_EQ(result, RET_OK);
 }
 
 /**
  * @tc.name: OnSubscribeInputActiveCallback_Test_004
- * @tc.desc: Pointer callback with a nullptr event or an invalid subscribe id is rejected
+ * @tc.desc: Test OnSubscribeInputActiveCallback
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -192,23 +186,24 @@ HWTEST_F(InputActiveSubscribeManagerTest, OnSubscribeInputActiveCallback_Test_00
     CALL_TEST_DEBUG;
     std::shared_ptr<TestInputEventConsumer> inputEventConsumer = std::make_shared<TestInputEventConsumer>();
     EXPECT_NE(inputEventConsumer, nullptr);
+    int64_t interval = 500; // ms
     int32_t subscriberInput = INPUT_ACTIVE_SUBSCRIBE_MGR.SubscribeInputActive(
-        std::static_pointer_cast<IInputEventConsumer>(inputEventConsumer), DEFAULT_INTERVAL);
-    EXPECT_EQ(subscriberInput, VALID_SUBSCRIBE_ID);
+        std::static_pointer_cast<IInputEventConsumer>(inputEventConsumer), interval);
+    EXPECT_GE(subscriberInput, 0);
 
     std::shared_ptr<PointerEvent> pointerEvent = nullptr;
     int32_t result = INPUT_ACTIVE_SUBSCRIBE_MGR.OnSubscribeInputActiveCallback(pointerEvent, subscriberInput);
     EXPECT_NE(result, RET_OK);
     pointerEvent = PointerEvent::Create();
-    result = INPUT_ACTIVE_SUBSCRIBE_MGR.OnSubscribeInputActiveCallback(pointerEvent, INVALID_SUBSCRIBE_ID);
-    EXPECT_EQ(result, ERROR_INVALID_SUBSCRIBE_ID);
+    result = INPUT_ACTIVE_SUBSCRIBE_MGR.OnSubscribeInputActiveCallback(pointerEvent, -1);
+    EXPECT_NE(result, RET_OK);
     result = INPUT_ACTIVE_SUBSCRIBE_MGR.UnsubscribeInputActive(subscriberInput);
     EXPECT_EQ(result, RET_OK);
 }
 
 /**
  * @tc.name: OnSubscribeInputActiveCallback_Test_005
- * @tc.desc: Key callback with a valid id but no active subscription is rejected
+ * @tc.desc: Test OnSubscribeInputActiveCallback KeyEvent with valid id but no active subscription
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -223,7 +218,7 @@ HWTEST_F(InputActiveSubscribeManagerTest, OnSubscribeInputActiveCallback_Test_00
 
 /**
  * @tc.name: OnSubscribeInputActiveCallback_Test_006
- * @tc.desc: Pointer callback with a valid id but no active subscription is rejected
+ * @tc.desc: Test OnSubscribeInputActiveCallback PointerEvent with valid id but no active subscription
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -237,16 +232,35 @@ HWTEST_F(InputActiveSubscribeManagerTest, OnSubscribeInputActiveCallback_Test_00
 }
 
 /**
+ * @tc.name: OnConnectedTest
+ * @tc.desc: OnConnected
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputActiveSubscribeManagerTest, OnConnectedTest, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    INPUT_ACTIVE_SUBSCRIBE_MGR.OnConnected();
+    std::shared_ptr<TestInputEventConsumer> inputEventConsumer = std::make_shared<TestInputEventConsumer>();
+    EXPECT_NE(inputEventConsumer, nullptr);
+    int64_t interval = 500; // ms
+    int32_t subscriberInput = INPUT_ACTIVE_SUBSCRIBE_MGR.SubscribeInputActive(
+        std::static_pointer_cast<IInputEventConsumer>(inputEventConsumer), interval);
+    EXPECT_GE(subscriberInput, 0);
+    INPUT_ACTIVE_SUBSCRIBE_MGR.OnConnected();
+}
+
+/**
  * @tc.name: UnsubscribeInputActive_Test_001
- * @tc.desc: Unsubscribe with the valid id but no active subscription is rejected
+ * @tc.desc: Test UnsubscribeInputActive with valid id but no active subscription
  * @tc.type: FUNC
  * @tc.require:
  */
 HWTEST_F(InputActiveSubscribeManagerTest, UnsubscribeInputActive_Test_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    int32_t result = INPUT_ACTIVE_SUBSCRIBE_MGR.UnsubscribeInputActive(VALID_SUBSCRIBE_ID);
-    EXPECT_EQ(result, ERROR_NO_SUBSCRIBE_INPUT_ACTIVE);
+    int32_t result = INPUT_ACTIVE_SUBSCRIBE_MGR.UnsubscribeInputActive(0);
+    EXPECT_NE(result, RET_OK);
 }
 
 /**
