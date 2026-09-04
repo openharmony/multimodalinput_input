@@ -87,6 +87,8 @@ public:
     void ApplyBoundDisplayId(std::shared_ptr<PointerEvent> pointerEvent);
     void ApplyBoundDisplayId(std::shared_ptr<KeyEvent> keyEvent);
     int32_t GetDisplayBindInfo(DisplayBindInfos &infos);
+    int32_t GetGlobalCoordinates(int32_t displayId, int32_t displayX, int32_t displayY,
+        int32_t &globalX, int32_t &globalY);
     int32_t SetDisplayBind(int32_t deviceId, int32_t displayId, std::string &msg);
     int32_t BindToDisplay(int32_t deviceId, int32_t displayId, std::string &msg);
     int32_t AppendExtraData(const ExtraData& extraData);

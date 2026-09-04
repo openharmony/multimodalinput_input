@@ -16,6 +16,7 @@
 #include "input_windows_manager.h"
 #include "error_multimodal.h"
 #include <algorithm>
+#include <limits>
 #include <linux/input.h>
 
 #include "account_manager.h"
@@ -1682,6 +1683,26 @@ GlobalCoords InputWindowsManager::DisplayCoords2GlobalCoords(const Coordinate2D 
         .y = displayInfo->y + displayCoords.y
     };
     return globalCoords;
+}
+
+int32_t InputWindowsManager::GetGlobalCoordinates(int32_t displayId, int32_t displayX, int32_t displayY,
+    int32_t &globalX, int32_t &globalY)
+{
+    auto displayInfo = GetPhysicalDisplay(displayId);
+    if (displayInfo == nullptr) {
+        return RET_ERR;
+    }
+    const int64_t calculatedX = static_cast<int64_t>(displayInfo->x) + displayX;
+    const int64_t calculatedY = static_cast<int64_t>(displayInfo->y) + displayY;
+    if (calculatedX < std::numeric_limits<int32_t>::min() ||
+        calculatedX > std::numeric_limits<int32_t>::max() ||
+        calculatedY < std::numeric_limits<int32_t>::min() ||
+        calculatedY > std::numeric_limits<int32_t>::max()) {
+        return RET_ERR;
+    }
+    globalX = static_cast<int32_t>(calculatedX);
+    globalY = static_cast<int32_t>(calculatedY);
+    return RET_OK;
 }
 
 void InputWindowsManager::ResetPointerPosition(const OLD::DisplayGroupInfo &displayGroupInfo)

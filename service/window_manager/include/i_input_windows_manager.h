@@ -95,6 +95,8 @@ public:
     virtual int32_t SetMouseCaptureMode(int32_t windowId, bool isCaptureMode) = 0;
     virtual bool GetMouseIsCaptureMode() const = 0;
     virtual int32_t GetDisplayBindInfo(DisplayBindInfos &infos) = 0;
+    virtual int32_t GetGlobalCoordinates(int32_t displayId, int32_t displayX, int32_t displayY,
+        int32_t &globalX, int32_t &globalY) = 0;
     virtual int32_t SetDisplayBind(int32_t deviceId, int32_t displayId, std::string &msg) = 0;
     virtual int32_t BindToDisplay(int32_t deviceId, int32_t displayId, std::string &msg) = 0;
     virtual int32_t GetBindDisplayIdByInputDevice(int32_t inputDeviceId) const = 0;

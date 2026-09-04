@@ -23,6 +23,7 @@
 #endif // OHOS_RSS_CLIENT
 
 #include <algorithm>
+#include <memory>
 
 #include "bundle_name_parser.h"
 #include "misc_product_type_parser.h"
@@ -3694,6 +3695,33 @@ ErrCode MMIService::GetWindowPid(int32_t windowId, int32_t &windowPid)
         return ret;
     }
     MMI_HILOGD("The windowpid is:%{public}d", windowPid);
+    return RET_OK;
+}
+
+ErrCode MMIService::GetGlobalCoordinates(int32_t displayId, int32_t displayX, int32_t displayY,
+    int32_t &globalX, int32_t &globalY)
+{
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
+    if (!IsRunning()) {
+        MMI_HILOGE("Service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
+    auto resultX = std::make_shared<int32_t>(0);
+    auto resultY = std::make_shared<int32_t>(0);
+    int32_t ret = delegateTasks_.PostSyncTask(
+        [displayId, displayX, displayY, resultX, resultY] {
+            return IInputWindowsManager::GetInstance()->GetGlobalCoordinates(displayId, displayX, displayY,
+                *resultX, *resultY);
+        });
+    if (ret != RET_OK) {
+        MMI_HILOGE("Get global coordinates failed, ret:%{public}d", ret);
+        return ret;
+    }
+    globalX = *resultX;
+    globalY = *resultY;
     return RET_OK;
 }
 

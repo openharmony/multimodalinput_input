@@ -150,6 +150,8 @@ public:
     ErrCode SetFunctionKeyState(int32_t funcKey, bool enable) override;
     ErrCode SetPointerLocation(int32_t x, int32_t y, int32_t displayId) override;
     ErrCode GetPointerLocation(int32_t &displayId, double &displayX, double &displayY) override;
+    ErrCode GetGlobalCoordinates(int32_t displayId, int32_t displayX, int32_t displayY, int32_t &globalX,
+        int32_t &globalY) override;
     ErrCode SetMouseCaptureMode(int32_t windowId, bool isCaptureMode) override;
     ErrCode GetWindowPid(int32_t windowId, int32_t &windowPid) override;
     ErrCode AppendExtraData(const ExtraData &extraData) override;
