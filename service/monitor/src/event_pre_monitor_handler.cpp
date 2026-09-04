@@ -197,7 +197,6 @@ void EventPreMonitorHandler::MonitorCollection::RemoveMonitor(SessionPtr sess, i
                 continue;
             }
             if ((*it)->handlerId_ == handlerId && (*it)->session_ == sess) {
-                MMI_HILOGD("Remove pre-monitor handler, handlerId:%{public}d", handlerId);
                 it = sessionHandlers.erase(it);
             } else {
                 ++it;

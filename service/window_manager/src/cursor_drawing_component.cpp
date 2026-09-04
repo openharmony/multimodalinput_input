@@ -783,7 +783,7 @@ void CursorDrawingInformation::CheckMouseIconPath()
     }
     for (auto iter = mouseIcons_.begin(); iter != mouseIcons_.end();) {
         if ((ReadCursorStyleFile(iter->second.iconPath)) != RET_OK) {
-            MMI_HILOGW("invalid iconPath");
+            MMI_HILOGI("invalid iconPath");
             iter = mouseIcons_.erase(iter);
             continue;
         }

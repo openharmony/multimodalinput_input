@@ -69,7 +69,6 @@ ErrCode AncoChannel::UpdateExcludedKeyEventWindow(
     const AncoExcludedKeyEventWindow &excludedKeyEventWindow)
 {
     if (consumer_ == nullptr) {
-        MMI_HILOGE("Consumer is nullptr");
         return RET_ERR;
     }
     return consumer_->UpdateExcludedKeyEventWindow(excludedKeyEventWindow);
@@ -79,7 +78,6 @@ ErrCode AncoChannel::UpdateTripleFingerSnapshotState(
     const AncoTripleFingerSnapshotState &snapshotState)
 {
     if (consumer_ == nullptr) {
-        MMI_HILOGE("Consumer is nullptr");
         return RET_ERR;
     }
     return consumer_->UpdateTripleFingerSnapshotState(snapshotState);
