@@ -61,12 +61,12 @@ MouseControllerImpl::~MouseControllerImpl()
         pointerEvent->SetTargetDisplayId(cursorPos_.displayId);
         pointerEvent->SetButtonId(button);
 
-        PointerEvent::PointerItem item = useGlobalCoordinates_ ?
-            CreateGlobalPointerItem(globalX_, globalY_) : CreatePointerItem();
+        PointerEvent::PointerItem item = globalCoordinateState_.enabled ?
+            CreateGlobalPointerItem(globalCoordinateState_.x, globalCoordinateState_.y) : CreatePointerItem();
         item.SetDownTime(buttonDownTimes_[button]);
         pointerEvent->AddPointerItem(item);
 
-        const int32_t coordinateType = useGlobalCoordinates_ ? PointerEvent::GLOBAL_COORDINATE :
+        const int32_t coordinateType = globalCoordinateState_.enabled ? PointerEvent::GLOBAL_COORDINATE :
             PointerEvent::DISPLAY_COORDINATE;
         int32_t ret = InjectPointerEvent(pointerEvent, coordinateType);
         if (ret != RET_OK) {
@@ -112,37 +112,23 @@ int32_t MouseControllerImpl::MoveTo(int32_t displayId, int32_t x, int32_t y)
 
     std::shared_ptr<PointerEvent> pointerEvent;
 
-    int32_t oldDisplayId;
-    int32_t oldX;
-    int32_t oldY;
-    bool oldUseGlobal;
-    int32_t oldGlobalX;
-    int32_t oldGlobalY;
+    decltype(cursorPos_) oldCursorPos;
+    decltype(globalCoordinateState_) oldGlobalCoordinateState;
     {
         std::lock_guard<std::mutex> lock(mutex_);
 
-        oldDisplayId = cursorPos_.displayId;
-        oldX = cursorPos_.x;
-        oldY = cursorPos_.y;
-        oldUseGlobal = useGlobalCoordinates_;
-        oldGlobalX = globalX_;
-        oldGlobalY = globalY_;
+        oldCursorPos = cursorPos_;
+        oldGlobalCoordinateState = globalCoordinateState_;
         cursorPos_.displayId = displayId;
         cursorPos_.x = x;
         cursorPos_.y = y;
-        useGlobalCoordinates_ = false;
-        globalX_ = 0;
-        globalY_ = 0;
+        ResetGlobalCoordinateState();
 
         pointerEvent = CreatePointerEvent(PointerEvent::POINTER_ACTION_MOVE);
         if (pointerEvent == nullptr) {
             MMI_HILOGE("Failed to create pointer event");
-            cursorPos_.displayId = oldDisplayId;
-            cursorPos_.x = oldX;
-            cursorPos_.y = oldY;
-            useGlobalCoordinates_ = oldUseGlobal;
-            globalX_ = oldGlobalX;
-            globalY_ = oldGlobalY;
+            cursorPos_ = oldCursorPos;
+            globalCoordinateState_ = oldGlobalCoordinateState;
             return RET_ERR;
         }
 
@@ -168,12 +154,8 @@ int32_t MouseControllerImpl::MoveTo(int32_t displayId, int32_t x, int32_t y)
     const int32_t ret = InjectPointerEvent(pointerEvent);
     if (ret != RET_OK) {
         std::lock_guard<std::mutex> lock(mutex_);
-        cursorPos_.displayId = oldDisplayId;
-        cursorPos_.x = oldX;
-        cursorPos_.y = oldY;
-        useGlobalCoordinates_ = oldUseGlobal;
-        globalX_ = oldGlobalX;
-        globalY_ = oldGlobalY;
+        cursorPos_ = oldCursorPos;
+        globalCoordinateState_ = oldGlobalCoordinateState;
     }
     return ret;
 }
@@ -206,9 +188,9 @@ int32_t MouseControllerImpl::MoveToGlobal(int32_t x, int32_t y)
     const int32_t ret = InjectPointerEvent(pointerEvent, PointerEvent::GLOBAL_COORDINATE);
     if (ret == RET_OK) {
         std::lock_guard<std::mutex> lock(mutex_);
-        globalX_ = x;
-        globalY_ = y;
-        useGlobalCoordinates_ = true;
+        globalCoordinateState_.x = x;
+        globalCoordinateState_.y = y;
+        globalCoordinateState_.enabled = true;
     }
     return ret;
 }
@@ -297,11 +279,10 @@ int32_t MouseControllerImpl::ReleaseButton(int32_t button)
             }
         }
 
-        const bool useGlobalCoordinates = useGlobalCoordinates_;
-        coordinateType = useGlobalCoordinates ? PointerEvent::GLOBAL_COORDINATE :
+        coordinateType = globalCoordinateState_.enabled ? PointerEvent::GLOBAL_COORDINATE :
             PointerEvent::DISPLAY_COORDINATE;
-        PointerEvent::PointerItem item = useGlobalCoordinates ?
-            CreateGlobalPointerItem(globalX_, globalY_) : CreatePointerItem();
+        PointerEvent::PointerItem item = globalCoordinateState_.enabled ?
+            CreateGlobalPointerItem(globalCoordinateState_.x, globalCoordinateState_.y) : CreatePointerItem();
         item.SetDownTime(downTime);
         pointerEvent->AddPointerItem(item);
     }
@@ -315,9 +296,7 @@ int32_t MouseControllerImpl::ReleaseButton(int32_t button)
         const bool hasPressedButton = std::any_of(buttonStates_.begin(), buttonStates_.end(),
             [](const auto &state) { return state.second; });
         if (!hasPressedButton) {
-            useGlobalCoordinates_ = false;
-            globalX_ = 0;
-            globalY_ = 0;
+            ResetGlobalCoordinateState();
         }
     }
 
@@ -464,6 +443,11 @@ PointerEvent::PointerItem MouseControllerImpl::CreateGlobalPointerItem(int32_t x
     item.SetGlobalX(x);
     item.SetGlobalY(y);
     return item;
+}
+
+void MouseControllerImpl::ResetGlobalCoordinateState()
+{
+    globalCoordinateState_ = {};
 }
 
 std::shared_ptr<PointerEvent> MouseControllerImpl::CreatePointerEvent(int32_t action)

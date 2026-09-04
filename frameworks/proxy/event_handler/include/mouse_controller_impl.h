@@ -44,6 +44,7 @@ private:
     std::shared_ptr<PointerEvent> CreatePointerEvent(int32_t action);
     int32_t InjectPointerEvent(std::shared_ptr<PointerEvent> event,
         int32_t useCoordinate = PointerEvent::DISPLAY_COORDINATE);
+    void ResetGlobalCoordinateState();
 
     std::map<int32_t, bool> buttonStates_;
     std::map<int32_t, int64_t> buttonDownTimes_;
@@ -60,9 +61,11 @@ private:
         int32_t y = 0;
     } cursorPos_;
 
-    bool useGlobalCoordinates_ { false };
-    int32_t globalX_ { 0 };
-    int32_t globalY_ { 0 };
+    struct {
+        bool enabled = false;
+        int32_t x = 0;
+        int32_t y = 0;
+    } globalCoordinateState_;
 
     mutable std::mutex mutex_;
 };

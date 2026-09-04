@@ -3902,5 +3902,43 @@ HWTEST_F(InputManagerImplTest, InputManagerImplTest_BindToDisplay_002, TestSize.
     EXPECT_EQ(inputManagerImpl.BindToDisplay(1, 0, callback), RET_OK);
     EXPECT_TRUE(invoked);
 }
+
+/**
+ * @tc.name: MouseControllerImpl_GlobalCoordinateStateReset_001
+ * @tc.desc: Resetting global coordinate mode clears both mode and coordinates
+ * @tc.type: FUNC
+ */
+HWTEST_F(InputManagerImplTest, MouseControllerImpl_GlobalCoordinateStateReset_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MouseControllerImpl controller;
+    controller.globalCoordinateState_.enabled = true;
+    controller.globalCoordinateState_.x = 1920;
+    controller.globalCoordinateState_.y = 1080;
+
+    controller.ResetGlobalCoordinateState();
+
+    EXPECT_FALSE(controller.globalCoordinateState_.enabled);
+    EXPECT_EQ(controller.globalCoordinateState_.x, 0);
+    EXPECT_EQ(controller.globalCoordinateState_.y, 0);
+}
+
+/**
+ * @tc.name: MouseControllerImpl_CreateGlobalPointerItem_001
+ * @tc.desc: Global pointer items preserve the requested global coordinates
+ * @tc.type: FUNC
+ */
+HWTEST_F(InputManagerImplTest, MouseControllerImpl_CreateGlobalPointerItem_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MouseControllerImpl controller;
+
+    auto item = controller.CreateGlobalPointerItem(1920, 1080);
+
+    EXPECT_EQ(item.GetGlobalX(), 1920);
+    EXPECT_EQ(item.GetGlobalY(), 1080);
+    EXPECT_EQ(item.GetPointerId(), 0);
+    EXPECT_EQ(item.GetToolType(), PointerEvent::TOOL_TYPE_MOUSE);
+}
 } // namespace MMI
 } // namespace OHOS
