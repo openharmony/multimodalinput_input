@@ -92,8 +92,7 @@ MouseControllerImpl::~MouseControllerImpl()
     }
 
     pointerEvent->SetTargetDisplayId(cursorPos_.displayId);
-    pointerEvent->SetAxisValue(static_cast<PointerEvent::AxisType>(axisState_.axisType),
-                               static_cast<double>(axisState_.lastValue));
+    pointerEvent->SetAxisValue(static_cast<PointerEvent::AxisType>(axisState_.axisType), 0.0);
 
     PointerEvent::PointerItem item = CreatePointerItem();
     pointerEvent->AddPointerItem(item);
@@ -341,12 +340,12 @@ int32_t MouseControllerImpl::BeginAxis(int32_t axis, int32_t value)
 
         axisState_.inProgress = true;
         axisState_.axisType = axis;
-        axisState_.lastValue = value;
 
         pointerEvent = CreatePointerEvent(PointerEvent::POINTER_ACTION_AXIS_BEGIN);
         if (pointerEvent == nullptr) {
             MMI_HILOGE("Failed to create pointer event");
             axisState_.inProgress = false;
+            axisState_.axisType = -1;
             return RET_ERR;
         }
 
@@ -362,7 +361,6 @@ int32_t MouseControllerImpl::BeginAxis(int32_t axis, int32_t value)
         std::lock_guard<std::mutex> lock(mutex_);
         axisState_.inProgress = false;
         axisState_.axisType = -1;
-        axisState_.lastValue = 0;
     }
 
     return ret;
@@ -388,8 +386,6 @@ int32_t MouseControllerImpl::UpdateAxis(int32_t axis, int32_t value)
             return ERROR_CODE_STATE_ERROR;
         }
 
-        axisState_.lastValue = value;
-
         pointerEvent = CreatePointerEvent(PointerEvent::POINTER_ACTION_AXIS_UPDATE);
         if (pointerEvent == nullptr) {
             MMI_HILOGE("Failed to create pointer event");
@@ -411,7 +407,6 @@ int32_t MouseControllerImpl::EndAxis(int32_t axis)
     MMI_HILOGD("EndAxis: axis=%{public}d", axis);
 
     std::shared_ptr<PointerEvent> pointerEvent;
-    int32_t lastValue;
 
     {
         std::lock_guard<std::mutex> lock(mutex_);
@@ -427,8 +422,6 @@ int32_t MouseControllerImpl::EndAxis(int32_t axis)
             return ERROR_CODE_STATE_ERROR;
         }
 
-        lastValue = axisState_.lastValue;
-
         pointerEvent = CreatePointerEvent(PointerEvent::POINTER_ACTION_AXIS_END);
         if (pointerEvent == nullptr) {
             MMI_HILOGE("Failed to create pointer event");
@@ -436,7 +429,7 @@ int32_t MouseControllerImpl::EndAxis(int32_t axis)
         }
 
         pointerEvent->SetTargetDisplayId(cursorPos_.displayId);
-        pointerEvent->SetAxisValue(static_cast<PointerEvent::AxisType>(axis), static_cast<double>(lastValue));
+        pointerEvent->SetAxisValue(static_cast<PointerEvent::AxisType>(axis), 0.0);
 
         PointerEvent::PointerItem item = CreatePointerItem();
         pointerEvent->AddPointerItem(item);
@@ -447,7 +440,6 @@ int32_t MouseControllerImpl::EndAxis(int32_t axis)
         std::lock_guard<std::mutex> lock(mutex_);
         axisState_.inProgress = false;
         axisState_.axisType = -1;
-        axisState_.lastValue = 0;
     }
 
     return ret;
