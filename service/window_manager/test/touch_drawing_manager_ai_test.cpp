@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2024-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -213,48 +213,6 @@ HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_UpdateBubbleData, Test
 }
 
 /**
- * @tc.name: TouchDrawingManagerTest_RotationScreen
- * @tc.desc: Test RotationScreen
- * @tc.type: Function
- * @tc.require:
- */
-HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_RotationScreen, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    TouchDrawingManager touchDrawingMgr;
-    touchDrawingMgr.isChangedRotation_ = false;
-    touchDrawingMgr.isChangedMode_ = false;
-    EXPECT_NO_FATAL_FAILURE(touchDrawingMgr.RotationScreen());
-
-    touchDrawingMgr.trackerCanvasNode_ = Rosen::RSCanvasNode::Create(false, false, rsUIContext_);
-    ASSERT_NE(touchDrawingMgr.trackerCanvasNode_, nullptr);
-    touchDrawingMgr.crosshairCanvasNode_ = Rosen::RSCanvasNode::Create(false, false, rsUIContext_);
-    ASSERT_NE(touchDrawingMgr.crosshairCanvasNode_, nullptr);
-    touchDrawingMgr.bubbleCanvasNode_ = Rosen::RSCanvasNode::Create(false, false, rsUIContext_);
-    ASSERT_NE(touchDrawingMgr.bubbleCanvasNode_, nullptr);
-    touchDrawingMgr.labelsCanvasNode_ = Rosen::RSCanvasNode::Create(false, false, rsUIContext_);
-    ASSERT_NE(touchDrawingMgr.labelsCanvasNode_, nullptr);
-    touchDrawingMgr.isChangedRotation_ = true;
-    touchDrawingMgr.isChangedMode_ = true;
-    touchDrawingMgr.pointerMode_.isShow = true;
-    touchDrawingMgr.bubbleMode_.isShow = true;
-    PointerEvent::PointerItem item;
-    touchDrawingMgr.lastPointerItem_.push_back(item);
-    EXPECT_NO_FATAL_FAILURE(touchDrawingMgr.RotationScreen());
-
-    touchDrawingMgr.lastPointerItem_.clear();
-    touchDrawingMgr.stopRecord_ = true;
-    EXPECT_NO_FATAL_FAILURE(touchDrawingMgr.RotationScreen());
-
-    touchDrawingMgr.bubbleMode_.isShow = false;
-    touchDrawingMgr.stopRecord_ = false;
-    EXPECT_NO_FATAL_FAILURE(touchDrawingMgr.RotationScreen());
-
-    touchDrawingMgr.pointerMode_.isShow = false;
-    EXPECT_NO_FATAL_FAILURE(touchDrawingMgr.RotationScreen());
-}
-
-/**
  * @tc.name: TouchDrawingManagerTest_CreateObserver
  * @tc.desc: Test CreateObserver
  * @tc.type: Function
@@ -306,30 +264,6 @@ HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_AddCanvasNode, TestSiz
 
     canvasNode = nullptr;
     EXPECT_NO_FATAL_FAILURE(touchDrawingMgr.AddCanvasNode(canvasNode, isTrackerNode));
-}
-
-/**
- * @tc.name: TouchDrawingManagerTest_RotationCanvasNode
- * @tc.desc: Test RotationCanvasNode
- * @tc.type: Function
- * @tc.require:
- */
-HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_RotationCanvasNode, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    TouchDrawingManager touchDrawingMgr;
-    std::shared_ptr<Rosen::RSCanvasNode> canvasNode = Rosen::RSCanvasNode::Create(false, false, rsUIContext_);
-    ASSERT_NE(canvasNode, nullptr);
-    touchDrawingMgr.displayInfo_.width = 720;
-    touchDrawingMgr.displayInfo_.height = 1800;
-    touchDrawingMgr.displayInfo_.direction = Direction::DIRECTION90;
-    EXPECT_NO_FATAL_FAILURE(touchDrawingMgr.RotationCanvasNode(canvasNode));
-    touchDrawingMgr.displayInfo_.direction = Direction::DIRECTION270;
-    EXPECT_NO_FATAL_FAILURE(touchDrawingMgr.RotationCanvasNode(canvasNode));
-    touchDrawingMgr.displayInfo_.direction = Direction::DIRECTION180;
-    EXPECT_NO_FATAL_FAILURE(touchDrawingMgr.RotationCanvasNode(canvasNode));
-    touchDrawingMgr.displayInfo_.direction = Direction::DIRECTION0;
-    EXPECT_NO_FATAL_FAILURE(touchDrawingMgr.RotationCanvasNode(canvasNode));
 }
 
 /**

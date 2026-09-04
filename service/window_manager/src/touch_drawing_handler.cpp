@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Huawei Device Co., Ltd.
+ * Copyright (c) 2025-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -78,7 +78,6 @@ constexpr int32_t FOLDABLE_DEVICE { 2 };
 constexpr int32_t ANGLE_90 { 90 };
 constexpr int32_t ANGLE_360 { 360 };
 constexpr char PRODUCT_PHONE[] { "phone" };
-constexpr char PRODUCT_TYPE_PC[] { "2in1" };
 } // namespace
 
 TouchDrawingHandler::~TouchDrawingHandler()
@@ -130,7 +129,7 @@ void TouchDrawingHandler::TouchDrawHandler(std::shared_ptr<PointerEvent> pointer
 
     if (bubbleMode_.isShow) {
         CreateTouchWindow();
-        AddCanvasNode(bubbleCanvasNode_, false);
+        AddCanvasNode(bubbleCanvasNode_, false, "Bubble CanvasNode");
         DrawBubbleHandler();
     }
     if ((pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_UP ||
@@ -145,9 +144,14 @@ void TouchDrawingHandler::TouchDrawHandler(std::shared_ptr<PointerEvent> pointer
     }
     if (pointerMode_.isShow && !stopRecord_) {
         CreateTouchWindow();
-        AddCanvasNode(trackerCanvasNode_, true);
-        AddCanvasNode(crosshairCanvasNode_, false);
-        AddCanvasNode(labelsCanvasNode_, false, false);
+        if (trackerCanvasNode_ != nullptr && needResetTracker_) {
+            trackerCanvasNode_.reset();
+            transformModifier_.reset();
+            needResetTracker_ = false;
+        }
+        AddCanvasNode(trackerCanvasNode_, true, "Tracker CanvasNode");
+        AddCanvasNode(crosshairCanvasNode_, false, "Crosshair CanvasNode");
+        AddCanvasNode(labelsCanvasNode_, false, "Labels CanvasNode");
         DrawPointerPositionHandler();
         lastPt_ = currentPt_;
     }
@@ -156,11 +160,14 @@ void TouchDrawingHandler::TouchDrawHandler(std::shared_ptr<PointerEvent> pointer
 void TouchDrawingHandler::UpdateDisplayInfo(const OLD::DisplayInfo& displayInfo)
 {
     CALL_DEBUG_ENTER;
+    // Window rotation or screen rotation.
     isChangedRotation_ = (displayInfo.direction == displayInfo_.direction &&
         displayInfo.displayDirection == displayInfo_.displayDirection) ? false : true;
+    //  Rotation not changed and validWidth/validHeight changed means Screen valid Area changed.
+    bool isScreenAreaChanged = !isChangedRotation_ &&
+        (displayInfo_.validWidth != displayInfo.validWidth || displayInfo_.validHeight != displayInfo.validHeight);
+    // display mode changed.
     isChangedMode_ = displayInfo.displayMode == displayInfo_.displayMode ? false : true;
-    scaleW_ = displayInfo.validWidth > displayInfo.validHeight ? displayInfo.validWidth : displayInfo.validHeight;
-    scaleH_ = displayInfo.validWidth > displayInfo.validHeight ? displayInfo.validWidth : displayInfo.validHeight;
     if (displayInfo.displaySourceMode != displayInfo_.displaySourceMode ||
         displayInfo.rsId != displayInfo_.rsId) {
         if (surfaceNode_ != nullptr) {
@@ -169,40 +176,31 @@ void TouchDrawingHandler::UpdateDisplayInfo(const OLD::DisplayInfo& displayInfo)
             isChangedMode_ = true;
         }
     }
-    //  Rotation not changed and validWidth/validHeight changed means Screen valid Area changed.
-    bool isScreenAreaChanged = !isChangedRotation_ &&
-        (displayInfo_.validWidth != displayInfo.validWidth || displayInfo_.validHeight != displayInfo.validHeight);
-    displayInfo_ = displayInfo;
+    scaleW_ = displayInfo.validWidth;
+    scaleH_ = displayInfo.validHeight;
+    std::tie(screenWidth_, screenHeight_) = GetScreenWidthHeight(displayInfo);
     bubble_.innerCircleRadius = displayInfo.dpi * INDEPENDENT_INNER_PIXELS / DENSITY_BASELINE / CALCULATE_MIDDLE;
     bubble_.outerCircleRadius = displayInfo.dpi * INDEPENDENT_OUTER_PIXELS / DENSITY_BASELINE / CALCULATE_MIDDLE;
     bubble_.outerCircleWidth = static_cast<float>(displayInfo.dpi * INDEPENDENT_WIDTH_PIXELS) / DENSITY_BASELINE;
-    itemRectW_ = static_cast<double>(displayInfo_.validWidth) / RECT_COUNT;
+    itemRectW_ = static_cast<double>(displayInfo.validWidth) / RECT_COUNT;
     rectTopPosition_ = 0;
+    displayInfo_ = displayInfo;
     if (IsWindowRotation()) {
-        if (displayInfo_.direction == DIRECTION0 || displayInfo_.direction == DIRECTION180) {
+        if (displayInfo.direction == DIRECTION0 || displayInfo.direction == DIRECTION180) {
             rectTopPosition_ = PRODUCT_TYPE == PRODUCT_PHONE ? PHONE_RECT_TOP : PAD_RECT_TOP;
         }
-        // If is Window Rotation policy, it's need reset rsnode when Screen valid Area changed.
-        isChangedMode_ = isChangedMode_ || isScreenAreaChanged;
+        rotationStatus_ = isChangedRotation_ ? RotationStatus::WINDOW_ROTATION : RotationStatus::NO_ROTATION;
     } else {
-        if (displayInfo_.direction == DIRECTION90 && PRODUCT_TYPE != PRODUCT_TYPE_PC) {
-            rectTopPosition_ = PHONE_RECT_TOP;
-        }
+        rotationStatus_ = isChangedRotation_ ? RotationStatus::SCREEN_ROTATION : RotationStatus::NO_ROTATION;
     }
     if (isChangedMode_) {
-        if (trackerCanvasNode_ != nullptr) {
-            trackerCanvasNode_.reset();
-        }
-        if (bubbleCanvasNode_ != nullptr) {
-            bubbleCanvasNode_.reset();
-        }
-        if (crosshairCanvasNode_ != nullptr) {
-            crosshairCanvasNode_.reset();
-        }
-        if (labelsCanvasNode_ != nullptr) {
-            labelsCanvasNode_.reset();
-        }
-        RsFlushImplicitTransaction();
+        OnDisplayModeChange();
+    } else if (isScreenAreaChanged) {
+        OnScreenAreaChange();
+    } else if (rotationStatus_ == RotationStatus::WINDOW_ROTATION) {
+        OnWindowRotation();
+    } else if (rotationStatus_ == RotationStatus::SCREEN_ROTATION) {
+        OnScreenRotation();
     }
 }
 
@@ -220,7 +218,7 @@ void TouchDrawingHandler::UpdateLabels(bool isOn)
     pointerMode_.isShow = isOn;
     if (pointerMode_.isShow) {
         CreateTouchWindow();
-        AddCanvasNode(labelsCanvasNode_, false, false);
+        AddCanvasNode(labelsCanvasNode_, false, "Labels CanvasNode");
         DrawLabels();
     } else {
         RemovePointerPosition();
@@ -242,30 +240,6 @@ void TouchDrawingHandler::UpdateBubbleData(bool isOn)
     }
 }
 
-void TouchDrawingHandler::RotationScreen()
-{
-    CALL_DEBUG_ENTER;
-    if (!isChangedRotation_ && !isChangedMode_) {
-        return;
-    }
-    if (pointerMode_.isShow) {
-        RotationCanvasNode(trackerCanvasNode_);
-        RotationCanvasNode(crosshairCanvasNode_);
-    }
-    if (bubbleMode_.isShow) {
-        RotationCanvasNode(bubbleCanvasNode_);
-    }
-
-    if (pointerMode_.isShow && !isChangedMode_) {
-        if (!lastPointerItem_.empty() || stopRecord_) {
-            Snapshot();
-        } else if (!stopRecord_) {
-            UpdateLabels(pointerMode_.isShow);
-        }
-    }
-    RsFlushImplicitTransaction();
-}
-
 template <class T>
 std::string TouchDrawingHandler::FormatNumber(T number, int32_t precision)
 {
@@ -278,25 +252,22 @@ std::string TouchDrawingHandler::FormatNumber(T number, int32_t precision)
 }
 
 void TouchDrawingHandler::AddCanvasNode(std::shared_ptr<Rosen::RSCanvasNode>& canvasNode, bool isTrackerNode,
-    bool isNeedRotate)
+    const std::string &nodeName)
 {
     CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> lock(mutex_);
     CHKPV(surfaceNode_);
-    if (canvasNode != nullptr && screenId_ == displayInfo_.rsId) {
+    if (canvasNode != nullptr && rsId_ == displayInfo_.rsId) {
         return;
     }
-    MMI_HILOGI("Screen from:%{public}" PRIu64 " to :%{public}" PRIu64, screenId_, displayInfo_.rsId);
-    screenId_ = displayInfo_.rsId;
+    MMI_HILOGI("Screen from:%{public}" PRIu64 " to :%{public}" PRIu64 ", %{public}s=(%{public}d, %{public}d)",
+        rsId_, displayInfo_.rsId, nodeName.c_str(), screenWidth_, screenHeight_);
+    rsId_ = displayInfo_.rsId;
     canvasNode = isTrackerNode ? Rosen::RSCanvasDrawingNode::Create(false, false, rsUIContext_) :
         Rosen::RSCanvasNode::Create(false, false, rsUIContext_);
-    canvasNode->SetBounds(0, 0, scaleW_, scaleH_);
-    canvasNode->SetFrame(0, 0, scaleW_, scaleH_);
-    surfaceNode_->SetBounds(0, 0, scaleW_, scaleH_);
-    surfaceNode_->SetFrame(0, 0, scaleW_, scaleH_);
-    if (isNeedRotate) {
-        RotationCanvasNode(canvasNode);
-    }
+    CHKPV(canvasNode);
+    canvasNode->SetBounds(0, 0, screenWidth_, screenHeight_);
+    canvasNode->SetFrame(0, 0, screenWidth_, screenHeight_);
 #ifndef USE_ROSEN_DRAWING
     canvasNode->SetBackgroundColor(SK_ColorTRANSPARENT);
 #else
@@ -305,50 +276,15 @@ void TouchDrawingHandler::AddCanvasNode(std::shared_ptr<Rosen::RSCanvasNode>& ca
     canvasNode->SetCornerRadius(1);
     canvasNode->SetPositionZ(Rosen::RSSurfaceNode::POINTER_WINDOW_POSITION_Z);
     surfaceNode_->AddChild(canvasNode, DEFAULT_VALUE);
-}
 
-void TouchDrawingHandler::RotationCanvasNode(std::shared_ptr<Rosen::RSCanvasNode> canvasNode)
-{
-    CALL_DEBUG_ENTER;
-    CHKPV(canvasNode);
-    Direction displayDirection = static_cast<Direction>((
-        ((displayInfo_.direction - displayInfo_.displayDirection) * ANGLE_90 + ANGLE_360) % ANGLE_360) / ANGLE_90);
-    double whDiff = std::fabs(displayInfo_.validWidth - displayInfo_.validHeight);
-    if (displayDirection == Direction::DIRECTION90) {
-        canvasNode->SetRotation(ROTATION_ANGLE_270);
-        if (displayInfo_.validHeight > displayInfo_.validWidth) {
-            canvasNode->SetTranslateY(-whDiff);
-        } else {
-            canvasNode->SetTranslateX(0);
-        }
-    } else if (displayDirection == Direction::DIRECTION270) {
-        canvasNode->SetRotation(ROTATION_ANGLE_90);
-        if (displayInfo_.validHeight > displayInfo_.validWidth) {
-            canvasNode->SetTranslateY(0);
-        } else {
-            canvasNode->SetTranslateX(-whDiff);
-        }
-    } else if (displayDirection == Direction::DIRECTION180) {
-        canvasNode->SetRotation(ROTATION_ANGLE_180);
-        if (displayInfo_.validWidth > displayInfo_.validHeight) {
-            canvasNode->SetTranslateY(-whDiff);
-        } else {
-            canvasNode->SetTranslateX(-whDiff);
-        }
-    } else {
-        canvasNode->SetRotation(ROTATION_ANGLE_0);
-        canvasNode->SetTranslateX(0);
-        canvasNode->SetTranslateY(0);
+    if (isTrackerNode) {
+        transformModifier_ = std::make_shared<Rosen::ModifierNG::RSTransformModifier>();
+        CHKPV(canvasNode);
+        transformModifier_->SetPivot({0, 0});
+        canvasNode->AddModifier(transformModifier_);
+        prevDirection_ = displayInfo_.direction;
+        MMI_HILOGI("Tracker canvasNode, current direction=%{public}d", prevDirection_);
     }
-}
-
-void TouchDrawingHandler::ResetCanvasNode(std::shared_ptr<Rosen::RSCanvasNode> canvasNode)
-{
-    CALL_DEBUG_ENTER;
-    CHKPV(canvasNode);
-    canvasNode->SetRotation(ROTATION_ANGLE_0);
-    canvasNode->SetTranslateX(0);
-    canvasNode->SetTranslateY(0);
 }
 
 void TouchDrawingHandler::RotationCanvas(RosenCanvas *canvas, Direction direction)
@@ -370,7 +306,7 @@ void TouchDrawingHandler::CreateTouchWindow()
 {
     CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> lock(mutex_);
-    if (surfaceNode_ != nullptr || scaleW_ == 0 || scaleH_ == 0) {
+    if (surfaceNode_ != nullptr || screenWidth_ == 0 || screenHeight_ == 0) {
         return;
     }
     if (!InitRSUIContext(displayInfo_.rsId)) {
@@ -384,20 +320,17 @@ void TouchDrawingHandler::CreateTouchWindow()
     CHKPV(surfaceNode_);
     surfaceNode_->SetFrameGravity(Rosen::Gravity::RESIZE_ASPECT_FILL);
     surfaceNode_->SetPositionZ(Rosen::RSSurfaceNode::POINTER_WINDOW_POSITION_Z);
-    surfaceNode_->SetBounds(0, 0, scaleW_, scaleH_);
-    surfaceNode_->SetFrame(0, 0, scaleW_, scaleH_);
+    surfaceNode_->SetBounds(0, 0, screenWidth_, screenHeight_);
+    surfaceNode_->SetFrame(0, 0, screenWidth_, screenHeight_);
 #ifndef USE_ROSEN_DRAWING
     surfaceNode_->SetBackgroundColor(SK_ColorTRANSPARENT);
 #else
     surfaceNode_->SetBackgroundColor(Rosen::Drawing::Color::COLOR_TRANSPARENT);
 #endif
     surfaceNode_->SetRotation(0);
-    screenId_ = displayInfo_.rsId;
-    if (windowScreenId_ == screenId_) {
-        screenId_ = displayNodeScreenId_;
-    }
-    surfaceNode_->AttachToDisplay(screenId_);
-    MMI_HILOGI("Setting screen:%{public}" PRIu64 ", displayNode:%{public}" PRIu64, screenId_, surfaceNode_->GetId());
+    rsId_ = displayInfo_.rsId;
+    surfaceNode_->AttachToDisplay(rsId_);
+    MMI_HILOGI("Setting screen:%{public}" PRIu64 ", displayNode:%{public}" PRIu64, rsId_, surfaceNode_->GetId());
 }
 
 void TouchDrawingHandler::DrawBubbleHandler()
@@ -415,7 +348,7 @@ void TouchDrawingHandler::DrawBubble()
 {
     CHKPV(pointerEvent_);
     CHKPV(bubbleCanvasNode_);
-    auto canvas = static_cast<RosenCanvas *>(bubbleCanvasNode_->BeginRecording(scaleW_, scaleH_));
+    auto canvas = static_cast<RosenCanvas *>(bubbleCanvasNode_->BeginRecording(screenWidth_, screenHeight_));
     CHKPV(canvas);
     auto pointerIdList = pointerEvent_->GetPointerIds();
     for (auto pointerId : pointerIdList) {
@@ -475,7 +408,7 @@ void TouchDrawingHandler::DrawPointerPositionHandler()
     ClearTracker();
     RecordLabelsInfo();
     CHKPV(crosshairCanvasNode_);
-    auto canvas = static_cast<RosenCanvas *>(crosshairCanvasNode_->BeginRecording(scaleW_, scaleH_));
+    auto canvas = static_cast<RosenCanvas *>(crosshairCanvasNode_->BeginRecording(screenWidth_, screenHeight_));
     CHKPV(canvas);
     auto pointerIdList = pointerEvent_->GetPointerIds();
     for (auto pointerId : pointerIdList) {
@@ -536,7 +469,8 @@ void TouchDrawingHandler::Snapshot()
     DrawRectItem(canvas, viewPrs, rect, color);
     labelsCanvasNode_->FinishRecording();
     CHKPV(crosshairCanvasNode_);
-    auto crosshairCanvas = static_cast<RosenCanvas *>(crosshairCanvasNode_->BeginRecording(scaleW_, scaleH_));
+    auto crosshairCanvas = static_cast<RosenCanvas *>(crosshairCanvasNode_->BeginRecording(
+        screenWidth_, screenHeight_));
     crosshairCanvas->Clear();
     crosshairCanvasNode_->FinishRecording();
     stopRecord_ = true;
@@ -575,7 +509,7 @@ void TouchDrawingHandler::DrawTracker(int32_t x, int32_t y, int32_t pointerId)
     }
     CHKPV(trackerCanvasNode_);
     StartTrace(pointerId);
-    auto canvas = static_cast<RosenCanvas *>(trackerCanvasNode_->BeginRecording(scaleW_, scaleH_));
+    auto canvas = static_cast<RosenCanvas *>(trackerCanvasNode_->BeginRecording(screenWidth_, screenHeight_));
     CHKPV(canvas);
     Rosen::Drawing::Pen pen;
     if (find) {
@@ -612,12 +546,8 @@ void TouchDrawingHandler::DrawCrosshairs(RosenCanvas *canvas, int32_t x, int32_t
     pen.SetColor(CROSS_HAIR_COLOR);
     pen.SetWidth(PEN_WIDTH);
     canvas->AttachPen(pen);
-    Rosen::Drawing::Point left(0, y);
-    Rosen::Drawing::Point right(scaleH_, y);
-    canvas->DrawLine(left, right);
-    Rosen::Drawing::Point top(x, 0);
-    Rosen::Drawing::Point bottom(x, scaleH_);
-    canvas->DrawLine(top, bottom);
+    canvas->DrawLine(Rosen::Drawing::Point(0, y), Rosen::Drawing::Point(screenWidth_, y));
+    canvas->DrawLine(Rosen::Drawing::Point(x, 0), Rosen::Drawing::Point(x, screenHeight_));
     canvas->DetachPen();
 }
 
@@ -741,6 +671,7 @@ void TouchDrawingHandler::RemovePointerPosition()
     CHKPV(surfaceNode_);
     surfaceNode_->RemoveChild(trackerCanvasNode_);
     trackerCanvasNode_.reset();
+    transformModifier_.reset();
 
     surfaceNode_->RemoveChild(crosshairCanvasNode_);
     crosshairCanvasNode_.reset();
@@ -773,7 +704,7 @@ void TouchDrawingHandler::ClearTracker()
     if (lastPointerItem_.empty() && isDownAction_) {
         MMI_HILOGD("ClearTracker isDownAction_ and empty");
         auto canvasNode = static_cast<Rosen::RSCanvasDrawingNode*>(trackerCanvasNode_.get());
-        canvasNode->ResetSurface(scaleW_, scaleH_);
+        canvasNode->ResetSurface(screenWidth_, screenHeight_);
     }
 }
 
@@ -865,6 +796,7 @@ std::pair<int32_t, int32_t> TouchDrawingHandler::CalcDrawCoordinate(
     CALL_DEBUG_ENTER;
     double physicalX = pointerItem.GetRawDisplayX();
     double physicalY = pointerItem.GetRawDisplayY();
+    WindowCoordinateToScreenCoordinate(displayInfo, physicalX, physicalY);
     if (!displayInfo.transform.empty()) {
         auto displayXY = TransformDisplayXY(displayInfo, physicalX, physicalY);
         physicalX = displayXY.first;
@@ -929,6 +861,219 @@ void TouchDrawingHandler::RsFlushImplicitTransaction()
     if (rsUIDirector_ != nullptr) {
         rsUIDirector_->SendMessages();
     }
+}
+
+std::tuple<int32_t, int32_t> TouchDrawingHandler::GetScreenWidthHeight(const OLD::DisplayInfo &displayInfo)
+{
+    Direction direction = static_cast<Direction>((
+        ((displayInfo.direction - displayInfo.displayDirection) * ANGLE_90 + ANGLE_360) % ANGLE_360) / ANGLE_90);
+    if (direction == Direction::DIRECTION90 || direction == Direction::DIRECTION270) {
+        return {displayInfo.validHeight, displayInfo.validWidth};
+    } else {
+        return {displayInfo.validWidth, displayInfo.validHeight};
+    }
+}
+
+void TouchDrawingHandler::WindowCoordinateToScreenCoordinate(const OLD::DisplayInfo &displayInfo, double &x, double &y)
+{
+    Direction direction = static_cast<Direction>((
+        ((displayInfo.direction - displayInfo.displayDirection) * ANGLE_90 + ANGLE_360) % ANGLE_360) / ANGLE_90);
+    switch (direction) {
+        case Direction::DIRECTION0: {
+            break;
+        }
+        case Direction::DIRECTION90: {
+            double temp = y;
+            y = displayInfo.validWidth - x;
+            x = temp;
+            break;
+        }
+        case Direction::DIRECTION180: {
+            x = displayInfo.validWidth - x;
+            y = displayInfo.validHeight - y;
+            break;
+        }
+        case Direction::DIRECTION270: {
+            double temp = x;
+            x = displayInfo.validHeight - y;
+            y = temp;
+            break;
+        }
+        default: {
+            MMI_HILOGE("Unexpected direction=%{public}d, displayDirection=%{public}d",
+                displayInfo.direction, displayInfo.displayDirection);
+            break;
+        }
+    }
+}
+
+void TouchDrawingHandler::OnDisplayModeChange()
+{
+    CALL_DEBUG_ENTER;
+    MMI_HILOGI("OnDisplayModeChange");
+    if (surfaceNode_ != nullptr) {
+        surfaceNode_->ClearChildren();
+    }
+    if (trackerCanvasNode_ != nullptr) {
+        trackerCanvasNode_.reset();
+        transformModifier_.reset();
+    }
+    if (bubbleCanvasNode_ != nullptr) {
+        bubbleCanvasNode_.reset();
+    }
+    if (crosshairCanvasNode_ != nullptr) {
+        crosshairCanvasNode_.reset();
+    }
+    if (labelsCanvasNode_ != nullptr) {
+        labelsCanvasNode_.reset();
+    }
+    RsFlushImplicitTransaction();
+}
+
+void TouchDrawingHandler::OnScreenAreaChange()
+{
+    CALL_DEBUG_ENTER;
+    MMI_HILOGI("OnScreenAreaChange");
+    if (pointerMode_.isShow) {
+        if (labelsCanvasNode_ != nullptr) {
+            labelsCanvasNode_->SetBounds(0, 0, screenWidth_, screenHeight_);
+            labelsCanvasNode_->SetFrame(0, 0, screenWidth_, screenHeight_);
+        }
+        if (!lastPointerItem_.empty() || stopRecord_) {
+            Snapshot();
+        } else if (!stopRecord_) {
+            UpdateLabels(pointerMode_.isShow);
+        }
+
+        if (crosshairCanvasNode_ != nullptr) {
+            crosshairCanvasNode_->SetBounds(0, 0, screenWidth_, screenHeight_);
+            crosshairCanvasNode_->SetFrame(0, 0, screenWidth_, screenHeight_);
+        }
+
+        if (trackerCanvasNode_ != nullptr) {
+            trackerCanvasNode_->SetBounds(0, 0, screenWidth_, screenHeight_);
+            trackerCanvasNode_->SetFrame(0, 0, screenWidth_, screenHeight_);
+        }
+    }
+
+    if (bubbleMode_.isShow) {
+        if (bubbleCanvasNode_ != nullptr) {
+            bubbleCanvasNode_->SetBounds(0, 0, screenWidth_, screenHeight_);
+            bubbleCanvasNode_->SetFrame(0, 0, screenWidth_, screenHeight_);
+        }
+    }
+
+    if (surfaceNode_ != nullptr) {
+        surfaceNode_->SetBounds(0, 0, screenWidth_, screenHeight_);
+        surfaceNode_->SetFrame(0, 0, screenWidth_, screenHeight_);
+    }
+    RsFlushImplicitTransaction();
+}
+
+void TouchDrawingHandler::OnWindowRotation()
+{
+    CALL_DEBUG_ENTER;
+    MMI_HILOGI("OnWindowRotation");
+    if (pointerMode_.isShow) {
+        if (labelsCanvasNode_ != nullptr) {
+            labelsCanvasNode_->SetBounds(0, 0, screenWidth_, screenHeight_);
+            labelsCanvasNode_->SetFrame(0, 0, screenWidth_, screenHeight_);
+        }
+        if (!lastPointerItem_.empty() || stopRecord_) {
+            Snapshot();
+        } else if (!stopRecord_) {
+            UpdateLabels(pointerMode_.isShow);
+        }
+    }
+    if (surfaceNode_ != nullptr) {
+        surfaceNode_->SetBounds(0, 0, screenWidth_, screenHeight_);
+        surfaceNode_->SetFrame(0, 0, screenWidth_, screenHeight_);
+    }
+    RsFlushImplicitTransaction();
+}
+
+void TouchDrawingHandler::OnScreenRotation()
+{
+    CALL_DEBUG_ENTER;
+    MMI_HILOGI("OnScreenRotation");
+    if (pointerMode_.isShow) {
+        if (labelsCanvasNode_ != nullptr) {
+            labelsCanvasNode_->SetBounds(0, 0, screenWidth_, screenHeight_);
+            labelsCanvasNode_->SetFrame(0, 0, screenWidth_, screenHeight_);
+        }
+        if (!lastPointerItem_.empty() || stopRecord_) {
+            Snapshot();
+        } else if (!stopRecord_) {
+            UpdateLabels(pointerMode_.isShow);
+        }
+
+        if (crosshairCanvasNode_ != nullptr) {
+            crosshairCanvasNode_->SetBounds(0, 0, screenWidth_, screenHeight_);
+            crosshairCanvasNode_->SetFrame(0, 0, screenWidth_, screenHeight_);
+        }
+
+        if (trackerCanvasNode_ != nullptr) {
+            trackerCanvasNode_->SetBounds(0, 0, screenWidth_, screenHeight_);
+            trackerCanvasNode_->SetFrame(0, 0, screenWidth_, screenHeight_);
+            TrackerSnapshot();
+        }
+    }
+
+    if (bubbleMode_.isShow) {
+        if (bubbleCanvasNode_ != nullptr) {
+            bubbleCanvasNode_->SetBounds(0, 0, screenWidth_, screenHeight_);
+            bubbleCanvasNode_->SetFrame(0, 0, screenWidth_, screenHeight_);
+        }
+    }
+
+    if (surfaceNode_ != nullptr) {
+        surfaceNode_->SetBounds(0, 0, screenWidth_, screenHeight_);
+        surfaceNode_->SetFrame(0, 0, screenWidth_, screenHeight_);
+    }
+    RsFlushImplicitTransaction();
+}
+
+void TouchDrawingHandler::TrackerSnapshot()
+{
+    CALL_DEBUG_ENTER;
+    CHKPV(transformModifier_);
+    Direction direction = static_cast<Direction>((
+        ((displayInfo_.direction - prevDirection_) * ANGLE_90 + ANGLE_360) % ANGLE_360) / ANGLE_90);
+    transformModifier_->DetachProperty(Rosen::ModifierNG::RSPropertyType::ROTATION);
+    transformModifier_->DetachProperty(Rosen::ModifierNG::RSPropertyType::TRANSLATE);
+    MMI_HILOGD("TrackerSnapshot, direction:%{public}d=>%{public}d", prevDirection_, displayInfo_.direction);
+    switch (direction) {
+        case Direction::DIRECTION0: {
+            transformModifier_->SetPivot({0, 0});
+            transformModifier_->SetRotation(ROTATION_ANGLE_0);
+            transformModifier_->SetTranslate({0, 0});
+            break;
+        }
+        case Direction::DIRECTION90: {
+            transformModifier_->SetPivot({0, 0});
+            transformModifier_->SetRotation(ROTATION_ANGLE_90);
+            transformModifier_->SetTranslate({displayInfo_.validWidth, 0});
+            break;
+        }
+        case Direction::DIRECTION180: {
+            transformModifier_->SetPivot({0, 0});
+            transformModifier_->SetRotation(ROTATION_ANGLE_180);
+            transformModifier_->SetTranslate({displayInfo_.validWidth, displayInfo_.validHeight});
+            break;
+        }
+        case Direction::DIRECTION270: {
+            transformModifier_->SetPivot({0, 0});
+            transformModifier_->SetRotation(ROTATION_ANGLE_270);
+            transformModifier_->SetTranslate({0, displayInfo_.validHeight});
+            break;
+        }
+        default: {
+            MMI_HILOGE("Unexpected direction:%{public}d", static_cast<int32_t>(direction));
+            break;
+        }
+    }
+    // After the screen rotation, the Tracker RSCanvasDrawingNode needs to reset.
+    needResetTracker_ = true;
 }
 
 extern "C" ITouchDrawingHandler* CreateInstance(IInputServiceContext *env)

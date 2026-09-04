@@ -1430,7 +1430,6 @@ void InputWindowsManager::UpdateDisplayInfoExtIfNeed(OLD::DisplayGroupInfo &disp
 #endif // OHOS_BUILD_ENABLE_TRIPLE_FINGER_SNAPSHOT
 #ifdef OHOS_BUILD_ENABLE_TOUCH_DRAWING
     TOUCH_DRAWING_MGR->UpdateDisplayInfo(*physicDisplayInfo);
-    TOUCH_DRAWING_MGR->RotationScreen();
 #endif // #ifdef OHOS_BUILD_ENABLE_TOUCH_DRAWING
 }
 

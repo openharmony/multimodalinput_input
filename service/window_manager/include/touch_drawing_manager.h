@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2023-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -40,7 +40,6 @@ public:
     void UpdateDisplayInfo(const OLD::DisplayInfo& displayInfo);
     void GetOriginalTouchScreenCoordinates(Direction direction, int32_t width, int32_t height,
         int32_t &physicalX, int32_t &physicalY);
-    void RotationScreen();
     void Dump(int32_t fd, const std::vector<std::string> &args);
     bool IsWindowRotation() const;
     void SetDelegateProxy(std::shared_ptr<IDelegateInterface> proxy);
