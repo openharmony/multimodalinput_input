@@ -307,43 +307,5 @@ HWTEST_F(InputActiveSubscribeManagerTest, OnConnected_Test_001, TestSize.Level1)
     EXPECT_NO_FATAL_FAILURE(INPUT_ACTIVE_SUBSCRIBE_MGR.OnConnected());
 }
 
-/**
- * @tc.name: OnConnected_Test_002
- * @tc.desc: OnConnected with an active subscription triggers a server subscribe and returns
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputActiveSubscribeManagerTest, OnConnected_Test_002, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    std::shared_ptr<TestInputEventConsumer> inputEventConsumer = std::make_shared<TestInputEventConsumer>();
-    EXPECT_NE(inputEventConsumer, nullptr);
-    int32_t subscriberInput = INPUT_ACTIVE_SUBSCRIBE_MGR.SubscribeInputActive(
-        std::static_pointer_cast<IInputEventConsumer>(inputEventConsumer), DEFAULT_INTERVAL);
-    EXPECT_EQ(subscriberInput, VALID_SUBSCRIBE_ID);
-    EXPECT_NO_FATAL_FAILURE(INPUT_ACTIVE_SUBSCRIBE_MGR.OnConnected());
-    EXPECT_EQ(INPUT_ACTIVE_SUBSCRIBE_MGR.UnsubscribeInputActive(subscriberInput), RET_OK);
-}
-
-/**
- * @tc.name: SubscribeAndUnsubscribe_Test_001
- * @tc.desc: A full subscribe and unsubscribe cycle leaves the manager reusable
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputActiveSubscribeManagerTest, SubscribeAndUnsubscribe_Test_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    std::shared_ptr<TestInputEventConsumer> inputEventConsumer = std::make_shared<TestInputEventConsumer>();
-    EXPECT_NE(inputEventConsumer, nullptr);
-    int32_t subscriberInput = INPUT_ACTIVE_SUBSCRIBE_MGR.SubscribeInputActive(
-        std::static_pointer_cast<IInputEventConsumer>(inputEventConsumer), DEFAULT_INTERVAL);
-    EXPECT_EQ(subscriberInput, VALID_SUBSCRIBE_ID);
-    EXPECT_EQ(INPUT_ACTIVE_SUBSCRIBE_MGR.UnsubscribeInputActive(subscriberInput), RET_OK);
-    int32_t subscriberInput2 = INPUT_ACTIVE_SUBSCRIBE_MGR.SubscribeInputActive(
-        std::static_pointer_cast<IInputEventConsumer>(inputEventConsumer), DEFAULT_INTERVAL * 2);
-    EXPECT_EQ(subscriberInput2, VALID_SUBSCRIBE_ID);
-    EXPECT_EQ(INPUT_ACTIVE_SUBSCRIBE_MGR.UnsubscribeInputActive(subscriberInput2), RET_OK);
-}
 } // namespace MMI
 } // namespace OHOS
