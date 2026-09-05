@@ -478,7 +478,6 @@ int32_t LongPressSubscriberHandler::GetBundleName(std::string &bundleName, int32
         bundleName = sess->GetProgramName();
         return RET_OK;
     }
-    MMI_HILOGD("Session not found, windowPid:%{public}d", windowPid);
     return RET_ERR;
 }
 

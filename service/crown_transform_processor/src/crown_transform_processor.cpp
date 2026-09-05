@@ -115,8 +115,6 @@ int32_t CrownTransformProcessor::NormalizeRotateEvent(struct libinput_event *eve
                 inputEventNormalizeHandler->HandlePointerEvent(pointerEvent);
 #endif // OHOS_BUILD_ENABLE_POINTER
             }, "CrownTransformProcessor");
-            MMI_HILOGD("Crown rotate session start, timerId:%{public}d, deviceId:%{private}d",
-                timerId_, deviceId_);
 
             HandleCrownRotateBegin(rawPointerEvent);
         }

@@ -254,7 +254,6 @@ int32_t InputHandlerManager::RemoveHandler(int32_t handlerId, InputHandlerType h
         }
         return ret;
     }
-    MMI_HILOGD("Handler not found, handlerId:%{public}d, handlerType:%{public}d", handlerId, handlerType);
     return RET_ERR;
 }
 
@@ -276,7 +275,7 @@ int32_t InputHandlerManager::AddGestureToLocal(int32_t handlerId, HandleEventTyp
             ((handler.gestureHandler_.gestureType & gestureType) == gestureType) &&
             ((handler.gestureHandler_.fingers == ALL_FINGER_COUNT) || (handler.gestureHandler_.fingers == fingers)) &&
             (handler.consumer_ == consumer)) {
-            MMI_HILOGW("Duplicate monitor of TouchGesture(%{public}u, %{public}d)", gestureType, fingers);
+            MMI_HILOGW("Duplicate monitor of TouchGesture(%{public}u, %{puglic}d)", gestureType, fingers);
             return RET_ERR;
         }
     }
@@ -567,7 +566,7 @@ void InputHandlerManager::GetConsumerInfos(std::shared_ptr<PointerEvent> pointer
             CHKPV(consumer);
             auto ret = consumerInfos.emplace(handlerId, consumer);
             if (!ret.second) {
-                MMI_HILOGW("Duplicate handler:%{public}d", handlerId);
+                MMI_HILOGI("Duplicate handler:%{public}d", handlerId);
                 continue;
             }
             consumerCount++;
@@ -734,7 +733,7 @@ int32_t InputHandlerManager::GetMonitorConsumerInfos(std::shared_ptr<PointerEven
         CHKPR(consumer, INVALID_HANDLER_ID);
         auto ret = consumerInfos.emplace(handlerId, consumer);
         if (!ret.second) {
-            MMI_HILOGW("Duplicate handler:%{public}d", handlerId);
+            MMI_HILOGI("Duplicate handler:%{public}d", handlerId);
             continue;
         }
         consumerCount++;
@@ -749,7 +748,7 @@ int32_t InputHandlerManager::GetMonitorConsumerInfos(std::shared_ptr<PointerEven
             CHKPR(consumer, INVALID_HANDLER_ID);
             auto ret = consumerInfos.emplace(handlerId, consumer);
             if (!ret.second) {
-                MMI_HILOGW("Duplicate handler:%{public}d", handlerId);
+                MMI_HILOGI("Duplicate handler:%{public}d", handlerId);
                 continue;
             }
             consumerCount++;

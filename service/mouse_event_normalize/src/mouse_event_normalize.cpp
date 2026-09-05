@@ -187,7 +187,6 @@ void MouseEventNormalize::OnDisplayLost(int32_t displayId)
 int32_t MouseEventNormalize::GetDisplayId() const
 {
     if (env_ == nullptr) {
-        MMI_HILOGE("Mouse env is nullptr");
         return RET_ERR;
     }
     return MouseTransformProcessor::GetDisplayId(*env_);
@@ -290,7 +289,6 @@ bool MouseEventNormalize::CheckAndPackageAxisEvent(libinput_event* event)
 int32_t MouseEventNormalize::SetPointerLocation(int32_t x, int32_t y, int32_t displayId)
 {
     if (env_ == nullptr) {
-        MMI_HILOGE("Mouse env is nullptr");
         return RET_ERR;
     }
     return MouseTransformProcessor::SetPointerLocation(*env_, x, y, displayId);
@@ -299,7 +297,6 @@ int32_t MouseEventNormalize::SetPointerLocation(int32_t x, int32_t y, int32_t di
 int32_t MouseEventNormalize::GetPointerLocation(int32_t &displayId, double &displayX, double &displayY)
 {
     if (env_ == nullptr) {
-        MMI_HILOGE("Mouse env is nullptr");
         return RET_ERR;
     }
     return MouseTransformProcessor::GetPointerLocation(*env_, displayId, displayX, displayY);
