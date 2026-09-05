@@ -504,5 +504,204 @@ HWTEST_F(InputActiveSubscriberHandlerTest, InputActiveSubscriberHandlerTest_Noti
     ret = handler.UnsubscribeInputActive(session, 0);
     EXPECT_EQ(ret, RET_OK);
 }
+
+/**
+ * @tc.name: InputActiveSubscriberHandlerTest_SubscribeInputActive_NullSession_001
+ * @tc.desc: Test SubscribeInputActive with null session
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputActiveSubscriberHandlerTest,
+    InputActiveSubscriberHandlerTest_SubscribeInputActive_NullSession_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputActiveSubscriberHandler handler;
+    auto ret = handler.SubscribeInputActive(nullptr, 0, 500);
+    EXPECT_NE(ret, RET_OK);
+    EXPECT_EQ(handler.subscribers_.size(), 0);
+}
+
+/**
+ * @tc.name: InputActiveSubscriberHandlerTest_SubscribeInputActive_NegativeId_001
+ * @tc.desc: Test SubscribeInputActive with negative subscribeId
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputActiveSubscriberHandlerTest,
+    InputActiveSubscriberHandlerTest_SubscribeInputActive_NegativeId_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputActiveSubscriberHandler handler;
+    auto session = std::make_shared<UDSSession>("test_program", 1, 123, 1000, 2000);
+    ASSERT_NE(session, nullptr);
+    auto ret = handler.SubscribeInputActive(session, -1, 500);
+    EXPECT_NE(ret, RET_OK);
+    EXPECT_EQ(handler.subscribers_.size(), 0);
+}
+
+/**
+ * @tc.name: InputActiveSubscriberHandlerTest_UnsubscribeInputActive_NotFound_001
+ * @tc.desc: Test UnsubscribeInputActive with unregistered subscribeId
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputActiveSubscriberHandlerTest,
+    InputActiveSubscriberHandlerTest_UnsubscribeInputActive_NotFound_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputActiveSubscriberHandler handler;
+    auto session = std::make_shared<UDSSession>("test_program", 1, 123, 1000, 2000);
+    ASSERT_NE(session, nullptr);
+    auto ret = handler.SubscribeInputActive(session, 5, 500);
+    EXPECT_EQ(ret, RET_OK);
+    EXPECT_EQ(handler.subscribers_.size(), 1);
+    ret = handler.UnsubscribeInputActive(session, 6);
+    EXPECT_NE(ret, RET_OK);
+    EXPECT_EQ(handler.subscribers_.size(), 1);
+    ret = handler.UnsubscribeInputActive(session, 5);
+    EXPECT_EQ(ret, RET_OK);
+    EXPECT_EQ(handler.subscribers_.size(), 0);
+}
+
+/**
+ * @tc.name: InputActiveSubscriberHandlerTest_IsImmediateNotifySubscriber_Boundary_001
+ * @tc.desc: Test IsImmediateNotifySubscriber with interval boundary
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputActiveSubscriberHandlerTest,
+    InputActiveSubscriberHandlerTest_IsImmediateNotifySubscriber_Boundary_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputActiveSubscriberHandler handler;
+    auto session = std::make_shared<UDSSession>("test_program", 1, 123, 1000, 2000);
+    ASSERT_NE(session, nullptr);
+    std::shared_ptr<InputActiveSubscriberHandler::Subscriber> subscriber =
+        std::make_shared<InputActiveSubscriberHandler::Subscriber>(0, session, 500);
+    ASSERT_NE(subscriber, nullptr);
+    subscriber->sendEventLastTime_ = 500;
+    bool result = handler.IsImmediateNotifySubscriber(subscriber, 999);
+    EXPECT_FALSE(result);
+    subscriber->sendEventLastTime_ = 500;
+    result = handler.IsImmediateNotifySubscriber(subscriber, 1000);
+    EXPECT_TRUE(result);
+    subscriber->sendEventLastTime_ = 500;
+    result = handler.IsImmediateNotifySubscriber(subscriber, 1001);
+    EXPECT_TRUE(result);
+}
+
+/**
+ * @tc.name: InputActiveSubscriberHandlerTest_IsImmediateNotifySubscriber_NonPositiveInterval_001
+ * @tc.desc: Test IsImmediateNotifySubscriber with non-positive interval
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputActiveSubscriberHandlerTest,
+    InputActiveSubscriberHandlerTest_IsImmediateNotifySubscriber_NonPositiveInterval_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputActiveSubscriberHandler handler;
+    auto session = std::make_shared<UDSSession>("test_program", 1, 123, 1000, 2000);
+    ASSERT_NE(session, nullptr);
+    std::shared_ptr<InputActiveSubscriberHandler::Subscriber> subscriber =
+        std::make_shared<InputActiveSubscriberHandler::Subscriber>(0, session, 0);
+    ASSERT_NE(subscriber, nullptr);
+    subscriber->sendEventLastTime_ = 1000;
+    bool result = handler.IsImmediateNotifySubscriber(subscriber, 2000);
+    EXPECT_TRUE(result);
+    subscriber = std::make_shared<InputActiveSubscriberHandler::Subscriber>(0, session, -1);
+    ASSERT_NE(subscriber, nullptr);
+    subscriber->sendEventLastTime_ = 1000;
+    result = handler.IsImmediateNotifySubscriber(subscriber, 2000);
+    EXPECT_TRUE(result);
+}
+
+/**
+ * @tc.name: InputActiveSubscriberHandlerTest_InsertSubscriber_Duplicate_001
+ * @tc.desc: Test InsertSubscriber with duplicate (id, session) pair
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputActiveSubscriberHandlerTest,
+    InputActiveSubscriberHandlerTest_InsertSubscriber_Duplicate_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputActiveSubscriberHandler handler;
+    auto session = std::make_shared<UDSSession>("test_program", 1, 123, 1000, 2000);
+    ASSERT_NE(session, nullptr);
+    std::shared_ptr<InputActiveSubscriberHandler::Subscriber> subscriber =
+        std::make_shared<InputActiveSubscriberHandler::Subscriber>(1, session, 500);
+    ASSERT_NE(subscriber, nullptr);
+    handler.InsertSubscriber(subscriber);
+    handler.InsertSubscriber(subscriber);
+    EXPECT_EQ(handler.subscribers_.size(), 1);
+    std::shared_ptr<InputActiveSubscriberHandler::Subscriber> subscriber2 =
+        std::make_shared<InputActiveSubscriberHandler::Subscriber>(2, session, 500);
+    ASSERT_NE(subscriber2, nullptr);
+    handler.InsertSubscriber(subscriber2);
+    EXPECT_EQ(handler.subscribers_.size(), 2);
+}
+
+/**
+ * @tc.name: InputActiveSubscriberHandlerTest_InsertSubscriber_Null_001
+ * @tc.desc: Test InsertSubscriber with null subscriber
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputActiveSubscriberHandlerTest, InputActiveSubscriberHandlerTest_InsertSubscriber_Null_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputActiveSubscriberHandler handler;
+    handler.InsertSubscriber(nullptr);
+    EXPECT_EQ(handler.subscribers_.size(), 0);
+}
+
+/**
+ * @tc.name: InputActiveSubscriberHandlerTest_OnSessionDelete_Null_001
+ * @tc.desc: Test OnSessionDelete with null session
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputActiveSubscriberHandlerTest, InputActiveSubscriberHandlerTest_OnSessionDelete_Null_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputActiveSubscriberHandler handler;
+    auto session = std::make_shared<UDSSession>("test_program", 1, 123, 1000, 2000);
+    ASSERT_NE(session, nullptr);
+    auto ret = handler.SubscribeInputActive(session, 0, 500);
+    EXPECT_EQ(ret, RET_OK);
+    EXPECT_EQ(handler.subscribers_.size(), 1);
+    handler.OnSessionDelete(nullptr);
+    EXPECT_EQ(handler.subscribers_.size(), 1);
+    handler.OnSessionDelete(session);
+    EXPECT_EQ(handler.subscribers_.size(), 0);
+}
+
+/**
+ * @tc.name: InputActiveSubscriberHandlerTest_CleanSubscribeInfo_001
+ * @tc.desc: Test CleanSubscribeInfo resets subscriber state
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputActiveSubscriberHandlerTest, InputActiveSubscriberHandlerTest_CleanSubscribeInfo_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputActiveSubscriberHandler handler;
+    auto session = std::make_shared<UDSSession>("test_program", 1, 123, 1000, 2000);
+    ASSERT_NE(session, nullptr);
+    std::shared_ptr<InputActiveSubscriberHandler::Subscriber> subscriber =
+        std::make_shared<InputActiveSubscriberHandler::Subscriber>(0, session, 500);
+    ASSERT_NE(subscriber, nullptr);
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    subscriber->lastEventType_ = InputActiveSubscriberHandler::EVENTTYPE_KEY;
+    subscriber->keyEvent_ = keyEvent;
+    subscriber->sendEventLastTime_ = 500;
+    handler.CleanSubscribeInfo(subscriber, 888);
+    EXPECT_EQ(subscriber->lastEventType_, InputActiveSubscriberHandler::EVENTTYPE_INVALID);
+    EXPECT_EQ(subscriber->keyEvent_, nullptr);
+    EXPECT_EQ(subscriber->pointerEvent_, nullptr);
+    EXPECT_EQ(subscriber->sendEventLastTime_, 888);
+}
 } // namespace MMI
 } // namespace OHOS

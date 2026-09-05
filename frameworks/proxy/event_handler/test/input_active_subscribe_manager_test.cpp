@@ -14,6 +14,8 @@
  */
 
 #include <gtest/gtest.h>
+
+#include "error_multimodal.h"
 #include "input_active_subscribe_manager.h"
 #include "input_handler_type.h"
 #include "mmi_log.h"
@@ -27,6 +29,8 @@ namespace OHOS {
 namespace MMI {
 namespace {
 using namespace testing::ext;
+constexpr int32_t VALID_SUBSCRIBE_ID { 0 };
+constexpr int32_t INVALID_SUBSCRIBE_ID { -1 };
 } // namespace
 
 class InputActiveSubscribeManagerTest : public testing::Test {
@@ -197,6 +201,36 @@ HWTEST_F(InputActiveSubscribeManagerTest, OnSubscribeInputActiveCallback_Test_00
 }
 
 /**
+ * @tc.name: OnSubscribeInputActiveCallback_Test_005
+ * @tc.desc: Test OnSubscribeInputActiveCallback KeyEvent with valid id but no active subscription
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputActiveSubscribeManagerTest, OnSubscribeInputActiveCallback_Test_005, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    int32_t result = INPUT_ACTIVE_SUBSCRIBE_MGR.OnSubscribeInputActiveCallback(keyEvent, VALID_SUBSCRIBE_ID);
+    EXPECT_EQ(result, ERROR_HAD_UNSUBSCRIBE_INPUT_ACTIVE);
+}
+
+/**
+ * @tc.name: OnSubscribeInputActiveCallback_Test_006
+ * @tc.desc: Test OnSubscribeInputActiveCallback PointerEvent with valid id but no active subscription
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputActiveSubscribeManagerTest, OnSubscribeInputActiveCallback_Test_006, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    int32_t result = INPUT_ACTIVE_SUBSCRIBE_MGR.OnSubscribeInputActiveCallback(pointerEvent, VALID_SUBSCRIBE_ID);
+    EXPECT_EQ(result, ERROR_HAD_UNSUBSCRIBE_INPUT_ACTIVE);
+}
+
+/**
  * @tc.name: OnConnectedTest
  * @tc.desc: OnConnected
  * @tc.type: FUNC
@@ -214,5 +248,63 @@ HWTEST_F(InputActiveSubscribeManagerTest, OnConnectedTest, TestSize.Level1)
     EXPECT_GE(subscriberInput, 0);
     INPUT_ACTIVE_SUBSCRIBE_MGR.OnConnected();
 }
+
+/**
+ * @tc.name: UnsubscribeInputActive_Test_002
+ * @tc.desc: Unsubscribe with an invalid id is rejected
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputActiveSubscribeManagerTest, UnsubscribeInputActive_Test_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t result = INPUT_ACTIVE_SUBSCRIBE_MGR.UnsubscribeInputActive(INVALID_SUBSCRIBE_ID);
+    EXPECT_EQ(result, ERROR_INVALID_SUBSCRIBE_ID);
+}
+
+/**
+ * @tc.name: SubscribeInputActiveInfo_Test_001
+ * @tc.desc: SubscribeInputActiveInfo stores the interval and callback and exposes them
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputActiveSubscribeManagerTest, SubscribeInputActiveInfo_Test_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<TestInputEventConsumer> inputEventConsumer = std::make_shared<TestInputEventConsumer>();
+    EXPECT_NE(inputEventConsumer, nullptr);
+    int64_t interval = 3600000; // 1 hour in ms
+    InputActiveSubscribeManager::SubscribeInputActiveInfo info(inputEventConsumer, interval);
+    EXPECT_EQ(info.GetInputActiveInterval(), interval);
+    EXPECT_EQ(info.GetCallback(), inputEventConsumer);
+}
+
+/**
+ * @tc.name: SubscribeInputActiveInfo_Test_002
+ * @tc.desc: SubscribeInputActiveInfo with a nullptr callback still exposes the stored data
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputActiveSubscribeManagerTest, SubscribeInputActiveInfo_Test_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int64_t interval = 0;
+    InputActiveSubscribeManager::SubscribeInputActiveInfo info(nullptr, interval);
+    EXPECT_EQ(info.GetInputActiveInterval(), interval);
+    EXPECT_EQ(info.GetCallback(), nullptr);
+}
+
+/**
+ * @tc.name: OnConnected_Test_001
+ * @tc.desc: OnConnected is a no-op when there is no active subscription
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputActiveSubscribeManagerTest, OnConnected_Test_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EXPECT_NO_FATAL_FAILURE(INPUT_ACTIVE_SUBSCRIBE_MGR.OnConnected());
+}
+
 } // namespace MMI
 } // namespace OHOS
