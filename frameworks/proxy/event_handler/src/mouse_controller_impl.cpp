@@ -163,7 +163,6 @@ int32_t MouseControllerImpl::MoveToGlobal(int32_t globalX, int32_t globalY)
     }
     {
         std::lock_guard<std::mutex> lock(mutex_);
-        pointerEvent->SetTargetDisplayId(cursorPos_.displayId);
         for (const auto &[button, pressed] : buttonStates_) {
             if (pressed) {
                 pointerEvent->SetButtonPressed(button);

@@ -14,6 +14,7 @@
  */
 
 #include "multimodal_input_connect_manager.h"
+
 #include "iservice_registry.h"
 
 #include "input_binder_client_server.h"
