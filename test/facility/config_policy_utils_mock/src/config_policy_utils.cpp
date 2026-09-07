@@ -16,6 +16,12 @@
 
 #include "config_policy_utils.h"
 
+#if defined(__clang__) || defined(__GNUC__)
+__asm__(".symver GetOneCfgFile,GetOneCfgFile@@LIBRARY");
+__asm__(".symver GetCfgFiles,GetCfgFiles@@LIBRARY");
+__asm__(".symver FreeCfgFiles,FreeCfgFiles@@LIBRARY");
+#endif
+
 namespace OHOS {
 namespace MMI {
 namespace {
