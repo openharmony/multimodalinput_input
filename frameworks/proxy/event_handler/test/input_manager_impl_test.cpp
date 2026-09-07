@@ -3940,5 +3940,23 @@ HWTEST_F(InputManagerImplTest, MouseControllerImpl_CreateGlobalPointerItem_001, 
     EXPECT_EQ(item.GetPointerId(), 0);
     EXPECT_EQ(item.GetToolType(), PointerEvent::TOOL_TYPE_MOUSE);
 }
+
+/**
+ * @tc.name: MouseControllerImpl_CreatePointerItem_001
+ * @tc.desc: Move events can be built from coordinates before state commit
+ * @tc.type: FUNC
+ */
+HWTEST_F(InputManagerImplTest, MouseControllerImpl_CreatePointerItem_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MouseControllerImpl controller;
+
+    auto item = controller.CreatePointerItem(640, 480);
+
+    EXPECT_EQ(item.GetDisplayX(), 640);
+    EXPECT_EQ(item.GetDisplayY(), 480);
+    EXPECT_EQ(item.GetDisplayXPos(), 640);
+    EXPECT_EQ(item.GetDisplayYPos(), 480);
+}
 } // namespace MMI
 } // namespace OHOS

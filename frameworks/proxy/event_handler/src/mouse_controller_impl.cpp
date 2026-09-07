@@ -112,23 +112,12 @@ int32_t MouseControllerImpl::MoveTo(int32_t displayId, int32_t x, int32_t y)
 
     std::shared_ptr<PointerEvent> pointerEvent;
 
-    decltype(cursorPos_) oldCursorPos;
-    decltype(globalCoordinateState_) oldGlobalCoordinateState;
     {
         std::lock_guard<std::mutex> lock(mutex_);
-
-        oldCursorPos = cursorPos_;
-        oldGlobalCoordinateState = globalCoordinateState_;
-        cursorPos_.displayId = displayId;
-        cursorPos_.x = x;
-        cursorPos_.y = y;
-        ResetGlobalCoordinateState();
 
         pointerEvent = CreatePointerEvent(PointerEvent::POINTER_ACTION_MOVE);
         if (pointerEvent == nullptr) {
             MMI_HILOGE("Failed to create pointer event");
-            cursorPos_ = oldCursorPos;
-            globalCoordinateState_ = oldGlobalCoordinateState;
             return RET_ERR;
         }
 
@@ -142,7 +131,7 @@ int32_t MouseControllerImpl::MoveTo(int32_t displayId, int32_t x, int32_t y)
         if (lastButtonId_ != PointerEvent::BUTTON_NONE) {
             pointerEvent->SetButtonId(lastButtonId_);
         }
-        PointerEvent::PointerItem item = CreatePointerItem();
+        PointerEvent::PointerItem item = CreatePointerItem(x, y);
         int64_t downTime = !buttonDownTimes_.empty() ? buttonDownTimes_.begin()->second : -1;
         item.SetDownTime(downTime);
         if (auto buttons = pointerEvent->GetPressedButtons(); !buttons.empty()) {
@@ -152,17 +141,19 @@ int32_t MouseControllerImpl::MoveTo(int32_t displayId, int32_t x, int32_t y)
     }
 
     const int32_t ret = InjectPointerEvent(pointerEvent);
-    if (ret != RET_OK) {
+    if (ret == RET_OK) {
         std::lock_guard<std::mutex> lock(mutex_);
-        cursorPos_ = oldCursorPos;
-        globalCoordinateState_ = oldGlobalCoordinateState;
+        cursorPos_.displayId = displayId;
+        cursorPos_.x = x;
+        cursorPos_.y = y;
+        ResetGlobalCoordinateState();
     }
     return ret;
 }
 
-int32_t MouseControllerImpl::MoveToGlobal(int32_t x, int32_t y)
+int32_t MouseControllerImpl::MoveToGlobal(int32_t globalX, int32_t globalY)
 {
-    MMI_HILOGD("MoveToGlobal: x=%{private}d, y=%{private}d", x, y);
+    MMI_HILOGD("MoveToGlobal: globalX=%{private}d, globalY=%{private}d", globalX, globalY);
     std::shared_ptr<PointerEvent> pointerEvent;
     {
         std::lock_guard<std::mutex> lock(mutex_);
@@ -180,7 +171,7 @@ int32_t MouseControllerImpl::MoveToGlobal(int32_t x, int32_t y)
         if (lastButtonId_ != PointerEvent::BUTTON_NONE) {
             pointerEvent->SetButtonId(lastButtonId_);
         }
-        PointerEvent::PointerItem item = CreateGlobalPointerItem(x, y);
+        PointerEvent::PointerItem item = CreateGlobalPointerItem(globalX, globalY);
         item.SetDownTime(!buttonDownTimes_.empty() ? buttonDownTimes_.begin()->second : -1);
         item.SetPressed(!pointerEvent->GetPressedButtons().empty());
         pointerEvent->AddPointerItem(item);
@@ -188,8 +179,8 @@ int32_t MouseControllerImpl::MoveToGlobal(int32_t x, int32_t y)
     const int32_t ret = InjectPointerEvent(pointerEvent, PointerEvent::GLOBAL_COORDINATE);
     if (ret == RET_OK) {
         std::lock_guard<std::mutex> lock(mutex_);
-        globalCoordinateState_.x = x;
-        globalCoordinateState_.y = y;
+        globalCoordinateState_.x = globalX;
+        globalCoordinateState_.y = globalY;
         globalCoordinateState_.enabled = true;
     }
     return ret;
@@ -426,12 +417,17 @@ int32_t MouseControllerImpl::EndAxis(int32_t axis)
 
 PointerEvent::PointerItem MouseControllerImpl::CreatePointerItem()
 {
+    return CreatePointerItem(cursorPos_.x, cursorPos_.y);
+}
+
+PointerEvent::PointerItem MouseControllerImpl::CreatePointerItem(int32_t x, int32_t y)
+{
     PointerEvent::PointerItem item;
     item.SetPointerId(0);
-    item.SetDisplayX(cursorPos_.x);
-    item.SetDisplayY(cursorPos_.y);
-    item.SetDisplayXPos(cursorPos_.x);
-    item.SetDisplayYPos(cursorPos_.y);
+    item.SetDisplayX(x);
+    item.SetDisplayY(y);
+    item.SetDisplayXPos(x);
+    item.SetDisplayYPos(y);
     item.SetToolType(PointerEvent::TOOL_TYPE_MOUSE);
     item.SetDeviceId(-1);
     return item;

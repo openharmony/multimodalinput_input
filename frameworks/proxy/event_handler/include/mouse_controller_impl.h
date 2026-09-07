@@ -31,7 +31,7 @@ public:
     ~MouseControllerImpl();
 
     int32_t MoveTo(int32_t displayId, int32_t x, int32_t y);
-    int32_t MoveToGlobal(int32_t x, int32_t y);
+    int32_t MoveToGlobal(int32_t globalX, int32_t globalY);
     int32_t PressButton(int32_t button);
     int32_t ReleaseButton(int32_t button);
     int32_t BeginAxis(int32_t axis, int32_t value);
@@ -40,6 +40,7 @@ public:
 
 private:
     PointerEvent::PointerItem CreatePointerItem();
+    PointerEvent::PointerItem CreatePointerItem(int32_t x, int32_t y);
     PointerEvent::PointerItem CreateGlobalPointerItem(int32_t x, int32_t y);
     std::shared_ptr<PointerEvent> CreatePointerEvent(int32_t action);
     int32_t InjectPointerEvent(std::shared_ptr<PointerEvent> event,
