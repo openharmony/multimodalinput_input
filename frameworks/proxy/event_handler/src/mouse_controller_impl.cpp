@@ -15,8 +15,6 @@
 
 #include "mouse_controller_impl.h"
 
-#include <algorithm>
-
 #include "define_multimodal.h"
 #include "input_manager.h"
 #include "input_manager_impl.h"
@@ -149,7 +147,6 @@ int32_t MouseControllerImpl::MoveTo(int32_t displayId, int32_t x, int32_t y)
 
     const int32_t ret = InjectPointerEvent(pointerEvent);
     if (ret == RET_OK) {
-        std::lock_guard<std::mutex> lock(mutex_);
         ResetGlobalCoordinateState();
     }
     return ret;
@@ -158,14 +155,14 @@ int32_t MouseControllerImpl::MoveTo(int32_t displayId, int32_t x, int32_t y)
 int32_t MouseControllerImpl::MoveToGlobal(int32_t globalX, int32_t globalY)
 {
     MMI_HILOGD("MoveToGlobal: globalX=%{private}d, globalY=%{private}d", globalX, globalY);
-    std::shared_ptr<PointerEvent> pointerEvent;
+    std::shared_ptr<PointerEvent> pointerEvent =
+        CreatePointerEvent(PointerEvent::POINTER_ACTION_MOVE);
+    if (pointerEvent == nullptr) {
+        MMI_HILOGE("Failed to create pointer event");
+        return RET_ERR;
+    }
     {
         std::lock_guard<std::mutex> lock(mutex_);
-        pointerEvent = CreatePointerEvent(PointerEvent::POINTER_ACTION_MOVE);
-        if (pointerEvent == nullptr) {
-            MMI_HILOGE("Failed to create pointer event");
-            return RET_ERR;
-        }
         pointerEvent->SetTargetDisplayId(cursorPos_.displayId);
         for (const auto &[button, pressed] : buttonStates_) {
             if (pressed) {
@@ -182,7 +179,6 @@ int32_t MouseControllerImpl::MoveToGlobal(int32_t globalX, int32_t globalY)
     }
     const int32_t ret = InjectPointerEvent(pointerEvent, PointerEvent::GLOBAL_COORDINATE);
     if (ret == RET_OK) {
-        std::lock_guard<std::mutex> lock(mutex_);
         SetGlobalCoordinateState(globalX, globalY);
     }
     return ret;
@@ -287,9 +283,6 @@ int32_t MouseControllerImpl::ReleaseButton(int32_t button)
         buttonStates_[button] = false;
         buttonDownTimes_.erase(button);
         lastButtonId_ = PointerEvent::BUTTON_NONE;
-        const bool hasPressedButton = std::any_of(buttonStates_.begin(), buttonStates_.end(),
-            [](const auto &state) { return state.second; });
-        ResetGlobalCoordinateState();
     }
 
     return ret;

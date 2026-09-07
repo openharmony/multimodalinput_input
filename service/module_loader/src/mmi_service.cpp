@@ -23,7 +23,6 @@
 #endif // OHOS_RSS_CLIENT
 
 #include <algorithm>
-#include <memory>
 
 #include "bundle_name_parser.h"
 #include "misc_product_type_parser.h"
@@ -31,7 +30,6 @@
 #include "special_input_device_parser.h"
 #include "product_name_definition_parser.h"
 #include "json_parser.h"
-#include "struct_multimodal.h"
 #include "bytrace_adapter.h"
 #ifdef OHOS_BUILD_ENABLE_KEY_HOOK
 #include "key_event_hook_manager.h"
@@ -3707,6 +3705,9 @@ ErrCode MMIService::GetGlobalCoordinates(int32_t displayId, int32_t displayX, in
         return MMISERVICE_NOT_RUNNING;
     }
     auto globalCoords = std::make_shared<GlobalCoords>();
+    if (globalCoords ==nullptr) {
+        MMI_HILOGE("Create globalCoords failed");
+    }
     int32_t ret = delegateTasks_.PostSyncTask(
         [displayId, displayX, displayY, globalCoords] {
             return IInputWindowsManager::GetInstance()->GetGlobalCoordinates(displayId, displayX, displayY,

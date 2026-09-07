@@ -229,7 +229,7 @@ public:
     int32_t GetGlobalCoordinates(int32_t displayId, int32_t displayX, int32_t displayY, int32_t &globalX,
         int32_t &globalY) override
     {
-        return displayId;
+        return RET_OK;
     }
     int32_t ClearWindowPointerStyle(int32_t pid, int32_t windowId) override { return pid; }
     int32_t SetMouseCaptureMode(int32_t windowId, bool isCaptureMode) override { return windowId; }
