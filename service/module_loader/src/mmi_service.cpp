@@ -3705,8 +3705,9 @@ ErrCode MMIService::GetGlobalCoordinates(int32_t displayId, int32_t displayX, in
         return MMISERVICE_NOT_RUNNING;
     }
     auto globalCoords = std::make_shared<GlobalCoords>();
-    if (globalCoords ==nullptr) {
+    if (globalCoords == nullptr) {
         MMI_HILOGE("Create globalCoords failed");
+        return RET_ERR;
     }
     int32_t ret = delegateTasks_.PostSyncTask(
         [displayId, displayX, displayY, globalCoords] {

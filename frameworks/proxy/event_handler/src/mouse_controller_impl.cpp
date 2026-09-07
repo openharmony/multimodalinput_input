@@ -41,9 +41,16 @@ MouseControllerImpl::MouseControllerImpl()
 MouseControllerImpl::~MouseControllerImpl()
 {
     MMI_HILOGD("MouseControllerImpl destroying, cleaning up state");
-    const auto globalCoordinateState = GetGlobalCoordinateState();
+    ReleasePressedButtons();
+    ResetGlobalCoordinateState();
+    EndAxisEvent();
+    buttonStates_.clear();
+    buttonDownTimes_.clear();
+}
 
-    // Auto cleanup: Release all pressed buttons
+void MouseControllerImpl::ReleasePressedButtons()
+{
+    const auto globalCoordinateState = GetGlobalCoordinateState();
     for (auto& [button, pressed] : buttonStates_) {
         if (!pressed) {
             continue;
@@ -72,13 +79,11 @@ MouseControllerImpl::~MouseControllerImpl()
             MMI_HILOGE("Failed to auto-release button %{public}d, ret=%{public}d", button, ret);
         }
     }
+}
 
-    ResetGlobalCoordinateState();
-
-    // Auto cleanup: End ongoing axis event
+void MouseControllerImpl::EndAxisEvent()
+{
     if (!axisState_.inProgress) {
-        buttonStates_.clear();
-        buttonDownTimes_.clear();
         return;
     }
 
@@ -87,8 +92,6 @@ MouseControllerImpl::~MouseControllerImpl()
     auto pointerEvent = CreatePointerEvent(PointerEvent::POINTER_ACTION_AXIS_END);
     if (pointerEvent == nullptr) {
         MMI_HILOGE("Failed to create pointer event for axis %{public}d", axisState_.axisType);
-        buttonStates_.clear();
-        buttonDownTimes_.clear();
         return;
     }
 
@@ -102,9 +105,6 @@ MouseControllerImpl::~MouseControllerImpl()
     if (ret != RET_OK) {
         MMI_HILOGE("Failed to auto-end axis %{public}d, ret=%{public}d", axisState_.axisType, ret);
     }
-
-    buttonStates_.clear();
-    buttonDownTimes_.clear();
 }
 
 int32_t MouseControllerImpl::MoveTo(int32_t displayId, int32_t x, int32_t y)

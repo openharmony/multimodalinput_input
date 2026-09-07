@@ -53,6 +53,8 @@ private:
     GlobalCoordinateState GetGlobalCoordinateState() const;
     void SetGlobalCoordinateState(int32_t globalX, int32_t globalY);
     void ResetGlobalCoordinateState();
+    void ReleasePressedButtons();
+    void EndAxisEvent();
 
     std::map<int32_t, bool> buttonStates_;
     std::map<int32_t, int64_t> buttonDownTimes_;
