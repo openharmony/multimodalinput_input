@@ -20,6 +20,9 @@
 #include "parameters.h"
 #endif // !defined(ANDROID_PLATFORM) && !defined(IOS_PLATFORM)
 
+#include <functional>
+#include <string>
+
 #include "key_event.h"
 #include "mmi_log.h"
 #include "pointer_event.h"
@@ -32,10 +35,10 @@ namespace MMI {
 static constexpr std::string_view InfoTrackingDict =
         "Info-InputTracking-Dict: "
         "AT-ActionTime, CL-CapsLock, DI-DisplayId, DPT-DispatchTimes, DT-DownTime, DX-DisplayX, DXP-DisplayXPos,"
-        " DY-DisplayY, DYP-DisplayYPos, ET-EventType, GU-GetUnicode, I-id, IP-IsPressed, IR-IsRepeat, SI-IsSimulate,"
-        " KA-KeyAction, KC-KeyCode, KIC-keyItemsCount, LA-LongAxis, NL-NumLock, OPI-OriginPointerId, PA-PointerAction,"
-        " PI-pointerId, P-Pressure, SA-ShortAxis, SL-ScrollLock, ST-SourceType, WI-WindowId, WXP-WindowXPos, "
-        "WYP-WindowYPos, PBS-PressedButtonsSize";
+        " DY-DisplayY, DYP-DisplayYPos, ES-EventSource, ET-EventType, GU-GetUnicode, I-id, IP-IsPressed,"
+        " IR-IsRepeat, SI-IsSimulate, KA-KeyAction, KC-KeyCode, KIC-keyItemsCount, LA-LongAxis, NL-NumLock,"
+        " OPI-OriginPointerId, PA-PointerAction, PH-Phys, PI-pointerId, P-Pressure, SA-ShortAxis, SL-ScrollLock,"
+        " ST-SourceType, WI-WindowId, WXP-WindowXPos, WYP-WindowYPos, PBS-PressedButtonsSize";
 
 static constexpr std::string_view DebugTrackingDict =
         "Debug-InputTracking-Dict: "
@@ -44,6 +47,13 @@ static constexpr std::string_view DebugTrackingDict =
         " ME-MarkEnabled, PAV-PinchAxisValue, PC-PointerCount, RZAV-RzAbsValue, SIT-SensorInputTime, "
         "TAV-ThrottleAbsValue, TX-TiltX, TY-TiltY, VAV-VerticalAxisValue, W-Width, WX-WindowX, WY-WindowY,"
         " XAV-XAbsValue, YAV-YAbsValue, ZAV-ZAbsValue, RAV-RotateAxisValue";
+
+struct EventSourceInfo {
+    std::string name { "unknown" };
+    std::string phys { "unknown" };
+};
+
+using EventSourceResolver = std::function<EventSourceInfo(int32_t deviceId)>;
 
 constexpr int32_t NUMBER_KEY_BEGIN { 2000 };
 constexpr int32_t NUMBER_KEY_END { 2011 };
@@ -62,6 +72,9 @@ public:
     static void PrintEventData(std::shared_ptr<T> event, int32_t actionType, int32_t itemNum, const LogHeader &lh);
 
     template<class T> static void PrintEventData(std::shared_ptr<T> event, const LogHeader &lh);
+
+    static void PrintEventData(std::shared_ptr<KeyEvent> event, const LogHeader &lh,
+        const EventSourceResolver &resolver);
 
     static std::string GetBetaUserType()
     {
@@ -122,9 +135,18 @@ private:
         }
     }
 
-    static void PrintInfoLog(const std::shared_ptr<KeyEvent> event, const LogHeader &lh)
+    static std::string GetEventSourceSuffix(const EventSourceResolver &resolver, int32_t deviceId)
     {
-        std::vector<KeyEvent::KeyItem> eventItems{ event->GetKeyItems() };
+        if (!resolver) {
+            return "";
+        }
+        EventSourceInfo source = resolver(deviceId);
+        return ", ES:" + source.name + ", PH:" + source.phys;
+    }
+
+    static void PrintKeyEventInfoHead(const std::shared_ptr<KeyEvent> event,
+        const std::vector<KeyEvent::KeyItem> &eventItems, const LogHeader &lh)
+    {
         std::string isSimulate = event->HasFlag(InputEvent::EVENT_FLAG_SIMULATE) ? "true" : "false";
         std::string isRepeat = event->IsRepeat() ? "true" : "false";
         if (event->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE) || IsEnterableKey(event->GetKeyCode())) {
@@ -151,44 +173,40 @@ private:
                 event->GetFunctionKey(KeyEvent::SCROLL_LOCK_FUNCTION_KEY), eventItems.size(),
                 event->GetTargetDisplayId(), isRepeat.c_str(), isSimulate.c_str());
         }
+    }
 
+    static void PrintKeyItemsInfoLog(const std::shared_ptr<KeyEvent> event,
+        const std::vector<KeyEvent::KeyItem> &eventItems, const EventSourceResolver &resolver,
+        const LogHeader &lh)
+    {
+        std::string items;
         for (const auto &item : eventItems) {
-            if (!IsBetaVersion()) {
-                MMI_HILOG_HEADER(LOG_INFO, lh, "DN:%{public}d" PRId64
-                ", IP:%{public}d,", item.GetDeviceId(), item.IsPressed());
-            } else {
-                if (event->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE)) {
-                    MMI_HILOG_HEADER(LOG_INFO, lh, "DN:%{public}d, KC:%{private}d, DT:%{public}" PRId64
-                    ", IP:%{public}d,", item.GetDeviceId(), item.GetKeyCode(), item.GetDownTime(), item.IsPressed());
-                } else {
-                    MMI_HILOG_HEADER(LOG_INFO, lh, "DN:%{public}d, KC:%{private}d, DT:%{public}" PRId64
-                    ", IP:%{public}d,", item.GetDeviceId(), item.GetKeyCode(), item.GetDownTime(), item.IsPressed());
-                }
-            }
+            bool isPrivacyKey = event->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE) ||
+                IsEnterableKey(item.GetKeyCode());
+            std::string keyStr = isPrivacyKey ? "<private>" : std::to_string(item.GetKeyCode());
+            std::string itemStr = "DN:" + std::to_string(item.GetDeviceId()) +
+                ", KC:" + keyStr +
+                ", DT:" + std::to_string(item.GetDownTime()) +
+                ", IP:" + std::to_string(item.IsPressed() ? 1 : 0) +
+                GetEventSourceSuffix(resolver, item.GetDeviceId());
+            items += (items.empty() ? "" : "; ") + itemStr;
         }
-        std::vector<int32_t> pressedKeys = event->GetPressedKeys();
-        std::vector<int32_t>::const_iterator cItr = pressedKeys.cbegin();
-        if (cItr != pressedKeys.cend()) {
-            std::string tmpStr = "Pressed KC: [" + std::to_string(*(cItr++));
-            for (; cItr != pressedKeys.cend(); ++cItr) {
-                tmpStr += ("," + std::to_string(*cItr));
-            }
-            if (IsBetaVersion()) {
-                if (!event->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE)) {
-                    MMI_HILOG_HEADER(LOG_INFO, lh, "%{public}s]", tmpStr.c_str());
-                }
-            }
+        if (!items.empty()) {
+            MMI_HILOG_HEADER(LOG_INFO, lh, "%{public}s", items.c_str());
         }
     }
 
-    static void Print(const std::shared_ptr<KeyEvent> event, const LogHeader &lh)
+    static void PrintInfoLog(const std::shared_ptr<KeyEvent> event, const LogHeader &lh,
+        const EventSourceResolver &resolver = nullptr)
     {
-        if (!HiLogIsLoggable(lh.domain, lh.func, LOG_DEBUG) && event->GetKeyCode() != KeyEvent::KEYCODE_POWER) {
-            return;
-        }
-        PrintDebugDict();
         std::vector<KeyEvent::KeyItem> eventItems{ event->GetKeyItems() };
-        bool isJudgeMode = IsEnterableKey(event->GetKeyCode());
+        PrintKeyEventInfoHead(event, eventItems, lh);
+        PrintKeyItemsInfoLog(event, eventItems, resolver, lh);
+    }
+
+    static void PrintKeyEventDebugHead(const std::shared_ptr<KeyEvent> event,
+        const std::vector<KeyEvent::KeyItem> &eventItems, bool isJudgeMode, const LogHeader &lh)
+    {
         if (event->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE) || isJudgeMode) {
             MMI_HILOG_HEADER(LOG_DEBUG, lh, "KC:%{private}d, KI:%{public}d,"
                 "AT:%{public}" PRId64 ", AST:%{public}" PRId64
@@ -211,34 +229,42 @@ private:
                 event->GetFunctionKey(KeyEvent::CAPS_LOCK_FUNCTION_KEY),
                 event->GetFunctionKey(KeyEvent::SCROLL_LOCK_FUNCTION_KEY), event->GetId(), eventItems.size());
         }
+    }
+
+    static void PrintKeyItemsDebugLog(const std::shared_ptr<KeyEvent> event,
+        const std::vector<KeyEvent::KeyItem> &eventItems, const EventSourceResolver &resolver,
+        const LogHeader &lh)
+    {
+        std::string items;
         for (const auto &item : eventItems) {
-            if (!IsBetaVersion()) {
-                MMI_HILOG_HEADER(LOG_INFO, lh, "DN:%{public}d, IP:%{public}d",
-                    item.GetDeviceId(), item.IsPressed());
-            } else {
-                if (event->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE)) {
-                    MMI_HILOG_HEADER(LOG_INFO, lh, "DN:%{public}d, IP:%{public}d",
-                        item.GetDeviceId(), item.IsPressed());
-                } else {
-                    MMI_HILOG_HEADER(LOG_INFO, lh, "DN:%{public}d, KC:%{private}d, DT:%{public}" PRId64 ","
-                        "IP:%{public}d, GU:%{public}d", item.GetDeviceId(), item.GetKeyCode(), item.GetDownTime(),
-                        item.IsPressed(), item.GetUnicode());
-                }
-            }
+            bool isPrivacyKey = event->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE) ||
+                IsEnterableKey(item.GetKeyCode());
+            std::string keyStr = isPrivacyKey ? "<private>" : std::to_string(item.GetKeyCode());
+            std::string guStr = isPrivacyKey ? "<private>" : std::to_string(item.GetUnicode());
+            std::string itemStr = "DN:" + std::to_string(item.GetDeviceId()) +
+                ", KC:" + keyStr +
+                ", DT:" + std::to_string(item.GetDownTime()) +
+                ", IP:" + std::to_string(item.IsPressed() ? 1 : 0) +
+                ", GU:" + guStr +
+                GetEventSourceSuffix(resolver, item.GetDeviceId());
+            items += (items.empty() ? "" : "; ") + itemStr;
         }
-        std::vector<int32_t> pressedKeys = event->GetPressedKeys();
-        std::vector<int32_t>::const_iterator cItr = pressedKeys.cbegin();
-        if (cItr != pressedKeys.cend()) {
-            std::string tmpStr = "Pressed keyCode: [" + std::to_string(*(cItr++));
-            for (; cItr != pressedKeys.cend(); ++cItr) {
-                tmpStr += ("," + std::to_string(*cItr));
-            }
-            if (IsBetaVersion()) {
-                if (!isJudgeMode || !event->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE)) {
-                        MMI_HILOG_HEADER(LOG_INFO, lh, "%{private}s]", tmpStr.c_str());
-                }
-            }
+        if (!items.empty()) {
+            MMI_HILOG_HEADER(LOG_INFO, lh, "%{public}s", items.c_str());
         }
+    }
+
+    static void Print(const std::shared_ptr<KeyEvent> event, const LogHeader &lh,
+        const EventSourceResolver &resolver = nullptr)
+    {
+        if (!HiLogIsLoggable(lh.domain, lh.func, LOG_DEBUG) && event->GetKeyCode() != KeyEvent::KEYCODE_POWER) {
+            return;
+        }
+        PrintDebugDict();
+        std::vector<KeyEvent::KeyItem> eventItems{ event->GetKeyItems() };
+        bool isJudgeMode = IsEnterableKey(event->GetKeyCode());
+        PrintKeyEventDebugHead(event, eventItems, isJudgeMode, lh);
+        PrintKeyItemsDebugLog(event, eventItems, resolver, lh);
     }
 
     __attribute__((no_sanitize("cfi")))
@@ -467,6 +493,17 @@ template <class T> void EventLogHelper::PrintEventData(std::shared_ptr<T> event,
     if (HiLogIsLoggable(lh.domain, lh.tag, LOG_DEBUG) ||
         (event->GetAction() == InputEvent::EVENT_TYPE_KEY)) {
         EventLogHelper::Print(event, lh);
+    }
+}
+
+inline void EventLogHelper::PrintEventData(std::shared_ptr<KeyEvent> event, const LogHeader &lh,
+    const EventSourceResolver &resolver)
+{
+    CHKPV(event);
+    PrintInfoLog(event, lh, resolver);
+    if (HiLogIsLoggable(lh.domain, lh.tag, LOG_DEBUG) ||
+        (event->GetAction() == InputEvent::EVENT_TYPE_KEY)) {
+        EventLogHelper::Print(event, lh, resolver);
     }
 }
 } // namespace MMI
