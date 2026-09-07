@@ -31,6 +31,7 @@
 #include "special_input_device_parser.h"
 #include "product_name_definition_parser.h"
 #include "json_parser.h"
+#include "struct_multimodal.h"
 #include "bytrace_adapter.h"
 #ifdef OHOS_BUILD_ENABLE_KEY_HOOK
 #include "key_event_hook_manager.h"
@@ -3701,27 +3702,22 @@ ErrCode MMIService::GetWindowPid(int32_t windowId, int32_t &windowPid)
 ErrCode MMIService::GetGlobalCoordinates(int32_t displayId, int32_t displayX, int32_t displayY,
     int32_t &globalX, int32_t &globalY)
 {
-    if (!PER_HELPER->VerifySystemApp()) {
-        MMI_HILOGE("Verify system APP failed");
-        return ERROR_NOT_SYSAPI;
-    }
     if (!IsRunning()) {
         MMI_HILOGE("Service is not running");
         return MMISERVICE_NOT_RUNNING;
     }
-    auto resultX = std::make_shared<int32_t>(0);
-    auto resultY = std::make_shared<int32_t>(0);
+    auto globalCoords = std::make_shared<GlobalCoords>();
     int32_t ret = delegateTasks_.PostSyncTask(
-        [displayId, displayX, displayY, resultX, resultY] {
+        [displayId, displayX, displayY, globalCoords] {
             return IInputWindowsManager::GetInstance()->GetGlobalCoordinates(displayId, displayX, displayY,
-                *resultX, *resultY);
+                *globalCoords);
         });
     if (ret != RET_OK) {
         MMI_HILOGE("Get global coordinates failed, ret:%{public}d", ret);
         return ret;
     }
-    globalX = *resultX;
-    globalY = *resultY;
+    globalX = static_cast<int32_t>(globalCoords->x);
+    globalY = static_cast<int32_t>(globalCoords->y);
     return RET_OK;
 }
 

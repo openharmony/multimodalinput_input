@@ -3912,15 +3912,19 @@ HWTEST_F(InputManagerImplTest, MouseControllerImpl_GlobalCoordinateStateReset_00
 {
     CALL_TEST_DEBUG;
     MouseControllerImpl controller;
-    controller.globalCoordinateState_.enabled = true;
-    controller.globalCoordinateState_.x = 1920;
-    controller.globalCoordinateState_.y = 1080;
+    controller.SetGlobalCoordinateState(1920, 1080);
+
+    auto state = controller.GetGlobalCoordinateState();
+    EXPECT_TRUE(state.enabled);
+    EXPECT_EQ(state.x, 1920);
+    EXPECT_EQ(state.y, 1080);
 
     controller.ResetGlobalCoordinateState();
 
-    EXPECT_FALSE(controller.globalCoordinateState_.enabled);
-    EXPECT_EQ(controller.globalCoordinateState_.x, 0);
-    EXPECT_EQ(controller.globalCoordinateState_.y, 0);
+    state = controller.GetGlobalCoordinateState();
+    EXPECT_FALSE(state.enabled);
+    EXPECT_EQ(state.x, 0);
+    EXPECT_EQ(state.y, 0);
 }
 
 /**
@@ -3950,8 +3954,10 @@ HWTEST_F(InputManagerImplTest, MouseControllerImpl_CreatePointerItem_001, TestSi
 {
     CALL_TEST_DEBUG;
     MouseControllerImpl controller;
+    controller.cursorPos_.x = 640;
+    controller.cursorPos_.y = 480;
 
-    auto item = controller.CreatePointerItem(640, 480);
+    auto item = controller.CreatePointerItem();
 
     EXPECT_EQ(item.GetDisplayX(), 640);
     EXPECT_EQ(item.GetDisplayY(), 480);

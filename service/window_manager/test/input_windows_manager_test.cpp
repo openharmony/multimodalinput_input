@@ -17856,8 +17856,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsSameDragUser_001, Te
 HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetGlobalCoordinates_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    int32_t globalX = 0;
-    int32_t globalY = 0;
+    GlobalCoords globalCoords;
     auto it = WIN_MGR->displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
     ASSERT_NE(it, WIN_MGR->displayGroupInfoMap_.end());
     ASSERT_FALSE(it->second.displaysInfo.empty());
@@ -17865,9 +17864,9 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetGlobalCoordinates_0
     displayInfo.x = -100;
     displayInfo.y = 50;
 
-    ASSERT_EQ(WIN_MGR->GetGlobalCoordinates(displayInfo.id, 12, -3, globalX, globalY), RET_OK);
-    EXPECT_EQ(globalX, -88);
-    EXPECT_EQ(globalY, 47);
+    ASSERT_EQ(WIN_MGR->GetGlobalCoordinates(displayInfo.id, 12, -3, globalCoords), RET_OK);
+    EXPECT_EQ(globalCoords.x, -88);
+    EXPECT_EQ(globalCoords.y, 47);
 }
 
 /**
@@ -17879,12 +17878,14 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetGlobalCoordinates_0
 HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetGlobalCoordinates_002, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    int32_t globalX = 7;
-    int32_t globalY = 8;
+    GlobalCoords globalCoords {
+        .x = 7,
+        .y = 8,
+    };
 
-    EXPECT_EQ(WIN_MGR->GetGlobalCoordinates(-1, 1, 2, globalX, globalY), RET_ERR);
-    EXPECT_EQ(globalX, 7);
-    EXPECT_EQ(globalY, 8);
+    EXPECT_EQ(WIN_MGR->GetGlobalCoordinates(-1, 1, 2, globalCoords), RET_ERR);
+    EXPECT_EQ(globalCoords.x, 7);
+    EXPECT_EQ(globalCoords.y, 8);
 }
 } // namespace MMI
 } // namespace OHOS
