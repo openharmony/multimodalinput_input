@@ -479,6 +479,10 @@ int32_t InputEventHandler::GetLastInputEventTimeByDisplay(int32_t displayId, int
         MMI_HILOGE("Invalid displayId:%{public}d", displayId);
         return RET_ERR;
     }
+    if (WIN_MGR->GetPhysicalDisplay(displayId) == nullptr) {
+        MMI_HILOGE("Display not exist, displayId:%{public}d", displayId);
+        return RET_ERR;
+    }
     int32_t groupId = WIN_MGR->FindDisplayGroupId(displayId);
     const auto groupIter = lastInputEventTimes_.find(groupId);
     if (groupIter == lastInputEventTimes_.end()) {

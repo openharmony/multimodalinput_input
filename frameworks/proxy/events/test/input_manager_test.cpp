@@ -4841,25 +4841,33 @@ HWTEST_F(InputManagerTest, InputManagerTest_GetIntervalSinceLastInput002, TestSi
 }
 
 /**
- * @tc.name: InputManagerTest_GetLastInputEventTimeByDisplay001
- * @tc.desc: GetLastInputEventTimeByDisplay interface detection
+ * @tc.name: InputManagerTest_GetLastInputEventTimeByDisplay001_DisplayId0
+ * @tc.desc: GetLastInputEventTimeByDisplay with displayId 0; display 0 may be absent until WMS
+ *           syncs display info (RET_ERR expected), so only the return/out-param pairing is asserted
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputManagerTest, InputManagerTest_GetLastInputEventTimeByDisplay001, TestSize.Level1)
+HWTEST_F(InputManagerTest, InputManagerTest_GetLastInputEventTimeByDisplay001_DisplayId0, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     int64_t lastInputEventTime = -1;
-    ASSERT_NO_FATAL_FAILURE(InputManager::GetInstance()->GetLastInputEventTimeByDisplay(0, lastInputEventTime));
+    int32_t result = InputManager::GetInstance()->GetLastInputEventTimeByDisplay(0, lastInputEventTime);
+    if (result == RET_OK) {
+        EXPECT_GE(lastInputEventTime, 0);
+    } else {
+        EXPECT_EQ(lastInputEventTime, -1);
+    }
 }
 
 /**
- * @tc.name: InputManagerTest_GetLastInputEventTimeByDisplay002
- * @tc.desc: GetLastInputEventTimeByDisplay interface detection with injected event
+ * @tc.name: InputManagerTest_GetLastInputEventTimeByDisplay002_DisplayId0
+ * @tc.desc: GetLastInputEventTimeByDisplay with injected event, displayId 0; display 0 may be
+ *           absent until WMS syncs display info (RET_ERR expected), so only the return/out-param
+ *           pairing is asserted
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputManagerTest, InputManagerTest_GetLastInputEventTimeByDisplay002, TestSize.Level1)
+HWTEST_F(InputManagerTest, InputManagerTest_GetLastInputEventTimeByDisplay002_DisplayId0, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     auto pointerEvent = PointerEvent::Create();
@@ -4867,10 +4875,87 @@ HWTEST_F(InputManagerTest, InputManagerTest_GetLastInputEventTimeByDisplay002, T
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHPAD);
     InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
-    int64_t lastInputEventTime = 0;
+    int64_t lastInputEventTime = -1;
     int32_t result = InputManager::GetInstance()->GetLastInputEventTimeByDisplay(0, lastInputEventTime);
-    ASSERT_EQ(result, RET_OK);
-    EXPECT_GE(lastInputEventTime, 0);
+    if (result == RET_OK) {
+        EXPECT_GE(lastInputEventTime, 0);
+    } else {
+        EXPECT_EQ(lastInputEventTime, -1);
+    }
+}
+
+/**
+ * @tc.name: InputManagerTest_GetLastInputEventTimeByDisplay003_DisplayIdNegative1
+ * @tc.desc: GetLastInputEventTimeByDisplay with invalid displayId -1
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_GetLastInputEventTimeByDisplay003_DisplayIdNegative1, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int64_t lastInputEventTime = -1;
+    int32_t result = InputManager::GetInstance()->GetLastInputEventTimeByDisplay(-1, lastInputEventTime);
+    EXPECT_NE(result, RET_OK);
+    EXPECT_EQ(lastInputEventTime, -1);
+}
+
+/**
+ * @tc.name: InputManagerTest_GetLastInputEventTimeByDisplay004_DisplayId9999
+ * @tc.desc: GetLastInputEventTimeByDisplay with displayId 9999; 9999 is beyond any product's
+ *           display range (RET_ERR expected), the return/out-param pairing is asserted
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_GetLastInputEventTimeByDisplay004_DisplayId9999, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int64_t lastInputEventTime = -1;
+    int32_t result = InputManager::GetInstance()->GetLastInputEventTimeByDisplay(9999, lastInputEventTime);
+    if (result == RET_OK) {
+        EXPECT_GE(lastInputEventTime, 0);
+    } else {
+        EXPECT_EQ(lastInputEventTime, -1);
+    }
+}
+
+/**
+ * @tc.name: InputManagerTest_GetLastInputEventTimeByDisplay005_DisplayId6
+ * @tc.desc: GetLastInputEventTimeByDisplay with displayId 6; display 6 exists on PC-extended /
+ *           cockpit products (RET_OK expected) but not on phones (RET_ERR expected), so only the
+ *           return/out-param pairing is asserted
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_GetLastInputEventTimeByDisplay005_DisplayId6, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int64_t lastInputEventTime = -1;
+    int32_t result = InputManager::GetInstance()->GetLastInputEventTimeByDisplay(6, lastInputEventTime);
+    if (result == RET_OK) {
+        EXPECT_GE(lastInputEventTime, 0);
+    } else {
+        EXPECT_EQ(lastInputEventTime, -1);
+    }
+}
+
+/**
+ * @tc.name: InputManagerTest_GetLastInputEventTimeByDisplay006_DisplayId12
+ * @tc.desc: GetLastInputEventTimeByDisplay with displayId 12; display 12 exists on PC-extended /
+ *           cockpit products (RET_OK expected) but not on phones (RET_ERR expected), so only the
+ *           return/out-param pairing is asserted
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_GetLastInputEventTimeByDisplay006_DisplayId12, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int64_t lastInputEventTime = -1;
+    int32_t result = InputManager::GetInstance()->GetLastInputEventTimeByDisplay(12, lastInputEventTime);
+    if (result == RET_OK) {
+        EXPECT_GE(lastInputEventTime, 0);
+    } else {
+        EXPECT_EQ(lastInputEventTime, -1);
+    }
 }
 
 /**
