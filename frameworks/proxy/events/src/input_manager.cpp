@@ -611,6 +611,12 @@ int32_t InputManager::GetPointerLocation(int32_t &displayId, double &displayX, d
     return InputMgrImpl.GetPointerLocation(displayId, displayX, displayY);
 }
 
+int32_t InputManager::GetGlobalCoordinates(int32_t displayId, int32_t displayX, int32_t displayY,
+    int32_t &globalX, int32_t &globalY)
+{
+    return InputMgrImpl.GetGlobalCoordinates(displayId, displayX, displayY, globalX, globalY);
+}
+
 int32_t InputManager::EnterCaptureMode(int32_t windowId)
 {
     return InputMgrImpl.EnterCaptureMode(windowId);

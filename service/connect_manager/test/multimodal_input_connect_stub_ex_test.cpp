@@ -226,6 +226,11 @@ public:
     int32_t GetFunctionKeyState(int32_t funckey, bool &state) override { return funckey; }
     int32_t SetFunctionKeyState(int32_t funcKey, bool enable) override { return funcKey; }
     int32_t SetPointerLocation(int32_t x, int32_t y, int32_t displayId) override { return x; }
+    int32_t GetGlobalCoordinates(int32_t displayId, int32_t displayX, int32_t displayY, int32_t &globalX,
+        int32_t &globalY) override
+    {
+        return RET_OK;
+    }
     int32_t ClearWindowPointerStyle(int32_t pid, int32_t windowId) override { return pid; }
     int32_t SetMouseCaptureMode(int32_t windowId, bool isCaptureMode) override { return windowId; }
     int32_t GetWindowPid(int32_t windowId) override { return windowId; }

@@ -3694,6 +3694,32 @@ ErrCode MMIService::GetWindowPid(int32_t windowId, int32_t &windowPid)
     return RET_OK;
 }
 
+ErrCode MMIService::GetGlobalCoordinates(int32_t displayId, int32_t displayX, int32_t displayY,
+    int32_t &globalX, int32_t &globalY)
+{
+    if (!IsRunning()) {
+        MMI_HILOGE("Service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
+    auto globalCoords = std::make_shared<GlobalCoords>();
+    if (globalCoords == nullptr) {
+        MMI_HILOGE("Create globalCoords failed");
+        return RET_ERR;
+    }
+    int32_t ret = delegateTasks_.PostSyncTask(
+        [displayId, displayX, displayY, globalCoords] {
+            return IInputWindowsManager::GetInstance()->GetGlobalCoordinates(displayId, displayX, displayY,
+                *globalCoords);
+        });
+    if (ret != RET_OK) {
+        MMI_HILOGE("Get global coordinates failed, ret:%{public}d", ret);
+        return ret;
+    }
+    globalX = static_cast<int32_t>(globalCoords->x);
+    globalY = static_cast<int32_t>(globalCoords->y);
+    return RET_OK;
+}
+
 ErrCode MMIService::AppendExtraData(const ExtraData &extraData)
 {
     CALL_DEBUG_ENTER;

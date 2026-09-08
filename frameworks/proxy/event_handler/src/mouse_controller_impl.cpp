@@ -41,8 +41,16 @@ MouseControllerImpl::MouseControllerImpl()
 MouseControllerImpl::~MouseControllerImpl()
 {
     MMI_HILOGD("MouseControllerImpl destroying, cleaning up state");
+    ReleasePressedButtons();
+    ResetGlobalCoordinateState();
+    EndAxisEvent();
+    buttonStates_.clear();
+    buttonDownTimes_.clear();
+}
 
-    // Auto cleanup: Release all pressed buttons
+void MouseControllerImpl::ReleasePressedButtons()
+{
+    const auto globalCoordinateState = GetGlobalCoordinateState();
     for (auto& [button, pressed] : buttonStates_) {
         if (!pressed) {
             continue;
@@ -59,20 +67,23 @@ MouseControllerImpl::~MouseControllerImpl()
         pointerEvent->SetTargetDisplayId(cursorPos_.displayId);
         pointerEvent->SetButtonId(button);
 
-        PointerEvent::PointerItem item = CreatePointerItem();
+        PointerEvent::PointerItem item = globalCoordinateState.enabled ?
+            CreateGlobalPointerItem(globalCoordinateState.x, globalCoordinateState.y) : CreatePointerItem();
         item.SetDownTime(buttonDownTimes_[button]);
         pointerEvent->AddPointerItem(item);
 
-        int32_t ret = InjectPointerEvent(pointerEvent);
+        const int32_t coordinateType = globalCoordinateState.enabled ? PointerEvent::GLOBAL_COORDINATE :
+            PointerEvent::DISPLAY_COORDINATE;
+        int32_t ret = InjectPointerEvent(pointerEvent, coordinateType);
         if (ret != RET_OK) {
             MMI_HILOGE("Failed to auto-release button %{public}d, ret=%{public}d", button, ret);
         }
     }
+}
 
-    // Auto cleanup: End ongoing axis event
+void MouseControllerImpl::EndAxisEvent()
+{
     if (!axisState_.inProgress) {
-        buttonStates_.clear();
-        buttonDownTimes_.clear();
         return;
     }
 
@@ -81,8 +92,6 @@ MouseControllerImpl::~MouseControllerImpl()
     auto pointerEvent = CreatePointerEvent(PointerEvent::POINTER_ACTION_AXIS_END);
     if (pointerEvent == nullptr) {
         MMI_HILOGE("Failed to create pointer event for axis %{public}d", axisState_.axisType);
-        buttonStates_.clear();
-        buttonDownTimes_.clear();
         return;
     }
 
@@ -96,9 +105,6 @@ MouseControllerImpl::~MouseControllerImpl()
     if (ret != RET_OK) {
         MMI_HILOGE("Failed to auto-end axis %{public}d, ret=%{public}d", axisState_.axisType, ret);
     }
-
-    buttonStates_.clear();
-    buttonDownTimes_.clear();
 }
 
 int32_t MouseControllerImpl::MoveTo(int32_t displayId, int32_t x, int32_t y)
@@ -139,7 +145,42 @@ int32_t MouseControllerImpl::MoveTo(int32_t displayId, int32_t x, int32_t y)
         pointerEvent->AddPointerItem(item);
     }
 
-    return InjectPointerEvent(pointerEvent);
+    const int32_t ret = InjectPointerEvent(pointerEvent);
+    if (ret == RET_OK) {
+        ResetGlobalCoordinateState();
+    }
+    return ret;
+}
+
+int32_t MouseControllerImpl::MoveToGlobal(int32_t globalX, int32_t globalY)
+{
+    MMI_HILOGD("MoveToGlobal: globalX=%{private}d, globalY=%{private}d", globalX, globalY);
+    std::shared_ptr<PointerEvent> pointerEvent =
+        CreatePointerEvent(PointerEvent::POINTER_ACTION_MOVE);
+    if (pointerEvent == nullptr) {
+        MMI_HILOGE("Failed to create pointer event");
+        return RET_ERR;
+    }
+    {
+        std::lock_guard<std::mutex> lock(mutex_);
+        for (const auto &[button, pressed] : buttonStates_) {
+            if (pressed) {
+                pointerEvent->SetButtonPressed(button);
+            }
+        }
+        if (lastButtonId_ != PointerEvent::BUTTON_NONE) {
+            pointerEvent->SetButtonId(lastButtonId_);
+        }
+        PointerEvent::PointerItem item = CreateGlobalPointerItem(globalX, globalY);
+        item.SetDownTime(!buttonDownTimes_.empty() ? buttonDownTimes_.begin()->second : -1);
+        item.SetPressed(!pointerEvent->GetPressedButtons().empty());
+        pointerEvent->AddPointerItem(item);
+    }
+    const int32_t ret = InjectPointerEvent(pointerEvent, PointerEvent::GLOBAL_COORDINATE);
+    if (ret == RET_OK) {
+        SetGlobalCoordinateState(globalX, globalY);
+    }
+    return ret;
 }
 
 int32_t MouseControllerImpl::PressButton(int32_t button)
@@ -199,6 +240,7 @@ int32_t MouseControllerImpl::ReleaseButton(int32_t button)
 
     std::shared_ptr<PointerEvent> pointerEvent;
     int64_t downTime;
+    int32_t coordinateType = PointerEvent::DISPLAY_COORDINATE;
 
     {
         std::lock_guard<std::mutex> lock(mutex_);
@@ -225,12 +267,16 @@ int32_t MouseControllerImpl::ReleaseButton(int32_t button)
             }
         }
 
-        PointerEvent::PointerItem item = CreatePointerItem();
+        const auto globalCoordinateState = GetGlobalCoordinateState();
+        coordinateType = globalCoordinateState.enabled ? PointerEvent::GLOBAL_COORDINATE :
+            PointerEvent::DISPLAY_COORDINATE;
+        PointerEvent::PointerItem item = globalCoordinateState.enabled ?
+            CreateGlobalPointerItem(globalCoordinateState.x, globalCoordinateState.y) : CreatePointerItem();
         item.SetDownTime(downTime);
         pointerEvent->AddPointerItem(item);
     }
 
-    int32_t ret = InjectPointerEvent(pointerEvent);
+    int32_t ret = InjectPointerEvent(pointerEvent, coordinateType);
     if (ret == RET_OK) {
         std::lock_guard<std::mutex> lock(mutex_);
         buttonStates_[button] = false;
@@ -375,6 +421,34 @@ PointerEvent::PointerItem MouseControllerImpl::CreatePointerItem()
     return item;
 }
 
+PointerEvent::PointerItem MouseControllerImpl::CreateGlobalPointerItem(int32_t x, int32_t y)
+{
+    PointerEvent::PointerItem item = CreatePointerItem();
+    item.SetGlobalX(x);
+    item.SetGlobalY(y);
+    return item;
+}
+
+void MouseControllerImpl::ResetGlobalCoordinateState()
+{
+    std::lock_guard<std::mutex> lock(globalCoordinateMutex_);
+    globalCoordinateState_ = {};
+}
+
+MouseControllerImpl::GlobalCoordinateState MouseControllerImpl::GetGlobalCoordinateState() const
+{
+    std::lock_guard<std::mutex> lock(globalCoordinateMutex_);
+    return globalCoordinateState_;
+}
+
+void MouseControllerImpl::SetGlobalCoordinateState(int32_t globalX, int32_t globalY)
+{
+    std::lock_guard<std::mutex> lock(globalCoordinateMutex_);
+    globalCoordinateState_.x = globalX;
+    globalCoordinateState_.y = globalY;
+    globalCoordinateState_.enabled = true;
+}
+
 std::shared_ptr<PointerEvent> MouseControllerImpl::CreatePointerEvent(int32_t action)
 {
     auto pointerEvent = PointerEvent::Create();
@@ -406,7 +480,7 @@ std::shared_ptr<PointerEvent> MouseControllerImpl::CreatePointerEvent(int32_t ac
     return pointerEvent;
 }
 
-int32_t MouseControllerImpl::InjectPointerEvent(std::shared_ptr<PointerEvent> event)
+int32_t MouseControllerImpl::InjectPointerEvent(std::shared_ptr<PointerEvent> event, int32_t useCoordinate)
 {
     if (event == nullptr) {
         MMI_HILOGE("PointerEvent is nullptr");
@@ -416,7 +490,7 @@ int32_t MouseControllerImpl::InjectPointerEvent(std::shared_ptr<PointerEvent> ev
     // Add Controller Flag to mark this event uses CONTROL_DEVICE permission check
     event->AddFlag(InputEvent::EVENT_FLAG_CONTROLLER);
 
-    int32_t ret = InputMgrImpl.SimulateInputEvent(event, false, PointerEvent::DISPLAY_COORDINATE);
+    int32_t ret = InputMgrImpl.SimulateInputEvent(event, false, useCoordinate);
     if (ret != RET_OK) {
         MMI_HILOGE("SimulateInputEvent failed, ret=%{public}d", ret);
         return ret;

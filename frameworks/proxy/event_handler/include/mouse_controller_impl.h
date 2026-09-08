@@ -31,6 +31,7 @@ public:
     ~MouseControllerImpl();
 
     int32_t MoveTo(int32_t displayId, int32_t x, int32_t y);
+    int32_t MoveToGlobal(int32_t globalX, int32_t globalY);
     int32_t PressButton(int32_t button);
     int32_t ReleaseButton(int32_t button);
     int32_t BeginAxis(int32_t axis, int32_t value);
@@ -38,9 +39,22 @@ public:
     int32_t EndAxis(int32_t axis);
 
 private:
+    struct GlobalCoordinateState {
+        bool enabled { false };
+        int32_t x { 0 };
+        int32_t y { 0 };
+    };
+
     PointerEvent::PointerItem CreatePointerItem();
+    PointerEvent::PointerItem CreateGlobalPointerItem(int32_t x, int32_t y);
     std::shared_ptr<PointerEvent> CreatePointerEvent(int32_t action);
-    int32_t InjectPointerEvent(std::shared_ptr<PointerEvent> event);
+    int32_t InjectPointerEvent(std::shared_ptr<PointerEvent> event,
+        int32_t useCoordinate = PointerEvent::DISPLAY_COORDINATE);
+    GlobalCoordinateState GetGlobalCoordinateState() const;
+    void SetGlobalCoordinateState(int32_t globalX, int32_t globalY);
+    void ResetGlobalCoordinateState();
+    void ReleasePressedButtons();
+    void EndAxisEvent();
 
     std::map<int32_t, bool> buttonStates_;
     std::map<int32_t, int64_t> buttonDownTimes_;
@@ -57,7 +71,10 @@ private:
         int32_t y = 0;
     } cursorPos_;
 
+    GlobalCoordinateState globalCoordinateState_;
+
     mutable std::mutex mutex_;
+    mutable std::mutex globalCoordinateMutex_;
 };
 
 } // namespace MMI

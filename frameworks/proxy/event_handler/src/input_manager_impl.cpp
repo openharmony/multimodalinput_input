@@ -2363,6 +2363,12 @@ int32_t InputManagerImpl::GetPointerLocation(int32_t &displayId, double &display
 #endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
 }
 
+int32_t InputManagerImpl::GetGlobalCoordinates(int32_t displayId, int32_t displayX, int32_t displayY,
+    int32_t &globalX, int32_t &globalY)
+{
+    return MULTIMODAL_INPUT_CONNECT_MGR->GetGlobalCoordinates(displayId, displayX, displayY, globalX, globalY);
+}
+
 int32_t InputManagerImpl::EnterCaptureMode(int32_t windowId)
 {
     CALL_DEBUG_ENTER;

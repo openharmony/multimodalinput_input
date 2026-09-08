@@ -17846,5 +17846,46 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsSameDragUser_001, Te
     manager.displayGroupInfoMap_[3].currentUserId = 100;
     EXPECT_TRUE(manager.IsSameDragUser(77));
 }
+
+/**
+ * @tc.name: InputWindowsManagerTest_GetGlobalCoordinates_001
+ * @tc.desc: Convert display coordinates to global coordinates using the display layout offset
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetGlobalCoordinates_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    GlobalCoords globalCoords;
+    auto it = WIN_MGR->displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
+    ASSERT_NE(it, WIN_MGR->displayGroupInfoMap_.end());
+    ASSERT_FALSE(it->second.displaysInfo.empty());
+    auto &displayInfo = it->second.displaysInfo.front();
+    displayInfo.x = -100;
+    displayInfo.y = 50;
+
+    ASSERT_EQ(WIN_MGR->GetGlobalCoordinates(displayInfo.id, 12, -3, globalCoords), RET_OK);
+    EXPECT_EQ(globalCoords.x, -88);
+    EXPECT_EQ(globalCoords.y, 47);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_GetGlobalCoordinates_002
+ * @tc.desc: Keep output unchanged when the display does not exist
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetGlobalCoordinates_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    GlobalCoords globalCoords {
+        .x = 7,
+        .y = 8,
+    };
+
+    EXPECT_EQ(WIN_MGR->GetGlobalCoordinates(-1, 1, 2, globalCoords), RET_ERR);
+    EXPECT_EQ(globalCoords.x, 7);
+    EXPECT_EQ(globalCoords.y, 8);
+}
 } // namespace MMI
 } // namespace OHOS

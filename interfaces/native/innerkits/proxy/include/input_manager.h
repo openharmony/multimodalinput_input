@@ -751,6 +751,8 @@ public:
      * @since 20
      */
     int32_t GetPointerLocation(int32_t &displayId, double &displayX, double &displayY);
+    int32_t GetGlobalCoordinates(int32_t displayId, int32_t displayX, int32_t displayY,
+        int32_t &globalX, int32_t &globalY);
 
     /**
      * @brief 进入捕获模式

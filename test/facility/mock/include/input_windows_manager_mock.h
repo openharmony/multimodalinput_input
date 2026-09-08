@@ -54,6 +54,7 @@ public:
     MOCK_METHOD(int32_t, SetMouseCaptureMode, (int32_t, bool));
     MOCK_METHOD(bool, GetMouseIsCaptureMode, (), (const));
     MOCK_METHOD(int32_t, GetDisplayBindInfo, (DisplayBindInfos&));
+    MOCK_METHOD(int32_t, GetGlobalCoordinates, (int32_t, int32_t, int32_t, GlobalCoords&));
     MOCK_METHOD(int32_t, SetDisplayBind, (int32_t, int32_t, std::string&));
     MOCK_METHOD(int32_t, BindToDisplay, (int32_t, int32_t, std::string&));
     int32_t GetBindDisplayIdByInputDevice(int32_t inputDeviceId) const override { return -1; }

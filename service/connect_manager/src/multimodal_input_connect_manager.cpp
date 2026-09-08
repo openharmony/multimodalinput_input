@@ -15,7 +15,6 @@
 
 #include "multimodal_input_connect_manager.h"
 
-
 #include "iservice_registry.h"
 
 #include "input_binder_client_server.h"
@@ -696,6 +695,21 @@ int32_t MultimodalInputConnectManager::GetPointerLocation(int32_t &displayId, do
     std::lock_guard<std::mutex> guard(lock_);
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
     return multimodalInputConnectService_->GetPointerLocation(displayId, displayX, displayY);
+}
+
+int32_t MultimodalInputConnectManager::GetGlobalCoordinates(int32_t displayId, int32_t displayX,
+    int32_t displayY, int32_t &globalX, int32_t &globalY)
+{
+    sptr<IMultimodalInputConnect> multimodalInputConnectService = nullptr;
+    {
+        std::lock_guard<std::mutex> guard(lock_);
+        if (multimodalInputConnectService_ == nullptr) {
+            MMI_HILOGE("GetGlobalCoordinates failed, multimodalInputConnectService_ is null");
+            return RET_ERR;
+        }
+        multimodalInputConnectService = multimodalInputConnectService_;
+    }
+    return multimodalInputConnectService->GetGlobalCoordinates(displayId, displayX, displayY, globalX, globalY);
 }
 
 bool MultimodalInputConnectManager::ConnectMultimodalInputService() __attribute__((no_sanitize("cfi")))

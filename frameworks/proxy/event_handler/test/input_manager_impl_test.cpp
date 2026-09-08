@@ -3902,5 +3902,67 @@ HWTEST_F(InputManagerImplTest, InputManagerImplTest_BindToDisplay_002, TestSize.
     EXPECT_EQ(inputManagerImpl.BindToDisplay(1, 0, callback), RET_OK);
     EXPECT_TRUE(invoked);
 }
+
+/**
+ * @tc.name: MouseControllerImpl_GlobalCoordinateStateReset_001
+ * @tc.desc: Resetting global coordinate mode clears both mode and coordinates
+ * @tc.type: FUNC
+ */
+HWTEST_F(InputManagerImplTest, MouseControllerImpl_GlobalCoordinateStateReset_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MouseControllerImpl controller;
+    controller.SetGlobalCoordinateState(1920, 1080);
+
+    auto state = controller.GetGlobalCoordinateState();
+    EXPECT_TRUE(state.enabled);
+    EXPECT_EQ(state.x, 1920);
+    EXPECT_EQ(state.y, 1080);
+
+    controller.ResetGlobalCoordinateState();
+
+    state = controller.GetGlobalCoordinateState();
+    EXPECT_FALSE(state.enabled);
+    EXPECT_EQ(state.x, 0);
+    EXPECT_EQ(state.y, 0);
+}
+
+/**
+ * @tc.name: MouseControllerImpl_CreateGlobalPointerItem_001
+ * @tc.desc: Global pointer items preserve the requested global coordinates
+ * @tc.type: FUNC
+ */
+HWTEST_F(InputManagerImplTest, MouseControllerImpl_CreateGlobalPointerItem_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MouseControllerImpl controller;
+
+    auto item = controller.CreateGlobalPointerItem(1920, 1080);
+
+    EXPECT_EQ(item.GetGlobalX(), 1920);
+    EXPECT_EQ(item.GetGlobalY(), 1080);
+    EXPECT_EQ(item.GetPointerId(), 0);
+    EXPECT_EQ(item.GetToolType(), PointerEvent::TOOL_TYPE_MOUSE);
+}
+
+/**
+ * @tc.name: MouseControllerImpl_CreatePointerItem_001
+ * @tc.desc: Move events can be built from coordinates before state commit
+ * @tc.type: FUNC
+ */
+HWTEST_F(InputManagerImplTest, MouseControllerImpl_CreatePointerItem_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MouseControllerImpl controller;
+    controller.cursorPos_.x = 640;
+    controller.cursorPos_.y = 480;
+
+    auto item = controller.CreatePointerItem();
+
+    EXPECT_EQ(item.GetDisplayX(), 640);
+    EXPECT_EQ(item.GetDisplayY(), 480);
+    EXPECT_EQ(item.GetDisplayXPos(), 640);
+    EXPECT_EQ(item.GetDisplayYPos(), 480);
+}
 } // namespace MMI
 } // namespace OHOS
