@@ -1586,7 +1586,7 @@ void PointerDrawingManager::AdjustMouseFocusByDirection0(ICON_TYPE iconType, int
         }
         case ANGLE_NW: {
             if (currentMouseStyle_.id == MOUSE_ICON::DEVELOPER_DEFINED_ICON) {
-                if (GetUserIconCopy() != nullptr) {
+                if (GetUserIconCopy(false) != nullptr) {
                     physicalX -= userIconHotSpotX_;
                     physicalY -= userIconHotSpotY_;
                 }
@@ -1625,7 +1625,7 @@ void PointerDrawingManager::AdjustMouseFocusByDirection90(ICON_TYPE iconType, in
         }
         case ANGLE_NW: {
             if (currentMouseStyle_.id == MOUSE_ICON::DEVELOPER_DEFINED_ICON) {
-                if (GetUserIconCopy() != nullptr) {
+                if (GetUserIconCopy(false) != nullptr) {
                     physicalX -= userIconHotSpotY_;
                     physicalY += userIconHotSpotX_;
                 }
@@ -1664,7 +1664,7 @@ void PointerDrawingManager::AdjustMouseFocusByDirection180(ICON_TYPE iconType, i
         }
         case ANGLE_NW: {
             if (currentMouseStyle_.id == MOUSE_ICON::DEVELOPER_DEFINED_ICON) {
-                if (GetUserIconCopy() != nullptr) {
+                if (GetUserIconCopy(false) != nullptr) {
                     physicalX += userIconHotSpotX_;
                     physicalY += userIconHotSpotY_;
                 }
@@ -1703,7 +1703,7 @@ void PointerDrawingManager::AdjustMouseFocusByDirection270(ICON_TYPE iconType, i
         }
         case ANGLE_NW: {
             if (currentMouseStyle_.id == MOUSE_ICON::DEVELOPER_DEFINED_ICON) {
-                if (GetUserIconCopy() != nullptr) {
+                if (GetUserIconCopy(false) != nullptr) {
                     physicalX += userIconHotSpotY_;
                     physicalY -= userIconHotSpotX_;
                 }
@@ -4025,7 +4025,12 @@ void PointerDrawingManager::SetSurfaceNodeBounds()
     }
     auto surfaceNodePtr = GetSurfaceNode();
     CHKPV(surfaceNodePtr);
-    surfaceNodePtr->SetBounds(lastPhysicalX_, lastPhysicalY_, canvasWidth_, canvasHeight_);
+    int32_t x = lastPhysicalX_;
+    int32_t y = lastPhysicalY_;
+    Direction direction = static_cast<Direction>((
+        ((displayInfo_.direction - displayInfo_.displayDirection) * ANGLE_90 + ANGLE_360) % ANGLE_360) / ANGLE_90);
+    AdjustMouseFocusToSoftRenderOrigin(direction, MOUSE_ICON(lastMouseStyle_.id), x, y);
+    surfaceNodePtr->SetBounds(x, y, canvasWidth_, canvasHeight_);
 }
 
 int32_t PointerDrawingManager::SetCustomCursor(int32_t pid, int32_t windowId, CustomCursor cursor,
