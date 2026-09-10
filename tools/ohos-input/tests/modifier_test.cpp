@@ -19,9 +19,12 @@
 #include <string>
 #include <vector>
 
+#include "key_event.h"
+
 using namespace testing;
 using namespace testing::ext;
 using namespace OHOS::MMI::InputCli;
+using OHOS::MMI::KeyEvent;
 
 class ModifierTest : public Test {
 protected:
@@ -35,8 +38,8 @@ HWTEST_F(ModifierTest, ParseModifiers_TwoKeys_KeepsGivenOrder, TestSize.Level1)
     std::string error;
     EXPECT_TRUE(ParseModifiers("shift|ctrl", modifiers, error));
     EXPECT_EQ(modifiers.size(), 2U);
-    EXPECT_EQ(modifiers[0], KEY_SHIFT_LEFT);
-    EXPECT_EQ(modifiers[1], KEY_CTRL_LEFT);
+    EXPECT_EQ(modifiers[0], KeyEvent::KEYCODE_SHIFT_LEFT);
+    EXPECT_EQ(modifiers[1], KeyEvent::KEYCODE_CTRL_LEFT);
 }
 
 HWTEST_F(ModifierTest, ParseModifiers_SingleKey_MapsToKeyCode, TestSize.Level1)
@@ -46,10 +49,10 @@ HWTEST_F(ModifierTest, ParseModifiers_SingleKey_MapsToKeyCode, TestSize.Level1)
         int32_t key;
     };
     const ModifierCase cases[] = {
-        { "ctrl", KEY_CTRL_LEFT },
-        { "alt", KEY_ALT_LEFT },
-        { "shift", KEY_SHIFT_LEFT },
-        { "meta", KEY_META_LEFT },
+        { "ctrl", KeyEvent::KEYCODE_CTRL_LEFT },
+        { "alt", KeyEvent::KEYCODE_ALT_LEFT },
+        { "shift", KeyEvent::KEYCODE_SHIFT_LEFT },
+        { "meta", KeyEvent::KEYCODE_META_LEFT },
     };
     for (const ModifierCase &testCase : cases) {
         std::vector<int32_t> modifiers;

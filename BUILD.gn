@@ -335,6 +335,10 @@ group("mmi_tests") {
   if (input_feature_product == "pc") {
     deps += [ "service:SuspendStateManagerTest" ]
   }
+
+  if (input_controller_inject_enable) {
+    deps += [ "tools/ohos-input/tests:unittest" ]
+  }
 }
 
 group("examples_group") {

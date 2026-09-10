@@ -2,49 +2,55 @@ import("//build/ohos.gni")
 import("//build/ohos/cli/ohos_cli_executable.gni")
 import("../../multimodalinput_mini.gni")
 
-if (input_controller_inject_enable) {
-  ohos_cli_executable("ohos-input") {
-    branch_protector_ret = "pac_ret"
-    cli_config_file = "ohos-input.json"
-    sanitize = {
-      cfi = true
-      cfi_cross_dso = true
-      debug = false
-    }
-    cflags = [
-      "-fPIC",
-      "-g",
-      "-Wall",
+ohos_cli_executable("ohos-input") {
+  branch_protector_ret = "pac_ret"
+  cli_config_file = "ohos-input.json"
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
+  cflags = [
+    "-fPIC",
+    "-g",
+    "-Wall",
+  ]
+  if (target_cpu == "arm") {
+    cflags += [ "-DBINDER_IPC_32BIT" ]
+  }
+  cflags_cc = cflags
+  sources = [
+    "src/executor.cpp",
+    "src/key_press_command.cpp",
+    "src/main.cpp",
+    "src/modifier.cpp",
+    "src/option_parser.cpp",
+    "src/printer.cpp",
+  ]
+  include_dirs = [
+    "include",
+    "${mmi_path}/frameworks/proxy/event_handler/include",
+    "${mmi_path}/interfaces/native/innerkits/event/include",
+    "${mmi_path}/interfaces/native/innerkits/proxy/include",
+    "${mmi_path}/util/common/include",
+  ]
+  deps = [ "${mmi_path}/frameworks/proxy:libmmi-client" ]
+  external_deps = [
+    "hilog:libhilog",
+    "ipc:ipc_single",
+    "json:nlohmann_json_static",
+  ]
+  subsystem_name = "multimodalinput"
+  part_name = "input"
+  install_enable = true
+  install_images = [ "system" ]
+  relative_install_dir = "cli_tool/executable"
+}
+
+group("ohos_input_cli") {
+  if (input_controller_inject_enable) {
+    deps = [
+      ":ohos-input"
     ]
-    if (target_cpu == "arm") {
-      cflags += [ "-DBINDER_IPC_32BIT" ]
-    }
-    cflags_cc = cflags
-    sources = [
-      "src/executor.cpp",
-      "src/key_press_command.cpp",
-      "src/main.cpp",
-      "src/modifier.cpp",
-      "src/option_parser.cpp",
-      "src/printer.cpp",
-    ]
-    include_dirs = [
-      "include",
-      "${mmi_path}/frameworks/proxy/event_handler/include",
-      "${mmi_path}/interfaces/native/innerkits/event/include",
-      "${mmi_path}/interfaces/native/innerkits/proxy/include",
-      "${mmi_path}/util/common/include",
-    ]
-    deps = [ "${mmi_path}/frameworks/proxy:libmmi-client" ]
-    external_deps = [
-      "hilog:libhilog",
-      "ipc:ipc_single",
-      "json:nlohmann_json_static",
-    ]
-    subsystem_name = "multimodalinput"
-    part_name = "input"
-    install_enable = true
-    install_images = [ "system" ]
-    relative_install_dir = "cli_tool/executable"
   }
 }

@@ -24,9 +24,12 @@
 #include "command_runner.h"
 #include "mock_controller_factory.h"
 
+#include "key_event.h"
+
 using namespace testing;
 using namespace testing::ext;
 using namespace OHOS::MMI::InputCli;
+using OHOS::MMI::KeyEvent;
 
 namespace {
 void ExpectSuccess(const CommandResult &result, const std::string &action)
@@ -54,9 +57,11 @@ HWTEST_F(IntegrationTest, KeyPress_CallsControllerInModifierOrder, TestSize.Leve
         "key", "press", "--key", "2049", "--holdDuration", "0", "--modifier",
         "ctrl|shift" });
     ExpectSuccess(result, "key press");
-    ExpectCalls(calls, { { "PressKey", { KEY_CTRL_LEFT } }, { "PressKey", { KEY_SHIFT_LEFT } },
-        { "PressKey", { 2049 } }, { "ReleaseKey", { 2049 } }, { "ReleaseKey", { KEY_SHIFT_LEFT } },
-        { "ReleaseKey", { KEY_CTRL_LEFT } } });
+    ExpectCalls(calls, { { "PressKey", { KeyEvent::KEYCODE_CTRL_LEFT } },
+        { "PressKey", { KeyEvent::KEYCODE_SHIFT_LEFT } },
+        { "PressKey", { 2049 } }, { "ReleaseKey", { 2049 } },
+        { "ReleaseKey", { KeyEvent::KEYCODE_SHIFT_LEFT } },
+        { "ReleaseKey", { KeyEvent::KEYCODE_CTRL_LEFT } } });
 }
 
 HWTEST_F(IntegrationTest, KeyPress_PrimaryKeyDuplicatedInModifier_RejectedBeforeControllerCreation, TestSize.Level1)
@@ -66,10 +71,10 @@ HWTEST_F(IntegrationTest, KeyPress_PrimaryKeyDuplicatedInModifier_RejectedBefore
         const char *modifier;
     };
     const DuplicateKeyCase cases[] = {
-        { KEY_CTRL_LEFT, "ctrl" },
-        { KEY_ALT_LEFT, "alt" },
-        { KEY_SHIFT_LEFT, "shift" },
-        { KEY_META_LEFT, "meta" },
+        { KeyEvent::KEYCODE_CTRL_LEFT, "ctrl" },
+        { KeyEvent::KEYCODE_ALT_LEFT, "alt" },
+        { KeyEvent::KEYCODE_SHIFT_LEFT, "shift" },
+        { KeyEvent::KEYCODE_META_LEFT, "meta" },
     };
     MockControllerFixture fixture;
     std::vector<RecordedCall> calls;
@@ -148,6 +153,6 @@ HWTEST_F(IntegrationTest, ReleaseFailureAfterModifierPress_EmitsOneJsonAndDestro
     EXPECT_EQ(result.code, SERVICE_EXIT);
     EXPECT_EQ(std::count(result.stdoutText.begin(), result.stdoutText.end(), '\n'), 1);
     EXPECT_EQ(ParseJson(result)["errCode"], "ERR_INPUT_SERVICE_EXCEPTION");
-    ExpectCalls(calls, { { "PressKey", { KEY_CTRL_LEFT } }, { "PressKey", { 2049 } },
+    ExpectCalls(calls, { { "PressKey", { KeyEvent::KEYCODE_CTRL_LEFT } }, { "PressKey", { 2049 } },
         { "ReleaseKey", { 2049 } }, { "DestroyKeyboard", {} } });
 }

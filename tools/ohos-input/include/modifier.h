@@ -24,11 +24,6 @@
 #include "keyboard_controller_impl.h"
 
 namespace OHOS::MMI::InputCli {
-constexpr int32_t KEY_ALT_LEFT = 2045;
-constexpr int32_t KEY_SHIFT_LEFT = 2047;
-constexpr int32_t KEY_CTRL_LEFT = 2072;
-constexpr int32_t KEY_META_LEFT = 2076;
-
 bool ParseModifiers(const std::string &value, std::vector<int32_t> &modifiers, std::string &error);
 
 int32_t PressModifiers(const std::shared_ptr<KeyboardControllerImpl> &keyboard, const std::vector<int32_t> &modifiers);

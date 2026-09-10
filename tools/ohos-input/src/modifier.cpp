@@ -19,6 +19,8 @@
 #include <set>
 #include <sstream>
 
+#include "key_event.h"
+
 namespace OHOS::MMI::InputCli {
 bool ParseModifiers(const std::string &value, std::vector<int32_t> &modifiers, std::string &error)
 {
@@ -40,13 +42,13 @@ bool ParseModifiers(const std::string &value, std::vector<int32_t> &modifiers, s
         }
         int32_t key = 0;
         if (token == "ctrl") {
-            key = KEY_CTRL_LEFT;
+            key = KeyEvent::KEYCODE_CTRL_LEFT;
         } else if (token == "alt") {
-            key = KEY_ALT_LEFT;
+            key = KeyEvent::KEYCODE_ALT_LEFT;
         } else if (token == "shift") {
-            key = KEY_SHIFT_LEFT;
+            key = KeyEvent::KEYCODE_SHIFT_LEFT;
         } else if (token == "meta") {
-            key = KEY_META_LEFT;
+            key = KeyEvent::KEYCODE_META_LEFT;
         } else {
             error = "modifier must use ctrl, alt, shift, or meta";
             return false;
