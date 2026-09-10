@@ -32,7 +32,8 @@ constexpr int32_t KEY_META_LEFT = 2076;
 bool ParseModifiers(const std::string &value, std::vector<int32_t> &modifiers, std::string &error);
 
 int32_t PressModifiers(const std::shared_ptr<KeyboardControllerImpl> &keyboard, const std::vector<int32_t> &modifiers);
-int32_t ReleaseModifiers(const std::shared_ptr<KeyboardControllerImpl> &keyboard, const std::vector<int32_t> &modifiers);
+int32_t ReleaseModifiers(const std::shared_ptr<KeyboardControllerImpl> &keyboard,
+    const std::vector<int32_t> &modifiers);
 } // namespace OHOS::MMI::InputCli
 
 #endif

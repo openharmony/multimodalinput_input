@@ -85,7 +85,7 @@ void AppendDocLine(std::ostringstream &stream, const std::string &name, const st
 {
     size_t begin = 0;
     bool firstLine = true;
-    while (true) {
+    while (begin <= description.size()) {
         const size_t end = description.find('\n', begin);
         const std::string part = description.substr(begin, end == std::string::npos ? end : end - begin);
         if (firstLine) {
