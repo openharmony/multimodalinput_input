@@ -8140,7 +8140,10 @@ bool InputWindowsManager::IsSameDragUser(int32_t displayId) const
         return true;
     }
     int32_t eventUserId = FindDisplayUserId(displayId);
-    if (eventUserId < 0) {
+    // userId 0 is not a valid active user (HasMultipleActiveUsers ignores userId <= 0);
+    // WMS may report a display group with userId 0 before the os account is attached,
+    // treat it as unknown so single-user drags are not rejected.
+    if (eventUserId <= 0) {
         return true;
     }
     return extraData_.userId == eventUserId;

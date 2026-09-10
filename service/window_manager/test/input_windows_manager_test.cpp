@@ -17832,6 +17832,16 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsSameDragUser_001, Te
     manager.extraData_.userId = 100;
     EXPECT_TRUE(manager.IsSameDragUser(999));
 
+    // Display group reported with userId 0 (account not yet attached) → treated as unknown → true.
+    OLD::DisplayGroupInfo zeroUserGroup;
+    zeroUserGroup.groupId = 4;
+    zeroUserGroup.currentUserId = 0;
+    OLD::DisplayInfo zeroUserDisplay;
+    zeroUserDisplay.id = 78;
+    zeroUserGroup.displaysInfo.push_back(zeroUserDisplay);
+    manager.displayGroupInfoMap_[4] = zeroUserGroup;
+    EXPECT_TRUE(manager.IsSameDragUser(78));
+
     // Drag user set, display resolves to another user → false.
     OLD::DisplayGroupInfo groupInfo;
     groupInfo.groupId = 3;
