@@ -254,7 +254,6 @@ void TimerManager::ProcessTimersInternal(std::list<std::function<void()>>& callb
         std::string msg = "StartTimer, Name is: ";
         msg += curTimer->name;
         BytraceAdapter::MMIServiceTraceStart(BytraceAdapter::MMI_THREAD_LOOP_DEPTH_THREE, msg);
-        CrashObjDumper dumper((curTimer->name).c_str());
         timers_.erase(it);
         ++curTimer->callbackCount;
         if ((curTimer->repeatCount >= 1) && (curTimer->callbackCount >= curTimer->repeatCount)) {
