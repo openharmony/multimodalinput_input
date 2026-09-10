@@ -81,13 +81,13 @@ HWTEST_F(OptionParserTest, ParseNumber_ValidValue_Accepted, TestSize.Level1)
     EXPECT_EQ(value, 10);
 }
 
-HWTEST_F(OptionParserTest, ParseNumber_NonNumeric_RejectedWithRangeMessage, TestSize.Level1)
+HWTEST_F(OptionParserTest, ParseNumber_NonNumeric_RejectedWithInvalidMessage, TestSize.Level1)
 {
     Options options { { "--x", "abc" } };
     int32_t value = -1;
     std::string error;
     EXPECT_FALSE(ParseNumber(options, { "--x", false, 7, 0, 100 }, value, error));
-    EXPECT_EQ(error, "--x is out of range");
+    EXPECT_EQ(error, "--x must be an integer");
 }
 
 HWTEST_F(OptionParserTest, ParseNumber_OutOfRange_RejectedWithRangeMessage, TestSize.Level1)

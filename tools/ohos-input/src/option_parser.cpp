@@ -61,7 +61,12 @@ bool ParseNumber(const Options &options, const NumberRule &rule, int32_t &value,
         value = rule.defaultValue;
         return true;
     }
-    if (!ParseInt(option->second, value) || value < rule.minValue || value > rule.maxValue) {
+    if (!ParseInt(option->second, value)) {
+        error = !rule.invalidValueMessage.empty() ? rule.invalidValueMessage
+            : std::string(rule.optionName) + " must be an integer";
+        return false;
+    }
+    if (value < rule.minValue || value > rule.maxValue) {
         error = !rule.outOfRangeMessage.empty() ? rule.outOfRangeMessage
             : std::string(rule.optionName) + " is out of range";
         return false;

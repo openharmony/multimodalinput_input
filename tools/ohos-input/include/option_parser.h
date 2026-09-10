@@ -33,6 +33,7 @@ struct NumberRule {
     int32_t maxValue;
     std::string missingOptionMessage;
     std::string outOfRangeMessage;
+    std::string invalidValueMessage;
 };
 
 bool ParseInt(const std::string &value, int32_t &number);

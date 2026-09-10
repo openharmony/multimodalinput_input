@@ -61,6 +61,7 @@ bool ParseKeyPressOptions(const std::vector<std::string> &args, KeyPressOptions 
         .minValue = 1,
         .maxValue = INT32_MAX,
         .outOfRangeMessage = "key must be an integer >= 1",
+        .invalidValueMessage = "key must be an integer",
     };
 
     if (!ParseNumber(options, keyRule, result.key, error)) {
@@ -74,6 +75,7 @@ bool ParseKeyPressOptions(const std::vector<std::string> &args, KeyPressOptions 
         .minValue = 0,
         .maxValue = MAX_HOLD_DURATION_MS,
         .outOfRangeMessage = "holdDuration is out of range",
+        .invalidValueMessage = "holdDuration must be an integer",
     };
     if (!ParseNumber(options, holdRule, result.holdDuration, error)) {
         suggestion = "Please use holdDuration in [0,10000]";
