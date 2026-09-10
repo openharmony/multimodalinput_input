@@ -60,7 +60,6 @@ bool ParseKeyPressOptions(const std::vector<std::string> &args, KeyPressOptions 
         .isRequired = true,
         .minValue = 1,
         .maxValue = INT32_MAX,
-        .missingOptionMessage = "key must be an integer >= 1",
         .outOfRangeMessage = "key must be an integer >= 1",
     };
 
