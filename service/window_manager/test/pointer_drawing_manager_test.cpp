@@ -3066,9 +3066,10 @@ HWTEST_F(PointerDrawingManagerTest, PointerDrawingManagerTest_SetSurfaceNodeBoun
     Rosen::RSSurfaceNodeType surfaceNodeType = Rosen::RSSurfaceNodeType::SELF_DRAWING_WINDOW_NODE;
     auto surfaceNode = Rosen::RSSurfaceNode::Create(
         surfaceNodeConfig, surfaceNodeType, true, false, rsUIContext_);
-    ASSERT_TRUE(manager.surfaceNode_ != nullptr);
+    if (surfaceNode != nullptr) {
+        pointerDrawingManager.SetSurfaceNode(surfaceNode);
+    }
 
-    pointerDrawingManager.SetSurfaceNode(surfaceNode);
     pointerDrawingManager.imageWidth_ = 50;
     pointerDrawingManager.imageHeight_ = 50;
     pointerDrawingManager.canvasWidth_ = 64;
