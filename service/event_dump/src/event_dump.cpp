@@ -114,6 +114,7 @@ void EventDump::ParseCommand(int32_t fd, const std::vector<std::string> &args)
         { "frozenPid", no_argument, 0, 'p' },
         { "pendingBind", no_argument, 0, 'B' },
         { "lastInputTime", no_argument, 0, 'L' },
+        { "touchpadScrollDirection", no_argument, 0, 'T' },
         { nullptr, 0, 0, 0 }
     };
     if (args.empty()) {
@@ -145,7 +146,7 @@ void EventDump::ParseCommand(int32_t fd, const std::vector<std::string> &args)
         std::lock_guard<std::mutex> lock(getoptMtx_);
         optind = 1;
         int32_t c;
-        while ((c = getopt_long (args.size(), argv, "hdlwusoifmckKetbnpBL", dumpOptions, &optionIndex)) != -1) {
+        while ((c = getopt_long (args.size(), argv, "hdlwusoifmckKetbnpBLT", dumpOptions, &optionIndex)) != -1) {
             getoptResults.push_back(c);
         }
     }
@@ -333,6 +334,14 @@ void EventDump::ParseCommand(int32_t fd, const std::vector<std::string> &args)
                 InputHandler->DumpLastInputTime(fd);
                 break;
             }
+            case 'T': {
+#ifdef OHOS_BUILD_ENABLE_POINTER
+                MouseEventHdr->DumpTouchpadScrollDirection(fd);
+#else
+                mprintf(fd, "Pointer device does not support");
+#endif // OHOS_BUILD_ENABLE_POINTER
+                break;
+            }
             default: {
                 mprintf(fd, "cmd param is error\n");
                 DumpHelp(fd);
@@ -377,6 +386,7 @@ void EventDump::DumpHelp(int32_t fd)
     mprintf(fd, "      -p, --frozen pid: dump frozen pid list\t");
     mprintf(fd, "      -B, --pendingBind: dump the deferred bind (active sequence/pending/timer) state\t");
     mprintf(fd, "      -L, --lastInputTime: dump the last input event time of each display group\t");
+    mprintf(fd, "      -T, --touchpadScrollDirection: dump the touchpad two-finger scroll direction of each user\t");
 }
 
 void EventDump::AttachTouchGestureMgr(std::shared_ptr<ITouchGestureManager> touchGestureMgr)

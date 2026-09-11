@@ -4044,10 +4044,6 @@ ErrCode MMIService::GetTouchpadScrollDirection(bool &state)
         MMI_HILOGE("Service is not running");
         return MMISERVICE_NOT_RUNNING;
     }
-    if (!PER_HELPER->VerifySystemApp()) {
-        MMI_HILOGE("Verify system APP failed");
-        return ERROR_NOT_SYSAPI;
-    }
     state = true;
 #ifdef OHOS_BUILD_ENABLE_POINTER
     int32_t userId = GetCallingUser();

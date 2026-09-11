@@ -15,11 +15,13 @@
 
 #include "mouse_event_interface.h"
 
+#include "account_manager.h"
 #include "mouse_preference_accessor.h"
 
 #include "ffrt.h"
 #include "input_device_manager.h"
 #include "timer_manager.h"
+#include "util_ex.h"
 
 #undef MMI_LOG_DOMAIN
 #define MMI_LOG_DOMAIN MMI_LOG_DISPATCH
@@ -119,6 +121,27 @@ void MouseEventInterface::Dump(int32_t fd, const std::vector<std::string> &args)
         return;
     }
     mouse->Dump(fd, args);
+}
+
+void MouseEventInterface::DumpTouchpadScrollDirection(int32_t fd)
+{
+    CALL_DEBUG_ENTER;
+    mprintf(fd, "Touchpad two-finger scroll direction information:\n");
+    std::vector<int32_t> userIds = ACCOUNT_MGR->QueryAllCreatedOsAccounts();
+    if (userIds.empty()) {
+        mprintf(fd, "No created os account\n");
+        return;
+    }
+    auto env = GetEnv();
+    if (env == nullptr) {
+        MMI_HILOGE("No input service context");
+        return;
+    }
+    for (int32_t userId : userIds) {
+        bool state = true;
+        MousePreferenceAccessor::GetTouchpadScrollDirection(*env, userId, state);
+        mprintf(fd, "  UserId:%d, touchpadScrollDirection:%s\n", userId, state ? "true" : "false");
+    }
 }
 
 int32_t MouseEventInterface::NormalizeRotateEvent(struct libinput_event *event, int32_t type, double angle)

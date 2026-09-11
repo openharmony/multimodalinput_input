@@ -14,7 +14,10 @@
  */
 
 #include <cstdio>
+#include <fstream>
 #include <gtest/gtest.h>
+#include <sys/stat.h>
+#include <unistd.h>
 
 #include "input_device_manager.h"
 #include "i_input_windows_manager.h"
@@ -618,6 +621,31 @@ HWTEST_F(MouseEventNormalizeTest, MouseEventNormalizeTest_GetMouseScrollDirectio
     MouseEventHdr->SetMouseScrollDirection(userId, state);
     MouseEventHdr->GetMouseScrollDirection(userId, newState);
     ASSERT_TRUE(newState);
+}
+
+/**
+ * @tc.name: MouseEventNormalizeTest_DumpTouchpadScrollDirection_001
+ * @tc.desc: Test DumpTouchpadScrollDirection output format
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MouseEventNormalizeTest, MouseEventNormalizeTest_DumpTouchpadScrollDirection_001, TestSize.Level1)
+{
+    char path[] = "/data/local/tmp/dump_touchpad_scroll_direction_001";
+    int32_t fd = open(path, O_CREAT | O_WRONLY | O_TRUNC, 0644);
+    ASSERT_GE(fd, 0);
+    MouseEventHdr->DumpTouchpadScrollDirection(fd);
+    close(fd);
+    std::ifstream inFile(path);
+    ASSERT_TRUE(inFile.is_open());
+    std::string content((std::istreambuf_iterator<char>(inFile)), std::istreambuf_iterator<char>());
+    inFile.close();
+    remove(path);
+    EXPECT_NE(content.find("Touchpad two-finger scroll direction information"), std::string::npos);
+    if (content.find("No created os account") == std::string::npos) {
+        EXPECT_NE(content.find("UserId:"), std::string::npos);
+        EXPECT_NE(content.find("touchpadScrollDirection:"), std::string::npos);
+    }
 }
 }
 }

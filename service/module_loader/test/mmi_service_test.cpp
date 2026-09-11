@@ -2838,8 +2838,10 @@ HWTEST_F(MMIServerTest, MMIService_SetTouchpadScrollDirection_002, TestSize.Leve
 
 /**
  * @tc.name: MMIService_GetTouchpadScrollDirection_001
- * @tc.desc: Verify return RET_OK when service is running and permission is valid
+ * @tc.desc: Service running without a working delegate thread; the query must not succeed
+ *           and must not be rejected as a system API anymore
  * @tc.type: FUNC
+ * @tc.require:
  */
 HWTEST_F(MMIServerTest, MMIService_GetTouchpadScrollDirection_001, TestSize.Level1)
 {
@@ -2849,6 +2851,7 @@ HWTEST_F(MMIServerTest, MMIService_GetTouchpadScrollDirection_001, TestSize.Leve
     bool switchFlag = false;
     ErrCode ret = mmiService.GetTouchpadScrollDirection(switchFlag);
     EXPECT_NE(ret, RET_OK);
+    EXPECT_NE(ret, ERROR_NOT_SYSAPI);
 }
 
 /**

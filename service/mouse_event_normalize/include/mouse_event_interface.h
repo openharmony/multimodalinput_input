@@ -63,6 +63,7 @@ public:
     std::shared_ptr<PointerEvent> GetPointerEvent();
     std::shared_ptr<PointerEvent> GetPointerEvent(int32_t deviceId);
     void Dump(int32_t fd, const std::vector<std::string> &args);
+    void DumpTouchpadScrollDirection(int32_t fd);
     int32_t NormalizeRotateEvent(struct libinput_event *event, int32_t type, double angle);
     bool CheckAndPackageAxisEvent(libinput_event* event);
 #ifdef OHOS_BUILD_MOUSE_REPORTING_RATE
