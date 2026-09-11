@@ -22,9 +22,14 @@
 #include <memory>
 #include <sstream>
 
+#include "mouse_click_command.h"
 #include "command.h"
+#include "mouse_double_click_command.h"
+#include "mouse_drag_command.h"
 #include "key_press_command.h"
+#include "mouse_move_to_command.h"
 #include "printer.h"
+#include "mouse_scroll_command.h"
 
 namespace OHOS::MMI::InputCli {
 namespace {
@@ -43,6 +48,11 @@ struct DeviceMeta {
 const std::vector<std::shared_ptr<Command>> &CommandTable()
 {
     static const std::vector<std::shared_ptr<Command>> commands = {
+        std::make_shared<MouseClickCommand>(),
+        std::make_shared<MouseDoubleClickCommand>(),
+        std::make_shared<MouseScrollCommand>(),
+        std::make_shared<MouseMoveToCommand>(),
+        std::make_shared<MouseDragCommand>(),
         std::make_shared<KeyPressCommand>(),
     };
     return commands;
@@ -51,6 +61,8 @@ const std::vector<std::shared_ptr<Command>> &CommandTable()
 const std::vector<DeviceMeta> &DeviceTable()
 {
     static const std::vector<DeviceMeta> table = {
+        { "mouse", "Mouse input simulation operations",
+            { "ohos-input mouse click --x 100 --y 200", "ohos-input mouse scroll --clicks -3" } },
         { "key", "Keyboard input simulation operations",
             { "ohos-input key press --key 2054", "ohos-input key press --key 2049 --modifier ctrl" } },
     };
@@ -85,7 +97,7 @@ void AppendDocLine(std::ostringstream &stream, const std::string &name, const st
 {
     size_t begin = 0;
     bool firstLine = true;
-    while (begin <= description.size()) {
+    while (true) {
         const size_t end = description.find('\n', begin);
         const std::string part = description.substr(begin, end == std::string::npos ? end : end - begin);
         if (firstLine) {
@@ -125,7 +137,8 @@ std::string BuildGlobalHelp()
         AppendSummaryLine(stream, device.name, device.summary);
     }
     stream << "\n";
-    AppendExamples(stream, { "# Key press with Ctrl modifier", "ohos-input key press --key 2049 --modifier ctrl" });
+    AppendExamples(stream, { "# Mouse click at position (100, 200)", "ohos-input mouse click --x 100 --y 200", "",
+        "# Key press with Ctrl modifier", "ohos-input key press --key 2049 --modifier ctrl" });
     return StripTrailingNewline(stream);
 }
 

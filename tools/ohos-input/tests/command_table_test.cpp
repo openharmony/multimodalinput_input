@@ -30,29 +30,19 @@ protected:
 
 HWTEST_F(CommandTableTest, GetCommand_KnownPair_Found, TestSize.Level1)
 {
-    EXPECT_NE(GetCommand("key", "press"), nullptr);
-    EXPECT_EQ(GetCommand("key", "unknown"), nullptr);
-    EXPECT_EQ(GetCommand("unknown", "press"), nullptr);
-}
-
-HWTEST_F(CommandTableTest, GetCommand_MouseActions_NotRegistered, TestSize.Level1)
-{
-    EXPECT_EQ(GetCommand("mouse", "click"), nullptr);
-    EXPECT_EQ(GetCommand("mouse", "double-click"), nullptr);
-    EXPECT_EQ(GetCommand("mouse", "scroll"), nullptr);
-    EXPECT_EQ(GetCommand("mouse", "move-to"), nullptr);
-    EXPECT_EQ(GetCommand("mouse", "drag"), nullptr);
+    EXPECT_NE(GetCommand("mouse", "click"), nullptr);
+    EXPECT_EQ(GetCommand("mouse", "unknown"), nullptr);
+    EXPECT_EQ(GetCommand("unknown", "click"), nullptr);
 }
 
 HWTEST_F(CommandTableTest, GetCommandsByDevice_ReturnsDeclarationOrder, TestSize.Level1)
 {
-    const auto commands = GetCommandsByDevice("key");
-    const std::vector<std::string> expectedNames { "press" };
+    const auto commands = GetCommandsByDevice("mouse");
+    const std::vector<std::string> expectedNames { "click", "double-click", "scroll", "move-to", "drag" };
     ASSERT_EQ(commands.size(), expectedNames.size());
     for (size_t index = 0; index < commands.size(); ++index) {
         EXPECT_EQ(commands[index]->GetName(), expectedNames[index]);
     }
-    EXPECT_TRUE(GetCommandsByDevice("mouse").empty());
 }
 
 HWTEST_F(CommandTableTest, GetCommand_RepeatedLookup_ReturnsSameObject, TestSize.Level1)
