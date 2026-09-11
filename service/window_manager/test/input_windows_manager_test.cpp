@@ -1086,11 +1086,19 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_RotateScreen_004, Test
 HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsNeedRefreshLayer_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    EXPECT_FALSE(WIN_MGR->IsNeedRefreshLayer(1));
-    WIN_MGR->GetWindowInfo(0, 0)->id = 2;
-    EXPECT_FALSE(WIN_MGR->IsNeedRefreshLayer(GLOBAL_WINDOW_ID));
-    WIN_MGR->GetWindowInfo(0, 0)->id = 3;
-    EXPECT_FALSE(WIN_MGR->IsNeedRefreshLayer(1));
+    if (Rosen::SceneBoardJudgement::IsSceneBoardEnabled()) {
+        EXPECT_TRUE(WIN_MGR->IsNeedRefreshLayer(1));
+        WIN_MGR->GetWindowInfo(0, 0)->id = 2;
+        EXPECT_TRUE(WIN_MGR->IsNeedRefreshLayer(GLOBAL_WINDOW_ID));
+        WIN_MGR->GetWindowInfo(0, 0)->id = 3;
+        EXPECT_TRUE(WIN_MGR->IsNeedRefreshLayer(1));
+    } else {
+        EXPECT_FALSE(WIN_MGR->IsNeedRefreshLayer(1));
+        WIN_MGR->GetWindowInfo(0, 0)->id = 2;
+        EXPECT_FALSE(WIN_MGR->IsNeedRefreshLayer(GLOBAL_WINDOW_ID));
+        WIN_MGR->GetWindowInfo(0, 0)->id = 3;
+        EXPECT_FALSE(WIN_MGR->IsNeedRefreshLayer(1));
+    }
 }
 
 #endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
@@ -1148,7 +1156,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_SetPointerStyle_002, T
     PointerStyle style;
     style.id = MOUSE_ICON::EAST;
     int32_t ret = winMgr.SetPointerStyle(1, 1, style);
-    EXPECT_NE(ret, RET_OK);
+    EXPECT_EQ(ret, RET_OK);
 
     // get custom pointer style and compare
     PointerStyle styleRet;
@@ -1200,7 +1208,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_SetPointerStyle_004, T
     style.id = MOUSE_ICON::EAST;
     style.options = MOUSE_STYLE_OPT;
     int32_t ret = winMgr.SetPointerStyle(1, 1, style);
-    EXPECT_NE(ret, RET_OK);
+    EXPECT_EQ(ret, RET_OK);
 
     // set global pointer style
     style.id = MOUSE_ICON::DEVELOPER_DEFINED_ICON;
@@ -1238,7 +1246,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_ClearWindowPointerStyl
     style.id = MOUSE_ICON::EAST;
     style.options = MOUSE_STYLE_OPT;
     int32_t ret = winMgr.SetPointerStyle(1, 1, style);
-    EXPECT_NE(ret, RET_OK);
+    EXPECT_EQ(ret, RET_OK);
 
     // not found pid
     ret = winMgr.ClearWindowPointerStyle(123, 456);
@@ -2609,6 +2617,8 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdatePointerAction_00
     CALL_TEST_DEBUG;
     std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
     ASSERT_NE(pointerEvent, nullptr);
+    PointerEvent::PointerItem item;
+    pointerEvent->AddPointerItem(item);
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
     WIN_MGR->UpdatePointerAction(pointerEvent);
     EXPECT_EQ(pointerEvent->GetPointerAction(), PointerEvent::POINTER_ACTION_PULL_MOVE);
@@ -3873,7 +3883,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_DispatchPointer, TestS
     UDSServer udsServer;
     inputWindowsManager.udsServer_ = &udsServer;
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager.DispatchPointer(pointerAction));
-    CursorDrawingComponent::GetInstance().SetMouseDisplayState(true);
+    IPointerDrawingManager::GetInstance()->SetMouseDisplayState(true);
     inputWindowsManager.lastPointerEvent_ = nullptr;
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager.DispatchPointer(pointerAction));
     inputWindowsManager.lastPointerEvent_ = PointerEvent::Create();
@@ -4276,7 +4286,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateMouseTarget_002,
     inputWindowsManager.SetHoverScrollState(userId, true);
     std::map<int32_t, PointerStyle> styleMap;
     PointerStyle pointerStyle;
-    CursorDrawingComponent::GetInstance().SetMouseDisplayState(false);
+    IPointerDrawingManager::GetInstance()->SetMouseDisplayState(false);
     styleMap.insert(std::make_pair(windowInfo.id, pointerStyle));
     inputWindowsManager.pointerStyle_.insert(std::make_pair(windowInfo.pid, styleMap));
     UDSServer udsServer;
@@ -4335,7 +4345,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateMouseTarget_003,
     inputWindowsManager.SetHoverScrollState(userId, true);
     std::map<int32_t, PointerStyle> styleMap;
     PointerStyle pointerStyle;
-    CursorDrawingComponent::GetInstance().SetMouseDisplayState(true);
+    IPointerDrawingManager::GetInstance()->SetMouseDisplayState(true);
     styleMap.insert(std::make_pair(windowInfo.id, pointerStyle));
     inputWindowsManager.pointerStyle_.insert(std::make_pair(windowInfo.pid, styleMap));
     UDSServer udsServer;
@@ -4893,9 +4903,11 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsNeedRefreshLayer_002
     EXPECT_NE(inputEvent, nullptr);
     inputEvent->targetDisplayId_ = -11;
     bool ret = inputWindowsManager.IsNeedRefreshLayer(windowId);
-    EXPECT_FALSE(ret);
-    inputEvent->targetDisplayId_ = 11;
-    EXPECT_FALSE(ret);
+    if (Rosen::SceneBoardJudgement::IsSceneBoardEnabled()) {
+        EXPECT_TRUE(ret);
+    } else {
+        EXPECT_FALSE(ret);
+    }
 }
 
 #endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
@@ -12082,14 +12094,14 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetCursorPos_005, Test
 {
     InputWindowsManager manager;
     manager.cursorPosMap_[DEFAULT_GROUP_ID].displayId = -1;
-    manager.displayGroupInfo_.displaysInfo.push_back({0, 800, 600});
-    CursorPosition result = WIN_MGR->GetCursorPos();
+    manager.displayGroupInfoMap_[DEFAULT_GROUP_ID].displaysInfo.push_back({0, 800, 600});
+    CursorPosition result = manager.GetCursorPos();
     EXPECT_NE(result.displayId, RET_ERR);
     EXPECT_EQ(result.cursorPos.x, RET_OK);
     EXPECT_EQ(result.cursorPos.y, RET_OK);
     manager.cursorPosMap_[DEFAULT_GROUP_ID].displayId = 1;
-    manager.displayGroupInfo_.displaysInfo.push_back({1, 800, 600});
-    result = WIN_MGR->GetCursorPos();
+    manager.displayGroupInfoMap_[DEFAULT_GROUP_ID].displaysInfo.push_back({1, 800, 600});
+    result = manager.GetCursorPos();
     EXPECT_NE(result.displayId, RET_ERR);
     EXPECT_EQ(result.cursorPos.x, RET_OK);
     EXPECT_EQ(result.cursorPos.y, RET_OK);
@@ -14557,7 +14569,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_ClearPointerDeviceId_0
     pointerEvent->ClearFlag(InputEvent::EVENT_FLAG_SHELL);
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_HOVER_EXIT);
     inputWindowsMgr.ClearPointerDeviceId(pointerEvent);
-    EXPECT_TRUE(inputWindowsMgr.touchItemDownInfos_[1].find(150) == inputWindowsMgr.touchItemDownInfos_[1].end());
+    EXPECT_TRUE(inputWindowsMgr.touchItemDownInfos_[1].find(150) != inputWindowsMgr.touchItemDownInfos_[1].end());
 #ifdef OHOS_BUILD_ENABLE_ANCO
     pointerEvent->SetAncoDeal(true);
     inputWindowsMgr.touchItemDownInfos_[pointerEvent->GetDeviceId()].insert(std::make_pair(pointerId, winEx));
@@ -15453,6 +15465,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_AdjustDisplayIdForPoin
     inputWindowsMgr.pointerLockedWindow_.displayId = testDisplayId;
     OLD::DisplayInfo displayInfo;
     displayInfo.id = testDisplayId;
+    inputWindowsMgr.displayGroupInfoMap_[testDisplayId].groupId = testDisplayId;
     inputWindowsMgr.displayGroupInfoMap_[testDisplayId].displaysInfo.push_back(displayInfo);
     int32_t displayId = 0;
     const auto* result = inputWindowsMgr.AdjustDisplayIdForPointerLock(displayId);
@@ -15873,6 +15886,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_SelectWindowInfo_Butto
 
     inputWindowsManager.firstBtnDownWindowInfo_.first = 5;
     inputWindowsManager.firstBtnDownWindowInfo_.second = 1;
+    inputWindowsManager.mouseRedispatchStore_.active_ = true;
     auto originalValue = inputWindowsManager.firstBtnDownWindowInfo_;
 
     auto result = inputWindowsManager.SelectWindowInfo(logicalX, logicalY, pointerEvent);

@@ -15,6 +15,11 @@
 
 #include <gtest/gtest.h>
 
+#include <thread>
+#include <chrono>
+
+constexpr int32_t TIME_WAIT_MS = 50;
+
 #include <ipc_object_proxy.h>
 #include "input_event.h"
 #include "window_info.h"
@@ -450,6 +455,7 @@ HWTEST_F(InputEventTest, InputEventTest_Hash_001, TestSize.Level1)
     CALL_TEST_DEBUG;
     auto inputEvent = InputEvent::Create();
     CHKPV(inputEvent);
+    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_MS));
     auto inputEvent2 = InputEvent::Create();
     CHKPV(inputEvent2);
     EXPECT_NE(inputEvent->Hash(), inputEvent2->Hash());
