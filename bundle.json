@@ -121,7 +121,8 @@
         "os_account",
         "openssl",
         "zlib",
-        "taihe_ffi_gen"
+        "taihe_ffi_gen",
+        "json"
       ],
       "third_party": [
         "libuv",
@@ -147,7 +148,8 @@
           "//foundation/multimodalinput/input:multimodalinput.rc",
           "//foundation/multimodalinput/input:uinput_inject",
           "//foundation/multimodalinput/input:mmi_uinput.rc",
-          "//foundation/multimodalinput/input:input-third-mmi"
+          "//foundation/multimodalinput/input:input-third-mmi",
+          "//foundation/multimodalinput/input/tools/ohos-input:ohos_input_cli"
         ]
       },
       "inner_kits": [

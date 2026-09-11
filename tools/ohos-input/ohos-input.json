@@ -1,0 +1,458 @@
+{
+  "name": "ohos-input",
+  "version": "1.0.0",
+  "description": "Simulate keyboard and mouse input. Used for AI Agent automation on PC products. Does not support non-PC products.",
+  "executablePath": "/system/bin/cli_tool/executable/ohos-input",
+  "requirePermissions": [
+    "ohos.permission.CONTROL_DEVICE"
+  ],
+  "inputSchema": {
+    "type": "object",
+    "properties": {}
+  },
+  "outputSchema": {
+    "type": "object",
+    "properties": {
+      "action": {
+        "type": "string",
+        "description": "Executed action"
+      }
+    }
+  },
+  "hasSubCommand": true,
+  "subcommands": {
+    "mouse click": {
+      "description": "Simulate one mouse click. Used for point selection. Does not support simultaneous buttons.",
+      "requirePermissions": [
+        "ohos.permission.CONTROL_DEVICE"
+      ],
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "displayId": {
+            "type": "integer",
+            "description": "Display ID",
+            "minimum": 0,
+            "default": 0
+          },
+          "x": {
+            "type": "integer",
+            "description": "Target X coordinate",
+            "minimum": 0
+          },
+          "y": {
+            "type": "integer",
+            "description": "Target Y coordinate",
+            "minimum": 0
+          },
+          "button": {
+            "type": "string",
+            "description": "Mouse button",
+            "enum": [
+              "left",
+              "right",
+              "middle"
+            ],
+            "default": "left"
+          },
+          "holdDuration": {
+            "type": "integer",
+            "description": "Button hold duration in ms",
+            "minimum": 50,
+            "maximum": 200,
+            "default": 100
+          },
+          "modifier": {
+            "type": "string",
+            "description": "Pipe-separated modifiers in press order",
+            "pattern": "^(ctrl|alt|shift|meta)(\\|(ctrl|alt|shift|meta))*$"
+          }
+        },
+        "required": [
+          "x",
+          "y"
+        ]
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "action": {
+            "type": "string",
+            "description": "Executed action"
+          },
+          "displayId": {
+            "type": "integer",
+            "description": "Target display ID"
+          },
+          "x": {
+            "type": "integer",
+            "description": "Target X coordinate"
+          },
+          "y": {
+            "type": "integer",
+            "description": "Target Y coordinate"
+          }
+        },
+        "required": [
+          "action",
+          "displayId",
+          "x",
+          "y"
+        ]
+      }
+    },
+    "mouse double-click": {
+      "description": "Simulate a mouse double-click. Used for double-click selection. Does not support simultaneous buttons.",
+      "requirePermissions": [
+        "ohos.permission.CONTROL_DEVICE"
+      ],
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "displayId": {
+            "type": "integer",
+            "description": "Display ID",
+            "minimum": 0,
+            "default": 0
+          },
+          "x": {
+            "type": "integer",
+            "description": "Target X coordinate",
+            "minimum": 0
+          },
+          "y": {
+            "type": "integer",
+            "description": "Target Y coordinate",
+            "minimum": 0
+          },
+          "button": {
+            "type": "string",
+            "description": "Mouse button",
+            "enum": [
+              "left",
+              "right",
+              "middle"
+            ],
+            "default": "left"
+          },
+          "holdDuration": {
+            "type": "integer",
+            "description": "Each click hold duration in ms",
+            "minimum": 50,
+            "maximum": 200,
+            "default": 100
+          },
+          "clickInterval": {
+            "type": "integer",
+            "description": "First-to-second press interval in ms",
+            "minimum": 100,
+            "maximum": 400,
+            "default": 250
+          },
+          "modifier": {
+            "type": "string",
+            "description": "Pipe-separated modifiers in press order",
+            "pattern": "^(ctrl|alt|shift|meta)(\\|(ctrl|alt|shift|meta))*$"
+          }
+        },
+        "required": [
+          "x",
+          "y"
+        ]
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "action": {
+            "type": "string",
+            "description": "Executed action"
+          },
+          "displayId": {
+            "type": "integer",
+            "description": "Target display ID"
+          },
+          "x": {
+            "type": "integer",
+            "description": "Target X coordinate"
+          },
+          "y": {
+            "type": "integer",
+            "description": "Target Y coordinate"
+          }
+        },
+        "required": [
+          "action",
+          "displayId",
+          "x",
+          "y"
+        ]
+      }
+    },
+    "mouse scroll": {
+      "description": "Simulate vertical mouse scroll. Used for scroll automation. Does not support horizontal scroll.",
+      "requirePermissions": [
+        "ohos.permission.CONTROL_DEVICE"
+      ],
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "clicks": {
+            "type": "integer",
+            "description": "Non-zero signed 15-degree scroll click count, positive to scroll up, negative to scroll down",
+            "minimum": -100,
+            "maximum": 100
+          },
+          "modifier": {
+            "type": "string",
+            "description": "Pipe-separated modifiers in press order",
+            "pattern": "^(ctrl|alt|shift|meta)(\\|(ctrl|alt|shift|meta))*$"
+          }
+        },
+        "required": [
+          "clicks"
+        ]
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "action": {
+            "type": "string",
+            "description": "Executed action"
+          },
+          "clicks": {
+            "type": "integer",
+            "description": "Executed signed click count"
+          }
+        },
+        "required": [
+          "action",
+          "clicks"
+        ]
+      }
+    },
+    "mouse move-to": {
+      "description": "Move the mouse cursor. Used for pointer positioning. Does not support button press.",
+      "requirePermissions": [
+        "ohos.permission.CONTROL_DEVICE"
+      ],
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "displayId": {
+            "type": "integer",
+            "description": "Display ID",
+            "minimum": 0,
+            "default": 0
+          },
+          "x": {
+            "type": "integer",
+            "description": "Target X coordinate",
+            "minimum": 0
+          },
+          "y": {
+            "type": "integer",
+            "description": "Target Y coordinate",
+            "minimum": 0
+          },
+          "modifier": {
+            "type": "string",
+            "description": "Pipe-separated modifiers in press order",
+            "pattern": "^(ctrl|alt|shift|meta)(\\|(ctrl|alt|shift|meta))*$"
+          }
+        },
+        "required": [
+          "x",
+          "y"
+        ]
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "action": {
+            "type": "string",
+            "description": "Executed action"
+          },
+          "displayId": {
+            "type": "integer",
+            "description": "Target display ID"
+          },
+          "x": {
+            "type": "integer",
+            "description": "Target X coordinate"
+          },
+          "y": {
+            "type": "integer",
+            "description": "Target Y coordinate"
+          }
+        },
+        "required": [
+          "action",
+          "displayId",
+          "x",
+          "y"
+        ]
+      }
+    },
+    "mouse drag": {
+      "description": "Drag mouse between positions. Used for drag-and-drop automation. Does not support duration above 10000 ms.",
+      "requirePermissions": [
+        "ohos.permission.CONTROL_DEVICE"
+      ],
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "srcDisplayId": {
+            "type": "integer",
+            "description": "Source display ID",
+            "minimum": 0,
+            "default": 0
+          },
+          "srcX": {
+            "type": "integer",
+            "description": "Source X coordinate",
+            "minimum": 0
+          },
+          "srcY": {
+            "type": "integer",
+            "description": "Source Y coordinate",
+            "minimum": 0
+          },
+          "dstDisplayId": {
+            "type": "integer",
+            "description": "Destination display ID",
+            "minimum": 0,
+            "default": 0
+          },
+          "dstX": {
+            "type": "integer",
+            "description": "Destination X coordinate",
+            "minimum": 0
+          },
+          "dstY": {
+            "type": "integer",
+            "description": "Destination Y coordinate",
+            "minimum": 0
+          },
+          "button": {
+            "type": "string",
+            "description": "Mouse button",
+            "enum": [
+              "left",
+              "right",
+              "middle"
+            ],
+            "default": "left"
+          },
+          "duration": {
+            "type": "integer",
+            "description": "Drag duration in ms",
+            "minimum": 0,
+            "maximum": 10000,
+            "default": 0
+          },
+          "modifier": {
+            "type": "string",
+            "description": "Pipe-separated modifiers in press order",
+            "pattern": "^(ctrl|alt|shift|meta)(\\|(ctrl|alt|shift|meta))*$"
+          }
+        },
+        "required": [
+          "srcX",
+          "srcY",
+          "dstX",
+          "dstY"
+        ]
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "action": {
+            "type": "string",
+            "description": "Executed action"
+          },
+          "srcDisplayId": {
+            "type": "integer",
+            "description": "Source display ID"
+          },
+          "srcX": {
+            "type": "integer",
+            "description": "Source X"
+          },
+          "srcY": {
+            "type": "integer",
+            "description": "Source Y"
+          },
+          "dstDisplayId": {
+            "type": "integer",
+            "description": "Destination display ID"
+          },
+          "dstX": {
+            "type": "integer",
+            "description": "Destination X"
+          },
+          "dstY": {
+            "type": "integer",
+            "description": "Destination Y"
+          }
+        },
+        "required": [
+          "action",
+          "srcDisplayId",
+          "srcX",
+          "srcY",
+          "dstDisplayId",
+          "dstX",
+          "dstY"
+        ]
+      }
+    },
+    "key press": {
+      "description": "Simulate a key press. Used for keyboard automation. Does not support more than five held keys.",
+      "requirePermissions": [
+        "ohos.permission.CONTROL_DEVICE"
+      ],
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "key": {
+            "type": "integer",
+            "description": "OHOS key code",
+            "minimum": 1
+          },
+          "holdDuration": {
+            "type": "integer",
+            "description": "Key hold duration in ms",
+            "minimum": 0,
+            "maximum": 10000,
+            "default": 100
+          },
+          "modifier": {
+            "type": "string",
+            "description": "Pipe-separated modifiers in press order",
+            "pattern": "^(ctrl|alt|shift|meta)(\\|(ctrl|alt|shift|meta))*$"
+          }
+        },
+        "required": [
+          "key"
+        ]
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "action": {
+            "type": "string",
+            "description": "Executed action"
+          },
+          "key": {
+            "type": "integer",
+            "description": "Pressed key code"
+          }
+        },
+        "required": [
+          "action",
+          "key"
+        ]
+      }
+    }
+  }
+}
