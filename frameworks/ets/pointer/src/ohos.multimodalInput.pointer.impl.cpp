@@ -681,11 +681,7 @@ bool GetTouchpadScrollDirectionAsync()
     MMI_HISTOGRAM_BOOLEAN("InputKit.pointer.getTouchpadScrollDirection.Call", true);
     bool state = true;
     auto errorCode = InputManager::GetInstance()->GetTouchpadScrollDirection(state);
-    if (errorCode == COMMON_USE_SYSAPI_ERROR) {
-        MMI_HILOGE("Non system applications use system API");
-        taihe::set_business_error(COMMON_USE_SYSAPI_ERROR, "Non system applications use system API");
-        MMI_HISTOGRAM_ERROR("InputKit.pointer.getTouchpadScrollDirection.Error", COMMON_USE_SYSAPI_ERROR);
-    } else if (errorCode != RET_OK) {
+    if (errorCode != RET_OK) {
         MMI_HILOGE("GetTouchpadScrollDirection failed");
         taihe::set_business_error(COMMON_PARAMETER_ERROR, "Parameter error.");
         MMI_HISTOGRAM_ERROR("InputKit.pointer.getTouchpadScrollDirection.Error", COMMON_PARAMETER_ERROR);
