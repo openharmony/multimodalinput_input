@@ -51,8 +51,8 @@ int32_t RunDragSteps(const MouseSession &session, const DragOptions &options)
         int32_t sourceY = 0;
         int32_t targetX = 0;
         int32_t targetY = 0;
-        int32_t ret = InputManager::GetInstance()->GetGlobalCoordinates(options.srcDisplayId, options.srcX, options.srcY,
-            sourceX, sourceY);
+        int32_t ret = InputManager::GetInstance()->GetGlobalCoordinates(options.srcDisplayId, options.srcX,
+            options.srcY, sourceX, sourceY);
         if (ret != 0) {
             return HandleControllerError(ret, "GetGlobalCoordinates");
         }

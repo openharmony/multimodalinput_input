@@ -140,9 +140,9 @@ HWTEST_F(IntegrationTest, KeyPress_CallsControllerInModifierOrder, TestSize.Leve
         "key", "press", "--key", "2049", "--holdDuration", "0", "--modifier",
         "ctrl|shift" });
     ExpectSuccess(result, "key press");
-    ExpectCalls(calls, { { "PressKey", { KeyEvent::KEYCODE_CTRL_LEFT } }, { "PressKey", { KeyEvent::KEYCODE_SHIFT_LEFT } },
-        { "PressKey", { 2049 } }, { "ReleaseKey", { 2049 } }, { "ReleaseKey", { KeyEvent::KEYCODE_SHIFT_LEFT } },
-        { "ReleaseKey", { KeyEvent::KEYCODE_CTRL_LEFT } } });
+    ExpectCalls(calls, { { "PressKey", { KeyEvent::KEYCODE_CTRL_LEFT } },
+        { "PressKey", { KeyEvent::KEYCODE_SHIFT_LEFT } }, { "PressKey", { 2049 } }, { "ReleaseKey", { 2049 } },
+        { "ReleaseKey", { KeyEvent::KEYCODE_SHIFT_LEFT } }, { "ReleaseKey", { KeyEvent::KEYCODE_CTRL_LEFT } } });
 }
 
 HWTEST_F(IntegrationTest, KeyPress_PrimaryKeyDuplicatedInModifier_RejectedBeforeControllerCreation, TestSize.Level1)
