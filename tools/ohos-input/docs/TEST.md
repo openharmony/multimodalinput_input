@@ -11,7 +11,7 @@
 | 错误处理测试 | 2 | 所有（错误码验证） |
 | 执行器测试 | 15 | 所有（命令注册、帮助路由、版本） |
 | 鼠标支持测试 | 5 | mouse click / scroll（齿数与按键名验证） |
-| 拖拽命令测试 | 5 | mouse drag（插值步进验证） |
+| 拖动命令测试 | 5 | mouse drag（插值步进验证） |
 | 集成测试 | 13 | 所有 6 个命令（mock Controller 工作流验证） |
 | 控制器工厂测试 | 6 | 所有（Controller 创建契约） |
 | **总计** | **68** | **所有 6 个命令** |
@@ -61,9 +61,9 @@
 
 | 测试用例 | 命令示例 | 说明 | 权限 | 前置依赖 | 预期结果 |
 |-----------|-----------------|-------------|------------|------------|-----------------|
-| 同屏按时长拖拽 | `ohos-input mouse drag --srcX 100 --srcY 100 --dstX 300 --dstY 300 --duration 500` | 左键 500ms 插值拖拽（16ms 步进） | `ohos.permission.CONTROL_DEVICE` | 无 | 成功：data 含 src/dst 全部坐标 |
-| 跨显示器拖拽 | `ohos-input mouse drag --srcDisplayId 0 --srcX 100 --srcY 100 --dstDisplayId 1 --dstX 200 --dstY 200 --duration 500` | 两端点换算全局坐标后插值注入 | `ohos.permission.CONTROL_DEVICE` | 多显示器环境 | 成功 |
-| 瞬间拖拽 | `ohos-input mouse drag --srcX 1 --srcY 1 --dstX 2 --dstY 2` | 默认 duration 0，瞬间完成 | `ohos.permission.CONTROL_DEVICE` | 无 | 成功 |
+| 同屏按时长拖动 | `ohos-input mouse drag --srcX 100 --srcY 100 --dstX 300 --dstY 300 --duration 500` | 左键 500ms 插值拖动（16ms 步进） | `ohos.permission.CONTROL_DEVICE` | 无 | 成功：data 含 src/dst 全部坐标 |
+| 跨显示器拖动 | `ohos-input mouse drag --srcDisplayId 0 --srcX 100 --srcY 100 --dstDisplayId 1 --dstX 200 --dstY 200 --duration 500` | 两端点换算全局坐标后插值注入 | `ohos.permission.CONTROL_DEVICE` | 多显示器环境 | 成功 |
+| 瞬间拖动 | `ohos-input mouse drag --srcX 1 --srcY 1 --dstX 2 --dstY 2` | 默认 duration 0，瞬间完成 | `ohos.permission.CONTROL_DEVICE` | 无 | 成功 |
 | 时长越界 | `ohos-input mouse drag --srcX 1 --srcY 1 --dstX 2 --dstY 2 --duration 10001` | 超出 [0,10000] 上界 | 无 | 无 | 失败：`ERR_PARAMETER_ERROR`，退出码 2 |
 | 缺少终点坐标 | `ohos-input mouse drag --srcX 1 --srcY 1` | 必填 `--dstX --dstY` 缺失 | 无 | 无 | 失败：`ERR_PARAMETER_ERROR`，退出码 2 |
 
@@ -119,17 +119,17 @@ ohos-input key press --key 2049 --modifier ctrl
 # 5. 滚动浏览内容
 ohos-input mouse scroll --clicks -3
 
-# 6. 拖拽对象到新位置
+# 6. 拖动对象到新位置
 ohos-input mouse drag --srcX 100 --srcY 100 --dstX 300 --dstY 300 --duration 500
 ```
 
-### 工作流 2：跨显示器拖拽
+### 工作流 2：跨显示器拖动
 
 ```bash
 # 1. 移动光标到 0 号显示器起点
 ohos-input mouse move-to --displayId 0 --x 100 --y 100
 
-# 2. 跨显示器拖拽到 1 号显示器
+# 2. 跨显示器拖动到 1 号显示器
 ohos-input mouse drag --srcDisplayId 0 --srcX 100 --srcY 100 --dstDisplayId 1 --dstX 200 --dstY 200 --duration 500
 
 # 3. 在目标显示器双击确认
@@ -251,6 +251,6 @@ hdc shell "cd /data/local/tmp/ohos_input_test && ./OhosInputCommandTest && ./Con
 | ErrorHandlerTest | 2 | 控制器错误码到权限/服务异常 JSON 与退出码映射 |
 | ExecutorTest | 15 | 三级帮助路由、任意位置 --help、--version、未知命令 JSON、注册完备性 |
 | MouseSupportTest | 5 | 滚动齿数边界、按键名映射与默认值 |
-| MouseDragCommandTest | 5 | 拖拽步进切分、静止/跨屏路径、极值不溢出 |
+| MouseDragCommandTest | 5 | 拖动步进切分、静止/跨屏路径、极值不溢出 |
 | IntegrationTest | 13 | 6 命令端到端（mock Controller 调用顺序）、创建前校验拦截、失败路径与销毁顺序 |
 | ControllerFactoryTest | 6 | 创建失败清理输出、空实现拒绝 |

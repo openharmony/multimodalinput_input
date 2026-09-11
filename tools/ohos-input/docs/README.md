@@ -2,7 +2,7 @@
 
 ## 概述
 
-面向 AI Agent 应用的键鼠输入模拟工具。基于 multimodalinput 部件内建 Controller 接口（MouseController / KeyboardController）模拟鼠标点击、双击、滚动、移动、拖拽与键盘按键等输入操作，输出统一 JSON 结果，供自动化框架解析。仅支持 PC（2in1）设备形态部署。
+面向 AI Agent 应用的键鼠输入模拟工具。基于 multimodalinput 部件内建 Controller 接口（MouseController / KeyboardController）模拟鼠标点击、双击、滚动、移动、拖动与键盘按键等输入操作，输出统一 JSON 结果，供自动化框架解析。仅支持 PC（2in1）设备形态部署。
 
 ## 功能列表
 
@@ -10,7 +10,7 @@
 - **模拟鼠标双击**：两次完整点击，按下间隔可配置
 - **模拟鼠标滚轮垂直滚动**：按齿数滚动，1 齿 = 15 度，正数向上、负数向下
 - **移动鼠标光标**：将光标移动到指定显示器的指定位置
-- **模拟鼠标拖拽**：按住按键从起点拖至终点，支持跨显示器与按时长插值步进
+- **模拟鼠标拖动**：按住按键从起点拖至终点，支持跨显示器与按时长插值步进
 - **模拟键盘按键**：按 OHOS 键码注入按键，支持 ctrl/alt/shift/meta 修饰键组合
 
 ## 依赖
@@ -47,7 +47,7 @@ ohos-input <device> <action> --help
 | mouse double-click | 模拟鼠标双击 | 同 click，另加 `--clickInterval`（可选） | `ohos.permission.CONTROL_DEVICE` | 无 |
 | mouse scroll | 模拟鼠标滚轮垂直滚动 | `--clicks`（必填）；`--modifier`（可选） | `ohos.permission.CONTROL_DEVICE` | 无 |
 | mouse move-to | 移动鼠标光标到指定位置 | `--x --y`（必填）；`--displayId --modifier`（可选） | `ohos.permission.CONTROL_DEVICE` | 无 |
-| mouse drag | 模拟鼠标拖拽（支持跨显示器） | `--srcX --srcY --dstX --dstY`（必填）；`--srcDisplayId --dstDisplayId --button --duration --modifier`（可选） | `ohos.permission.CONTROL_DEVICE` | 无 |
+| mouse drag | 模拟鼠标拖动（支持跨显示器） | `--srcX --srcY --dstX --dstY`（必填）；`--srcDisplayId --dstDisplayId --button --duration --modifier`（可选） | `ohos.permission.CONTROL_DEVICE` | 无 |
 | key press | 模拟键盘按键 | `--key`（必填）；`--holdDuration --modifier`（可选） | `ohos.permission.CONTROL_DEVICE` | 无 |
 
 **前置依赖说明**：
@@ -101,12 +101,12 @@ ohos-input mouse drag [options]
   --srcX/--srcY <integer> 起点 X/Y 坐标（必填整数，>=0）
   --dstDisplayId <number> 目标显示器 ID（可选，>=0，默认 0）
   --dstX/--dstY <integer> 终点 X/Y 坐标（必填整数，>=0）
-  --button <key>          拖拽按住的按键（可选，默认 left）
+  --button <key>          拖动按住的按键（可选，默认 left）
   --duration <number>     总时长 ms（可选，[0,10000]，0 表示瞬间完成，默认 0；>0 时按 16ms 步进插值）
   --modifier <keys>       修饰键（可选）
 ```
 
-源显示器与目标显示器不同时，两端点换算为全局坐标后插值注入，由输入服务选择实际显示器；同显示器拖拽走显示器坐标路径。
+源显示器与目标显示器不同时，两端点换算为全局坐标后插值注入，由输入服务选择实际显示器；同显示器拖动走显示器坐标路径。
 
 ### key press
 
@@ -209,10 +209,10 @@ ohos-input mouse move-to --displayId 1 --x 100 --y 200
 ### mouse drag
 
 ```bash
-# 左键从 (100,100) 拖拽到 (300,300)，历时 500ms
+# 左键从 (100,100) 拖动到 (300,300)，历时 500ms
 ohos-input mouse drag --srcX 100 --srcY 100 --dstX 300 --dstY 300 --duration 500
 
-# 跨显示器拖拽
+# 跨显示器拖动
 ohos-input mouse drag --srcDisplayId 0 --srcX 100 --srcY 100 --dstDisplayId 1 --dstX 200 --dstY 200 --duration 500
 
 # 输出示例：
@@ -253,7 +253,7 @@ ohos-input key press --key 2049 --modifier ctrl
 # 5. 滚动浏览内容
 ohos-input mouse scroll --clicks -3
 
-# 6. 拖拽对象到新位置
+# 6. 拖动对象到新位置
 ohos-input mouse drag --srcX 100 --srcY 100 --dstX 300 --dstY 300 --duration 500
 ```
 
