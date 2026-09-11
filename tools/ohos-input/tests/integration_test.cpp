@@ -131,6 +131,21 @@ HWTEST_F(IntegrationTest, MoveAndDrag_CallExpectedMouseOperations, TestSize.Leve
         { "ReleaseButton", { 0 } } });
 }
 
+HWTEST_F(IntegrationTest, Drag_StepMoveFailure_EmitsOneJsonAndDestroysControllers, TestSize.Level1)
+{
+    MockControllerFixture fixture;
+    std::vector<RecordedCall> calls;
+    fixture.Configure(calls, { 0, 0, "MoveToGlobal", -1, true });
+    const CommandResult result = OHOS::MMI::InputCli::Run({ "mouse", "drag", "--srcDisplayId", "0",
+        "--srcX", "10", "--srcY", "20", "--dstDisplayId", "1", "--dstX", "10", "--dstY", "20",
+        "--duration", "32" });
+    EXPECT_EQ(result.code, SERVICE_EXIT);
+    EXPECT_EQ(std::count(result.stdoutText.begin(), result.stdoutText.end(), '\n'), 1);
+    EXPECT_EQ(ParseJson(result)["errCode"], "ERR_INPUT_SERVICE_EXCEPTION");
+    ExpectCalls(calls, { { "MoveTo", { 0, 10, 20 } }, { "PressButton", { 0 } },
+        { "MoveToGlobal", { 510, 20 } }, { "ReleaseButton", { 0 } }, { "DestroyMouse", {} } });
+}
+
 HWTEST_F(IntegrationTest, KeyPress_CallsControllerInModifierOrder, TestSize.Level1)
 {
     MockControllerFixture fixture;

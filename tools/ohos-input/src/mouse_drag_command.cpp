@@ -46,46 +46,39 @@ int32_t RunDragSteps(const MouseSession &session, const DragOptions &options)
     if (options.duration == 0) {
         return MoveTo(session, options.dstDisplayId, options.dstX, options.dstY);
     }
-    if (options.srcDisplayId != options.dstDisplayId) {
+    DragPath path { options.srcDisplayId, options.srcX, options.srcY, options.dstDisplayId, options.dstX,
+        options.dstY };
+    const bool crossDisplay = options.srcDisplayId != options.dstDisplayId;
+    if (crossDisplay) {
         int32_t sourceX = 0;
         int32_t sourceY = 0;
         int32_t targetX = 0;
         int32_t targetY = 0;
-        int32_t ret = InputManager::GetInstance()->GetGlobalCoordinates(options.srcDisplayId, options.srcX,
-            options.srcY, sourceX, sourceY);
+        int32_t ret = InputManager::GetInstance()->GetGlobalCoordinates(path.srcDisplayId, path.srcX, path.srcY,
+            sourceX, sourceY);
         if (ret != 0) {
             return HandleControllerError(ret, "GetGlobalCoordinates");
         }
-        ret = InputManager::GetInstance()->GetGlobalCoordinates(options.dstDisplayId, options.dstX, options.dstY,
-            targetX, targetY);
+        ret = InputManager::GetInstance()->GetGlobalCoordinates(path.dstDisplayId, path.dstX, path.dstY, targetX,
+            targetY);
         if (ret != 0) {
             return HandleControllerError(ret, "GetGlobalCoordinates");
         }
-        const DragPath globalPath { options.srcDisplayId, sourceX, sourceY,
-            options.dstDisplayId, targetX, targetY };
-        const auto steps = BuildDragSteps(options.duration, globalPath);
-        for (const auto &step : steps) {
-            std::this_thread::sleep_for(std::chrono::milliseconds(step.delayMs));
-            ret = session.mouse->MoveToGlobal(step.x, step.y);
-            if (ret != 0) {
-                return HandleControllerError(ret, "MoveToGlobal");
-            }
-        }
-        return 0;
+        path.srcX = sourceX;
+        path.srcY = sourceY;
+        path.dstX = targetX;
+        path.dstY = targetY;
     }
-    const DragPath path { options.srcDisplayId, options.srcX, options.srcY, options.dstDisplayId, options.dstX,
-        options.dstY };
     const auto steps = BuildDragSteps(options.duration, path);
-    if (steps.empty()) {
-        return MoveTo(session, options.dstDisplayId, options.dstX, options.dstY);
-    }
     for (const auto &step : steps) {
         std::this_thread::sleep_for(std::chrono::milliseconds(step.delayMs));
-        if (step.move) {
-            const int32_t ret = MoveTo(session, options.dstDisplayId, step.x, step.y);
-            if (ret != 0) {
-                return ret;
-            }
+        if (!step.move) {
+            continue;
+        }
+        const int32_t ret = crossDisplay ? session.mouse->MoveToGlobal(step.x, step.y)
+                                         : MoveTo(session, path.dstDisplayId, step.x, step.y);
+        if (ret != 0) {
+            return HandleControllerError(ret, crossDisplay ? "MoveToGlobal" : "MoveTo");
         }
     }
     return 0;
