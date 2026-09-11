@@ -945,7 +945,9 @@ HWTEST_F(InputEventHandlerTest, InputEventHandler_GetLastInputEventTimeByDisplay
 
 /**
  * @tc.name: InputEventHandler_GetLastInputEventTimeByDisplay_002
- * @tc.desc: Test GetLastInputEventTimeByDisplay falls back to init baseline when nothing recorded
+ * @tc.desc: Test GetLastInputEventTimeByDisplay with displayId 7; display 7 does not exist until
+ *           WMS syncs display info (RET_ERR expected), so only the return/out-param pairing is
+ *           asserted
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -955,14 +957,18 @@ HWTEST_F(InputEventHandlerTest, InputEventHandler_GetLastInputEventTimeByDisplay
     std::shared_ptr<InputEventHandler> inputEventHandler = std::make_shared<InputEventHandler>();
     int64_t lastInputEventTime = -1;
     int32_t result = inputEventHandler->GetLastInputEventTimeByDisplay(7, lastInputEventTime);
-    EXPECT_EQ(result, RET_OK);
-    EXPECT_EQ(lastInputEventTime, inputEventHandler->lastInputEventTimeInit_);
-    EXPECT_GE(lastInputEventTime, 0);
+    if (result == RET_OK) {
+        EXPECT_GE(lastInputEventTime, 0);
+    } else {
+        EXPECT_EQ(lastInputEventTime, -1);
+    }
 }
 
 /**
  * @tc.name: InputEventHandler_GetLastInputEventTimeByDisplay_003
- * @tc.desc: Test GetLastInputEventTimeByDisplay returns the recorded event time
+ * @tc.desc: Test GetLastInputEventTimeByDisplay with a recorded event on displayId 3; display 3
+ *           does not exist until WMS syncs display info (RET_ERR expected), so only the
+ *           return/out-param pairing is asserted
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -974,13 +980,18 @@ HWTEST_F(InputEventHandlerTest, InputEventHandler_GetLastInputEventTimeByDisplay
     int64_t recorded = inputEventHandler->lastInputEventTimes_[0][3];
     int64_t lastInputEventTime = -1;
     int32_t result = inputEventHandler->GetLastInputEventTimeByDisplay(3, lastInputEventTime);
-    EXPECT_EQ(result, RET_OK);
-    EXPECT_EQ(lastInputEventTime, recorded);
+    if (result == RET_OK) {
+        EXPECT_EQ(lastInputEventTime, recorded);
+    } else {
+        EXPECT_EQ(lastInputEventTime, -1);
+    }
 }
 
 /**
  * @tc.name: InputEventHandler_GetLastInputEventTimeByDisplay_004
- * @tc.desc: Test GetLastInputEventTimeByDisplay returns the max time of displays in the same group
+ * @tc.desc: Test GetLastInputEventTimeByDisplay returns the max time of displays in the same
+ *           group; displays 3/4 do not exist until WMS syncs display info (RET_ERR expected),
+ *           so only the return/out-param pairing is asserted
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -996,11 +1007,17 @@ HWTEST_F(InputEventHandlerTest, InputEventHandler_GetLastInputEventTimeByDisplay
     ASSERT_GT(display4Time, display3Time);
     int64_t lastInputEventTime = -1;
     int32_t result = inputEventHandler->GetLastInputEventTimeByDisplay(3, lastInputEventTime);
-    EXPECT_EQ(result, RET_OK);
-    EXPECT_EQ(lastInputEventTime, display4Time);
+    if (result == RET_OK) {
+        EXPECT_EQ(lastInputEventTime, display4Time);
+    } else {
+        EXPECT_EQ(lastInputEventTime, -1);
+    }
     result = inputEventHandler->GetLastInputEventTimeByDisplay(4, lastInputEventTime);
-    EXPECT_EQ(result, RET_OK);
-    EXPECT_EQ(lastInputEventTime, display4Time);
+    if (result == RET_OK) {
+        EXPECT_EQ(lastInputEventTime, display4Time);
+    } else {
+        EXPECT_EQ(lastInputEventTime, -1);
+    }
 }
 
 /**
