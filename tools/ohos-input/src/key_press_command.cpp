@@ -50,8 +50,7 @@ bool ParseKeyPressOptions(const std::vector<std::string> &args, KeyPressOptions 
     std::string &suggestion)
 {
     Options options;
-    if (!ParseOptionPairs(args, ALLOWED_OPTIONS, options)) {
-        error = "options must use documented --name value once";
+    if (!ParseOptionPairs(args, ALLOWED_OPTIONS, options, error)) {
         suggestion = "Please use key press --help";
         return false;
     }

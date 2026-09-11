@@ -35,7 +35,7 @@ constexpr int32_t MAX_HOLD_DURATION_MS = 200;
 bool ParseMouseOptions(const std::set<std::string> &allowed, const std::vector<std::string> &args,
     Options &options, std::vector<int32_t> &modifiers, std::string &error)
 {
-    if (!ParseOptionPairs(args, allowed, options)) {
+    if (!ParseOptionPairs(args, allowed, options, error)) {
         return false;
     }
     const auto modifier = options.find("--modifier");

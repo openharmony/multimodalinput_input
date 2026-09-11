@@ -34,42 +34,52 @@ HWTEST_F(OptionParserTest, ParseOptionPairs_KnownPairs_Accepted, TestSize.Level1
 {
     const std::set<std::string> allowed { "--key", "--modifier" };
     Options options;
-    EXPECT_TRUE(ParseOptionPairs({ "--key", "2049" }, allowed, options));
+    std::string error;
+    EXPECT_TRUE(ParseOptionPairs({ "--key", "2049" }, allowed, options, error));
+    EXPECT_TRUE(error.empty());
     EXPECT_EQ(options.count("--key"), 1U);
     EXPECT_EQ(options["--key"], "2049");
 }
 
-HWTEST_F(OptionParserTest, ParseOptionPairs_MissingValue_Rejected, TestSize.Level1)
+HWTEST_F(OptionParserTest, ParseOptionPairs_MissingValue_RejectedWithMessage, TestSize.Level1)
 {
     const std::set<std::string> allowed { "--key", "--modifier" };
     Options options;
-    EXPECT_FALSE(ParseOptionPairs({ "--key" }, allowed, options));
+    std::string error;
+    EXPECT_FALSE(ParseOptionPairs({ "--key" }, allowed, options, error));
     EXPECT_TRUE(options.empty());
+    EXPECT_EQ(error, "--key requires a value");
 }
 
-HWTEST_F(OptionParserTest, ParseOptionPairs_NameWithoutDashes_Rejected, TestSize.Level1)
+HWTEST_F(OptionParserTest, ParseOptionPairs_NameWithoutDashes_RejectedWithMessage, TestSize.Level1)
 {
     const std::set<std::string> allowed { "--key", "--modifier" };
     Options options;
-    EXPECT_FALSE(ParseOptionPairs({ "key", "2049" }, allowed, options));
+    std::string error;
+    EXPECT_FALSE(ParseOptionPairs({ "key", "2049" }, allowed, options, error));
     EXPECT_TRUE(options.empty());
+    EXPECT_EQ(error, "unexpected argument: key");
 }
 
-HWTEST_F(OptionParserTest, ParseOptionPairs_UnknownOption_Rejected, TestSize.Level1)
+HWTEST_F(OptionParserTest, ParseOptionPairs_UnknownOption_RejectedWithMessage, TestSize.Level1)
 {
     const std::set<std::string> allowed { "--key", "--modifier" };
     Options options;
-    EXPECT_FALSE(ParseOptionPairs({ "--unknown", "x" }, allowed, options));
+    std::string error;
+    EXPECT_FALSE(ParseOptionPairs({ "--unknown", "x" }, allowed, options, error));
     EXPECT_TRUE(options.empty());
+    EXPECT_EQ(error, "unknown option: --unknown");
 }
 
 HWTEST_F(OptionParserTest, ParseOptionPairs_Duplicate_RejectedAndKeepsFirst, TestSize.Level1)
 {
     const std::set<std::string> allowed { "--key", "--modifier" };
     Options options;
-    EXPECT_FALSE(ParseOptionPairs({ "--key", "1", "--key", "2" }, allowed, options));
+    std::string error;
+    EXPECT_FALSE(ParseOptionPairs({ "--key", "1", "--key", "2" }, allowed, options, error));
     EXPECT_EQ(options.count("--key"), 1U);
     EXPECT_EQ(options["--key"], "1");
+    EXPECT_EQ(error, "--key is specified more than once");
 }
 
 HWTEST_F(OptionParserTest, ParseNumber_ValidValue_Accepted, TestSize.Level1)
