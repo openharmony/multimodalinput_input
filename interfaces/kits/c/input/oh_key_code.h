@@ -1686,47 +1686,47 @@ typedef enum {
     KEYCODE_FINGERPRINT_SLIDE_DOWN = 3234,
     /**
      * PTZ click
-     * @since 27.0.0
+     * @since 26.0.1
      */
     KEYCODE_PTZ_CLICK = 3235,
     /**
      * PTZ focus left
-     * @since 27.0.0
+     * @since 26.0.1
      */
     KEYCODE_PTZ_FOCUS_LEFT = 3236,
     /**
      * PTZ focus right
-     * @since 27.0.0
+     * @since 26.0.1
      */
     KEYCODE_PTZ_FOCUS_RIGHT = 3237,
     /**
      * PTZ expose left
-     * @since 27.0.0
+     * @since 26.0.1
      */
     KEYCODE_PTZ_EXPOSE_LEFT = 3238,
     /**
      * PTZ expose right
-     * @since 27.0.0
+     * @since 26.0.1
      */
     KEYCODE_PTZ_EXPOSE_RIGHT = 3239,
     /**
      * PTZ shutter left
-     * @since 27.0.0
+     * @since 26.0.1
      */
     KEYCODE_PTZ_SHUTTER_LEFT = 3240,
     /**
      * PTZ shutter right
-     * @since 27.0.0
+     * @since 26.0.1
      */
     KEYCODE_PTZ_SHUTTER_RIGHT = 3241,
     /**
      * PTZ aperture left
-     * @since 27.0.0
+     * @since 26.0.1
      */
     KEYCODE_PTZ_APERTURE_LEFT = 3242,
     /**
      * PTZ aperture right
-     * @since 27.0.0
+     * @since 26.0.1
      */
     KEYCODE_PTZ_APERTURE_RIGHT = 3243,
     /**
