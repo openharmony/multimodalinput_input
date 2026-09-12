@@ -34,14 +34,9 @@ const std::set<std::string> ALLOWED_OPTIONS = {
 };
 } // namespace
 
-std::string MouseClickCommand::GetDevice() const
-{
-    return "mouse";
-}
-
 std::string MouseClickCommand::GetName() const
 {
-    return "click";
+    return "mouse-click";
 }
 
 std::string MouseClickCommand::GetDescription() const
@@ -56,7 +51,7 @@ std::string MouseClickCommand::GetTitle() const
 
 std::string MouseClickCommand::GetUsage() const
 {
-    return "ohos-input mouse click [options]";
+    return "ohos-input mouse-click [options]";
 }
 
 std::vector<ParameterDoc> MouseClickCommand::GetParameters() const
@@ -76,13 +71,13 @@ std::vector<std::string> MouseClickCommand::GetExamples() const
 {
     return {
         "# Click at position (100, 200)",
-        "ohos-input mouse click --x 100 --y 200",
+        "ohos-input mouse-click --x 100 --y 200",
         "",
         "# Ctrl+click at position (300, 400) with 100ms hold",
-        "ohos-input mouse click --x 300 --y 400 --holdDuration 100 --modifier ctrl",
+        "ohos-input mouse-click --x 300 --y 400 --holdDuration 100 --modifier ctrl",
         "",
         "# Shift+Ctrl+click (pressed in order: shift then ctrl; released: ctrl then shift)",
-        "ohos-input mouse click --x 300 --y 400 --modifier shift|ctrl",
+        "ohos-input mouse-click --x 300 --y 400 --modifier shift|ctrl",
     };
 }
 
@@ -118,7 +113,7 @@ int32_t MouseClickCommand::Execute(const std::vector<std::string> &args)
     if (ret != 0) {
         return HandleControllerError(ret, "ReleaseKey");
     }
-    return OutputPrinter::PrintSuccess({ { "action", "mouse click" }, { "displayId", point.displayId },
+    return OutputPrinter::PrintSuccess({ { "action", "mouse-click" }, { "displayId", point.displayId },
         { "x", point.x }, { "y", point.y } });
 }
 } // namespace OHOS::MMI::InputCli

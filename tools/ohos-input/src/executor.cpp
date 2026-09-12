@@ -39,12 +39,6 @@ constexpr size_t OPTION_COLUMN_WIDTH = 24;
 constexpr size_t OPTION_GAP_WIDTH = 2;
 constexpr size_t DESCRIPTION_COLUMN_WIDTH = OPTION_INDENT_WIDTH + OPTION_COLUMN_WIDTH + OPTION_GAP_WIDTH;
 
-struct DeviceMeta {
-    std::string name;
-    std::string summary;
-    std::vector<std::string> examples;
-};
-
 const std::vector<std::shared_ptr<Command>> &CommandTable()
 {
     static const std::vector<std::shared_ptr<Command>> commands = {
@@ -56,27 +50,6 @@ const std::vector<std::shared_ptr<Command>> &CommandTable()
         std::make_shared<KeyPressCommand>(),
     };
     return commands;
-}
-
-const std::vector<DeviceMeta> &DeviceTable()
-{
-    static const std::vector<DeviceMeta> table = {
-        { "mouse", "Mouse input simulation operations",
-            { "ohos-input mouse click --x 100 --y 200", "ohos-input mouse scroll --clicks -3" } },
-        { "key", "Keyboard input simulation operations",
-            { "ohos-input key press --key 2054", "ohos-input key press --key 2049 --modifier ctrl" } },
-    };
-    return table;
-}
-
-const DeviceMeta *FindDevice(const std::string &name)
-{
-    for (const DeviceMeta &device : DeviceTable()) {
-        if (name == device.name) {
-            return &device;
-        }
-    }
-    return nullptr;
 }
 
 std::string StripTrailingNewline(std::ostringstream &stream)
@@ -128,39 +101,24 @@ std::string BuildGlobalHelp()
 {
     std::ostringstream stream;
     stream << "ohos-input - Keyboard and mouse input simulation tool for AI Agent applications\n\n";
-    stream << "Usage:\n  ohos-input <device> <action> [options]\n\n";
+    stream << "Usage:\n  ohos-input <command> [options]\n\n";
     stream << "Parameters:\n";
     AppendDocLine(stream, "--help", "Display this help message");
     AppendDocLine(stream, "--version", "Display tool version");
     stream << "\nSubCommands:\n";
-    for (const DeviceMeta &device : DeviceTable()) {
-        AppendSummaryLine(stream, device.name, device.summary);
-    }
-    stream << "\n";
-    AppendExamples(stream, { "# Mouse click at position (100, 200)", "ohos-input mouse click --x 100 --y 200", "",
-        "# Key press with Ctrl modifier", "ohos-input key press --key 2049 --modifier ctrl" });
-    return StripTrailingNewline(stream);
-}
-
-std::string BuildDeviceHelp(const DeviceMeta &device)
-{
-    std::ostringstream stream;
-    stream << "ohos-input " << device.name << " - " << device.summary << "\n\n";
-    stream << "Usage:\n  ohos-input " << device.name << " <action> [options]\n\n";
-    stream << "SubCommands:\n";
-    for (const auto &command : GetCommandsByDevice(device.name)) {
+    for (const auto &command : CommandTable()) {
         AppendSummaryLine(stream, command->GetName(), command->GetDescription());
     }
     stream << "\n";
-    AppendExamples(stream, device.examples);
+    AppendExamples(stream, { "# Mouse click at position (100, 200)", "ohos-input mouse-click --x 100 --y 200", "",
+        "# Key press with Ctrl modifier", "ohos-input key-press --key 2049 --modifier ctrl" });
     return StripTrailingNewline(stream);
 }
 
 std::string BuildCommandHelp(const std::shared_ptr<Command> &command)
 {
     std::ostringstream stream;
-    stream << "ohos-input " << command->GetDevice() << " " << command->GetName() << " - "
-           << command->GetTitle() << "\n\n";
+    stream << "ohos-input " << command->GetName() << " - " << command->GetTitle() << "\n\n";
     stream << "Usage:\n  " << command->GetUsage() << "\n\n";
     stream << "Parameters:\n";
     for (const auto &[name, description] : command->GetParameters()) {
@@ -173,25 +131,19 @@ std::string BuildCommandHelp(const std::shared_ptr<Command> &command)
 }
 } // namespace
 
-std::shared_ptr<Command> GetCommand(const std::string &device, const std::string &name)
+std::shared_ptr<Command> GetCommand(const std::string &name)
 {
     for (const auto &command : CommandTable()) {
-        if (command->GetDevice() == device && command->GetName() == name) {
+        if (command->GetName() == name) {
             return command;
         }
     }
     return nullptr;
 }
 
-std::vector<std::shared_ptr<Command>> GetCommandsByDevice(const std::string &device)
+std::vector<std::shared_ptr<Command>> GetAllCommands()
 {
-    std::vector<std::shared_ptr<Command>> matched;
-    for (const auto &command : CommandTable()) {
-        if (command->GetDevice() == device) {
-            matched.push_back(command);
-        }
-    }
-    return matched;
+    return CommandTable();
 }
 
 int32_t ExecuteCommand(const std::vector<std::string> &args)
@@ -204,19 +156,15 @@ int32_t ExecuteCommand(const std::vector<std::string> &args)
         std::cout << OHOS_INPUT_VERSION << std::endl;
         return 0;
     }
-    const DeviceMeta *device = FindDevice(args[0]);
-    if (device == nullptr) {
+    const auto command = GetCommand(args[0]);
+    if (command == nullptr) {
         return UnknownCommandError(args[0], TOP_LEVEL_SUGGESTION);
     }
     if (args.size() == 1U || args[1] == "--help") {
-        OutputPrinter::PrintHelp(BuildDeviceHelp(*device));
+        OutputPrinter::PrintHelp(BuildCommandHelp(command));
         return 0;
     }
-    const auto command = GetCommand(device->name, args[1]);
-    if (command == nullptr) {
-        return UnknownCommandError(args[1], TOP_LEVEL_SUGGESTION);
-    }
-    const std::vector<std::string> commandArgs(args.begin() + 2, args.end());
+    const std::vector<std::string> commandArgs(args.begin() + 1, args.end());
     if (std::find(commandArgs.begin(), commandArgs.end(), "--help") != commandArgs.end()) {
         OutputPrinter::PrintHelp(BuildCommandHelp(command));
         return 0;

@@ -28,17 +28,18 @@ protected:
     void TearDown() override {}
 };
 
-HWTEST_F(CommandTableTest, GetCommand_KnownPair_Found, TestSize.Level1)
+HWTEST_F(CommandTableTest, GetCommand_KnownName_Found, TestSize.Level1)
 {
-    EXPECT_NE(GetCommand("mouse", "click"), nullptr);
-    EXPECT_EQ(GetCommand("mouse", "unknown"), nullptr);
-    EXPECT_EQ(GetCommand("unknown", "click"), nullptr);
+    EXPECT_NE(GetCommand("mouse-click"), nullptr);
+    EXPECT_EQ(GetCommand("mouse-unknown"), nullptr);
+    EXPECT_EQ(GetCommand("unknown"), nullptr);
 }
 
-HWTEST_F(CommandTableTest, GetCommandsByDevice_ReturnsDeclarationOrder, TestSize.Level1)
+HWTEST_F(CommandTableTest, GetAllCommands_ReturnsDeclarationOrder, TestSize.Level1)
 {
-    const auto commands = GetCommandsByDevice("mouse");
-    const std::vector<std::string> expectedNames { "click", "double-click", "scroll", "move-to", "drag" };
+    const auto commands = GetAllCommands();
+    const std::vector<std::string> expectedNames { "mouse-click", "mouse-double-click", "mouse-scroll",
+        "mouse-move-to", "mouse-drag", "key-press" };
     ASSERT_EQ(commands.size(), expectedNames.size());
     for (size_t index = 0; index < commands.size(); ++index) {
         EXPECT_EQ(commands[index]->GetName(), expectedNames[index]);
@@ -47,8 +48,8 @@ HWTEST_F(CommandTableTest, GetCommandsByDevice_ReturnsDeclarationOrder, TestSize
 
 HWTEST_F(CommandTableTest, GetCommand_RepeatedLookup_ReturnsSameObject, TestSize.Level1)
 {
-    const auto first = GetCommand("key", "press");
-    const auto second = GetCommand("key", "press");
+    const auto first = GetCommand("key-press");
+    const auto second = GetCommand("key-press");
     ASSERT_NE(first, nullptr);
     EXPECT_EQ(first, second);
 }

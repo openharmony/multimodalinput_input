@@ -25,7 +25,6 @@
 namespace OHOS::MMI::InputCli {
 class MouseScrollCommand final : public Command {
 public:
-    std::string GetDevice() const override;
     std::string GetName() const override;
     std::string GetDescription() const override;
     std::string GetTitle() const override;

@@ -42,14 +42,9 @@ const std::set<std::string> ALLOWED_OPTIONS = {
 };
 } // namespace
 
-std::string MouseDoubleClickCommand::GetDevice() const
-{
-    return "mouse";
-}
-
 std::string MouseDoubleClickCommand::GetName() const
 {
-    return "double-click";
+    return "mouse-double-click";
 }
 
 std::string MouseDoubleClickCommand::GetDescription() const
@@ -64,7 +59,7 @@ std::string MouseDoubleClickCommand::GetTitle() const
 
 std::string MouseDoubleClickCommand::GetUsage() const
 {
-    return "ohos-input mouse double-click [options]";
+    return "ohos-input mouse-double-click [options]";
 }
 
 std::vector<ParameterDoc> MouseDoubleClickCommand::GetParameters() const
@@ -89,10 +84,10 @@ std::vector<std::string> MouseDoubleClickCommand::GetExamples() const
 {
     return {
         "# Double-click at position (100, 200)",
-        "ohos-input mouse double-click --x 100 --y 200",
+        "ohos-input mouse-double-click --x 100 --y 200",
         "",
         "# Right-button double-click with custom interval",
-        "ohos-input mouse double-click --x 100 --y 200 --button right --holdDuration 100 --clickInterval 200",
+        "ohos-input mouse-double-click --x 100 --y 200 --button right --holdDuration 100 --clickInterval 200",
     };
 }
 
@@ -144,7 +139,7 @@ int32_t MouseDoubleClickCommand::Execute(const std::vector<std::string> &args)
     if (ret != 0) {
         return HandleControllerError(ret, "ReleaseKey");
     }
-    return OutputPrinter::PrintSuccess({ { "action", "mouse double-click" }, { "displayId", point.displayId },
+    return OutputPrinter::PrintSuccess({ { "action", "mouse-double-click" }, { "displayId", point.displayId },
         { "x", point.x }, { "y", point.y } });
 }
 } // namespace OHOS::MMI::InputCli

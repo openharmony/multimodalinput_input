@@ -21,7 +21,7 @@
   },
   "hasSubCommand": true,
   "subcommands": {
-    "mouse click": {
+    "mouse-click": {
       "description": "Simulate one mouse click. Used for point selection. Does not support simultaneous buttons.",
       "requirePermissions": [
         "ohos.permission.CONTROL_DEVICE"
@@ -101,7 +101,7 @@
         ]
       }
     },
-    "mouse double-click": {
+    "mouse-double-click": {
       "description": "Simulate a mouse double-click. Used for double-click selection. Does not support simultaneous buttons.",
       "requirePermissions": [
         "ohos.permission.CONTROL_DEVICE"
@@ -188,7 +188,7 @@
         ]
       }
     },
-    "mouse scroll": {
+    "mouse-scroll": {
       "description": "Simulate vertical mouse scroll. Used for scroll automation. Does not support horizontal scroll.",
       "requirePermissions": [
         "ohos.permission.CONTROL_DEVICE"
@@ -230,7 +230,7 @@
         ]
       }
     },
-    "mouse move-to": {
+    "mouse-move-to": {
       "description": "Move the mouse cursor. Used for pointer positioning. Does not support button press.",
       "requirePermissions": [
         "ohos.permission.CONTROL_DEVICE"
@@ -293,7 +293,7 @@
         ]
       }
     },
-    "mouse drag": {
+    "mouse-drag": {
       "description": "Drag mouse between positions. Used for drag-and-drop automation. Does not support duration above 10000 ms.",
       "requirePermissions": [
         "ohos.permission.CONTROL_DEVICE"
@@ -406,7 +406,7 @@
         ]
       }
     },
-    "key press": {
+    "key-press": {
       "description": "Simulate a key press. Used for keyboard automation. Does not support more than five held keys.",
       "requirePermissions": [
         "ohos.permission.CONTROL_DEVICE"

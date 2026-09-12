@@ -34,14 +34,9 @@ const std::set<std::string> ALLOWED_OPTIONS = {
 };
 } // namespace
 
-std::string MouseScrollCommand::GetDevice() const
-{
-    return "mouse";
-}
-
 std::string MouseScrollCommand::GetName() const
 {
-    return "scroll";
+    return "mouse-scroll";
 }
 
 std::string MouseScrollCommand::GetDescription() const
@@ -56,7 +51,7 @@ std::string MouseScrollCommand::GetTitle() const
 
 std::string MouseScrollCommand::GetUsage() const
 {
-    return "ohos-input mouse scroll [options]";
+    return "ohos-input mouse-scroll [options]";
 }
 
 std::vector<ParameterDoc> MouseScrollCommand::GetParameters() const
@@ -74,10 +69,10 @@ std::vector<std::string> MouseScrollCommand::GetExamples() const
 {
     return {
         "# Scroll down 3 clicks (vertical)",
-        "ohos-input mouse scroll --clicks -3",
+        "ohos-input mouse-scroll --clicks -3",
         "",
         "# Ctrl+scroll up 5 clicks (vertical)",
-        "ohos-input mouse scroll --clicks 5 --modifier ctrl",
+        "ohos-input mouse-scroll --clicks 5 --modifier ctrl",
     };
 }
 
@@ -129,6 +124,6 @@ int32_t MouseScrollCommand::Execute(const std::vector<std::string> &args)
     if (ret != 0) {
         return HandleControllerError(ret, "ReleaseKey");
     }
-    return OutputPrinter::PrintSuccess({ { "action", "mouse scroll" }, { "clicks", clicks } });
+    return OutputPrinter::PrintSuccess({ { "action", "mouse-scroll" }, { "clicks", clicks } });
 }
 } // namespace OHOS::MMI::InputCli

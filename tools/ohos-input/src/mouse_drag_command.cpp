@@ -85,14 +85,9 @@ int32_t RunDragSteps(const MouseSession &session, const DragOptions &options)
 }
 } // namespace
 
-std::string MouseDragCommand::GetDevice() const
-{
-    return "mouse";
-}
-
 std::string MouseDragCommand::GetName() const
 {
-    return "drag";
+    return "mouse-drag";
 }
 
 std::string MouseDragCommand::GetDescription() const
@@ -107,7 +102,7 @@ std::string MouseDragCommand::GetTitle() const
 
 std::string MouseDragCommand::GetUsage() const
 {
-    return "ohos-input mouse drag [options]";
+    return "ohos-input mouse-drag [options]";
 }
 
 std::vector<ParameterDoc> MouseDragCommand::GetParameters() const
@@ -132,13 +127,13 @@ std::vector<std::string> MouseDragCommand::GetExamples() const
 {
     return {
         "# Left-button drag from (100,100) to (300,300) over 500ms",
-        "ohos-input mouse drag --srcX 100 --srcY 100 --dstX 300 --dstY 300 --duration 500",
+        "ohos-input mouse-drag --srcX 100 --srcY 100 --dstX 300 --dstY 300 --duration 500",
         "",
         "# Instant drag (no intermediate move steps)",
-        "ohos-input mouse drag --srcX 100 --srcY 100 --dstX 300 --dstY 300 --duration 0",
+        "ohos-input mouse-drag --srcX 100 --srcY 100 --dstX 300 --dstY 300 --duration 0",
         "",
         "# Cross-display drag",
-        "ohos-input mouse drag --srcDisplayId 0 --srcX 100 --srcY 100 --dstDisplayId 1 --dstX 200 --dstY 200"
+        "ohos-input mouse-drag --srcDisplayId 0 --srcX 100 --srcY 100 --dstDisplayId 1 --dstX 200 --dstY 200"
         " --duration 500",
     };
 }
@@ -184,7 +179,7 @@ int32_t MouseDragCommand::Execute(const std::vector<std::string> &args)
     if (ret != 0) {
         return HandleControllerError(ret, "ReleaseKey");
     }
-    return OutputPrinter::PrintSuccess({ { "action", "mouse drag" }, { "srcDisplayId", drag.srcDisplayId },
+    return OutputPrinter::PrintSuccess({ { "action", "mouse-drag" }, { "srcDisplayId", drag.srcDisplayId },
         { "srcX", drag.srcX }, { "srcY", drag.srcY }, { "dstDisplayId", drag.dstDisplayId },
         { "dstX", drag.dstX }, { "dstY", drag.dstY } });
 }

@@ -43,7 +43,6 @@ std::vector<DragStep> BuildDragSteps(int32_t duration, const DragPath &path);
 
 class MouseDragCommand final : public Command {
 public:
-    std::string GetDevice() const override;
     std::string GetName() const override;
     std::string GetDescription() const override;
     std::string GetTitle() const override;
