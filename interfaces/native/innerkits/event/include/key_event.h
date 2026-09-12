@@ -3247,55 +3247,55 @@ public:
 
     /**
      * PTZ_CLICK
-     * @since 27.0.0
+     * @since 26.0.1
      */
     static const int32_t KEYCODE_PTZ_CLICK;
 
     /**
      * PTZ_FOCUS_LEFT
-     * @since 27.0.0
+     * @since 26.0.1
      */
     static const int32_t KEYCODE_PTZ_FOCUS_LEFT;
 
     /**
      * PTZ_FOCUS_RIGHT
-     * @since 27.0.0
+     * @since 26.0.1
      */
     static const int32_t KEYCODE_PTZ_FOCUS_RIGHT;
 
     /**
      * PTZ_EXPOSE_LEFT
-     * @since 27.0.0
+     * @since 26.0.1
      */
     static const int32_t KEYCODE_PTZ_EXPOSE_LEFT;
 
     /**
      * PTZ_EXPOSE_RIGHT
-     * @since 27.0.0
+     * @since 26.0.1
      */
     static const int32_t KEYCODE_PTZ_EXPOSE_RIGHT;
 
     /**
      * PTZ_SHUTTER_LEFT
-     * @since 27.0.0
+     * @since 26.0.1
      */
     static const int32_t KEYCODE_PTZ_SHUTTER_LEFT;
 
     /**
      * PTZ_SHUTTER_RIGHT
-     * @since 27.0.0
+     * @since 26.0.1
      */
     static const int32_t KEYCODE_PTZ_SHUTTER_RIGHT;
 
     /**
      * PTZ_APERTURE_LEFT
-     * @since 27.0.0
+     * @since 26.0.1
      */
     static const int32_t KEYCODE_PTZ_APERTURE_LEFT;
 
     /**
      * PTZ_APERTURE_RIGHT
-     * @since 27.0.0
+     * @since 26.0.1
      */
     static const int32_t KEYCODE_PTZ_APERTURE_RIGHT;
 
