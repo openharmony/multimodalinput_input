@@ -32,20 +32,22 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-std::shared_ptr<MultimodalInputConnectManager> g_instance = nullptr; 
 constexpr const char* POWER_MANAGER_PROCESS = "powermgr";
 } // namespace
 
 std::shared_ptr<MultimodalInputConnectManager> MultimodalInputConnectManager::GetInstance()
 {
-    static std::once_flag flag;
-    std::call_once(flag, [&]() { g_instance.reset(new (std::nothrow) MultimodalInputConnectManager()); });
-
-    CHKPP(g_instance);
-    if (g_instance != nullptr) {
-        g_instance->ConnectMultimodalInputService();
+  static std::shared_ptr<MultimodalInputConnectManager>* instance = []() {
+        auto p = new std::shared_ptr<MultimodalInputConnectManager>(new MultimodalInputConnectManager());
+        if (*p != nullptr) {
+            (*p)->ConnectMultimodalInputService();
+        }
+        return p;
+    }();
+    if (*instance == nullptr) {
+        return nullptr;
     }
-    return g_instance;
+    return *instance;
 }
 
 int32_t MultimodalInputConnectManager::AllocSocketPair(const int32_t moduleType)
