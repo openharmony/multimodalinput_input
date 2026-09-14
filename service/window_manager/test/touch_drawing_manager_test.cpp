@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023-2025 Huawei Device Co., Ltd.
+ * Copyright (c) 2023-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -130,19 +130,6 @@ HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_GetOriginalTouchScreen
     TOUCH_DRAWING_MGR->GetOriginalTouchScreenCoordinates(DIRECTION270, width, height, physicalX, physicalY);
     EXPECT_EQ(physicalX, 140);
     EXPECT_EQ(physicalY, 50);
-}
-
-/**
- * @tc.name: TouchDrawingManagerTest_RotationScreen_001
- * @tc.desc: Test TouchDrawingManager::RotationScreen
- * @tc.type: Function
- * @tc.require:
- */
-HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_RotationScreen_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    TOUCH_DRAWING_MGR->LoadTouchDrawingHandler();
-    EXPECT_NO_FATAL_FAILURE(TOUCH_DRAWING_MGR->RotationScreen());
 }
 
 /**

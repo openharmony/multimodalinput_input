@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Huawei Device Co., Ltd.
+ * Copyright (c) 2025-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -17,6 +17,7 @@
 #define TOUCH_DRAWING_HANDLER_H
 
 #include <draw/canvas.h>
+#include <modifier_ng/geometry/rs_transform_modifier.h>
 #include <nocopyable.h>
 #include <transaction/rs_transaction.h>
 #include <ui/rs_canvas_node.h>
@@ -48,6 +49,12 @@ class TouchDrawingHandler final : public ITouchDrawingHandler {
         bool isShow { false };
     };
 
+    enum class RotationStatus : int32_t {
+        NO_ROTATION = 0,
+        WINDOW_ROTATION = 1,
+        SCREEN_ROTATION = 2
+    };
+
 #ifndef USE_ROSEN_DRAWING
     using RosenCanvas = Rosen::RSRecordingCanvas;
 #else
@@ -61,7 +68,6 @@ public:
 
     void UpdateDisplayInfo(const OLD::DisplayInfo &displayInfo) override;
     void TouchDrawHandler(std::shared_ptr<PointerEvent> pointerEvent) override;
-    void RotationScreen() override;
     void UpdateLabels(bool isOn) override;
     void UpdateBubbleData(bool isOn) override;
     void SetMultiWindowScreenId(uint64_t screenId, uint64_t displayNodeScreenId) override;
@@ -71,9 +77,7 @@ public:
 
 private:
     void AddCanvasNode(std::shared_ptr<Rosen::RSCanvasNode>& canvasNode, bool isTrackerNode,
-        bool isNeedRotate = true);
-    void RotationCanvasNode(std::shared_ptr<Rosen::RSCanvasNode> canvasNode);
-    void ResetCanvasNode(std::shared_ptr<Rosen::RSCanvasNode> canvasNode);
+        const std::string &nodeName = "");
     void RotationCanvas(RosenCanvas *canvas, Direction direction);
     void CreateTouchWindow();
     void DestoryTouchWindow();
@@ -105,6 +109,14 @@ private:
     bool InitRSUIContext(uint64_t screenId);
     void RsFlushImplicitTransaction();
 
+    std::tuple<int32_t, int32_t> GetScreenWidthHeight(const OLD::DisplayInfo &displayInfo);
+    void WindowCoordinateToScreenCoordinate(const OLD::DisplayInfo &displayInfo, double &x, double &y);
+    void OnDisplayModeChange();
+    void OnScreenAreaChange();
+    void OnWindowRotation();
+    void OnScreenRotation();
+    void TrackerSnapshot();
+
 private:
     std::shared_ptr<OHOS::Rosen::RSUIDirector> rsUIDirector_ { nullptr };
     std::shared_ptr<OHOS::Rosen::RSUIContext> rsUIContext_ { nullptr };
@@ -127,8 +139,10 @@ private:
     int32_t rectTopPosition_ { 0 };
     int32_t scaleW_ { 0 };
     int32_t scaleH_ { 0 };
+    int32_t screenWidth_ { 0 };
+    int32_t screenHeight_ { 0 };
     int64_t lastActionTime_ { 0 };
-    uint64_t screenId_ { -1 };
+    uint64_t rsId_ { -1 };
     double xVelocity_ { 0.0 };
     double yVelocity_ { 0.0 };
     double pressure_ { 0.0 };
@@ -146,6 +160,10 @@ private:
     std::mutex mutex_;
     uint64_t windowScreenId_ { 0 };
     uint64_t displayNodeScreenId_ { 0 };
+    RotationStatus rotationStatus_ { RotationStatus::NO_ROTATION };
+    Direction prevDirection_ { Direction::DIRECTION0 };
+    bool needResetTracker_ = { false };
+    std::shared_ptr<Rosen::ModifierNG::RSTransformModifier> transformModifier_ { nullptr };
 };
 } // namespace MMI
 } // namespace OHOS
