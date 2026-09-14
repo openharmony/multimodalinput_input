@@ -270,7 +270,7 @@ void InputManagerImpl::SetEnhanceConfig(uint8_t *cfg, uint32_t cfgLen)
     CALL_DEBUG_ENTER;
     if (cfg == nullptr || cfgLen <= 0) {
         MMI_HILOGE("SecCompEnhance cfg info is empty");
-        return;
+        return; 
     }
     if (enhanceCfg_ != nullptr) {
         delete enhanceCfg_;
