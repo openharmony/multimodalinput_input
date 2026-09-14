@@ -34,7 +34,7 @@ const std::set<std::string> ALLOWED_OPTIONS = {
 
 std::string MouseMoveToCommand::GetName() const
 {
-    return "mouse-move-to";
+    return "mouse-move";
 }
 
 std::string MouseMoveToCommand::GetDescription() const
@@ -49,7 +49,7 @@ std::string MouseMoveToCommand::GetTitle() const
 
 std::string MouseMoveToCommand::GetUsage() const
 {
-    return "ohos-input mouse-move-to [options]";
+    return "ohos-input mouse-move [options]";
 }
 
 std::vector<ParameterDoc> MouseMoveToCommand::GetParameters() const
@@ -67,13 +67,13 @@ std::vector<std::string> MouseMoveToCommand::GetExamples() const
 {
     return {
         "# Move cursor to position (100, 200)",
-        "ohos-input mouse-move-to --x 100 --y 200",
+        "ohos-input mouse-move --x 100 --y 200",
         "",
         "# Move cursor to display 1",
-        "ohos-input mouse-move-to --displayId 1 --x 100 --y 200",
+        "ohos-input mouse-move --displayId 1 --x 100 --y 200",
         "",
         "# Move with Ctrl held",
-        "ohos-input mouse-move-to --x 100 --y 200 --modifier ctrl",
+        "ohos-input mouse-move --x 100 --y 200 --modifier ctrl",
     };
 }
 
@@ -105,7 +105,7 @@ int32_t MouseMoveToCommand::Execute(const std::vector<std::string> &args)
     if (ret != 0) {
         return HandleControllerError(ret, "ReleaseKey");
     }
-    return OutputPrinter::PrintSuccess({ { "action", "mouse-move-to" }, { "displayId", point.displayId },
+    return OutputPrinter::PrintSuccess({ { "action", "mouse-move" }, { "displayId", point.displayId },
         { "x", point.x }, { "y", point.y } });
 }
 } // namespace OHOS::MMI::InputCli

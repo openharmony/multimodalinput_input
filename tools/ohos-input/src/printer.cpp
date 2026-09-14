@@ -57,7 +57,8 @@ int32_t HandleControllerError(int32_t result, const std::string &operation)
     if (result == ERROR_NO_PERMISSION) {
         return OutputPrinter::PrintError("ERR_PERMISSION_DENIED",
             "Permission denied: ohos.permission.CONTROL_DEVICE is required",
-            "Please grant ohos.permission.CONTROL_DEVICE permission to the caller application", PERMISSION_EXIT);
+            "Please add ohos.permission.CONTROL_DEVICE in the requirePermissions field of module.json5",
+            PERMISSION_EXIT);
     }
     return OutputPrinter::PrintError("ERR_INPUT_SERVICE_EXCEPTION",
         "Input service exception: failed to execute " + operation,

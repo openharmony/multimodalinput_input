@@ -101,7 +101,7 @@ std::string BuildGlobalHelp()
 {
     std::ostringstream stream;
     stream << "ohos-input - Keyboard and mouse input simulation tool for AI Agent applications\n\n";
-    stream << "Usage:\n  ohos-input <command> [options]\n\n";
+    stream << "Usage:\n  ohos-input <subcommand> [options]\n\n";
     stream << "Parameters:\n";
     AppendDocLine(stream, "--help", "Display this help message");
     AppendDocLine(stream, "--version", "Display tool version");
@@ -118,7 +118,8 @@ std::string BuildGlobalHelp()
 std::string BuildCommandHelp(const std::shared_ptr<Command> &command)
 {
     std::ostringstream stream;
-    stream << "ohos-input " << command->GetName() << " - " << command->GetTitle() << "\n\n";
+    stream << "ohos-input " << command->GetName() << " - "
+           << command->GetTitle() << "\n\n";
     stream << "Usage:\n  " << command->GetUsage() << "\n\n";
     stream << "Parameters:\n";
     for (const auto &[name, description] : command->GetParameters()) {
@@ -141,11 +142,6 @@ std::shared_ptr<Command> GetCommand(const std::string &name)
     return nullptr;
 }
 
-std::vector<std::shared_ptr<Command>> GetAllCommands()
-{
-    return CommandTable();
-}
-
 int32_t ExecuteCommand(const std::vector<std::string> &args)
 {
     if (args.empty() || args[0] == "--help") {
@@ -159,10 +155,6 @@ int32_t ExecuteCommand(const std::vector<std::string> &args)
     const auto command = GetCommand(args[0]);
     if (command == nullptr) {
         return UnknownCommandError(args[0], TOP_LEVEL_SUGGESTION);
-    }
-    if (args.size() == 1U || args[1] == "--help") {
-        OutputPrinter::PrintHelp(BuildCommandHelp(command));
-        return 0;
     }
     const std::vector<std::string> commandArgs(args.begin() + 1, args.end());
     if (std::find(commandArgs.begin(), commandArgs.end(), "--help") != commandArgs.end()) {

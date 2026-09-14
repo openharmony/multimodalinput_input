@@ -58,8 +58,8 @@ HWTEST_F(ExecutorTest, ExecuteCommand_EmptyArgs_PrintsGlobalHelp, TestSize.Level
     const CommandResult result = OHOS::MMI::InputCli::Run({});
     EXPECT_EQ(result.code, 0);
     EXPECT_TRUE(result.stdoutText.find("Usage:") != std::string::npos);
-    EXPECT_TRUE(result.stdoutText.find("mouse") != std::string::npos);
-    EXPECT_TRUE(result.stdoutText.find("key") != std::string::npos);
+    EXPECT_TRUE(result.stdoutText.find("mouse-click") != std::string::npos);
+    EXPECT_TRUE(result.stdoutText.find("key-press") != std::string::npos);
 }
 
 HWTEST_F(ExecutorTest, ExecuteCommand_TopLevelHelp_ListsCommandsAndExamples, TestSize.Level1)
@@ -72,15 +72,6 @@ HWTEST_F(ExecutorTest, ExecuteCommand_TopLevelHelp_ListsCommandsAndExamples, Tes
     EXPECT_TRUE(result.stdoutText.find("--version") != std::string::npos);
     EXPECT_TRUE(result.stdoutText.find("Examples:") != std::string::npos);
     ExpectHelpOptionColumnAligned(result.stdoutText);
-}
-
-HWTEST_F(ExecutorTest, ExecuteCommand_BareDeviceName_UnknownCommand, TestSize.Level1)
-{
-    const CommandResult result = OHOS::MMI::InputCli::Run({ "mouse" });
-    EXPECT_EQ(result.code, PARAMETER_EXIT);
-    const auto parsed = ParseJson(result);
-    EXPECT_EQ(parsed["errCode"], "ERR_PARAMETER_ERROR");
-    EXPECT_EQ(parsed["errMsg"], "Unknown command: mouse");
 }
 
 HWTEST_F(ExecutorTest, ExecuteCommand_ClickHelp_ShowsUsageAndRules, TestSize.Level1)
@@ -149,7 +140,7 @@ HWTEST_F(ExecutorTest, ExecuteCommand_Version_PrintsVersion, TestSize.Level1)
     EXPECT_EQ(result.stdoutText, std::string(OHOS_INPUT_VERSION) + "\n");
 }
 
-HWTEST_F(ExecutorTest, ExecuteCommand_UnknownDevice_ParameterErrorJson, TestSize.Level1)
+HWTEST_F(ExecutorTest, ExecuteCommand_UnknownCommand_ParameterErrorJson, TestSize.Level1)
 {
     const CommandResult result = OHOS::MMI::InputCli::Run({ "unknown" });
     EXPECT_EQ(result.code, PARAMETER_EXIT);
@@ -157,13 +148,6 @@ HWTEST_F(ExecutorTest, ExecuteCommand_UnknownDevice_ParameterErrorJson, TestSize
     EXPECT_EQ(parsed["errCode"], "ERR_PARAMETER_ERROR");
     EXPECT_EQ(parsed["errMsg"], "Unknown command: unknown");
     EXPECT_EQ(parsed["data"], "");
-}
-
-HWTEST_F(ExecutorTest, ExecuteCommand_UnknownCommandName_ParameterErrorJson, TestSize.Level1)
-{
-    const CommandResult result = OHOS::MMI::InputCli::Run({ "mouse-unknown" });
-    EXPECT_EQ(result.code, PARAMETER_EXIT);
-    EXPECT_EQ(ParseJson(result)["errMsg"], "Unknown command: mouse-unknown");
 }
 
 HWTEST_F(ExecutorTest, ExecuteCommand_MissingRequiredOption_ParameterErrorJson, TestSize.Level1)
@@ -178,15 +162,10 @@ HWTEST_F(ExecutorTest, ExecuteCommand_MissingRequiredOption_ParameterErrorJson, 
 
 HWTEST_F(ExecutorTest, AllCommands_Available, TestSize.Level2)
 {
-    const char *commands[] = {
-        "mouse-click",
-        "mouse-double-click",
-        "mouse-scroll",
-        "mouse-move-to",
-        "mouse-drag",
-        "key-press",
+    const std::vector<std::string> names = {
+        "mouse-click", "mouse-double-click", "mouse-scroll", "mouse-move", "mouse-drag", "key-press"
     };
-    for (const char *command : commands) {
-        EXPECT_TRUE(GetCommand(command) != nullptr) << command << " not registered";
+    for (const auto &name : names) {
+        EXPECT_TRUE(GetCommand(name) != nullptr) << name << " not registered";
     }
 }

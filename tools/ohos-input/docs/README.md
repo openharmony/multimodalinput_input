@@ -32,11 +32,10 @@
 ## 基本用法
 
 ```bash
-ohos-input <command> [options]
+ohos-input <subcommand> [options]
 ohos-input --help
 ohos-input --version
-ohos-input <device> --help
-ohos-input <command> --help
+ohos-input <subcommand> --help
 ```
 
 ## 命令列表
@@ -44,9 +43,9 @@ ohos-input <command> --help
 | 命令 | 说明 | 参数 | 权限 | 前置依赖 |
 |---------|-------------|------------|-------------|--------------|
 | mouse-click | 模拟鼠标单击 | `--x --y`（必填）；`--displayId --button --holdDuration --modifier`（可选） | `ohos.permission.CONTROL_DEVICE` | 无 |
-| mouse-double-click | 模拟鼠标双击 | 同 click，另加 `--clickInterval`（可选） | `ohos.permission.CONTROL_DEVICE` | 无 |
+| mouse-double-click | 模拟鼠标双击 | 同 mouse-click，另加 `--clickInterval`（可选） | `ohos.permission.CONTROL_DEVICE` | 无 |
 | mouse-scroll | 模拟鼠标滚轮垂直滚动 | `--clicks`（必填）；`--modifier`（可选） | `ohos.permission.CONTROL_DEVICE` | 无 |
-| mouse-move-to | 移动鼠标光标到指定位置 | `--x --y`（必填）；`--displayId --modifier`（可选） | `ohos.permission.CONTROL_DEVICE` | 无 |
+| mouse-move | 移动鼠标光标到指定位置 | `--x --y`（必填）；`--displayId --modifier`（可选） | `ohos.permission.CONTROL_DEVICE` | 无 |
 | mouse-drag | 模拟鼠标拖动（支持跨显示器） | `--srcX --srcY --dstX --dstY`（必填）；`--srcDisplayId --dstDisplayId --button --duration --modifier`（可选） | `ohos.permission.CONTROL_DEVICE` | 无 |
 | key-press | 模拟键盘按键 | `--key`（必填）；`--holdDuration --modifier`（可选） | `ohos.permission.CONTROL_DEVICE` | 无 |
 
@@ -69,7 +68,7 @@ ohos-input mouse-click [options]
 
 ### mouse-double-click
 
-同 click，另增加：
+同 mouse-click，另增加：
 
 ```
   --clickInterval <number> 第一次按下到第二次按下的间隔 ms（可选，[100,400]，须大于 holdDuration，默认 250）
@@ -83,10 +82,10 @@ ohos-input mouse-scroll [options]
   --modifier <keys>       修饰键（可选）
 ```
 
-### mouse-move-to
+### mouse-move
 
 ```
-ohos-input mouse-move-to [options]
+ohos-input mouse-move [options]
   --displayId <number>    显示器 ID（可选，>=0，默认 0）
   --x <integer>           目标 X 坐标（必填整数，>=0）
   --y <integer>           目标 Y 坐标（必填整数，>=0）
@@ -193,17 +192,17 @@ ohos-input mouse-scroll --clicks 5 --modifier ctrl
 {"type":"result","status":"success","data":{"action":"mouse-scroll","clicks":-3}}
 ```
 
-### mouse-move-to
+### mouse-move
 
 ```bash
 # 移动光标到 (100, 200)
-ohos-input mouse-move-to --x 100 --y 200
+ohos-input mouse-move --x 100 --y 200
 
 # 移动光标到 1 号显示器 (100, 200)
-ohos-input mouse-move-to --displayId 1 --x 100 --y 200
+ohos-input mouse-move --displayId 1 --x 100 --y 200
 
 # 输出示例：
-{"type":"result","status":"success","data":{"action":"mouse-move-to","displayId":1,"x":100,"y":200}}
+{"type":"result","status":"success","data":{"action":"mouse-move","displayId":1,"x":100,"y":200}}
 ```
 
 ### mouse-drag
@@ -239,7 +238,7 @@ ohos-input key-press --key 2066 --modifier ctrl|shift
 
 ```bash
 # 1. 移动光标到目标位置
-ohos-input mouse-move-to --x 100 --y 200
+ohos-input mouse-move --x 100 --y 200
 
 # 2. 单击选中对象
 ohos-input mouse-click --x 100 --y 200

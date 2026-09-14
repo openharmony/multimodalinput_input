@@ -31,18 +31,16 @@ protected:
 HWTEST_F(CommandTableTest, GetCommand_KnownName_Found, TestSize.Level1)
 {
     EXPECT_NE(GetCommand("mouse-click"), nullptr);
-    EXPECT_EQ(GetCommand("mouse-unknown"), nullptr);
     EXPECT_EQ(GetCommand("unknown"), nullptr);
 }
 
-HWTEST_F(CommandTableTest, GetAllCommands_ReturnsDeclarationOrder, TestSize.Level1)
+HWTEST_F(CommandTableTest, GetCommand_AllKnownNames_Found, TestSize.Level1)
 {
-    const auto commands = GetAllCommands();
-    const std::vector<std::string> expectedNames { "mouse-click", "mouse-double-click", "mouse-scroll",
-        "mouse-move-to", "mouse-drag", "key-press" };
-    ASSERT_EQ(commands.size(), expectedNames.size());
-    for (size_t index = 0; index < commands.size(); ++index) {
-        EXPECT_EQ(commands[index]->GetName(), expectedNames[index]);
+    const std::vector<std::string> expectedNames {
+        "mouse-click", "mouse-double-click", "mouse-scroll", "mouse-move", "mouse-drag", "key-press"
+    };
+    for (const auto &name : expectedNames) {
+        EXPECT_NE(GetCommand(name), nullptr) << name << " not registered";
     }
 }
 

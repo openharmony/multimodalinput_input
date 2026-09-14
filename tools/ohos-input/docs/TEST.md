@@ -9,12 +9,12 @@
 | 注册表测试 | 3 | 所有（命令注册与查找） |
 | 输出打印测试 | 5 | 所有（JSON 输出格式验证） |
 | 错误处理测试 | 2 | 所有（错误码验证） |
-| 执行器测试 | 15 | 所有（命令注册、帮助路由、版本） |
-| 鼠标支持测试 | 5 | mouse-click / scroll（齿数与按键名验证） |
+| 执行器测试 | 13 | 所有（命令注册、帮助路由、版本） |
+| 鼠标支持测试 | 5 | mouse-click / mouse-scroll（齿数与按键名验证） |
 | 拖动命令测试 | 5 | mouse-drag（插值步进验证） |
-| 集成测试 | 14 | 所有 6 个命令（mock Controller 工作流验证） |
+| 集成测试 | 13 | 所有 6 个命令（mock Controller 工作流验证） |
 | 控制器工厂测试 | 6 | 所有（Controller 创建契约） |
-| **总计** | **68** | **所有 6 个命令** |
+| **总计** | **66** | **所有 6 个命令** |
 
 ## 命令测试矩阵
 
@@ -49,13 +49,13 @@
 | 零齿数 | `ohos-input mouse-scroll --clicks 0` | 非零校验 | 无 | 无 | 失败：`ERR_PARAMETER_ERROR`，退出码 2 |
 | 齿数越界 | `ohos-input mouse-scroll --clicks 101` | 超出 [-100,100] 取值上界 | 无 | 无 | 失败：`ERR_PARAMETER_ERROR`，退出码 2 |
 
-### mouse-move-to
+### mouse-move
 
 | 测试用例 | 命令示例 | 说明 | 权限 | 前置依赖 | 预期结果 |
 |-----------|-----------------|-------------|------------|------------|-----------------|
-| 移动光标 | `ohos-input mouse-move-to --x 100 --y 200` | 移动到 0 号显示器 (100,200) | `ohos.permission.CONTROL_DEVICE` | 无 | 成功：`data:{action:"mouse-move-to",displayId:0,x:100,y:200}` |
-| 指定显示器 | `ohos-input mouse-move-to --displayId 1 --x 100 --y 200` | 移动到 1 号显示器 | `ohos.permission.CONTROL_DEVICE` | 无 | 成功：data 含 `displayId:1` |
-| 缺少参数 | `ohos-input mouse-move-to --x 100` | 缺少 `--y` | 无 | 无 | 失败：`ERR_PARAMETER_ERROR`，退出码 2 |
+| 移动光标 | `ohos-input mouse-move --x 100 --y 200` | 移动到 0 号显示器 (100,200) | `ohos.permission.CONTROL_DEVICE` | 无 | 成功：`data:{action:"mouse-move",displayId:0,x:100,y:200}` |
+| 指定显示器 | `ohos-input mouse-move --displayId 1 --x 100 --y 200` | 移动到 1 号显示器 | `ohos.permission.CONTROL_DEVICE` | 无 | 成功：data 含 `displayId:1` |
+| 缺少参数 | `ohos-input mouse-move --x 100` | 缺少 `--y` | 无 | 无 | 失败：`ERR_PARAMETER_ERROR`，退出码 2 |
 
 ### mouse-drag
 
@@ -85,17 +85,14 @@
 | 全局帮助 | `ohos-input --help` | 显示顶层帮助 | 无 | 无 | 帮助文本输出到 stdout（非 JSON 格式） |
 | 空参数 | `ohos-input` | 无参数调用 | 无 | 无 | 帮助文本输出到 stdout（非 JSON 格式） |
 | 版本号 | `ohos-input --version` | 输出版本字符串 | 无 | 无 | 版本号输出到 stdout（非 JSON 格式） |
-| 设备帮助 | `ohos-input mouse --help` | 显示 mouse 子命令帮助 | 无 | 无 | 帮助文本输出到 stdout（非 JSON 格式） |
-| 仅设备名 | `ohos-input mouse` | 缺少动作子命令 | 无 | 无 | 设备帮助输出到 stdout（非 JSON 格式） |
-| 动作帮助 | `ohos-input mouse-click --help` | 显示 click 选项帮助 | 无 | 无 | 帮助文本输出到 stdout（非 JSON 格式） |
+| 命令帮助 | `ohos-input mouse-click --help` | 显示 mouse-click 选项帮助 | 无 | 无 | 帮助文本输出到 stdout（非 JSON 格式） |
 | 选项中帮助 | `ohos-input mouse-click --x 1 --help` | `--help` 可出现在选项任意位置 | 无 | 无 | 帮助文本输出到 stdout（非 JSON 格式），不创建 Controller |
 
 ### 错误场景
 
 | 测试用例 | 命令示例 | 说明 | 权限 | 前置依赖 | 预期结果 |
 |-----------|-----------------|-------------|------------|------------|-----------------|
-| 未知设备 | `ohos-input touchscreen click --x 1 --y 1` | 设备名无效 | 无 | 无 | 失败：`{type:"result",status:"failed",errCode:"ERR_PARAMETER_ERROR",errMsg:"Unknown command: touchscreen",suggestion:"..."}` |
-| 未知动作 | `ohos-input mouse hover` | 动作名无效 | 无 | 无 | 失败：`ERR_PARAMETER_ERROR`（"Unknown command: hover"），退出码 2 |
+| 未知命令 | `ohos-input unknown --x 1 --y 1` | 命令名无效 | 无 | 无 | 失败：`{type:"result",status:"failed",errCode:"ERR_PARAMETER_ERROR",errMsg:"Unknown command: unknown",suggestion:"..."}` |
 | 权限拒绝 | Controller 创建返回 -201 | 未持有 CONTROL_DEVICE | `ohos.permission.CONTROL_DEVICE` | 无 | 失败：`ERR_PERMISSION_DENIED`，退出码 3 |
 | 服务异常 | 注入调用返回非 0 | 输入服务运行期失败 | `ohos.permission.CONTROL_DEVICE` | 服务运行 | 失败：`ERR_INPUT_SERVICE_EXCEPTION`，退出码 1 |
 
@@ -105,7 +102,7 @@
 
 ```bash
 # 1. 移动光标到目标位置
-ohos-input mouse-move-to --x 100 --y 200
+ohos-input mouse-move --x 100 --y 200
 
 # 2. 单击选中对象
 ohos-input mouse-click --x 100 --y 200
@@ -127,7 +124,7 @@ ohos-input mouse-drag --srcX 100 --srcY 100 --dstX 300 --dstY 300 --duration 500
 
 ```bash
 # 1. 移动光标到 0 号显示器起点
-ohos-input mouse-move-to --displayId 0 --x 100 --y 100
+ohos-input mouse-move --displayId 0 --x 100 --y 100
 
 # 2. 跨显示器拖动到 1 号显示器
 ohos-input mouse-drag --srcDisplayId 0 --srcX 100 --srcY 100 --dstDisplayId 1 --dstX 200 --dstY 200 --duration 500
@@ -158,15 +155,15 @@ ohos-input key-press --key 2054
 
 | 参数 | 适用命令 | 合法范围 | 默认值 | 非法示例 |
 |-----------|-----------------|-------------|-------|-------------|
-| `--x` / `--y` | click、double-click、move-to | 整数，[0, INT32_MAX] | 必填 | `-1`、非数字、缺失 |
-| `--srcX` / `--srcY` / `--dstX` / `--dstY` | drag | 整数，[0, INT32_MAX] | 必填 | `-1`、缺失 |
-| `--displayId` / `--srcDisplayId` / `--dstDisplayId` | click、move-to、drag | 整数，≥0 | 0 | `-1` |
-| `--button` | click、double-click、drag | left / right / middle | left | `side` |
-| `--holdDuration`（鼠标） | click、double-click | [50, 200] ms | 100 | `49`、`201`、`300` |
+| `--x` / `--y` | mouse-click、mouse-double-click、mouse-move | 整数，[0, INT32_MAX] | 必填 | `-1`、非数字、缺失 |
+| `--srcX` / `--srcY` / `--dstX` / `--dstY` | mouse-drag | 整数，[0, INT32_MAX] | 必填 | `-1`、缺失 |
+| `--displayId` / `--srcDisplayId` / `--dstDisplayId` | mouse-click、mouse-move、mouse-drag | 整数，≥0 | 0 | `-1` |
+| `--button` | mouse-click、mouse-double-click、mouse-drag | left / right / middle | left | `side` |
+| `--holdDuration`（鼠标） | mouse-click、mouse-double-click | [50, 200] ms | 100 | `49`、`201`、`300` |
 | `--holdDuration`（键盘） | key-press | [0, 10000] ms | 100 | `10001` |
-| `--clickInterval` | double-click | [100, 400] ms 且 > holdDuration | 250 | `99`、`401`、`200`（当 holdDuration=250） |
-| `--clicks` | scroll | [-100,-1] ∪ [1,100] 齿 | 必填 | `0`、`101`、`-101` |
-| `--duration` | drag | [0, 10000] ms（0 表示瞬间完成） | 0 | `10001`、`-1` |
+| `--clickInterval` | mouse-double-click | [100, 400] ms 且 > holdDuration | 250 | `99`、`401`、`200`（当 holdDuration=250） |
+| `--clicks` | mouse-scroll | [-100,-1] ∪ [1,100] 齿 | 必填 | `0`、`101`、`-101` |
+| `--duration` | mouse-drag | [0, 10000] ms（0 表示瞬间完成） | 0 | `10001`、`-1` |
 | `--key` | key-press | 整数 ≥1（如 2049=A、2054=回车） | 必填 | `0`、与修饰键键码重复 |
 
 ### 修饰键取值
@@ -226,13 +223,16 @@ hb build input -t --gn-args input_controller_inject_enable=true
 
 # 推送到设备
 hdc file send out/standard/test/tests/unittest/input/input/OhosInputCommandTest /data/local/tmp/ohos_input_test/
+hdc file send out/standard/test/tests/unittest/input/input/ControllerFactoryTest /data/local/tmp/ohos_input_test/
 
 # 运行测试
-hdc shell "cd /data/local/tmp/ohos_input_test && ./OhosInputCommandTest"
+hdc shell "cd /data/local/tmp/ohos_input_test && ./OhosInputCommandTest && ./ControllerFactoryTest"
 
 # 预期输出
-[==========] 62 tests from 8 test suites ran.
+[==========] 62 tests from 9 test suites ran.
 [  PASSED  ] 62 tests.
+[==========] 6 tests from 1 test suite ran.
+[  PASSED  ] 6 tests.
 
 # host 冒烟验证（无 gtest/SDK 环境的最小替身方案）见 tests/TEST.md
 ```
@@ -243,9 +243,11 @@ hdc shell "cd /data/local/tmp/ohos_input_test && ./OhosInputCommandTest"
 |------------|------------|----------|
 | ModifierTest | 4 | 修饰键解析顺序、单键映射、非法与重复输入 |
 | OptionParserTest | 10 | 选项对白名单/重复/缺值、数值规则默认值/越界/报错文案 |
-| CommandTableTest | 3 | 按扁平命令名查找、全表声明顺序、重复查找返回同一对象 |
-| PrinterTest | 7 | 成功/失败 JSON 形态、帮助输出、参数与未知命令错误 |
-| ExecutorTest | 14 | 两级帮助路由（全局/命令）、任意位置 --help、--version、未知命令 JSON、注册完备性 |
+| CommandRegistryTest | 3 | 按命令名查找、全部命令注册完备、注册幂等 |
+| PrinterTest | 5 | 成功/失败 JSON 形态、帮助输出、参数与未知命令错误 |
+| ErrorHandlerTest | 2 | 控制器错误码到权限/服务异常 JSON 与退出码映射 |
+| ExecutorTest | 13 | 帮助路由（全局+命令级）、任意位置 --help、--version、未知命令 JSON、注册完备性 |
 | MouseSupportTest | 5 | 滚动齿数边界、按键名映射与默认值 |
 | MouseDragCommandTest | 5 | 拖动步进切分、静止/跨屏路径、极值不溢出 |
-| IntegrationTest | 14 | 6 命令端到端（mock Controller 调用顺序）、创建前校验拦截、失败路径与销毁顺序 |
+| IntegrationTest | 13 | 6 命令端到端（mock Controller 调用顺序）、创建前校验拦截、失败路径与销毁顺序 |
+| ControllerFactoryTest | 6 | 创建失败清理输出、空实现拒绝 |

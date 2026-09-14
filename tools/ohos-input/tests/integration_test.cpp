@@ -101,7 +101,7 @@ HWTEST_F(IntegrationTest, ConsecutiveActions_DoNotReusePriorActionState, TestSiz
 
     calls.clear();
     ExpectSuccess(OHOS::MMI::InputCli::Run({
-        "mouse-move-to", "--displayId", "2", "--x", "7", "--y", "8" }), "mouse-move-to");
+        "mouse-move", "--displayId", "2", "--x", "7", "--y", "8" }), "mouse-move");
     ExpectCalls(calls, { { "MoveTo", { 2, 7, 8 } } });
 }
 
@@ -111,8 +111,8 @@ HWTEST_F(IntegrationTest, MoveAndDrag_CallExpectedMouseOperations, TestSize.Leve
     std::vector<RecordedCall> calls;
     fixture.Configure(calls);
     ExpectSuccess(OHOS::MMI::InputCli::Run({
-        "mouse-move-to", "--displayId", "1", "--x", "10", "--y", "20", "--modifier", "ctrl" }),
-        "mouse-move-to");
+        "mouse-move", "--displayId", "1", "--x", "10", "--y", "20", "--modifier", "ctrl" }),
+        "mouse-move");
     ExpectCalls(calls, { { "PressKey", { KeyEvent::KEYCODE_CTRL_LEFT } }, { "MoveTo", { 1, 10, 20 } },
         { "ReleaseKey", { KeyEvent::KEYCODE_CTRL_LEFT } } });
 
@@ -238,7 +238,7 @@ HWTEST_F(IntegrationTest, ControllerPermissionFailure_MapsToPermissionJsonAndExi
     MockControllerFixture fixture;
     std::vector<RecordedCall> calls;
     fixture.Configure(calls, { -201 });
-    const CommandResult result = OHOS::MMI::InputCli::Run({ "mouse-move-to", "--x", "1", "--y", "2" });
+    const CommandResult result = OHOS::MMI::InputCli::Run({ "mouse-move", "--x", "1", "--y", "2" });
     EXPECT_EQ(result.code, PERMISSION_EXIT);
     const auto parsed = ParseJson(result);
     EXPECT_EQ(parsed["errCode"], "ERR_PERMISSION_DENIED");

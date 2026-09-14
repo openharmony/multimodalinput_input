@@ -38,7 +38,6 @@ public:
 };
 
 std::shared_ptr<Command> GetCommand(const std::string &name);
-std::vector<std::shared_ptr<Command>> GetAllCommands();
 } // namespace OHOS::MMI::InputCli
 
 #endif
