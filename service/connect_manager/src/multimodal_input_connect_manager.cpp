@@ -37,7 +37,7 @@ constexpr const char* POWER_MANAGER_PROCESS = "powermgr";
 
 std::shared_ptr<MultimodalInputConnectManager> MultimodalInputConnectManager::GetInstance()
 {
-  static std::shared_ptr<MultimodalInputConnectManager>* instance = []() {
+    static std::shared_ptr<MultimodalInputConnectManager>* instance = []() {
         auto p = new std::shared_ptr<MultimodalInputConnectManager>(new MultimodalInputConnectManager());
         if (*p != nullptr) {
             (*p)->ConnectMultimodalInputService();
