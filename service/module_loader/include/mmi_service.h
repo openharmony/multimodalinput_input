@@ -222,7 +222,7 @@ public:
     void StopAncoUds();
     int32_t InjectKeyEventExt(const std::shared_ptr<KeyEvent> keyEvent, int32_t pid, bool isNativeInject);
     int32_t InjectPointerEventExt(int32_t userId, const std::shared_ptr<PointerEvent> pointerEvent, int32_t pid,
-        bool isNativeInject, bool isShell);
+        bool isNativeInject, bool isShell, int32_t useCoordinate);
     ErrCode AncoAddChannel(const sptr<IAncoChannel>& channel) override;
     ErrCode AncoRemoveChannel(const sptr<IAncoChannel>& channel) override;
     ErrCode CheckKnuckleEvent(float pointX, float pointY, bool &isKnuckleType) override;
@@ -369,7 +369,7 @@ private:
     ErrCode CheckControllerPermission();
     ErrCode CheckInjectKeyEventPermission(const std::shared_ptr<KeyEvent> keyEvent, bool isNativeInject);
     ErrCode CheckInjectPointerEventPermission(const std::shared_ptr<PointerEvent> pointerEvent,
-        bool isNativeInject);
+        bool isNativeInject, int32_t useCoordinate = PointerEvent::DISPLAY_COORDINATE);
 #ifdef OHOS_BUILD_ENABLE_CONTROLLER_INJECT
     int32_t ValidateControllerEventCoordinates(const std::shared_ptr<PointerEvent> pointerEvent);
 #endif // OHOS_BUILD_ENABLE_CONTROLLER_INJECT

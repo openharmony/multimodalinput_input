@@ -58,45 +58,64 @@ HWTEST_F(ExecutorTest, ExecuteCommand_EmptyArgs_PrintsGlobalHelp, TestSize.Level
     const CommandResult result = OHOS::MMI::InputCli::Run({});
     EXPECT_EQ(result.code, 0);
     EXPECT_TRUE(result.stdoutText.find("Usage:") != std::string::npos);
-    EXPECT_TRUE(result.stdoutText.find("mouse") != std::string::npos);
-    EXPECT_TRUE(result.stdoutText.find("key") != std::string::npos);
+    EXPECT_TRUE(result.stdoutText.find("mouse-click") != std::string::npos);
+    EXPECT_TRUE(result.stdoutText.find("key-press") != std::string::npos);
 }
 
-HWTEST_F(ExecutorTest, ExecuteCommand_TopLevelHelp_ListsDevicesAndExamples, TestSize.Level1)
+HWTEST_F(ExecutorTest, ExecuteCommand_TopLevelHelp_ListsCommandsAndExamples, TestSize.Level1)
 {
     const CommandResult result = OHOS::MMI::InputCli::Run({ "--help" });
     EXPECT_EQ(result.code, 0);
     EXPECT_TRUE(result.stdoutText.find("Usage:") != std::string::npos);
-    EXPECT_TRUE(result.stdoutText.find("mouse") != std::string::npos);
-    EXPECT_TRUE(result.stdoutText.find("key") != std::string::npos);
+    EXPECT_TRUE(result.stdoutText.find("mouse-click") != std::string::npos);
+    EXPECT_TRUE(result.stdoutText.find("key-press") != std::string::npos);
     EXPECT_TRUE(result.stdoutText.find("--version") != std::string::npos);
     EXPECT_TRUE(result.stdoutText.find("Examples:") != std::string::npos);
     ExpectHelpOptionColumnAligned(result.stdoutText);
 }
 
-HWTEST_F(ExecutorTest, ExecuteCommand_BareDevice_PrintsDeviceHelp, TestSize.Level1)
+HWTEST_F(ExecutorTest, ExecuteCommand_ClickHelp_ShowsUsageAndRules, TestSize.Level1)
 {
-    const CommandResult result = OHOS::MMI::InputCli::Run({ "key" });
+    const CommandResult result = OHOS::MMI::InputCli::Run({ "mouse-click", "--help" });
     EXPECT_EQ(result.code, 0);
-    EXPECT_TRUE(result.stdoutText.find("Usage:") != std::string::npos);
-    EXPECT_TRUE(result.stdoutText.find("SubCommands:") != std::string::npos);
-    EXPECT_TRUE(result.stdoutText.find("press") != std::string::npos);
+    EXPECT_TRUE(result.stdoutText.find("Usage:\n  ohos-input mouse-click [options]") != std::string::npos);
+    EXPECT_TRUE(result.stdoutText.find("(required, range: >=0)") != std::string::npos);
+    EXPECT_TRUE(result.stdoutText.find("[left, right, middle]") != std::string::npos);
+    EXPECT_TRUE(result.stdoutText.find("range: [50, 200], default: 100") != std::string::npos);
+    EXPECT_TRUE(result.stdoutText.find("ctrl|shift") != std::string::npos);
+    ExpectHelpOptionColumnAligned(result.stdoutText);
 }
 
-HWTEST_F(ExecutorTest, ExecuteCommand_DeviceHelp_ListsActions, TestSize.Level1)
+HWTEST_F(ExecutorTest, ExecuteCommand_DoubleClickHelp_ShowsIntervalRule, TestSize.Level1)
 {
-    const CommandResult key = OHOS::MMI::InputCli::Run({ "key", "--help" });
-    EXPECT_EQ(key.code, 0);
-    EXPECT_TRUE(key.stdoutText.find("Usage:") != std::string::npos);
-    EXPECT_TRUE(key.stdoutText.find("SubCommands:") != std::string::npos);
-    EXPECT_TRUE(key.stdoutText.find("press") != std::string::npos);
+    const CommandResult result = OHOS::MMI::InputCli::Run({ "mouse-double-click", "--help" });
+    EXPECT_EQ(result.code, 0);
+    EXPECT_TRUE(result.stdoutText.find("must be greater than holdDuration") != std::string::npos);
+    ExpectHelpOptionColumnAligned(result.stdoutText);
+}
+
+HWTEST_F(ExecutorTest, ExecuteCommand_ScrollHelp_ShowsClicksRule, TestSize.Level1)
+{
+    const CommandResult result = OHOS::MMI::InputCli::Run({ "mouse-scroll", "--help" });
+    EXPECT_EQ(result.code, 0);
+    EXPECT_TRUE(result.stdoutText.find("[-100, -1] or [1, 100]") != std::string::npos);
+    EXPECT_TRUE(result.stdoutText.find("1 click = 15 degrees") != std::string::npos);
+    ExpectHelpOptionColumnAligned(result.stdoutText);
+}
+
+HWTEST_F(ExecutorTest, ExecuteCommand_DragHelp_ShowsDurationRule, TestSize.Level1)
+{
+    const CommandResult result = OHOS::MMI::InputCli::Run({ "mouse-drag", "--help" });
+    EXPECT_EQ(result.code, 0);
+    EXPECT_TRUE(result.stdoutText.find("range: [0, 10000], 0 means instant, default: 0") != std::string::npos);
+    ExpectHelpOptionColumnAligned(result.stdoutText);
 }
 
 HWTEST_F(ExecutorTest, ExecuteCommand_KeyPressHelp_ShowsKeyRules, TestSize.Level1)
 {
-    const CommandResult result = OHOS::MMI::InputCli::Run({ "key", "press", "--help" });
+    const CommandResult result = OHOS::MMI::InputCli::Run({ "key-press", "--help" });
     EXPECT_EQ(result.code, 0);
-    EXPECT_TRUE(result.stdoutText.find("Usage:\n  ohos-input key press [options]") != std::string::npos);
+    EXPECT_TRUE(result.stdoutText.find("Usage:\n  ohos-input key-press [options]") != std::string::npos);
     EXPECT_TRUE(result.stdoutText.find("range: >=1") != std::string::npos);
     EXPECT_TRUE(result.stdoutText.find("[0, 10000], 0 means instant release") != std::string::npos);
     ExpectHelpOptionColumnAligned(result.stdoutText);
@@ -107,7 +126,7 @@ HWTEST_F(ExecutorTest, ExecuteCommand_HelpAnywhereInOptions_ShortCircuits, TestS
     MockControllerFixture fixture;
     std::vector<RecordedCall> calls;
     fixture.Configure(calls);
-    const CommandResult result = OHOS::MMI::InputCli::Run({ "key", "press", "--key", "1", "--help" });
+    const CommandResult result = OHOS::MMI::InputCli::Run({ "mouse-click", "--x", "1", "--help" });
     EXPECT_EQ(result.code, 0);
     EXPECT_TRUE(result.stdoutText.find("Usage:") != std::string::npos);
     EXPECT_TRUE(result.stdoutText.find("--holdDuration") != std::string::npos);
@@ -121,9 +140,9 @@ HWTEST_F(ExecutorTest, ExecuteCommand_Version_PrintsVersion, TestSize.Level1)
     EXPECT_EQ(result.stdoutText, std::string(OHOS_INPUT_VERSION) + "\n");
 }
 
-HWTEST_F(ExecutorTest, ExecuteCommand_UnknownDevice_ParameterErrorJson, TestSize.Level1)
+HWTEST_F(ExecutorTest, ExecuteCommand_UnknownCommand_ParameterErrorJson, TestSize.Level1)
 {
-    const CommandResult result = OHOS::MMI::InputCli::Run({ "unknown", "click" });
+    const CommandResult result = OHOS::MMI::InputCli::Run({ "unknown" });
     EXPECT_EQ(result.code, PARAMETER_EXIT);
     const auto parsed = ParseJson(result);
     EXPECT_EQ(parsed["errCode"], "ERR_PARAMETER_ERROR");
@@ -131,16 +150,9 @@ HWTEST_F(ExecutorTest, ExecuteCommand_UnknownDevice_ParameterErrorJson, TestSize
     EXPECT_EQ(parsed["data"], "");
 }
 
-HWTEST_F(ExecutorTest, ExecuteCommand_UnknownAction_ParameterErrorJson, TestSize.Level1)
-{
-    const CommandResult result = OHOS::MMI::InputCli::Run({ "key", "unknown" });
-    EXPECT_EQ(result.code, PARAMETER_EXIT);
-    EXPECT_EQ(ParseJson(result)["errMsg"], "Unknown command: unknown");
-}
-
 HWTEST_F(ExecutorTest, ExecuteCommand_MissingRequiredOption_ParameterErrorJson, TestSize.Level1)
 {
-    const CommandResult result = OHOS::MMI::InputCli::Run({ "key", "press" });
+    const CommandResult result = OHOS::MMI::InputCli::Run({ "mouse-click", "--y", "2" });
     EXPECT_EQ(result.code, PARAMETER_EXIT);
     const auto parsed = ParseJson(result);
     EXPECT_EQ(parsed["status"], "failed");
@@ -150,15 +162,10 @@ HWTEST_F(ExecutorTest, ExecuteCommand_MissingRequiredOption_ParameterErrorJson, 
 
 HWTEST_F(ExecutorTest, AllCommands_Available, TestSize.Level2)
 {
-    struct DeviceAction {
-        const char *device;
-        const char *action;
+    const std::vector<std::string> names = {
+        "mouse-click", "mouse-double-click", "mouse-scroll", "mouse-move", "mouse-drag", "key-press"
     };
-    const DeviceAction pairs[] = {
-        { "key", "press" },
-    };
-    for (const DeviceAction &pair : pairs) {
-        EXPECT_TRUE(GetCommand(pair.device, pair.action) != nullptr) <<
-            pair.device << " " << pair.action << " not registered";
+    for (const auto &name : names) {
+        EXPECT_TRUE(GetCommand(name) != nullptr) << name << " not registered";
     }
 }

@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_INPUT_KEY_PRESS_COMMAND_H
-#define OHOS_INPUT_KEY_PRESS_COMMAND_H
+#ifndef OHOS_INPUT_MOUSE_MOVE_TO_COMMAND_H
+#define OHOS_INPUT_MOUSE_MOVE_TO_COMMAND_H
 
 #include <cstdint>
 #include <string>
@@ -23,7 +23,7 @@
 #include "command.h"
 
 namespace OHOS::MMI::InputCli {
-class KeyPressCommand final : public Command {
+class MouseMoveToCommand final : public Command {
 public:
     std::string GetName() const override;
     std::string GetDescription() const override;

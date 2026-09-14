@@ -37,11 +37,23 @@ bool ParseInt(const std::string &value, int32_t &number)
 }
 
 bool ParseOptionPairs(const std::vector<std::string> &args, const std::set<std::string> &allowed,
-    Options &options)
+    Options &options, std::string &error)
 {
     for (size_t index = 0; index < args.size(); index += OPTION_PAIR_STRIDE) {
-        if (index + 1 >= args.size() || args[index].rfind("--", 0) != 0 || options.count(args[index]) != 0 ||
-            allowed.count(args[index]) == 0) {
+        if (index + 1 >= args.size() || args[index + 1].rfind("--", 0) == 0) {
+            error = args[index] + " requires a value";
+            return false;
+        }
+        if (args[index].rfind("--", 0) != 0) {
+            error = "unexpected argument: " + args[index];
+            return false;
+        }
+        if (options.count(args[index]) != 0) {
+            error = args[index] + " is specified more than once";
+            return false;
+        }
+        if (allowed.count(args[index]) == 0) {
+            error = "unknown option: " + args[index];
             return false;
         }
         options[args[index]] = args[index + 1];

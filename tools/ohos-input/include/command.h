@@ -28,7 +28,6 @@ using ParameterDoc = std::tuple<std::string, std::string>;
 class Command {
 public:
     virtual ~Command() = default;
-    virtual std::string GetDevice() const = 0;
     virtual std::string GetName() const = 0;
     virtual std::string GetDescription() const = 0;
     virtual std::string GetTitle() const = 0;
@@ -38,8 +37,7 @@ public:
     virtual int32_t Execute(const std::vector<std::string> &args) = 0;
 };
 
-std::shared_ptr<Command> GetCommand(const std::string &device, const std::string &name);
-std::vector<std::shared_ptr<Command>> GetCommandsByDevice(const std::string &device);
+std::shared_ptr<Command> GetCommand(const std::string &name);
 } // namespace OHOS::MMI::InputCli
 
 #endif

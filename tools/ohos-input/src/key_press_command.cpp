@@ -50,9 +50,8 @@ bool ParseKeyPressOptions(const std::vector<std::string> &args, KeyPressOptions 
     std::string &suggestion)
 {
     Options options;
-    if (!ParseOptionPairs(args, ALLOWED_OPTIONS, options)) {
-        error = "options must use documented --name value once";
-        suggestion = "Please use key press --help";
+    if (!ParseOptionPairs(args, ALLOWED_OPTIONS, options, error)) {
+        suggestion = "Please use key-press --help";
         return false;
     }
     const NumberRule keyRule {
@@ -95,14 +94,9 @@ bool ParseKeyPressOptions(const std::vector<std::string> &args, KeyPressOptions 
 }
 } // namespace
 
-std::string KeyPressCommand::GetDevice() const
-{
-    return "key";
-}
-
 std::string KeyPressCommand::GetName() const
 {
-    return "press";
+    return "key-press";
 }
 
 std::string KeyPressCommand::GetDescription() const
@@ -117,7 +111,7 @@ std::string KeyPressCommand::GetTitle() const
 
 std::string KeyPressCommand::GetUsage() const
 {
-    return "ohos-input key press [options]";
+    return "ohos-input key-press [options]";
 }
 
 std::vector<ParameterDoc> KeyPressCommand::GetParameters() const
@@ -135,16 +129,16 @@ std::vector<std::string> KeyPressCommand::GetExamples() const
 {
     return {
         "# Press Enter key (hold 100ms)",
-        "ohos-input key press --key 2054",
+        "ohos-input key-press --key 2054",
         "",
         "# Press A key for 200ms",
-        "ohos-input key press --key 2049 --holdDuration 200",
+        "ohos-input key-press --key 2049 --holdDuration 200",
         "",
         "# Ctrl+A (select all)",
-        "ohos-input key press --key 2049 --modifier ctrl",
+        "ohos-input key-press --key 2049 --modifier ctrl",
         "",
         "# Ctrl+Shift+S (save as), pressed in order: ctrl then shift; released: shift then ctrl",
-        "ohos-input key press --key 2066 --modifier ctrl|shift",
+        "ohos-input key-press --key 2066 --modifier ctrl|shift",
     };
 }
 
@@ -181,6 +175,6 @@ int32_t KeyPressCommand::Execute(const std::vector<std::string> &args)
     if (ret != 0) {
         return HandleControllerError(ret, "ReleaseKey");
     }
-    return OutputPrinter::PrintSuccess({ { "action", "key press" }, { "key", options.key } });
+    return OutputPrinter::PrintSuccess({ { "action", "key-press" }, { "key", options.key } });
 }
 } // namespace OHOS::MMI::InputCli

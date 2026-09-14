@@ -28,37 +28,26 @@ protected:
     void TearDown() override {}
 };
 
-HWTEST_F(CommandTableTest, GetCommand_KnownPair_Found, TestSize.Level1)
+HWTEST_F(CommandTableTest, GetCommand_KnownName_Found, TestSize.Level1)
 {
-    EXPECT_NE(GetCommand("key", "press"), nullptr);
-    EXPECT_EQ(GetCommand("key", "unknown"), nullptr);
-    EXPECT_EQ(GetCommand("unknown", "press"), nullptr);
+    EXPECT_NE(GetCommand("mouse-click"), nullptr);
+    EXPECT_EQ(GetCommand("unknown"), nullptr);
 }
 
-HWTEST_F(CommandTableTest, GetCommand_MouseActions_NotRegistered, TestSize.Level1)
+HWTEST_F(CommandTableTest, GetCommand_AllKnownNames_Found, TestSize.Level1)
 {
-    EXPECT_EQ(GetCommand("mouse", "click"), nullptr);
-    EXPECT_EQ(GetCommand("mouse", "double-click"), nullptr);
-    EXPECT_EQ(GetCommand("mouse", "scroll"), nullptr);
-    EXPECT_EQ(GetCommand("mouse", "move-to"), nullptr);
-    EXPECT_EQ(GetCommand("mouse", "drag"), nullptr);
-}
-
-HWTEST_F(CommandTableTest, GetCommandsByDevice_ReturnsDeclarationOrder, TestSize.Level1)
-{
-    const auto commands = GetCommandsByDevice("key");
-    const std::vector<std::string> expectedNames { "press" };
-    ASSERT_EQ(commands.size(), expectedNames.size());
-    for (size_t index = 0; index < commands.size(); ++index) {
-        EXPECT_EQ(commands[index]->GetName(), expectedNames[index]);
+    const std::vector<std::string> expectedNames {
+        "mouse-click", "mouse-double-click", "mouse-scroll", "mouse-move", "mouse-drag", "key-press"
+    };
+    for (const auto &name : expectedNames) {
+        EXPECT_NE(GetCommand(name), nullptr) << name << " not registered";
     }
-    EXPECT_TRUE(GetCommandsByDevice("mouse").empty());
 }
 
 HWTEST_F(CommandTableTest, GetCommand_RepeatedLookup_ReturnsSameObject, TestSize.Level1)
 {
-    const auto first = GetCommand("key", "press");
-    const auto second = GetCommand("key", "press");
+    const auto first = GetCommand("key-press");
+    const auto second = GetCommand("key-press");
     ASSERT_NE(first, nullptr);
     EXPECT_EQ(first, second);
 }

@@ -24,6 +24,12 @@ ohos_cli_executable("ohos-input") {
     "src/key_press_command.cpp",
     "src/main.cpp",
     "src/modifier.cpp",
+    "src/mouse_click_command.cpp",
+    "src/mouse_double_click_command.cpp",
+    "src/mouse_drag_command.cpp",
+    "src/mouse_move_to_command.cpp",
+    "src/mouse_scroll_command.cpp",
+    "src/mouse_support.cpp",
     "src/option_parser.cpp",
     "src/printer.cpp",
   ]

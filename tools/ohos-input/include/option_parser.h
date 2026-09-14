@@ -38,7 +38,7 @@ struct NumberRule {
 
 bool ParseInt(const std::string &value, int32_t &number);
 bool ParseOptionPairs(const std::vector<std::string> &args, const std::set<std::string> &allowed,
-    Options &options);
+    Options &options, std::string &error);
 bool ParseNumber(const Options &options, const NumberRule &rule, int32_t &value, std::string &error);
 NumberRule CoordinateRule(const std::string &optionName);
 NumberRule DisplayIdRule(const std::string &optionName);

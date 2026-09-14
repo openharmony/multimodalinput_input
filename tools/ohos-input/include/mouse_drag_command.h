@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_INPUT_KEY_PRESS_COMMAND_H
-#define OHOS_INPUT_KEY_PRESS_COMMAND_H
+#ifndef OHOS_INPUT_MOUSE_DRAG_COMMAND_H
+#define OHOS_INPUT_MOUSE_DRAG_COMMAND_H
 
 #include <cstdint>
 #include <string>
@@ -23,7 +23,25 @@
 #include "command.h"
 
 namespace OHOS::MMI::InputCli {
-class KeyPressCommand final : public Command {
+struct DragPath {
+    int32_t srcDisplayId;
+    int32_t srcX;
+    int32_t srcY;
+    int32_t dstDisplayId;
+    int32_t dstX;
+    int32_t dstY;
+};
+
+struct DragStep {
+    int32_t x { 0 };
+    int32_t y { 0 };
+    int32_t delayMs { 0 };
+    bool move { false };
+};
+
+std::vector<DragStep> BuildDragSteps(int32_t duration, const DragPath &path);
+
+class MouseDragCommand final : public Command {
 public:
     std::string GetName() const override;
     std::string GetDescription() const override;
