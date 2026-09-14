@@ -2467,7 +2467,7 @@ int32_t MMIService::CheckTouchPadEvent(int32_t userId, const std::shared_ptr<Poi
 }
 
 ErrCode MMIService::CheckInjectPointerEventPermission(const std::shared_ptr<PointerEvent> pointerEvent,
-    bool isNativeInject)
+    bool isNativeInject, int32_t useCoordinate)
 {
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
 #ifdef OHOS_BUILD_ENABLE_CONTROLLER_INJECT
@@ -2477,6 +2477,10 @@ ErrCode MMIService::CheckInjectPointerEventPermission(const std::shared_ptr<Poin
         if (ret != RET_OK) {
             MMI_HILOGE("Controller permission check failed for touch event, ret:%{public}d", ret);
             return ret;
+        }
+        if (useCoordinate == PointerEvent::GLOBAL_COORDINATE) {
+            MMI_HILOGD("Skip coordinate validation for global coordinate event");
+            return RET_OK;
         }
         ret = ValidateControllerEventCoordinates(pointerEvent);
         if (ret != RET_OK) {
@@ -2506,7 +2510,7 @@ ErrCode MMIService::InjectPointerEvent(const PointerEvent& pointerEvent, bool is
 
     auto pointerEventPtr = std::make_shared<PointerEvent>(pointerEvent);
     CHKPR(pointerEventPtr, ERROR_NULL_POINTER);
-    ErrCode permissionRet = CheckInjectPointerEventPermission(pointerEventPtr, isNativeInject);
+    ErrCode permissionRet = CheckInjectPointerEventPermission(pointerEventPtr, isNativeInject, useCoordinate);
     if (permissionRet != RET_OK) {
         return permissionRet;
     }
@@ -2521,7 +2525,7 @@ ErrCode MMIService::InjectPointerEvent(const PointerEvent& pointerEvent, bool is
     int32_t callingUid = GetCallingUid();
     pointerEventPtr->SetCallingUid(callingUid);
 #ifdef OHOS_BUILD_ENABLE_ANCO
-    ret = InjectPointerEventExt(userId, pointerEventPtr, pid, isNativeInject, isShell);
+    ret = InjectPointerEventExt(userId, pointerEventPtr, pid, isNativeInject, isShell, useCoordinate);
 #else
     ret = delegateTasks_.PostSyncTask(
         [this, userId, pointerEventPtr, pid, isNativeInject, isShell, useCoordinate] {
