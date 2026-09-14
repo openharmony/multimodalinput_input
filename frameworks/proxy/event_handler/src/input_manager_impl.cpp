@@ -268,9 +268,14 @@ int32_t InputManagerImpl::GetWindowMaxSize(int32_t maxAreasCount)
 void InputManagerImpl::SetEnhanceConfig(uint8_t *cfg, uint32_t cfgLen)
 {
     CALL_DEBUG_ENTER;
-    if (cfg == nullptr || cfgLen <= 0) {
+    if (cfg == nullptr || cfgLen == 0) {
         MMI_HILOGE("SecCompEnhance cfg info is empty");
         return; 
+    }
+    if (cfgLen > MAX_ENHANCE_CONFIG_SIZE) {
+        MMI_HILOGE("SecCompEnhance cfgLen(%{public}u) exceeds max limit(%{public}u)",
+            cfgLen, MAX_ENHANCE_CONFIG_SIZE);
+        return;
     }
     if (enhanceCfg_ != nullptr) {
         delete enhanceCfg_;
@@ -281,6 +286,8 @@ void InputManagerImpl::SetEnhanceConfig(uint8_t *cfg, uint32_t cfgLen)
     errno_t ret = memcpy_s(enhanceCfg_, cfgLen, cfg, cfgLen);
     if (ret != EOK) {
         MMI_HILOGE("The cfg memcpy failed");
+        delete enhanceCfg_;
+        enhanceCfg_ = nullptr;
         return;
     }
     enhanceCfgLen_ = cfgLen;
