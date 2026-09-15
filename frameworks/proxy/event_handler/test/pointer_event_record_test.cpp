@@ -15,6 +15,9 @@
 
 #include <gtest/gtest.h>
 
+#include <chrono>
+#include <thread>
+
 #include "define_multimodal.h"
 #include "input_manager.h"
 #include "input_manager_impl.h"
@@ -69,6 +72,19 @@ public:
     {
         InputMgrImpl.DisablePointerEventRecord();
     }
+    // Wait until the async consumer dispatch reaches expectedCount or times out.
+    // OnPointerEvent posts the dispatch to the EventHandler runner; asserting
+    // immediately races with the pending task in standalone UT execution.
+    void WaitForReceivedCount(uint32_t expectedCount, uint32_t timeoutMs = 3000)
+    {
+        constexpr uint32_t stepMs = 20;
+        for (uint32_t elapsed = 0; elapsed < timeoutMs; elapsed += stepMs) {
+            if (consumer_->GetReceivedCount() >= expectedCount) {
+                return;
+            }
+            std::this_thread::sleep_for(std::chrono::milliseconds(stepMs));
+        }
+    }
 
 private:
     std::shared_ptr<AppExecFwk::EventRunner> runner_;
@@ -101,6 +117,7 @@ HWTEST_F(PointerEventRecordTest, PointerEventRecord_EnableQueryDisable_001, Test
 
     InputMgrImpl.OnPointerEvent(event);
 
+    WaitForReceivedCount(1u);
     ASSERT_EQ(consumer_->GetReceivedCount(), 1u);
 
     std::vector<std::shared_ptr<PointerEvent>> records;
@@ -150,6 +167,7 @@ HWTEST_F(PointerEventRecordTest, PointerEventRecord_MultiTouchItems_002, TestSiz
 
     InputMgrImpl.OnPointerEvent(event);
 
+    WaitForReceivedCount(1u);
     ASSERT_EQ(consumer_->GetReceivedCount(), 1u);
     std::vector<std::shared_ptr<PointerEvent>> records;
     EXPECT_EQ(InputMgrImpl.GetPointerEventRecord(records), RET_OK);
@@ -195,6 +213,7 @@ HWTEST_F(PointerEventRecordTest, PointerEventRecord_FifoEvict_003, TestSize.Leve
         InputMgrImpl.OnPointerEvent(event);
     }
 
+    WaitForReceivedCount(static_cast<uint32_t>(driveCount));
     ASSERT_EQ(consumer_->GetReceivedCount(), static_cast<uint32_t>(driveCount));
     std::vector<std::shared_ptr<PointerEvent>> records;
     EXPECT_EQ(InputMgrImpl.GetPointerEventRecord(records), RET_OK);
@@ -248,6 +267,7 @@ HWTEST_F(PointerEventRecordTest, PointerEventRecord_DisabledNoRecord_005, TestSi
 
     InputMgrImpl.OnPointerEvent(event);
 
+    WaitForReceivedCount(1u);
     ASSERT_EQ(consumer_->GetReceivedCount(), 1u);
     std::vector<std::shared_ptr<PointerEvent>> records;
     EXPECT_EQ(InputMgrImpl.GetPointerEventRecord(records), RET_OK);
