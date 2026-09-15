@@ -35,6 +35,15 @@ namespace {
 constexpr const char* POWER_MANAGER_PROCESS = "powermgr";
 } // namespace
 
+// Singleton accessor using a "never-destruct" pattern.
+// The shared_ptr itself is heap-allocated via new (not a global variable),
+// so it is NOT destroyed during process exit(). The MultimodalInputConnectManager
+// object remains valid for the entire process lifetime, eliminating the race
+// between global destruction (on exit()) and EventRunner thread async tasks
+// that previously caused heap-use-after-free.
+// Thread safety: static local variable initialization is guaranteed by the
+// C++ runtime to execute exactly once. After initialization, the shared_ptr
+// pointed to by instance is read-only, so concurrent copies are safe.
 std::shared_ptr<MultimodalInputConnectManager> MultimodalInputConnectManager::GetInstance()
 {
     static std::shared_ptr<MultimodalInputConnectManager>* instance = []() {
