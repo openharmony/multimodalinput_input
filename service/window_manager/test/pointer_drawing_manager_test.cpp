@@ -1011,6 +1011,9 @@ HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_AdjustMouseFocusByDi
     CursorDrawingInformation::GetInstance().userIcon_ = std::make_unique<OHOS::Media::PixelMap>();
     pointerDrawingManager->currentMouseStyle_.id = MOUSE_ICON::DEVELOPER_DEFINED_ICON;
     pointerDrawingManager->AdjustMouseFocusByDirection0(ANGLE_NW, physicalX, physicalY);
+    EXPECT_EQ(pointerDrawingManager->GetUserIconCopy(false), nullptr);
+    EXPECT_NE(physicalX, 200);
+    EXPECT_NE(physicalY, 200);
     physicalX = 100;
     physicalY = 100;
     pointerDrawingManager->AdjustMouseFocusByDirection0(ANGLE_E, physicalX, physicalY);
@@ -2768,6 +2771,18 @@ HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_AdjustMouseFocusToSo
         EXPECT_EQ(physicalX, 125);
         EXPECT_EQ(physicalY, 75);
     }
+    physicalX = 100;
+    physicalY = 100;
+    pointerDrawingManager->RotateDegree(DIRECTION180);
+    pointerDrawingManager->AdjustMouseFocusToSoftRenderOrigin(
+        DIRECTION180, MOUSE_ICON::TEXT_CURSOR, physicalX, physicalY);
+    if (pointerDrawingManager->GetHardCursorEnabled()) {
+        EXPECT_NE(physicalX, 200);
+        EXPECT_NE(physicalY, 200);
+    } else {
+        EXPECT_EQ(physicalX, 125);
+        EXPECT_EQ(physicalY, 125);
+    }
 }
 
 /**
@@ -2815,6 +2830,17 @@ HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_AdjustMouseFocusToSo
     } else {
         EXPECT_EQ(physicalX, 125);
         EXPECT_EQ(physicalY, 75);
+    }
+    physicalX = 100;
+    physicalY = 100;
+    pointerDrawingManager->RotateDegree(DIRECTION180);
+    pointerDrawingManager->AdjustMouseFocusToSoftRenderOrigin(DIRECTION180, MOUSE_ICON::DEFAULT, physicalX, physicalY);
+    if (pointerDrawingManager->GetHardCursorEnabled()) {
+        EXPECT_NE(physicalX, 200);
+        EXPECT_NE(physicalY, 200);
+    } else {
+        EXPECT_EQ(physicalX, 125);
+        EXPECT_EQ(physicalY, 125);
     }
 }
 
@@ -2864,6 +2890,18 @@ HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_AdjustMouseFocusToSo
         EXPECT_NE(physicalX, 125);
         EXPECT_NE(physicalY, 75);
     }
+
+    physicalX = 100;
+    physicalY = 100;
+    pointerDrawingManager->RotateDegree(DIRECTION180);
+    pointerDrawingManager->AdjustMouseFocusToSoftRenderOrigin(DIRECTION180, MOUSE_ICON::DEFAULT, physicalX, physicalY);
+    if (pointerDrawingManager->GetHardCursorEnabled()) {
+        EXPECT_NE(physicalX, 200);
+        EXPECT_NE(physicalY, 200);
+    } else {
+        EXPECT_EQ(physicalX, 125);
+        EXPECT_EQ(physicalY, 125);
+    }
 }
 
 /**
@@ -2897,6 +2935,154 @@ HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_AdjustMouseFocusToSo
     pointerDrawingManager->AdjustMouseFocusToSoftRenderOrigin(DIRECTION270, MOUSE_ICON::DEFAULT, physicalX, physicalY);
     EXPECT_NE(physicalX, 200);
     EXPECT_NE(physicalY, 200);
+    physicalX = 100;
+    physicalY = 100;
+    pointerDrawingManager->RotateDegree(DIRECTION180);
+    pointerDrawingManager->AdjustMouseFocusToSoftRenderOrigin(DIRECTION180, MOUSE_ICON::DEFAULT, physicalX, physicalY);
+    EXPECT_NE(physicalX, 200);
+    EXPECT_NE(physicalY, 200);
+}
+
+/**
+ * @tc.name: PointerDrawingManagerTest_SetSurfaceNodeBounds_001
+ * @tc.desc: Test SetSurfaceNodeBounds with soft cursor (hardcursor disabled), null surfaceNode
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerTest, PointerDrawingManagerTest_SetSurfaceNodeBounds_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerDrawingManager pointerDrawingManager;
+    ASSERT_NE(pointerDrawingManager.hardwareCursorPointerManager_, nullptr);
+    pointerDrawingManager.hardwareCursorPointerManager_->isEnable_ = true;
+    pointerDrawingManager.hardwareCursorPointerManager_->isDeviceChange_ = true;
+    pointerDrawingManager.hardwareCursorPointerManager_->isEnableState_ = false;
+    EXPECT_FALSE(pointerDrawingManager.GetHardCursorEnabled());
+
+    pointerDrawingManager.SetSurfaceNode(nullptr);
+    pointerDrawingManager.canvasWidth_ = 0;
+    pointerDrawingManager.canvasHeight_ = 0;
+    pointerDrawingManager.cursorWidth_ = 1;
+    pointerDrawingManager.cursorHeight_ = 1;
+    pointerDrawingManager.lastPhysicalX_ = 100;
+    pointerDrawingManager.lastPhysicalY_ = 100;
+    pointerDrawingManager.displayInfo_.direction = DIRECTION0;
+    pointerDrawingManager.displayInfo_.displayDirection = DIRECTION0;
+    pointerDrawingManager.lastMouseStyle_.id = MOUSE_ICON::DEFAULT;
+    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.SetSurfaceNodeBounds());
+    EXPECT_EQ(pointerDrawingManager.canvasWidth_, (1 / 64 + 1) * 64);
+    EXPECT_EQ(pointerDrawingManager.canvasHeight_, (1 / 64 + 1) * 64);
+
+}
+
+/**
+ * @tc.name: PointerDrawingManagerTest_SetSurfaceNodeBounds_002
+ * @tc.desc: Test SetSurfaceNodeBounds with various directions (soft cursor)
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerTest, PointerDrawingManagerTest_SetSurfaceNodeBounds_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerDrawingManager pointerDrawingManager;
+    ASSERT_NE(pointerDrawingManager.hardwareCursorPointerManager_, nullptr);
+    pointerDrawingManager.hardwareCursorPointerManager_->isEnable_ = true;
+    pointerDrawingManager.hardwareCursorPointerManager_->isDeviceChange_ = true;
+    pointerDrawingManager.hardwareCursorPointerManager_->isEnableState_ = false;
+    EXPECT_FALSE(pointerDrawingManager.GetHardCursorEnabled());
+
+    pointerDrawingManager.imageWidth_ = 50;
+    pointerDrawingManager.imageHeight_ = 50;
+    pointerDrawingManager.canvasWidth_ = 64;
+    pointerDrawingManager.canvasHeight_ = 64;
+    pointerDrawingManager.cursorWidth_ = 50;
+    pointerDrawingManager.cursorHeight_ = 50;
+    pointerDrawingManager.lastPhysicalX_ = 100;
+    pointerDrawingManager.lastPhysicalY_ = 100;
+    pointerDrawingManager.lastMouseStyle_.id = MOUSE_ICON::DEFAULT;
+
+    pointerDrawingManager.displayInfo_.direction = DIRECTION0;
+    pointerDrawingManager.displayInfo_.displayDirection = DIRECTION0;
+    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.SetSurfaceNodeBounds());
+
+    pointerDrawingManager.displayInfo_.direction = DIRECTION90;
+    pointerDrawingManager.displayInfo_.displayDirection = DIRECTION90;
+    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.SetSurfaceNodeBounds());
+
+    pointerDrawingManager.displayInfo_.direction = DIRECTION180;
+    pointerDrawingManager.displayInfo_.displayDirection = DIRECTION180;
+    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.SetSurfaceNodeBounds());
+
+    pointerDrawingManager.displayInfo_.direction = DIRECTION270;
+    pointerDrawingManager.displayInfo_.displayDirection = DIRECTION270;
+    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.SetSurfaceNodeBounds());
+
+}
+
+/**
+ * @tc.name: PointerDrawingManagerTest_SetSurfaceNodeBounds_003
+ * @tc.desc: Test SetSurfaceNodeBounds with hard cursor enabled (early return)
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerTest, PointerDrawingManagerTest_SetSurfaceNodeBounds_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerDrawingManager pointerDrawingManager;
+    ASSERT_NE(pointerDrawingManager.hardwareCursorPointerManager_, nullptr);
+    pointerDrawingManager.hardwareCursorPointerManager_->isEnable_ = true;
+    pointerDrawingManager.hardwareCursorPointerManager_->isDeviceChange_ = true;
+    pointerDrawingManager.hardwareCursorPointerManager_->isEnableState_ = true;
+    EXPECT_TRUE(pointerDrawingManager.GetHardCursorEnabled());
+
+    pointerDrawingManager.canvasWidth_ = 0;
+    pointerDrawingManager.canvasHeight_ = 0;
+    pointerDrawingManager.cursorWidth_ = 1;
+    pointerDrawingManager.cursorHeight_ = 1;
+    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.SetSurfaceNodeBounds());
+    EXPECT_EQ(pointerDrawingManager.canvasWidth_, 0);
+    EXPECT_EQ(pointerDrawingManager.canvasHeight_, 0);
+
+}
+
+/**
+ * @tc.name: PointerDrawingManagerTest_SetSurfaceNodeBounds_004
+ * @tc.desc: Test SetSurfaceNodeBounds with non-null surfaceNode under sorftcursor
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerTest, PointerDrawingManagerTest_SetSurfaceNodeBounds_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerDrawingManager pointerDrawingManager;
+    ASSERT_NE(pointerDrawingManager.hardwareCursorPointerManager_, nullptr);
+    pointerDrawingManager.hardwareCursorPointerManager_->isEnable_ = true;
+    pointerDrawingManager.hardwareCursorPointerManager_->isDeviceChange_ = true;
+    pointerDrawingManager.hardwareCursorPointerManager_->isEnableState_ = false;
+    EXPECT_FALSE(pointerDrawingManager.GetHardCursorEnabled());
+
+    Rosen::RSSurfaceNodeConfig surfaceNodeConfig;
+    surfaceNodeConfig.SurfaceNodeName = "pointer window";
+    Rosen::RSSurfaceNodeType surfaceNodeType = Rosen::RSSurfaceNodeType::SELF_DRAWING_WINDOW_NODE;
+    auto surfaceNode = Rosen::RSSurfaceNode::Create(
+        surfaceNodeConfig, surfaceNodeType, true, false, rsUIContext_);
+    if (surfaceNode != nullptr) {
+        pointerDrawingManager.SetSurfaceNode(surfaceNode);
+    }
+
+    pointerDrawingManager.imageWidth_ = 50;
+    pointerDrawingManager.imageHeight_ = 50;
+    pointerDrawingManager.canvasWidth_ = 64;
+    pointerDrawingManager.canvasHeight_ = 64;
+    pointerDrawingManager.cursorWidth_ = 50;
+    pointerDrawingManager.cursorHeight_ = 50;
+    pointerDrawingManager.lastPhysicalX_ = 100;
+    pointerDrawingManager.lastPhysicalY_ = 100;
+    pointerDrawingManager.lastMouseStyle_.id = MOUSE_ICON::DEFAULT;
+
+    pointerDrawingManager.displayInfo_.direction = DIRECTION90;
+    pointerDrawingManager.displayInfo_.displayDirection = DIRECTION0;
+    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.SetSurfaceNodeBounds());
 }
 
 /**
