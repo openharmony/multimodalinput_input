@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2025 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -32,20 +32,31 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-std::shared_ptr<MultimodalInputConnectManager> g_instance = nullptr;
 constexpr const char* POWER_MANAGER_PROCESS = "powermgr";
 } // namespace
 
+// Singleton accessor using a "never-destruct" pattern.
+// The shared_ptr itself is heap-allocated via new (not a global variable),
+// so it is NOT destroyed during process exit(). The MultimodalInputConnectManager
+// object remains valid for the entire process lifetime, eliminating the race
+// between global destruction (on exit()) and EventRunner thread async tasks
+// that previously caused heap-use-after-free.
+// Thread safety: static local variable initialization is guaranteed by the
+// C++ runtime to execute exactly once. After initialization, the shared_ptr
+// pointed to by instance is read-only, so concurrent copies are safe.
 std::shared_ptr<MultimodalInputConnectManager> MultimodalInputConnectManager::GetInstance()
 {
-    static std::once_flag flag;
-    std::call_once(flag, [&]() { g_instance.reset(new (std::nothrow) MultimodalInputConnectManager()); });
-
-    CHKPP(g_instance);
-    if (g_instance != nullptr) {
-        g_instance->ConnectMultimodalInputService();
+    static std::shared_ptr<MultimodalInputConnectManager>* instance = []() {
+        auto p = new std::shared_ptr<MultimodalInputConnectManager>(new MultimodalInputConnectManager());
+        if (*p != nullptr) {
+            (*p)->ConnectMultimodalInputService();
+        }
+        return p;
+    }();
+    if (*instance == nullptr) {
+        return nullptr;
     }
-    return g_instance;
+    return *instance;
 }
 
 int32_t MultimodalInputConnectManager::AllocSocketPair(const int32_t moduleType)

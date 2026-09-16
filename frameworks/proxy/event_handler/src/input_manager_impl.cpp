@@ -62,6 +62,7 @@ constexpr int32_t MAX_WINDOW_SIZE { 15 };
 constexpr int32_t INPUT_SUCCESS { 0 };
 constexpr int32_t INPUT_PERMISSION_DENIED { 201 };
 [[ maybe_unused ]] constexpr int32_t INPUT_OCCUPIED_BY_OTHER { 4200003 };
+constexpr uint32_t MAX_ENHANCE_CONFIG_SIZE { 1000 };
 const std::map<int32_t, int32_t> g_keyActionMap = {
     {KeyEvent::KEY_ACTION_DOWN, KEY_ACTION_DOWN},
     {KeyEvent::KEY_ACTION_UP, KEY_ACTION_UP},
@@ -268,8 +269,13 @@ int32_t InputManagerImpl::GetWindowMaxSize(int32_t maxAreasCount)
 void InputManagerImpl::SetEnhanceConfig(uint8_t *cfg, uint32_t cfgLen)
 {
     CALL_DEBUG_ENTER;
-    if (cfg == nullptr || cfgLen <= 0) {
+    if (cfg == nullptr || cfgLen == 0) {
         MMI_HILOGE("SecCompEnhance cfg info is empty");
+        return;
+    }
+    if (cfgLen > MAX_ENHANCE_CONFIG_SIZE) {
+        MMI_HILOGE("SecCompEnhance cfgLen(%{public}u) exceeds max limit(%{public}u)",
+            cfgLen, MAX_ENHANCE_CONFIG_SIZE);
         return;
     }
     if (enhanceCfg_ != nullptr) {
@@ -281,6 +287,8 @@ void InputManagerImpl::SetEnhanceConfig(uint8_t *cfg, uint32_t cfgLen)
     errno_t ret = memcpy_s(enhanceCfg_, cfgLen, cfg, cfgLen);
     if (ret != EOK) {
         MMI_HILOGE("The cfg memcpy failed");
+        delete enhanceCfg_;
+        enhanceCfg_ = nullptr;
         return;
     }
     enhanceCfgLen_ = cfgLen;

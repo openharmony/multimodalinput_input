@@ -232,7 +232,9 @@ bool MultimodalEventHandler::InitClient(EventHandlerPtr eventHandler)
     }
     EventHandlerPtr eventHandlerPtr = client_->GetEventHandler();
     CHKPF(eventHandlerPtr);
-    if (!eventHandlerPtr->PostTask([this] { SetClientInfo(GetPid(), GetThisThreadId()); })) {
+    auto connectMgr = MultimodalInputConnectManager::GetInstance();
+    if (!eventHandlerPtr->PostTask(
+        [this, connectMgr] { SetClientInfo(GetPid(), GetThisThreadId()); })) {
         MMI_HILOGE("Send reconnect event failed");
         return false;
     }
@@ -317,8 +319,9 @@ int32_t MultimodalEventHandler::CancelInjection()
 int32_t MultimodalEventHandler::SetClientInfo(int32_t pid, uint64_t readThreadId)
 {
     CALL_DEBUG_ENTER;
-    CHKPR(MULTIMODAL_INPUT_CONNECT_MGR, RET_ERR);
-    return MULTIMODAL_INPUT_CONNECT_MGR->SetClientInfo(pid, readThreadId);
+    auto connectMgr = MultimodalInputConnectManager::GetInstance();
+    CHKPR(connectMgr, RET_ERR);
+    return connectMgr->SetClientInfo(pid, readThreadId);
 }
 
 static void ReadMaxTouchPoints(cJSON *jsonProductCfg, int32_t &maxMultiTouchPointNum)
