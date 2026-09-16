@@ -16,9 +16,7 @@
 #ifndef JS_UTIL_H
 #define JS_UTIL_H
 
-#include <atomic>
 #include <functional>
-#include <mutex>
 #include <uv.h>
 
 #include "napi/native_node_api.h"
