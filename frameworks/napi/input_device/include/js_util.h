@@ -16,7 +16,9 @@
 #ifndef JS_UTIL_H
 #define JS_UTIL_H
 
+#include <atomic>
 #include <functional>
+#include <mutex>
 #include <uv.h>
 
 #include "napi/native_node_api.h"
@@ -50,6 +52,7 @@ public:
     };
     struct CallbackInfo : RefBase {
         napi_env env { nullptr };
+        std::mutex envMutex_;
         napi_ref ref { nullptr };
         napi_deferred deferred { nullptr };
         int32_t errCode { -1 };
@@ -59,6 +62,11 @@ public:
         bool setFuncKeyType { false };
         bool getFuncKeyType { false };
         std::function<void(int32_t)> histogramError {};
+        bool hasEnvCleanupHook_ {false};
+
+        CallbackInfo() = default;
+        explicit CallbackInfo(napi_env env);
+        ~CallbackInfo();
     };
     struct DeviceType {
         std::string sourceTypeName;
