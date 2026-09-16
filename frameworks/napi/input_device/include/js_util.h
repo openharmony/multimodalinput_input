@@ -76,7 +76,6 @@ public:
     static bool GetDeviceAxisInfo(sptr<CallbackInfo> cb, napi_value &object);
     static bool GetDeviceSourceType(sptr<CallbackInfo> cb, napi_value &object);
     static bool TypeOf(napi_env env, napi_value value, napi_valuetype type);
-    static void DeleteCallbackInfo(std::unique_ptr<CallbackInfo> callback);
     template <typename T>
     static void DeletePtr(T &ptr)
     {
