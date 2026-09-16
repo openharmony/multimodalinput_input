@@ -1315,8 +1315,7 @@ void JsEventTarget::AddListener(napi_env env, const std::string &type, napi_valu
         }
         napi_ref ref = nullptr;
         CHKRV(napi_create_reference(env, handle, 1, &ref), CREATE_REFERENCE);
-        auto monitor = std::make_unique<JsUtil::CallbackInfo>();
-        monitor->env = env;
+        auto monitor = std::make_unique<JsUtil::CallbackInfo>(env);
         monitor->ref = ref;
         iter->second.push_back(std::move(monitor));
         isListening = isListeningProcess_;
@@ -1353,7 +1352,6 @@ void JsEventTarget::RemoveListener(napi_env env, const std::string &type, napi_v
             }
             if (JsUtil::IsSameHandle(env, handle, (*it)->ref)) {
                 MMI_HILOGD("Succeeded in removing monitor");
-                JsUtil::DeleteCallbackInfo(std::move(*it));
                 it = iter->second.erase(it);
                 goto monitorLabel;
             }
