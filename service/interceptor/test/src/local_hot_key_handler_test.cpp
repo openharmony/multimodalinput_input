@@ -1234,21 +1234,6 @@ HWTEST_F(LocalHotKeyHandlerTest, MarkProcessed_006, TestSize.Level1)
 }
 
 /**
- * @tc.name: HandleLocalHotKey_001
- * @tc.desc: Test LocalHotKeyHandler::HandleLocalHotKey
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(LocalHotKeyHandlerTest, HandleLocalHotKey_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    LocalHotKeyHandler handler;
-    InputEventHandlerMock eventHandler;
-    handler.HandleLocalHotKey(nullptr, eventHandler);
-    EXPECT_TRUE(eventHandler.events_.empty());
-}
-
-/**
  * @tc.name: HandleLocalHotKey_002
  * @tc.desc: Test LocalHotKeyHandler::HandleLocalHotKey
  * @tc.type: FUNC

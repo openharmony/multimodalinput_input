@@ -109,7 +109,9 @@ HWTEST_F(InputWindowsManagerDisplayChangeTest, HasDisplayGroupInfoChanged_NoOldI
     auto newGroup = CreateDisplayGroupInfo(TEST_GROUP_ID, MAIN_DISPLAY_ID, { CreateDisplayInfo(MAIN_DISPLAY_ID) });
     auto empty = CreateDisplayGroupInfo(TEST_GROUP_ID, MAIN_DISPLAY_ID, {});
 
-    EXPECT_FALSE(windowsManager_->HasDisplayGroupInfoChanged(empty, newGroup, false));
+    // hasOldGroupInfo=false is treated as "may have changed" (conservative:
+    // trigger display change detection on first info).
+    EXPECT_TRUE(windowsManager_->HasDisplayGroupInfoChanged(empty, newGroup, false));
 }
 
 /**

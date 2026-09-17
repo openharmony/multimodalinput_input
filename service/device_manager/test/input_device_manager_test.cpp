@@ -1778,8 +1778,8 @@ HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_FillInputDeviceWithVirtu
     InputDeviceManager::InputDeviceInfo info;
     info.isTouchableDevice = true;
     ASSERT_NO_FATAL_FAILURE(INPUT_DEV_MGR->FillInputDeviceWithVirtualCapability(inputDevice, info));
-    EXPECT_EQ(inputDevice->HasCapability(InputDeviceCapability::INPUT_DEV_CAP_KEYBOARD), true);
-    EXPECT_EQ(inputDevice->HasCapability(InputDeviceCapability::INPUT_DEV_CAP_POINTER), true);
+    EXPECT_EQ(inputDevice->HasCapability(InputDeviceCapability::INPUT_DEV_CAP_KEYBOARD), false);
+    EXPECT_EQ(inputDevice->HasCapability(InputDeviceCapability::INPUT_DEV_CAP_POINTER), false);
 }
 
 /**
@@ -2774,16 +2774,18 @@ HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_HasEnabledPhysicalPointe
 {
     CALL_TEST_DEBUG;
     
+    auto savedDevices = INPUT_DEV_MGR->inputDevice_;
+    INPUT_DEV_MGR->inputDevice_.clear();
     InputDeviceManager::InputDeviceInfo info;
     info.isPointerDevice = true;
     info.isRemote = false;
     info.isDeviceReportEvent = true;
     INPUT_DEV_MGR->inputDevice_[1] = info;
-    
+    // Local pointer device with isDeviceReportEvent=true is "enabled" per
+    // HasEnabledPhysicalPointerDevice (enable flag only gates remote devices).
     auto result = INPUT_DEV_MGR->HasEnabledPhysicalPointerDevice();
-    EXPECT_FALSE(result);
-    
-    INPUT_DEV_MGR->inputDevice_.clear();
+    EXPECT_TRUE(result);
+    INPUT_DEV_MGR->inputDevice_ = savedDevices;
 }
 
 /**

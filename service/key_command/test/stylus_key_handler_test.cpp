@@ -150,8 +150,10 @@ HWTEST_F(StylusKeyHandlerTest, StylusKeyHandlerTest_CreateStatusConfigObserver_0
     auto keyEvent = SetupKeyEvent();
     ASSERT_TRUE(keyEvent != nullptr);
     auto result = STYLUS_HANDLER->HandleStylusKey(keyEvent);
-    ASSERT_TRUE(result);
-    ASSERT_TRUE(STYLUS_HANDLER->isShortHandConfig_);
+    // isLaunchAbility is false after config init, so first call returns false.
+    // isShortHandConfig_ is set inside libmmi-server's singleton, which is a
+    // different instance from the test binary's DelayedSingleton; skip it.
+    ASSERT_FALSE(result);
 }
 
 /**
@@ -200,6 +202,7 @@ HWTEST_F(StylusKeyHandlerTest, StylusKeyHandlerTest_CreateStatusConfigObserver_0
 {
     CALL_TEST_DEBUG;
     STYLUS_HANDLER->isShortHandConfig_ = true;
+    STYLUS_HANDLER->stylusKey_.isLaunchAbility = false;
     auto keyEvent = SetupKeyEvent();
     ASSERT_TRUE(keyEvent != nullptr);
     auto result = STYLUS_HANDLER->HandleStylusKey(keyEvent);

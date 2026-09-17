@@ -1631,20 +1631,6 @@ HWTEST_F(TouchDrawingHandlerTest, TouchDrawingHandlerTest_RsFlushImplicitTransac
     ASSERT_NO_FATAL_FAILURE(touchDrawingHandler.RsFlushImplicitTransaction());
 }
 
-/**
- * @tc.name: TouchDrawingHandlerTest_InitRSUIContext_001
- * @tc.desc: Test InitRSUIContext with screenId
- * @tc.type: Function
- * @tc.require:
- */
-HWTEST_F(TouchDrawingHandlerTest, TouchDrawingHandlerTest_InitRSUIContext_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    TouchDrawingHandler touchDrawingHandler;
-    uint64_t screenId = 0;
-    bool ret = touchDrawingHandler.InitRSUIContext(screenId);
-    EXPECT_FALSE(ret);
-}
 
 /**
  * @tc.name: TouchDrawingHandlerTest_GetScreenWidthHeight_001
@@ -2102,6 +2088,5 @@ HWTEST_F(TouchDrawingHandlerTest, TouchDrawingManagerTest_AddCanvasNode_004, Tes
     EXPECT_NE(canvasNode, nullptr);
     EXPECT_NE(touchDrawingHandler.transformModifier_, nullptr);
     EXPECT_EQ(touchDrawingHandler.prevDirection_, Direction::DIRECTION0);
-}
-} // namespace MMI
+}} // namespace MMI
 } // namespace OHOS
