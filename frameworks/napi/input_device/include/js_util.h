@@ -50,6 +50,7 @@ public:
     };
     struct CallbackInfo : RefBase {
         napi_env env { nullptr };
+        std::mutex envMutex_;
         napi_ref ref { nullptr };
         napi_deferred deferred { nullptr };
         int32_t errCode { -1 };
@@ -59,6 +60,11 @@ public:
         bool setFuncKeyType { false };
         bool getFuncKeyType { false };
         std::function<void(int32_t)> histogramError {};
+        bool hasEnvCleanupHook_ {false};
+
+        CallbackInfo() = default;
+        explicit CallbackInfo(napi_env env);
+        ~CallbackInfo();
     };
     struct DeviceType {
         std::string sourceTypeName;
@@ -70,7 +76,6 @@ public:
     static bool GetDeviceAxisInfo(sptr<CallbackInfo> cb, napi_value &object);
     static bool GetDeviceSourceType(sptr<CallbackInfo> cb, napi_value &object);
     static bool TypeOf(napi_env env, napi_value value, napi_valuetype type);
-    static void DeleteCallbackInfo(std::unique_ptr<CallbackInfo> callback);
     template <typename T>
     static void DeletePtr(T &ptr)
     {

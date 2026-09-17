@@ -50,6 +50,16 @@ JsUtil::DeviceType g_deviceType[] = {
     { "joystick", EVDEV_UDEV_TAG_JOYSTICK },
     { "trackball", EVDEV_UDEV_TAG_TRACKBALL },
 };
+
+static void EnvCleanUp(void *data)
+{
+    if (data == nullptr) {
+        return;
+    }
+    auto* info = reinterpret_cast<JsUtil::CallbackInfo *>(data);
+    std::lock_guard<std::mutex> lock(info->envMutex_);
+    info->env = nullptr;
+}
 } // namespace
 bool JsUtil::IsSameHandle(napi_env env, napi_value handle, napi_ref ref)
 {
@@ -238,14 +248,31 @@ bool JsUtil::TypeOf(napi_env env, napi_value value, napi_valuetype type)
     return true;
 }
 
-void JsUtil::DeleteCallbackInfo(std::unique_ptr<CallbackInfo> callback)
+JsUtil::CallbackInfo::CallbackInfo(napi_env env):env(env)
 {
-    CALL_DEBUG_ENTER;
-    CHKPV(callback);
-    if (callback->ref != nullptr && callback->env != nullptr) {
-        CHKRV(napi_delete_reference(callback->env, callback->ref), DELETE_REFERENCE);
-        callback->env = nullptr;
+    hasEnvCleanupHook_= true;
+    (void)napi_add_env_cleanup_hook(env, EnvCleanUp, this);
+}
+
+JsUtil::CallbackInfo::~CallbackInfo()
+{
+    if (!hasEnvCleanupHook_) {
+        return;
     }
+    std::lock_guard<std::mutex> lock(envMutex_);
+    if (env == nullptr) {
+        return;
+    }
+    (void)napi_remove_env_cleanup_hook(env, EnvCleanUp, this);
+    if (ref == nullptr) {
+        return;
+    }
+    uint32_t refcount = 0;
+    CHKRV(napi_reference_unref(env, ref, &refcount), REFERENCE_UNREF);
+    if (refcount == 0) {
+        CHKRV(napi_delete_reference(env, ref), DELETE_REFERENCE);
+    }
+    ref = nullptr;
 }
 } // namespace MMI
 } // namespace OHOS
