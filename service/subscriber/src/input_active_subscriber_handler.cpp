@@ -315,8 +315,8 @@ void InputActiveSubscriberHandler::NotifySubscriber(
     }
     int32_t fd = subscriber->sess_->GetFd();
     pkt << subscriber->id_;
-    MMI_HILOGI("Notify subscriber id: %{public}d, keycode:%{private}d, pid: %{public}d",
-        subscriber->id_, keyEvent->GetKeyCode(), subscriber->sess_->GetPid());
+    MMI_HILOGI("Notify subscriber id: %{public}d, keycode:%{private}d, pid: %{public}d, targetDisplayId:%{public}d",
+        subscriber->id_, keyEvent->GetKeyCode(), subscriber->sess_->GetPid(), keyEvent->GetTargetDisplayId());
     if (pkt.ChkRWError()) {
         MMI_HILOGE("Packet write dispatch subscriber failed");
         return;

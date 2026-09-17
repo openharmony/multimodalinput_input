@@ -1025,8 +1025,8 @@ void KeySubscriberHandler::NotifySubscriber(std::shared_ptr<KeyEvent> keyEvent,
     CHKPV(sess);
     int32_t fd = sess->GetFd();
     pkt << fd << subscriber->id_;
-    MMI_HILOGW("Notify subscriber id:%{public}d, code:%{private}d, pid:%{public}d",
-        subscriber->id_, keyEvent->GetKeyCode(), sess->GetPid());
+    MMI_HILOGW("Notify subscriber id:%{public}d, code:%{private}d, pid:%{public}d, targetDisplayId:%{public}d",
+        subscriber->id_, keyEvent->GetKeyCode(), sess->GetPid(), keyEvent->GetTargetDisplayId());
     if (pkt.ChkRWError()) {
         MMI_HILOGE("Packet write dispatch subscriber failed");
         return;
