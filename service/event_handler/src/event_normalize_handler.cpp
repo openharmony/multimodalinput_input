@@ -532,6 +532,7 @@ int32_t EventNormalizeHandler::HandleKeyboardEvent(libinput_event* event)
         lastPressedKey = pressedKeys.back();
         MMI_HILOGD("The last repeat button, keyCode:%{private}d", lastPressedKey);
     }
+    keyEvent->SetTargetDisplayId(-1);
     WIN_MGR->HandleKeyEventWindowId(keyEvent);
     auto packageResult = KeyEventHdr->Normalize(event, keyEvent);
 
@@ -576,6 +577,7 @@ int32_t EventNormalizeHandler::HandleKeyboardEvent(libinput_event* event)
     CHKPR(device, RET_ERR);
     MMI_HILOGI("InputTracking id:%{public}d event created by:%{public}s", keyEvent->GetId(), device->GetName().c_str());
     UpdateKeyEventHandlerChain(keyEvent);
+    MMI_HILOGI("displayId:%{public}d", keyEvent->GetTargetDisplayId());
 #ifdef SHORTCUT_KEY_RULES_ENABLED
     KEY_SHORTCUT_MGR->UpdateShortcutConsumed(keyEvent);
 #endif // SHORTCUT_KEY_RULES_ENABLED

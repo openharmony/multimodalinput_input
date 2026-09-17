@@ -7421,23 +7421,24 @@ void InputWindowsManager::CreatePrivacyProtectionObserver(T& item)
 void InputWindowsManager::ApplyBoundDisplayId(std::shared_ptr<KeyEvent> keyEvent)
 {
     CHKPV(keyEvent);
+    if (keyEvent->HasFlag(InputEvent::EVENT_FLAG_SIMULATE)) {
+        return;
+    }
     int32_t deviceId = keyEvent->GetDeviceId();
     int32_t bindDisplayId = bindInfo_.GetBindDisplayIdByInputDevice(deviceId);
     if (bindDisplayId >= 0) {
         keyEvent->SetTargetDisplayId(bindDisplayId);
     }
-    if (!keyEvent->HasFlag(InputEvent::EVENT_FLAG_SIMULATE)) {
-        // Assign the counter directly from the authoritative pressed-keys count. This is
-        // state-based, so it is idempotent under the double-dispatch (pre/post Normalize) of this
-        // function and immune to auto-repeat ticks (a repeat does not change how many keys are
-        // held). When no key is held, drop the counter and flush any pending bind.
-        int32_t pressedCount = static_cast<int32_t>(keyEvent->GetPressedKeys().size());
-        if (pressedCount > 0) {
-            activeSequenceCount_[deviceId] = pressedCount;
-        } else {
-            activeSequenceCount_.erase(deviceId);
-            FlushPendingBind(deviceId);
-        }
+    // Assign the counter directly from the authoritative pressed-keys count. This is
+    // state-based, so it is idempotent under the double-dispatch (pre/post Normalize) of this
+    // function and immune to auto-repeat ticks (a repeat does not change how many keys are
+    // held). When no key is held, drop the counter and flush any pending bind.
+    int32_t pressedCount = static_cast<int32_t>(keyEvent->GetPressedKeys().size());
+    if (pressedCount > 0) {
+        activeSequenceCount_[deviceId] = pressedCount;
+    } else {
+        activeSequenceCount_.erase(deviceId);
+        FlushPendingBind(deviceId);
     }
 }
 
@@ -7445,6 +7446,9 @@ void InputWindowsManager::ApplyBoundDisplayId(std::shared_ptr<KeyEvent> keyEvent
 void InputWindowsManager::ApplyBoundDisplayId(std::shared_ptr<PointerEvent> pointerEvent)
 {
     CHKPV(pointerEvent);
+    if (pointerEvent->HasFlag(InputEvent::EVENT_FLAG_SIMULATE)) {
+        return;
+    }
     int32_t deviceId = pointerEvent->GetDeviceId();
     int32_t bindDisplayId = bindInfo_.GetBindDisplayIdByInputDevice(deviceId);
     if (bindDisplayId >= 0) {
