@@ -344,6 +344,9 @@ bool PointerDrawingManager::CreateGroupContext(int32_t groupId, uint64_t rsId)
     screenId_ = rsId;
     AttachToDisplay();
     CreateCanvasNode();
+    if (InitLayer(MOUSE_ICON(lastMouseStyle_.id)) != RET_OK) {
+        MMI_HILOGE("Init layer failed, groupId:%{public}d rsId:%{public}" PRIu64, groupId, rsId);
+    }
     RsFlushImplicitTransaction();
     std::unique_lock<std::mutex> lockGuard(surfaceNodeMutex_);
     activeGroupId_ = groupId;
