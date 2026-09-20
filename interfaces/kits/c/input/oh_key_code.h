@@ -1688,47 +1688,47 @@ typedef enum {
      * PTZ click
      * @since 26.0.1
      */
-    KEYCODE_PTZ_CLICK = 3235,
+    OH_INPUT_KEYCODE_PTZ_CLICK = 3235,
     /**
      * PTZ focus left
      * @since 26.0.1
      */
-    KEYCODE_PTZ_FOCUS_LEFT = 3236,
+    OH_INPUT_KEYCODE_PTZ_FOCUS_LEFT = 3236,
     /**
      * PTZ focus right
      * @since 26.0.1
      */
-    KEYCODE_PTZ_FOCUS_RIGHT = 3237,
+    OH_INPUT_KEYCODE_PTZ_FOCUS_RIGHT = 3237,
     /**
      * PTZ expose left
      * @since 26.0.1
      */
-    KEYCODE_PTZ_EXPOSE_LEFT = 3238,
+    OH_INPUT_KEYCODE_PTZ_EXPOSE_LEFT = 3238,
     /**
      * PTZ expose right
      * @since 26.0.1
      */
-    KEYCODE_PTZ_EXPOSE_RIGHT = 3239,
+    OH_INPUT_KEYCODE_PTZ_EXPOSE_RIGHT = 3239,
     /**
      * PTZ shutter left
      * @since 26.0.1
      */
-    KEYCODE_PTZ_SHUTTER_LEFT = 3240,
+    OH_INPUT_KEYCODE_PTZ_SHUTTER_LEFT = 3240,
     /**
      * PTZ shutter right
      * @since 26.0.1
      */
-    KEYCODE_PTZ_SHUTTER_RIGHT = 3241,
+    OH_INPUT_KEYCODE_PTZ_SHUTTER_RIGHT = 3241,
     /**
      * PTZ aperture left
      * @since 26.0.1
      */
-    KEYCODE_PTZ_APERTURE_LEFT = 3242,
+    OH_INPUT_KEYCODE_PTZ_APERTURE_LEFT = 3242,
     /**
      * PTZ aperture right
      * @since 26.0.1
      */
-    KEYCODE_PTZ_APERTURE_RIGHT = 3243,
+    OH_INPUT_KEYCODE_PTZ_APERTURE_RIGHT = 3243,
     /**
      * Wrist Turn key
      * @since 26.0.0
