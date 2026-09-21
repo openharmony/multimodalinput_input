@@ -374,7 +374,9 @@ ITouchDrawingHandler* TouchDrawingManager::GetTouchDrawingHandler() const
 
 void TouchDrawingManager::UnloadTouchDrawingHandler()
 {
-    if (bubbleMode_.isShow || pointerMode_.isShow) {
+    bool isShow = (screenRecondingBubbleStatus_ == "true") ||
+        ((screenRecondingBubbleStatus_ == "") && (bubbleMode_.isShow == true));
+    if (isShow || pointerMode_.isShow) {
         return;
     }
     touchDrawingHandler_ = { nullptr, ComponentManager::Component<ITouchDrawingHandler>() };
