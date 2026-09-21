@@ -200,6 +200,7 @@ void PointerDrawingManager::RsRemoteDiedCallback()
     g_isHdiRemoteDied = true;
     g_isReStartVsync = true;
     isHardCursorSurfaceNodeInited_ = false;
+    isPointerCallbackInited_.store(false);
 #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
     MAGIC_CURSOR->RsRemoteDiedCallbackForMagicCursor();
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
@@ -234,6 +235,10 @@ void PointerDrawingManager::InitPointerThread()
 
 void PointerDrawingManager::InitPointerCallback()
 {
+    if (isPointerCallbackInited_.exchange(true)) {
+        MMI_HILOGI("Pointer callback is already initialized, skip re-initialization");
+        return;
+    }
     InitRsCallback();
     if (GetSurfaceNode() != nullptr) {
         SetSurfaceNode(nullptr);
@@ -2451,11 +2456,11 @@ int32_t PointerDrawingManager::GetPointerColor(int32_t userId)
     std::string name = POINTER_COLOR;
     GetPreferenceKey(name);
     int32_t pointerColor = DEFAULT_VALUE;
-    
+
     bool configLoaded = INPUT_SETTING_MANAGER->IsUserConfigLoaded(userId);
-    
+
     INPUT_SETTING_MANAGER->GetIntValue(userId, MOUSE_KEY_SETTING, name, pointerColor);
-    
+
     if (configLoaded) {
         {
             std::lock_guard<std::mutex> guard(configCacheMutex_);
@@ -2475,7 +2480,7 @@ int32_t PointerDrawingManager::GetPointerColor(int32_t userId)
         }
         tempPointerColor_ = pointerColor;
     }
-    
+
     if (pointerColor == DEFAULT_VALUE) {
         pointerColor = MIN_POINTER_COLOR;
     }
@@ -2589,11 +2594,11 @@ int32_t PointerDrawingManager::GetPointerSize(int32_t userId)
     std::string name = POINTER_SIZE;
     GetPreferenceKey(name);
     int32_t pointerSize = DEFAULT_POINTER_SIZE;
-    
+
     bool configLoaded = INPUT_SETTING_MANAGER->IsUserConfigLoaded(userId);
-    
+
     INPUT_SETTING_MANAGER->GetIntValue(userId, MOUSE_KEY_SETTING, name, pointerSize);
-    
+
     if (configLoaded) {
         {
             std::lock_guard<std::mutex> guard(configCacheMutex_);
@@ -2613,7 +2618,7 @@ int32_t PointerDrawingManager::GetPointerSize(int32_t userId)
         }
         MMI_HILOGD("Get pointer size successfully, pointerSize:%{public}d", pointerSize);
     }
-    
+
     return pointerSize;
 }
 

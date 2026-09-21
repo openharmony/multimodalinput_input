@@ -437,6 +437,7 @@ private:
     std::atomic<bool> moveFinished_ { false };
     std::mutex cursorBlurEnableMutex_;
     bool isRsRemoteDied_ { false };
+    std::atomic<bool> isPointerCallbackInited_ { false };
     std::atomic<bool> isHardCursorSurfaceNodeInited_ { false };
 };
 } // namespace MMI

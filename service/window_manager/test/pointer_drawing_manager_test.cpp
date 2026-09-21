@@ -2159,6 +2159,31 @@ HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_InitPointerCallback_
 }
 
 /**
+ * @tc.name: InputWindowsManagerTest_InitPointerCallback_004
+ * @tc.desc: Test InitPointerCallback is skipped after pointer callback initialized
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_InitPointerCallback_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerDrawingManager pointerDrawingManager;
+    pointerDrawingManager.isPointerCallbackInited_.store(true);
+    pointerDrawingManager.initEventHandlerFlag_.store(true);
+    Rosen::RSSurfaceNodeConfig surfaceNodeConfig;
+    surfaceNodeConfig.SurfaceNodeName = "pointer window";
+    Rosen::RSSurfaceNodeType surfaceNodeType = Rosen::RSSurfaceNodeType::CURSOR_NODE;
+    std::shared_ptr<Rosen::RSSurfaceNode> surfaceNode =
+        Rosen::RSSurfaceNode::Create(surfaceNodeConfig, surfaceNodeType, true, false, rsUIContext_);
+    ASSERT_NE(surfaceNode, nullptr);
+    pointerDrawingManager.SetSurfaceNode(surfaceNode);
+
+    pointerDrawingManager.InitPointerCallback();
+    ASSERT_EQ(pointerDrawingManager.isPointerCallbackInited_.load(), true);
+    ASSERT_EQ(pointerDrawingManager.GetSurfaceNode(), surfaceNode);
+}
+
+/**
  * @tc.name: InputWindowsManagerTest_InitPointerObserver_001
  * @tc.desc: Test InitPointerObserver
  * @tc.type: FUNC
