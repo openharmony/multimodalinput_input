@@ -44,19 +44,25 @@ constexpr const char* POWER_MANAGER_PROCESS = "powermgr";
 // Thread safety: static local variable initialization is guaranteed by the
 // C++ runtime to execute exactly once. After initialization, the shared_ptr
 // pointed to by instance is read-only, so concurrent copies are safe.
+// Connection note: ConnectMultimodalInputService() is called on EVERY GetInstance()
+// (fast no-op while the service proxy is valid), so a connection that failed on
+// first use - e.g. service not yet registered - is retried by later calls instead
+// of leaving multimodalInputConnectService_ null for the whole process lifetime.
+// Allocations use nothrow new per coding guidelines; on allocation failure
+// GetInstance() returns nullptr.
 std::shared_ptr<MultimodalInputConnectManager> MultimodalInputConnectManager::GetInstance()
 {
     static std::shared_ptr<MultimodalInputConnectManager>* instance = []() {
-        auto p = new std::shared_ptr<MultimodalInputConnectManager>(new MultimodalInputConnectManager());
-        if (*p != nullptr) {
-            (*p)->ConnectMultimodalInputService();
-        }
-        return p;
+        auto object = new (std::nothrow) MultimodalInputConnectManager();
+        return new (std::nothrow) std::shared_ptr<MultimodalInputConnectManager>(object);
     }();
-    if (*instance == nullptr) {
+    if (instance == nullptr || *instance == nullptr) {
+        MMI_HILOGE("instance is null");
         return nullptr;
     }
-    return *instance;
+    auto manager = *instance;
+    manager->ConnectMultimodalInputService();
+    return manager;
 }
 
 int32_t MultimodalInputConnectManager::AllocSocketPair(const int32_t moduleType)
