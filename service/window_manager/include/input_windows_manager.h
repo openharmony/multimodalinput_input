@@ -293,6 +293,8 @@ public:
     int32_t GetDisplayId(std::shared_ptr<InputEvent> inputEvent) const;
     int32_t FindDisplayGroupId(int32_t displayId) const;
 private:
+    int32_t GetDefaultGroupId() const;
+    const OLD::DisplayGroupInfo* GetDefaultGroupInfo() const;
     bool NeedTouchTracking(PointerEvent &event) const;
     void ProcessTouchTracking(std::shared_ptr<PointerEvent> event, const WindowInfo &targetWindow);
     bool IgnoreTouchEvent(std::shared_ptr<PointerEvent> pointerEvent);

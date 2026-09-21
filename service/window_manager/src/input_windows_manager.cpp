@@ -688,6 +688,26 @@ void InputWindowsManager::FoldScreenRotation(std::shared_ptr<PointerEvent> point
 }
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 
+int32_t InputWindowsManager::GetDefaultGroupId() const
+{
+    for (const auto& it : displayGroupInfoMap_) {
+        if (it.second.type == GroupType::GROUP_DEFAULT) {
+            return it.second.groupId;
+        }
+    }
+    return DEFAULT_GROUP_ID;
+}
+
+const OLD::DisplayGroupInfo* InputWindowsManager::GetDefaultGroupInfo() const
+{
+    for (const auto& it : displayGroupInfoMap_) {
+        if (it.second.type == GroupType::GROUP_DEFAULT) {
+            return &it.second;
+        }
+    }
+    return nullptr;
+}
+
 int32_t InputWindowsManager::FindDisplayGroupId(int32_t displayId) const
 {
     for (const auto& it : displayGroupInfoMap_) {
@@ -697,7 +717,8 @@ int32_t InputWindowsManager::FindDisplayGroupId(int32_t displayId) const
             }
         }
     }
-    return DEFAULT_GROUP_ID;
+    MMI_HILOG_DISPATCHD("DisplayId:%{public}d", displayId);
+    return GetDefaultGroupId();
 }
 
 int32_t InputWindowsManager::FindDisplayUserId(int32_t displayId) const
@@ -721,7 +742,7 @@ int32_t InputWindowsManager::FindGroupIdByRsId(uint64_t rsId) const
             }
         }
     }
-    return DEFAULT_GROUP_ID;
+    return GetDefaultGroupId();
 }
 
 bool InputWindowsManager::HasMultipleActiveUsers() const
@@ -2280,8 +2301,9 @@ void InputWindowsManager::PrintWindowNavbar(int32_t groupId)
 bool InputWindowsManager::JudgeCameraInFore()
 {
     CALL_DEBUG_ENTER;
-    int32_t focWid = GetFocusWindowId(MAIN_GROUPID);
-    int mainDisplayId = GetMainDisplayId(MAIN_GROUPID);
+    int32_t defaultGroupId = GetDefaultGroupId();
+    int32_t focWid = GetFocusWindowId(defaultGroupId);
+    int mainDisplayId = GetMainDisplayId(defaultGroupId);
     int32_t focPid = GetPidByDisplayIdAndWindowId(mainDisplayId, focWid);
     if (udsServer_ == nullptr) {
         MMI_HILOGW("The udsServer is nullptr");
@@ -2301,8 +2323,7 @@ void InputWindowsManager::InitDisplayGroupInfo(OLD::DisplayGroupInfo &displayGro
     int32_t groupId = displayGroupInfo.groupId;
     if (displayGroupInfo.type == GroupType::GROUP_DEFAULT) {
         if (groupId != MAIN_GROUPID) {
-            MMI_HILOGE("The groupId is incorrect, groupId:%{public}d", groupId);
-            return;
+            MMI_HILOGI("GROUP_DEFAULT with groupId:%{public}d", groupId);
         }
     }
     displayGroupInfoMap_[groupId] = displayGroupInfo;
@@ -2380,8 +2401,8 @@ void InputWindowsManager::UpdateDisplayInfo(OLD::DisplayGroupInfo &displayGroupI
         if (hasChanged) {
             auto pluginMgr = InputPluginManager::GetInstance();
             if (pluginMgr != nullptr) {
-                pluginMgr->NotifyDisplayChange();
                 MMI_HILOGI("Notified display info changed to plugins");
+                pluginMgr->NotifyDisplayChange();
             }
         }
 
@@ -2530,7 +2551,8 @@ void InputWindowsManager::AdjustDragPosition(int32_t groupId)
 
 DisplayMode InputWindowsManager::GetDisplayMode() const
 {
-    const auto iter = displayModeMap_.find(MAIN_GROUPID);
+    int32_t defaultGroupId = GetDefaultGroupId();
+    const auto iter = displayModeMap_.find(defaultGroupId);
     if (iter != displayModeMap_.end()) {
         return iter->second;
     }
@@ -2590,6 +2612,8 @@ void InputWindowsManager::PointerDrawingManagerOnDisplayInfo(const OLD::DisplayG
 {
     if (!INPUT_DEV_MGR->HasPointerDeviceIncludingVirtual()) {
         MMI_HILOGI("OnDisplayInfo no pointer device");
+        int32_t defaultGroupId = GetDefaultGroupId();
+        NotifyPointerToWindow(defaultGroupId);
         return;
     }
     auto currentDisplayInfo = CursorDrawingComponent::GetInstance().GetCurrentDisplayInfo();
@@ -2919,7 +2943,7 @@ void InputWindowsManager::SendPointerEvent(int32_t pointerAction)
     lastLogicY_ = mouseLocation.physicalY + displayInfoY;
     if (pointerAction == PointerEvent::POINTER_ACTION_ENTER_WINDOW ||
         Rosen::SceneBoardJudgement::IsSceneBoardEnabled()) {
-        auto touchWindow = GetWindowInfo(lastLogicX_, lastLogicY_, MAIN_GROUPID);
+        auto touchWindow = GetWindowInfo(lastLogicX_, lastLogicY_, GetDefaultGroupId());
         if (!touchWindow) {
             MMI_HILOGE("TouchWindow is nullptr");
             return;
@@ -3007,7 +3031,7 @@ void InputWindowsManager::DispatchPointer(int32_t pointerAction, int32_t windowI
             (eventAction >= PointerEvent::POINTER_ACTION_AXIS_BEGIN &&
             eventAction <= PointerEvent::POINTER_ACTION_AXIS_END);
         if (checkFlag) {
-            windowInfo = GetWindowInfo(lastLogicX_, lastLogicY_, MAIN_GROUPID);
+            windowInfo = GetWindowInfo(lastLogicX_, lastLogicY_, GetDefaultGroupId());
         } else {
             windowInfo = SelectWindowInfo(lastLogicX_, lastLogicY_, lastPointerEventCopy);
         }
@@ -3031,7 +3055,7 @@ void InputWindowsManager::DispatchPointer(int32_t pointerAction, int32_t windowI
         double cursorPosx = 0.0;
         double cursorPosy = 0.0;
 
-        const auto iter = mouseLocationMap_.find(MAIN_GROUPID);
+        const auto iter = mouseLocationMap_.find(GetDefaultGroupId());
         if (iter != mouseLocationMap_.end()) {
             displayId = iter->second.displayId;
             cursorPosx = iter->second.physicalX;
@@ -3845,10 +3869,9 @@ const std::vector<OLD::DisplayInfo>& InputWindowsManager::GetDisplayInfoVector(i
         const auto &displaysInfo = groupInfo->second.displaysInfo;
         return displaysInfo;
     }
-    const auto &mainGroupInfo = displayGroupInfoMap_.find(MAIN_GROUPID);
-    if (mainGroupInfo != displayGroupInfoMap_.end()) {
-        const auto &displaysInfo = mainGroupInfo->second.displaysInfo;
-        return displaysInfo;
+    auto defaultGroup = GetDefaultGroupInfo();
+    if (defaultGroup != nullptr) {
+        return defaultGroup->displaysInfo;
     }
     return displayGroupInfo_.displaysInfo;
 }
@@ -3870,10 +3893,9 @@ const std::vector<WindowInfo>& InputWindowsManager::GetWindowInfoVector(int32_t 
         const auto &windowsInfo = groupInfo->second.windowsInfo;
         return windowsInfo;
     }
-    const auto &mainGroupInfo = displayGroupInfoMap_.find(MAIN_GROUPID);
-    if (mainGroupInfo != displayGroupInfoMap_.end()) {
-        const auto &windowsInfo = mainGroupInfo->second.windowsInfo;
-        return windowsInfo;
+    auto defaultGroup = GetDefaultGroupInfo();
+    if (defaultGroup != nullptr) {
+        return defaultGroup->windowsInfo;
     }
     return displayGroupInfo_.windowsInfo;
 }
@@ -3884,9 +3906,9 @@ int32_t InputWindowsManager::GetFocusWindowId(int32_t groupId) const
     if (iter != displayGroupInfoMap_.end()) {
         return iter->second.focusWindowId;
     }
-    iter = displayGroupInfoMap_.find(MAIN_GROUPID);
-    if (iter != displayGroupInfoMap_.end()) {
-        return iter->second.focusWindowId;
+    auto defaultGroup = GetDefaultGroupInfo();
+    if (defaultGroup != nullptr) {
+        return defaultGroup->focusWindowId;
     }
     return 0;
 }
@@ -4745,7 +4767,7 @@ void InputWindowsManager::UpdatePointerChangeAreas()
 {
     CALL_DEBUG_ENTER;
     if (Rosen::SceneBoardJudgement::IsSceneBoardEnabled()) {
-        const auto iter = displayGroupInfoMapTmp_.find(MAIN_GROUPID);
+        const auto iter = displayGroupInfoMapTmp_.find(GetDefaultGroupId());
         if(iter == displayGroupInfoMapTmp_.end()) {
             return;
         }
@@ -5483,14 +5505,15 @@ int32_t InputWindowsManager::SetMouseCaptureMode(int32_t windowId, bool isCaptur
         MMI_HILOGE("Windowid(%{public}d) is invalid", windowId);
         return RET_ERR;
     }
-    auto itr = captureModeInfoMap_.find(MAIN_GROUPID);
+    int32_t defaultGroupId = GetDefaultGroupId();
+    auto itr = captureModeInfoMap_.find(defaultGroupId);
     if (itr != captureModeInfoMap_.end()) {
         if (itr->second.isCaptureMode == isCaptureMode && !isCaptureMode) {
             MMI_HILOGE("Windowid:(%{public}d) is not capture mode", windowId);
             return RET_OK;
         }
-        captureModeInfoMap_[MAIN_GROUPID].windowId = windowId;
-        captureModeInfoMap_[MAIN_GROUPID].isCaptureMode = isCaptureMode;
+        captureModeInfoMap_[defaultGroupId].windowId = windowId;
+        captureModeInfoMap_[defaultGroupId].isCaptureMode = isCaptureMode;
     }
     MMI_HILOGI("Windowid:(%{public}d) is (%{public}d)", windowId, isCaptureMode);
     return RET_OK;
@@ -5499,7 +5522,7 @@ int32_t InputWindowsManager::SetMouseCaptureMode(int32_t windowId, bool isCaptur
 bool InputWindowsManager::GetMouseIsCaptureMode() const
 {
     CALL_DEBUG_ENTER;
-    auto itr = captureModeInfoMap_.find(MAIN_GROUPID);
+    auto itr = captureModeInfoMap_.find(GetDefaultGroupId());
     if (itr != captureModeInfoMap_.end()) {
         return itr->second.isCaptureMode;
     }
@@ -7945,9 +7968,10 @@ void InputWindowsManager::UpdateAndAdjustMouseLocation(int32_t& displayId, doubl
 
 MouseLocation InputWindowsManager::GetMouseInfo()
 {
-    auto &displaysInfoVector = GetDisplayInfoVector(MAIN_GROUPID);
+    int32_t defaultGroupId = GetDefaultGroupId();
+    auto &displaysInfoVector = GetDisplayInfoVector(defaultGroupId);
     MouseLocation curMouseLocation;
-    const auto iter = mouseLocationMap_.find(MAIN_GROUPID);
+    const auto iter = mouseLocationMap_.find(defaultGroupId);
     if (iter != mouseLocationMap_.end()) {
         curMouseLocation = iter->second;
     }
@@ -7958,11 +7982,11 @@ MouseLocation InputWindowsManager::GetMouseInfo()
 #ifdef OHOS_BUILD_ENABLE_EXTERNAL_SCREEN
         (void)GetMainScreenDisplayInfo(displaysInfoVector, displayInfo);
 #endif // OHOS_BUILD_ENABLE_EXTERNAL_SCREEN
-        const auto iter = mouseLocationMap_.find(MAIN_GROUPID);
+        const auto iter = mouseLocationMap_.find(defaultGroupId);
         if (iter != mouseLocationMap_.end()) {
-            mouseLocationMap_[MAIN_GROUPID].displayId = displayInfo.id;
-            mouseLocationMap_[MAIN_GROUPID].physicalX = displayInfo.validWidth / TWOFOLD;
-            mouseLocationMap_[MAIN_GROUPID].physicalY = displayInfo.validHeight / TWOFOLD;
+            mouseLocationMap_[defaultGroupId].displayId = displayInfo.id;
+            mouseLocationMap_[defaultGroupId].physicalX = displayInfo.validWidth / TWOFOLD;
+            mouseLocationMap_[defaultGroupId].physicalY = displayInfo.validHeight / TWOFOLD;
             curMouseLocation = iter->second;
         }
         MMI_HILOGD("Mouselocation displayinfo: displayId:%{public}d, W:%{public}d, H:%{public}d",
@@ -7977,9 +8001,10 @@ MouseLocation InputWindowsManager::GetMouseInfo()
 CursorPosition InputWindowsManager::GetCursorPos()
 {
     CALL_DEBUG_ENTER;
-    auto &displaysInfoVector = GetDisplayInfoVector(MAIN_GROUPID);
+    int32_t defaultGroupId = GetDefaultGroupId();
+    auto &displaysInfoVector = GetDisplayInfoVector(defaultGroupId);
     CursorPosition cursorPos;
-    const auto iter = cursorPosMap_.find(MAIN_GROUPID);
+    const auto iter = cursorPosMap_.find(defaultGroupId);
     if (iter != cursorPosMap_.end()) {
         cursorPos = iter->second;
     }
@@ -7988,7 +8013,7 @@ CursorPosition InputWindowsManager::GetCursorPos()
 #ifdef OHOS_BUILD_ENABLE_EXTERNAL_SCREEN
         (void)GetMainScreenDisplayInfo(displaysInfoVector, displayInfo);
 #endif // OHOS_BUILD_ENABLE_EXTERNAL_SCREEN
-        const auto iter = cursorPosMap_.find(MAIN_GROUPID);
+        const auto iter = cursorPosMap_.find(defaultGroupId);
         if (iter != cursorPosMap_.end()) {
             int32_t validW = displayInfo.validWidth;
             int32_t validH = displayInfo.validHeight;
@@ -7996,12 +8021,12 @@ CursorPosition InputWindowsManager::GetCursorPos()
             if (direction == DIRECTION90 || direction == DIRECTION270) {
                 std::swap(validW, validH);
             }
-            cursorPosMap_[MAIN_GROUPID].displayId = displayInfo.id;
-            cursorPosMap_[MAIN_GROUPID].cursorPos.x = validW * HALF_RATIO;
-            cursorPosMap_[MAIN_GROUPID].cursorPos.y = validH * HALF_RATIO;
-            cursorPosMap_[MAIN_GROUPID].direction = displayInfo.direction;
-            cursorPosMap_[MAIN_GROUPID].displayDirection = displayInfo.displayDirection;
-            cursorPos = cursorPosMap_[MAIN_GROUPID];
+            cursorPosMap_[defaultGroupId].displayId = displayInfo.id;
+            cursorPosMap_[defaultGroupId].cursorPos.x = validW * HALF_RATIO;
+            cursorPosMap_[defaultGroupId].cursorPos.y = validH * HALF_RATIO;
+            cursorPosMap_[defaultGroupId].direction = displayInfo.direction;
+            cursorPosMap_[defaultGroupId].displayDirection = displayInfo.displayDirection;
+            cursorPos = cursorPosMap_[defaultGroupId];
         }
     }
     return cursorPos;
@@ -8010,7 +8035,8 @@ CursorPosition InputWindowsManager::GetCursorPos()
 CursorPosition InputWindowsManager::ResetCursorPos()
 {
     CALL_DEBUG_ENTER;
-    auto &displaysInfoVector = GetDisplayInfoVector(MAIN_GROUPID);
+    int32_t defaultGroupId = GetDefaultGroupId();
+    auto &displaysInfoVector = GetDisplayInfoVector(defaultGroupId);
     if (!displaysInfoVector.empty()) {
         OLD::DisplayInfo displayInfo = displaysInfoVector[0];
 #ifdef OHOS_BUILD_ENABLE_EXTERNAL_SCREEN
@@ -8028,24 +8054,24 @@ CursorPosition InputWindowsManager::ResetCursorPos()
         if (displayDirection == DIRECTION90 || displayDirection == DIRECTION270) {
             std::swap(x, y);
         }
-        const auto iter = cursorPosMap_.find(MAIN_GROUPID);
+        const auto iter = cursorPosMap_.find(defaultGroupId);
         if (iter != cursorPosMap_.end()) {
-            cursorPosMap_[MAIN_GROUPID].displayId = displayInfo.id;
-            cursorPosMap_[MAIN_GROUPID].cursorPos.x = x;
-            cursorPosMap_[MAIN_GROUPID].cursorPos.y = y;
-            cursorPosMap_[MAIN_GROUPID].direction = displayInfo.direction;
-            cursorPosMap_[MAIN_GROUPID].displayDirection = displayInfo.displayDirection;
+            cursorPosMap_[defaultGroupId].displayId = displayInfo.id;
+            cursorPosMap_[defaultGroupId].cursorPos.x = x;
+            cursorPosMap_[defaultGroupId].cursorPos.y = y;
+            cursorPosMap_[defaultGroupId].direction = displayInfo.direction;
+            cursorPosMap_[defaultGroupId].displayDirection = displayInfo.displayDirection;
         }
     } else {
-        const auto iter = cursorPosMap_.find(MAIN_GROUPID);
+        const auto iter = cursorPosMap_.find(defaultGroupId);
         if (iter != cursorPosMap_.end()) {
-            cursorPosMap_[MAIN_GROUPID].displayId = -1;
-            cursorPosMap_[MAIN_GROUPID].cursorPos.x = 0;
-            cursorPosMap_[MAIN_GROUPID].cursorPos.y = 0;
+            cursorPosMap_[defaultGroupId].displayId = -1;
+            cursorPosMap_[defaultGroupId].cursorPos.x = 0;
+            cursorPosMap_[defaultGroupId].cursorPos.y = 0;
         }
     }
     CursorPosition cursorPos;
-    const auto iter = cursorPosMap_.find(MAIN_GROUPID);
+    const auto iter = cursorPosMap_.find(defaultGroupId);
     if (iter != cursorPosMap_.end()) {
         cursorPos = iter->second;
     }
@@ -8546,7 +8572,7 @@ int32_t InputWindowsManager::CheckWindowIdPermissionByPid(int32_t windowId, int3
 void InputWindowsManager::ReverseXY(int32_t &x, int32_t &y)
 {
     CALL_DEBUG_ENTER;
-    auto &DisplaysInfo = GetDisplayInfoVector(MAIN_GROUPID);
+    auto &DisplaysInfo = GetDisplayInfoVector(GetDefaultGroupId());
     if (DisplaysInfo.empty()) {
         MMI_HILOGE("DisplaysInfo is empty");
         return;
@@ -8989,6 +9015,7 @@ bool InputWindowsManager::IsBackCenterDisplayChange(const OLD::DisplayGroupInfo 
             return true;
         }
     }
+    MMI_HILOGD("No condition matched, no need center");
     return false;
 }
 
