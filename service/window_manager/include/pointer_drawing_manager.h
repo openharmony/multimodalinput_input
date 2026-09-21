@@ -343,6 +343,9 @@ private:
     void DestroyPointerWindowOfHardCursor();
     void DestroyPointerWindowOfSoftCursor();
     void ScalePixelMap(Media::PixelMap* pixelMap, float xScale, float yScale);
+    std::vector<sptr<OHOS::Rosen::ScreenInfo>> FilterOutScreensWithDisableCursor(
+        const std::vector<sptr<OHOS::Rosen::ScreenInfo>> &screens);
+    bool IsDisableCursorScreen(uint64_t rsId);
 private:
     bool hasDisplay_ { false };
     bool hasPointerDevice_ { false };
