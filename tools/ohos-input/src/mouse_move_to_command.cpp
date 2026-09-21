@@ -59,7 +59,8 @@ std::vector<ParameterDoc> MouseMoveToCommand::GetParameters() const
         { "--x <integer>", "Target X coordinate (required, range: >=0)" },
         { "--y <integer>", "Target Y coordinate (required, range: >=0)" },
         { "--modifier <keys>",
-            "Modifier keys, pipe-separated, in press order (optional, e.g. ctrl|shift, no duplicates)" },
+            "Modifier keys (optional, values: [ctrl, alt, shift, meta], pipe-separated with |, in press order, "
+            "no duplicates)" },
     };
 }
 

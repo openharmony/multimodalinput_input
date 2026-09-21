@@ -21,9 +21,9 @@
 #include "error_multimodal.h"
 
 namespace OHOS::MMI::InputCli {
-int32_t OutputPrinter::PrintSuccess(const nlohmann::json &data)
+int32_t OutputPrinter::PrintSuccess(const nlohmann::ordered_json &data)
 {
-    std::cout << nlohmann::json { { "type", "result" }, { "status", "success" }, { "data", data } }.dump()
+    std::cout << nlohmann::ordered_json { { "type", "result" }, { "status", "success" }, { "data", data } }.dump()
               << std::endl;
     return 0;
 }
@@ -31,7 +31,7 @@ int32_t OutputPrinter::PrintSuccess(const nlohmann::json &data)
 int32_t OutputPrinter::PrintError(const std::string &errCode, const std::string &errMsg, const std::string &suggestion,
     int32_t exitCode)
 {
-    std::cout << nlohmann::json { { "type", "result" }, { "status", "failed" }, { "data", "" },
+    std::cout << nlohmann::ordered_json { { "type", "result" }, { "status", "failed" },
         { "errCode", errCode }, { "errMsg", errMsg }, { "suggestion", suggestion } }.dump()
               << std::endl;
     return exitCode;

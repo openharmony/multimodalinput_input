@@ -7,14 +7,14 @@
 | 修饰键测试 | 4 | 所有（修饰键解析，前置拦截） |
 | 选项解析测试 | 10 | 所有（选项白名单与数值规则） |
 | 注册表测试 | 3 | 所有（命令注册与查找） |
-| 输出打印测试 | 5 | 所有（JSON 输出格式验证） |
+| 输出打印测试 | 7 | 所有（JSON 输出格式与字段顺序验证） |
 | 错误处理测试 | 2 | 所有（错误码验证） |
 | 执行器测试 | 13 | 所有（命令注册、帮助路由、版本） |
 | 鼠标支持测试 | 5 | mouse-click / mouse-scroll（齿数与按键名验证） |
 | 拖动命令测试 | 5 | mouse-drag（插值步进验证） |
 | 集成测试 | 13 | 所有 6 个命令（mock Controller 工作流验证） |
 | 控制器工厂测试 | 6 | 所有（Controller 创建契约） |
-| **总计** | **66** | **所有 6 个命令** |
+| **总计** | **68** | **所有 6 个命令** |
 
 ## 命令测试矩阵
 
@@ -72,8 +72,8 @@
 | 测试用例 | 命令示例 | 说明 | 权限 | 前置依赖 | 预期结果 |
 |-----------|-----------------|-------------|------------|------------|-----------------|
 | 回车键 | `ohos-input key-press --key 2054` | 按下回车，默认按住 100ms | `ohos.permission.CONTROL_DEVICE` | 无 | 成功：`data:{action:"key-press",key:2054}` |
-| Ctrl+A 组合 | `ohos-input key-press --key 2049 --modifier ctrl` | 全选 | `ohos.permission.CONTROL_DEVICE` | 无 | 成功：data 含 `key:2049` |
-| 三键组合 | `ohos-input key-press --key 2066 --modifier ctrl\|shift` | 按下为书写顺序，抬起为逆序 | `ohos.permission.CONTROL_DEVICE` | 无 | 成功 |
+| Ctrl+A 组合 | `ohos-input key-press --key 2017 --modifier ctrl` | 全选 | `ohos.permission.CONTROL_DEVICE` | 无 | 成功：data 含 `key:2017` |
+| 三键组合 | `ohos-input key-press --key 2035 --modifier ctrl\|shift` | 按下为书写顺序，抬起为逆序 | `ohos.permission.CONTROL_DEVICE` | 无 | 成功 |
 | 键码重复 | `ohos-input key-press --key 2072 --modifier ctrl` | 2072 为 ctrl 修饰键码，不得重复 | 无 | 无 | 失败：`ERR_PARAMETER_ERROR`，退出码 2 |
 | 键码越界 | `ohos-input key-press --key 0` | 键码须 ≥1 | 无 | 无 | 失败：`ERR_PARAMETER_ERROR`，退出码 2 |
 | 时长越界 | `ohos-input key-press --key 2049 --holdDuration 10001` | 超出 [0,10000] 上界 | 无 | 无 | 失败：`ERR_PARAMETER_ERROR`，退出码 2 |
@@ -111,7 +111,7 @@ ohos-input mouse-click --x 100 --y 200
 ohos-input mouse-double-click --x 100 --y 200
 
 # 4. Ctrl+A 全选
-ohos-input key-press --key 2049 --modifier ctrl
+ohos-input key-press --key 2017 --modifier ctrl
 
 # 5. 滚动浏览内容
 ohos-input mouse-scroll --clicks -3
@@ -140,10 +140,10 @@ ohos-input mouse-double-click --displayId 1 --x 200 --y 200
 ohos-input mouse-click --x 100 --y 200
 
 # 2. Ctrl+A 全选已有内容
-ohos-input key-press --key 2049 --modifier ctrl
+ohos-input key-press --key 2017 --modifier ctrl
 
 # 3. 输入字母 A（覆盖）
-ohos-input key-press --key 2049
+ohos-input key-press --key 2017
 
 # 4. 回车提交
 ohos-input key-press --key 2054
@@ -164,7 +164,7 @@ ohos-input key-press --key 2054
 | `--clickInterval` | mouse-double-click | [100, 400] ms 且 > holdDuration | 250 | `99`、`401`、`200`（当 holdDuration=250） |
 | `--clicks` | mouse-scroll | [-100,-1] ∪ [1,100] 齿 | 必填 | `0`、`101`、`-101` |
 | `--duration` | mouse-drag | [0, 10000] ms（0 表示瞬间完成） | 0 | `10001`、`-1` |
-| `--key` | key-press | 整数 ≥1（如 2049=A、2054=回车） | 必填 | `0`、与修饰键键码重复 |
+| `--key` | key-press | 整数 ≥1（如 2017=A、2054=回车） | 必填 | `0`、与修饰键键码重复 |
 
 ### 修饰键取值
 
@@ -191,7 +191,6 @@ ohos-input key-press --key 2054
 {
   "type": "result",
   "status": "failed",
-  "data": "",
   "errCode": "ERR_XXX",
   "errMsg": "...",
   "suggestion": "..."
@@ -201,7 +200,7 @@ ohos-input key-press --key 2054
 **验证检查项**：
 - `type` 字段始终等于 `"result"`
 - `status` 为 `"success"` 或 `"failed"`（不是 `"error"`）
-- 失败响应的 `data` 字段为空字符串 `""`
+- 失败响应不包含 `data` 字段
 - 失败响应必须包含 `errCode`、`errMsg`、`suggestion`
 - 所有 JSON 输出不使用缩进（紧凑格式）
 - 帮助/版本输出为纯文本格式，非 JSON 结构
@@ -244,7 +243,7 @@ hdc shell "cd /data/local/tmp/ohos_input_test && ./OhosInputCommandTest && ./Con
 | ModifierTest | 4 | 修饰键解析顺序、单键映射、非法与重复输入 |
 | OptionParserTest | 10 | 选项对白名单/重复/缺值、数值规则默认值/越界/报错文案 |
 | CommandRegistryTest | 3 | 按命令名查找、全部命令注册完备、注册幂等 |
-| PrinterTest | 5 | 成功/失败 JSON 形态、帮助输出、参数与未知命令错误 |
+| PrinterTest | 7 | 成功/失败 JSON 形态与字段顺序、帮助输出、参数与未知命令错误 |
 | ErrorHandlerTest | 2 | 控制器错误码到权限/服务异常 JSON 与退出码映射 |
 | ExecutorTest | 13 | 帮助路由（全局+命令级）、任意位置 --help、--version、未知命令 JSON、注册完备性 |
 | MouseSupportTest | 5 | 滚动齿数边界、按键名映射与默认值 |

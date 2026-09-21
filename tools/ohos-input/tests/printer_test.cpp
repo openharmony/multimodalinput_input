@@ -46,6 +46,15 @@ HWTEST_F(PrinterTest, PrintSuccess_ContainsTypeStatusData, TestSize.Level1)
     EXPECT_EQ(parsed["data"]["message"], "success");
 }
 
+HWTEST_F(PrinterTest, PrintSuccess_FieldsInDocumentedOrder, TestSize.Level1)
+{
+    std::ostringstream output;
+    StdoutRedirectGuard redirectGuard(output.rdbuf());
+    OutputPrinter::PrintSuccess({ { "action", "mouse-scroll" }, { "clicks", -3 } });
+
+    EXPECT_TRUE(output.str().rfind("{\"type\":\"result\",\"status\":\"success\",\"data\":", 0) == 0);
+}
+
 HWTEST_F(PrinterTest, PrintError_ContainsFieldsAndExitCode, TestSize.Level1)
 {
     std::ostringstream output;
@@ -56,10 +65,19 @@ HWTEST_F(PrinterTest, PrintError_ContainsFieldsAndExitCode, TestSize.Level1)
     const auto parsed = nlohmann::json::parse(output.str());
     EXPECT_EQ(parsed["type"], "result");
     EXPECT_EQ(parsed["status"], "failed");
-    EXPECT_EQ(parsed["data"], "");
+    EXPECT_FALSE(parsed.contains("data"));
     EXPECT_EQ(parsed["errCode"], "ERR_TEST");
     EXPECT_EQ(parsed["errMsg"], "Test error");
     EXPECT_EQ(parsed["suggestion"], "Try again");
+}
+
+HWTEST_F(PrinterTest, PrintError_FieldsInDocumentedOrder, TestSize.Level1)
+{
+    std::ostringstream output;
+    StdoutRedirectGuard redirectGuard(output.rdbuf());
+    OutputPrinter::PrintError("ERR_TEST", "Test error", "Try again", 9);
+
+    EXPECT_TRUE(output.str().rfind("{\"type\":\"result\",\"status\":\"failed\",\"errCode\":", 0) == 0);
 }
 
 HWTEST_F(PrinterTest, PrintHelp_WritesTextWithSingleNewline, TestSize.Level1)
@@ -105,7 +123,7 @@ HWTEST_F(PrinterTest, HandleControllerError_NoPermission_MapsToPermissionJson, T
     EXPECT_EQ(code, PERMISSION_EXIT);
     const auto parsed = nlohmann::json::parse(output.str());
     EXPECT_EQ(parsed["errCode"], "ERR_PERMISSION_DENIED");
-    EXPECT_EQ(parsed["data"], "");
+    EXPECT_FALSE(parsed.contains("data"));
 }
 
 HWTEST_F(PrinterTest, HandleControllerError_ServiceFailure_MapsToServiceJson, TestSize.Level1)

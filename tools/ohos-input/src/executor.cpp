@@ -111,7 +111,7 @@ std::string BuildGlobalHelp()
     }
     stream << "\n";
     AppendExamples(stream, { "# Mouse click at position (100, 200)", "ohos-input mouse-click --x 100 --y 200", "",
-        "# Key press with Ctrl modifier", "ohos-input key-press --key 2049 --modifier ctrl" });
+        "# Key press with Ctrl modifier", "ohos-input key-press --key 2017 --modifier ctrl" });
     return StripTrailingNewline(stream);
 }
 

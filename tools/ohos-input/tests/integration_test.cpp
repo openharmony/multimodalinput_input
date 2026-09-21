@@ -212,7 +212,7 @@ HWTEST_F(IntegrationTest, DoubleClick_IntervalNotExceedingHoldDuration_Rejected,
     EXPECT_EQ(result.code, PARAMETER_EXIT);
     const auto parsed = ParseJson(result);
     EXPECT_EQ(parsed["errCode"], "ERR_PARAMETER_ERROR");
-    EXPECT_EQ(parsed["data"], "");
+    EXPECT_FALSE(parsed.contains("data"));
     EXPECT_EQ(fixture.MouseCreateCount(), 0);
     EXPECT_TRUE(calls.empty());
 }
@@ -242,7 +242,7 @@ HWTEST_F(IntegrationTest, ControllerPermissionFailure_MapsToPermissionJsonAndExi
     EXPECT_EQ(result.code, PERMISSION_EXIT);
     const auto parsed = ParseJson(result);
     EXPECT_EQ(parsed["errCode"], "ERR_PERMISSION_DENIED");
-    EXPECT_EQ(parsed["data"], "");
+    EXPECT_FALSE(parsed.contains("data"));
     EXPECT_TRUE(calls.empty());
 }
 

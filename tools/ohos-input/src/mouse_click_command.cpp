@@ -63,7 +63,8 @@ std::vector<ParameterDoc> MouseClickCommand::GetParameters() const
         { "--button <key>", "Mouse button to click (optional, values: [left, right, middle], default: left)" },
         { "--holdDuration <number>", "Duration to hold the button in ms (optional, range: [50, 200], default: 100)" },
         { "--modifier <keys>",
-            "Modifier keys, pipe-separated, in press order (optional, e.g. ctrl|shift, no duplicates)" },
+            "Modifier keys (optional, values: [ctrl, alt, shift, meta], pipe-separated with |, in press order, "
+            "no duplicates)" },
     };
 }
 

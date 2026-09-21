@@ -61,7 +61,8 @@ std::vector<ParameterDoc> MouseScrollCommand::GetParameters() const
             "Number of scroll clicks (required, range: [-100, -1] or [1, 100],\npositive for scroll up, "
             "negative for scroll down. 1 click = 15 degrees)" },
         { "--modifier <keys>",
-            "Modifier keys, pipe-separated, in press order (optional, e.g. ctrl|shift, no duplicates)" },
+            "Modifier keys (optional, values: [ctrl, alt, shift, meta], pipe-separated with |, in press order, "
+            "no duplicates)" },
     };
 }
 
