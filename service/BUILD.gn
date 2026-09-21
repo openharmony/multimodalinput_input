@@ -253,7 +253,10 @@ ohos_shared_library("libcursor_drawing_adapter") {
   ]
 
   if (input_feature_pointer_drawing) {
-    external_deps += [ "window_manager:libwm_lite" ]
+    external_deps += [
+      "window_manager:libwm_lite",
+      "samgr:samgr_proxy"
+    ]
   }
 
   if (input_ext_feature_magiccursor) {
@@ -597,6 +600,7 @@ ohos_shared_library("libmmi-server") {
     "window_manager:libdm_lite",
     "window_manager:libwm_lite",
     "window_manager:libwsutils",
+    "samgr:samgr_proxy",
   ]
 
   if (input_feature_product != "watch") {
