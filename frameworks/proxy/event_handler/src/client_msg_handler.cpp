@@ -412,7 +412,11 @@ int32_t ClientMsgHandler::OnDevListener(const UDSClient& client, NetPacket& pkt)
         MMI_HILOGE("Packet read type failed");
         return RET_ERR;
     }
-    INPUT_DEVICE_IMPL.OnDevListener(deviceId, type);
+    if (auto deviceImpl = INPUT_DEVICE_IMPL; deviceImpl != nullptr) {
+        deviceImpl->OnDevListener(deviceId, type);
+    } else {
+        MMI_HILOGE("InputDeviceImpl is null, skip dev listener notify");
+    }
     return RET_OK;
 }
 
@@ -547,7 +551,11 @@ int32_t ClientMsgHandler::OnSetInputDeviceAck(const UDSClient& client, NetPacket
         MMI_HILOGE("Packet read type failed");
         return RET_ERR;
     }
-    INPUT_DEVICE_IMPL.OnSetInputDeviceAck(index, result);
+    if (auto deviceImpl = INPUT_DEVICE_IMPL; deviceImpl != nullptr) {
+        deviceImpl->OnSetInputDeviceAck(index, result);
+    } else {
+        MMI_HILOGE("InputDeviceImpl is null, skip set input device ack notify");
+    }
     return RET_OK;
 }
 

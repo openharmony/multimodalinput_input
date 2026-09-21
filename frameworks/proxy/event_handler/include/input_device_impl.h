@@ -28,7 +28,7 @@ namespace OHOS {
 namespace MMI {
 class InputDeviceImpl final {
 public:
-    static InputDeviceImpl& GetInstance();
+    static InputDeviceImpl* GetInstance();
     DISALLOW_COPY_AND_MOVE(InputDeviceImpl);
     ~InputDeviceImpl() = default;
 
