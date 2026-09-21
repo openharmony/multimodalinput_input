@@ -1703,12 +1703,12 @@ typedef enum {
      * PTZ expose left
      * @since 26.0.1
      */
-    OH_INPUT_KEYCODE_PTZ_EXPOSE_LEFT = 3238,
+    OH_INPUT_KEYCODE_PTZ_EXPOSURE_LEFT = 3238,
     /**
      * PTZ expose right
      * @since 26.0.1
      */
-    OH_INPUT_KEYCODE_PTZ_EXPOSE_RIGHT = 3239,
+    OH_INPUT_KEYCODE_PTZ_EXPOSURE_RIGHT = 3239,
     /**
      * PTZ shutter left
      * @since 26.0.1
