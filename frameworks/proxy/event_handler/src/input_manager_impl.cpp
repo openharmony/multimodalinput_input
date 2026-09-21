@@ -2158,7 +2158,12 @@ int32_t InputManagerImpl::RegisterDevListener(std::string type, std::shared_ptr<
         BytraceAdapter::MMIClientTraceStop();
         return RET_ERR;
     }
-    int32_t ret = INPUT_DEVICE_IMPL.RegisterDevListener(type, listener);
+    int32_t ret = RET_ERR;
+    if (auto deviceImpl = INPUT_DEVICE_IMPL; deviceImpl != nullptr) {
+        ret = deviceImpl->RegisterDevListener(type, listener);
+    } else {
+        MMI_HILOGE("InputDeviceImpl is null");
+    }
     BytraceAdapter::MMIClientTraceStop();
     return ret;
 }
@@ -2175,7 +2180,12 @@ int32_t InputManagerImpl::UnregisterDevListener(std::string type,
         BytraceAdapter::MMIClientTraceStop();
         return RET_ERR;
     }
-    int32_t ret = INPUT_DEVICE_IMPL.UnregisterDevListener(type, listener);
+    int32_t ret = RET_ERR;
+    if (auto deviceImpl = INPUT_DEVICE_IMPL; deviceImpl != nullptr) {
+        ret = deviceImpl->UnregisterDevListener(type, listener);
+    } else {
+        MMI_HILOGE("InputDeviceImpl is null");
+    }
     BytraceAdapter::MMIClientTraceStop();
     return ret;
 }
@@ -2187,7 +2197,11 @@ int32_t InputManagerImpl::GetDeviceIds(std::function<void(std::vector<int32_t>&)
         MMI_HILOGE("Client init failed");
         return RET_ERR;
     }
-    return INPUT_DEVICE_IMPL.GetInputDeviceIds(callback);
+    if (auto deviceImpl = INPUT_DEVICE_IMPL; deviceImpl != nullptr) {
+        return deviceImpl->GetInputDeviceIds(callback);
+    }
+    MMI_HILOGE("InputDeviceImpl is null");
+    return RET_ERR;
 }
 
 int32_t InputManagerImpl::GetDevice(int32_t deviceId,
@@ -2198,7 +2212,11 @@ int32_t InputManagerImpl::GetDevice(int32_t deviceId,
         MMI_HILOGE("Client init failed");
         return RET_ERR;
     }
-    return INPUT_DEVICE_IMPL.GetInputDevice(deviceId, callback);
+    if (auto deviceImpl = INPUT_DEVICE_IMPL; deviceImpl != nullptr) {
+        return deviceImpl->GetInputDevice(deviceId, callback);
+    }
+    MMI_HILOGE("InputDeviceImpl is null");
+    return RET_ERR;
 }
 
 int32_t InputManagerImpl::SupportKeys(int32_t deviceId, std::vector<int32_t> &keyCodes,
@@ -2209,7 +2227,11 @@ int32_t InputManagerImpl::SupportKeys(int32_t deviceId, std::vector<int32_t> &ke
         MMI_HILOGE("Client init failed");
         return RET_ERR;
     }
-    return INPUT_DEVICE_IMPL.SupportKeys(deviceId, keyCodes, callback);
+    if (auto deviceImpl = INPUT_DEVICE_IMPL; deviceImpl != nullptr) {
+        return deviceImpl->SupportKeys(deviceId, keyCodes, callback);
+    }
+    MMI_HILOGE("InputDeviceImpl is null");
+    return RET_ERR;
 }
 
 int32_t InputManagerImpl::GetKeyboardType(int32_t deviceId, std::function<void(int32_t)> callback)
@@ -2219,7 +2241,11 @@ int32_t InputManagerImpl::GetKeyboardType(int32_t deviceId, std::function<void(i
         MMI_HILOGE("Client init failed");
         return RET_ERR;
     }
-    return INPUT_DEVICE_IMPL.GetKeyboardType(deviceId, callback);
+    if (auto deviceImpl = INPUT_DEVICE_IMPL; deviceImpl != nullptr) {
+        return deviceImpl->GetKeyboardType(deviceId, callback);
+    }
+    MMI_HILOGE("InputDeviceImpl is null");
+    return RET_ERR;
 }
 
 int32_t InputManagerImpl::SetKeyboardRepeatDelay(int32_t delay)
@@ -2229,7 +2255,11 @@ int32_t InputManagerImpl::SetKeyboardRepeatDelay(int32_t delay)
         MMI_HILOGE("Client init failed");
         return RET_ERR;
     }
-    return INPUT_DEVICE_IMPL.SetKeyboardRepeatDelay(delay);
+    if (auto deviceImpl = INPUT_DEVICE_IMPL; deviceImpl != nullptr) {
+        return deviceImpl->SetKeyboardRepeatDelay(delay);
+    }
+    MMI_HILOGE("InputDeviceImpl is null");
+    return RET_ERR;
 }
 
 int32_t InputManagerImpl::SetKeyboardRepeatRate(int32_t rate)
@@ -2239,7 +2269,11 @@ int32_t InputManagerImpl::SetKeyboardRepeatRate(int32_t rate)
         MMI_HILOGE("Client init failed");
         return RET_ERR;
     }
-    return INPUT_DEVICE_IMPL.SetKeyboardRepeatRate(rate);
+    if (auto deviceImpl = INPUT_DEVICE_IMPL; deviceImpl != nullptr) {
+        return deviceImpl->SetKeyboardRepeatRate(rate);
+    }
+    MMI_HILOGE("InputDeviceImpl is null");
+    return RET_ERR;
 }
 
 int32_t InputManagerImpl::GetKeyboardRepeatDelay(std::function<void(int32_t)> callback)
@@ -2249,7 +2283,11 @@ int32_t InputManagerImpl::GetKeyboardRepeatDelay(std::function<void(int32_t)> ca
         MMI_HILOGE("Client init failed");
         return RET_ERR;
     }
-    return INPUT_DEVICE_IMPL.GetKeyboardRepeatDelay(callback);
+    if (auto deviceImpl = INPUT_DEVICE_IMPL; deviceImpl != nullptr) {
+        return deviceImpl->GetKeyboardRepeatDelay(callback);
+    }
+    MMI_HILOGE("InputDeviceImpl is null");
+    return RET_ERR;
 }
 
 int32_t InputManagerImpl::GetKeyboardRepeatRate(std::function<void(int32_t)> callback)
@@ -2259,7 +2297,11 @@ int32_t InputManagerImpl::GetKeyboardRepeatRate(std::function<void(int32_t)> cal
         MMI_HILOGE("Client init failed");
         return RET_ERR;
     }
-    return INPUT_DEVICE_IMPL.GetKeyboardRepeatRate(callback);
+    if (auto deviceImpl = INPUT_DEVICE_IMPL; deviceImpl != nullptr) {
+        return deviceImpl->GetKeyboardRepeatRate(callback);
+    }
+    MMI_HILOGE("InputDeviceImpl is null");
+    return RET_ERR;
 }
 
 void InputManagerImpl::SetAnrObserver(std::shared_ptr<IAnrObserver> observer)
@@ -3211,7 +3253,11 @@ int32_t InputManagerImpl::SetInputDeviceEnabled(int32_t deviceId, bool enable, s
         MMI_HILOGE("Client init failed");
         return RET_ERR;
     }
-    return INPUT_DEVICE_IMPL.RegisterInputdevice(deviceId, enable, callback);
+    if (auto deviceImpl = INPUT_DEVICE_IMPL; deviceImpl != nullptr) {
+        return deviceImpl->RegisterInputdevice(deviceId, enable, callback);
+    }
+    MMI_HILOGE("InputDeviceImpl is null");
+    return RET_ERR;
 }
 
 int32_t InputManagerImpl::DisableInputEventDispatch(bool disabled)
