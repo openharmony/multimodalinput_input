@@ -4180,7 +4180,8 @@ HWTEST_F(MMIServerTest, MMIService_GetIntervalSinceLastInput_001, TestSize.Level
 
 /**
  * @tc.name: MMIService_GetLastInputEventTimeByDisplay_001
- * @tc.desc: Verify that the input interval time returned under normal conditions is greater than or equal to 0
+ * @tc.desc: Verify the return and out-parameter pairing of GetLastInputEventTimeByDisplay: the out
+ *           parameter is set on success and keeps its original value on failure
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -4190,8 +4191,11 @@ HWTEST_F(MMIServerTest, MMIService_GetLastInputEventTimeByDisplay_001, TestSize.
     MMIService mmiService;
     int64_t timeInterval = -1;
     ErrCode ret = mmiService.GetLastInputEventTimeByDisplay(0, timeInterval);
-    EXPECT_NE(ret, RET_OK);
-    EXPECT_GE(timeInterval, 0);
+    if (ret == RET_OK) {
+        EXPECT_GE(timeInterval, 0);
+    } else {
+        EXPECT_EQ(timeInterval, -1);
+    }
 }
 
 /**

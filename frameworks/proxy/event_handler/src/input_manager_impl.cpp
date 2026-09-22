@@ -3217,7 +3217,8 @@ int32_t InputManagerImpl::GetLastInputEventTimeByDisplay(int32_t displayId, int6
         return RET_ERR;
     }
     if (MULTIMODAL_INPUT_CONNECT_MGR->GetLastInputEventTimeByDisplay(displayId, lastInputEventTime) != RET_OK) {
-        MMI_HILOGE("GetLastInputEventTimeByDisplay failed");
+        MMI_HILOGE("GetLastInputEventTimeByDisplay failed, displayId:%{public}d, lastInputEventTime:%{public}" PRId64,
+            displayId, lastInputEventTime);
         return RET_ERR;
     }
     return RET_OK;

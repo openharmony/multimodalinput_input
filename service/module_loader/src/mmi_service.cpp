@@ -5428,9 +5428,13 @@ ErrCode MMIService::GetIntervalSinceLastInput(int64_t &timeInterval)
 ErrCode MMIService::GetLastInputEventTimeByDisplay(int32_t displayId, int64_t &lastInputEventTime)
 {
     CALL_DEBUG_ENTER;
-    lastInputEventTime = 0;
-    int32_t ret = delegateTasks_.PostSyncTask(std::bind(&InputEventHandler::GetLastInputEventTimeByDisplay,
-        InputHandler, displayId, std::ref(lastInputEventTime)));
+    auto lastInputEventTimeVal = std::make_shared<int64_t>(0);
+    int32_t ret = delegateTasks_.PostSyncTask([displayId, lastInputEventTimeVal] {
+        return InputHandler->GetLastInputEventTimeByDisplay(displayId, *lastInputEventTimeVal);
+    });
+    if (ret == RET_OK) {
+        lastInputEventTime = *lastInputEventTimeVal;
+    }
     MMI_HILOGI("displayId:%{public}d, lastInputEventTime:%{public}" PRId64, displayId, lastInputEventTime);
     if (ret != RET_OK) {
         MMI_HILOGE("Failed to GetLastInputEventTimeByDisplay, ret:%{public}d", ret);
