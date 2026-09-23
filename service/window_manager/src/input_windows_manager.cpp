@@ -6950,7 +6950,7 @@ void InputWindowsManager::CheckUIExtentionWindowDefaultHotArea(std::pair<int32_t
             if (windowinfo.id == uiExtentionWindowId) {
                 *touchWindow = &windowinfo;
                 MMI_HILOG_DISPATCHD("uiExtentionWindowid:%{public}d", uiExtentionWindowId);
-                AddActiveWindow(windowinfo.id, pointerEvent->GetPointerId());
+                AddActiveWindow(windowinfo.displayId, windowinfo.id, pointerEvent->GetPointerId());
                 AddTargetWindowIds(pointerEvent->GetPointerId(), pointerEvent->GetSourceType(), uiExtentionWindowId,
                     pointerEvent->GetDeviceId());
                 break;
