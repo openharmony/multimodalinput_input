@@ -2662,13 +2662,13 @@ int32_t PointerDrawingManager::GetCursorSurfaceId(uint64_t &surfaceId)
 void PointerDrawingManager::OnDisplayInfo(const OLD::DisplayGroupInfo &displayGroupInfo, bool isDisplayChanged)
 {
     CALL_DEBUG_ENTER;
-    if (displayGroupInfo.groupId != DEFAULT_GROUP_ID) {
+    if (displayGroupInfo.groupId != WIN_MGR->GetDefaultDisplayGroupInfo().groupId) {
         MMI_HILOGD("groupId:%{public}d", displayGroupInfo.groupId);
         return;
     }
     if (WIN_MGR->HasMultipleActiveUsers()) {
         int32_t cursorGroupId = WIN_MGR->FindGroupIdByRsId(displayInfo_.rsId);
-        if (cursorGroupId != DEFAULT_GROUP_ID && displayGroupInfo.groupId != cursorGroupId) {
+        if (displayGroupInfo.groupId != cursorGroupId) {
             MMI_HILOGI("Skip non-cursor group update, groupId:%{public}d cursorGroupId:%{public}d"
                 " cursorRsId:%{public}" PRIu64, displayGroupInfo.groupId, cursorGroupId, displayInfo_.rsId);
             return;
