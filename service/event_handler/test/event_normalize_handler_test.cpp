@@ -13,6 +13,8 @@
  * limitations under the License.
  */
 
+#include <algorithm>
+
 #include <gtest/gtest.h>
 
 #include "dfx_hisysevent.h"
@@ -23,6 +25,7 @@
 #include "general_uwb_remote_control.h"
 #include "input_device_manager.h"
 #include "input_scene_board_judgement.h"
+#include "key_event_normalize.h"
 #include "i_input_windows_manager.h"
 #include "libinput_wrapper.h"
 #ifdef OHOS_BUILD_ENABLE_TOUCHPAD
@@ -254,6 +257,67 @@ HWTEST_F(EventNormalizeHandlerTest, EventNormalizeHandlerTest_HandlePointerEvent
     item.SetPointerId(0);
     pointerEvent->UpdatePointerItem(0, item);
     ASSERT_NO_FATAL_FAILURE(handler.HandlePointerEvent(pointerEvent));
+}
+
+/**
+ * @tc.name: EventNormalizeHandlerTest_HandlePointerEvent_ControllerPressedKeys
+ * @tc.desc: Controller-injected mouse event carries pressed keys, plain injected event does not
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventNormalizeHandlerTest, EventNormalizeHandlerTest_HandlePointerEvent_ControllerPressedKeys, TestSize.Level1)
+{
+    ASSERT_NE(KeyEventHdr->GetKeyEvent(), nullptr);
+    auto keyEventDown = KeyEvent::Create();
+    ASSERT_NE(keyEventDown, nullptr);
+    keyEventDown->SetKeyCode(KeyEvent::KEYCODE_CTRL_LEFT);
+    keyEventDown->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+    keyEventDown->AddFlag(InputEvent::EVENT_FLAG_SIMULATE);
+    KeyEvent::KeyItem downItem;
+    downItem.SetKeyCode(KeyEvent::KEYCODE_CTRL_LEFT);
+    downItem.SetPressed(true);
+    downItem.SetDeviceId(-1);
+    keyEventDown->AddKeyItem(downItem);
+
+    EventNormalizeHandler handler;
+    handler.nextHandler_ = std::make_shared<EventFilterHandler>();
+    ASSERT_NO_FATAL_FAILURE(handler.HandleKeyEvent(keyEventDown));
+
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_DOWN);
+    pointerEvent->SetPointerId(0);
+    pointerEvent->AddFlag(InputEvent::EVENT_FLAG_CONTROLLER);
+    PointerEvent::PointerItem item;
+    item.SetPointerId(0);
+    pointerEvent->AddPointerItem(item);
+    ASSERT_NO_FATAL_FAILURE(handler.HandlePointerEvent(pointerEvent));
+    auto pressedKeys = pointerEvent->GetPressedKeys();
+    EXPECT_NE(std::find(pressedKeys.begin(), pressedKeys.end(), KeyEvent::KEYCODE_CTRL_LEFT), pressedKeys.end());
+
+    auto plainEvent = PointerEvent::Create();
+    ASSERT_NE(plainEvent, nullptr);
+    plainEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
+    plainEvent->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_DOWN);
+    plainEvent->SetPointerId(0);
+    PointerEvent::PointerItem plainItem;
+    plainItem.SetPointerId(0);
+    plainEvent->AddPointerItem(plainItem);
+    ASSERT_NO_FATAL_FAILURE(handler.HandlePointerEvent(plainEvent));
+    EXPECT_TRUE(plainEvent->GetPressedKeys().empty());
+
+    auto keyEventUp = KeyEvent::Create();
+    ASSERT_NE(keyEventUp, nullptr);
+    keyEventUp->SetKeyCode(KeyEvent::KEYCODE_CTRL_LEFT);
+    keyEventUp->SetKeyAction(KeyEvent::KEY_ACTION_UP);
+    keyEventUp->AddFlag(InputEvent::EVENT_FLAG_SIMULATE);
+    KeyEvent::KeyItem upItem;
+    upItem.SetKeyCode(KeyEvent::KEYCODE_CTRL_LEFT);
+    upItem.SetPressed(false);
+    upItem.SetDeviceId(-1);
+    keyEventUp->AddKeyItem(upItem);
+    ASSERT_NO_FATAL_FAILURE(handler.HandleKeyEvent(keyEventUp));
 }
 
 /**

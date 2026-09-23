@@ -445,6 +445,11 @@ void EventNormalizeHandler::HandlePointerEvent(const std::shared_ptr<PointerEven
     CHKPV(nextHandler_);
     DfxHisysevent::GetDispStartTime();
     CHKPV(pointerEvent);
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
+    if (pointerEvent->HasFlag(InputEvent::EVENT_FLAG_CONTROLLER)) {
+        PointerEventSetPressedKeys(pointerEvent);
+    }
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
     PointerEvent::PointerItem item;
     if (!pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), item)) {
         MMI_HILOGE("GetPointerItem failed, pointerId:%{public}d", pointerEvent->GetPointerId());

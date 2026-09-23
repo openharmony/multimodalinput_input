@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 
+#include <algorithm>
 #include <cstdio>
 
 #include <gtest/gtest.h>
@@ -642,6 +643,45 @@ HWTEST_F(KeyEventNormalizeTest, KeyEventNormalizeTest_CheckSimulatedModifierKeyE
     auto keyEvent = KeyEvent::Create();
     ASSERT_NE(keyEvent, nullptr);
     EXPECT_FALSE(KeyEventHdr->CheckSimulatedModifierKeyEvent(keyEvent));
+}
+
+/**
+ * @tc.name: KeyEventNormalizeTest_SimulatedModifierKeyEventNormalize_DownUp
+ * @tc.desc: Verify simulated modifier key down/up maintains pressed keys of the normalized key event
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyEventNormalizeTest, KeyEventNormalizeTest_SimulatedModifierKeyEventNormalize_DownUp, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ASSERT_NE(KeyEventHdr->GetKeyEvent(), nullptr);
+    auto keyEventDown = KeyEvent::Create();
+    ASSERT_NE(keyEventDown, nullptr);
+    keyEventDown->SetKeyCode(KeyEvent::KEYCODE_CTRL_LEFT);
+    keyEventDown->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+    KeyEvent::KeyItem downItem;
+    downItem.SetKeyCode(KeyEvent::KEYCODE_CTRL_LEFT);
+    downItem.SetPressed(true);
+    downItem.SetDeviceId(-1);
+    keyEventDown->AddKeyItem(downItem);
+    keyEventDown->AddFlag(InputEvent::EVENT_FLAG_SIMULATE);
+    EXPECT_NO_FATAL_FAILURE(KeyEventHdr->SimulatedModifierKeyEventNormalize(keyEventDown));
+    auto pressedKeys = KeyEventHdr->GetKeyEvent()->GetPressedKeys();
+    EXPECT_NE(std::find(pressedKeys.begin(), pressedKeys.end(), KeyEvent::KEYCODE_CTRL_LEFT), pressedKeys.end());
+
+    auto keyEventUp = KeyEvent::Create();
+    ASSERT_NE(keyEventUp, nullptr);
+    keyEventUp->SetKeyCode(KeyEvent::KEYCODE_CTRL_LEFT);
+    keyEventUp->SetKeyAction(KeyEvent::KEY_ACTION_UP);
+    KeyEvent::KeyItem upItem;
+    upItem.SetKeyCode(KeyEvent::KEYCODE_CTRL_LEFT);
+    upItem.SetPressed(false);
+    upItem.SetDeviceId(-1);
+    keyEventUp->AddKeyItem(upItem);
+    keyEventUp->AddFlag(InputEvent::EVENT_FLAG_SIMULATE);
+    EXPECT_NO_FATAL_FAILURE(KeyEventHdr->SimulatedModifierKeyEventNormalize(keyEventUp));
+    pressedKeys = KeyEventHdr->GetKeyEvent()->GetPressedKeys();
+    EXPECT_EQ(std::find(pressedKeys.begin(), pressedKeys.end(), KeyEvent::KEYCODE_CTRL_LEFT), pressedKeys.end());
 }
 
 /**
