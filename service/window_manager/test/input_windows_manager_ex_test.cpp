@@ -4477,7 +4477,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetActiveWindowTypeByI
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager->GetActiveWindowTypeById(displayId, windowId, windowTypeTemp));
  
     inputWindowsManager->activeTouchWinTypes_.emplace(
-        std::make_pair(windowId, displayId),
+        std::make_pair(displayId, windowId),
         InputWindowsManager::ActiveTouchWin{WindowInputType::MIX_LEFT_RIGHT_ANTI_AXIS_MOVE, { pointerId }});
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager->GetActiveWindowTypeById(displayId, windowId, windowTypeTemp));
 }
@@ -4499,7 +4499,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_AddActiveWindow_001, T
     int32_t displayId = 0;
     auto windowTypeTemp = WindowInputType::MIX_LEFT_RIGHT_ANTI_AXIS_MOVE;
     inputWindowsManager->activeTouchWinTypes_.emplace(
-        std::make_pair(windowId, displayId),
+        std::make_pair(displayId, windowId),
         InputWindowsManager::ActiveTouchWin{WindowInputType::MIX_LEFT_RIGHT_ANTI_AXIS_MOVE, { pointerId }});
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager->AddActiveWindow(displayId, windowId, pointerId));
 }
@@ -4519,7 +4519,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_AddActiveWindow_002, T
     int32_t windowId = 1;
     int32_t pointerId = 0;
     int32_t displayId = 0;
-    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->AddActiveWindow(windowId, pointerId, displayId));
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->AddActiveWindow(displayId, windowId, pointerId));
  
     WindowInfo windowInfo;
     windowInfo.id = 1;
@@ -4528,8 +4528,8 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_AddActiveWindow_002, T
     if (it != inputWindowsManager->displayGroupInfoMap_.end()) {
         it->second.windowsInfo.push_back(windowInfo);
     }
-    inputWindowsManager->AddActiveWindow(windowId, pointerId, displayId);
-    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->AddActiveWindow(windowId, pointerId, displayId));
+    inputWindowsManager->AddActiveWindow(displayId, windowId, pointerId);
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->AddActiveWindow(displayId, windowId, pointerId));
 }
 
 /**
@@ -4549,7 +4549,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_AddActiveWindow_003, T
     int32_t pointerId = 1;
     int32_t displayId = 0;
  
-    inputWindowsManager->AddActiveWindow(windowId, pointerId, displayId);
+    inputWindowsManager->AddActiveWindow(displayId, windowId, pointerId);
  
     auto it = inputWindowsManager->activeTouchWinTypes_.find({displayId, windowId});
     EXPECT_EQ(it, inputWindowsManager->activeTouchWinTypes_.end());
@@ -4579,7 +4579,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_AddActiveWindow_004, T
             WindowInputType::MIX_LEFT_RIGHT_ANTI_AXIS_MOVE, { pointerId }
         });
  
-    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->AddActiveWindow(windowId, pointerId, displayId));
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->AddActiveWindow(displayId, windowId, pointerId));
  
     auto iter = inputWindowsManager->activeTouchWinTypes_.find({displayId, windowId});
     ASSERT_NE(iter, inputWindowsManager->activeTouchWinTypes_.end());

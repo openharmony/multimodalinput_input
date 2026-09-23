@@ -9639,7 +9639,8 @@ void InputWindowsManager::AddActiveWindow(int32_t displayId, int32_t windowId, i
                 windowId, displayId);
             return;
         }
-        activeTouchWinTypes_.emplace(windowId, ActiveTouchWin{(*info).windowInputType, { pointerId }});
+        activeTouchWinTypes_.emplace(std::make_pair(windowId, displayId),
+            ActiveTouchWin{(*info).windowInputType, { pointerId }});
     }
 }
 
