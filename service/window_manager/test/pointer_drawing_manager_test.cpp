@@ -65,6 +65,13 @@ constexpr int32_t AECH_DEVELOPER_DEFINED_STYLE { 47 };
 constexpr int32_t AECH_DEVELOPER_DEFINED { 4 };
 constexpr int32_t DEFAULT_VALUE { -1 };
 constexpr uint64_t TEST_INVALID_DISPLAY_ID { 999 };
+
+sptr<OHOS::Rosen::ScreenInfo> CreateScreenInfoWithRsId(uint64_t rsId)
+{
+    sptr<OHOS::Rosen::ScreenInfo> screenInfo = new OHOS::Rosen::ScreenInfo();
+    screenInfo->SetRsId(rsId);
+    return screenInfo;
+}
 } // namespace
 
 class PointerDrawingManagerTest : public testing::Test {
@@ -5446,6 +5453,144 @@ HWTEST_F(PointerDrawingManagerTest, PointerDrawingManagerTest_CreatePointerWindo
     pointerDrawingManager.activeGroupId_ = 7;
     EXPECT_NO_FATAL_FAILURE(pointerDrawingManager.CreatePointerWindow(86, 100, 100, Direction::DIRECTION0));
     EXPECT_EQ(pointerDrawingManager.activeGroupId_, 7);
+}
+
+/**
+ * @tc.name: PointerDrawingManagerTest_IsDisableCursorScreen_001
+ * @tc.desc: Test IsDisableCursorScreen whether the screen cursor is disabled
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerTest, PointerDrawingManagerTest_IsDisableCursorScreen_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerDrawingManager pointerDrawingManager;
+    int32_t disabledRsId = system::GetIntParameter("const.multimodalinput.cursor.disablescreen", -1);
+    if (disabledRsId < 0) {
+        // The parameter is not configured, no screen should be considered disabled.
+        EXPECT_FALSE(pointerDrawingManager.IsDisableCursorScreen(0));
+        EXPECT_FALSE(pointerDrawingManager.IsDisableCursorScreen(1));
+        EXPECT_FALSE(pointerDrawingManager.IsDisableCursorScreen(UINT64_MAX));
+    } else {
+        // The parameter is configured, only the matched screen is disabled.
+        uint64_t disabled = static_cast<uint64_t>(disabledRsId);
+        EXPECT_TRUE(pointerDrawingManager.IsDisableCursorScreen(disabled));
+        EXPECT_FALSE(pointerDrawingManager.IsDisableCursorScreen(disabled + 1));
+    }
+}
+
+/**
+ * @tc.name: PointerDrawingManagerTest_FilterOutScreensWithDisableCursor_001
+ * @tc.desc: Test FilterOutScreensWithDisableCursor with empty screens
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerTest, PointerDrawingManagerTest_FilterOutScreensWithDisableCursor_001,
+    TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerDrawingManager pointerDrawingManager;
+    std::vector<sptr<OHOS::Rosen::ScreenInfo>> screens;
+    auto filteredScreens = pointerDrawingManager.FilterOutScreensWithDisableCursor(screens);
+    EXPECT_TRUE(filteredScreens.empty());
+}
+
+/**
+ * @tc.name: PointerDrawingManagerTest_FilterOutScreensWithDisableCursor_002
+ * @tc.desc: Test FilterOutScreensWithDisableCursor with null screen in the vector
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerTest, PointerDrawingManagerTest_FilterOutScreensWithDisableCursor_002,
+    TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerDrawingManager pointerDrawingManager;
+    std::vector<sptr<OHOS::Rosen::ScreenInfo>> screens;
+    screens.push_back(nullptr);
+    auto filteredScreens = pointerDrawingManager.FilterOutScreensWithDisableCursor(screens);
+    EXPECT_TRUE(filteredScreens.empty());
+}
+
+/**
+ * @tc.name: PointerDrawingManagerTest_FilterOutScreensWithDisableCursor_003
+ * @tc.desc: Test FilterOutScreensWithDisableCursor filters out null and disabled screens
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerTest, PointerDrawingManagerTest_FilterOutScreensWithDisableCursor_003,
+    TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    uint64_t normalRsId = 100;
+    uint64_t otherRsId = 200;
+    int32_t disabledRsId = system::GetIntParameter("const.multimodalinput.cursor.disablescreen", -1);
+    PointerDrawingManager pointerDrawingManager;
+    std::vector<sptr<OHOS::Rosen::ScreenInfo>> screens;
+    screens.push_back(nullptr);
+    screens.push_back(CreateScreenInfoWithRsId(normalRsId));
+    screens.push_back(CreateScreenInfoWithRsId(otherRsId));
+    auto filteredScreens = pointerDrawingManager.FilterOutScreensWithDisableCursor(screens);
+    if (disabledRsId == static_cast<int32_t>(normalRsId)) {
+        ASSERT_EQ(filteredScreens.size(), 1u);
+        EXPECT_EQ(filteredScreens[0]->GetRsId(), otherRsId);
+    } else if (disabledRsId == static_cast<int32_t>(otherRsId)) {
+        ASSERT_EQ(filteredScreens.size(), 1u);
+        EXPECT_EQ(filteredScreens[0]->GetRsId(), normalRsId);
+    } else {
+        // No screen is disabled, only the null screen is filtered out.
+        ASSERT_EQ(filteredScreens.size(), 2u);
+        EXPECT_EQ(filteredScreens[0]->GetRsId(), normalRsId);
+        EXPECT_EQ(filteredScreens[1]->GetRsId(), otherRsId);
+    }
+}
+
+/**
+ * @tc.name: PointerDrawingManagerTest_CreatePointerWindowForScreenPointer_Disable_001
+ * @tc.desc: Test CreatePointerWindowForScreenPointer when the screen cursor is disabled
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerTest, PointerDrawingManagerTest_CreatePointerWindowForScreenPointer_Disable_001,
+    TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerDrawingManager pointerDrawingManager;
+    int32_t disabledRsId = system::GetIntParameter("const.multimodalinput.cursor.disablescreen", -1);
+    uint64_t rsId = 1;
+    if (disabledRsId < 0) {
+        // The parameter is not configured, the disable guard is bypassed and the original logic runs.
+        pointerDrawingManager.displayInfo_.rsId = rsId;
+        EXPECT_NO_FATAL_FAILURE(pointerDrawingManager.CreatePointerWindowForScreenPointer(rsId, 0, 0));
+    } else {
+        // The main screen is disabled, expect an early error return.
+        pointerDrawingManager.displayInfo_.rsId = static_cast<uint64_t>(disabledRsId);
+        int32_t result = pointerDrawingManager.CreatePointerWindowForScreenPointer(rsId, 0, 0);
+        EXPECT_EQ(result, RET_ERR);
+    }
+}
+
+/**
+ * @tc.name: PointerDrawingManagerTest_CreatePointerWindowForNoScreenPointer_Disable_001
+ * @tc.desc: Test CreatePointerWindowForNoScreenPointer when the screen cursor is disabled
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerTest, PointerDrawingManagerTest_CreatePointerWindowForNoScreenPointer_Disable_001,
+    TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerDrawingManager pointerDrawingManager;
+    int32_t disabledRsId = system::GetIntParameter("const.multimodalinput.cursor.disablescreen", -1);
+    if (disabledRsId < 0) {
+        // The parameter is not configured, the disable guard is bypassed and the original logic runs.
+        EXPECT_NO_FATAL_FAILURE(pointerDrawingManager.CreatePointerWindowForNoScreenPointer(1, 0, 0));
+    } else {
+        // The screen is disabled, expect an early error return.
+        int32_t result = pointerDrawingManager.CreatePointerWindowForNoScreenPointer(
+            static_cast<uint64_t>(disabledRsId), 0, 0);
+        EXPECT_EQ(result, RET_ERR);
+    }
 }
 } // namespace MMI
 } // namespace OHOS
