@@ -611,7 +611,7 @@ private:
     std::map<int32_t, OLD::DisplayGroupInfo> displayGroupInfoMap_;
     std::map<int32_t, OLD::DisplayGroupInfo> displayGroupInfoMapTmp_;
     std::map<int32_t, bool> backCenterDisplayChangeMap_;
-    bool mainGroupExisted_;
+    bool mainGroupExisted_ { false };
     DisplayGroupInfo displayGroupInfoTmp_;
     std::mutex tmpInfoMutex_;
     OLD::DisplayGroupInfo displayGroupInfo_;

@@ -149,6 +149,45 @@ HWTEST_F(InputWindowsManagerCoverageTest, GetDefaultDisplayGroupInfo_001, TestSi
 }
 
 /**
+ * @tc.name: GetDefaultDisplayGroupInfo_NonZeroGroupId_002
+ * @tc.desc: Test GetDefaultDisplayGroupInfo when the default group id is not zero
+ * @tc.type: FUNC
+ */
+HWTEST_F(InputWindowsManagerCoverageTest, GetDefaultDisplayGroupInfo_NonZeroGroupId_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    OLD::DisplayGroupInfo specialGroup;
+    InitDisplayGroupInfo(specialGroup);
+    specialGroup.type = GroupType::GROUP_SPECIAL;
+    WIN_MGR->UpdateDisplayInfo(specialGroup);
+
+    OLD::DisplayGroupInfo defaultGroup;
+    InitDisplayGroupInfo(defaultGroup);
+    defaultGroup.groupId = 5;
+    defaultGroup.mainDisplayId = 1;
+    for (auto &displayInfo : defaultGroup.displaysInfo) {
+        displayInfo.id = 5;
+    }
+    WIN_MGR->UpdateDisplayInfo(defaultGroup);
+
+    auto &info = WIN_MGR->GetDefaultDisplayGroupInfo();
+    EXPECT_EQ(info.groupId, 5);
+    EXPECT_EQ(info.type, GroupType::GROUP_DEFAULT);
+    EXPECT_EQ(WIN_MGR->GetFocusWindowId(5), 1);
+    EXPECT_EQ(WIN_MGR->GetFocusWindowId(-1), 1);
+
+    // Restore the id-0 default group for subsequent test cases
+    OLD::DisplayGroupInfo restoreGroup;
+    InitDisplayGroupInfo(restoreGroup);
+    WIN_MGR->UpdateDisplayInfo(restoreGroup);
+    OLD::DisplayGroupInfo restoreSpecialGroup;
+    InitDisplayGroupInfo(restoreSpecialGroup);
+    restoreSpecialGroup.type = GroupType::GROUP_SPECIAL;
+    restoreSpecialGroup.groupId = 5;
+    WIN_MGR->UpdateDisplayInfo(restoreSpecialGroup);
+}
+
+/**
  * @tc.name: GetWindowGroupInfoByDisplayIdCopy_001
  * @tc.desc: Test GetWindowGroupInfoByDisplayIdCopy with negative displayId
  * @tc.type: FUNC

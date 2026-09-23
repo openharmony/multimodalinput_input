@@ -1347,8 +1347,9 @@ void InputWindowsManager::UpdateWindowInfo(const WindowGroupInfo &windowGroupInf
     windowGroupInfoTmp.focusWindowId = windowGroupInfo.focusWindowId;
     windowGroupInfoTmp.displayId = windowGroupInfo.displayId;
     int32_t focusWid = 0;
+    int32_t defaultGroupId = GetDefaultGroupId();
     for (const auto &it : groupWindows) {
-        if (it.first != MAIN_GROUPID) {
+        if (it.first != defaultGroupId) {
             focusWid = GetFocusWindowId(it.first);
             windowGroupInfoTmp.focusWindowId = focusWid;
         }
@@ -1362,7 +1363,7 @@ void InputWindowsManager::UpdateWindowInfo(const WindowGroupInfo &windowGroupInf
         OLD::DisplayGroupInfo displayGroupInfo;
         const auto &iter = displayGroupInfoMapTmp_.find(it.first);
         displayGroupInfo = (iter != displayGroupInfoMapTmp_.end()) ? iter->second : GetDefaultDisplayGroupInfo();
-        if (it.first != MAIN_GROUPID) {
+        if (it.first != defaultGroupId) {
             displayGroupInfo.focusWindowId = focusWid;
         }
         for (const auto &item : windowGroupInfoTmp.windowsInfo) {
@@ -1436,7 +1437,7 @@ void InputWindowsManager::UpdateDisplayInfoExtIfNeed(OLD::DisplayGroupInfo &disp
         MMI_HILOGE("displaysInfo is empty");
         return;
     }
-    if (displayGroupInfo.groupId != DEFAULT_GROUP_ID) {
+    if (displayGroupInfo.groupId != GetDefaultGroupId()) {
         MMI_HILOGD("groupId:%{public}d", displayGroupInfo.groupId);
         return;
     }
@@ -1767,10 +1768,10 @@ void InputWindowsManager::OnScreenModeChangeForMirrorScreen(size_t screenCount)
         lastScreenCount_, screenCount);
     lastScreenCount_ = screenCount;
 
-    const auto iter = displayGroupInfoMap_.find(MAIN_GROUPID);
-    if (iter != displayGroupInfoMap_.end() && !iter->second.displaysInfo.empty()) {
+    const auto defaultGroup = GetDefaultGroupInfo();
+    if (defaultGroup != nullptr && !defaultGroup->displaysInfo.empty()) {
         MMI_HILOGD("Triggering ResetPointerPosition due to screen change");
-        ResetPointerPosition(iter->second);
+        ResetPointerPosition(*defaultGroup);
     } else {
         MMI_HILOGW("DisplayGroupInfo not available for cursor center reset");
     }
@@ -6482,7 +6483,7 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
                     if ((pointerEvent->HasFlag(InputEvent::EVENT_FLAG_SIMULATE)) &&
                         MMI_GNE(pointerEvent->GetZOrder(), 0.0f)) {
                         gestureInject = true;
-                    } else if (!HasMultipleActiveUsers() && groupId != MAIN_GROUPID) {
+                    } else if (!HasMultipleActiveUsers() && groupId != GetDefaultGroupId()) {
                         gestureInject = true;
                     }
                     timerId_ = TimerMgr->AddTimer(REPEAT_COOLING_TIME, REPEAT_ONCE, [this, gestureInject]() {
@@ -9550,13 +9551,13 @@ void InputWindowsManager::TouchEnterLeaveEvent(int32_t logicalX, int32_t logical
                 static_cast<int32_t>(lastInfo.lastTouchWindowInfo.windowInputType),
                 static_cast<int32_t>(touchWindow->windowInputType));
             int32_t toolType = pointerItem.GetToolType();
-            DispatchTouch(PointerEvent::POINTER_ACTION_CANCEL, DEFAULT_GROUP_ID, toolType);
+            DispatchTouch(PointerEvent::POINTER_ACTION_CANCEL, GetDefaultGroupId(), toolType);
             MMI_HILOG_DISPATCHI("Send down-action to the new window, (lastWId:%{public}d, LastPId:%{public}d), "
                 "(newWId:%{public}d, newWId:%{public}d)",
             lastInfo.lastTouchWindowInfo.id, lastInfo.lastTouchWindowInfo.pid, touchWindow->id, touchWindow->pid);
             UpdateStashTouchEventInfo(logicalX, logicalY, pointerEvent, touchWindow);
             TouchLockWindowInfo() = *touchWindow;
-            DispatchTouch(PointerEvent::POINTER_ACTION_DOWN, DEFAULT_GROUP_ID, toolType);
+            DispatchTouch(PointerEvent::POINTER_ACTION_DOWN, GetDefaultGroupId(), toolType);
             return;
         }
     }
@@ -9757,7 +9758,7 @@ void InputWindowsManager::EnterMouseCaptureMode(const OLD::DisplayGroupInfo &dis
 {
     CALL_DEBUG_ENTER;
     int32_t groupId = displayGroupInfo.groupId;
-    if (groupId != DEFAULT_GROUP_ID) {
+    if (groupId != GetDefaultGroupId()) {
         MMI_HILOGD("groupId is error");
         return;
     }
