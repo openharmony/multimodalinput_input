@@ -4575,7 +4575,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_AddActiveWindow_004, T
     int32_t displayId = 0;
  
     inputWindowsManager->activeTouchWinTypes_.emplace(
-        std::make_pair(windowId, displayId), InputWindowsManager::ActiveTouchWin{
+        std::make_pair(displayId, windowId), InputWindowsManager::ActiveTouchWin{
             WindowInputType::MIX_LEFT_RIGHT_ANTI_AXIS_MOVE, { pointerId }
         });
  
@@ -4637,7 +4637,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_RemoveActiveWindow_002
     int32_t displayId = 0;
     auto windowTypeTemp = WindowInputType::MIX_LEFT_RIGHT_ANTI_AXIS_MOVE;
     inputWindowsManager->activeTouchWinTypes_.emplace(
-        std::make_pair(windowId, displayId),
+        std::make_pair(displayId, windowId),
         InputWindowsManager::ActiveTouchWin{WindowInputType::MIX_LEFT_RIGHT_ANTI_AXIS_MOVE, { pointerIdA }});
  
     pointerEvent->SetPointerId(pointerIdB);

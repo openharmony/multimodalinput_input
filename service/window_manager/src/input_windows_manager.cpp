@@ -9191,7 +9191,7 @@ std::optional<WindowInfo> InputWindowsManager::GetWindowInfoById(int32_t windowI
         for (auto iter = it.second.begin(); iter != it.second.end(); ++iter) {
             int32_t curDisplayId = iter->first;
             if (displayId >= 0 && curDisplayId != displayId) {
-                  continue;
+                continue;
             }
             if (curDisplayId < 0) {
                 MMI_HILOGE("windowsPerDisplay_ contain invalid displayId:%{public}d", curDisplayId);
@@ -9630,7 +9630,7 @@ void InputWindowsManager::AddActiveWindow(int32_t displayId, int32_t windowId, i
     auto it = activeTouchWinTypes_.find({displayId, windowId});
     if (it != activeTouchWinTypes_.end()) {
         it->second.pointerSet.emplace(pointerId);
-        MMI_HILOGD("AddActiveWindow success: :%{public}d|%{public}d|%{public}hhu|:%{public}d|:%{public}zu",
+        MMI_HILOGD("AddActiveWindow success: %{public}d|%{public}d|%{public}hhu|:%{public}d|:%{public}zu",
             displayId, windowId, it->second.windowInputType, pointerId, it->second.pointerSet.size());
     } else {
         std::optional<WindowInfo> info = GetWindowInfoById(windowId, displayId);
@@ -9639,7 +9639,7 @@ void InputWindowsManager::AddActiveWindow(int32_t displayId, int32_t windowId, i
                 windowId, displayId);
             return;
         }
-        activeTouchWinTypes_.emplace(std::make_pair(windowId, displayId),
+        activeTouchWinTypes_.emplace(std::make_pair(displayId, windowId),
             ActiveTouchWin{(*info).windowInputType, { pointerId }});
     }
 }
