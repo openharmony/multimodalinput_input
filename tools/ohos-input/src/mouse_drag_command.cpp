@@ -119,7 +119,8 @@ std::vector<ParameterDoc> MouseDragCommand::GetParameters() const
         { "--duration <number>",
             "Total drag duration in ms (optional, range: [0, 10000], 0 means instant, default: 0)" },
         { "--modifier <keys>",
-            "Modifier keys, pipe-separated, in press order (optional, e.g. ctrl|shift, no duplicates)" },
+            "Modifier keys (optional, values: [ctrl, alt, shift, meta], pipe-separated with |, in press order, "
+            "no duplicates)" },
     };
 }
 

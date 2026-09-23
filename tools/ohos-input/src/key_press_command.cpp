@@ -121,7 +121,8 @@ std::vector<ParameterDoc> KeyPressCommand::GetParameters() const
         { "--holdDuration <number>",
             "Duration to hold the key in ms\n(optional, range: [0, 10000], 0 means instant release, default: 100)" },
         { "--modifier <keys>",
-            "Modifier keys, pipe-separated, in press order (optional, e.g. ctrl|shift, no duplicates)" },
+            "Modifier keys (optional, values: [ctrl, alt, shift, meta], pipe-separated with |, in press order, "
+            "no duplicates)" },
     };
 }
 
@@ -132,13 +133,13 @@ std::vector<std::string> KeyPressCommand::GetExamples() const
         "ohos-input key-press --key 2054",
         "",
         "# Press A key for 200ms",
-        "ohos-input key-press --key 2049 --holdDuration 200",
+        "ohos-input key-press --key 2017 --holdDuration 200",
         "",
         "# Ctrl+A (select all)",
-        "ohos-input key-press --key 2049 --modifier ctrl",
+        "ohos-input key-press --key 2017 --modifier ctrl",
         "",
         "# Ctrl+Shift+S (save as), pressed in order: ctrl then shift; released: shift then ctrl",
-        "ohos-input key-press --key 2066 --modifier ctrl|shift",
+        "ohos-input key-press --key 2035 --modifier ctrl|shift",
     };
 }
 

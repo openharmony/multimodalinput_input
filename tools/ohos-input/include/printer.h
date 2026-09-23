@@ -28,7 +28,7 @@ constexpr int32_t SERVICE_EXIT = 1;
 
 class OutputPrinter {
 public:
-    static int32_t PrintSuccess(const nlohmann::json &data);
+    static int32_t PrintSuccess(const nlohmann::ordered_json &data);
     static int32_t PrintError(const std::string &errCode, const std::string &errMsg, const std::string &suggestion,
         int32_t exitCode);
     static void PrintHelp(const std::string &helpText);

@@ -79,7 +79,7 @@ ohos-input mouse-click [options]
 ```
 ohos-input mouse-scroll [options]
   --clicks <number>       滚动齿数（必填，[-100,-1] 或 [1,100]，正数向上、负数向下，1 齿 = 15 度）
-  --modifier <keys>       修饰键（可选）
+  --modifier <keys>       修饰键（可选，ctrl/alt/shift/meta，多个用 | 分隔，不可重复）
 ```
 
 ### mouse-move
@@ -89,7 +89,7 @@ ohos-input mouse-move [options]
   --displayId <number>    显示器 ID（可选，>=0，默认 0）
   --x <integer>           目标 X 坐标（必填整数，>=0）
   --y <integer>           目标 Y 坐标（必填整数，>=0）
-  --modifier <keys>       修饰键（可选）
+  --modifier <keys>       修饰键（可选，ctrl/alt/shift/meta，多个用 | 分隔，不可重复）
 ```
 
 ### mouse-drag
@@ -100,9 +100,9 @@ ohos-input mouse-drag [options]
   --srcX/--srcY <integer> 起点 X/Y 坐标（必填整数，>=0）
   --dstDisplayId <number> 目标显示器 ID（可选，>=0，默认 0）
   --dstX/--dstY <integer> 终点 X/Y 坐标（必填整数，>=0）
-  --button <key>          拖动按住的按键（可选，默认 left）
+  --button <key>          拖动按住的按键（可选，left/right/middle，默认 left）
   --duration <number>     总时长 ms（可选，[0,10000]，0 表示瞬间完成，默认 0；>0 时按 16ms 步进插值）
-  --modifier <keys>       修饰键（可选）
+  --modifier <keys>       修饰键（可选，ctrl/alt/shift/meta，多个用 | 分隔，不可重复）
 ```
 
 源显示器与目标显示器不同时，两端点换算为全局坐标后插值注入，由输入服务选择实际显示器；同显示器拖动走显示器坐标路径。
@@ -111,9 +111,9 @@ ohos-input mouse-drag [options]
 
 ```
 ohos-input key-press [options]
-  --key <number>          OHOS 键码（必填，>=1，如 2049=A、2054=回车）
+  --key <number>          OHOS 键码（必填，>=1，如 2017=A、2054=回车）
   --holdDuration <number> 按下持续时间 ms（可选，[0,10000]，0 表示瞬间抬起，默认 100）
-  --modifier <keys>       修饰键（可选；修饰键+目标键总数不超过 5）
+  --modifier <keys>       修饰键（可选，ctrl/alt/shift/meta，多个用 | 分隔，不可重复；修饰键+目标键总数不超过 5）
 ```
 
 修饰键仅支持 `ctrl` / `alt` / `shift` / `meta`（映射 LEFT 变体键码 2072/2045/2047/2076），按下顺序为书写顺序，抬起顺序为逆序；`--key` 键码不得与已选修饰键键码重复。
@@ -225,13 +225,13 @@ ohos-input mouse-drag --srcDisplayId 0 --srcX 100 --srcY 100 --dstDisplayId 1 --
 ohos-input key-press --key 2054
 
 # Ctrl+A（全选）
-ohos-input key-press --key 2049 --modifier ctrl
+ohos-input key-press --key 2017 --modifier ctrl
 
 # Ctrl+Shift+S（按下顺序 ctrl、shift；抬起顺序 shift、ctrl）
-ohos-input key-press --key 2066 --modifier ctrl|shift
+ohos-input key-press --key 2035 --modifier ctrl|shift
 
 # 输出示例：
-{"type":"result","status":"success","data":{"action":"key-press","key":2049}}
+{"type":"result","status":"success","data":{"action":"key-press","key":2017}}
 ```
 
 ## 典型工作流
@@ -247,7 +247,7 @@ ohos-input mouse-click --x 100 --y 200
 ohos-input mouse-double-click --x 100 --y 200
 
 # 4. Ctrl+A 全选
-ohos-input key-press --key 2049 --modifier ctrl
+ohos-input key-press --key 2017 --modifier ctrl
 
 # 5. 滚动浏览内容
 ohos-input mouse-scroll --clicks -3

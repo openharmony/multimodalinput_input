@@ -76,7 +76,8 @@ std::vector<ParameterDoc> MouseDoubleClickCommand::GetParameters() const
             "Interval between first press and second press in ms\n(optional, range: [100, 400], "
             "must be greater than holdDuration, default: 250)" },
         { "--modifier <keys>",
-            "Modifier keys, pipe-separated, in press order (optional, e.g. ctrl|shift, no duplicates)" },
+            "Modifier keys (optional, values: [ctrl, alt, shift, meta], pipe-separated with |, in press order, "
+            "no duplicates)" },
     };
 }
 
