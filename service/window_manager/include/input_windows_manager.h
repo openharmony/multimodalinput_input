@@ -536,7 +536,7 @@ void HandleOneHandMode(const OLD::DisplayInfo &displayInfo, std::shared_ptr<Poin
     void SendBackCenterPointerEvent(const CursorPosition &cursorPos);
     WINDOW_UPDATE_ACTION UpdateWindowInfo(OLD::DisplayGroupInfo &displayGroupInfo);
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
-    std::optional<WindowInfo> GetWindowInfoById(int32_t windowId) const;
+    std::optional<WindowInfo> GetWindowInfoById(int32_t windowId, int32_t displayId = -1) const;
     int32_t ShiftAppMousePointerEvent(const ShiftWindowInfo &shiftWindowInfo, bool autoGenDown);
     int32_t ShiftAppTouchPointerEvent(const ShiftWindowInfo &shiftWindowInfo);
     int32_t ShiftAppSimulateTouchPointerEvent(const ShiftWindowInfo &shiftWindowInfo);
@@ -553,8 +553,8 @@ void HandleOneHandMode(const OLD::DisplayInfo &displayInfo, std::shared_ptr<Poin
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
     bool IsAccessibilityFocusEvent(std::shared_ptr<PointerEvent> pointerEvent);
     bool IsAccessibilityEventWithZorderInjected(std::shared_ptr<PointerEvent> pointerEvent);
-    void GetActiveWindowTypeById(int32_t windowId, WindowInputType &windowTypeTemp);
-    void AddActiveWindow(int32_t windowId, int32_t pointerId);
+    void GetActiveWindowTypeById(int32_t displayId, int32_t windowId, WindowInputType &windowTypeTemp);
+    void AddActiveWindow(int32_t displayId, int32_t windowId, int32_t pointerId);
     void RemoveActiveWindow(std::shared_ptr<PointerEvent> pointerEvent);
     void ClearActiveWindow();
     void UpdateWindowInfoFlag(uint32_t flag, std::shared_ptr<InputEvent> event);
@@ -682,7 +682,7 @@ private:
             : windowInputType(windowInputType), pointerSet(pointerSet)
         {}
     };
-    std::map<int32_t, ActiveTouchWin> activeTouchWinTypes_;
+    std::map<std::pair<int32_t, int32_t>, ActiveTouchWin> activeTouchWinTypes_;
     std::map<int32_t, std::map<int32_t, std::set<int32_t>>> targetTouchWinIds_;
     std::map<int32_t, std::map<int32_t, std::set<int32_t>>>& TouchTargetWinIds();
     std::map<int32_t, WindowPartInfo>& TouchFirstTouchInfos();
