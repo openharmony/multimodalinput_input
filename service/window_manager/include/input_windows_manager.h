@@ -245,6 +245,7 @@ public:
     int32_t GetPidByDisplayIdAndWindowId(int32_t displayId, int32_t windowId);
     int32_t GetAgentPidByDisplayIdAndWindowId(int32_t displayId, int32_t windowId);
     int32_t FindDisplayUserId(int32_t displayId) const;
+    int32_t GetMainDisplayIdByUserId(int32_t userId) const;
 #ifdef OHOS_BUILD_ENABLE_ANCO
     void InitializeAnco();
     int32_t AncoAddChannel(sptr<IAncoChannel> channel);

@@ -211,6 +211,9 @@ void GetInjectionEventDataNative(Input_KeyEvent* keyEventNative,
     OH_Input_SetKeyEventAction(keyEventNative, keyAction);
     OH_Input_SetKeyEventKeyCode(keyEventNative, thKeyEvent.keyCode);
     OH_Input_SetKeyEventActionTime(keyEventNative, static_cast<int64_t>(thKeyEvent.keyDownDuration));
+    if (thKeyEvent.displayId.has_value() && thKeyEvent.displayId.value() >= 0) {
+        OH_Input_SetKeyEventDisplayId(keyEventNative, thKeyEvent.displayId.value());
+    }
     Input_Result result = static_cast<Input_Result>(OH_Input_InjectKeyEvent(keyEventNative));
     if (result != INPUT_SUCCESS) {
         MMI_HILOGE("OH_Input_InjectKeyEvent error");
@@ -242,6 +245,9 @@ void GetInjectionEventData(std::shared_ptr<OHOS::MMI::KeyEvent> keyEventNative,
     keyEventNative->SetKeyCode(thKeyEvent.keyCode);
     auto keyAction = thKeyEvent.isPressed ? OHOS::MMI::KeyEvent::KEY_ACTION_DOWN : OHOS::MMI::KeyEvent::KEY_ACTION_UP;
     keyEventNative->SetKeyAction(keyAction);
+    if (thKeyEvent.displayId.has_value() && thKeyEvent.displayId.value() >= 0) {
+        keyEventNative->SetTargetDisplayId(thKeyEvent.displayId.value());
+    }
     OHOS::MMI::KeyEvent::KeyItem item;
     item.SetKeyCode(thKeyEvent.keyCode);
     item.SetPressed(thKeyEvent.isPressed);

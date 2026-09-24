@@ -26,6 +26,7 @@ struct KeyEvent {
     keyCode: i32;
     keyDownDuration: i32;
     isIntercepted: bool;
+    displayId: Optional<i32>;
 }
 
 struct TouchEventData {

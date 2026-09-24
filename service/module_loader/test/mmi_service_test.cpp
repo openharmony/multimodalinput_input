@@ -5500,5 +5500,93 @@ HWTEST_F(MMIServerTest, MMIService_UpdateUIExtensionInfo_NoPermission_002, TestS
     ErrCode ret = mmiService.UpdateUIExtensionInfo(uiExtensionInfos);
     EXPECT_EQ(ret, ERROR_NO_PERMISSION);
 }
+
+namespace {
+constexpr int32_t TEST_DEFAULT_USER_ID { 0 };
+constexpr int32_t TEST_SECONDARY_USER_ID { 100 };
+constexpr int32_t TEST_DISPLAY_ID_INVALID { -1 };
+constexpr int32_t TEST_DISPLAY_ID_FIRST { 1 };
+constexpr int32_t TEST_DISPLAY_ID_SECOND { 7 };
+} // namespace
+
+/**
+ * @tc.name: MMIServerTest_GetTargetDisplayIdByUserId_001
+ * @tc.desc: Negative user id keeps the requested display id without display queries
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIServerTest, MMIServerTest_GetTargetDisplayIdByUserId_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MMIService mmiService;
+    int32_t displayId = TEST_DISPLAY_ID_FIRST;
+    ErrCode ret = mmiService.GetTargetDisplayIdByUserId(-1, displayId);
+    EXPECT_EQ(ret, RET_OK);
+    EXPECT_EQ(displayId, TEST_DISPLAY_ID_FIRST);
+}
+
+/**
+ * @tc.name: MMIServerTest_GetTargetDisplayIdByUserId_002
+ * @tc.desc: Default user without a specified display keeps the default behavior
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIServerTest, MMIServerTest_GetTargetDisplayIdByUserId_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MMIService mmiService;
+    int32_t displayId = TEST_DISPLAY_ID_INVALID;
+    ErrCode ret = mmiService.GetTargetDisplayIdByUserId(TEST_DEFAULT_USER_ID, displayId);
+    EXPECT_EQ(ret, RET_OK);
+    EXPECT_EQ(displayId, TEST_DISPLAY_ID_INVALID);
+}
+
+/**
+ * @tc.name: MMIServerTest_GetTargetDisplayIdByUserId_004
+ * @tc.desc: Default user targeting a nonexistent display is rejected
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIServerTest, MMIServerTest_GetTargetDisplayIdByUserId_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MMIService mmiService;
+    int32_t displayId = TEST_DISPLAY_ID_SECOND;
+    ErrCode ret = mmiService.GetTargetDisplayIdByUserId(TEST_DEFAULT_USER_ID, displayId);
+    EXPECT_EQ(ret, RET_ERR);
+    EXPECT_EQ(displayId, TEST_DISPLAY_ID_SECOND);
+}
+
+/**
+ * @tc.name: MMIServerTest_GetTargetDisplayIdByUserId_006
+ * @tc.desc: Secondary user targeting a display outside its space is rejected
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIServerTest, MMIServerTest_GetTargetDisplayIdByUserId_006, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MMIService mmiService;
+    int32_t displayId = TEST_DISPLAY_ID_FIRST;
+    ErrCode ret = mmiService.GetTargetDisplayIdByUserId(TEST_SECONDARY_USER_ID, displayId);
+    EXPECT_EQ(ret, RET_ERR);
+    EXPECT_EQ(displayId, TEST_DISPLAY_ID_FIRST);
+}
+
+/**
+ * @tc.name: MMIServerTest_GetTargetDisplayIdByUserId_007
+ * @tc.desc: Secondary user without a display in its space is rejected
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIServerTest, MMIServerTest_GetTargetDisplayIdByUserId_007, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MMIService mmiService;
+    int32_t displayId = TEST_DISPLAY_ID_INVALID;
+    ErrCode ret = mmiService.GetTargetDisplayIdByUserId(TEST_SECONDARY_USER_ID, displayId);
+    EXPECT_EQ(ret, RET_ERR);
+    EXPECT_EQ(displayId, TEST_DISPLAY_ID_INVALID);
+}
 } // namespace MMI
 } // namespace OHOS

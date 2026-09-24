@@ -202,6 +202,7 @@ public:
     virtual int32_t GetPidByDisplayIdAndWindowId(int32_t displayId, int32_t windowId) = 0;
     virtual int32_t GetAgentPidByDisplayIdAndWindowId(int32_t displayId, int32_t windowId) = 0;
     virtual int32_t FindDisplayUserId(int32_t displayId) const = 0;
+    virtual int32_t GetMainDisplayIdByUserId(int32_t userId) const = 0;
     virtual void ClearPointerDeviceId(const std::shared_ptr<PointerEvent> pointerEvent) = 0;
     virtual std::map<int32_t, std::vector<std::shared_ptr<WindowInfo>>>& GetCancelEventList(
         std::map<int32_t, std::vector<std::shared_ptr<WindowInfo>>>& realList) = 0;

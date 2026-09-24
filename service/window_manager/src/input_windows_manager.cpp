@@ -712,6 +712,16 @@ int32_t InputWindowsManager::FindDisplayUserId(int32_t displayId) const
     return RET_ERR;
 }
 
+int32_t InputWindowsManager::GetMainDisplayIdByUserId(int32_t userId) const
+{
+    for (const auto& it : displayGroupInfoMap_) {
+        if (it.second.currentUserId == userId) {
+            return it.second.mainDisplayId;
+        }
+    }
+    return RET_ERR;
+}
+
 int32_t InputWindowsManager::FindGroupIdByRsId(uint64_t rsId) const
 {
     for (const auto& it : displayGroupInfoMap_) {
