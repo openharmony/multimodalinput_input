@@ -6249,7 +6249,7 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
                 }
             }
             touchWindow = &item;
-            AddActiveWindow(touchWindow->id, pointerEvent->GetPointerId());
+            AddActiveWindow(displayId, touchWindow->id, pointerEvent->GetPointerId());
             bool isSpecialWindow = HandleWindowInputType(item, pointerEvent);
             if (!isFirstSpecialWindow) {
                 isFirstSpecialWindow = isSpecialWindow;
@@ -6974,7 +6974,7 @@ void InputWindowsManager::CheckUIExtentionWindowDefaultHotArea(std::pair<int32_t
             if (windowinfo.id == uiExtentionWindowId) {
                 *touchWindow = &windowinfo;
                 MMI_HILOG_DISPATCHD("uiExtentionWindowid:%{public}d", uiExtentionWindowId);
-                AddActiveWindow(windowinfo.id, pointerEvent->GetPointerId());
+                AddActiveWindow(windowinfo.displayId, windowinfo.id, pointerEvent->GetPointerId());
                 AddTargetWindowIds(pointerEvent->GetPointerId(), pointerEvent->GetSourceType(), uiExtentionWindowId,
                     pointerEvent->GetDeviceId());
                 break;
@@ -8401,7 +8401,7 @@ bool InputWindowsManager::HandleWindowInputType(const WindowInfo &window, std::s
     int32_t sourceType = pointerEvent->GetSourceType();
     WindowInputType windowTypeTemp = window.windowInputType;
     if (sourceType == PointerEvent::SOURCE_TYPE_TOUCHSCREEN) {
-        GetActiveWindowTypeById(window.id, windowTypeTemp);
+        GetActiveWindowTypeById(window.displayId, window.id, windowTypeTemp);
     }
     switch (windowTypeTemp)
     {
@@ -9213,13 +9213,16 @@ const OLD::DisplayInfo *InputWindowsManager::GetPhysicalDisplay(int32_t id,
 }
 
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
-std::optional<WindowInfo> InputWindowsManager::GetWindowInfoById(int32_t windowId) const
+std::optional<WindowInfo> InputWindowsManager::GetWindowInfoById(int32_t windowId, int32_t displayId) const
 {
     for (const auto &it : windowsPerDisplayMap_) {
         for (auto iter = it.second.begin(); iter != it.second.end(); ++iter) {
-            int32_t displayId = iter->first;
-            if (displayId < 0) {
-                MMI_HILOGE("windowsPerDisplay_ contain invalid displayId:%{public}d", displayId);
+            int32_t curDisplayId = iter->first;
+            if (displayId >= 0 && curDisplayId != displayId) {
+                continue;
+            }
+            if (curDisplayId < 0) {
+                MMI_HILOGE("windowsPerDisplay_ contain invalid displayId:%{public}d", curDisplayId);
                 continue;
             }
             for (const auto& item : iter->second.windowsInfo) {
@@ -9640,35 +9643,32 @@ int32_t InputWindowsManager::ClearMouseHideFlag(int32_t eventId)
     return RET_ERR;
 }
 
-void InputWindowsManager::GetActiveWindowTypeById(int32_t windowId, WindowInputType &windowTypeTemp)
+void InputWindowsManager::GetActiveWindowTypeById(int32_t displayId, int32_t windowId, WindowInputType &windowTypeTemp)
 {
-    auto it = activeTouchWinTypes_.find(windowId);
+    auto it = activeTouchWinTypes_.find({displayId, windowId});
     if (it != activeTouchWinTypes_.end()) {
         windowTypeTemp = it->second.windowInputType;
-        MMI_HILOGD("GetActiveWindowTypeById success: windowId:%{public}d, windowTypeTemp:%{public}hhu",
-            windowId,
-            it->second.windowInputType);
+        MMI_HILOGD("GetActiveWindowTypeById success: displayId:%{public}d, windowId:%{public}d,"
+            "windowTypeTemp:%{public}hhu", displayId, windowId, it->second.windowInputType);
     }
 }
 
-void InputWindowsManager::AddActiveWindow(int32_t windowId, int32_t pointerId)
+void InputWindowsManager::AddActiveWindow(int32_t displayId, int32_t windowId, int32_t pointerId)
 {
-    auto it = activeTouchWinTypes_.find(windowId);
+    auto it = activeTouchWinTypes_.find({displayId, windowId});
     if (it != activeTouchWinTypes_.end()) {
         it->second.pointerSet.emplace(pointerId);
-        MMI_HILOGD("AddActiveWindow success: windowId:%{public}d, windowType:%{public}hhu, "
-                   "pointerId:%{public}d, pointerSet:%{public}zu",
-            windowId,
-            it->second.windowInputType,
-            pointerId,
-            it->second.pointerSet.size());
+        MMI_HILOGD("AddActiveWindow success: %{public}d|%{public}d|%{public}hhu|:%{public}d|:%{public}zu",
+            displayId, windowId, it->second.windowInputType, pointerId, it->second.pointerSet.size());
     } else {
-        std::optional<WindowInfo> info = GetWindowInfoById(windowId);
+        std::optional<WindowInfo> info = GetWindowInfoById(windowId, displayId);
         if (!info) {
-            MMI_HILOGE("Failed to add active window: windowInfo with windowId:%{public}d not found", windowId);
+            MMI_HILOGE("Failed to add active window: windowId:%{public}d with displayId:%{public}d not found",
+                windowId, displayId);
             return;
         }
-        activeTouchWinTypes_.emplace(windowId, ActiveTouchWin{(*info).windowInputType, { pointerId }});
+        activeTouchWinTypes_.emplace(std::make_pair(displayId, windowId),
+            ActiveTouchWin{(*info).windowInputType, { pointerId }});
     }
 }
 
@@ -9684,18 +9684,13 @@ void InputWindowsManager::RemoveActiveWindow(std::shared_ptr<PointerEvent> point
         auto pointerIter = it->second.pointerSet.find(pointerId);
         if (pointerIter != it->second.pointerSet.end()) {
             it->second.pointerSet.erase(pointerIter);
-            MMI_HILOGD("RemoveActiveWindow success: windowId:%{public}d, windowType:%{public}hhu, "
-                       "pointerId:%{public}d, pointerSet:%{public}zu, isInject:%{public}d",
-                it->first,
-                it->second.windowInputType,
-                pointerId,
-                it->second.pointerSet.size(),
-                pointerEvent->HasFlag(InputEvent::EVENT_FLAG_SIMULATE));
+            MMI_HILOGD("RemoveActiveWindow success: %{public}d|%{public}d|%{public}hhu|%{public}d|%{public}zu|"
+                "%{public}d", it->first.first, it->first.second, it->second.windowInputType, pointerId,
+                it->second.pointerSet.size(), pointerEvent->HasFlag(InputEvent::EVENT_FLAG_SIMULATE));
         }
         if (it->second.pointerSet.empty()) {
-            MMI_HILOGD("RemoveActiveWindow success: erase windowId:%{public}d, windowType:%{public}hhu",
-                it->first,
-                it->second.windowInputType);
+            MMI_HILOGD("RemoveActiveWindow success: erase %{public}d|%{public}d|%{public}hhu",
+                it->first.first, it->first.second, it->second.windowInputType);
             it = activeTouchWinTypes_.erase(it);
         } else {
             ++it;

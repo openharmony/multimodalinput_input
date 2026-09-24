@@ -2971,7 +2971,8 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_AddActiveWindow,
     ASSERT_NE(inputWindowsManager, nullptr);
     int32_t windowId = 1;
     int32_t pointerId = 0;
-    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->AddActiveWindow(windowId, pointerId));
+    int32_t displayId = 0;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->AddActiveWindow(displayId, windowId, pointerId));
 
     WindowInfo windowInfo;
     windowInfo.id = 1;
@@ -2980,10 +2981,10 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_AddActiveWindow,
     if (it != inputWindowsManager->displayGroupInfoMap_.end()) {
         it->second.windowsInfo.push_back(windowInfo);
     }
-    inputWindowsManager->AddActiveWindow(windowId, pointerId);
+    inputWindowsManager->AddActiveWindow(displayId, windowId, pointerId);
     pointerId = 100;
     inputWindowsManager->activeTouchWinTypes_.clear();
-    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->AddActiveWindow(windowId, pointerId));
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->AddActiveWindow(displayId, windowId, pointerId));
 }
 
 /* *
