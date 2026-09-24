@@ -116,11 +116,18 @@ static void GetInjectionEventDataNative(napi_env env, struct Input_KeyEvent* key
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "keyCode must be greater than or equal to 0");
         histogramError(COMMON_PARAMETER_ERROR);
     }
+    int32_t displayId = -1;
+    if (GetNamedPropertyInt32(env, keyHandle, "displayId", displayId, false) == RET_OK) {
+        MMI_HILOGD("displayId:%{public}d", displayId);
+    }
     CHKPV(keyEventNative);
     auto keyAction = isPressed ? Input_KeyEventAction::KEY_ACTION_DOWN : Input_KeyEventAction::KEY_ACTION_UP;
     OH_Input_SetKeyEventAction(keyEventNative, keyAction);
     OH_Input_SetKeyEventKeyCode(keyEventNative, keyCode);
     OH_Input_SetKeyEventActionTime(keyEventNative, static_cast<int64_t>(keyDownDuration));
+    if (displayId >= 0) {
+        OH_Input_SetKeyEventDisplayId(keyEventNative, displayId);
+    }
     Input_Result result = static_cast<Input_Result>(OH_Input_InjectKeyEvent(keyEventNative));
     if (result != INPUT_SUCCESS) {
         THROWERR_CUSTOM(env, result, "Error while injecting KeyEvent with native api");
@@ -162,9 +169,16 @@ static void GetInjectionEventData(napi_env env, std::shared_ptr<KeyEvent> keyEve
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "keyCode must be greater than or equal to 0");
         histogramError(COMMON_PARAMETER_ERROR);
     }
+    int32_t displayId = -1;
+    if (GetNamedPropertyInt32(env, keyHandle, "displayId", displayId, false) == RET_OK) {
+        MMI_HILOGD("displayId:%{public}d", displayId);
+    }
     keyEvent->SetKeyCode(keyCode);
     auto keyAction = isPressed ? KeyEvent::KEY_ACTION_DOWN : KeyEvent::KEY_ACTION_UP;
     keyEvent->SetKeyAction(keyAction);
+    if (displayId >= 0) {
+        keyEvent->SetTargetDisplayId(displayId);
+    }
     KeyEvent::KeyItem item;
     item.SetKeyCode(keyCode);
     item.SetPressed(isPressed);

@@ -368,6 +368,7 @@ private:
 
     ErrCode CheckControllerPermission();
     ErrCode CheckInjectKeyEventPermission(const std::shared_ptr<KeyEvent> keyEvent, bool isNativeInject);
+    ErrCode GetTargetDisplayIdByUserId(int32_t userId, int32_t &displayId);
     ErrCode CheckInjectPointerEventPermission(const std::shared_ptr<PointerEvent> pointerEvent,
         bool isNativeInject, int32_t useCoordinate = PointerEvent::DISPLAY_COORDINATE);
 #ifdef OHOS_BUILD_ENABLE_CONTROLLER_INJECT

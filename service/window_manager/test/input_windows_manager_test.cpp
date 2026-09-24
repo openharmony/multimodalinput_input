@@ -17911,5 +17911,29 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetGlobalCoordinates_0
     EXPECT_EQ(globalCoords.x, 7);
     EXPECT_EQ(globalCoords.y, 8);
 }
+
+/**
+ * @tc.name: InputWindowsManagerTest_GetMainDisplayIdByUserId_001
+ * @tc.desc: Test GetMainDisplayIdByUserId with matched and unmatched user ids
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetMainDisplayIdByUserId_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    OLD::DisplayGroupInfo group1 = InputWindowsManagerTest::CreateDisplayGroupInfo(NUM_100, NUM_100, NUM_100 + NUM_1);
+    group1.currentUserId = NUM_100;
+    group1.mainDisplayId = NUM_100;
+    OLD::DisplayGroupInfo group2 = InputWindowsManagerTest::CreateDisplayGroupInfo(NUM_200, NUM_200);
+    group2.currentUserId = NUM_200;
+    group2.mainDisplayId = NUM_200;
+
+    WIN_MGR->UpdateDisplayInfo(group1);
+    WIN_MGR->UpdateDisplayInfo(group2);
+
+    EXPECT_EQ(WIN_MGR->GetMainDisplayIdByUserId(NUM_100), NUM_100);
+    EXPECT_EQ(WIN_MGR->GetMainDisplayIdByUserId(NUM_200), NUM_200);
+    EXPECT_EQ(WIN_MGR->GetMainDisplayIdByUserId(NUM_1), RET_ERR);
+}
 } // namespace MMI
 } // namespace OHOS

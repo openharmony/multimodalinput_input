@@ -2327,6 +2327,36 @@ ErrCode MMIService::CheckInjectKeyEventPermission(const std::shared_ptr<KeyEvent
     return RET_OK;
 }
 
+ErrCode MMIService::GetTargetDisplayIdByUserId(int32_t userId, int32_t &displayId)
+{
+    if (userId < 0) {
+        return RET_OK;
+    }
+    if (userId == 0) {
+        if (displayId >= 0 && WIN_MGR->FindDisplayUserId(displayId) < 0) {
+            MMI_HILOGE("userId is 0, displayId:%{public}d not exist", displayId);
+            return RET_ERR;
+        }
+        return RET_OK;
+    }
+    if (displayId >= 0) {
+        if (WIN_MGR->FindDisplayUserId(displayId) != userId) {
+            MMI_HILOGE("displayId:%{public}d not in caller user:%{public}d space", displayId, userId);
+            return RET_ERR;
+        }
+        MMI_HILOGD("displayId:%{public}d belongs to caller user:%{public}d", displayId, userId);
+        return RET_OK;
+    }
+    int32_t mainDisplayId = WIN_MGR->GetMainDisplayIdByUserId(userId);
+    if (mainDisplayId < 0) {
+        MMI_HILOGW("No display found for caller user:%{public}d", userId);
+        return RET_ERR;
+    }
+    displayId = mainDisplayId;
+    MMI_HILOGD("Set main displayId:%{public}d for caller user:%{public}d", displayId, userId);
+    return RET_OK;
+}
+
 ErrCode MMIService::InjectKeyEvent(const KeyEvent& keyEvent, bool isNativeInject)
 {
     CALL_DEBUG_ENTER;
@@ -2349,6 +2379,18 @@ ErrCode MMIService::InjectKeyEvent(const KeyEvent& keyEvent, bool isNativeInject
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     int32_t ret;
     int32_t pid = GetCallingPid();
+    auto tokenId = IPCSkeleton::GetCallingTokenID();
+    auto tokenType = OHOS::Security::AccessToken::AccessTokenKit::GetTokenTypeFlag(tokenId);
+    if (tokenType == OHOS::Security::AccessToken::TOKEN_HAP) {
+        int32_t userId = ACCOUNT_MGR->GetAccountIdFromUid(GetCallingUid());
+        int32_t displayId = keyEventPtr->GetTargetDisplayId();
+        ret = GetTargetDisplayIdByUserId(userId, displayId);
+        if (ret != RET_OK) {
+            MMI_HILOGE("GetTargetDisplayIdByUserId failed, ret:%{public}d, userId:%{public}d", ret, userId);
+            return ret;
+        }
+        keyEventPtr->SetTargetDisplayId(displayId);
+    }
 #ifdef OHOS_BUILD_ENABLE_ANCO
     ret = InjectKeyEventExt(keyEventPtr, pid, isNativeInject);
 #else
