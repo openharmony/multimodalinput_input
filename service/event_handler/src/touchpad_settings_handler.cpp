@@ -19,6 +19,7 @@
 #include "touchpad_settings_handler.h"
 #include "mmi_log.h"
 #include "account_manager.h"
+#include "parameters.h"
 
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "TouchpadSettingsObserver"
@@ -32,6 +33,8 @@
 namespace OHOS {
 namespace MMI {
 namespace {
+constexpr uint32_t TOUCHPAD_FEATURE_VERTICAL { 1 << 4 };
+const std::string TOUCHPAD_TYPE = OHOS::system::GetParameter("const.settings.clickpad_type", "0");
 const std::string DEFAULT_SWIPE_INWARD_SWITCH_VALUE {"1"};
 const std::string g_volumeSwitchesKey {"settings.trackpad.right_volume_switches"};
 const std::string g_brightnessSwitchesKey {"settings.trackpad.left_brightness_switches"};
@@ -168,11 +171,16 @@ sptr<SettingObserver> TouchpadSettingsObserver::RegisterSwipeInwardObserver()
 {
     const std::string datashareUri = GetDatashareUri();
     SettingObserver::UpdateFunc updateFunc = [this, datashareUri](const std::string& key) {
-        std::string value = DEFAULT_SWIPE_INWARD_SWITCH_VALUE;
+        std::string defaultSwitch = DEFAULT_SWIPE_INWARD_SWITCH_VALUE;
+        if (IsNumeric(TOUCHPAD_TYPE) &&
+            (std::stoul(TOUCHPAD_TYPE) & TOUCHPAD_FEATURE_VERTICAL) != TOUCHPAD_FEATURE_VERTICAL) {
+            defaultSwitch = "0";
+        }
+        std::string value = defaultSwitch;
         auto ret = SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID).GetStringValue(key, value, datashareUri);
         if (ret != RET_OK) {
             MMI_HILOGE("Get value from settings db failed, ret:%{public}d", ret);
-            this->SetSupportSwipeInward(std::stoi(DEFAULT_SWIPE_INWARD_SWITCH_VALUE));
+            this->SetSupportSwipeInward(std::stoi(defaultSwitch));
             return;
         }
         MMI_HILOGI("Config changed, key:%{public}s, value:%{public}s", key.c_str(), value.c_str());
