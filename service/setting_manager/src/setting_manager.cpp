@@ -108,10 +108,6 @@ void SettingManager::Initialize()
             {FIELD_KEYBOARD_REPEAT_RATE_DELAY, KEYBOARD_REPEATDELAY_DEFAULT}}};
 
     defaultSettingData_ = SettingData({mouseItem, touchpadItem, keyboardItem});
-
-    if (ffrtHandler_ == nullptr) {
-        ffrtHandler_ = std::make_shared<ffrt::queue>("InputSettingManager");
-    }
 }
 
 void SettingManager::OnDataShareReady()
@@ -121,10 +117,12 @@ void SettingManager::OnDataShareReady()
         MMI_HILOGI("The database ready event has been received");
         return;
     }
-    if (ffrtHandler_ == nullptr) {
-        ffrtHandler_ = std::make_shared<ffrt::queue>("InputSettingManager");
+    auto ffrtHandler = GetFfrtHandler();
+    if (ffrtHandler == nullptr) {
+        MMI_HILOGI("OnDataShareReady process failed, ffrtHandler is null");
+        return;
     }
-    ffrtHandler_->submit([this] {
+    ffrtHandler->submit([this] {
         flushFlag_.store(true);
         int32_t userId = ACCOUNT_MGR->QueryCurrentAccountId();
         MMI_HILOGI("Run task in data share ready, current id:%{private}d", userId);
@@ -155,10 +153,12 @@ void SettingManager::OnSwitchUser(int32_t userId)
         MMI_HILOGW("Data share not ready, id:%{private}d", userId);
         return;
     }
-    if (ffrtHandler_ == nullptr) {
-        ffrtHandler_ = std::make_shared<ffrt::queue>("InputSettingManager");
+    auto ffrtHandler = GetFfrtHandler();
+    if (ffrtHandler == nullptr) {
+        MMI_HILOGI("OnSwitchUser process failed, ffrtHandler is null, id:%{private}d", userId);
+        return;
     }
-    ffrtHandler_->submit([this, userId] {
+    ffrtHandler->submit([this, userId] {
         MMI_HILOGI("Run task on switch, id:%{private}d", userId);
         MarkUserConfigLoading(userId);
         flushFlag_.store(true);
@@ -189,14 +189,15 @@ void SettingManager::OnSwitchUser(int32_t userId)
 
 bool SettingManager::CheckAddUser(int32_t userId)
 {
-    if (cacheSettingMap_.find(userId) == cacheSettingMap_.end()) {
-        MMI_HILOGI("Can not find id:%{private}d in cache", userId);
-        return false;
-    }
     SettingData data;
     {
-        std::lock_guard<std::mutex> cacheGuard(cacheMapMutex_);
-        data = cacheSettingMap_[userId];
+        std::lock_guard<std::mutex> guard(cacheMapMutex_);
+        auto iter = cacheSettingMap_.find(userId);
+        if (iter == cacheSettingMap_.end()) {
+            MMI_HILOGI("Can not find id:%{private}d in cache", userId);
+            return false;
+        }
+        data = iter->second;
     }
     if (!data.GetAddFlag()) {
         MMI_HILOGI("Not new id:%{private}d", userId);
@@ -219,10 +220,12 @@ void SettingManager::OnAddUser(int32_t userId)
 {
     MMI_HILOGI("In add, id:%{private}d", userId);
     if (databaseReadyFlag_.load()) {
-        if (ffrtHandler_ == nullptr) {
-            ffrtHandler_ = std::make_shared<ffrt::queue>("InputSettingManager");
+        auto ffrtHandler = GetFfrtHandler();
+        if (ffrtHandler == nullptr) {
+            MMI_HILOGI("OnAddUser process failed, ffrtHandler is null, id:%{private}d", userId);
+            return;
         }
-        ffrtHandler_->submit([this, userId] {
+        ffrtHandler->submit([this, userId] {
             MMI_HILOGI("Run task on add, id:%{private}d", userId);
             std::vector<SettingItem> items;
             for (auto &key : SETTING_KEYS) {
@@ -256,6 +259,15 @@ void SettingManager::OnRemoveUser(int32_t userId)
 bool SettingManager::IsDatabaseReady() const
 {
     return databaseReadyFlag_.load();
+}
+
+std::shared_ptr<ffrt::queue> SettingManager::GetFfrtHandler()
+{
+    std::lock_guard<std::mutex> guard(ffrtHandlerMutex_);
+    if (ffrtHandler_ == nullptr) {
+        ffrtHandler_ = std::make_shared<ffrt::queue>("InputSettingManager");
+    }
+    return ffrtHandler_;
 }
 
 void SettingManager::CommitStagedChanges()

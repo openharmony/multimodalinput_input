@@ -16,6 +16,7 @@
 #pragma once
 #include <atomic>
 #include <memory>
+#include <mutex>
 #include <string>
 #include <unordered_map>
 
@@ -66,6 +67,8 @@ private:
     void MarkUserConfigLoaded(int32_t userId);
     bool IsUserConfigLoaded(int32_t userId) const override;
 
+    std::shared_ptr<ffrt::queue> GetFfrtHandler();
+
     // Helper methods for SetValueInner
     bool ShouldWriteToTemp() const;
     bool WriteToDatabase(int32_t userId, const std::string& settingKey, SettingData& settingData);
@@ -79,6 +82,7 @@ private:
     std::mutex cacheMapMutex_;
     std::mutex tempMapMutex_;
     std::shared_ptr<ffrt::queue> ffrtHandler_;
+    std::mutex ffrtHandlerMutex_;
     std::unordered_map<int32_t, bool> userConfigLoadedMap_;
     mutable std::mutex userConfigLoadedMutex_;
 };
