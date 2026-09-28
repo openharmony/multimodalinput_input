@@ -41,6 +41,14 @@ void InputActiveSubscriberHandler::HandleKeyEvent(const std::shared_ptr<KeyEvent
     CHKPV(nextHandler_);
     InputHandler->UpdateLastInputEventTime(WIN_MGR->GetDisplayId(keyEvent));
     OnSubscribeInputActive(keyEvent);
+    if (keyEvent->IsExtendedFunctionKey()) {
+        MMI_HILOGI("Extended function key, notify active subscribers and process only in KeyCommandHandler");
+        auto keyCommandHandler = InputHandler->GetKeyCommandHandler();
+        if (keyCommandHandler != nullptr) {
+            keyCommandHandler->HandleKeyEvent(keyEvent);
+        }
+        return;
+    }
     nextHandler_->HandleKeyEvent(keyEvent);
 }
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
