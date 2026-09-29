@@ -279,15 +279,16 @@ void InputManagerImpl::SetEnhanceConfig(uint8_t *cfg, uint32_t cfgLen)
         return;
     }
     if (enhanceCfg_ != nullptr) {
-        delete enhanceCfg_;
+        delete[] enhanceCfg_;
         enhanceCfg_ = nullptr;
     }
+    enhanceCfgLen_ = 0;
     enhanceCfg_ = new (std::nothrow) uint8_t[cfgLen];
     CHKPV(enhanceCfg_);
     errno_t ret = memcpy_s(enhanceCfg_, cfgLen, cfg, cfgLen);
     if (ret != EOK) {
         MMI_HILOGE("The cfg memcpy failed");
-        delete enhanceCfg_;
+        delete[] enhanceCfg_;
         enhanceCfg_ = nullptr;
         return;
     }
