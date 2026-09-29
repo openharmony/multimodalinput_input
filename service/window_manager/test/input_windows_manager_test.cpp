@@ -13511,7 +13511,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_ProcessNoFirstTouchHit
     ASSERT_TRUE(item.IsCanceled());
     inputWindowsManager.firstTouchWindowInfos_.clear();
 }
-
+ 
 /**
  * @tc.name: InputWindowsManagerTest_IsFindFirstTouchWindow_FindWindow
  * @tc.desc: Test the funcation IsFindFirstTouchFlagWindow
