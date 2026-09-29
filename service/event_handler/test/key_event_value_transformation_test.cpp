@@ -958,9 +958,9 @@ HWTEST_F(KeyEventValueTransformationTest, KeyEventValueTransformationTest_Transf
     ASSERT_NE(KeyEvent, nullptr);
     int32_t keyValue = 771;
     KeyEventValueTransformation result = TransferKeyValue(keyValue);
-    EXPECT_EQ(result.sysKeyValue, KeyEvent::KEYCODE_PTZ_EXPOSE_LEFT);
+    EXPECT_EQ(result.sysKeyValue, KeyEvent::KEYCODE_PTZ_EXPOSURE_LEFT);
     EXPECT_EQ(result.nativeKeyValue, keyValue);
-    EXPECT_EQ(result.keyEvent, "KEY_PTZ_EXPOSE_LEFT");
+    EXPECT_EQ(result.keyEvent, "KEY_PTZ_EXPOSURE_LEFT");
 }
 
 /**
@@ -976,9 +976,9 @@ HWTEST_F(KeyEventValueTransformationTest, KeyEventValueTransformationTest_Transf
     ASSERT_NE(KeyEvent, nullptr);
     int32_t keyValue = 772;
     KeyEventValueTransformation result = TransferKeyValue(keyValue);
-    EXPECT_EQ(result.sysKeyValue, KeyEvent::KEYCODE_PTZ_EXPOSE_RIGHT);
+    EXPECT_EQ(result.sysKeyValue, KeyEvent::KEYCODE_PTZ_EXPOSURE_RIGHT);
     EXPECT_EQ(result.nativeKeyValue, keyValue);
-    EXPECT_EQ(result.keyEvent, "KEY_PTZ_EXPOSE_RIGHT");
+    EXPECT_EQ(result.keyEvent, "KEY_PTZ_EXPOSURE_RIGHT");
 }
 
 /**
