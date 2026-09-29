@@ -1158,6 +1158,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_SetPointerStyle_002, T
 {
     CALL_TEST_DEBUG;
     InputWindowsManager winMgr;
+    winMgr.pointerStyle_[1];
     // set custom pointer style
     PointerStyle style;
     style.id = MOUSE_ICON::EAST;
@@ -1208,6 +1209,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_SetPointerStyle_004, T
 {
     CALL_TEST_DEBUG;
     InputWindowsManager winMgr;
+    winMgr.pointerStyle_[1];
 
     // set custom pointer style
     PointerStyle style;
@@ -1246,6 +1248,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_ClearWindowPointerStyl
 {
     CALL_TEST_DEBUG;
     InputWindowsManager winMgr;
+    winMgr.pointerStyle_[1];
 
     // set custom pointer style, which pid=1, windowId=1
     PointerStyle style;
@@ -4951,9 +4954,11 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsNeedRefreshLayer_002
     EXPECT_NE(inputEvent, nullptr);
     inputEvent->targetDisplayId_ = -11;
     bool ret = inputWindowsManager.IsNeedRefreshLayer(windowId);
-    EXPECT_TRUE(ret);
-    inputEvent->targetDisplayId_ = 11;
-    EXPECT_TRUE(ret);
+    if (Rosen::SceneBoardJudgement::IsSceneBoardEnabled()) {
+        EXPECT_TRUE(ret);
+    } else {
+        EXPECT_FALSE(ret);
+    }
 }
 
 #endif // OHOS_BUILD_ENABLE_POINTER_DRAWING

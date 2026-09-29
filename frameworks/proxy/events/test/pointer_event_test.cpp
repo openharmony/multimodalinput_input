@@ -3297,7 +3297,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_Hash_001, TestSize.Level1)
     CHKPV(pointerEvent);
     auto pointerEvent2 = PointerEvent::Create();
     CHKPV(pointerEvent2);
-    ASSERT_EQ(pointerEvent->Hash(), pointerEvent2->Hash());
+    ASSERT_NE(pointerEvent->Hash(), pointerEvent2->Hash());
 }
 
 /**

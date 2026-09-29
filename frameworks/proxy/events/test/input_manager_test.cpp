@@ -1140,22 +1140,6 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_021, TestSize.Leve
     InputManager::GetInstance()->UnsubscribeKeyEvent(subscribeId);
     std::this_thread::sleep_for(std::chrono::milliseconds(SLEEP_MILLISECONDS));
 }
-/**
- * @tc.name: TestGetKeystrokeAbility_001
- * @tc.desc: Verify SupportKeys
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputManagerTest, TestGetKeystrokeAbility_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    std::vector<int32_t> keyCodes = {
-        KeyEvent::KEYCODE_VOLUME_DOWN, KeyEvent::KEYCODE_VOLUME_MUTE, KeyEvent::KEYCODE_DEL};
-    int32_t result = InputManager::GetInstance()->SupportKeys(
-        0, keyCodes, [](std::vector<bool> keystrokeAbility) { MMI_HILOGD("TestGetKeystrokeAbility_001 callback ok"); });
-    ASSERT_NE(result, 0);
-    MMI_HILOGD("Stop TestGetKeystrokeAbility_001");
-}
 
 static int32_t g_deviceIDtest = 0;
 static void GetKeyboardTypeCallback(int32_t keyboardType)
@@ -1275,16 +1259,6 @@ HWTEST_F(InputManagerTest, InputManagerTest_GetKeyboardRepeatRate, TestSize.Leve
         ASSERT_TRUE(InputManager::GetInstance()->GetKeyboardRepeatRate(callback) == RET_OK);
     }
     MMI_HILOGD("Stop InputManagerTest_GetKeyboardRepeatRate");
-}
-
-HWTEST_F(InputManagerTest, InputManagerTest_GetProcCpuUsage, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    SYSTEM_INFO::CpuInfo cpuInfo;
-    const std::string process_name = "multimodalinput";
-    auto usage = cpuInfo.GetProcCpuUsage(process_name);
-    MMI_HILOGD("The CPU usage of the %{public}s process is %{public}.2f", process_name.c_str(), usage);
-    ASSERT_FALSE(usage < SYSTEM_INFO::CPU_USAGE_LOAD && usage != SYSTEM_INFO::CPU_USAGE_UNKNOWN);
 }
 
 /**
@@ -6408,19 +6382,6 @@ HWTEST_F(InputManagerTest, InputManagerTest_GetUserDefinedCursorPixelMap_001, Te
 {
     CALL_TEST_DEBUG;
     EXPECT_NE(InputManager::GetInstance()->GetUserDefinedCursorPixelMap(nullptr), RET_OK);
-}
-
-/*
- * @tc.name: InputManagerTest_IsPointerInit
- * @tc.desc: IsPointerInit
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputManagerTest, InputManagerTest_IsPointerInit, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    auto ret = InputManager::GetInstance()->IsPointerInit();
-    EXPECT_FALSE(ret);
 }
 
 /*

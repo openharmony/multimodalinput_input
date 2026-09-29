@@ -1735,6 +1735,7 @@ HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_SetMouseIcon_004, Te
     int32_t windowId = 2;
     CursorPixelMap curPixelMap;
     curPixelMap.pixelMap = (void *)pixelMap.release();
+    EXPECT_CALL(*WIN_MGR_MOCK, CheckWindowIdPermissionByPid).WillRepeatedly(testing::Return(RET_ERR));
     int32_t ret = CursorDrawingInformation::GetInstance().SetMouseIcon(pid, windowId, curPixelMap);
     ASSERT_NE(ret, RET_OK);
 }
@@ -1755,6 +1756,7 @@ HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_SetMouseIcon_005, Te
     int32_t windowId = 2;
     CursorPixelMap curPixelMap;
     curPixelMap.pixelMap = (void *)pixelMap.release();
+    EXPECT_CALL(*WIN_MGR_MOCK, CheckWindowIdPermissionByPid).WillRepeatedly(testing::Return(RET_ERR));
     int32_t ret = CursorDrawingInformation::GetInstance().SetMouseIcon(pid, windowId, curPixelMap);
     ASSERT_NE(ret, RET_OK);
 }

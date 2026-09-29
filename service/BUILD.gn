@@ -1062,12 +1062,16 @@ ohos_unittest("PointerDrawingManagerTest") {
     "${mmi_path}/service/common/include",
   ]
 
-  sources = [ "window_manager/test/pointer_drawing_manager_test.cpp" ]
+  sources = [
+    "window_manager/src/cursor_drawing_component.cpp",
+    "window_manager/test/pointer_drawing_manager_test.cpp",
+  ]
 
   deps = [
     "${mmi_path}/frameworks/proxy:libmmi-common",
     "${mmi_path}/service:libcursor_drawing_adapter",
     "${mmi_path}/service:libmmi-server",
+    "${mmi_path}/service:libmmi-server-common",
     "${mmi_path}/test/facility/mock:mmi_mock_sources",
     "${mmi_path}/util:libmmi-util",
   ]
@@ -1081,6 +1085,7 @@ ohos_unittest("PointerDrawingManagerTest") {
     "drivers_interface_display:libdisplay_composer_hdi_impl_1.2",
     "drivers_interface_display:libdisplay_composer_proxy_1.0",
     "eventhandler:libeventhandler",
+    "ffrt:libffrt",
     "googletest:gmock_main",
     "googletest:gtest_main",
     "graphic_2d:2d_graphics",
@@ -1129,12 +1134,16 @@ ohos_unittest("PointerDrawingManagerExTest") {
     "${mmi_path}/service/common/include",
   ]
 
-  sources = [ "window_manager/test/pointer_drawing_manager_ex_test.cpp" ]
+  sources = [
+    "window_manager/src/cursor_drawing_component.cpp",
+    "window_manager/test/pointer_drawing_manager_ex_test.cpp",
+  ]
 
   deps = [
     "${mmi_path}/frameworks/proxy:libmmi-common",
     "${mmi_path}/service:libcursor_drawing_adapter",
     "${mmi_path}/service:libmmi-server",
+    "${mmi_path}/service:libmmi-server-common",
     "${mmi_path}/test/facility/mock:mmi_mock_sources",
     "${mmi_path}/util:libmmi-util",
   ]
@@ -1147,6 +1156,7 @@ ohos_unittest("PointerDrawingManagerExTest") {
     "drivers_interface_display:libdisplay_composer_hdi_impl_1.2",
     "drivers_interface_display:libdisplay_composer_proxy_1.0",
     "eventhandler:libeventhandler",
+    "ffrt:libffrt",
     "googletest:gmock_main",
     "googletest:gtest_main",
     "graphic_2d:2d_graphics",
