@@ -3264,16 +3264,16 @@ public:
     static const int32_t KEYCODE_PTZ_FOCUS_RIGHT;
 
     /**
-     * PTZ_EXPOSE_LEFT
+     * PTZ_EXPOSURE_LEFT
      * @since 26.0.1
      */
-    static const int32_t KEYCODE_PTZ_EXPOSE_LEFT;
+    static const int32_t KEYCODE_PTZ_EXPOSURE_LEFT;
 
     /**
-     * PTZ_EXPOSE_RIGHT
+     * PTZ_EXPOSURE_RIGHT
      * @since 26.0.1
      */
-    static const int32_t KEYCODE_PTZ_EXPOSE_RIGHT;
+    static const int32_t KEYCODE_PTZ_EXPOSURE_RIGHT;
 
     /**
      * PTZ_SHUTTER_LEFT
