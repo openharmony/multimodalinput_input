@@ -53,6 +53,7 @@ ohos_source_set("mmi_mock_sources") {
 
   sources = [
     "src/input_windows_manager_mock.cpp",
+    "src/libinput_adapter.cpp",
     "src/preferences_manager_mock.cpp",
   ]
 
