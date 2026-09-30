@@ -16,6 +16,7 @@
 #include <gtest/gtest.h>
 
 #include "i_input_event_consumer.h"
+#include "input_interceptor_manager.h"
 #include "input_monitor_manager.h"
 #include "mmi_log.h"
 
@@ -30,6 +31,10 @@ constexpr int32_t TEN_FINGERS { 10 };
 constexpr int32_t THREE_FINGERS { 3 };
 constexpr int32_t FOUR_FINGERS { 4 };
 constexpr int32_t COMMON_PARAMETER_ERROR { -401 };
+constexpr uint32_t KEYBOARD_DEVICE_TAGS { 1 };
+constexpr uint32_t POINTER_DEVICE_TAGS { 2 };
+constexpr int32_t LOW_PRIORITY { 100 };
+constexpr int32_t HIGH_PRIORITY { 300 };
 } // namespace
 
 class InputHandlerManagerTest : public testing::Test {
@@ -1304,6 +1309,466 @@ HWTEST_F(InputHandlerManagerTest, InputHandlerManagerTest_OnInputEvent_other, Te
 
     uint32_t deviceTags = 0;
     EXPECT_NO_FATAL_FAILURE(manager.OnInputEvent(pointerEvent, deviceTags));
+}
+
+/**
+ * @tc.name: InputHandlerManagerTest_GetEventType_001
+ * @tc.desc: Test the function GetEventType
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputHandlerManagerTest, InputHandlerManagerTest_GetEventType_001, TestSize.Level1)
+{
+    MYInputHandlerManager monitorMgr;
+    EXPECT_EQ(monitorMgr.GetEventType(), HANDLE_EVENT_TYPE_NONE);
+    InputHandlerManager::Handler monitorHandler;
+    monitorHandler.eventType_ = HANDLE_EVENT_TYPE_KEY;
+    monitorMgr.monitorHandlers_.emplace(1, monitorHandler);
+    EXPECT_EQ(monitorMgr.GetEventType(), HANDLE_EVENT_TYPE_KEY);
+
+    MyInputHandlerManager interMgr;
+    EXPECT_EQ(interMgr.GetEventType(), HANDLE_EVENT_TYPE_NONE);
+    InputHandlerManager::Handler interHandler;
+    interHandler.eventType_ = HANDLE_EVENT_TYPE_POINTER;
+    interMgr.interHandlers_.push_back(interHandler);
+    EXPECT_EQ(interMgr.GetEventType(), HANDLE_EVENT_TYPE_POINTER);
+}
+
+/**
+ * @tc.name: InputHandlerManagerTest_GetPriority_001
+ * @tc.desc: Test the function GetPriority
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputHandlerManagerTest, InputHandlerManagerTest_GetPriority_001, TestSize.Level1)
+{
+    MYInputHandlerManager monitorMgr;
+    EXPECT_EQ(monitorMgr.GetPriority(), DEFUALT_INTERCEPTOR_PRIORITY);
+
+    MyInputHandlerManager interMgr;
+    EXPECT_EQ(interMgr.GetPriority(), DEFUALT_INTERCEPTOR_PRIORITY);
+    InputHandlerManager::Handler handler;
+    handler.priority_ = 100;
+    interMgr.interHandlers_.push_back(handler);
+    EXPECT_EQ(interMgr.GetPriority(), 100);
+}
+
+/**
+ * @tc.name: InputHandlerManagerTest_GetDeviceTags_001
+ * @tc.desc: Test the function GetDeviceTags
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputHandlerManagerTest, InputHandlerManagerTest_GetDeviceTags_001, TestSize.Level1)
+{
+    MYInputHandlerManager monitorMgr;
+    EXPECT_EQ(monitorMgr.GetDeviceTags(), 0u);
+    InputHandlerManager::Handler monitorHandler;
+    monitorHandler.deviceTags_ = 2;
+    monitorMgr.monitorHandlers_.emplace(1, monitorHandler);
+    EXPECT_EQ(monitorMgr.GetDeviceTags(), 2u);
+
+    MyInputHandlerManager interMgr;
+    EXPECT_EQ(interMgr.GetDeviceTags(), 0u);
+    InputHandlerManager::Handler interHandler;
+    interHandler.deviceTags_ = 4;
+    interMgr.interHandlers_.push_back(interHandler);
+    EXPECT_EQ(interMgr.GetDeviceTags(), 4u);
+}
+
+/**
+ * @tc.name: InputHandlerManagerTest_IsNeedAddToServer_001
+ * @tc.desc: Test the function IsNeedAddToServer and GetActionsType
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputHandlerManagerTest, InputHandlerManagerTest_IsNeedAddToServer_001, TestSize.Level1)
+{
+    MYInputHandlerManager manager;
+    EXPECT_TRUE(manager.GetActionsType().empty());
+    std::vector<int32_t> actionsType { 1, 2, 3 };
+    EXPECT_TRUE(manager.IsNeedAddToServer(actionsType));
+    EXPECT_FALSE(manager.IsNeedAddToServer(actionsType));
+    EXPECT_EQ(manager.GetActionsType().size(), 3u);
+}
+
+/**
+ * @tc.name: InputHandlerManagerTest_UpdateAddToServerActions_001
+ * @tc.desc: Test the function UpdateAddToServerActions
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputHandlerManagerTest, InputHandlerManagerTest_UpdateAddToServerActions_001, TestSize.Level1)
+{
+    MYInputHandlerManager manager;
+    InputHandlerManager::Handler handler1;
+    handler1.actionsType_ = { 1, 2 };
+    manager.actionsMonitorHandlers_.emplace(1, handler1);
+    InputHandlerManager::Handler handler2;
+    handler2.actionsType_ = { 2, 3 };
+    manager.actionsMonitorHandlers_.emplace(2, handler2);
+    manager.addToServerActions_ = { 5, 6 };
+    manager.UpdateAddToServerActions();
+    EXPECT_EQ(manager.addToServerActions_.size(), 3u);
+    EXPECT_EQ(manager.GetActionsType().size(), 3u);
+}
+
+/**
+ * @tc.name: InputHandlerManagerTest_RemoveLocalActions_001
+ * @tc.desc: Test the function RemoveLocalActions
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputHandlerManagerTest, InputHandlerManagerTest_RemoveLocalActions_001, TestSize.Level1)
+{
+    MYInputHandlerManager manager;
+    InputHandlerType handlerType = InputHandlerType::MONITOR;
+    EXPECT_EQ(manager.RemoveLocalActions(1, handlerType), RET_ERR);
+
+    InputHandlerManager::Handler handler;
+    handler.handlerType_ = InputHandlerType::MONITOR;
+    handler.actionsType_ = { 1 };
+    manager.actionsMonitorHandlers_.emplace(1, handler);
+    EXPECT_EQ(manager.RemoveLocalActions(1, handlerType), RET_OK);
+    EXPECT_TRUE(manager.actionsMonitorHandlers_.empty());
+
+    InputHandlerManager::Handler interHandler;
+    interHandler.handlerType_ = InputHandlerType::INTERCEPTOR;
+    manager.actionsMonitorHandlers_.emplace(2, interHandler);
+    EXPECT_EQ(manager.RemoveLocalActions(2, handlerType), RET_ERR);
+}
+
+/**
+ * @tc.name: InputHandlerManagerTest_AddHandler_Actions_001
+ * @tc.desc: Test the function AddHandler with actions and null consumer
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputHandlerManagerTest, InputHandlerManagerTest_AddHandler_Actions_001, TestSize.Level1)
+{
+    MYInputHandlerManager manager;
+    std::shared_ptr<IInputEventConsumer> consumer = nullptr;
+    std::vector<int32_t> actionsType { 1 };
+    EXPECT_EQ(manager.AddHandler(InputHandlerType::MONITOR, consumer, actionsType), INVALID_HANDLER_ID);
+}
+
+/**
+ * @tc.name: InputHandlerManagerTest_AddHandler_Actions_002
+ * @tc.desc: Test the function AddHandler with empty actions
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputHandlerManagerTest, InputHandlerManagerTest_AddHandler_Actions_002, TestSize.Level1)
+{
+    MYInputHandlerManager manager;
+    auto consumer = std::make_shared<InputEventConsumer>();
+    std::vector<int32_t> actionsType;
+    int32_t handlerId = manager.AddHandler(InputHandlerType::MONITOR, consumer, actionsType);
+    ASSERT_GE(handlerId, 0);
+    EXPECT_TRUE(manager.HasHandler(handlerId));
+    EXPECT_EQ(manager.RemoveHandler(handlerId, InputHandlerType::MONITOR), RET_OK);
+}
+
+/**
+ * @tc.name: InputHandlerManagerTest_AddHandler_InvalidEventType_001
+ * @tc.desc: Test the function AddHandler with invalid interceptor event type
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputHandlerManagerTest, InputHandlerManagerTest_AddHandler_InvalidEventType_001, TestSize.Level1)
+{
+    MyInputHandlerManager manager;
+    auto consumer = std::make_shared<InputEventConsumer>();
+    EXPECT_EQ(manager.AddHandler(InputHandlerType::INTERCEPTOR, consumer, HANDLE_EVENT_TYPE_KEY,
+        DEFUALT_INTERCEPTOR_PRIORITY, 0), INVALID_HANDLER_ID);
+}
+
+/**
+ * @tc.name: InputHandlerManagerTest_AddHandler_ExceedMaxCount_001
+ * @tc.desc: Test the function AddHandler when the handler count exceeds the maximum
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputHandlerManagerTest, InputHandlerManagerTest_AddHandler_ExceedMaxCount_001, TestSize.Level1)
+{
+    MYInputHandlerManager manager;
+    for (size_t i = 0; i < MAX_N_INPUT_HANDLERS; ++i) {
+        InputHandlerManager::Handler handler;
+        handler.handlerId_ = static_cast<int32_t>(i);
+        manager.monitorHandlers_.emplace(static_cast<int32_t>(i), handler);
+    }
+    auto consumer = std::make_shared<InputEventConsumer>();
+    EXPECT_EQ(manager.AddHandler(InputHandlerType::MONITOR, consumer, HANDLE_EVENT_TYPE_KEY),
+        ERROR_EXCEED_MAX_COUNT);
+}
+
+/**
+ * @tc.name: InputHandlerManagerTest_RemoveHandler_001
+ * @tc.desc: Test the function RemoveHandler with actions monitor handler
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputHandlerManagerTest, InputHandlerManagerTest_RemoveHandler_001, TestSize.Level1)
+{
+    MYInputHandlerManager manager;
+    EXPECT_EQ(manager.RemoveHandler(1, InputHandlerType::MONITOR), RET_ERR);
+
+    InputHandlerManager::Handler handler;
+    handler.handlerId_ = 1;
+    handler.handlerType_ = InputHandlerType::MONITOR;
+    manager.actionsMonitorHandlers_.emplace(1, handler);
+    EXPECT_EQ(manager.RemoveHandler(1, InputHandlerType::MONITOR), RET_OK);
+    EXPECT_TRUE(manager.actionsMonitorHandlers_.empty());
+}
+
+/**
+ * @tc.name: InputHandlerManagerTest_FindHandler_006
+ * @tc.desc: Test the function FindHandler for interceptor consumer
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputHandlerManagerTest, InputHandlerManagerTest_FindHandler_006, TestSize.Level1)
+{
+    MyInputHandlerManager manager;
+    auto consumer = std::make_shared<InputEventConsumer>();
+    InputHandlerManager::Handler handler;
+    handler.handlerId_ = 1;
+    handler.consumer_ = consumer;
+    manager.interHandlers_.push_back(handler);
+    EXPECT_EQ(manager.FindHandler(1), consumer);
+    EXPECT_EQ(manager.FindHandler(2), nullptr);
+}
+
+/**
+ * @tc.name: InputInterceptorManagerTest_GetHandlerType_001
+ * @tc.desc: Test GetHandlerType returns INTERCEPTOR
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputHandlerManagerTest, InputInterceptorManagerTest_GetHandlerType_001, TestSize.Level1)
+{
+    InputInterceptorManager manager;
+    EXPECT_EQ(manager.GetHandlerType(), InputHandlerType::INTERCEPTOR);
+}
+
+/**
+ * @tc.name: InputInterceptorManagerTest_AddInterceptor_NullConsumer_001
+ * @tc.desc: Test AddInterceptor with null consumer
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputHandlerManagerTest, InputInterceptorManagerTest_AddInterceptor_NullConsumer_001, TestSize.Level1)
+{
+    InputInterceptorManager manager;
+    std::shared_ptr<IInputEventConsumer> interceptor = nullptr;
+    EXPECT_EQ(manager.AddInterceptor(interceptor, HANDLE_EVENT_TYPE_KP), INVALID_HANDLER_ID);
+    EXPECT_EQ(manager.AddInterceptor(interceptor, HANDLE_EVENT_TYPE_KP, DEFUALT_INTERCEPTOR_PRIORITY, 0),
+        INVALID_HANDLER_ID);
+}
+
+/**
+ * @tc.name: InputInterceptorManagerTest_AddInterceptor_InvalidDeviceTags_001
+ * @tc.desc: Test AddInterceptor with empty device tags
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputHandlerManagerTest, InputInterceptorManagerTest_AddInterceptor_InvalidDeviceTags_001, TestSize.Level1)
+{
+    InputInterceptorManager manager;
+    auto interceptor = std::make_shared<InputEventConsumer>();
+    EXPECT_EQ(manager.AddInterceptor(interceptor, HANDLE_EVENT_TYPE_KP, DEFUALT_INTERCEPTOR_PRIORITY, 0),
+        INVALID_HANDLER_ID);
+}
+
+/**
+ * @tc.name: InputInterceptorManagerTest_AddInterceptor_001
+ * @tc.desc: Test AddInterceptor with default event type
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputHandlerManagerTest, InputInterceptorManagerTest_AddInterceptor_001, TestSize.Level1)
+{
+    InputInterceptorManager manager;
+    auto interceptor = std::make_shared<InputEventConsumer>();
+    int32_t handlerId = manager.AddInterceptor(interceptor, HANDLE_EVENT_TYPE_KP);
+    ASSERT_GE(handlerId, 0);
+    EXPECT_TRUE(manager.HasHandler(handlerId));
+    EXPECT_EQ(manager.FindHandler(handlerId), interceptor);
+    EXPECT_EQ(manager.RemoveInterceptor(handlerId), RET_OK);
+    EXPECT_FALSE(manager.HasHandler(handlerId));
+}
+
+/**
+ * @tc.name: InputInterceptorManagerTest_AddInterceptor_002
+ * @tc.desc: Test AddInterceptor with priority and device tags
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputHandlerManagerTest, InputInterceptorManagerTest_AddInterceptor_002, TestSize.Level1)
+{
+    InputInterceptorManager manager;
+    auto interceptor = std::make_shared<InputEventConsumer>();
+    int32_t handlerId = manager.AddInterceptor(interceptor, HANDLE_EVENT_TYPE_KP, LOW_PRIORITY, POINTER_DEVICE_TAGS);
+    ASSERT_GE(handlerId, 0);
+    EXPECT_TRUE(manager.HasHandler(handlerId));
+    EXPECT_EQ(manager.RemoveInterceptor(handlerId), RET_OK);
+}
+
+/**
+ * @tc.name: InputInterceptorManagerTest_RemoveInterceptor_001
+ * @tc.desc: Test RemoveInterceptor with non-existent handler id
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputHandlerManagerTest, InputInterceptorManagerTest_RemoveInterceptor_001, TestSize.Level1)
+{
+    InputInterceptorManager manager;
+    EXPECT_EQ(manager.RemoveInterceptor(1), RET_ERR);
+    EXPECT_EQ(manager.RemoveInterceptor(INVALID_HANDLER_ID), RET_ERR);
+}
+
+/**
+ * @tc.name: InputInterceptorManagerTest_AddLocal_PriorityOrder_001
+ * @tc.desc: Test AddLocal keeps interceptor handlers sorted by priority
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputHandlerManagerTest, InputInterceptorManagerTest_AddLocal_PriorityOrder_001, TestSize.Level1)
+{
+    InputInterceptorManager manager;
+    auto consumer = std::make_shared<InputEventConsumer>();
+    EXPECT_EQ(manager.AddLocal(1, InputHandlerType::INTERCEPTOR, HANDLE_EVENT_TYPE_KEY,
+        HIGH_PRIORITY, KEYBOARD_DEVICE_TAGS, consumer), RET_OK);
+    EXPECT_EQ(manager.AddLocal(2, InputHandlerType::INTERCEPTOR, HANDLE_EVENT_TYPE_KEY,
+        LOW_PRIORITY, KEYBOARD_DEVICE_TAGS, consumer), RET_OK);
+    ASSERT_EQ(manager.interHandlers_.size(), 2u);
+    EXPECT_EQ(manager.interHandlers_.front().handlerId_, 2);
+    EXPECT_EQ(manager.interHandlers_.front().priority_, LOW_PRIORITY);
+    EXPECT_EQ(manager.interHandlers_.back().handlerId_, 1);
+}
+
+/**
+ * @tc.name: InputInterceptorManagerTest_GetEventType_001
+ * @tc.desc: Test GetEventType aggregates interceptor event types
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputHandlerManagerTest, InputInterceptorManagerTest_GetEventType_001, TestSize.Level1)
+{
+    InputInterceptorManager manager;
+    EXPECT_EQ(manager.GetEventType(), HANDLE_EVENT_TYPE_NONE);
+    auto consumer = std::make_shared<InputEventConsumer>();
+    ASSERT_EQ(manager.AddLocal(1, InputHandlerType::INTERCEPTOR, HANDLE_EVENT_TYPE_KEY,
+        LOW_PRIORITY, KEYBOARD_DEVICE_TAGS, consumer), RET_OK);
+    ASSERT_EQ(manager.AddLocal(2, InputHandlerType::INTERCEPTOR, HANDLE_EVENT_TYPE_POINTER,
+        HIGH_PRIORITY, POINTER_DEVICE_TAGS, consumer), RET_OK);
+    EXPECT_EQ(manager.GetEventType(), HANDLE_EVENT_TYPE_KP);
+}
+
+/**
+ * @tc.name: InputInterceptorManagerTest_GetDeviceTags_001
+ * @tc.desc: Test GetDeviceTags aggregates interceptor device tags
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputHandlerManagerTest, InputInterceptorManagerTest_GetDeviceTags_001, TestSize.Level1)
+{
+    InputInterceptorManager manager;
+    EXPECT_EQ(manager.GetDeviceTags(), 0u);
+    auto consumer = std::make_shared<InputEventConsumer>();
+    ASSERT_EQ(manager.AddLocal(1, InputHandlerType::INTERCEPTOR, HANDLE_EVENT_TYPE_KEY,
+        LOW_PRIORITY, KEYBOARD_DEVICE_TAGS, consumer), RET_OK);
+    ASSERT_EQ(manager.AddLocal(2, InputHandlerType::INTERCEPTOR, HANDLE_EVENT_TYPE_POINTER,
+        HIGH_PRIORITY, POINTER_DEVICE_TAGS, consumer), RET_OK);
+    EXPECT_EQ(manager.GetDeviceTags(), KEYBOARD_DEVICE_TAGS | POINTER_DEVICE_TAGS);
+}
+
+/**
+ * @tc.name: InputInterceptorManagerTest_GetPriority_001
+ * @tc.desc: Test GetPriority returns the front interceptor priority
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputHandlerManagerTest, InputInterceptorManagerTest_GetPriority_001, TestSize.Level1)
+{
+    InputInterceptorManager manager;
+    EXPECT_EQ(manager.GetPriority(), DEFUALT_INTERCEPTOR_PRIORITY);
+    auto consumer = std::make_shared<InputEventConsumer>();
+    ASSERT_EQ(manager.AddLocal(1, InputHandlerType::INTERCEPTOR, HANDLE_EVENT_TYPE_KEY,
+        HIGH_PRIORITY, KEYBOARD_DEVICE_TAGS, consumer), RET_OK);
+    ASSERT_EQ(manager.AddLocal(2, InputHandlerType::INTERCEPTOR, HANDLE_EVENT_TYPE_KEY,
+        LOW_PRIORITY, KEYBOARD_DEVICE_TAGS, consumer), RET_OK);
+    EXPECT_EQ(manager.GetPriority(), LOW_PRIORITY);
+}
+
+/**
+ * @tc.name: InputInterceptorManagerTest_FindHandler_001
+ * @tc.desc: Test FindHandler returns the registered interceptor consumer
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputHandlerManagerTest, InputInterceptorManagerTest_FindHandler_001, TestSize.Level1)
+{
+    InputInterceptorManager manager;
+    auto consumer = std::make_shared<InputEventConsumer>();
+    ASSERT_EQ(manager.AddLocal(1, InputHandlerType::INTERCEPTOR, HANDLE_EVENT_TYPE_KEY,
+        LOW_PRIORITY, KEYBOARD_DEVICE_TAGS, consumer), RET_OK);
+    EXPECT_EQ(manager.FindHandler(1), consumer);
+    EXPECT_EQ(manager.FindHandler(2), nullptr);
+}
+
+/**
+ * @tc.name: InputInterceptorManagerTest_HasHandler_001
+ * @tc.desc: Test HasHandler for interceptor handlers
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputHandlerManagerTest, InputInterceptorManagerTest_HasHandler_001, TestSize.Level1)
+{
+    InputInterceptorManager manager;
+    EXPECT_FALSE(manager.HasHandler(1));
+    auto consumer = std::make_shared<InputEventConsumer>();
+    ASSERT_EQ(manager.AddLocal(1, InputHandlerType::INTERCEPTOR, HANDLE_EVENT_TYPE_KEY,
+        LOW_PRIORITY, KEYBOARD_DEVICE_TAGS, consumer), RET_OK);
+    EXPECT_TRUE(manager.HasHandler(1));
+    EXPECT_FALSE(manager.HasHandler(2));
+}
+
+/**
+ * @tc.name: InputInterceptorManagerTest_AddHandler_ExceedMaxCount_001
+ * @tc.desc: Test AddHandler when handler count exceeds the maximum
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputHandlerManagerTest, InputInterceptorManagerTest_AddHandler_ExceedMaxCount_001, TestSize.Level1)
+{
+    InputInterceptorManager manager;
+    for (size_t i = 0; i < MAX_N_INPUT_HANDLERS; ++i) {
+        InputHandlerManager::Handler handler;
+        handler.handlerId_ = static_cast<int32_t>(i);
+        manager.interHandlers_.push_back(handler);
+    }
+    auto consumer = std::make_shared<InputEventConsumer>();
+    EXPECT_EQ(manager.AddHandler(InputHandlerType::INTERCEPTOR, consumer, HANDLE_EVENT_TYPE_KEY,
+        LOW_PRIORITY, KEYBOARD_DEVICE_TAGS), ERROR_EXCEED_MAX_COUNT);
+}
+
+/**
+ * @tc.name: InputInterceptorManagerTest_RemoveLocal_001
+ * @tc.desc: Test RemoveLocal for interceptor handlers
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputHandlerManagerTest, InputInterceptorManagerTest_RemoveLocal_001, TestSize.Level1)
+{
+    InputInterceptorManager manager;
+    auto consumer = std::make_shared<InputEventConsumer>();
+    ASSERT_EQ(manager.AddLocal(1, InputHandlerType::INTERCEPTOR, HANDLE_EVENT_TYPE_KEY,
+        LOW_PRIORITY, POINTER_DEVICE_TAGS, consumer), RET_OK);
+    uint32_t deviceTags = 0;
+    EXPECT_EQ(manager.RemoveLocal(1, InputHandlerType::INTERCEPTOR, deviceTags), RET_OK);
+    EXPECT_EQ(deviceTags, POINTER_DEVICE_TAGS);
+    EXPECT_TRUE(manager.interHandlers_.empty());
 }
 } // namespace MMI
 } // namespace OHOS
