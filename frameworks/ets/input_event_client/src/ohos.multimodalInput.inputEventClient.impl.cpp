@@ -190,6 +190,18 @@ static std::unordered_map<int32_t, int32_t> THMouseButton2Native = {
     { JS_MOUSE_BUTTON_TASK, PointerEvent::MOUSE_BUTTON_TASK }
 };
 
+bool CheckInjectionEventDisplayId(const taihe::optional<int32_t> &displayId,
+    std::function<void(int32_t)> histogramError)
+{
+    if (displayId.has_value() && displayId.value() < 0) {
+        MMI_HILOGE("displayId is invalid, displayId:%{public}d", displayId.value());
+        set_business_error(INPUT_PARAMETER_ERROR, "displayId must be a non-negative integer");
+        histogramError(INPUT_PARAMETER_ERROR);
+        return false;
+    }
+    return true;
+}
+
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
 void GetInjectionEventDataNative(Input_KeyEvent* keyEventNative,
     ::ohos::multimodalInput::inputEventClient::KeyEvent const& thKeyEvent,
@@ -211,7 +223,10 @@ void GetInjectionEventDataNative(Input_KeyEvent* keyEventNative,
     OH_Input_SetKeyEventAction(keyEventNative, keyAction);
     OH_Input_SetKeyEventKeyCode(keyEventNative, thKeyEvent.keyCode);
     OH_Input_SetKeyEventActionTime(keyEventNative, static_cast<int64_t>(thKeyEvent.keyDownDuration));
-    if (thKeyEvent.displayId.has_value() && thKeyEvent.displayId.value() >= 0) {
+    if (!CheckInjectionEventDisplayId(thKeyEvent.displayId, histogramError)) {
+        return;
+    }
+    if (thKeyEvent.displayId.has_value()) {
         OH_Input_SetKeyEventDisplayId(keyEventNative, thKeyEvent.displayId.value());
     }
     Input_Result result = static_cast<Input_Result>(OH_Input_InjectKeyEvent(keyEventNative));
@@ -245,7 +260,10 @@ void GetInjectionEventData(std::shared_ptr<OHOS::MMI::KeyEvent> keyEventNative,
     keyEventNative->SetKeyCode(thKeyEvent.keyCode);
     auto keyAction = thKeyEvent.isPressed ? OHOS::MMI::KeyEvent::KEY_ACTION_DOWN : OHOS::MMI::KeyEvent::KEY_ACTION_UP;
     keyEventNative->SetKeyAction(keyAction);
-    if (thKeyEvent.displayId.has_value() && thKeyEvent.displayId.value() >= 0) {
+    if (!CheckInjectionEventDisplayId(thKeyEvent.displayId, histogramError)) {
+        return;
+    }
+    if (thKeyEvent.displayId.has_value()) {
         keyEventNative->SetTargetDisplayId(thKeyEvent.displayId.value());
     }
     OHOS::MMI::KeyEvent::KeyItem item;
