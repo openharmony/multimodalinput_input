@@ -703,5 +703,133 @@ HWTEST_F(InputActiveSubscriberHandlerTest, InputActiveSubscriberHandlerTest_Clea
     EXPECT_EQ(subscriber->pointerEvent_, nullptr);
     EXPECT_EQ(subscriber->sendEventLastTime_, 888);
 }
+
+class TestNextEventHandler final : public IInputEventHandler {
+public:
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
+    void HandleKeyEvent(const std::shared_ptr<KeyEvent> keyEvent) override
+    {
+        ++keyEventCount_;
+        lastKeyEvent_ = keyEvent;
+    }
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
+#ifdef OHOS_BUILD_ENABLE_POINTER
+    void HandlePointerEvent(const std::shared_ptr<PointerEvent> pointerEvent) override {}
+#endif // OHOS_BUILD_ENABLE_POINTER
+#ifdef OHOS_BUILD_ENABLE_TOUCH
+    void HandleTouchEvent(const std::shared_ptr<PointerEvent> pointerEvent) override {}
+#endif // OHOS_BUILD_ENABLE_TOUCH
+    int32_t keyEventCount_ { 0 };
+    std::shared_ptr<KeyEvent> lastKeyEvent_ { nullptr };
+};
+
+/**
+ * @tc.name: InputActiveSubscriberHandlerTest_HandleKeyEvent_ExtendedFunctionKey_001
+ * @tc.desc: Extended function key notifies active subscriber, does not forward to next handler
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputActiveSubscriberHandlerTest, InputActiveSubscriberHandlerTest_HandleKeyEvent_ExtendedFunctionKey_001,
+    TestSize.Level1)
+{
+    InputActiveSubscriberHandler handler;
+    auto nextHandler = std::make_shared<TestNextEventHandler>();
+    handler.nextHandler_ = nextHandler;
+    auto session = std::make_shared<UDSSession>("test_program", 1, 123, 1000, 2000);
+    std::shared_ptr<InputActiveSubscriberHandler::Subscriber> subscriber =
+        std::make_shared<InputActiveSubscriberHandler::Subscriber>(1, session, 0);
+    handler.InsertSubscriber(subscriber);
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_WRIST_TURN);
+    ASSERT_TRUE(keyEvent->IsExtendedFunctionKey());
+    handler.HandleKeyEvent(keyEvent);
+    EXPECT_EQ(nextHandler->keyEventCount_, 0);
+    EXPECT_GT(subscriber->sendEventLastTime_, 0);
+    EXPECT_EQ(subscriber->lastEventType_, InputActiveSubscriberHandler::EVENTTYPE_INVALID);
+}
+
+/**
+ * @tc.name: InputActiveSubscriberHandlerTest_HandleKeyEvent_ExtendedFunctionKey_002
+ * @tc.desc: Extended function key without subscriber does not forward to next handler
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputActiveSubscriberHandlerTest, InputActiveSubscriberHandlerTest_HandleKeyEvent_ExtendedFunctionKey_002,
+    TestSize.Level1)
+{
+    InputActiveSubscriberHandler handler;
+    auto nextHandler = std::make_shared<TestNextEventHandler>();
+    handler.nextHandler_ = nextHandler;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_EXT_FN_MIN);
+    ASSERT_TRUE(keyEvent->IsExtendedFunctionKey());
+    handler.HandleKeyEvent(keyEvent);
+    EXPECT_EQ(nextHandler->keyEventCount_, 0);
+}
+
+/**
+ * @tc.name: InputActiveSubscriberHandlerTest_HandleKeyEvent_NormalKey_001
+ * @tc.desc: Normal key notifies active subscriber and forwards to next handler
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputActiveSubscriberHandlerTest, InputActiveSubscriberHandlerTest_HandleKeyEvent_NormalKey_001,
+    TestSize.Level1)
+{
+    InputActiveSubscriberHandler handler;
+    auto nextHandler = std::make_shared<TestNextEventHandler>();
+    handler.nextHandler_ = nextHandler;
+    auto session = std::make_shared<UDSSession>("test_program", 1, 123, 1000, 2000);
+    std::shared_ptr<InputActiveSubscriberHandler::Subscriber> subscriber =
+        std::make_shared<InputActiveSubscriberHandler::Subscriber>(1, session, 0);
+    handler.InsertSubscriber(subscriber);
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_A);
+    ASSERT_FALSE(keyEvent->IsExtendedFunctionKey());
+    handler.HandleKeyEvent(keyEvent);
+    EXPECT_EQ(nextHandler->keyEventCount_, 1);
+    EXPECT_EQ(nextHandler->lastKeyEvent_, keyEvent);
+    EXPECT_GT(subscriber->sendEventLastTime_, 0);
+}
+
+/**
+ * @tc.name: InputActiveSubscriberHandlerTest_HandleKeyEvent_NullEvent_001
+ * @tc.desc: HandleKeyEvent with null key event
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputActiveSubscriberHandlerTest, InputActiveSubscriberHandlerTest_HandleKeyEvent_NullEvent_001,
+    TestSize.Level1)
+{
+    InputActiveSubscriberHandler handler;
+    auto nextHandler = std::make_shared<TestNextEventHandler>();
+    handler.nextHandler_ = nextHandler;
+    handler.HandleKeyEvent(nullptr);
+    EXPECT_EQ(nextHandler->keyEventCount_, 0);
+}
+
+/**
+ * @tc.name: InputActiveSubscriberHandlerTest_HandleKeyEvent_NullNextHandler_001
+ * @tc.desc: HandleKeyEvent with null next handler returns before active notify
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputActiveSubscriberHandlerTest, InputActiveSubscriberHandlerTest_HandleKeyEvent_NullNextHandler_001,
+    TestSize.Level1)
+{
+    InputActiveSubscriberHandler handler;
+    auto session = std::make_shared<UDSSession>("test_program", 1, 123, 1000, 2000);
+    std::shared_ptr<InputActiveSubscriberHandler::Subscriber> subscriber =
+        std::make_shared<InputActiveSubscriberHandler::Subscriber>(1, session, 0);
+    handler.InsertSubscriber(subscriber);
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_WRIST_TURN);
+    handler.HandleKeyEvent(keyEvent);
+    EXPECT_EQ(subscriber->sendEventLastTime_, 0);
+}
 } // namespace MMI
 } // namespace OHOS

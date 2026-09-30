@@ -622,15 +622,6 @@ void EventNormalizeHandler::UpdateKeyEventHandlerChain(const std::shared_ptr<Key
         return;
     }
 
-    if (keyEvent->IsExtendedFunctionKey()) {
-        MMI_HILOGI("Extended function key, skip all handlers and process only in KeyCommandHandler");
-        auto keyCommandHandler = InputHandler->GetKeyCommandHandler();
-        if (keyCommandHandler != nullptr) {
-            keyCommandHandler->HandleKeyEvent(keyEvent);
-        }
-        return;
-    }
-
     CHKPV(nextHandler_);
     nextHandler_->HandleKeyEvent(keyEvent);
 }
