@@ -297,6 +297,7 @@ ohos_unittest("InputHandlerManagerTest") {
   sources = [
     "event_handler/src/anr_handler.cpp",
     "event_handler/src/input_handler_manager.cpp",
+    "event_handler/src/input_interceptor_manager.cpp",
     "event_handler/test/input_handler_manager_test.cpp",
     "event_handler/test/scene_board_judgement_test.cpp",
   ]
