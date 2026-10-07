@@ -90,6 +90,30 @@ static std::unordered_map<int32_t, int32_t> JSMouseButton2Native = {
 };
 } // namespace
 
+static int32_t GetInjectionEventDisplayId(napi_env env, napi_value keyHandle,
+    std::function<void(int32_t)> histogramError)
+{
+    int32_t displayId = -1;
+    napi_value displayIdValue = nullptr;
+    napi_valuetype displayIdType = napi_undefined;
+    if (napi_get_named_property(env, keyHandle, "displayId", &displayIdValue) == napi_ok &&
+        displayIdValue != nullptr && napi_typeof(env, displayIdValue, &displayIdType) == napi_ok &&
+        displayIdType != napi_undefined) {
+        double displayIdDouble = 0.0;
+        if (displayIdType != napi_number ||
+            napi_get_value_double(env, displayIdValue, &displayIdDouble) != napi_ok ||
+            displayIdDouble != static_cast<int32_t>(displayIdDouble) || displayIdDouble < 0) {
+            MMI_HILOGE("displayId is invalid");
+            THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "displayId must be a non-negative integer");
+            histogramError(COMMON_PARAMETER_ERROR);
+        } else {
+            displayId = static_cast<int32_t>(displayIdDouble);
+            MMI_HILOGD("displayId:%{public}d", displayId);
+        }
+    }
+    return displayId;
+}
+
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
 static void GetInjectionEventDataNative(napi_env env, struct Input_KeyEvent* keyEventNative, napi_value keyHandle,
     std::function<void(int32_t)> histogramError)
@@ -116,10 +140,7 @@ static void GetInjectionEventDataNative(napi_env env, struct Input_KeyEvent* key
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "keyCode must be greater than or equal to 0");
         histogramError(COMMON_PARAMETER_ERROR);
     }
-    int32_t displayId = -1;
-    if (GetNamedPropertyInt32(env, keyHandle, "displayId", displayId, false) == RET_OK) {
-        MMI_HILOGD("displayId:%{public}d", displayId);
-    }
+    int32_t displayId = GetInjectionEventDisplayId(env, keyHandle, histogramError);
     CHKPV(keyEventNative);
     auto keyAction = isPressed ? Input_KeyEventAction::KEY_ACTION_DOWN : Input_KeyEventAction::KEY_ACTION_UP;
     OH_Input_SetKeyEventAction(keyEventNative, keyAction);
@@ -169,10 +190,7 @@ static void GetInjectionEventData(napi_env env, std::shared_ptr<KeyEvent> keyEve
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "keyCode must be greater than or equal to 0");
         histogramError(COMMON_PARAMETER_ERROR);
     }
-    int32_t displayId = -1;
-    if (GetNamedPropertyInt32(env, keyHandle, "displayId", displayId, false) == RET_OK) {
-        MMI_HILOGD("displayId:%{public}d", displayId);
-    }
+    int32_t displayId = GetInjectionEventDisplayId(env, keyHandle, histogramError);
     keyEvent->SetKeyCode(keyCode);
     auto keyAction = isPressed ? KeyEvent::KEY_ACTION_DOWN : KeyEvent::KEY_ACTION_UP;
     keyEvent->SetKeyAction(keyAction);
